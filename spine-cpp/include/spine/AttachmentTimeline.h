@@ -33,8 +33,6 @@
 #include <spine/Timeline.h>
 #include <spine/SpineObject.h>
 #include <spine/Array.h>
-#include <spine/MixBlend.h>
-#include <spine/MixDirection.h>
 #include <spine/SpineString.h>
 #include <spine/SlotTimeline.h>
 
@@ -60,8 +58,8 @@ namespace spine {
 
 		virtual ~AttachmentTimeline();
 
-		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
-						   MixDirection direction, bool appliedPose) override;
+		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+						   bool appliedPose) override;
 
 		/// Sets the time and attachment name for the specified frame.
 		/// @param frame Between 0 and frameCount, inclusive.

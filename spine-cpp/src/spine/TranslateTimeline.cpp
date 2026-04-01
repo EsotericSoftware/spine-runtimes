@@ -46,18 +46,12 @@ TranslateTimeline::TranslateTimeline(size_t frameCount, size_t bezierCount, int 
 	: BoneTimeline2(frameCount, bezierCount, boneIndex, Property_X, Property_Y) {
 }
 
-void TranslateTimeline::_apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, MixBlend blend, MixDirection direction) {
+void TranslateTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
+	SP_UNUSED(out);
 	if (time < _frames[0]) {
-		switch (blend) {
-			case MixBlend_Setup:
-				pose._x = setup._x;
-				pose._y = setup._y;
-				return;
-			case MixBlend_First:
-				pose._x += (setup._x - pose._x) * alpha;
-				pose._y += (setup._y - pose._y) * alpha;
-			default: {
-			}
+		if (fromSetup) {
+			pose._x = setup._x;
+			pose._y = setup._y;
 		}
 		return;
 	}
@@ -86,19 +80,15 @@ void TranslateTimeline::_apply(BoneLocal &pose, BoneLocal &setup, float time, fl
 		}
 	}
 
-	switch (blend) {
-		case MixBlend_Setup:
-			pose._x = setup._x + x * alpha;
-			pose._y = setup._y + y * alpha;
-			break;
-		case MixBlend_First:
-		case MixBlend_Replace:
-			pose._x += (setup._x + x - pose._x) * alpha;
-			pose._y += (setup._y + y - pose._y) * alpha;
-			break;
-		case MixBlend_Add:
-			pose._x += x * alpha;
-			pose._y += y * alpha;
+	if (fromSetup) {
+		pose._x = setup._x + x * alpha;
+		pose._y = setup._y + y * alpha;
+	} else if (add) {
+		pose._x += x * alpha;
+		pose._y += y * alpha;
+	} else {
+		pose._x += (setup._x + x - pose._x) * alpha;
+		pose._y += (setup._y + y - pose._y) * alpha;
 	}
 }
 
@@ -108,8 +98,9 @@ TranslateXTimeline::TranslateXTimeline(size_t frameCount, size_t bezierCount, in
 	: BoneTimeline1(frameCount, bezierCount, boneIndex, Property_X) {
 }
 
-void TranslateXTimeline::_apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, MixBlend blend, MixDirection direction) {
-	pose._x = getRelativeValue(time, alpha, blend, pose._x, setup._x);
+void TranslateXTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
+	SP_UNUSED(out);
+	pose._x = getRelativeValue(time, alpha, fromSetup, add, pose._x, setup._x);
 }
 
 RTTI_IMPL(TranslateYTimeline, BoneTimeline1)
@@ -118,6 +109,7 @@ TranslateYTimeline::TranslateYTimeline(size_t frameCount, size_t bezierCount, in
 	: BoneTimeline1(frameCount, bezierCount, boneIndex, Property_Y) {
 }
 
-void TranslateYTimeline::_apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, MixBlend blend, MixDirection direction) {
-	pose._y = getRelativeValue(time, alpha, blend, pose._y, setup._y);
+void TranslateYTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
+	SP_UNUSED(out);
+	pose._y = getRelativeValue(time, alpha, fromSetup, add, pose._y, setup._y);
 }

@@ -39,6 +39,7 @@ import 'bone.dart';
 import 'bounding_box_attachment.dart';
 import 'clipping_attachment.dart';
 import 'color.dart';
+import 'draw_order.dart';
 import 'mesh_attachment.dart';
 import 'path_attachment.dart';
 import 'physics.dart';
@@ -49,7 +50,12 @@ import 'skeleton_data.dart';
 import 'skin.dart';
 import 'slot.dart';
 
-/// Skeleton wrapper
+/// Stores bones and slots to be posed by animations and application code.
+/// Multiple skeleton instances can share the same SkeletonData, including
+/// animations, attachments, and skins.
+///
+/// After posing, call updateWorldTransform(Physics) to apply constraints and
+/// compute world transforms for rendering.
 class Skeleton {
   final Pointer<spine_skeleton_wrapper> _ptr;
 
@@ -67,8 +73,9 @@ class Skeleton {
     SpineBindings.bindings.spine_skeleton_dispose(_ptr);
   }
 
-  /// Caches information about bones and constraints. Must be called if bones,
-  /// constraints or weighted path attachments are added or removed.
+  /// Caches information about bones and constraints. Must be called if the
+  /// active skin is modified or if bones, constraints, or weighted path
+  /// attachments are added or removed.
   void updateCache() {
     SpineBindings.bindings.spine_skeleton_update_cache(_ptr);
   }
@@ -138,6 +145,7 @@ class Skeleton {
     return result.address == 0 ? null : Bone.fromPointer(result);
   }
 
+  /// The skeleton's slots. To add a slot, also add it to DrawOrder::getPose().
   ArraySlot get slots {
     final result = SpineBindings.bindings.spine_skeleton_get_slots(_ptr);
     return ArraySlot.fromPointer(result);
@@ -149,9 +157,11 @@ class Skeleton {
     return result.address == 0 ? null : Slot.fromPointer(result);
   }
 
-  ArraySlot get drawOrder {
+  /// The skeleton's draw order. Use DrawOrder::getAppliedPose() for rendering
+  /// and DrawOrder::getPose() for changing the draw order.
+  DrawOrder get drawOrder {
     final result = SpineBindings.bindings.spine_skeleton_get_draw_order(_ptr);
-    return ArraySlot.fromPointer(result);
+    return DrawOrder.fromPointer(result);
   }
 
   Skin? get skin {
@@ -159,10 +169,14 @@ class Skeleton {
     return result.address == 0 ? null : Skin.fromPointer(result);
   }
 
-  /// [attachmentName] May be empty.
-  void setAttachment(String slotName, String attachmentName) {
+  /// A convenience method to set an attachment by finding the slot with
+  /// findSlot(String), finding the attachment with getAttachment(int, String),
+  /// then setting the slot's SlotPose::getAttachment().
+  ///
+  /// [placeholderName] May be empty.
+  void setAttachment(String slotName, String placeholderName) {
     SpineBindings.bindings.spine_skeleton_set_attachment(
-        _ptr, slotName.toNativeUtf8().cast<Char>(), attachmentName.toNativeUtf8().cast<Char>());
+        _ptr, slotName.toNativeUtf8().cast<Char>(), placeholderName.toNativeUtf8().cast<Char>());
   }
 
   ArrayConstraint get constraints {
@@ -170,6 +184,7 @@ class Skeleton {
     return ArrayConstraint.fromPointer(result);
   }
 
+  /// The skeleton's physics constraints.
   ArrayPhysicsConstraint get physicsConstraints {
     final result = SpineBindings.bindings.spine_skeleton_get_physics_constraints(_ptr);
     return ArrayPhysicsConstraint.fromPointer(result);
@@ -224,6 +239,8 @@ class Skeleton {
     SpineBindings.bindings.spine_skeleton_set_position(_ptr, x, y);
   }
 
+  /// The x component of a vector that defines the direction
+  /// PhysicsConstraintPose::getWind() is applied.
   double get windX {
     final result = SpineBindings.bindings.spine_skeleton_get_wind_x(_ptr);
     return result;
@@ -233,6 +250,8 @@ class Skeleton {
     SpineBindings.bindings.spine_skeleton_set_wind_x(_ptr, value);
   }
 
+  /// The y component of a vector that defines the direction
+  /// PhysicsConstraintPose::getWind() is applied.
   double get windY {
     final result = SpineBindings.bindings.spine_skeleton_get_wind_y(_ptr);
     return result;
@@ -242,6 +261,8 @@ class Skeleton {
     SpineBindings.bindings.spine_skeleton_set_wind_y(_ptr, value);
   }
 
+  /// The x component of a vector that defines the direction
+  /// PhysicsConstraintPose::getGravity() is applied.
   double get gravityX {
     final result = SpineBindings.bindings.spine_skeleton_get_gravity_x(_ptr);
     return result;
@@ -251,6 +272,8 @@ class Skeleton {
     SpineBindings.bindings.spine_skeleton_set_gravity_x(_ptr, value);
   }
 
+  /// The y component of a vector that defines the direction
+  /// PhysicsConstraintPose::getGravity() is applied.
   double get gravityY {
     final result = SpineBindings.bindings.spine_skeleton_get_gravity_y(_ptr);
     return result;
@@ -270,6 +293,10 @@ class Skeleton {
     SpineBindings.bindings.spine_skeleton_physics_rotate(_ptr, x, y, degrees);
   }
 
+  /// Returns the skeleton's time, used for time-based manipulations, such as
+  /// PhysicsConstraint.
+  ///
+  /// See update().
   double get time {
     final result = SpineBindings.bindings.spine_skeleton_get_time(_ptr);
     return result;
@@ -288,24 +315,34 @@ class Skeleton {
     SpineBindings.bindings.spine_skeleton_set_skin_1(_ptr, skinName.toNativeUtf8().cast<Char>());
   }
 
+  /// Sets the skin used to look up attachments before looking in
+  /// SkeletonData::getDefaultSkin(). If the skin is changed, updateCache() is
+  /// called.
+  ///
   /// Attachments from the new skin are attached if the corresponding attachment
   /// from the old skin was attached. If there was no old skin, each slot's
-  /// setup mode attachment is attached from the new skin. After changing the
-  /// skin, the visible attachments can be reset to those attached in the setup
-  /// pose by calling See Skeleton::setSlotsToSetupPose() Also, often
-  /// AnimationState::apply(Skeleton & ) is called before the next time the
-  /// skeleton is rendered to allow any attachment keys in the current
-  /// animation(s) to hide or show attachments from the new skin.
+  /// setup pose placeholder attachment is attached from the new skin.
+  ///
+  /// After changing the skin, the visible attachments can be reset to those
+  /// attached in the setup pose by calling setupPoseSlots(). Also,
+  /// AnimationState::apply(Skeleton & ) is often called before the next time
+  /// the skeleton is rendered so attachment keys in the current animation(s)
+  /// can hide or show attachments from the new skin.
   ///
   /// [newSkin] May be NULL.
   void setSkin2(Skin? newSkin) {
     SpineBindings.bindings.spine_skeleton_set_skin_2(_ptr, newSkin?.nativePtr.cast() ?? Pointer.fromAddress(0));
   }
 
+  /// Finds an attachment by looking in getSkin() and
+  /// SkeletonData::getDefaultSkin() using the slot name and skin placeholder
+  /// name. First the skin is checked and if the attachment was not found, the
+  /// default skin is checked.
+  ///
   /// Returns May be NULL.
-  Attachment? getAttachment(String slotName, String attachmentName) {
+  Attachment? getAttachment(String slotName, String placeholderName) {
     final result = SpineBindings.bindings.spine_skeleton_get_attachment_1(
-        _ptr, slotName.toNativeUtf8().cast<Char>(), attachmentName.toNativeUtf8().cast<Char>());
+        _ptr, slotName.toNativeUtf8().cast<Char>(), placeholderName.toNativeUtf8().cast<Char>());
     if (result.address == 0) return null;
     final rtti = SpineBindings.bindings.spine_attachment_get_rtti(result);
     final className = SpineBindings.bindings.spine_rtti_get_class_name(rtti).cast<Utf8>().toDartString();
@@ -333,10 +370,15 @@ class Skeleton {
     }
   }
 
+  /// Finds an attachment by looking in getSkin() and
+  /// SkeletonData::getDefaultSkin() using the slot index and skin placeholder
+  /// name. First the skin is checked and if the attachment was not found, the
+  /// default skin is checked.
+  ///
   /// Returns May be NULL.
-  Attachment? getAttachment2(int slotIndex, String attachmentName) {
+  Attachment? getAttachment2(int slotIndex, String placeholderName) {
     final result = SpineBindings.bindings
-        .spine_skeleton_get_attachment_2(_ptr, slotIndex, attachmentName.toNativeUtf8().cast<Char>());
+        .spine_skeleton_get_attachment_2(_ptr, slotIndex, placeholderName.toNativeUtf8().cast<Char>());
     if (result.address == 0) return null;
     final rtti = SpineBindings.bindings.spine_attachment_get_rtti(result);
     final className = SpineBindings.bindings.spine_rtti_get_class_name(rtti).cast<Utf8>().toDartString();

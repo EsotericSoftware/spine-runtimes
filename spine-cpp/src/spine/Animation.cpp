@@ -41,9 +41,7 @@
 
 using namespace spine;
 
-Animation::Animation(const String &name, Array<Timeline *> &timelines, float duration)
-	: _timelines(), _timelineIds(), _bones(), _duration(duration), _name(name) {
-	setTimelines(timelines);
+Animation::Animation(const String &name) : _timelines(), _timelineIds(), _bones(), _duration(0), _name(name) {
 }
 
 bool Animation::hasTimeline(Array<PropertyId> &ids) {
@@ -57,8 +55,8 @@ Animation::~Animation() {
 	ArrayUtils::deleteElements(_timelines);
 }
 
-void Animation::apply(Skeleton &skeleton, float lastTime, float time, bool loop, Array<Event *> *events, float alpha, MixBlend blend,
-					  MixDirection direction, bool appliedPose) {
+void Animation::apply(Skeleton &skeleton, float lastTime, float time, bool loop, Array<Event *> *events, float alpha, bool fromSetup, bool add,
+					  bool out, bool appliedPose) {
 	if (loop && _duration != 0) {
 		time = MathUtil::fmod(time, _duration);
 		if (lastTime > 0) {
@@ -67,7 +65,7 @@ void Animation::apply(Skeleton &skeleton, float lastTime, float time, bool loop,
 	}
 
 	for (size_t i = 0, n = _timelines.size(); i < n; ++i) {
-		_timelines[i]->apply(skeleton, lastTime, time, events, alpha, blend, direction, appliedPose);
+		_timelines[i]->apply(skeleton, lastTime, time, events, alpha, fromSetup, add, out, appliedPose);
 	}
 }
 
@@ -106,31 +104,17 @@ int Animation::search(Array<float> &frames, float target, int step) {
 	return (int) (n - step);
 }
 
-void Animation::setTimelines(Array<Timeline *> &timelines) {
+void Animation::setTimelines(Array<Timeline *> &timelines, Array<int> &bones) {
 	_timelines = timelines;
+	_bones = bones;
 
 	size_t n = timelines.size();
 	_timelineIds.clear();
-	_bones.clear();
-
-	HashMap<int, bool> boneSet;
 	for (size_t i = 0; i < n; i++) {
 		Timeline *timeline = timelines[i];
 		Array<PropertyId> &propertyIds = timeline->getPropertyIds();
 		for (size_t ii = 0; ii < propertyIds.size(); ii++) {
 			_timelineIds.put(propertyIds[ii], true);
-		}
-
-		int boneIndex = -1;
-		if (timeline->getRTTI().instanceOf(BoneTimeline1::rtti)) {
-			boneIndex = static_cast<BoneTimeline1 *>(timeline)->getBoneIndex();
-		} else if (timeline->getRTTI().instanceOf(BoneTimeline2::rtti)) {
-			boneIndex = static_cast<BoneTimeline2 *>(timeline)->getBoneIndex();
-		}
-
-		if (boneIndex >= 0 && !boneSet.containsKey(boneIndex)) {
-			boneSet.put(boneIndex, true);
-			_bones.add(boneIndex);
 		}
 	}
 }

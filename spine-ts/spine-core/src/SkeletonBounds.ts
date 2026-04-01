@@ -76,7 +76,7 @@ export class SkeletonBounds {
 		for (let i = 0; i < slotCount; i++) {
 			const slot = slots[i];
 			if (!slot.bone.active) continue;
-			const attachment = slot.applied.attachment;
+			const attachment = slot.appliedPose.attachment;
 			if (attachment instanceof BoundingBoxAttachment) {
 				boundingBoxes.push(attachment);
 
@@ -151,7 +151,7 @@ export class SkeletonBounds {
 	}
 
 	/** Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
-	 * efficient to only call this method if {@link #aabbContainsPoint(float, float)} returns true. */
+	 * efficient to only call this method if {@link aabbContainsPoint} returns true. */
 	containsPoint (x: number, y: number): BoundingBoxAttachment | null {
 		const polygons = this.polygons;
 		for (let i = 0, n = polygons.length; i < n; i++)
@@ -179,7 +179,7 @@ export class SkeletonBounds {
 	}
 
 	/** Returns the first bounding box attachment that contains any part of the line segment, or null. When doing many checks, it
-	 * is usually more efficient to only call this method if {@link #aabbIntersectsSegment()} returns
+	 * is usually more efficient to only call this method if {@link aabbIntersectsSegment} returns
 	 * true. */
 	intersectsSegment (x1: number, y1: number, x2: number, y2: number) {
 		const polygons = this.polygons;

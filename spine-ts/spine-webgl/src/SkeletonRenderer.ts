@@ -69,7 +69,7 @@ export class SkeletonRenderer {
 		const renderable: Renderable = this.renderable;
 		let uvs: NumberArrayLike;
 		let triangles: Array<number>;
-		const drawOrder = skeleton.drawOrder;
+		const drawOrder = skeleton.drawOrder.appliedPose;
 		let attachmentColor: Color;
 		const skeletonColor = skeleton.color;
 		const vertexSize = twoColorTint ? 12 : 8;
@@ -95,7 +95,7 @@ export class SkeletonRenderer {
 				inRange = false;
 			}
 
-			const pose = slot.applied;
+			const pose = slot.appliedPose;
 			const attachment = pose.attachment;
 			let texture: GLTexture;
 			if (attachment instanceof RegionAttachment) {

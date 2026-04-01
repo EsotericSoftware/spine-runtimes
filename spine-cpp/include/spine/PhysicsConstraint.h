@@ -41,7 +41,7 @@ namespace spine {
 	class BonePose;
 	class PhysicsConstraintPose;
 
-	/// Stores the current pose for a physics constraint. A physics constraint applies physics to bones.
+	/// Applies physics to a bone.
 	///
 	/// See https://esotericsoftware.com/spine-physics-constraints Physics constraints in the Spine User Guide.
 	// Non-exported base class that inherits from the template
@@ -74,12 +74,14 @@ namespace spine {
 		bool isSourceActive() override;
 		PhysicsConstraint &copy(Skeleton &skeleton);
 
+		/// Resets all physics state that was the result of previous movement. Use this after moving a bone to prevent physics
+		/// from reacting to the movement.
 		void reset(Skeleton &skeleton);
 
-		/// Translates the physics constraint so next update() forces are applied as if the bone moved an additional amount in world space.
+		/// Translates the physics constraint so the next update() forces are applied as if the bone moved an additional amount in world space.
 		void translate(float x, float y);
 
-		/// Rotates the physics constraint so next update() forces are applied as if the bone rotated around the specified point in world space.
+		/// Rotates the physics constraint so the next update() forces are applied as if the bone rotated around the specified point in world space.
 		void rotate(float x, float y, float degrees);
 
 		/// The bone constrained by this physics constraint.

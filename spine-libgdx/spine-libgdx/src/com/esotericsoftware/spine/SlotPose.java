@@ -38,9 +38,7 @@ import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.Sequence;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
 
-/** Stores a slot's pose. Slots organize attachments for {@link Skeleton#drawOrder} purposes and provide a place to store state
- * for an attachment. State cannot be stored in an attachment itself because attachments are stateless and may be shared across
- * multiple skeletons. */
+/** Stores a slot's pose. */
 public class SlotPose implements Pose<SlotPose> {
 	final Color color = new Color(1, 1, 1, 1);
 	@Null Color darkColor;
@@ -61,8 +59,8 @@ public class SlotPose implements Pose<SlotPose> {
 		deform.addAll(pose.deform);
 	}
 
-	/** The color used to tint the slot's attachment. If {@link #getDarkColor()} is set, this is used as the light color for two
-	 * color tinting. */
+	/** The color used to tint the slot's attachment. If {@link #darkColor} is set, this is used as the light color for two color
+	 * tinting. */
 	public Color getColor () {
 		return color;
 	}

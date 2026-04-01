@@ -17,10 +17,9 @@ spine_rtti spine_sequence_timeline_get_rtti(spine_sequence_timeline self) {
 }
 
 void spine_sequence_timeline_apply(spine_sequence_timeline self, spine_skeleton skeleton, float lastTime, float time,
-								   /*@null*/ spine_array_event events, float alpha, spine_mix_blend blend, spine_mix_direction direction,
-								   bool appliedPose) {
+								   /*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
 	SequenceTimeline *_self = (SequenceTimeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixBlend) blend, (MixDirection) direction, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
 }
 
 void spine_sequence_timeline_set_frame(spine_sequence_timeline self, int frame, float time, spine_sequence_mode mode, int index, float delay) {
@@ -41,6 +40,16 @@ int spine_sequence_timeline_get_slot_index(spine_sequence_timeline self) {
 void spine_sequence_timeline_set_slot_index(spine_sequence_timeline self, int inValue) {
 	SequenceTimeline *_self = (SequenceTimeline *) self;
 	_self->setSlotIndex(inValue);
+}
+
+bool spine_sequence_timeline_get_additive(spine_sequence_timeline self) {
+	SequenceTimeline *_self = (SequenceTimeline *) self;
+	return _self->getAdditive();
+}
+
+bool spine_sequence_timeline_get_instant(spine_sequence_timeline self) {
+	SequenceTimeline *_self = (SequenceTimeline *) self;
+	return _self->getInstant();
 }
 
 size_t spine_sequence_timeline_get_frame_entries(spine_sequence_timeline self) {

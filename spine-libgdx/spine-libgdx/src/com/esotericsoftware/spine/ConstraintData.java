@@ -10,5 +10,12 @@ abstract public class ConstraintData< //
 		super(name, setup);
 	}
 
+	/** The constraint's name, unique across all constraints in the skeleton.
+	 * <p>
+	 * See {@link SkeletonData#findConstraint(String, Class)} and {@link Skeleton#findConstraint(String, Class)}. */
+	public String getName () { // Do not port.
+		return super.getName();
+	}
+
 	abstract public T create (Skeleton skeleton);
 }

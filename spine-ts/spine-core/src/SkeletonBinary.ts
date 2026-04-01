@@ -107,7 +107,7 @@ export class SkeletonBinary {
 			if (!name) throw new Error("Bone name must not be null.");
 			const parent = i === 0 ? null : bones[input.readInt(true)];
 			const data = new BoneData(i, name, parent);
-			const setup = data.setup;
+			const setup = data.setupPose;
 			setup.rotation = input.readFloat();
 			setup.x = input.readFloat() * scale;
 			setup.y = input.readFloat() * scale;
@@ -133,10 +133,10 @@ export class SkeletonBinary {
 			if (!slotName) throw new Error("Slot name must not be null.");
 			const boneData = bones[input.readInt(true)];
 			const data = new SlotData(i, slotName, boneData);
-			Color.rgba8888ToColor(data.setup.color, input.readInt32());
+			Color.rgba8888ToColor(data.setupPose.color, input.readInt32());
 
 			const darkColor = input.readInt32();
-			if (darkColor !== -1) Color.rgb888ToColor(data.setup.darkColor = new Color(), darkColor);
+			if (darkColor !== -1) Color.rgb888ToColor(data.setupPose.darkColor = new Color(), darkColor);
 
 			data.attachmentName = input.readStringRef();
 			data.blendMode = input.readInt(true);
@@ -161,7 +161,7 @@ export class SkeletonBinary {
 					const flags = input.readByte();
 					data.skinRequired = (flags & 1) !== 0;
 					data.uniform = (flags & 2) !== 0;
-					const setup = data.setup;
+					const setup = data.setupPose;
 					setup.bendDirection = (flags & 4) !== 0 ? -1 : 1;
 					setup.compress = (flags & 8) !== 0;
 					setup.stretch = (flags & 16) !== 0;
@@ -243,7 +243,7 @@ export class SkeletonBinary {
 					if ((flags & 16) !== 0) data.offsets[TransformConstraintData.SCALEY] = input.readFloat();
 					if ((flags & 32) !== 0) data.offsets[TransformConstraintData.SHEARY] = input.readFloat();
 					flags = input.readByte();
-					const setup = data.setup;
+					const setup = data.setupPose;
 					if ((flags & 1) !== 0) setup.mixRotate = input.readFloat();
 					if ((flags & 2) !== 0) setup.mixX = input.readFloat();
 					if ((flags & 4) !== 0) setup.mixY = input.readFloat();
@@ -265,7 +265,7 @@ export class SkeletonBinary {
 					data.spacingMode = (flags >> 2) & 0b11;
 					data.rotateMode = (flags >> 4) & 0b11;
 					if ((flags & 128) !== 0) data.offsetRotation = input.readFloat();
-					const setup = data.setup;
+					const setup = data.setupPose;
 					setup.position = input.readFloat();
 					if (data.positionMode === PositionMode.Fixed) setup.position *= scale;
 					setup.spacing = input.readFloat();
@@ -288,7 +288,7 @@ export class SkeletonBinary {
 					if ((flags & 32) !== 0) data.shearX = input.readFloat();
 					data.limit = ((flags & 64) !== 0 ? input.readFloat() : 5000) * scale;
 					data.step = 1 / input.readUnsignedByte();
-					const setup = data.setup;
+					const setup = data.setupPose;
 					setup.inertia = input.readFloat();
 					setup.strength = input.readFloat();
 					setup.damping = input.readFloat();
@@ -313,8 +313,8 @@ export class SkeletonBinary {
 					data.skinRequired = (flags & 1) !== 0;
 					data.loop = (flags & 2) !== 0;
 					data.additive = (flags & 4) !== 0;
-					if ((flags & 8) !== 0) data.setup.time = input.readFloat();
-					if ((flags & 16) !== 0) data.setup.mix = (flags & 32) !== 0 ? input.readFloat() : 1;
+					if ((flags & 8) !== 0) data.setupPose.time = input.readFloat();
+					if ((flags & 16) !== 0) data.setupPose.mix = (flags & 32) !== 0 ? input.readFloat() : 1;
 					if ((flags & 64) !== 0) {
 						data.local = (flags & 128) !== 0;
 						data.bone = bones[input.readInt(true)];
@@ -385,13 +385,14 @@ export class SkeletonBinary {
 			const eventName = input.readString();
 			if (!eventName) throw new Error("Event data name must not be null");
 			const data = new EventData(eventName);
-			data.intValue = input.readInt(false);
-			data.floatValue = input.readFloat();
-			data.stringValue = input.readString();
-			data.audioPath = input.readString();
+			const setup = data.setupPose;
+			setup.intValue = input.readInt(false);
+			setup.floatValue = input.readFloat();
+			setup.stringValue = input.readString();
+			data._audioPath = input.readString();
 			if (data.audioPath) {
-				data.volume = input.readFloat();
-				data.balance = input.readFloat();
+				setup.volume = input.readFloat();
+				setup.balance = input.readFloat();
 			}
 			skeletonData.events.push(data);
 		}
@@ -1164,7 +1165,7 @@ export class SkeletonBinary {
 				event.intValue = input.readInt(false);
 				event.floatValue = input.readFloat();
 				event.stringValue = input.readString();
-				if (event.stringValue == null) event.stringValue = eventData.stringValue;
+				if (event.stringValue == null) event.stringValue = eventData.setupPose.stringValue;
 				if (event.data.audioPath) {
 					event.volume = input.readFloat();
 					event.balance = input.readFloat();

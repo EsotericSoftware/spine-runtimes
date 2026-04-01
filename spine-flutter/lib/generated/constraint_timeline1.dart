@@ -35,7 +35,7 @@ import '../spine_bindings.dart';
 import 'constraint_timeline.dart';
 import 'curve_timeline1.dart';
 
-/// Base class for single-value constraint timelines.
+/// The base class for timelines that change 1 constraint property with a curve.
 abstract class ConstraintTimeline1 extends CurveTimeline1 implements ConstraintTimeline {
   final Pointer<spine_constraint_timeline1_wrapper> _ptr;
 

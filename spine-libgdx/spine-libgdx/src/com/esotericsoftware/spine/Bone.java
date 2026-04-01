@@ -32,13 +32,17 @@ package com.esotericsoftware.spine;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
 
-// BOZO - Update javadocs.
-/** The current pose for a bone, before constraints are applied.
- * <p>
- * A bone has a local transform which is used to compute its world transform. A bone also has an applied transform, which is a
- * local transform that can be applied to compute the world transform. The local transform and applied transform may differ if a
- * constraint or application code modifies the world transform after it was computed from the local transform. */
-public class Bone extends PosedActive<BoneData, BoneLocal, BonePose> {
+/** A node in a skeleton's hierarchy with a transform that affects its children and their attachments. A bone has a number of
+ * poses:
+ * <ul>
+ * <li>{@link #data}: The setup pose.
+ * <li>{@link #pose}: The unconstrained local pose. Set by animations and application code.
+ * <li>{@link #appliedPose}: The local pose to use for rendering. Possibly modified by constraints.
+ * <li>World transform: the local pose combined with the parent world transform. Computed on a pose by
+ * {@link BonePose#updateWorldTransform(Skeleton)} and {@link Skeleton#updateWorldTransform(Physics)}.
+ * </ul>
+ */
+public class Bone extends PosedActive<BoneData, BonePose> {
 	@Null final Bone parent;
 	final Array<Bone> children = new Array(true, 4, Bone[]::new);
 	boolean sorted;
@@ -46,11 +50,11 @@ public class Bone extends PosedActive<BoneData, BoneLocal, BonePose> {
 	public Bone (BoneData data, @Null Bone parent) {
 		super(data, new BonePose(), new BonePose());
 		this.parent = parent;
-		applied.bone = this;
-		constrained.bone = this;
+		appliedPose.bone = this;
+		constrainedPose.bone = this;
 	}
 
-	/** Copy constructor. Does not copy the {@link #getChildren()} bones. */
+	/** Copy constructor. Does not copy the {@link #children} bones. */
 	public Bone (Bone bone, @Null Bone parent) {
 		this(bone.data, parent);
 		pose.set(bone.pose);

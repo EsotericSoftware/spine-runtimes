@@ -38,7 +38,7 @@ namespace spine {
 	class Slot;
 	class Skeleton;
 
-	/// An attachment with vertices that are transformed by one or more bones and can be deformed by a slot's
+	/// An attachment with vertices that are transformed by one or more bones and can be deformed by
 	/// SlotPose::getDeform().
 	class SP_API VertexAttachment : public Attachment {
 		friend class SkeletonBinary;
@@ -55,8 +55,8 @@ namespace spine {
 		virtual ~VertexAttachment();
 
 
-		/// Transforms the attachment's local vertices to world coordinates. If the slot's SlotPose::getDeform()
-		/// is not empty, it is used to deform the vertices.
+		/// Transforms the attachment's local vertices to world coordinates. If SlotPose::getDeform() is not empty,
+		/// it is used to deform the vertices.
 		///
 		/// See https://esotericsoftware.com/spine-runtime-skeletons#World-transforms World transforms in the Spine
 		/// Runtimes Guide.
@@ -74,10 +74,16 @@ namespace spine {
 		/// Gets a unique ID for this attachment.
 		int getId();
 
+		/// The bones that affect the vertices. The entries are, for each vertex, the number of bones affecting the
+		/// vertex followed by that many bone indices, which is Skeleton::getBones() index. Empty if this attachment
+		/// has no weights.
 		Array<int> &getBones();
 
 		void setBones(Array<int> &bones);
 
+		/// The vertex positions in the bone's coordinate system. For a non-weighted attachment, the values are x,y pairs
+		/// for each vertex. For a weighted attachment, the values are x,y,weight triplets for each bone affecting each
+		/// vertex.
 		Array<float> &getVertices();
 
 		void setVertices(Array<float> &vertices);

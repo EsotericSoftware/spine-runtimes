@@ -54,6 +54,7 @@ public class PhysicsConstraintData extends ConstraintData<PhysicsConstraint, Phy
 		this.bone = bone;
 	}
 
+	/** The time in milliseconds required to advanced the physics simulation one step. */
 	public float getStep () {
 		return step;
 	}
@@ -62,6 +63,7 @@ public class PhysicsConstraintData extends ConstraintData<PhysicsConstraint, Phy
 		this.step = step;
 	}
 
+	/** Physics influence on x translation, 0-1. */
 	public float getX () {
 		return x;
 	}
@@ -70,6 +72,7 @@ public class PhysicsConstraintData extends ConstraintData<PhysicsConstraint, Phy
 		this.x = x;
 	}
 
+	/** Physics influence on y translation, 0-1. */
 	public float getY () {
 		return y;
 	}
@@ -78,6 +81,7 @@ public class PhysicsConstraintData extends ConstraintData<PhysicsConstraint, Phy
 		this.y = y;
 	}
 
+	/** Physics influence on rotation, 0-1. */
 	public float getRotate () {
 		return rotate;
 	}
@@ -86,6 +90,7 @@ public class PhysicsConstraintData extends ConstraintData<PhysicsConstraint, Phy
 		this.rotate = rotate;
 	}
 
+	/** Physics influence on scaleX, 0-1. */
 	public float getScaleX () {
 		return scaleX;
 	}
@@ -94,6 +99,7 @@ public class PhysicsConstraintData extends ConstraintData<PhysicsConstraint, Phy
 		this.scaleX = scaleX;
 	}
 
+	/** Physics influence on shearX, 0-1. */
 	public float getShearX () {
 		return shearX;
 	}
@@ -102,6 +108,7 @@ public class PhysicsConstraintData extends ConstraintData<PhysicsConstraint, Phy
 		this.shearX = shearX;
 	}
 
+	/** Movement greater than the limit will not have a greater affect on physics. */
 	public float getLimit () {
 		return limit;
 	}
@@ -110,6 +117,7 @@ public class PhysicsConstraintData extends ConstraintData<PhysicsConstraint, Phy
 		this.limit = limit;
 	}
 
+	/** True when this constraint's inertia is controlled by global slider timelines. */
 	public boolean getInertiaGlobal () {
 		return inertiaGlobal;
 	}
@@ -118,6 +126,7 @@ public class PhysicsConstraintData extends ConstraintData<PhysicsConstraint, Phy
 		this.inertiaGlobal = inertiaGlobal;
 	}
 
+	/** True when this constraint's strength is controlled by global slider timelines. */
 	public boolean getStrengthGlobal () {
 		return strengthGlobal;
 	}
@@ -126,6 +135,7 @@ public class PhysicsConstraintData extends ConstraintData<PhysicsConstraint, Phy
 		this.strengthGlobal = strengthGlobal;
 	}
 
+	/** True when this constraint's damping is controlled by global slider timelines. */
 	public boolean getDampingGlobal () {
 		return dampingGlobal;
 	}
@@ -134,6 +144,7 @@ public class PhysicsConstraintData extends ConstraintData<PhysicsConstraint, Phy
 		this.dampingGlobal = dampingGlobal;
 	}
 
+	/** True when this constraint's mass is controlled by global slider timelines. */
 	public boolean getMassGlobal () {
 		return massGlobal;
 	}
@@ -142,6 +153,7 @@ public class PhysicsConstraintData extends ConstraintData<PhysicsConstraint, Phy
 		this.massGlobal = massGlobal;
 	}
 
+	/** True when this constraint's wind is controlled by global slider timelines. */
 	public boolean getWindGlobal () {
 		return windGlobal;
 	}
@@ -150,6 +162,7 @@ public class PhysicsConstraintData extends ConstraintData<PhysicsConstraint, Phy
 		this.windGlobal = windGlobal;
 	}
 
+	/** True when this constraint's gravity is controlled by global slider timelines. */
 	public boolean getGravityGlobal () {
 		return gravityGlobal;
 	}
@@ -158,6 +171,7 @@ public class PhysicsConstraintData extends ConstraintData<PhysicsConstraint, Phy
 		this.gravityGlobal = gravityGlobal;
 	}
 
+	/** True when this constraint's mix is controlled by global slider timelines. */
 	public boolean getMixGlobal () {
 		return mixGlobal;
 	}

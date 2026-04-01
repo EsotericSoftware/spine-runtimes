@@ -189,7 +189,7 @@ public class SkeletonJson extends SkeletonLoader {
 				}
 				var data = new BoneData(skeletonData.bones.size, boneMap.getString("name"), parent);
 				data.length = boneMap.getFloat("length", 0) * scale;
-				BoneLocal setup = data.setup;
+				BonePose setup = data.setupPose;
 				setup.x = boneMap.getFloat("x", 0) * scale;
 				setup.y = boneMap.getFloat("y", 0) * scale;
 				setup.rotation = boneMap.getFloat("rotation", 0);
@@ -219,10 +219,10 @@ public class SkeletonJson extends SkeletonLoader {
 				var data = new SlotData(skeletonData.slots.size, slotName, boneData);
 
 				String color = slotMap.getString("color", null);
-				if (color != null) Color.valueOf(color, data.setup.getColor());
+				if (color != null) Color.valueOf(color, data.setupPose.getColor());
 
 				String dark = slotMap.getString("dark", null);
-				if (dark != null) data.setup.darkColor = Color.valueOf(dark);
+				if (dark != null) data.setupPose.darkColor = Color.valueOf(dark);
 
 				data.attachmentName = slotMap.getString("attachment", null);
 				data.blendMode = BlendMode.valueOf(slotMap.getString("blend", BlendMode.normal.name()));
@@ -250,7 +250,7 @@ public class SkeletonJson extends SkeletonLoader {
 					if (data.target == null) throw new SerializationException("IK target bone not found: " + targetName);
 
 					data.uniform = constraintMap.getBoolean("uniform", false);
-					IkConstraintPose setup = data.setup;
+					IkConstraintPose setup = data.setupPose;
 					setup.mix = constraintMap.getFloat("mix", 1);
 					setup.softness = constraintMap.getFloat("softness", 0) * scale;
 					setup.bendDirection = constraintMap.getBoolean("bendPositive", true) ? 1 : -1;
@@ -331,7 +331,7 @@ public class SkeletonJson extends SkeletonLoader {
 					data.offsets[TransformConstraintData.SCALEY] = constraintMap.getFloat("scaleY", 0);
 					data.offsets[TransformConstraintData.SHEARY] = constraintMap.getFloat("shearY", 0);
 
-					TransformConstraintPose setup = data.setup;
+					TransformConstraintPose setup = data.setupPose;
 					if (rotate) setup.mixRotate = constraintMap.getFloat("mixRotate", 1);
 					if (x) setup.mixX = constraintMap.getFloat("mixX", 1);
 					if (y) setup.mixY = constraintMap.getFloat("mixY", setup.mixX);
@@ -359,7 +359,7 @@ public class SkeletonJson extends SkeletonLoader {
 					data.spacingMode = SpacingMode.valueOf(constraintMap.getString("spacingMode", "length"));
 					data.rotateMode = RotateMode.valueOf(constraintMap.getString("rotateMode", "tangent"));
 					data.offsetRotation = constraintMap.getFloat("rotation", 0);
-					PathConstraintPose setup = data.setup;
+					PathConstraintPose setup = data.setupPose;
 					setup.position = constraintMap.getFloat("position", 0);
 					if (data.positionMode == PositionMode.fixed) setup.position *= scale;
 					setup.spacing = constraintMap.getFloat("spacing", 0);
@@ -385,7 +385,7 @@ public class SkeletonJson extends SkeletonLoader {
 					data.shearX = constraintMap.getFloat("shearX", 0);
 					data.limit = constraintMap.getFloat("limit", 5000) * scale;
 					data.step = 1f / constraintMap.getInt("fps", 60);
-					PhysicsConstraintPose setup = data.setup;
+					PhysicsConstraintPose setup = data.setupPose;
 					setup.inertia = constraintMap.getFloat("inertia", 0.5f);
 					setup.strength = constraintMap.getFloat("strength", 100);
 					setup.damping = constraintMap.getFloat("damping", 0.85f);
@@ -408,8 +408,8 @@ public class SkeletonJson extends SkeletonLoader {
 					data.skinRequired = skinRequired;
 					data.additive = constraintMap.getBoolean("additive", false);
 					data.loop = constraintMap.getBoolean("loop", false);
-					data.setup.time = constraintMap.getFloat("time", 0);
-					data.setup.mix = constraintMap.getFloat("mix", 1);
+					data.setupPose.time = constraintMap.getFloat("time", 0);
+					data.setupPose.mix = constraintMap.getFloat("mix", 1);
 
 					String boneName = constraintMap.getString("bone", null);
 					if (boneName != null) {
@@ -501,13 +501,14 @@ public class SkeletonJson extends SkeletonLoader {
 			// Events.
 			for (JsonValue eventMap = root.getChild("events"); eventMap != null; eventMap = eventMap.next) {
 				var data = new EventData(eventMap.name);
-				data.intValue = eventMap.getInt("int", 0);
-				data.floatValue = eventMap.getFloat("float", 0f);
-				data.stringValue = eventMap.getString("string", "");
+				Event setup = data.setupPose;
+				setup.intValue = eventMap.getInt("int", 0);
+				setup.floatValue = eventMap.getFloat("float", 0f);
+				setup.stringValue = eventMap.getString("string", "");
 				data.audioPath = eventMap.getString("audio", null);
 				if (data.audioPath != null) {
-					data.volume = eventMap.getFloat("volume", 1);
-					data.balance = eventMap.getFloat("balance", 0);
+					setup.volume = eventMap.getFloat("volume", 1);
+					setup.balance = eventMap.getFloat("balance", 0);
 				}
 				skeletonData.events.add(data);
 			}
@@ -910,9 +911,12 @@ public class SkeletonJson extends SkeletonLoader {
 		}
 
 		// Bone timelines.
-		for (JsonValue boneMap = map.getChild("bones"); boneMap != null; boneMap = boneMap.next) {
+		JsonValue boneMap = map.getChild("bones");
+		var bones = new IntArray(boneMap == null ? 0 : boneMap.size);
+		for (; boneMap != null; boneMap = boneMap.next) {
 			BoneData bone = skeletonData.findBone(boneMap.name);
 			if (bone == null) throw new SerializationException("Bone not found: " + boneMap.name);
+			bones.add(bone.index);
 			for (JsonValue timelineMap = boneMap.child; timelineMap != null; timelineMap = timelineMap.next) {
 				JsonValue keyMap = timelineMap.child;
 				if (keyMap == null) continue;
@@ -1243,15 +1247,16 @@ public class SkeletonJson extends SkeletonLoader {
 			var timeline = new EventTimeline(eventsMap.size);
 			int frame = 0;
 			for (JsonValue keyMap = eventsMap.child; keyMap != null; keyMap = keyMap.next, frame++) {
-				EventData eventData = skeletonData.findEvent(keyMap.getString("name"));
-				if (eventData == null) throw new SerializationException("Event not found: " + keyMap.getString("name"));
-				var event = new Event(keyMap.getFloat("time", 0), eventData);
-				event.intValue = keyMap.getInt("int", eventData.intValue);
-				event.floatValue = keyMap.getFloat("float", eventData.floatValue);
-				event.stringValue = keyMap.getString("string", eventData.stringValue);
+				EventData data = skeletonData.findEvent(keyMap.getString("name"));
+				if (data == null) throw new SerializationException("Event not found: " + keyMap.getString("name"));
+				Event setup = data.setupPose;
+				var event = new Event(keyMap.getFloat("time", 0), data);
+				event.intValue = keyMap.getInt("int", setup.intValue);
+				event.floatValue = keyMap.getFloat("float", setup.floatValue);
+				event.stringValue = keyMap.getString("string", setup.stringValue);
 				if (event.data.audioPath != null) {
-					event.volume = keyMap.getFloat("volume", eventData.volume);
-					event.balance = keyMap.getFloat("balance", eventData.balance);
+					event.volume = keyMap.getFloat("volume", setup.volume);
+					event.balance = keyMap.getFloat("balance", setup.balance);
 				}
 				timeline.setFrame(frame, event);
 			}
@@ -1263,7 +1268,11 @@ public class SkeletonJson extends SkeletonLoader {
 		Timeline[] items = timelines.items;
 		for (int i = 0, n = timelines.size; i < n; i++)
 			duration = Math.max(duration, items[i].getDuration());
-		skeletonData.animations.add(new Animation(name, timelines, duration));
+
+		Animation animation = new Animation(name);
+		animation.setTimelines(timelines, bones);
+		animation.setDuration(duration);
+		skeletonData.animations.add(animation);
 	}
 
 	private void readTimeline (Array<Timeline> timelines, JsonValue keyMap, CurveTimeline1 timeline, float defaultValue,

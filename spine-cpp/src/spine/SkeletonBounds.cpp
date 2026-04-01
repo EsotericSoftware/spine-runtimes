@@ -62,7 +62,7 @@ void SkeletonBounds::update(Skeleton &skeleton, bool updateAabb) {
 		Slot *slot = slots[i];
 		if (!slot->getBone().isActive()) continue;
 
-		Attachment *attachment = slot->_applied->getAttachment();
+		Attachment *attachment = slot->_appliedPose->getAttachment();
 		if (attachment == NULL || !attachment->getRTTI().instanceOf(BoundingBoxAttachment::rtti)) continue;
 		BoundingBoxAttachment *boundingBox = static_cast<BoundingBoxAttachment *>(attachment);
 		_boundingBoxes.add(boundingBox);

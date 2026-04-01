@@ -29,8 +29,19 @@ SPINE_C_API void spine_mesh_attachment_update_sequence(spine_mesh_attachment sel
 SPINE_C_API const char *spine_mesh_attachment_get_path(spine_mesh_attachment self);
 SPINE_C_API void spine_mesh_attachment_set_path(spine_mesh_attachment self, const char *inValue);
 SPINE_C_API spine_color spine_mesh_attachment_get_color(spine_mesh_attachment self);
+/**
+ * The parent mesh if this is a linked mesh, else NULL. A linked mesh shares the
+ * bones, vertices, regionUVs, triangles, hullLength, edges, width, and height
+ * with the parent mesh, but may have a different name or path, and therefore a
+ * different texture region.
+ */
 SPINE_C_API /*@null*/ spine_mesh_attachment spine_mesh_attachment_get_parent_mesh(spine_mesh_attachment self);
 SPINE_C_API void spine_mesh_attachment_set_parent_mesh(spine_mesh_attachment self, /*@null*/ spine_mesh_attachment inValue);
+/**
+ * Vertex index pairs describing edges for controlling triangulation, or empty
+ * if nonessential data was not exported. Mesh triangles do not cross edges.
+ * Triangulation is not performed at runtime.
+ */
 SPINE_C_API spine_array_unsigned_short spine_mesh_attachment_get_edges(spine_mesh_attachment self);
 SPINE_C_API void spine_mesh_attachment_set_edges(spine_mesh_attachment self, spine_array_unsigned_short inValue);
 SPINE_C_API float spine_mesh_attachment_get_width(spine_mesh_attachment self);
@@ -49,8 +60,19 @@ SPINE_C_API void spine_mesh_attachment_compute_u_vs(/*@null*/ spine_texture_regi
  * Gets a unique ID for this attachment.
  */
 SPINE_C_API int spine_mesh_attachment_get_id(spine_mesh_attachment self);
+/**
+ * The bones that affect the vertices. The entries are, for each vertex, the
+ * number of bones affecting the vertex followed by that many bone indices,
+ * which is Skeleton::getBones() index. Empty if this attachment has no weights.
+ */
 SPINE_C_API spine_array_int spine_mesh_attachment_get_bones(spine_mesh_attachment self);
 SPINE_C_API void spine_mesh_attachment_set_bones(spine_mesh_attachment self, spine_array_int bones);
+/**
+ * The vertex positions in the bone's coordinate system. For a non-weighted
+ * attachment, the values are x,y pairs for each vertex. For a weighted
+ * attachment, the values are x,y,weight triplets for each bone affecting each
+ * vertex.
+ */
 SPINE_C_API spine_array_float spine_mesh_attachment_get_vertices(spine_mesh_attachment self);
 SPINE_C_API void spine_mesh_attachment_set_vertices(spine_mesh_attachment self, spine_array_float vertices);
 SPINE_C_API size_t spine_mesh_attachment_get_world_vertices_length(spine_mesh_attachment self);

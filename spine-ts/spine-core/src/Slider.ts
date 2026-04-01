@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { isConstraintTimeline, isSlotTimeline, MixBlend, MixDirection, PhysicsConstraintTimeline } from "./Animation.js";
+import { DrawOrderFolderTimeline, DrawOrderTimeline, isConstraintTimeline, isSlotTimeline, PhysicsConstraintTimeline } from "./Animation.js";
 import type { Bone } from "./Bone.js";
 import { Constraint } from "./Constraint.js";
 import type { Physics } from "./Physics.js";
@@ -35,12 +35,13 @@ import type { Skeleton } from "./Skeleton.js";
 import type { SliderData } from "./SliderData.js";
 import { SliderPose } from "./SliderPose.js";
 
-/** Stores the setup pose for a {@link PhysicsConstraint}.
+/** Applies an animation based on either the slider's {@link SliderPose.time} or a bone's transform property.
  *
- * See <a href="https://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide. */
+ * See <a href="https://esotericsoftware.com/spine-sliders">Sliders</a> in the Spine User Guide. */
 export class Slider extends Constraint<Slider, SliderData, SliderPose> {
 	private static readonly offsets = [0, 0, 0, 0, 0, 0];
 
+	/** When set, the bone's transform property is used to set the slider's {@link SliderPose.time}. */
 	bone: Bone | null = null;
 
 	constructor (data: SliderData, skeleton: Skeleton) {
@@ -57,15 +58,15 @@ export class Slider extends Constraint<Slider, SliderData, SliderPose> {
 	}
 
 	public update (skeleton: Skeleton, physics: Physics) {
-		const p = this.applied;
+		const p = this.appliedPose;
 		if (p.mix === 0) return;
 
 		const data = this.data, animation = data.animation, bone = this.bone;
 		if (bone !== null) {
 			if (!bone.active) return;
-			if (data.local) bone.applied.validateLocalTransform(skeleton);
+			if (data.local) bone.appliedPose.validateLocalTransform(skeleton);
 			p.time = data.offset
-				+ (data.property.value(skeleton, bone.applied, data.local, Slider.offsets) - data.property.offset) * data.scale;
+				+ (data.property.value(skeleton, bone.appliedPose, data.local, Slider.offsets) - data.property.offset) * data.scale;
 			if (data.loop)
 				p.time = animation.duration + (p.time % animation.duration);
 			else
@@ -75,10 +76,9 @@ export class Slider extends Constraint<Slider, SliderData, SliderPose> {
 		const bones = skeleton.bones;
 		const indices = animation.bones;
 		for (let i = 0, n = animation.bones.length; i < n; i++)
-			bones[indices[i]].applied.modifyLocal(skeleton);
+			bones[indices[i]].appliedPose.modifyLocal(skeleton);
 
-		animation.apply(skeleton, p.time, p.time, data.loop, null, p.mix, data.additive ? MixBlend.add : MixBlend.replace,
-			MixDirection.in, true);
+		animation.apply(skeleton, p.time, p.time, data.loop, null, p.mix, false, data.additive, false, true);
 	}
 
 	sort (skeleton: Skeleton) {
@@ -105,6 +105,8 @@ export class Slider extends Constraint<Slider, SliderData, SliderPose> {
 			const t = timelines[i];
 			if (isSlotTimeline(t))
 				skeleton.constrained(slots[t.slotIndex]);
+			else if (t instanceof DrawOrderTimeline || t instanceof DrawOrderFolderTimeline)
+				skeleton.drawOrder.constrained();
 			else if (t instanceof PhysicsConstraintTimeline) {
 				if (t.constraintIndex === -1) {
 					for (let ii = 0; ii < physicsCount; ii++)

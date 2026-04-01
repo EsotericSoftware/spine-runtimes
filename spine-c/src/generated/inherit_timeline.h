@@ -22,10 +22,18 @@ SPINE_C_API spine_rtti spine_inherit_timeline_get_rtti(spine_inherit_timeline se
  */
 SPINE_C_API void spine_inherit_timeline_set_frame(spine_inherit_timeline self, int frame, float time, spine_inherit inherit);
 SPINE_C_API void spine_inherit_timeline_apply(spine_inherit_timeline self, spine_skeleton skeleton, float lastTime, float time,
-											  /*@null*/ spine_array_event events, float alpha, spine_mix_blend blend, spine_mix_direction direction,
-											  bool appliedPose);
+											  /*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out, bool appliedPose);
 SPINE_C_API int spine_inherit_timeline_get_bone_index(spine_inherit_timeline self);
 SPINE_C_API void spine_inherit_timeline_set_bone_index(spine_inherit_timeline self, int inValue);
+/**
+ * True if this timeline supports additive blending.
+ */
+SPINE_C_API bool spine_inherit_timeline_get_additive(spine_inherit_timeline self);
+/**
+ * True if this timeline sets values instantaneously and does not support
+ * interpolation between frames.
+ */
+SPINE_C_API bool spine_inherit_timeline_get_instant(spine_inherit_timeline self);
 SPINE_C_API size_t spine_inherit_timeline_get_frame_entries(spine_inherit_timeline self);
 SPINE_C_API size_t spine_inherit_timeline_get_frame_count(spine_inherit_timeline self);
 SPINE_C_API spine_array_float spine_inherit_timeline_get_frames(spine_inherit_timeline self);

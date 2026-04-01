@@ -53,9 +53,9 @@ public:
 
 	void set_loop(bool v);
 
-	bool get_hold_previous();
+	bool get_additive();
 
-	void set_hold_previous(bool v);
+	void set_additive(bool v);
 
 	bool get_reverse();
 
@@ -129,9 +129,6 @@ public:
 
 	void set_mix_duration_and_delay(float v, float delay);
 
-	SpineConstant::MixBlend get_mix_blend();
-
-	void set_mix_blend(SpineConstant::MixBlend v);
 
 	Ref<SpineTrackEntry> get_mixing_from();
 

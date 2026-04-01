@@ -130,117 +130,30 @@ float CurveTimeline1::getCurveValue(float time) {
 	return getBezierValue(time, i, CurveTimeline1::VALUE, curveType - CurveTimeline1::BEZIER);
 }
 
-float CurveTimeline1::getRelativeValue(float time, float alpha, MixBlend blend, float current, float setup) {
-	if (time < _frames[0]) {
-		switch (blend) {
-			case MixBlend_Setup:
-				return setup;
-			case MixBlend_First:
-				return current + (setup - current) * alpha;
-			default:
-				return current;
-		}
-	}
+float CurveTimeline1::getRelativeValue(float time, float alpha, bool fromSetup, bool add, float current, float setup) {
+	if (time < _frames[0]) return fromSetup ? setup : current;
 	float value = getCurveValue(time);
-	switch (blend) {
-		case MixBlend_Setup:
-			return setup + value * alpha;
-		case MixBlend_First:
-		case MixBlend_Replace:
-			return current + (value + setup - current) * alpha;
-		case MixBlend_Add:
-			return current + value * alpha;
-	}
-	return current;
+	return fromSetup ? setup + value * alpha : current + (add ? value : value + setup - current) * alpha;
 }
 
-float CurveTimeline1::getAbsoluteValue(float time, float alpha, MixBlend blend, float current, float setup) {
-	if (time < _frames[0]) {
-		switch (blend) {
-			case MixBlend_Setup:
-				return setup;
-			case MixBlend_First:
-				return current + (setup - current) * alpha;
-			default:
-				return current;
-		}
-	}
+float CurveTimeline1::getAbsoluteValue(float time, float alpha, bool fromSetup, bool add, float current, float setup) {
+	if (time < _frames[0]) return fromSetup ? setup : current;
 	float value = getCurveValue(time);
-	switch (blend) {
-		case MixBlend_Setup:
-			return setup + (value - setup) * alpha;
-		case MixBlend_First:
-		case MixBlend_Replace:
-			return current + (value - current) * alpha;
-		case MixBlend_Add:
-			return current + value * alpha;
-	}
-	return current;
+	return fromSetup ? setup + (value - setup) * alpha : current + (add ? value : value - current) * alpha;
 }
 
-float CurveTimeline1::getAbsoluteValue(float time, float alpha, MixBlend blend, float current, float setup, float value) {
-	if (time < _frames[0]) {
-		switch (blend) {
-			case MixBlend_Setup:
-				return setup;
-			case MixBlend_First:
-				return current + (setup - current) * alpha;
-			default:
-				return current;
-		}
-	}
-	switch (blend) {
-		case MixBlend_Setup:
-			return setup + (value - setup) * alpha;
-		case MixBlend_First:
-		case MixBlend_Replace:
-			return current + (value - current) * alpha;
-		case MixBlend_Add:
-			return current + value * alpha;
-	}
-	return current;
+float CurveTimeline1::getAbsoluteValue(float time, float alpha, bool fromSetup, bool add, float current, float setup, float value) {
+	if (time < _frames[0]) return fromSetup ? setup : current;
+	return fromSetup ? setup + (value - setup) * alpha : current + (add ? value : value - current) * alpha;
 }
 
-float CurveTimeline1::getScaleValue(float time, float alpha, MixBlend blend, MixDirection direction, float current, float setup) {
-	if (time < _frames[0]) {
-		switch (blend) {
-			case MixBlend_Setup:
-				return setup;
-			case MixBlend_First:
-				return current + (setup - current) * alpha;
-			default:
-				return current;
-		}
-	}
+float CurveTimeline1::getScaleValue(float time, float alpha, bool fromSetup, bool add, bool out, float current, float setup) {
+	if (time < _frames[0]) return fromSetup ? setup : current;
 	float value = getCurveValue(time) * setup;
-	if (alpha == 1) {
-		if (blend == MixBlend_Add) return current + value - setup;
-		return value;
-	}
-	// Mixing out uses sign of setup or current pose, else use sign of key.
-	if (direction == MixDirection_Out) {
-		switch (blend) {
-			case MixBlend_Setup:
-				return setup + (MathUtil::abs(value) * MathUtil::sign(setup) - setup) * alpha;
-			case MixBlend_First:
-			case MixBlend_Replace:
-				return current + (MathUtil::abs(value) * MathUtil::sign(current) - current) * alpha;
-			default:
-				break;
-		}
-	} else {
-		float s;
-		switch (blend) {
-			case MixBlend_Setup:
-				s = MathUtil::abs(setup) * MathUtil::sign(value);
-				return s + (value - s) * alpha;
-			case MixBlend_First:
-			case MixBlend_Replace:
-				s = MathUtil::abs(current) * MathUtil::sign(value);
-				return s + (value - s) * alpha;
-			default:
-				break;
-		}
-	}
-	return current + (value - setup) * alpha;
+	if (alpha == 1 && !add) return value;
+	float base = fromSetup ? setup : current;
+	if (add) return base + (value - setup) * alpha;
+	if (out) return base + (MathUtil::abs(value) * MathUtil::sign(base) - base) * alpha;
+	base = MathUtil::abs(base) * MathUtil::sign(value);
+	return base + (value - base) * alpha;
 }

@@ -182,7 +182,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 			const char *name = input.readString();
 			BoneData *parent = i == 0 ? 0 : bones[input.readInt(true)];
 			BoneData *data = new (__FILE__, __LINE__) BoneData(i, String(name, true), parent);
-			BoneLocal &setup = data->_setup;
+			BonePose &setup = data->_setupPose;
 			setup._rotation = input.readFloat();
 			setup._x = input.readFloat() * _scale;
 			setup._y = input.readFloat() * _scale;
@@ -207,12 +207,12 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 			String slotName = String(input.readString(), true);
 			BoneData *boneData = bones[input.readInt(true)];
 			SlotData *data = new (__FILE__, __LINE__) SlotData(i, slotName, *boneData);
-			Color::rgba8888ToColor(data->_setup._color, input.readInt());
+			Color::rgba8888ToColor(data->_setupPose._color, input.readInt());
 
 			int darkColor = input.readInt();
 			if (darkColor != -1) {
-				Color::rgb888ToColor(data->_setup._darkColor, darkColor);
-				data->_setup._hasDarkColor = true;
+				Color::rgb888ToColor(data->_setupPose._darkColor, darkColor);
+				data->_setupPose._hasDarkColor = true;
 			}
 
 			data->_attachmentName = input.readStringRef();
@@ -236,7 +236,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 					int flags = input.read();
 					data->_skinRequired = (flags & 1) != 0;
 					data->_uniform = (flags & 2) != 0;
-					IkConstraintPose &setup = data->_setup;
+					IkConstraintPose &setup = data->_setupPose;
 					setup._bendDirection = (flags & 4) != 0 ? -1 : 1;
 					setup._compress = (flags & 8) != 0;
 					setup._stretch = (flags & 16) != 0;
@@ -324,7 +324,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 					if ((flags & 16) != 0) data->_offsets[TransformConstraintData::SCALEY] = input.readFloat();
 					if ((flags & 32) != 0) data->_offsets[TransformConstraintData::SHEARY] = input.readFloat();
 					flags = input.read();
-					TransformConstraintPose &setup = data->_setup;
+					TransformConstraintPose &setup = data->_setupPose;
 					if ((flags & 1) != 0) setup._mixRotate = input.readFloat();
 					if ((flags & 2) != 0) setup._mixX = input.readFloat();
 					if ((flags & 4) != 0) setup._mixY = input.readFloat();
@@ -345,7 +345,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 					data->_spacingMode = (SpacingMode) ((flags >> 2) & 3);
 					data->_rotateMode = (RotateMode) ((flags >> 4) & 3);
 					if ((flags & 128) != 0) data->_offsetRotation = input.readFloat();
-					PathConstraintPose &setup = data->_setup;
+					PathConstraintPose &setup = data->_setupPose;
 					setup._position = input.readFloat();
 					if (data->_positionMode == PositionMode_Fixed) setup._position *= _scale;
 					setup._spacing = input.readFloat();
@@ -393,7 +393,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 					data->_skinRequired = (flags & 1) != 0;
 					data->_loop = (flags & 2) != 0;
 					data->_additive = (flags & 4) != 0;
-					SliderPose &setup = data->_setup;
+					SliderPose &setup = data->_setupPose;
 					if ((flags & 8) != 0) setup._time = input.readFloat();
 					if ((flags & 16) != 0) setup._mix = (flags & 32) != 0 ? input.readFloat() : 1;
 					if ((flags & 64) != 0) {
@@ -487,13 +487,14 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 		Array<EventData *> &events = skeletonData->_events.setSize(eventsCount, NULL);
 		for (int i = 0; i < eventsCount; ++i) {
 			EventData *eventData = new (__FILE__, __LINE__) EventData(String(input.readString(), true));
-			eventData->_intValue = input.readInt(false);
-			eventData->_floatValue = input.readFloat();
-			eventData->_stringValue.own(input.readString());
+			Event &setup = eventData->_setupPose;
+			setup._intValue = input.readInt(false);
+			setup._floatValue = input.readFloat();
+			setup._stringValue.own(input.readString());
 			eventData->_audioPath.own(input.readString());
 			if (!eventData->_audioPath.isEmpty()) {
-				eventData->_volume = input.readFloat();
-				eventData->_balance = input.readFloat();
+				setup._volume = input.readFloat();
+				setup._balance = input.readFloat();
 			}
 			events[i] = eventData;
 		}
@@ -795,6 +796,7 @@ void SkeletonBinary::readUnsignedShortArray(DataInput &input, Array<unsigned sho
 
 Animation *SkeletonBinary::readAnimation(DataInput &input, const String &name, SkeletonData &skeletonData) {
 	Array<Timeline *> timelines;
+	Array<int> bones;
 	timelines.ensureCapacity(input.readInt(true));
 	float scale = _scale;
 
@@ -986,8 +988,11 @@ Animation *SkeletonBinary::readAnimation(DataInput &input, const String &name, S
 	}
 
 	// Bone timelines.
-	for (int i = 0, n = input.readInt(true); i < n; ++i) {
+	int boneCount = input.readInt(true);
+	bones.ensureCapacity(boneCount);
+	for (int i = 0; i < boneCount; ++i) {
 		int boneIndex = input.readInt(true);
+		bones.add(boneIndex);
 		for (int ii = 0, nn = input.readInt(true); ii < nn; ++ii) {
 			int timelineType = input.readByte(), frameCount = input.readInt(true);
 			if (timelineType == BONE_INHERIT) {
@@ -1348,7 +1353,7 @@ Animation *SkeletonBinary::readAnimation(DataInput &input, const String &name, S
 			event->_floatValue = input.readFloat();
 			const char *stringValue = input.readString();
 			if (stringValue == NULL)
-				event->_stringValue = eventData->_stringValue;
+				event->_stringValue = eventData->_setupPose._stringValue;
 			else
 				event->_stringValue.own(stringValue);
 
@@ -1365,7 +1370,10 @@ Animation *SkeletonBinary::readAnimation(DataInput &input, const String &name, S
 	for (int i = 0, n = (int) timelines.size(); i < n; i++) {
 		duration = MathUtil::max(duration, (timelines[i])->getDuration());
 	}
-	return new (__FILE__, __LINE__) Animation(String(name), timelines, duration);
+	Animation *animation = new (__FILE__, __LINE__) Animation(String(name));
+	animation->setTimelines(timelines, bones);
+	animation->setDuration(duration);
+	return animation;
 }
 
 void SkeletonBinary::readTimeline(DataInput &input, Array<Timeline *> &timelines, CurveTimeline1 &timeline, float scale) {

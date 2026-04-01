@@ -32,7 +32,8 @@
 import Foundation
 import SpineC
 
-/// Attachment wrapper
+/// The base class for all attachments. Multiple Skeleton instances, slots, or skins can use the
+/// same attachments.
 @objc(SpineAttachment)
 @objcMembers
 open class Attachment: NSObject {

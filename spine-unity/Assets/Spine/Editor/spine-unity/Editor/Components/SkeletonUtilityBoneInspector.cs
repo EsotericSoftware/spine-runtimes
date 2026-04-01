@@ -61,7 +61,7 @@ namespace Spine.Unity.Editor {
 		Dictionary<Slot, List<BoundingBoxAttachment>> boundingBoxTable = new Dictionary<Slot, List<BoundingBoxAttachment>>();
 
 		void OnEnable () {
-			mode = this.serializedObject.FindProperty("mode");
+			mode = this.serializedObject.FindProperty("boneMode");
 			boneName = this.serializedObject.FindProperty("boneName");
 			zPosition = this.serializedObject.FindProperty("zPosition");
 			position = this.serializedObject.FindProperty("position");
@@ -145,6 +145,8 @@ namespace Spine.Unity.Editor {
 			if (EditorGUI.EndChangeCheck()) {
 				containsOverrides = mode.enumValueIndex == 1;
 				containsFollows = mode.enumValueIndex == 0;
+				if (skeletonUtility != null)
+					skeletonUtility.OnUtilityBoneChanged();
 			}
 
 			using (new EditorGUI.DisabledGroupScope(multiObject)) {

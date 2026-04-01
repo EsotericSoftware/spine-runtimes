@@ -89,6 +89,7 @@ namespace spine {
 		float getY();
 		void setY(float y);
 
+		/// Sets local x and y translation.
 		void setPosition(float x, float y);
 
 		/// The local rotation in degrees, counter clockwise.
@@ -103,7 +104,10 @@ namespace spine {
 		float getScaleY();
 		void setScaleY(float scaleY);
 
+		/// Sets local scaleX and scaleY.
 		void setScale(float scaleX, float scaleY);
+
+		/// Sets local scaleX and scaleY to the same value.
 		void setScale(float scale);
 
 		/// The local shearX.

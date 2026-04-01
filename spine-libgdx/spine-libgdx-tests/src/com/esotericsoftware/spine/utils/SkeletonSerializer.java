@@ -17,7 +17,6 @@ import com.esotericsoftware.spine.AnimationState.TrackEntry;
 import com.esotericsoftware.spine.AnimationStateData;
 import com.esotericsoftware.spine.Bone;
 import com.esotericsoftware.spine.BoneData;
-import com.esotericsoftware.spine.BoneLocal;
 import com.esotericsoftware.spine.BonePose;
 import com.esotericsoftware.spine.Constraint;
 import com.esotericsoftware.spine.ConstraintData;
@@ -145,7 +144,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -195,7 +194,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -252,7 +251,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -303,7 +302,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -350,7 +349,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -393,7 +392,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -436,7 +435,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -479,7 +478,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -522,7 +521,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -565,7 +564,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -608,7 +607,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -651,7 +650,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -694,7 +693,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -737,7 +736,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -780,7 +779,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -823,7 +822,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -866,7 +865,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -909,7 +908,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -952,7 +951,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -995,7 +994,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -1038,7 +1037,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -1081,7 +1080,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -1124,7 +1123,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -1167,7 +1166,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -1210,7 +1209,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -1253,7 +1252,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -1299,7 +1298,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -1342,7 +1341,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -1385,7 +1384,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -1428,7 +1427,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -1471,7 +1470,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -1514,7 +1513,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -1635,7 +1634,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -1678,7 +1677,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -1721,7 +1720,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -1764,7 +1763,7 @@ public class SkeletonSerializer {
 
 		json.writeName("propertyIds");
 		json.writeArrayStart();
-		for (String item : obj.getPropertyIds()) {
+		for (long item : obj.getPropertyIds()) {
 			json.writeValue(item);
 		}
 		json.writeArrayEnd();
@@ -1900,8 +1899,8 @@ public class SkeletonSerializer {
 		json.writeName("mixDuration");
 		json.writeValue(obj.getMixDuration());
 
-		json.writeName("mixBlend");
-		json.writeValue(obj.getMixBlend().name());
+		json.writeName("additive");
+		json.writeValue(obj.getAdditive());
 
 		json.writeName("mixingFrom");
 		if (obj.getMixingFrom() == null) {
@@ -1916,9 +1915,6 @@ public class SkeletonSerializer {
 		} else {
 			writeTrackEntry(obj.getMixingTo());
 		}
-
-		json.writeName("holdPrevious");
-		json.writeValue(obj.getHoldPrevious());
 
 		json.writeName("shortestRotation");
 		json.writeValue(obj.getShortestRotation());
@@ -2002,7 +1998,7 @@ public class SkeletonSerializer {
 		writeBoneData(obj.getData());
 
 		json.writeName("pose");
-		writeBoneLocal(obj.getPose());
+		writeBonePose(obj.getPose());
 
 		json.writeName("appliedPose");
 		writeBonePose(obj.getAppliedPose());
@@ -2050,51 +2046,10 @@ public class SkeletonSerializer {
 		json.writeValue(obj.getName());
 
 		json.writeName("setupPose");
-		writeBoneLocal(obj.getSetupPose());
+		writeBonePose(obj.getSetupPose());
 
 		json.writeName("skinRequired");
 		json.writeValue(obj.getSkinRequired());
-
-		json.writeObjectEnd();
-	}
-
-	private void writeBoneLocal (BoneLocal obj) {
-		if (visitedObjects.containsKey(obj)) {
-			json.writeValue(visitedObjects.get(obj));
-			return;
-		}
-		String refString = "<BoneLocal-" + (nextId++) + ">";
-		visitedObjects.put(obj, refString);
-
-		json.writeObjectStart();
-		json.writeName("refString");
-		json.writeValue(refString);
-		json.writeName("type");
-		json.writeValue("BoneLocal");
-
-		json.writeName("x");
-		json.writeValue(obj.getX());
-
-		json.writeName("y");
-		json.writeValue(obj.getY());
-
-		json.writeName("rotation");
-		json.writeValue(obj.getRotation());
-
-		json.writeName("scaleX");
-		json.writeValue(obj.getScaleX());
-
-		json.writeName("scaleY");
-		json.writeValue(obj.getScaleY());
-
-		json.writeName("shearX");
-		json.writeValue(obj.getShearX());
-
-		json.writeName("shearY");
-		json.writeValue(obj.getShearY());
-
-		json.writeName("inherit");
-		json.writeValue(obj.getInherit().name());
 
 		json.writeObjectEnd();
 	}
@@ -2371,23 +2326,24 @@ public class SkeletonSerializer {
 		json.writeName("type");
 		json.writeValue("EventData");
 
+		Event setup = obj.getSetupPose();
 		json.writeName("int");
-		json.writeValue(obj.getInt());
+		json.writeValue(setup.getInt());
 
 		json.writeName("float");
-		json.writeValue(obj.getFloat());
+		json.writeValue(setup.getFloat());
 
 		json.writeName("string");
-		json.writeValue(obj.getString());
+		json.writeValue(setup.getString());
 
 		json.writeName("audioPath");
 		json.writeValue(obj.getAudioPath());
 
 		json.writeName("volume");
-		json.writeValue(obj.getVolume());
+		json.writeValue(setup.getVolume());
 
 		json.writeName("balance");
-		json.writeValue(obj.getBalance());
+		json.writeValue(setup.getBalance());
 
 		json.writeName("name");
 		json.writeValue(obj.getName());
@@ -3135,11 +3091,16 @@ public class SkeletonSerializer {
 		}
 		json.writeArrayEnd();
 
-		json.writeName("drawOrder");
+		json.writeName("drawOrderPose");
 		json.writeArrayStart();
-		for (Slot item : obj.getDrawOrder()) {
+		for (Slot item : obj.getDrawOrder().getPose())
 			writeSlot(item);
-		}
+		json.writeArrayEnd();
+
+		json.writeName("drawOrderApplied");
+		json.writeArrayStart();
+		for (Slot item : obj.getDrawOrder().getAppliedPose())
+			writeSlot(item);
 		json.writeArrayEnd();
 
 		json.writeName("skin");
@@ -3346,7 +3307,8 @@ public class SkeletonSerializer {
 			json.writeValue(visitedObjects.get(obj));
 			return;
 		}
-		String refString = obj.getName() != null ? "<SkinEntry-" + obj.getName() + ">" : "<SkinEntry-" + (nextId++) + ">";
+		String refString = obj.getPlaceholderName() != null ? "<SkinEntry-" + obj.getPlaceholderName() + ">"
+			: "<SkinEntry-" + (nextId++) + ">";
 		visitedObjects.put(obj, refString);
 
 		json.writeObjectStart();
@@ -3359,7 +3321,7 @@ public class SkeletonSerializer {
 		json.writeValue(obj.getSlotIndex());
 
 		json.writeName("name");
-		json.writeValue(obj.getName());
+		json.writeValue(obj.getPlaceholderName());
 
 		json.writeName("attachment");
 		writeAttachment(obj.getAttachment());

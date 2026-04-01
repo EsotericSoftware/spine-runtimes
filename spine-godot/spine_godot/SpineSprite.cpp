@@ -633,7 +633,7 @@ void SpineSprite::sort_slot_nodes() {
 		slot_nodes[i].setSize(0, nullptr);
 	}
 
-	auto &draw_order = skeleton->get_spine_object()->getDrawOrder();
+	auto &draw_order = skeleton->get_spine_object()->getDrawOrder().getAppliedPose();
 	for (int i = 0; i < get_child_count(); i++) {
 		auto child = cast_to<Node2D>(get_child(i));
 		if (!child) continue;
@@ -848,7 +848,7 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 	auto statics = SpineSpriteStatics::instance();
 	spine::Skeleton *skeleton = skeleton_ref->get_spine_object();
 	for (int i = 0, n = (int) skeleton->getSlots().size(); i < n; ++i) {
-		spine::Slot *slot = skeleton->getDrawOrder()[i];
+		spine::Slot *slot = skeleton->getDrawOrder().getAppliedPose()[i];
 		spine::Attachment *attachment = slot->getAppliedPose().getAttachment();
 		SpineMesh2D *mesh_instance = mesh_instances[i];
 		mesh_instance->renderer_object = nullptr;
@@ -1054,7 +1054,7 @@ void SpineSprite::draw() {
 
 	if (debug_regions) {
 		draw_set_transform(Vector2(0, 0), 0, Vector2(1, 1));
-		auto &draw_order = skeleton->get_spine_object()->getDrawOrder();
+		auto &draw_order = skeleton->get_spine_object()->getDrawOrder().getAppliedPose();
 		for (int i = 0; i < (int) draw_order.size(); i++) {
 			auto slot = draw_order[i];
 			if (!slot->getBone().isActive()) continue;
@@ -1097,7 +1097,7 @@ void SpineSprite::draw() {
 
 	if (debug_meshes) {
 		draw_set_transform(Vector2(0, 0), 0, Vector2(1, 1));
-		auto &draw_order = skeleton->get_spine_object()->getDrawOrder();
+		auto &draw_order = skeleton->get_spine_object()->getDrawOrder().getAppliedPose();
 		for (int i = 0; i < (int) draw_order.size(); i++) {
 			auto slot = draw_order[i];
 			if (!slot->getBone().isActive()) continue;
@@ -1137,7 +1137,7 @@ void SpineSprite::draw() {
 
 	if (debug_bounding_boxes) {
 		draw_set_transform(Vector2(0, 0), 0, Vector2(1, 1));
-		auto &draw_order = skeleton->get_spine_object()->getDrawOrder();
+		auto &draw_order = skeleton->get_spine_object()->getDrawOrder().getAppliedPose();
 		for (int i = 0; i < (int) draw_order.size(); i++) {
 			auto slot = draw_order[i];
 			if (!slot->getBone().isActive()) continue;
@@ -1159,7 +1159,7 @@ void SpineSprite::draw() {
 
 	if (debug_clipping) {
 		draw_set_transform(Vector2(0, 0), 0, Vector2(1, 1));
-		auto &draw_order = skeleton->get_spine_object()->getDrawOrder();
+		auto &draw_order = skeleton->get_spine_object()->getDrawOrder().getAppliedPose();
 		for (int i = 0; i < (int) draw_order.size(); i++) {
 			auto slot = draw_order[i];
 			if (!slot->getBone().isActive()) continue;

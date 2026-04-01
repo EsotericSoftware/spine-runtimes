@@ -35,11 +35,8 @@ import '../spine_bindings.dart';
 import 'constraint_timeline.dart';
 import 'curve_timeline.dart';
 
-/// Changes a transform constraint's TransformConstraintPose::getMixRotate(),
-/// TransformConstraintPose::getMixX(), TransformConstraintPose::getMixY(),
-/// TransformConstraintPose::getMixScaleX(),
-/// TransformConstraintPose::getMixScaleY(), and
-/// TransformConstraintPose::getMixShearY().
+/// Changes a transform constraint's rotate, x, y, scaleX, scaleY, and shearY
+/// mix values.
 class TransformConstraintTimeline extends CurveTimeline implements ConstraintTimeline {
   final Pointer<spine_transform_constraint_timeline_wrapper> _ptr;
 

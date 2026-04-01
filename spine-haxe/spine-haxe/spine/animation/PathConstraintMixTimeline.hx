@@ -69,24 +69,19 @@ class PathConstraintMixTimeline extends CurveTimeline implements ConstraintTimel
 		frames[frame + Y] = mixY;
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend, direction:MixDirection,
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
 			appliedPose:Bool) {
 		var constraint = cast(skeleton.constraints[constraintIndex], PathConstraint);
 		if (!constraint.active)
 			return;
-		var pose = appliedPose ? constraint.applied : constraint.pose;
+		var pose = appliedPose ? constraint.appliedPose : constraint.pose;
 
 		if (time < frames[0]) {
-			var setup = constraint.data.setup;
-			switch (blend) {
-				case MixBlend.setup:
-					pose.mixRotate = setup.mixRotate;
-					pose.mixX = setup.mixX;
-					pose.mixY = setup.mixY;
-				case MixBlend.first:
-					pose.mixRotate += (setup.mixRotate - pose.mixRotate) * alpha;
-					pose.mixX += (setup.mixX - pose.mixX) * alpha;
-					pose.mixY += (setup.mixY - pose.mixY) * alpha;
+			if (fromSetup) {
+				var setup = constraint.data.setupPose;
+				pose.mixRotate = setup.mixRotate;
+				pose.mixX = setup.mixX;
+				pose.mixY = setup.mixY;
 			}
 			return;
 		}
@@ -114,15 +109,9 @@ class PathConstraintMixTimeline extends CurveTimeline implements ConstraintTimel
 				y = getBezierValue(time, i, Y, curveType + CurveTimeline.BEZIER_SIZE * 2 - CurveTimeline.BEZIER);
 		}
 
-		if (blend == MixBlend.setup) {
-			var setup = constraint.data.setup;
-			pose.mixRotate = setup.mixRotate + (rotate - setup.mixRotate) * alpha;
-			pose.mixX = setup.mixX + (x - setup.mixX) * alpha;
-			pose.mixY = setup.mixY + (y - setup.mixY) * alpha;
-		} else {
-			pose.mixRotate += (rotate - pose.mixRotate) * alpha;
-			pose.mixX += (x - pose.mixX) * alpha;
-			pose.mixY += (y - pose.mixY) * alpha;
-		}
+		var base = fromSetup ? constraint.data.setupPose : pose;
+		pose.mixRotate = base.mixRotate + (rotate - base.mixRotate) * alpha;
+		pose.mixX = base.mixX + (x - base.mixX) * alpha;
+		pose.mixY = base.mixY + (y - base.mixY) * alpha;
 	}
 }

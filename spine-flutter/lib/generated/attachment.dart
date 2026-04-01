@@ -41,7 +41,8 @@ import 'path_attachment.dart';
 import 'point_attachment.dart';
 import 'region_attachment.dart';
 
-/// Attachment wrapper
+/// The base class for all attachments. Multiple Skeleton instances, slots, or
+/// skins can use the same attachments.
 abstract class Attachment {
   final Pointer<spine_attachment_wrapper> _ptr;
 

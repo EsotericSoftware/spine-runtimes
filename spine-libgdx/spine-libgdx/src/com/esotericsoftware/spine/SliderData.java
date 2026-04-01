@@ -50,6 +50,7 @@ public class SliderData extends ConstraintData<Slider, SliderPose> {
 		return new Slider(this, skeleton);
 	}
 
+	/** The animation the slider will apply. */
 	public Animation getAnimation () {
 		return animation;
 	}
@@ -58,6 +59,7 @@ public class SliderData extends ConstraintData<Slider, SliderPose> {
 		this.animation = animation;
 	}
 
+	/** When true, the animation is applied by adding it to the current pose rather than overwriting it. */
 	public boolean getAdditive () {
 		return additive;
 	}
@@ -66,6 +68,7 @@ public class SliderData extends ConstraintData<Slider, SliderPose> {
 		this.additive = additive;
 	}
 
+	/** When true, the animation repeats after its duration, otherwise the last frame is used. */
 	public boolean getLoop () {
 		return loop;
 	}
@@ -74,6 +77,7 @@ public class SliderData extends ConstraintData<Slider, SliderPose> {
 		this.loop = loop;
 	}
 
+	/** When set, the bone's transform property is used to set the slider's {@link SliderPose#time}. */
 	public @Null BoneData getBone () {
 		return bone;
 	}
@@ -82,6 +86,7 @@ public class SliderData extends ConstraintData<Slider, SliderPose> {
 		this.bone = bone;
 	}
 
+	/** When a bone is set, the specified transform property is used to set the slider's {@link SliderPose#time}. */
 	public @Null FromProperty getProperty () {
 		return property;
 	}
@@ -90,6 +95,7 @@ public class SliderData extends ConstraintData<Slider, SliderPose> {
 		this.property = property;
 	}
 
+	/** When a bone is set, the offset is added to the property. */
 	public float getOffset () {
 		return offset;
 	}
@@ -98,6 +104,7 @@ public class SliderData extends ConstraintData<Slider, SliderPose> {
 		this.offset = offset;
 	}
 
+	/** When a bone is set, this is the scale of the {@link #property} value in relation to the slider time. */
 	public float getScale () {
 		return scale;
 	}
@@ -106,6 +113,7 @@ public class SliderData extends ConstraintData<Slider, SliderPose> {
 		this.scale = scale;
 	}
 
+	/** When true and a bone is set, the bone's local transform property is read instead of its world transform. */
 	public boolean getLocal () {
 		return local;
 	}

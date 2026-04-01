@@ -35,15 +35,11 @@ class ShearTimeline extends BoneTimeline2 {
 		super(frameCount, bezierCount, boneIndex, Property.shearX, Property.shearY);
 	}
 
-	public function apply1(pose:BoneLocal, setup:BoneLocal, time:Float, alpha:Float, blend:MixBlend, direction:MixDirection) {
+	public function apply1(pose:BonePose, setup:BonePose, time:Float, alpha:Float, fromSetup:Bool, add:Bool, out:Bool) {
 		if (time < frames[0]) {
-			switch (blend) {
-				case MixBlend.setup:
-					pose.shearX = setup.shearX;
-					pose.shearY = setup.shearY;
-				case MixBlend.first:
-					pose.shearX += (setup.shearX - pose.shearX) * alpha;
-					pose.shearY += (setup.shearY - pose.shearY) * alpha;
+			if (fromSetup) {
+				pose.shearX = setup.shearX;
+				pose.shearY = setup.shearY;
 			}
 			return;
 		}
@@ -67,16 +63,15 @@ class ShearTimeline extends BoneTimeline2 {
 				y = getBezierValue(time, i, BoneTimeline2.VALUE2, curveType + CurveTimeline.BEZIER_SIZE - CurveTimeline.BEZIER);
 		}
 
-		switch (blend) {
-			case MixBlend.setup:
-				pose.shearX = setup.shearX + x * alpha;
-				pose.shearY = setup.shearY + y * alpha;
-			case MixBlend.first, MixBlend.replace:
-				pose.shearX += (setup.shearX + x - pose.shearX) * alpha;
-				pose.shearY += (setup.shearY + y - pose.shearY) * alpha;
-			case MixBlend.add:
-				pose.shearX += x * alpha;
-				pose.shearY += y * alpha;
+		if (fromSetup) {
+			pose.shearX = setup.shearX + x * alpha;
+			pose.shearY = setup.shearY + y * alpha;
+		} else if (add) {
+			pose.shearX += x * alpha;
+			pose.shearY += y * alpha;
+		} else {
+			pose.shearX += (setup.shearX + x - pose.shearX) * alpha;
+			pose.shearY += (setup.shearY + y - pose.shearY) * alpha;
 		}
 	}
 }

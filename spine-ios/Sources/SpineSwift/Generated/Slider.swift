@@ -47,6 +47,7 @@ public class Slider: SliderBase {
         self.init(fromPointer: ptr!)
     }
 
+    /// When set, the bone's transform property is used to set the slider's SliderPose::getTime().
     public var bone: Bone {
         get {
             let result = spine_slider_get_bone(_ptr.assumingMemoryBound(to: spine_slider_wrapper.self))

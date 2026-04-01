@@ -41,7 +41,7 @@ namespace spine {
 
 	class Animation;
 
-	/// Stores mix (crossfade) durations to be applied when AnimationState animations are changed.
+	/// Stores mix (crossfade) durations to be applied when AnimationState animations are changed on the same track.
 	class SP_API AnimationStateData : public SpineObject {
 		friend class AnimationState;
 
@@ -63,8 +63,8 @@ namespace spine {
 		/// See TrackEntry.MixDuration.
 		void setMix(Animation &from, Animation &to, float duration);
 
-		/// The mix duration to use when changing from the specified animation to the other,
-		/// or the DefaultMix if no mix duration has been set.
+		/// Returns the mix duration to use when changing from the specified animation to the other on the same track,
+		/// or the default mix if no mix duration has been set.
 		float getMix(Animation &from, Animation &to);
 
 		/// Removes all mixes and sets the default mix to 0.

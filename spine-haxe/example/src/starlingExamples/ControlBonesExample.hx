@@ -82,7 +82,7 @@ class ControlBonesExample extends Scene {
 		skeletonSprite.advanceTime(0);
 		for (boneName in controlBoneNames) {
 			var bone = skeletonSprite.skeleton.findBone(boneName);
-			var point = [bone.applied.worldX, bone.applied.worldY];
+			var point = [bone.appliedPose.worldX, bone.appliedPose.worldY];
 			skeletonSprite.skeletonToHaxeWorldCoordinates(point);
 
 			var control:Canvas = new Canvas();

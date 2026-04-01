@@ -17,10 +17,9 @@ spine_rtti spine_scale_x_timeline_get_rtti(spine_scale_x_timeline self) {
 }
 
 void spine_scale_x_timeline_apply(spine_scale_x_timeline self, spine_skeleton skeleton, float lastTime, float time,
-								  /*@null*/ spine_array_event events, float alpha, spine_mix_blend blend, spine_mix_direction direction,
-								  bool appliedPose) {
+								  /*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
 	ScaleXTimeline *_self = (ScaleXTimeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixBlend) blend, (MixDirection) direction, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
 }
 
 int spine_scale_x_timeline_get_bone_index(spine_scale_x_timeline self) {
@@ -43,28 +42,28 @@ float spine_scale_x_timeline_get_curve_value(spine_scale_x_timeline self, float 
 	return _self->getCurveValue(time);
 }
 
-float spine_scale_x_timeline_get_relative_value(spine_scale_x_timeline self, float time, float alpha, spine_mix_blend blend, float current,
+float spine_scale_x_timeline_get_relative_value(spine_scale_x_timeline self, float time, float alpha, bool fromSetup, bool add, float current,
 												float setup) {
 	ScaleXTimeline *_self = (ScaleXTimeline *) self;
-	return _self->getRelativeValue(time, alpha, (MixBlend) blend, current, setup);
+	return _self->getRelativeValue(time, alpha, fromSetup, add, current, setup);
 }
 
-float spine_scale_x_timeline_get_absolute_value_1(spine_scale_x_timeline self, float time, float alpha, spine_mix_blend blend, float current,
+float spine_scale_x_timeline_get_absolute_value_1(spine_scale_x_timeline self, float time, float alpha, bool fromSetup, bool add, float current,
 												  float setup) {
 	ScaleXTimeline *_self = (ScaleXTimeline *) self;
-	return _self->getAbsoluteValue(time, alpha, (MixBlend) blend, current, setup);
+	return _self->getAbsoluteValue(time, alpha, fromSetup, add, current, setup);
 }
 
-float spine_scale_x_timeline_get_absolute_value_2(spine_scale_x_timeline self, float time, float alpha, spine_mix_blend blend, float current,
+float spine_scale_x_timeline_get_absolute_value_2(spine_scale_x_timeline self, float time, float alpha, bool fromSetup, bool add, float current,
 												  float setup, float value) {
 	ScaleXTimeline *_self = (ScaleXTimeline *) self;
-	return _self->getAbsoluteValue(time, alpha, (MixBlend) blend, current, setup, value);
+	return _self->getAbsoluteValue(time, alpha, fromSetup, add, current, setup, value);
 }
 
-float spine_scale_x_timeline_get_scale_value(spine_scale_x_timeline self, float time, float alpha, spine_mix_blend blend,
-											 spine_mix_direction direction, float current, float setup) {
+float spine_scale_x_timeline_get_scale_value(spine_scale_x_timeline self, float time, float alpha, bool fromSetup, bool add, bool out, float current,
+											 float setup) {
 	ScaleXTimeline *_self = (ScaleXTimeline *) self;
-	return _self->getScaleValue(time, alpha, (MixBlend) blend, (MixDirection) direction, current, setup);
+	return _self->getScaleValue(time, alpha, fromSetup, add, out, current, setup);
 }
 
 void spine_scale_x_timeline_set_linear(spine_scale_x_timeline self, size_t frame) {
@@ -91,6 +90,16 @@ float spine_scale_x_timeline_get_bezier_value(spine_scale_x_timeline self, float
 spine_array_float spine_scale_x_timeline_get_curves(spine_scale_x_timeline self) {
 	ScaleXTimeline *_self = (ScaleXTimeline *) self;
 	return (spine_array_float) &_self->getCurves();
+}
+
+bool spine_scale_x_timeline_get_additive(spine_scale_x_timeline self) {
+	ScaleXTimeline *_self = (ScaleXTimeline *) self;
+	return _self->getAdditive();
+}
+
+bool spine_scale_x_timeline_get_instant(spine_scale_x_timeline self) {
+	ScaleXTimeline *_self = (ScaleXTimeline *) self;
+	return _self->getInstant();
 }
 
 size_t spine_scale_x_timeline_get_frame_entries(spine_scale_x_timeline self) {

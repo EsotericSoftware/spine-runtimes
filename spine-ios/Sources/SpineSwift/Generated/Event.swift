@@ -32,12 +32,10 @@
 import Foundation
 import SpineC
 
-/// Stores the current pose values for an Event.
+/// Fired by EventTimeline when specific animation times are reached.
 ///
 /// See Timeline::apply(), AnimationStateListener::event(), and
-///
-/// - SeeAlso:
-///   - https://esotericsoftware.com/spine-events Events in the Spine User Guide.
+/// https://esotericsoftware.com/spine-events Events in the Spine User Guide.
 @objc(SpineEvent)
 @objcMembers
 public class Event: NSObject {
@@ -59,12 +57,13 @@ public class Event: NSObject {
         return EventData(fromPointer: result!)
     }
 
-    /// The animation time this event was keyed.
+    /// The animation time this event was keyed, or -1 for the setup pose.
     public var time: Float {
         let result = spine_event_get_time(_ptr.assumingMemoryBound(to: spine_event_wrapper.self))
         return result
     }
 
+    /// The integer payload for this event.
     public var intValue: Int32 {
         get {
             let result = spine_event_get_int(_ptr.assumingMemoryBound(to: spine_event_wrapper.self))
@@ -75,6 +74,7 @@ public class Event: NSObject {
         }
     }
 
+    /// The float payload for this event.
     public var floatValue: Float {
         get {
             let result = spine_event_get_float(_ptr.assumingMemoryBound(to: spine_event_wrapper.self))
@@ -85,6 +85,7 @@ public class Event: NSObject {
         }
     }
 
+    /// The string payload for this event.
     public var stringValue: String {
         get {
             let result = spine_event_get_string(_ptr.assumingMemoryBound(to: spine_event_wrapper.self))
@@ -95,6 +96,7 @@ public class Event: NSObject {
         }
     }
 
+    /// If an audio path is set, the volume for the audio.
     public var volume: Float {
         get {
             let result = spine_event_get_volume(_ptr.assumingMemoryBound(to: spine_event_wrapper.self))
@@ -105,6 +107,7 @@ public class Event: NSObject {
         }
     }
 
+    /// If an audio path is set, the left/right balance for the audio.
     public var balance: Float {
         get {
             let result = spine_event_get_balance(_ptr.assumingMemoryBound(to: spine_event_wrapper.self))

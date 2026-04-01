@@ -52,14 +52,15 @@ RTTI_IMPL(PhysicsConstraintMixTimeline, PhysicsConstraintTimeline)
 RTTI_IMPL_MULTI(PhysicsConstraintResetTimeline, Timeline, ConstraintTimeline)
 
 PhysicsConstraintTimeline::PhysicsConstraintTimeline(size_t frameCount, size_t bezierCount, int constraintIndex, Property property)
-	: CurveTimeline1(frameCount, bezierCount), ConstraintTimeline(), _constraintIndex(constraintIndex), _additive(false) {
+	: CurveTimeline1(frameCount, bezierCount), ConstraintTimeline(), _constraintIndex(constraintIndex) {
 	PropertyId ids[] = {((PropertyId) property << 32) | constraintIndex};
 	setPropertyIds(ids, 1);
 }
 
-void PhysicsConstraintTimeline::apply(Skeleton &skeleton, float, float time, Array<Event *> *, float alpha, MixBlend blend, MixDirection direction,
+void PhysicsConstraintTimeline::apply(Skeleton &skeleton, float, float time, Array<Event *> *, float alpha, bool fromSetup, bool add, bool out,
 									  bool appliedPose) {
-	if (blend == MixBlend_Add && !_additive) blend = MixBlend_Replace;
+	SP_UNUSED(out);
+	if (add && !_additive) add = false;
 	if (_constraintIndex == -1) {
 		float value = time >= _frames[0] ? getCurveValue(time) : 0;
 
@@ -67,21 +68,21 @@ void PhysicsConstraintTimeline::apply(Skeleton &skeleton, float, float time, Arr
 		for (size_t i = 0; i < physicsConstraints.size(); i++) {
 			PhysicsConstraint *constraint = physicsConstraints[i];
 			if (constraint->isActive() && global(constraint->_data)) {
-				PhysicsConstraintPose &pose = appliedPose ? *constraint->_applied : constraint->_pose;
-				set(pose, getAbsoluteValue(time, alpha, blend, get(pose), get(constraint->_data._setup), value));
+				PhysicsConstraintPose &pose = appliedPose ? *constraint->_appliedPose : constraint->_pose;
+				set(pose, getAbsoluteValue(time, alpha, fromSetup, add, get(pose), get(constraint->_data._setupPose), value));
 			}
 		}
 	} else {
 		PhysicsConstraint *constraint = static_cast<PhysicsConstraint *>(skeleton.getConstraints()[_constraintIndex]);
 		if (constraint->isActive()) {
-			PhysicsConstraintPose &pose = appliedPose ? *constraint->_applied : constraint->_pose;
-			set(pose, getAbsoluteValue(time, alpha, blend, get(pose), get(constraint->_data._setup)));
+			PhysicsConstraintPose &pose = appliedPose ? *constraint->_appliedPose : constraint->_pose;
+			set(pose, getAbsoluteValue(time, alpha, fromSetup, add, get(pose), get(constraint->_data._setupPose)));
 		}
 	}
 }
 
-void PhysicsConstraintResetTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *, float alpha, MixBlend blend,
-										   MixDirection direction, bool appliedPose) {
+void PhysicsConstraintResetTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *, float alpha, bool fromSetup, bool add,
+										   bool out, bool appliedPose) {
 	PhysicsConstraint *constraint = nullptr;
 	if (_constraintIndex != -1) {
 		constraint = static_cast<PhysicsConstraint *>(skeleton.getConstraints()[_constraintIndex]);
@@ -89,7 +90,7 @@ void PhysicsConstraintResetTimeline::apply(Skeleton &skeleton, float lastTime, f
 	}
 
 	if (lastTime > time) {// Apply after lastTime for looped animations.
-		apply(skeleton, lastTime, FLT_MAX, nullptr, alpha, blend, direction, appliedPose);
+		apply(skeleton, lastTime, FLT_MAX, nullptr, alpha, false, false, false, false);
 		lastTime = -1;
 	} else if (lastTime >= _frames[_frames.size() - 1])// Last time is after last frame.
 		return;

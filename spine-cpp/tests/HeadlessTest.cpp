@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
 	setlocale(LC_ALL, "C");
 
 	if (argc < 3) {
-		fprintf(stderr, "Usage: DebugPrinter <skeleton-path> <atlas-path> [animation-name]\n");
+		fprintf(stderr, "Usage: HeadlessTest <skeleton-path> <atlas-path> [animation-name] [animation-name-2]\n");
 		return 1;
 	}
 
@@ -81,6 +81,7 @@ int main(int argc, char *argv[]) {
 	const char *skeletonPath = argv[1];
 	const char *atlasPath = argv[2];
 	const char *animationName = argc >= 4 ? argv[3] : nullptr;
+	const char *animationName2 = argc >= 5 ? argv[4] : nullptr;
 
 	// Load atlas with headless texture loader
 	HeadlessTextureLoader textureLoader;
@@ -145,6 +146,47 @@ int main(int argc, char *argv[]) {
 	if (state != nullptr) {
 		printf("\n=== ANIMATION STATE ===\n");
 		printf("%s", serializer.serializeAnimationState(state).buffer());
+	}
+
+	// Transition test: if a second animation is provided, play A for 10 frames, transition to B,
+	// then sample skeleton state at frames 5, 10, 15, 20 during the mix.
+	if (state != nullptr && animationName2 != nullptr) {
+		Animation *animation2 = skeletonData->findAnimation(animationName2);
+		if (!animation2) {
+			fprintf(stderr, "Animation not found: %s\n", animationName2);
+			delete state;
+			delete stateData;
+			delete skeletonData;
+			delete atlas;
+			return 1;
+		}
+
+		// Reset skeleton and state
+		skeleton.setupPose();
+		state->clearTracks();
+		state->setAnimation(0, *skeletonData->findAnimation(animationName), true);
+
+		// Run 10 frames of animation A
+		for (int i = 0; i < 10; i++) {
+			state->update(1 / 60.0f);
+			state->apply(skeleton);
+			skeleton.updateWorldTransform(Physics_Update);
+		}
+
+		// Transition to animation B
+		state->setAnimation(0, *animation2, true);
+
+		// Run 20 frames through the mix, serializing at frames 5, 10, 15, 20
+		for (int i = 1; i <= 20; i++) {
+			state->update(1 / 60.0f);
+			state->apply(skeleton);
+			skeleton.updateWorldTransform(Physics_Update);
+			if (i == 5 || i == 10 || i == 15 || i == 20) {
+				SkeletonSerializer transSerializer;
+				printf("\n=== TRANSITION FRAME %d ===\n", i);
+				printf("%s", transSerializer.serializeSkeleton(&skeleton).buffer());
+			}
+		}
 	}
 
 	// Cleanup

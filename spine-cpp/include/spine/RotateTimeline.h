@@ -47,7 +47,7 @@ namespace spine {
 		explicit RotateTimeline(size_t frameCount, size_t bezierCount, int boneIndex);
 
 	protected:
-		virtual void _apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, MixBlend blend, MixDirection direction) override;
+		virtual void _apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) override;
 	};
 }
 

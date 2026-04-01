@@ -81,10 +81,10 @@ void SpineBoneData::set_length(float v) {
 	get_spine_object()->setLength(v);
 }
 
-Ref<SpineBoneLocal> SpineBoneData::get_setup_pose() {
+Ref<SpineBonePose> SpineBoneData::get_setup_pose() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto &setup_pose = get_spine_object()->getSetupPose();
-	Ref<SpineBoneLocal> pose_ref(memnew(SpineBoneLocal));
+	Ref<SpineBonePose> pose_ref(memnew(SpineBonePose));
 	pose_ref->set_spine_object(get_spine_owner(), &setup_pose);
 	return pose_ref;
 }

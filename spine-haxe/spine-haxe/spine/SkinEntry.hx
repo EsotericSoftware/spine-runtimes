@@ -35,14 +35,14 @@ import spine.attachments.Attachment;
 class SkinEntry {
 	public var slotIndex:Int = 0;
 
-	/** The name the attachment is associated with, equivalent to the skin placeholder name in the Spine editor. */
-	public var name:String;
+	/** The placeholder name that the attachment is associated with. */
+	public var placeholderName:String;
 
 	public var attachment:Attachment;
 
-	public function new(slotIndex:Int, name:String, attachment:Attachment) {
+	public function new(slotIndex:Int, placeholderName:String, attachment:Attachment) {
 		this.slotIndex = slotIndex;
-		this.name = name;
+		this.placeholderName = placeholderName;
 		this.attachment = attachment;
 	}
 }

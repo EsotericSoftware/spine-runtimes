@@ -28,13 +28,14 @@
  *****************************************************************************/
 
 import type { BoneData } from "./BoneData.js";
+import type { Slot } from "./Slot.js";
 import { PosedData } from "./PosedData.js";
 import type { Skeleton } from "./Skeleton.js";
 import { SlotPose } from "./SlotPose.js";
 
 /** Stores the setup pose for a {@link Slot}. */
 export class SlotData extends PosedData<SlotPose> {
-	/** The index of the slot in {@link Skeleton.getSlots()}. */
+	/** The index of the slot in {@link Skeleton.slots}. */
 	index: number = 0;
 
 	/** The bone this slot belongs to. */

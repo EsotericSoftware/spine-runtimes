@@ -33,7 +33,7 @@ import 'package:universal_ffi/ffi.dart';
 import 'package:universal_ffi/ffi_utils.dart';
 import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
-import 'bone_local.dart';
+import 'bone_pose.dart';
 import 'color.dart';
 import 'posed_data.dart';
 
@@ -58,13 +58,13 @@ class BoneData extends PosedData {
     SpineBindings.bindings.spine_bone_data_dispose(_ptr);
   }
 
-  /// The index of the bone in Skeleton.Bones
+  /// The Skeleton::getBones() index for this bone.
   int get index {
     final result = SpineBindings.bindings.spine_bone_data_get_index(_ptr);
     return result;
   }
 
-  /// May be NULL.
+  /// The parent bone, or NULL if this bone is the root.
   BoneData? get parent {
     final result = SpineBindings.bindings.spine_bone_data_get_parent(_ptr);
     return result.address == 0 ? null : BoneData.fromPointer(result);
@@ -84,6 +84,8 @@ class BoneData extends PosedData {
     return Color.fromPointer(result);
   }
 
+  /// The bone icon name as it was in Spine, or empty if nonessential data was
+  /// not exported.
   String get icon {
     final result = SpineBindings.bindings.spine_bone_data_get_icon(_ptr);
     return result.cast<Utf8>().toDartString();
@@ -102,8 +104,9 @@ class BoneData extends PosedData {
     SpineBindings.bindings.spine_bone_data_set_visible(_ptr, value);
   }
 
-  BoneLocal get setupPose {
+  /// The setup pose that most animations are relative to.
+  BonePose get setupPose {
     final result = SpineBindings.bindings.spine_bone_data_get_setup_pose(_ptr);
-    return BoneLocal.fromPointer(result);
+    return BonePose.fromPointer(result);
   }
 }

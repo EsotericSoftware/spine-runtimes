@@ -56,7 +56,7 @@ export class SkeletonRenderer {
 		const ctx = this.ctx;
 		const color = this.tempColor;
 		const skeletonColor = skeleton.color;
-		const drawOrder = skeleton.drawOrder;
+		const drawOrder = skeleton.drawOrder.appliedPose;
 
 		if (this.debugRendering) ctx.strokeStyle = "green";
 
@@ -65,7 +65,7 @@ export class SkeletonRenderer {
 			const bone = slot.bone;
 			if (!bone.active) continue;
 
-			const pose = slot.applied;
+			const pose = slot.appliedPose;
 			const attachment = pose.attachment;
 			if (!(attachment instanceof RegionAttachment)) continue;
 
@@ -85,7 +85,7 @@ export class SkeletonRenderer {
 				skeletonColor.a * slotColor.a * regionColor.a);
 
 			ctx.save();
-			const boneApplied = bone.applied;
+			const boneApplied = bone.appliedPose;
 			ctx.transform(boneApplied.a, boneApplied.c, boneApplied.b, boneApplied.d, boneApplied.worldX, boneApplied.worldY);
 			const offsets = attachment.getOffsets(pose);
 			ctx.translate(offsets[0], offsets[1]);
@@ -116,7 +116,7 @@ export class SkeletonRenderer {
 		const ctx = this.ctx;
 		const color = this.tempColor;
 		const skeletonColor = skeleton.color;
-		const drawOrder = skeleton.drawOrder;
+		const drawOrder = skeleton.drawOrder.appliedPose;
 
 		let blendMode: BlendMode | null = null;
 		let vertices: ArrayLike<number> = this.vertices;
@@ -124,7 +124,7 @@ export class SkeletonRenderer {
 
 		for (let i = 0, n = drawOrder.length; i < n; i++) {
 			const slot = drawOrder[i];
-			const pose = slot.applied;
+			const pose = slot.appliedPose;
 			const attachment = pose.attachment;
 
 			let texture: HTMLImageElement;
@@ -243,7 +243,7 @@ export class SkeletonRenderer {
 
 	private computeRegionVertices (slot: Slot, region: RegionAttachment, offsets: NumberArrayLike, uvs: NumberArrayLike, pma: boolean) {
 		const skeletonColor = slot.skeleton.color;
-		const slotColor = slot.applied.color;
+		const slotColor = slot.appliedPose.color;
 		const regionColor = region.color;
 		const alpha = skeletonColor.a * slotColor.a * regionColor.a;
 		const multiplier = pma ? alpha : 1;
@@ -291,7 +291,7 @@ export class SkeletonRenderer {
 	private computeMeshVertices (slot: Slot, mesh: MeshAttachment, uvs: NumberArrayLike, pma: boolean) {
 		const skeleton = slot.skeleton;
 		const skeletonColor = skeleton.color;
-		const slotColor = slot.applied.color;
+		const slotColor = slot.appliedPose.color;
 		const regionColor = mesh.color;
 		const alpha = skeletonColor.a * slotColor.a * regionColor.a;
 		const multiplier = pma ? alpha : 1;

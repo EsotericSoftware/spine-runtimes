@@ -41,9 +41,8 @@ import 'posed.dart';
 import 'posed_active.dart';
 import 'skeleton.dart';
 
-/// Stores the current pose for a path constraint. A path constraint adjusts the
-/// rotation, translation, and scale of the constrained bones so they follow a
-/// PathAttachment.
+/// Adjusts the rotation, translation, and scale of the constrained bones so
+/// they follow a PathAttachment.
 ///
 /// See https://esotericsoftware.com/spine-path-constraints Path constraints in
 /// the Spine User Guide. Non-exported base class that inherits from the
@@ -64,21 +63,30 @@ abstract class PathConstraintBase extends PosedActive implements Posed, Constrai
     return PathConstraintData.fromPointer(result);
   }
 
+  /// The unconstrained pose for this object, set by animations and application
+  /// code.
   PathConstraintPose get pose {
     final result = SpineBindings.bindings.spine_path_constraint_base_get_pose(_ptr);
     return PathConstraintPose.fromPointer(result);
   }
 
+  /// The pose to use for rendering. If no constraints modify this pose, this is
+  /// the same as getPose(). Otherwise it is a copy of getPose() modified by
+  /// constraints.
   PathConstraintPose get appliedPose {
     final result = SpineBindings.bindings.spine_path_constraint_base_get_applied_pose(_ptr);
     return PathConstraintPose.fromPointer(result);
   }
 
+  /// Sets the constrained pose to the unconstrained pose, as a starting point
+  /// for constraints to be applied.
   @override
   void resetConstrained() {
     SpineBindings.bindings.spine_path_constraint_base_reset_constrained(_ptr);
   }
 
+  /// Sets the applied pose to the constrained pose, in anticipation of the
+  /// applied pose being modified by constraints.
   @override
   void constrained() {
     SpineBindings.bindings.spine_path_constraint_base_constrained(_ptr);

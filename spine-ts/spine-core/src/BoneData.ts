@@ -27,17 +27,17 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { BoneLocal } from "./BoneLocal.js";
+import { BonePose } from "./BonePose.js";
 import { PosedData } from "./PosedData.js";
 import type { Skeleton } from "./Skeleton.js";
 import { Color } from "./Utils.js";
 
 /** The setup pose for a bone. */
-export class BoneData extends PosedData<BoneLocal> {
-	/** The index of the bone in {@link Skeleton.getBones}. */
+export class BoneData extends PosedData<BonePose> {
+	/** The index of the bone in {@link Skeleton.bones}. */
 	index: number = 0;
 
-	/** @returns May be null. */
+	/** The parent bone, or null if this bone is the root. */
 	parent: BoneData | null = null;
 
 	/** The bone's length. */
@@ -48,14 +48,14 @@ export class BoneData extends PosedData<BoneLocal> {
 	 * rendered at runtime. */
 	readonly color = new Color();
 
-	/** The bone icon as it was in Spine, or null if nonessential data was not exported. */
+	/** The bone icon name as it was in Spine, or null if nonessential data was not exported. */
 	icon?: string;
 
 	/** False if the bone was hidden in Spine and nonessential data was exported. Does not affect runtime rendering. */
 	visible = false;
 
 	constructor (index: number, name: string, parent: BoneData | null) {
-		super(name, new BoneLocal());
+		super(name, new BonePose());
 		if (index < 0) throw new Error("index must be >= 0.");
 		if (!name) throw new Error("name cannot be null.");
 		this.index = index;
@@ -65,7 +65,7 @@ export class BoneData extends PosedData<BoneLocal> {
 	copy (parent: BoneData | null): BoneData {
 		const copy = new BoneData(this.index, this.name, parent);
 		copy.length = this.length;
-		copy.setup.set(this.setup);
+		copy.setupPose.set(this.setupPose);
 		return copy;
 	}
 }

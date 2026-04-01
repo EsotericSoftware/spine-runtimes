@@ -37,8 +37,8 @@ import type { Physics } from "./Physics.js";
 import type { Skeleton } from "./Skeleton.js";
 import { MathUtils } from "./Utils.js";
 
-/** Stores the current pose for an IK constraint. An IK constraint adjusts the rotation of 1 or 2 constrained bones so the tip of
- * the last bone is as close to the target bone as possible.
+/** Adjusts the local rotation of 1 or 2 constrained bones so the world position of the tip of the last bone is as close to the
+ * target bone as possible.
  *
  * See [IK constraints](http://esotericsoftware.com/spine-ik-constraints) in the Spine User Guide. */
 export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkConstraintPose> {
@@ -54,7 +54,7 @@ export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 
 		this.bones = [] as BonePose[];
 		for (const boneData of data.bones)
-			this.bones.push(skeleton.bones[boneData.index].constrained);
+			this.bones.push(skeleton.bones[boneData.index].constrainedPose);
 
 		this.target = skeleton.bones[data.target.index];
 	}
@@ -66,9 +66,9 @@ export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 	}
 
 	update (skeleton: Skeleton, physics: Physics) {
-		const p = this.applied;
+		const p = this.appliedPose;
 		if (p.mix === 0) return;
-		const target = this.target.applied;
+		const target = this.target.appliedPose;
 		const bones = this.bones;
 		switch (bones.length) {
 			case 1:
@@ -117,7 +117,7 @@ export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 		bone.modifyLocal(skeleton);
 
 		// biome-ignore lint/style/noNonNullAssertion: reference runtime
-		const p = bone.bone.parent!.applied;
+		const p = bone.bone.parent!.appliedPose;
 
 		let pa = p.a, pb = p.b, pc = p.c, pd = p.d;
 		let rotationIK = -bone.shearX - bone.rotation, tx = 0, ty = 0;
@@ -211,7 +211,7 @@ export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 			cwy = c * child.x + d * child.y + parent.worldY;
 		}
 		// biome-ignore lint/style/noNonNullAssertion: reference runtime
-		const pp = parent.bone.parent!.applied;
+		const pp = parent.bone.parent!.appliedPose;
 		a = pp.a;
 		b = pp.b;
 		c = pp.c;

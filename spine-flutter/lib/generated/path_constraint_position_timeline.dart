@@ -34,7 +34,7 @@ import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
 import 'constraint_timeline1.dart';
 
-/// Changes a path constraint's PathConstraintPose::getPosition().
+/// Changes a path constraint's position.
 class PathConstraintPositionTimeline extends ConstraintTimeline1 {
   final Pointer<spine_path_constraint_position_timeline_wrapper> _ptr;
 

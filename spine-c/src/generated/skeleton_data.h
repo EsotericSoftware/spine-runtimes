@@ -123,13 +123,13 @@ SPINE_C_API void spine_skeleton_data_set_version(spine_skeleton_data self, const
 SPINE_C_API const char *spine_skeleton_data_get_hash(spine_skeleton_data self);
 SPINE_C_API void spine_skeleton_data_set_hash(spine_skeleton_data self, const char *inValue);
 /**
- * The path to the images directory as defined in Spine, or null if nonessential
+ * The path to the images folder as defined in Spine, or null if nonessential
  * data was not exported.
  */
 SPINE_C_API const char *spine_skeleton_data_get_images_path(spine_skeleton_data self);
 SPINE_C_API void spine_skeleton_data_set_images_path(spine_skeleton_data self, const char *inValue);
 /**
- * The path to the audio directory as defined in Spine, or null if nonessential
+ * The path to the audio folder as defined in Spine, or null if nonessential
  * data was not exported.
  */
 SPINE_C_API const char *spine_skeleton_data_get_audio_path(spine_skeleton_data self);

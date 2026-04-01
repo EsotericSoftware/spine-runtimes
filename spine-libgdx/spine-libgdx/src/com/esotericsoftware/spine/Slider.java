@@ -30,15 +30,15 @@
 package com.esotericsoftware.spine;
 
 import com.esotericsoftware.spine.Animation.ConstraintTimeline;
-import com.esotericsoftware.spine.Animation.MixBlend;
-import com.esotericsoftware.spine.Animation.MixDirection;
+import com.esotericsoftware.spine.Animation.DrawOrderFolderTimeline;
+import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.PhysicsConstraintTimeline;
 import com.esotericsoftware.spine.Animation.SlotTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 
-/** Stores the setup pose for a {@link PhysicsConstraint}.
+/** Applies an animation based on either the slider's {@link SliderPose#time} or a bone's transform property.
  * <p>
- * See <a href="https://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide. */
+ * See <a href="https://esotericsoftware.com/spine-sliders">Sliders</a> in the Spine User Guide. */
 public class Slider extends Constraint<Slider, SliderData, SliderPose> {
 	static private final float[] offsets = new float[6];
 
@@ -58,15 +58,15 @@ public class Slider extends Constraint<Slider, SliderData, SliderPose> {
 	}
 
 	public void update (Skeleton skeleton, Physics physics) {
-		SliderPose p = applied;
+		SliderPose p = appliedPose;
 		if (p.mix == 0) return;
 
 		Animation animation = data.animation;
 		if (bone != null) {
 			if (!bone.active) return;
-			if (data.local) bone.applied.validateLocalTransform(skeleton);
+			if (data.local) bone.appliedPose.validateLocalTransform(skeleton);
 			p.time = data.offset
-				+ (data.property.value(skeleton, bone.applied, data.local, offsets) - data.property.offset) * data.scale;
+				+ (data.property.value(skeleton, bone.appliedPose, data.local, offsets) - data.property.offset) * data.scale;
 			if (data.loop)
 				p.time = animation.duration + (p.time % animation.duration);
 			else
@@ -76,10 +76,9 @@ public class Slider extends Constraint<Slider, SliderData, SliderPose> {
 		Bone[] bones = skeleton.bones.items;
 		int[] indices = animation.bones.items;
 		for (int i = 0, n = animation.bones.size; i < n; i++)
-			bones[indices[i]].applied.modifyLocal(skeleton);
+			bones[indices[i]].appliedPose.modifyLocal(skeleton);
 
-		animation.apply(skeleton, p.time, p.time, data.loop, null, p.mix, data.additive ? MixBlend.add : MixBlend.replace,
-			MixDirection.in, true);
+		animation.apply(skeleton, p.time, p.time, data.loop, null, p.mix, false, data.additive, false, true);
 	}
 
 	void sort (Skeleton skeleton) {
@@ -104,6 +103,8 @@ public class Slider extends Constraint<Slider, SliderData, SliderPose> {
 			Timeline t = timelines[i];
 			if (t instanceof SlotTimeline timeline)
 				skeleton.constrained(slots[timeline.getSlotIndex()]);
+			else if (t instanceof DrawOrderTimeline || t instanceof DrawOrderFolderTimeline)
+				skeleton.drawOrder.constrained();
 			else if (t instanceof PhysicsConstraintTimeline timeline) {
 				if (timeline.constraintIndex == -1) {
 					for (int ii = 0; ii < physicsCount; ii++)
@@ -117,6 +118,7 @@ public class Slider extends Constraint<Slider, SliderData, SliderPose> {
 		}
 	}
 
+	/** When set, the bone's transform property is used to set the slider's {@link SliderPose#time}. */
 	public Bone getBone () {
 		return bone;
 	}

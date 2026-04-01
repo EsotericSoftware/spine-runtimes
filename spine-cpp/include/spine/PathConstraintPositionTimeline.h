@@ -34,7 +34,7 @@
 
 namespace spine {
 
-	/// Changes a path constraint's PathConstraintPose::getPosition().
+	/// Changes a path constraint's position.
 	class SP_API PathConstraintPositionTimeline : public ConstraintTimeline1 {
 		friend class SkeletonBinary;
 
@@ -49,8 +49,8 @@ namespace spine {
 
 		virtual ~PathConstraintPositionTimeline();
 
-		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
-						   MixDirection direction, bool appliedPose) override;
+		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+						   bool appliedPose) override;
 	};
 }// namespace spine
 

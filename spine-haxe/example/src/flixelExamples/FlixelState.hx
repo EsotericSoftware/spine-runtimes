@@ -172,14 +172,14 @@ class FlixelState extends FlxState {
 		var tmpPoint = [.0, .0];
 		spineSprite.afterUpdateWorldTransforms = spineSprite -> {
 			if (jumping) {
-				tmpPoint[1] = hip.applied.worldY;
+				tmpPoint[1] = hip.appliedPose.worldY;
 				spineSprite.skeletonToHaxeWorldCoordinates(tmpPoint);
 				diff -= (tmpPoint[1]);
 				spineSprite.offsetY += diff;
 				spineSprite.y -= diff;
 			}
 
-			tmpPoint[1] = hip.applied.worldY;
+			tmpPoint[1] = hip.appliedPose.worldY;
 			spineSprite.skeletonToHaxeWorldCoordinates(tmpPoint);
 			diff = tmpPoint[1];
 		}
@@ -269,8 +269,8 @@ class FlixelState extends FlxState {
 		}
 
 		var rootBone = spineSprite.skeleton.findBone("root");
-		rootPoint[0] = rootBone.applied.worldX;
-		rootPoint[1] = rootBone.applied.worldY;
+		rootPoint[0] = rootBone.appliedPose.worldX;
+		rootPoint[1] = rootBone.appliedPose.worldY;
 		spineSprite.skeletonToHaxeWorldCoordinates(rootPoint);
 		skeletonOrigin.setPosition(rootPoint[0] - radius, rootPoint[1] - radius);
 		gameObjectOrigin.setPosition(spineSprite.x - radius, spineSprite.y - radius);

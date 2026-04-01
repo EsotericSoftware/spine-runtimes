@@ -67,19 +67,21 @@ public class PhysicsConstraint: PhysicsConstraintBase {
         return PhysicsConstraint(fromPointer: result!)
     }
 
+    /// Resets all physics state that was the result of previous movement. Use this after moving a
+    /// bone to prevent physics from reacting to the movement.
     public func reset(_ skeleton: Skeleton) {
         spine_physics_constraint_reset(
             _ptr.assumingMemoryBound(to: spine_physics_constraint_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
     }
 
-    /// Translates the physics constraint so next update() forces are applied as if the bone moved
-    /// an additional amount in world space.
+    /// Translates the physics constraint so the next update() forces are applied as if the bone
+    /// moved an additional amount in world space.
     public func translate(_ x: Float, _ y: Float) {
         spine_physics_constraint_translate(_ptr.assumingMemoryBound(to: spine_physics_constraint_wrapper.self), x, y)
     }
 
-    /// Rotates the physics constraint so next update() forces are applied as if the bone rotated
-    /// around the specified point in world space.
+    /// Rotates the physics constraint so the next update() forces are applied as if the bone
+    /// rotated around the specified point in world space.
     public func rotate(_ x: Float, _ y: Float, _ degrees: Float) {
         spine_physics_constraint_rotate(_ptr.assumingMemoryBound(to: spine_physics_constraint_wrapper.self), x, y, degrees)
     }

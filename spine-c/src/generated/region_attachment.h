@@ -39,6 +39,9 @@ SPINE_C_API float spine_region_attachment_get_scale_x(spine_region_attachment se
 SPINE_C_API void spine_region_attachment_set_scale_x(spine_region_attachment self, float inValue);
 SPINE_C_API float spine_region_attachment_get_scale_y(spine_region_attachment self);
 SPINE_C_API void spine_region_attachment_set_scale_y(spine_region_attachment self, float inValue);
+/**
+ * The local rotation in degrees, counter clockwise.
+ */
 SPINE_C_API float spine_region_attachment_get_rotation(spine_region_attachment self);
 SPINE_C_API void spine_region_attachment_set_rotation(spine_region_attachment self, float inValue);
 SPINE_C_API float spine_region_attachment_get_width(spine_region_attachment self);

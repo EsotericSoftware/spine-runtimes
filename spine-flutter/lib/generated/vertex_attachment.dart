@@ -38,7 +38,7 @@ import 'skeleton.dart';
 import 'slot.dart';
 
 /// An attachment with vertices that are transformed by one or more bones and
-/// can be deformed by a slot's SlotPose::getDeform().
+/// can be deformed by SlotPose::getDeform().
 abstract class VertexAttachment extends Attachment {
   final Pointer<spine_vertex_attachment_wrapper> _ptr;
 
@@ -55,6 +55,10 @@ abstract class VertexAttachment extends Attachment {
     return result;
   }
 
+  /// The bones that affect the vertices. The entries are, for each vertex, the
+  /// number of bones affecting the vertex followed by that many bone indices,
+  /// which is Skeleton::getBones() index. Empty if this attachment has no
+  /// weights.
   ArrayInt get bones {
     final result = SpineBindings.bindings.spine_vertex_attachment_get_bones(_ptr);
     return ArrayInt.fromPointer(result);
@@ -64,6 +68,10 @@ abstract class VertexAttachment extends Attachment {
     SpineBindings.bindings.spine_vertex_attachment_set_bones(_ptr, value.nativePtr.cast());
   }
 
+  /// The vertex positions in the bone's coordinate system. For a non-weighted
+  /// attachment, the values are x,y pairs for each vertex. For a weighted
+  /// attachment, the values are x,y,weight triplets for each bone affecting
+  /// each vertex.
   ArrayFloat get vertices {
     final result = SpineBindings.bindings.spine_vertex_attachment_get_vertices(_ptr);
     return ArrayFloat.fromPointer(result);

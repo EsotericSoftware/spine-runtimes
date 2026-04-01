@@ -17,7 +17,7 @@ SPINE_C_API void spine_physics_constraint_gravity_timeline_dispose(spine_physics
 SPINE_C_API spine_rtti spine_physics_constraint_gravity_timeline_get_rtti(spine_physics_constraint_gravity_timeline self);
 SPINE_C_API void spine_physics_constraint_gravity_timeline_apply(spine_physics_constraint_gravity_timeline self, spine_skeleton skeleton,
 																 float lastTime, float time, /*@null*/ spine_array_event events, float alpha,
-																 spine_mix_blend blend, spine_mix_direction direction, bool appliedPose);
+																 bool fromSetup, bool add, bool out, bool appliedPose);
 SPINE_C_API int spine_physics_constraint_gravity_timeline_get_constraint_index(spine_physics_constraint_gravity_timeline self);
 SPINE_C_API void spine_physics_constraint_gravity_timeline_set_constraint_index(spine_physics_constraint_gravity_timeline self, int inValue);
 /**
@@ -33,15 +33,14 @@ SPINE_C_API void spine_physics_constraint_gravity_timeline_set_frame(spine_physi
  */
 SPINE_C_API float spine_physics_constraint_gravity_timeline_get_curve_value(spine_physics_constraint_gravity_timeline self, float time);
 SPINE_C_API float spine_physics_constraint_gravity_timeline_get_relative_value(spine_physics_constraint_gravity_timeline self, float time,
-																			   float alpha, spine_mix_blend blend, float current, float setup);
+																			   float alpha, bool fromSetup, bool add, float current, float setup);
 SPINE_C_API float spine_physics_constraint_gravity_timeline_get_absolute_value_1(spine_physics_constraint_gravity_timeline self, float time,
-																				 float alpha, spine_mix_blend blend, float current, float setup);
+																				 float alpha, bool fromSetup, bool add, float current, float setup);
 SPINE_C_API float spine_physics_constraint_gravity_timeline_get_absolute_value_2(spine_physics_constraint_gravity_timeline self, float time,
-																				 float alpha, spine_mix_blend blend, float current, float setup,
+																				 float alpha, bool fromSetup, bool add, float current, float setup,
 																				 float value);
 SPINE_C_API float spine_physics_constraint_gravity_timeline_get_scale_value(spine_physics_constraint_gravity_timeline self, float time, float alpha,
-																			spine_mix_blend blend, spine_mix_direction direction, float current,
-																			float setup);
+																			bool fromSetup, bool add, bool out, float current, float setup);
 SPINE_C_API void spine_physics_constraint_gravity_timeline_set_linear(spine_physics_constraint_gravity_timeline self, size_t frame);
 SPINE_C_API void spine_physics_constraint_gravity_timeline_set_stepped(spine_physics_constraint_gravity_timeline self, size_t frame);
 SPINE_C_API void spine_physics_constraint_gravity_timeline_set_bezier(spine_physics_constraint_gravity_timeline self, size_t bezier, size_t frame,
@@ -50,6 +49,15 @@ SPINE_C_API void spine_physics_constraint_gravity_timeline_set_bezier(spine_phys
 SPINE_C_API float spine_physics_constraint_gravity_timeline_get_bezier_value(spine_physics_constraint_gravity_timeline self, float time, size_t frame,
 																			 size_t valueOffset, size_t i);
 SPINE_C_API spine_array_float spine_physics_constraint_gravity_timeline_get_curves(spine_physics_constraint_gravity_timeline self);
+/**
+ * True if this timeline supports additive blending.
+ */
+SPINE_C_API bool spine_physics_constraint_gravity_timeline_get_additive(spine_physics_constraint_gravity_timeline self);
+/**
+ * True if this timeline sets values instantaneously and does not support
+ * interpolation between frames.
+ */
+SPINE_C_API bool spine_physics_constraint_gravity_timeline_get_instant(spine_physics_constraint_gravity_timeline self);
 SPINE_C_API size_t spine_physics_constraint_gravity_timeline_get_frame_entries(spine_physics_constraint_gravity_timeline self);
 SPINE_C_API size_t spine_physics_constraint_gravity_timeline_get_frame_count(spine_physics_constraint_gravity_timeline self);
 SPINE_C_API spine_array_float spine_physics_constraint_gravity_timeline_get_frames(spine_physics_constraint_gravity_timeline self);

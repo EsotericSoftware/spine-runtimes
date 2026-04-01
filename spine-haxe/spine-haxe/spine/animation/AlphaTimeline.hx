@@ -55,34 +55,27 @@ class AlphaTimeline extends CurveTimeline1 implements SlotTimeline {
 		return slotIndex;
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend, direction:MixDirection,
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
 			appliedPose:Bool) {
 		var slot = skeleton.slots[slotIndex];
 		if (!slot.bone.active)
 			return;
 
-		var color = (appliedPose ? slot.applied : slot.pose).color;
+		var color = (appliedPose ? slot.appliedPose : slot.pose).color;
 		var a:Float = 0;
 		if (time < frames[0]) {
-			var setup:Color = slot.data.setup.color;
-			switch (blend) {
-				case MixBlend.setup:
-					color.a = setup.a;
-					return;
-				case MixBlend.first:
-					a = color.a + (setup.a - color.a) * alpha;
-				default:
-					return;
-			}
-		} else {
-			a = getCurveValue(time);
-			if (alpha != 1) {
-				if (blend == MixBlend.setup) {
-					var setup = slot.data.setup.color;
-					a = setup.a + (a - setup.a) * alpha;
-				} else
-					a = color.a + (a - color.a) * alpha;
-			}
+			if (fromSetup)
+				color.a = slot.data.setupPose.color.a;
+			return;
+		}
+
+		a = getCurveValue(time);
+		if (alpha != 1) {
+			if (fromSetup) {
+				var setup = slot.data.setupPose.color;
+				a = setup.a + (a - setup.a) * alpha;
+			} else
+				a = color.a + (a - color.a) * alpha;
 		}
 		color.a = a < 0 ? 0 : (a > 1 ? 1 : a);
 	}

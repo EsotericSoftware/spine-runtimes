@@ -120,6 +120,7 @@ public class PathConstraintData: PosedData, ConstraintData {
         }
     }
 
+    /// The setup pose that most animations are relative to.
     public var setupPose: PathConstraintPose {
         let result = spine_path_constraint_data_get_setup_pose(_ptr.assumingMemoryBound(to: spine_path_constraint_data_wrapper.self))
         return PathConstraintPose(fromPointer: result!)

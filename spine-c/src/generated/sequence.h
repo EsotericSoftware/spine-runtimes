@@ -9,6 +9,11 @@
 extern "C" {
 #endif
 
+/**
+ *
+ * @param count The number of texture regions this sequence will display.
+ * @param pathSuffix If true, getPath(String, int) has a numeric suffix. If false, all regions will use the same path, so count should be 1.
+ */
 SPINE_C_API spine_sequence spine_sequence_create(int count, bool pathSuffix);
 /**
  * Copy constructor.
@@ -23,17 +28,37 @@ SPINE_C_API void spine_sequence_dispose(spine_sequence self);
  */
 SPINE_C_API void spine_sequence_update_1(spine_sequence self, spine_region_attachment attachment);
 SPINE_C_API void spine_sequence_update_2(spine_sequence self, spine_mesh_attachment attachment);
+/**
+ * The list of texture regions this sequence will display.
+ */
 SPINE_C_API spine_array_texture_region spine_sequence_get_regions(spine_sequence self);
+/**
+ * Returns the getRegions() index for SlotPose::getSequenceIndex().
+ */
 SPINE_C_API int spine_sequence_resolve_index(spine_sequence self, spine_slot_pose pose);
+/**
+ * Returns the texture region from getRegions() for the specified index.
+ */
 SPINE_C_API /*@null*/ spine_texture_region spine_sequence_get_region(spine_sequence self, int index);
+/**
+ * Returns the UVs for the specified index. getRegions() must be populated and
+ * update() called before calling this method.
+ */
 SPINE_C_API spine_array_float spine_sequence_get_u_vs(spine_sequence self, int index);
 /**
  * Returns vertex offsets from the center of a RegionAttachment. Invalid to call
  * for a MeshAttachment.
  */
 SPINE_C_API spine_array_float spine_sequence_get_offsets(spine_sequence self, int index);
+/**
+ * The starting number for the numeric getPath(String, int) suffix.
+ */
 SPINE_C_API int spine_sequence_get_start(spine_sequence self);
 SPINE_C_API void spine_sequence_set_start(spine_sequence self, int start);
+/**
+ * The minimum number of digits in the numeric getPath(String, int) suffix, for
+ * zero padding. 0 for no zero padding.
+ */
 SPINE_C_API int spine_sequence_get_digits(spine_sequence self);
 SPINE_C_API void spine_sequence_set_digits(spine_sequence self, int digits);
 /**
@@ -41,10 +66,17 @@ SPINE_C_API void spine_sequence_set_digits(spine_sequence self, int digits);
  */
 SPINE_C_API int spine_sequence_get_setup_index(spine_sequence self);
 SPINE_C_API void spine_sequence_set_setup_index(spine_sequence self, int setupIndex);
+/**
+ * Returns true if getPath(String, int) has a numeric suffix.
+ */
 SPINE_C_API bool spine_sequence_has_path_suffix(spine_sequence self);
+/**
+ * Returns the specified base path with an optional numeric suffix for the
+ * specified index.
+ */
 SPINE_C_API const char *spine_sequence_get_path(spine_sequence self, const char *basePath, int index);
 /**
- * Returns a unique ID for this attachment.
+ * Returns a unique ID for this sequence.
  */
 SPINE_C_API int spine_sequence_get_id(spine_sequence self);
 

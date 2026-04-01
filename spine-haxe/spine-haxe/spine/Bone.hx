@@ -34,7 +34,7 @@ package spine;
  * A bone has a local transform which is used to compute its world transform. A bone also has an applied transform, which is a
  * local transform that can be applied to compute the world transform. The local transform and applied transform may differ if a
  * constraint or application code modifies the world transform after it was computed from the local transform. */
-class Bone extends PosedActive<BoneData, BoneLocal, BonePose> {
+class Bone extends PosedActive<BoneData, BonePose> {
 	static public var yDown:Bool = false;
 	static public var yDir(get, never):Int;
 
@@ -53,8 +53,8 @@ class Bone extends PosedActive<BoneData, BoneLocal, BonePose> {
 	public function new(data:BoneData, parent:Bone) {
 		super(data, new BonePose(), new BonePose());
 		this.parent = parent;
-		applied.bone = this;
-		constrained.bone = this;
+		appliedPose.bone = this;
+		constrainedPose.bone = this;
 	}
 
 	/** Copy method. Does not copy the children bones. */

@@ -27,39 +27,53 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_MixPose_h
-#define Spine_MixPose_h
+#ifndef Spine_DrawOrder_h
+#define Spine_DrawOrder_h
+
+#include <spine/Array.h>
+#include <spine/SpineObject.h>
 
 namespace spine {
+	class Slot;
 
-	/// Controls how timeline values are mixed with setup pose values or current pose values when a timeline is applied with
-	/// alpha < 1.
-	///
-	/// See Timeline::apply().
-	enum MixBlend {
-		/// Transitions between the setup and timeline values (the current value is not used). Before the first frame, the setup
-		/// value is used.
-		///
-		/// MixBlend_Setup is intended to transition to or from the setup pose, not for animations layered on top of others.
-		MixBlend_Setup = 0,
-		/// Transitions between the current and timeline values. Before the first frame, transitions between the current and setup
-		/// values. Timelines which perform instant transitions, such as DrawOrderTimeline or AttachmentTimeline, use
-		/// the setup value before the first frame.
-		///
-		/// MixBlend_First is intended for the first animations applied, not for animations layered on top of others.
-		MixBlend_First,
-		/// Transitions between the current and timeline values. No change is made before the first frame.
-		///
-		/// MixBlend_Replace is intended for animations layered on top of others, not for the first animations applied.
-		MixBlend_Replace,
-		/// Transitions between the current value and the current plus timeline values. No change is made before the first frame.
-		///
-		/// MixBlend_Add is intended for animations layered on top of others, not for the first animations applied.
-		///
-		/// Properties set by additive animations must be set manually or by another animation before applying the additive
-		/// animations, else the property values will increase each time the additive animations are applied.
-		MixBlend_Add
+	/// Stores the skeleton's draw order, which is the order that each slot's attachment is rendered.
+	class SP_API DrawOrder : public SpineObject {
+		friend class Skeleton;
+
+		friend class DrawOrderTimeline;
+
+		friend class DrawOrderFolderTimeline;
+
+		friend class Slider;
+
+	public:
+		explicit DrawOrder(Array<Slot *> &setupPose);
+
+		/// Sets the unconstrained draw order to the setup pose order.
+		void setupPose();
+
+		/// The unconstrained draw order, set by animations and application code.
+		Array<Slot *> &getPose();
+
+		/// The constrained draw order for rendering. If no constraints modify the draw order, this is the same as getPose().
+		/// Otherwise it is a copy of getPose() modified by constraints.
+		Array<Slot *> &getAppliedPose();
+
+	private:
+		/// Sets the applied pose to the unconstrained pose, for when no constraints will modify the draw order.
+		void pose();
+
+		/// Sets the applied pose to the constrained pose, in anticipation of the applied pose being modified by constraints.
+		void constrained();
+
+		/// Copies the unconstrained pose to the constrained pose, as a starting point for constraints to be applied.
+		void reset();
+
+		Array<Slot *> &_setupPose;
+		Array<Slot *> _pose;
+		Array<Slot *> _constrainedPose;
+		Array<Slot *> *_appliedPose;
 	};
 }
 
-#endif /* Spine_MixPose_h */
+#endif /* Spine_DrawOrder_h */

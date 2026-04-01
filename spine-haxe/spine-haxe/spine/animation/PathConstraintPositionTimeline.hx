@@ -35,12 +35,12 @@ class PathConstraintPositionTimeline extends ConstraintTimeline1 {
 		super(frameCount, bezierCount, constraintIndex, Property.pathConstraintPosition);
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend, direction:MixDirection,
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
 			appliedPose:Bool) {
 		var constraint = cast(skeleton.constraints[constraintIndex], PathConstraint);
 		if (constraint.active) {
-			var pose = appliedPose ? constraint.applied : constraint.pose;
-			pose.position = getAbsoluteValue(time, alpha, blend, pose.position, constraint.data.setup.position);
+			var pose = appliedPose ? constraint.appliedPose : constraint.pose;
+			pose.position = getAbsoluteValue(time, alpha, fromSetup, add, pose.position, constraint.data.setupPose.position);
 		}
 	}
 }

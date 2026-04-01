@@ -46,7 +46,7 @@ PhysicsConstraint::PhysicsConstraint(PhysicsConstraintData &data, Skeleton &skel
 	  _yLag(0), _yVelocity(0), _rotateOffset(0), _rotateLag(0), _rotateVelocity(0), _scaleOffset(0), _scaleLag(0), _scaleVelocity(0), _remaining(0),
 	  _lastTime(0) {
 
-	_bone = &skeleton._bones[(size_t) data._bone->getIndex()]->_constrained;
+	_bone = &skeleton._bones[(size_t) data._bone->getIndex()]->_constrainedPose;
 }
 
 PhysicsConstraint &PhysicsConstraint::copy(Skeleton &skeleton) {
@@ -87,7 +87,7 @@ void PhysicsConstraint::rotate(float x, float y, float degrees) {
 }
 
 void PhysicsConstraint::update(Skeleton &skeleton, Physics physics) {
-	PhysicsConstraintPose &p = *_applied;
+	PhysicsConstraintPose &p = *_appliedPose;
 	float mix = p._mix;
 	if (mix == 0) return;
 

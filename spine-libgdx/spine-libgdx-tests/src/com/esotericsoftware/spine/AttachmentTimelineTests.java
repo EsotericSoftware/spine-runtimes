@@ -30,6 +30,7 @@
 package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntArray;
 
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
@@ -75,7 +76,8 @@ public class AttachmentTimelineTests {
 
 		Array<Timeline> timelines = new Array(true, 1, Timeline[]::new);
 		timelines.add(timeline);
-		Animation animation = new Animation("animation", timelines, 1);
+		Animation animation = new Animation("animation");
+		animation.setTimelines(timelines, new IntArray(0));
 		animation.setDuration(1);
 
 		state = new AnimationState(new AnimationStateData(skeletonData));

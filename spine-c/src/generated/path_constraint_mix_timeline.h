@@ -15,8 +15,8 @@ SPINE_C_API void spine_path_constraint_mix_timeline_dispose(spine_path_constrain
 
 SPINE_C_API spine_rtti spine_path_constraint_mix_timeline_get_rtti(spine_path_constraint_mix_timeline self);
 SPINE_C_API void spine_path_constraint_mix_timeline_apply(spine_path_constraint_mix_timeline self, spine_skeleton skeleton, float lastTime,
-														  float time, /*@null*/ spine_array_event events, float alpha, spine_mix_blend blend,
-														  spine_mix_direction direction, bool appliedPose);
+														  float time, /*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add,
+														  bool out, bool appliedPose);
 /**
  * Sets the time and color for the specified frame.
  *
@@ -35,6 +35,15 @@ SPINE_C_API void spine_path_constraint_mix_timeline_set_bezier(spine_path_constr
 SPINE_C_API float spine_path_constraint_mix_timeline_get_bezier_value(spine_path_constraint_mix_timeline self, float time, size_t frame,
 																	  size_t valueOffset, size_t i);
 SPINE_C_API spine_array_float spine_path_constraint_mix_timeline_get_curves(spine_path_constraint_mix_timeline self);
+/**
+ * True if this timeline supports additive blending.
+ */
+SPINE_C_API bool spine_path_constraint_mix_timeline_get_additive(spine_path_constraint_mix_timeline self);
+/**
+ * True if this timeline sets values instantaneously and does not support
+ * interpolation between frames.
+ */
+SPINE_C_API bool spine_path_constraint_mix_timeline_get_instant(spine_path_constraint_mix_timeline self);
 SPINE_C_API size_t spine_path_constraint_mix_timeline_get_frame_entries(spine_path_constraint_mix_timeline self);
 SPINE_C_API size_t spine_path_constraint_mix_timeline_get_frame_count(spine_path_constraint_mix_timeline self);
 SPINE_C_API spine_array_float spine_path_constraint_mix_timeline_get_frames(spine_path_constraint_mix_timeline self);

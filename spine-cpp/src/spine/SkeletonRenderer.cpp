@@ -139,8 +139,9 @@ RenderCommand *SkeletonRenderer::render(Skeleton &skeleton) {
 
 	SkeletonClipping &clipper = _clipping;
 
-	for (unsigned i = 0; i < skeleton.getSlots().size(); ++i) {
-		Slot &slot = *skeleton.getDrawOrder()[i];
+	Array<Slot *> &drawOrder = skeleton.getDrawOrder().getAppliedPose();
+	for (unsigned i = 0; i < drawOrder.size(); ++i) {
+		Slot &slot = *drawOrder[i];
 		Attachment *attachment = slot.getAppliedPose().getAttachment();
 		if (!attachment) {
 			clipper.clipEnd(slot);

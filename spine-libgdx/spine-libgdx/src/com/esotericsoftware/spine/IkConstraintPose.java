@@ -29,7 +29,7 @@
 
 package com.esotericsoftware.spine;
 
-/** Stores the current pose for an IK constraint. */
+/** Stores a pose for an IK constraint. */
 public class IkConstraintPose implements Pose<IkConstraintPose> {
 	int bendDirection;
 	boolean compress, stretch;
@@ -84,8 +84,8 @@ public class IkConstraintPose implements Pose<IkConstraintPose> {
 
 	/** When true and the target is out of range, the parent bone is scaled to reach it.
 	 * <p>
-	 * For two bone IK: 1) the child bone's local Y translation is set to 0, 2) stretch is not applied if {@link #getSoftness()} is
-	 * > 0, and 3) if the parent bone has local nonuniform scale, stretch is not applied. */
+	 * For two bone IK: 1) the child bone's local Y translation is set to 0, 2) stretch is not applied if {@link #softness} is > 0,
+	 * and 3) if the parent bone has local nonuniform scale, stretch is not applied. */
 	public boolean getStretch () {
 		return stretch;
 	}

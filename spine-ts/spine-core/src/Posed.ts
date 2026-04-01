@@ -30,52 +30,63 @@
 import type { Pose } from "./Pose.js";
 import type { PosedData } from "./PosedData.js";
 
+/** The base class for an object with a number of poses:
+ * - {@link data}: The setup pose.
+ * - {@link pose}: The unconstrained pose. Set by animations and application code.
+ * - {@link appliedPose}: The pose to use for rendering. Possibly modified by constraints.
+ */
 export abstract class Posed<
 	D extends PosedData<P>,
-	P extends Pose<P>,
-	A extends P> {
+	P extends Pose<P>> {
 
 	/** The constraint's setup pose data. */
 	readonly data: D;
-	readonly pose: A;
-	readonly constrained: A;
-	applied: A;
+	readonly pose: P;
+	readonly constrainedPose: P;
+	appliedPose: P;
 
-	constructor (data: D, pose: A, constrained: A) {
+	constructor (data: D, pose: P, constrainedPose: P) {
 		if (data == null) throw new Error("data cannot be null.");
 		this.data = data;
 		this.pose = pose;
-		this.constrained = constrained;
-		this.applied = pose;
+		this.constrainedPose = constrainedPose;
+		this.appliedPose = pose;
 	}
 
+	/** Sets the unconstrained pose to the setup pose. */
 	public setupPose (): void {
-		this.pose.set(this.data.setup);
+		this.pose.set(this.data.setupPose);
 	}
 
-	/** The constraint's setup pose data. */
+	/** The setup pose data. May be shared with multiple instances. */
 	public getData (): D {
 		return this.data;
 	}
 
+	/** The unconstrained pose for this object, set by animations and application code. */
 	public getPose (): P {
 		return this.pose;
 	}
 
-	public getAppliedPose (): A {
-		return this.applied;
+	/** The pose to use for rendering. If no constraints modify this pose, this is the same as {@link pose}. Otherwise it is a
+	 * copy of {@link pose} modified by constraints. */
+	public getAppliedPose (): P {
+		return this.appliedPose;
 	}
 
-	usePose () { // Port: usePose - reference runtime:  pose()
-		this.applied = this.pose;
+	/** Sets the applied pose to the unconstrained pose, for when no constraints will modify the pose. */
+	unconstrained () {
+		this.appliedPose = this.pose;
 	}
 
-	useConstrained () { // Port: useConstrained - reference runtime:  constrained()
-		this.applied = this.constrained;
+	/** Sets the applied pose to the constrained pose, in anticipation of the applied pose being modified by constraints. */
+	constrained () {
+		this.appliedPose = this.constrainedPose;
 	}
 
+	/** Sets the constrained pose to the unconstrained pose, as a starting point for constraints to be applied. */
 	resetConstrained () { // Port: resetConstrained - reference runtime:  reset()
-		this.constrained.set(this.pose);
+		this.constrainedPose.set(this.pose);
 	}
 
 }

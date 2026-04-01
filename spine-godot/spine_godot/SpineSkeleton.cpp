@@ -291,7 +291,7 @@ Array SpineSkeleton::get_slots() {
 Array SpineSkeleton::get_draw_order() {
 	Array result;
 	SPINE_CHECK(skeleton, result)
-	auto &slots = skeleton->getDrawOrder();
+	auto &slots = skeleton->getDrawOrder().getAppliedPose();
 	result.resize((int) slots.size());
 	for (int i = 0; i < result.size(); ++i) {
 		auto slot = slots[i];

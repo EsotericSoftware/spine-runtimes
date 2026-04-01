@@ -130,7 +130,7 @@ class SkeletonJson {
 			}
 			var data = new BoneData(skeletonData.bones.length, Reflect.getProperty(boneMap, "name"), parent);
 			data.length = getFloat(boneMap, "length") * scale;
-			var setup = data.setup;
+			var setup = data.setupPose;
 			setup.x = getFloat(boneMap, "x") * scale;
 			setup.y = getFloat(boneMap, "y") * scale;
 			setup.rotation = getFloat(boneMap, "rotation");
@@ -160,11 +160,11 @@ class SkeletonJson {
 
 			var color:String = Reflect.getProperty(slotMap, "color");
 			if (color != null)
-				data.setup.color.setFromString(color);
+				data.setupPose.color.setFromString(color);
 
 			var dark:String = Reflect.getProperty(slotMap, "dark");
 			if (dark != null)
-				data.setup.darkColor = new Color(0, 0, 0).setFromString(dark);
+				data.setupPose.darkColor = new Color(0, 0, 0).setFromString(dark);
 
 			data.attachmentName = Reflect.getProperty(slotMap, "attachment");
 			data.blendMode = Reflect.hasField(slotMap, "blend") ? BlendMode.fromName(Reflect.getProperty(slotMap, "blend")) : BlendMode.normal;
@@ -196,7 +196,7 @@ class SkeletonJson {
 
 						data.uniform = (Reflect.hasField(constraintMap, "uniform")
 							&& cast(Reflect.getProperty(constraintMap, "uniform"), Bool));
-						var setup = data.setup;
+						var setup = data.setupPose;
 						setup.mix = getFloat(constraintMap, "mix", 1);
 						setup.softness = getFloat(constraintMap, "softness", 0) * scale;
 						setup.bendDirection = (!Reflect.hasField(constraintMap, "bendPositive")
@@ -286,7 +286,7 @@ class SkeletonJson {
 						data.offsets[TransformConstraintData.SCALEY] = getFloat(constraintMap, "scaleY", 0);
 						data.offsets[TransformConstraintData.SHEARY] = getFloat(constraintMap, "shearY", 0);
 
-						var setup = data.setup;
+						var setup = data.setupPose;
 						if (rotate)
 							setup.mixRotate = getFloat(constraintMap, "mixRotate", 1);
 						if (x)
@@ -324,7 +324,7 @@ class SkeletonJson {
 						data.rotateMode = Reflect.hasField(constraintMap,
 							"rotateMode") ? RotateMode.fromName(Reflect.getProperty(constraintMap, "rotateMode")) : RotateMode.tangent;
 						data.offsetRotation = getFloat(constraintMap, "rotation", 0);
-						var setup = data.setup;
+						var setup = data.setupPose;
 						setup.position = getFloat(constraintMap, "position", 0);
 						if (data.positionMode == PositionMode.fixed)
 							setup.position *= scale;
@@ -352,7 +352,7 @@ class SkeletonJson {
 						data.shearX = getFloat(constraintMap, "shearX");
 						data.limit = getFloat(constraintMap, "limit", 5000) * scale;
 						data.step = 1 / getFloat(constraintMap, "fps", 60);
-						var setup = data.setup;
+						var setup = data.setupPose;
 						setup.inertia = getFloat(constraintMap, "inertia", .5);
 						setup.strength = getFloat(constraintMap, "strength", 100);
 						setup.damping = getFloat(constraintMap, "damping", .85);
@@ -379,8 +379,8 @@ class SkeletonJson {
 						data.skinRequired = skinRequired;
 						data.additive = getBoolean(constraintMap, "additive", false);
 						data.loop = getBoolean(constraintMap, "loop", false);
-						data.setup.time = getFloat(constraintMap, "time", 0);
-						data.setup.mix = getFloat(constraintMap, "mix", 1);
+						data.setupPose.time = getFloat(constraintMap, "time", 0);
+						data.setupPose.mix = getFloat(constraintMap, "mix", 1);
 
 						var boneName = getString(constraintMap, "bone", null);
 						if (boneName != null) {
@@ -507,13 +507,14 @@ class SkeletonJson {
 		for (eventName in Reflect.fields(events)) {
 			var eventMap:DynamicAccess<Dynamic> = Reflect.field(events, eventName);
 			var eventData:EventData = new EventData(eventName);
-			eventData.intValue = getInt(eventMap, "int");
-			eventData.floatValue = getFloat(eventMap, "float");
-			eventData.stringValue = getString(eventMap, "string", "");
+			var setup = eventData.setupPose;
+			setup.intValue = getInt(eventMap, "int");
+			setup.floatValue = getFloat(eventMap, "float");
+			setup.stringValue = getString(eventMap, "string", "");
 			eventData.audioPath = getString(eventMap, "audio", "");
 			if (eventData.audioPath != null) {
-				eventData.volume = getFloat(eventMap, "volume", 1);
-				eventData.balance = getFloat(eventMap, "balance");
+				setup.volume = getFloat(eventMap, "volume", 1);
+				setup.balance = getFloat(eventMap, "balance");
 			}
 			skeletonData.events.push(eventData);
 		}
@@ -695,7 +696,8 @@ class SkeletonJson {
 	/** @param folderSlots Slot names are resolved to positions within this array. If null, slot indices are used as positions. */
 	private function readDrawOrder(skeletonData:SkeletonData, keyMap:Dynamic, slotCount:Int, folderSlots:Array<Int>):Array<Int> {
 		var changes:Array<Dynamic> = Reflect.getProperty(keyMap, "offsets");
-		if (changes == null) return null;
+		if (changes == null)
+			return null;
 		var drawOrder:Array<Int> = new Array<Int>();
 		drawOrder.resize(slotCount);
 		for (i in 0...slotCount)
@@ -705,7 +707,8 @@ class SkeletonJson {
 		var originalIndex:Int = 0, unchangedIndex:Int = 0;
 		for (offsetMap in changes) {
 			var slot = skeletonData.findSlot(Reflect.getProperty(offsetMap, "slot"));
-			if (slot == null) throw new SpineException("Draw order slot not found: " + Reflect.getProperty(offsetMap, "slot"));
+			if (slot == null)
+				throw new SpineException("Draw order slot not found: " + Reflect.getProperty(offsetMap, "slot"));
 			var index:Int;
 			if (folderSlots == null)
 				index = slot.index;
@@ -717,7 +720,8 @@ class SkeletonJson {
 						break;
 					}
 				}
-				if (index == -1) throw new SpineException("Slot not in folder: " + Reflect.getProperty(offsetMap, "slot"));
+				if (index == -1)
+					throw new SpineException("Slot not in folder: " + Reflect.getProperty(offsetMap, "slot"));
 			}
 			while (originalIndex != index)
 				unchanged[unchangedIndex++] = originalIndex++;
@@ -727,7 +731,8 @@ class SkeletonJson {
 			unchanged[unchangedIndex++] = originalIndex++;
 		var i:Int = slotCount - 1;
 		while (i >= 0) {
-			if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
+			if (drawOrder[i] == -1)
+				drawOrder[i] = unchanged[--unchangedIndex];
 			i--;
 		}
 		return drawOrder;
@@ -1376,7 +1381,8 @@ class SkeletonJson {
 					var ii:Int = 0;
 					for (slotEntry in slotEntries) {
 						var slot = skeletonData.findSlot(cast(slotEntry, String));
-						if (slot == null) throw new SpineException("Draw order folder slot not found: " + cast(slotEntry, String));
+						if (slot == null)
+							throw new SpineException("Draw order folder slot not found: " + cast(slotEntry, String));
 						folderSlots[ii++] = slot.index;
 					}
 
@@ -1400,12 +1406,13 @@ class SkeletonJson {
 					var eventData:EventData = skeletonData.findEvent(Reflect.getProperty(eventMap, "name"));
 					if (eventData == null)
 						throw new SpineException("Event not found: " + Reflect.getProperty(eventMap, "name"));
+					var setup = eventData.setupPose;
 					var event:Event = new Event(getFloat(eventMap, "time"), eventData);
-					event.intValue = Reflect.hasField(eventMap, "int") ? getInt(eventMap, "int") : eventData.intValue;
+					event.intValue = Reflect.hasField(eventMap, "int") ? getInt(eventMap, "int") : setup.intValue;
 
-					event.floatValue = Reflect.hasField(eventMap, "float") ? getFloat(eventMap, "float") : eventData.floatValue;
+					event.floatValue = Reflect.hasField(eventMap, "float") ? getFloat(eventMap, "float") : setup.floatValue;
 
-					event.stringValue = Reflect.hasField(eventMap, "string") ? Reflect.getProperty(eventMap, "string") : eventData.stringValue;
+					event.stringValue = Reflect.hasField(eventMap, "string") ? Reflect.getProperty(eventMap, "string") : setup.stringValue;
 					if (event.data.audioPath != null) {
 						event.volume = getFloat(eventMap, "volume", 1);
 						event.balance = getFloat(eventMap, "balance");

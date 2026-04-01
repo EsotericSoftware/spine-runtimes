@@ -56,9 +56,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-import com.esotericsoftware.spine.Animation.MixBlend;
-import com.esotericsoftware.spine.Animation.MixDirection;
-
 /** Demonstrates simplistic usage of lighting with normal maps.
  * <p>
  * Note the normals are not rotated when bones are rotated, making lighting incorrect. */
@@ -136,7 +133,7 @@ public class NormalMapTest extends ApplicationAdapter {
 		float lastTime = time;
 		float delta = Gdx.graphics.getDeltaTime();
 		time += delta;
-		if (animation != null) animation.apply(skeleton, lastTime, time, true, null, 1, MixBlend.first, MixDirection.in, false);
+		if (animation != null) animation.apply(skeleton, lastTime, time, true, null, 1, true, false, false, false);
 		skeleton.update(delta);
 		skeleton.updateWorldTransform(Physics.update);
 

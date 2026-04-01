@@ -27,6 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+/** An interface for an object representing a pose. */
 export interface Pose<P> {
+	/** Sets this pose to the specified pose. */
 	set (pose: P): void;
 }

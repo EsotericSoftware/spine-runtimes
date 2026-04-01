@@ -22,9 +22,9 @@ void spine_rgb2_timeline_set_frame(spine_rgb2_timeline self, int frame, float ti
 }
 
 void spine_rgb2_timeline_apply(spine_rgb2_timeline self, spine_skeleton skeleton, float lastTime, float time, /*@null*/ spine_array_event events,
-							   float alpha, spine_mix_blend blend, spine_mix_direction direction, bool appliedPose) {
+							   float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
 	RGB2Timeline *_self = (RGB2Timeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixBlend) blend, (MixDirection) direction, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
 }
 
 int spine_rgb2_timeline_get_slot_index(spine_rgb2_timeline self) {
@@ -61,6 +61,16 @@ float spine_rgb2_timeline_get_bezier_value(spine_rgb2_timeline self, float time,
 spine_array_float spine_rgb2_timeline_get_curves(spine_rgb2_timeline self) {
 	RGB2Timeline *_self = (RGB2Timeline *) self;
 	return (spine_array_float) &_self->getCurves();
+}
+
+bool spine_rgb2_timeline_get_additive(spine_rgb2_timeline self) {
+	RGB2Timeline *_self = (RGB2Timeline *) self;
+	return _self->getAdditive();
+}
+
+bool spine_rgb2_timeline_get_instant(spine_rgb2_timeline self) {
+	RGB2Timeline *_self = (RGB2Timeline *) self;
+	return _self->getInstant();
 }
 
 size_t spine_rgb2_timeline_get_frame_entries(spine_rgb2_timeline self) {

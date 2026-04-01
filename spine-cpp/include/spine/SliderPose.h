@@ -53,9 +53,11 @@ namespace spine {
 
 		virtual void set(SliderPose &pose) override;
 
+		/// The time in SliderData::getAnimation() to apply the animation.
 		float getTime();
 		void setTime(float time);
 
+		/// A percentage that controls the mix between the constrained and unconstrained poses.
 		float getMix();
 		void setMix(float mix);
 	};

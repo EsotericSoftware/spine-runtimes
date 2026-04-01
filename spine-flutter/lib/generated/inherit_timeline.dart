@@ -36,7 +36,7 @@ import 'bone_timeline.dart';
 import 'inherit.dart';
 import 'timeline.dart';
 
-/// Changes a bone's BoneLocal::getInherit().
+/// Changes a bone's inherit mode.
 class InheritTimeline extends Timeline implements BoneTimeline {
   final Pointer<spine_inherit_timeline_wrapper> _ptr;
 

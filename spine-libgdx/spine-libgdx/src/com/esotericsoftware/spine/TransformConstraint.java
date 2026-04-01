@@ -36,8 +36,7 @@ import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.TransformConstraintData.FromProperty;
 import com.esotericsoftware.spine.TransformConstraintData.ToProperty;
 
-/** Stores the current pose for a transform constraint. A transform constraint adjusts the world transform of the constrained
- * bones to match that of the source bone.
+/** Adjusts the world transform of the constrained bones to match that of the source bone.
  * <p>
  * See <a href="https://esotericsoftware.com/spine-transform-constraints">Transform constraints</a> in the Spine User Guide. */
 public class TransformConstraint extends Constraint<TransformConstraint, TransformConstraintData, TransformConstraintPose> {
@@ -50,7 +49,7 @@ public class TransformConstraint extends Constraint<TransformConstraint, Transfo
 
 		bones = new Array(true, data.bones.size, BonePose[]::new);
 		for (BoneData boneData : data.bones)
-			bones.add(skeleton.bones.items[boneData.index].constrained);
+			bones.add(skeleton.bones.items[boneData.index].constrainedPose);
 
 		source = skeleton.bones.items[data.source.index];
 	}
@@ -63,13 +62,13 @@ public class TransformConstraint extends Constraint<TransformConstraint, Transfo
 
 	/** Applies the constraint to the constrained bones. */
 	public void update (Skeleton skeleton, Physics physics) {
-		TransformConstraintPose p = applied;
+		TransformConstraintPose p = appliedPose;
 		if (p.mixRotate == 0 & p.mixX == 0 & p.mixY == 0 & p.mixScaleX == 0 & p.mixScaleY == 0 & p.mixShearY == 0) return;
 
 		TransformConstraintData data = this.data;
 		boolean localSource = data.localSource, localTarget = data.localTarget, additive = data.additive, clamp = data.clamp;
 		float[] offsets = data.offsets;
-		BonePose source = this.source.applied;
+		BonePose source = this.source.appliedPose;
 		if (localSource) source.validateLocalTransform(skeleton);
 		FromProperty[] fromItems = data.properties.items;
 		int fn = data.properties.size, update = skeleton.update;

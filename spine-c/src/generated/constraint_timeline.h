@@ -13,8 +13,8 @@ SPINE_C_API void spine_constraint_timeline_dispose(spine_constraint_timeline sel
 
 SPINE_C_API spine_rtti spine_constraint_timeline_get_rtti(spine_constraint_timeline self);
 /**
- * The index of the constraint in Skeleton::getConstraints() that will be
- * changed when this timeline is applied.
+ * The Skeleton::getConstraints() index of the constraint that will be changed
+ * when this timeline is applied.
  */
 SPINE_C_API int spine_constraint_timeline_get_constraint_index(spine_constraint_timeline self);
 SPINE_C_API void spine_constraint_timeline_set_constraint_index(spine_constraint_timeline self, int inValue);

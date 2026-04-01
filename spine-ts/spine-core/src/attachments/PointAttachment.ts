@@ -37,8 +37,14 @@ import { type Attachment, VertexAttachment } from "./Attachment.js";
  *
  * See [Point Attachments](https://esotericsoftware.com/spine-points) in the Spine User Guide. */
 export class PointAttachment extends VertexAttachment {
+
+	/** The local x position. */
 	x: number = 0;
+
+	/** The local y position. */
 	y: number = 0;
+
+	/** The local rotation in degrees, counter clockwise. */
 	rotation: number = 0;
 
 	/** The color of the point attachment as it was in Spine. Available only when nonessential data was exported. Point attachments
@@ -49,12 +55,14 @@ export class PointAttachment extends VertexAttachment {
 		super(name);
 	}
 
+	/** Computes the world position from the local position. */
 	computeWorldPosition (bone: BonePose, point: Vector2) {
 		point.x = this.x * bone.a + this.y * bone.b + bone.worldX;
 		point.y = this.x * bone.c + this.y * bone.d + bone.worldY;
 		return point;
 	}
 
+	/** Computes the world rotation from the local rotation. */
 	computeWorldRotation (bone: BonePose) {
 		const r = this.rotation * MathUtils.degRad, cos = Math.cos(r), sin = Math.sin(r);
 		const x = cos * bone.a + sin * bone.b;

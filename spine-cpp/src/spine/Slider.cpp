@@ -37,6 +37,8 @@
 #include <spine/SlotTimeline.h>
 #include <spine/ConstraintTimeline.h>
 #include <spine/PhysicsConstraintTimeline.h>
+#include <spine/DrawOrderTimeline.h>
+#include <spine/DrawOrderFolderTimeline.h>
 #include <spine/SliderData.h>
 #include <spine/SliderPose.h>
 #include <spine/Slot.h>
@@ -63,15 +65,15 @@ Slider &Slider::copy(Skeleton &skeleton) {
 }
 
 void Slider::update(Skeleton &skeleton, Physics physics) {
-	SliderPose &p = *_applied;
+	SliderPose &p = *_appliedPose;
 	if (p._mix == 0) return;
 
 	Animation *animation = _data._animation;
 	if (_bone != NULL) {
 		if (!_bone->isActive()) return;
-		if (_data._local) _bone->_applied->validateLocalTransform(skeleton);
+		if (_data._local) _bone->_appliedPose->validateLocalTransform(skeleton);
 		p._time = _data._offset +
-			(_data._property->value(skeleton, *_bone->_applied, _data._local, _offsets) - _data._property->_offset) * _data._scale;
+			(_data._property->value(skeleton, *_bone->_appliedPose, _data._local, _offsets) - _data._property->_offset) * _data._scale;
 		if (_data._loop)
 			p._time = animation->getDuration() + MathUtil::fmod(p._time, animation->getDuration());
 		else
@@ -80,9 +82,9 @@ void Slider::update(Skeleton &skeleton, Physics physics) {
 
 	Array<Bone *> &bones = skeleton._bones;
 	const Array<int> &indices = animation->getBones();
-	for (size_t i = 0, n = indices.size(); i < n; i++) bones[indices[i]]->_applied->modifyLocal(skeleton);
+	for (size_t i = 0, n = indices.size(); i < n; i++) bones[indices[i]]->_appliedPose->modifyLocal(skeleton);
 
-	animation->apply(skeleton, p._time, p._time, _data._loop, NULL, p._mix, _data._additive ? MixBlend_Add : MixBlend_Replace, MixDirection_In, true);
+	animation->apply(skeleton, p._time, p._time, _data._loop, NULL, p._mix, false, _data._additive, false, true);
 }
 
 void Slider::sort(Skeleton &skeleton) {
@@ -109,6 +111,8 @@ void Slider::sort(Skeleton &skeleton) {
 		if (t->getRTTI().instanceOf(SlotTimeline::rtti)) {
 			SlotTimeline *timeline = (SlotTimeline *) t;
 			skeleton.constrained(*slots[timeline->getSlotIndex()]);
+		} else if (t->getRTTI().instanceOf(DrawOrderTimeline::rtti) || t->getRTTI().instanceOf(DrawOrderFolderTimeline::rtti)) {
+			skeleton.getDrawOrder().constrained();
 		} else if (t->getRTTI().instanceOf(PhysicsConstraintTimeline::rtti)) {
 			PhysicsConstraintTimeline *timeline = (PhysicsConstraintTimeline *) t;
 			if (timeline->getConstraintIndex() == -1) {

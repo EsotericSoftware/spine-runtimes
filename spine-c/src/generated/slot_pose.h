@@ -15,8 +15,8 @@ SPINE_C_API void spine_slot_pose_dispose(spine_slot_pose self);
 
 SPINE_C_API void spine_slot_pose_set(spine_slot_pose self, spine_slot_pose pose);
 /**
- * The color used to tint the slot's attachment. If getDarkColor() is set, this
- * is used as the light color for two color tinting.
+ * The color used to tint the slot's attachment. If a dark color is set, this is
+ * used as the light color for two color tinting.
  */
 SPINE_C_API spine_color spine_slot_pose_get_color(spine_slot_pose self);
 /**

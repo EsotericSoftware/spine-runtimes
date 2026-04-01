@@ -33,17 +33,18 @@
 #include <spine/Posed.h>
 #include <spine/PosedActive.h>
 #include <spine/BoneData.h>
-#include <spine/BoneLocal.h>
 #include <spine/BonePose.h>
 #include <spine/Array.h>
 
 namespace spine {
-	/// The current pose for a bone, before constraints are applied.
-	///
-	/// A bone has a local transform which is used to compute its world transform. A bone also has an applied transform, which is a
-	/// local transform that can be applied to compute the world transform. The local transform and applied transform may differ if a
-	/// constraint or application code modifies the world transform after it was computed from the local transform.
-	class SP_API Bone : public PosedGeneric<BoneData, BoneLocal, BonePose>, public PosedActive, public Update {
+	/// A node in a skeleton's hierarchy with a transform that affects its children and their attachments. A bone has a number of
+	/// poses:
+	/// - getData(): The setup pose data.
+	/// - getPose(): The unconstrained local pose. Set by animations and application code.
+	/// - getAppliedPose(): The local pose to use for rendering. Possibly modified by constraints.
+	/// - World transform: the local pose combined with the parent world transform. Computed on a pose by
+	///   BonePose::updateWorldTransform(Skeleton) and Skeleton::updateWorldTransform(Physics).
+	class SP_API Bone : public PosedGeneric<BoneData, BonePose, BonePose>, public PosedActive, public Update {
 		friend class AnimationState;
 		friend class RotateTimeline;
 		friend class IkConstraint;
@@ -78,7 +79,7 @@ namespace spine {
 		/// @param parent May be NULL.
 		Bone(BoneData &data, Bone *parent);
 
-		/// Copy constructor. Does not copy the children bones.
+		/// Copy constructor. Does not copy the child bones.
 		Bone(Bone &bone, Bone *parent);
 
 		/// The parent bone, or null if this is the root bone.

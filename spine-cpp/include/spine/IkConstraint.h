@@ -72,8 +72,8 @@ namespace spine {
 
 		void setTarget(Bone &inValue);
 
-		/// Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified
-		/// in the world coordinate system.
+		/// Adjusts the local rotation of the bone so the world position of the tip is as close to the target position as
+		/// possible. The target is specified in the world coordinate system.
 		static void apply(Skeleton &skeleton, BonePose &bone, float targetX, float targetY, bool compress, bool stretch, bool uniform, float mix);
 
 		/// Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as

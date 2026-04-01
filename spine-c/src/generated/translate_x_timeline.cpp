@@ -17,10 +17,9 @@ spine_rtti spine_translate_x_timeline_get_rtti(spine_translate_x_timeline self) 
 }
 
 void spine_translate_x_timeline_apply(spine_translate_x_timeline self, spine_skeleton skeleton, float lastTime, float time,
-									  /*@null*/ spine_array_event events, float alpha, spine_mix_blend blend, spine_mix_direction direction,
-									  bool appliedPose) {
+									  /*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
 	TranslateXTimeline *_self = (TranslateXTimeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixBlend) blend, (MixDirection) direction, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
 }
 
 int spine_translate_x_timeline_get_bone_index(spine_translate_x_timeline self) {
@@ -43,28 +42,28 @@ float spine_translate_x_timeline_get_curve_value(spine_translate_x_timeline self
 	return _self->getCurveValue(time);
 }
 
-float spine_translate_x_timeline_get_relative_value(spine_translate_x_timeline self, float time, float alpha, spine_mix_blend blend, float current,
+float spine_translate_x_timeline_get_relative_value(spine_translate_x_timeline self, float time, float alpha, bool fromSetup, bool add, float current,
 													float setup) {
 	TranslateXTimeline *_self = (TranslateXTimeline *) self;
-	return _self->getRelativeValue(time, alpha, (MixBlend) blend, current, setup);
+	return _self->getRelativeValue(time, alpha, fromSetup, add, current, setup);
 }
 
-float spine_translate_x_timeline_get_absolute_value_1(spine_translate_x_timeline self, float time, float alpha, spine_mix_blend blend, float current,
-													  float setup) {
+float spine_translate_x_timeline_get_absolute_value_1(spine_translate_x_timeline self, float time, float alpha, bool fromSetup, bool add,
+													  float current, float setup) {
 	TranslateXTimeline *_self = (TranslateXTimeline *) self;
-	return _self->getAbsoluteValue(time, alpha, (MixBlend) blend, current, setup);
+	return _self->getAbsoluteValue(time, alpha, fromSetup, add, current, setup);
 }
 
-float spine_translate_x_timeline_get_absolute_value_2(spine_translate_x_timeline self, float time, float alpha, spine_mix_blend blend, float current,
-													  float setup, float value) {
+float spine_translate_x_timeline_get_absolute_value_2(spine_translate_x_timeline self, float time, float alpha, bool fromSetup, bool add,
+													  float current, float setup, float value) {
 	TranslateXTimeline *_self = (TranslateXTimeline *) self;
-	return _self->getAbsoluteValue(time, alpha, (MixBlend) blend, current, setup, value);
+	return _self->getAbsoluteValue(time, alpha, fromSetup, add, current, setup, value);
 }
 
-float spine_translate_x_timeline_get_scale_value(spine_translate_x_timeline self, float time, float alpha, spine_mix_blend blend,
-												 spine_mix_direction direction, float current, float setup) {
+float spine_translate_x_timeline_get_scale_value(spine_translate_x_timeline self, float time, float alpha, bool fromSetup, bool add, bool out,
+												 float current, float setup) {
 	TranslateXTimeline *_self = (TranslateXTimeline *) self;
-	return _self->getScaleValue(time, alpha, (MixBlend) blend, (MixDirection) direction, current, setup);
+	return _self->getScaleValue(time, alpha, fromSetup, add, out, current, setup);
 }
 
 void spine_translate_x_timeline_set_linear(spine_translate_x_timeline self, size_t frame) {
@@ -91,6 +90,16 @@ float spine_translate_x_timeline_get_bezier_value(spine_translate_x_timeline sel
 spine_array_float spine_translate_x_timeline_get_curves(spine_translate_x_timeline self) {
 	TranslateXTimeline *_self = (TranslateXTimeline *) self;
 	return (spine_array_float) &_self->getCurves();
+}
+
+bool spine_translate_x_timeline_get_additive(spine_translate_x_timeline self) {
+	TranslateXTimeline *_self = (TranslateXTimeline *) self;
+	return _self->getAdditive();
+}
+
+bool spine_translate_x_timeline_get_instant(spine_translate_x_timeline self) {
+	TranslateXTimeline *_self = (TranslateXTimeline *) self;
+	return _self->getInstant();
 }
 
 size_t spine_translate_x_timeline_get_frame_entries(spine_translate_x_timeline self) {

@@ -43,7 +43,10 @@ import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.utils.SkeletonClipping;
 
-/** Stores the current pose for a skeleton.
+/** Stores bones and slots to be posed by animations and application code. Multiple skeleton instances can share the same
+ * {@link SkeletonData}, including animations, attachments, and skins.
+ * <p>
+ * After posing, call {@link #updateWorldTransform(Physics)} to apply constraints and compute world transforms for rendering.
  * <p>
  * See <a href="https://esotericsoftware.com/spine-runtime-architecture#Instance-objects">Instance objects</a> in the Spine
  * Runtimes Guide. */
@@ -53,7 +56,7 @@ public class Skeleton {
 	final SkeletonData data;
 	final Array<Bone> bones;
 	final Array<Slot> slots;
-	Array<Slot> drawOrder;
+	final DrawOrder drawOrder;
 	final Array<Constraint> constraints;
 	final Array<PhysicsConstraint> physics;
 	final Array updateCache = new Array();
@@ -82,12 +85,9 @@ public class Skeleton {
 		}
 
 		slots = new Array(true, data.slots.size, Slot[]::new);
-		drawOrder = new Array(true, data.slots.size, Slot[]::new);
-		for (SlotData slotData : data.slots) {
-			var slot = new Slot(slotData, this);
-			slots.add(slot);
-			drawOrder.add(slot);
-		}
+		for (SlotData slotData : data.slots)
+			slots.add(new Slot(slotData, this));
+		drawOrder = new DrawOrder(slots);
 
 		physics = new Array(true, 8, PhysicsConstraint[]::new);
 		constraints = new Array(true, data.constraints.size, Constraint[]::new);
@@ -125,9 +125,10 @@ public class Skeleton {
 		for (Slot slot : skeleton.slots)
 			slots.add(new Slot(slot, bones.items[slot.bone.data.index], this));
 
-		drawOrder = new Array(true, slots.size, Slot[]::new);
-		for (Slot slot : skeleton.drawOrder)
-			drawOrder.add(slots.items[slot.data.index]);
+		drawOrder = new DrawOrder(slots);
+		drawOrder.pose.clear();
+		for (Slot slot : skeleton.drawOrder.pose)
+			drawOrder.pose.add(slots.items[slot.data.index]);
 
 		physics = new Array(true, skeleton.physics.size, PhysicsConstraint[]::new);
 		constraints = new Array(true, skeleton.constraints.size, Constraint[]::new);
@@ -148,15 +149,16 @@ public class Skeleton {
 		updateCache();
 	}
 
-	/** Caches information about bones and constraints. Must be called if the {@link #getSkin()} is modified or if bones,
-	 * constraints, or weighted path attachments are added or removed. */
+	/** Caches information about bones and constraints. Must be called if the {@link #skin} is modified or if bones, constraints,
+	 * or weighted path attachments are added or removed. */
 	public void updateCache () {
 		updateCache.clear();
 		resetCache.clear();
 
+		drawOrder.unconstrained();
 		Slot[] slots = this.slots.items;
 		for (int i = 0, n = this.slots.size; i < n; i++)
-			slots[i].pose();
+			slots[i].unconstrained();
 
 		int boneCount = bones.size;
 		Bone[] bones = this.bones.items;
@@ -164,7 +166,7 @@ public class Skeleton {
 			Bone bone = bones[i];
 			bone.sorted = bone.data.skinRequired;
 			bone.active = !bone.sorted;
-			bone.pose();
+			bone.unconstrained();
 		}
 		if (skin != null) {
 			BoneData[] skinBones = skin.bones.items;
@@ -181,7 +183,7 @@ public class Skeleton {
 		Constraint[] constraints = this.constraints.items;
 		int n = this.constraints.size;
 		for (int i = 0; i < n; i++)
-			constraints[i].pose();
+			constraints[i].unconstrained();
 		for (int i = 0; i < n; i++) {
 			Constraint<?, ?, ?> constraint = constraints[i];
 			constraint.active = constraint.isSourceActive()
@@ -195,11 +197,11 @@ public class Skeleton {
 		Object[] updateCache = this.updateCache.items;
 		n = this.updateCache.size;
 		for (int i = 0; i < n; i++)
-			if (updateCache[i] instanceof Bone bone) updateCache[i] = bone.applied;
+			if (updateCache[i] instanceof Bone bone) updateCache[i] = bone.appliedPose;
 	}
 
 	void constrained (Posed object) {
-		if (object.pose == object.applied) {
+		if (object.pose == object.appliedPose) {
 			object.constrained();
 			resetCache.add(object);
 		}
@@ -231,6 +233,7 @@ public class Skeleton {
 	public void updateWorldTransform (Physics physics) {
 		update++;
 
+		drawOrder.reset();
 		Posed[] resetCache = this.resetCache.items;
 		for (int i = 0, n = this.resetCache.size; i < n; i++)
 			resetCache[i].reset();
@@ -250,12 +253,13 @@ public class Skeleton {
 
 		update++;
 
+		drawOrder.reset();
 		Posed[] resetCache = this.resetCache.items;
 		for (int i = 0, n = this.resetCache.size; i < n; i++)
 			resetCache[i].reset();
 
 		// Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection.
-		BonePose rootBone = getRootBone().applied;
+		BonePose rootBone = getRootBone().appliedPose;
 		float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
 		rootBone.worldX = pa * x + pb * y + parent.worldX;
 		rootBone.worldY = pc * x + pd * y + parent.worldY;
@@ -298,10 +302,9 @@ public class Skeleton {
 
 	/** Sets the slots and draw order to their setup pose values. */
 	public void setupPoseSlots () {
+		drawOrder.setupPose();
 		Slot[] slots = this.slots.items;
-		int n = this.slots.size;
-		arraycopy(slots, 0, drawOrder.items, 0, n);
-		for (int i = 0; i < n; i++)
+		for (int i = 0, n = this.slots.size; i < n; i++)
 			slots[i].setupPose();
 	}
 
@@ -335,7 +338,8 @@ public class Skeleton {
 		return null;
 	}
 
-	/** The skeleton's slots. */
+	/** The skeleton's slots in setup pose order. To change the order use {@link DrawOrder#getPose()}. For rendering use
+	 * {@link DrawOrder#getAppliedPose()}. */
 	public Array<Slot> getSlots () {
 		return slots;
 	}
@@ -350,14 +354,10 @@ public class Skeleton {
 		return null;
 	}
 
-	/** The skeleton's slots in the order they should be drawn. The returned array may be modified to change the draw order. */
-	public Array<Slot> getDrawOrder () {
+	/** The skeleton's draw order. Use {@link DrawOrder#appliedPose} for rendering and {@link DrawOrder#pose} for changing the draw
+	 * order. */
+	public DrawOrder getDrawOrder () {
 		return drawOrder;
-	}
-
-	public void setDrawOrder (Array<Slot> drawOrder) {
-		if (drawOrder == null) throw new IllegalArgumentException("drawOrder cannot be null.");
-		this.drawOrder = drawOrder;
 	}
 
 	/** The skeleton's current skin. */
@@ -374,8 +374,8 @@ public class Skeleton {
 		setSkin(skin);
 	}
 
-	/** Sets the skin used to look up attachments before looking in the {@link SkeletonData#getDefaultSkin() default skin}. If the
-	 * skin is changed, {@link #updateCache()} is called.
+	/** Sets the skin used to look up attachments before looking in {@link SkeletonData#defaultSkin}. If the skin is changed,
+	 * {@link #updateCache()} is called.
 	 * <p>
 	 * Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was no
 	 * old skin, each slot's setup mode attachment is attached from the new skin.
@@ -408,38 +408,38 @@ public class Skeleton {
 	 * name.
 	 * <p>
 	 * See {@link #getAttachment(int, String)}. */
-	public @Null Attachment getAttachment (String slotName, String attachmentName) {
+	public @Null Attachment getAttachment (String slotName, String placeholderName) {
 		SlotData slot = data.findSlot(slotName);
 		if (slot == null) throw new IllegalArgumentException("Slot not found: " + slotName);
-		return getAttachment(slot.getIndex(), attachmentName);
+		return getAttachment(slot.getIndex(), placeholderName);
 	}
 
-	/** Finds an attachment by looking in the {@link #skin} and {@link SkeletonData#defaultSkin} using the slot index and
-	 * attachment name. First the skin is checked and if the attachment was not found, the default skin is checked.
+	/** Finds an attachment by looking in the {@link #skin} and {@link SkeletonData#defaultSkin} using the slot index and skin
+	 * placeholder name. First the skin is checked and if the attachment was not found, the default skin is checked.
 	 * <p>
 	 * See <a href="https://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide. */
-	public @Null Attachment getAttachment (int slotIndex, String attachmentName) {
-		if (attachmentName == null) throw new IllegalArgumentException("attachmentName cannot be null.");
+	public @Null Attachment getAttachment (int slotIndex, String placeholderName) {
+		if (placeholderName == null) throw new IllegalArgumentException("placeholderName cannot be null.");
 		if (skin != null) {
-			Attachment attachment = skin.getAttachment(slotIndex, attachmentName);
+			Attachment attachment = skin.getAttachment(slotIndex, placeholderName);
 			if (attachment != null) return attachment;
 		}
-		if (data.defaultSkin != null) return data.defaultSkin.getAttachment(slotIndex, attachmentName);
+		if (data.defaultSkin != null) return data.defaultSkin.getAttachment(slotIndex, placeholderName);
 		return null;
 	}
 
 	/** A convenience method to set an attachment by finding the slot with {@link #findSlot(String)}, finding the attachment with
 	 * {@link #getAttachment(int, String)}, then setting the slot's {@link SlotPose#attachment}.
-	 * @param attachmentName May be null to clear the slot's attachment. */
-	public void setAttachment (String slotName, @Null String attachmentName) {
+	 * @param placeholderName May be null to clear the slot's attachment. */
+	public void setAttachment (String slotName, @Null String placeholderName) {
 		if (slotName == null) throw new IllegalArgumentException("slotName cannot be null.");
 		Slot slot = findSlot(slotName);
 		if (slot == null) throw new IllegalArgumentException("Slot not found: " + slotName);
 		Attachment attachment = null;
-		if (attachmentName != null) {
-			attachment = getAttachment(slot.data.index, attachmentName);
+		if (placeholderName != null) {
+			attachment = getAttachment(slot.data.index, placeholderName);
 			if (attachment == null)
-				throw new IllegalArgumentException("Attachment not found: " + attachmentName + ", for slot: " + slotName);
+				throw new IllegalArgumentException("Attachment not found: " + placeholderName + ", for slot: " + slotName);
 		}
 		slot.pose.setAttachment(attachment);
 	}
@@ -449,10 +449,13 @@ public class Skeleton {
 		return constraints;
 	}
 
+	/** The skeleton's physics constraints. */
 	public Array<PhysicsConstraint> getPhysicsConstraints () {
 		return physics;
 	}
 
+	/** Finds a constraint of the specified type by comparing each constraints's name. It is more efficient to cache the results of
+	 * this method than to call it multiple times. */
 	public @Null <T extends Constraint> T findConstraint (String constraintName, Class<T> type) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		if (type == null) throw new IllegalArgumentException("type cannot be null.");
@@ -464,7 +467,7 @@ public class Skeleton {
 		return null;
 	}
 
-	/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.
+	/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the applied pose.
 	 * @param offset An output value, the distance from the skeleton origin to the bottom left corner of the AABB.
 	 * @param size An output value, the width and height of the AABB.
 	 * @param temp Working memory to temporarily store attachments' computed world vertices. */
@@ -472,7 +475,7 @@ public class Skeleton {
 		getBounds(offset, size, temp, null);
 	}
 
-	/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose. Optionally applies
+	/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the applied pose. Optionally applies
 	 * clipping.
 	 * @param offset An output value, the distance from the skeleton origin to the bottom left corner of the AABB.
 	 * @param size An output value, the width and height of the AABB.
@@ -482,20 +485,21 @@ public class Skeleton {
 		if (offset == null) throw new IllegalArgumentException("offset cannot be null.");
 		if (size == null) throw new IllegalArgumentException("size cannot be null.");
 		if (temp == null) throw new IllegalArgumentException("temp cannot be null.");
-		Slot[] drawOrder = this.drawOrder.items;
+		Array<Slot> drawOrder = this.drawOrder.appliedPose;
+		Slot[] slots = drawOrder.items;
 		float minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
-		for (int i = 0, n = this.drawOrder.size; i < n; i++) {
-			Slot slot = drawOrder[i];
+		for (int i = 0, n = drawOrder.size; i < n; i++) {
+			Slot slot = slots[i];
 			if (!slot.bone.active) continue;
 			int verticesLength = 0;
 			float[] vertices = null;
 			short[] triangles = null;
-			Attachment attachment = slot.pose.attachment;
+			Attachment attachment = slot.appliedPose.attachment;
 			if (attachment != null) {
 				if (attachment instanceof RegionAttachment region) {
 					verticesLength = 8;
 					vertices = temp.setSize(8);
-					region.computeWorldVertices(slot, region.getOffsets(slot.applied), vertices, 0, 2);
+					region.computeWorldVertices(slot, region.getOffsets(slot.appliedPose), vertices, 0, 2);
 					triangles = quadTriangles;
 				} else if (attachment instanceof MeshAttachment mesh) {
 					verticesLength = mesh.getWorldVerticesLength();
@@ -533,13 +537,13 @@ public class Skeleton {
 		return color;
 	}
 
-	/** A convenience method for setting the skeleton color. The color can also be set by modifying {@link #getColor()}. */
+	/** A convenience method for setting the skeleton color. The color can also be set by modifying {@link #color}. */
 	public void setColor (Color color) {
 		if (color == null) throw new IllegalArgumentException("color cannot be null.");
 		this.color.set(color);
 	}
 
-	/** A convenience method for setting the skeleton color. The color can also be set by modifying {@link #getColor()}. */
+	/** A convenience method for setting the skeleton color. The color can also be set by modifying {@link #color}. */
 	public void setColor (float r, float g, float b, float a) {
 		color.set(r, g, b, a);
 	}
@@ -604,6 +608,7 @@ public class Skeleton {
 		this.y = y;
 	}
 
+	/** The x component of a vector that defines the direction {@link PhysicsConstraintPose#wind} is applied. */
 	public float getWindX () {
 		return windX;
 	}
@@ -612,6 +617,7 @@ public class Skeleton {
 		this.windX = windX;
 	}
 
+	/** The y component of a vector that defines the direction {@link PhysicsConstraintPose#wind} is applied. */
 	public float getWindY () {
 		return windY;
 	}
@@ -620,6 +626,7 @@ public class Skeleton {
 		this.windY = windY;
 	}
 
+	/** The x component of a vector that defines the direction {@link PhysicsConstraintPose#gravity} is applied. */
 	public float getGravityX () {
 		return gravityX;
 	}
@@ -628,6 +635,7 @@ public class Skeleton {
 		this.gravityX = gravityX;
 	}
 
+	/** The y component of a vector that defines the direction {@link PhysicsConstraintPose#gravity} is applied. */
 	public float getGravityY () {
 		return gravityY;
 	}
@@ -650,7 +658,7 @@ public class Skeleton {
 			constraints[i].rotate(x, y, degrees);
 	}
 
-	/** Returns the skeleton's time. This is used for time-based manipulations, such as {@link PhysicsConstraint}.
+	/** Returns the skeleton's time, used for time-based manipulations, such as {@link PhysicsConstraint}.
 	 * <p>
 	 * See {@link #update(float)}. */
 	public float getTime () {

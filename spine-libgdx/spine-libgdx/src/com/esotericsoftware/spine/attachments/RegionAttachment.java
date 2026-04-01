@@ -153,7 +153,7 @@ public class RegionAttachment extends Attachment implements HasSequence {
 		this.scaleY = scaleY;
 	}
 
-	/** The local rotation. */
+	/** The local rotation in degrees, counter clockwise. */
 	public float getRotation () {
 		return rotation;
 	}

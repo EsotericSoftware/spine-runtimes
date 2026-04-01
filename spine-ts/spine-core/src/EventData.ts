@@ -27,17 +27,32 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+import { Event } from "./Event.js";
+import type { SkeletonData } from "./SkeletonData.js";
+
 /** Stores the setup pose values for an {@link Event}.
  *
  * See [Events](http://esotericsoftware.com/spine-events) in the Spine User Guide. */
 export class EventData {
+	/** The name of the event, unique across all events in the skeleton.
+	 *
+	 * See {@link SkeletonData.findEvent}. */
 	name: string;
-	intValue: number = 0;
-	floatValue: number = 0;
-	stringValue: string | null = null;
-	audioPath: string | null = null;
-	volume: number = 0;
-	balance: number = 0;
+
+	_audioPath: string | null = null;
+	/** Path to an audio file relative to the audio folder as defined in Spine. */
+	get audioPath (): string {
+		// biome-ignore lint/style/noNonNullAssertion: can't be null after initialization
+		return this._audioPath!;
+	}
+
+	set audioPath (audioPath: string | null) {
+		if (audioPath == null) throw new Error("audioPath cannot be null.");
+		this._audioPath = audioPath;
+	}
+
+	/** The setup values that are shared by all events with this data. */
+	readonly setupPose = new Event(-1, this);
 
 	constructor (name: string) {
 		this.name = name;

@@ -50,8 +50,8 @@ namespace spine {
 		/// @param constraintIndex -1 for all physics constraints in the skeleton.
 		explicit PhysicsConstraintTimeline(size_t frameCount, size_t bezierCount, int constraintIndex, Property property);
 
-		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
-						   MixDirection direction, bool appliedPose) override;
+		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+						   bool appliedPose) override;
 
 		virtual int getConstraintIndex() const override {
 			return _constraintIndex;
@@ -67,10 +67,9 @@ namespace spine {
 		virtual bool global(PhysicsConstraintData &constraintData) = 0;
 
 		int _constraintIndex;
-		bool _additive;
 	};
 
-	/// Changes a physics constraint's PhysicsConstraintPose::getInertia().
+	/// Changes a physics constraint's inertia.
 	class SP_API PhysicsConstraintInertiaTimeline : public PhysicsConstraintTimeline {
 		friend class SkeletonBinary;
 
@@ -96,7 +95,7 @@ namespace spine {
 		}
 	};
 
-	/// Changes a physics constraint's PhysicsConstraintPose::getStrength().
+	/// Changes a physics constraint's strength.
 	class SP_API PhysicsConstraintStrengthTimeline : public PhysicsConstraintTimeline {
 		friend class SkeletonBinary;
 
@@ -122,7 +121,7 @@ namespace spine {
 		}
 	};
 
-	/// Changes a physics constraint's PhysicsConstraintPose::getDamping().
+	/// Changes a physics constraint's damping.
 	class SP_API PhysicsConstraintDampingTimeline : public PhysicsConstraintTimeline {
 		friend class SkeletonBinary;
 
@@ -148,8 +147,7 @@ namespace spine {
 		}
 	};
 
-	/// Changes a physics constraint's PhysicsConstraintPose::getMassInverse(). The
-	/// timeline values are not inverted.
+	/// Changes a physics constraint's mass inverse. The timeline values are not inverted.
 	class SP_API PhysicsConstraintMassTimeline : public PhysicsConstraintTimeline {
 		friend class SkeletonBinary;
 
@@ -175,7 +173,7 @@ namespace spine {
 		}
 	};
 
-	/// Changes a physics constraint's PhysicsConstraintPose::getWind().
+	/// Changes a physics constraint's wind.
 	class SP_API PhysicsConstraintWindTimeline : public PhysicsConstraintTimeline {
 		friend class SkeletonBinary;
 
@@ -203,7 +201,7 @@ namespace spine {
 		}
 	};
 
-	/// Changes a physics constraint's PhysicsConstraintPose::getGravity().
+	/// Changes a physics constraint's gravity.
 	class SP_API PhysicsConstraintGravityTimeline : public PhysicsConstraintTimeline {
 		friend class SkeletonBinary;
 
@@ -231,7 +229,7 @@ namespace spine {
 		}
 	};
 
-	/// Changes a physics constraint's PhysicsConstraintPose::getMix().
+	/// Changes a physics constraint's mix.
 	class SP_API PhysicsConstraintMixTimeline : public PhysicsConstraintTimeline {
 		friend class SkeletonBinary;
 
@@ -271,10 +269,11 @@ namespace spine {
 			: Timeline(frameCount, 1), ConstraintTimeline(), _constraintIndex(constraintIndex) {
 			PropertyId ids[] = {((PropertyId) Property_PhysicsConstraintReset) << 32};
 			setPropertyIds(ids, 1);
+			_instant = true;
 		}
 
-		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
-						   MixDirection direction, bool appliedPose) override;
+		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+						   bool appliedPose) override;
 
 		int getFrameCount() {
 			return (int) _frames.size();

@@ -106,8 +106,8 @@ class Sequence {
 				this.uvs[i].resize(8);
 				this.offsets[i] = new Array<Float>();
 				this.offsets[i].resize(8);
-				RegionAttachment.computeUVs(this.regions[i], region.x, region.y, region.scaleX, region.scaleY, region.rotation,
-					region.width, region.height, this.offsets[i], this.uvs[i]);
+				RegionAttachment.computeUVs(this.regions[i], region.x, region.y, region.scaleX, region.scaleY, region.rotation, region.width, region.height,
+					this.offsets[i], this.uvs[i]);
 			}
 		} else if (Std.isOfType(attachment, MeshAttachment)) {
 			var mesh:MeshAttachment = cast(attachment, MeshAttachment);
@@ -125,8 +125,10 @@ class Sequence {
 
 	public function resolveIndex(pose:SlotPose):Int {
 		var index:Int = pose.sequenceIndex;
-		if (index == -1) index = this.setupIndex;
-		if (index >= this.regions.length) index = this.regions.length - 1;
+		if (index == -1)
+			index = this.setupIndex;
+		if (index >= this.regions.length)
+			index = this.regions.length - 1;
 		return index;
 	}
 
@@ -139,7 +141,8 @@ class Sequence {
 	}
 
 	public function getPath(basePath:String, index:Int):String {
-		if (!this.pathSuffix) return basePath;
+		if (!this.pathSuffix)
+			return basePath;
 		var result = basePath;
 		var frame = Std.string(this.start + index);
 		for (i in 0...(this.digits - frame.length))

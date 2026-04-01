@@ -69,6 +69,8 @@ public class PathAttachment: VertexAttachment {
         }
     }
 
+    /// If true, additional calculations are performed to make computing positions along the path
+    /// more accurate so movement along the path has a constant speed.
     public var constantSpeed: Bool {
         get {
             let result = spine_path_attachment_get_constant_speed(_ptr.assumingMemoryBound(to: spine_path_attachment_wrapper.self))

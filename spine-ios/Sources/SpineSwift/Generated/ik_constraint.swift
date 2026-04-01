@@ -70,8 +70,8 @@ public class IkConstraint: IkConstraintBase {
         return IkConstraint(fromPointer: result!)
     }
 
-    /// Adjusts the bone rotation so the tip is as close to the target position as possible. The
-    /// target is specified in the world coordinate system.
+    /// Adjusts the local rotation of the bone so the world position of the tip is as close to the
+    /// target position as possible. The target is specified in the world coordinate system.
     public static func apply(
         _ skeleton: Skeleton, _ bone: BonePose, _ targetX: Float, _ targetY: Float, _ compress: Bool, _ stretch: Bool, _ uniform: Bool, _ mix: Float
     ) {

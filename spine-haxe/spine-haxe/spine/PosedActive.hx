@@ -31,13 +31,12 @@ package spine;
 
 abstract class PosedActive< //
 	D:PosedData<P>, //
-	P:Pose<Any>, //
-	A:P> //
-extends Posed<D, P, A> {
+	P:Pose<Any>> //
+extends Posed<D, P> {
 	public var active:Bool;
 
-	public function new(data:D, pose:A, constrained:A) {
-		super(data, pose, constrained);
+	public function new(data:D, pose:P, constrainedPose:P) {
+		super(data, pose, constrainedPose);
 		setupPose();
 	}
 

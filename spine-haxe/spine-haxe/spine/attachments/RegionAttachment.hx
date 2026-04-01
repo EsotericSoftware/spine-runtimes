@@ -109,7 +109,7 @@ class RegionAttachment extends Attachment implements HasSequence {
 	 * @param offset The worldVertices index to begin writing values.
 	 * @param stride The number of worldVertices entries between the value pairs written. */
 	public function computeWorldVertices(slot:Slot, vertexOffsets:Array<Float>, worldVertices:Array<Float>, offset:Int, stride:Int):Void {
-		var bone = slot.bone.applied;
+		var bone = slot.bone.appliedPose;
 		var x = bone.worldX, y = bone.worldY;
 		var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
 
@@ -150,10 +150,10 @@ class RegionAttachment extends Attachment implements HasSequence {
 	/** Computes UVs and offsets for a region attachment.
 	 * @param uvs Output array for the computed UVs, length of 8.
 	 * @param offset Output array for the computed vertex offsets, length of 8. */
-	public static function computeUVs(region:TextureRegion, x:Float, y:Float, scaleX:Float, scaleY:Float, rotation:Float,
-		width:Float, height:Float, offset:Array<Float>, uvs:Array<Float>):Void {
-
-		if (region == null) throw "Region not set.";
+	public static function computeUVs(region:TextureRegion, x:Float, y:Float, scaleX:Float, scaleY:Float, rotation:Float, width:Float, height:Float,
+			offset:Array<Float>, uvs:Array<Float>):Void {
+		if (region == null)
+			throw "Region not set.";
 		var regionScaleX = width / region.originalWidth * scaleX;
 		var regionScaleY = height / region.originalHeight * scaleY;
 		var localX = -width / 2 * scaleX + region.offsetX * regionScaleX;

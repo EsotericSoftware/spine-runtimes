@@ -66,7 +66,6 @@ namespace spine {
 		PosedData(const String &name);
 		virtual ~PosedData();
 
-		/// The constraint's name, which is unique across all constraints in the skeleton of the same type.
 		const String &getName() const {
 			return _name;
 		};
@@ -93,7 +92,7 @@ namespace spine {
 	inline PosedData::~PosedData() {
 	}
 
-	/// The base class for all constrained datas.
+	/// The base class for storing setup data for a posed object. May be shared with multiple instances.
 	template<class P>
 	class PosedDataGeneric : public PosedData {
 		friend class SkeletonBinary;
@@ -127,18 +126,19 @@ namespace spine {
 		friend class Slot;
 
 	protected:
-		P _setup;
+		P _setupPose;
 
 	public:
-		PosedDataGeneric(const String &name) : PosedData(name), _setup() {
+		PosedDataGeneric(const String &name) : PosedData(name), _setupPose() {
 		}
 		virtual ~PosedDataGeneric() {};
 
+		/// The setup pose that most animations are relative to.
 		P &getSetupPose() {
-			return _setup;
+			return _setupPose;
 		};
 		const P &getSetupPose() const {
-			return _setup;
+			return _setupPose;
 		};
 	};
 }

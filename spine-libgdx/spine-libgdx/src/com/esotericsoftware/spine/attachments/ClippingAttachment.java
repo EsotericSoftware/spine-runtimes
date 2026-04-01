@@ -52,7 +52,7 @@ public class ClippingAttachment extends VertexAttachment {
 		color.set(other.color);
 	}
 
-	/** Clipping is performed between the clipping attachment's slot and the end slot. If null clipping is done until the end of
+	/** Clipping is performed between the clipping attachment's slot and the end slot. If null, clipping is done until the end of
 	 * the skeleton's rendering. */
 	public @Null SlotData getEndSlot () {
 		return endSlot;

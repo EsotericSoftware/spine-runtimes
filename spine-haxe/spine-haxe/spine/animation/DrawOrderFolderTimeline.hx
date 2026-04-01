@@ -42,7 +42,7 @@ class DrawOrderFolderTimeline extends Timeline {
 	/** @param slots spine.Skeleton.slots indices controlled by this timeline, in setup order.
 	 * @param slotCount The maximum number of slots in the skeleton. */
 	public function new(frameCount:Int, slots:Array<Int>, slotCount:Int) {
-		super(frameCount, Property.drawOrder);
+		super(frameCount, ...DrawOrderFolderTimeline.getPropertyIds(slots));
 		this.slots = slots;
 		drawOrders = new Array<Array<Int>>();
 		drawOrders.resize(frameCount);
@@ -52,6 +52,14 @@ class DrawOrderFolderTimeline extends Timeline {
 			inFolder[i] = false;
 		for (i in slots)
 			inFolder[i] = true;
+	}
+
+	private static function getPropertyIds(slots:Array<Int>):Array<String> {
+		var n = slots.length;
+		var ids = new Array();
+		for (i in 0...n)
+			ids[i] = "d" + slots[i];
+		return ids;
 	}
 
 	public var frameCount(get, never):Int;
@@ -79,23 +87,25 @@ class DrawOrderFolderTimeline extends Timeline {
 		drawOrders[frame] = drawOrder;
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend, direction:MixDirection,
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
 			appliedPose:Bool) {
-		if (direction == MixDirection.mixOut) {
-			if (blend == MixBlend.setup) setupApply(skeleton);
+		if (out) {
+			if (fromSetup)
+				setupApply(skeleton, appliedPose);
 		} else if (time < frames[0]) {
-			if (blend == MixBlend.setup || blend == MixBlend.first) setupApply(skeleton);
+			if (fromSetup)
+				setupApply(skeleton, appliedPose);
 		} else {
 			var order = drawOrders[Timeline.search1(frames, time)];
 			if (order == null)
-				setupApply(skeleton);
+				setupApply(skeleton, appliedPose);
 			else
-				orderApply(skeleton, order);
+				orderApply(skeleton, order, appliedPose);
 		}
 	}
 
-	private function setupApply(skeleton:Skeleton):Void {
-		var drawOrder = skeleton.drawOrder;
+	private function setupApply(skeleton:Skeleton, appliedPose:Bool):Void {
+		var drawOrder = appliedPose ? skeleton.drawOrder.appliedPose : skeleton.drawOrder.pose;
 		var allSlots = skeleton.slots;
 		var found = 0, done = slots.length;
 		var i = 0;
@@ -103,14 +113,15 @@ class DrawOrderFolderTimeline extends Timeline {
 			if (inFolder[drawOrder[i].data.index]) {
 				drawOrder[i] = allSlots[slots[found]];
 				found++;
-				if (found == done) break;
+				if (found == done)
+					break;
 			}
 			i++;
 		}
 	}
 
-	private function orderApply(skeleton:Skeleton, order:Array<Int>):Void {
-		var drawOrder = skeleton.drawOrder;
+	private function orderApply(skeleton:Skeleton, order:Array<Int>, appliedPose:Bool):Void {
+		var drawOrder = appliedPose ? skeleton.drawOrder.appliedPose : skeleton.drawOrder.pose;
 		var allSlots = skeleton.slots;
 		var found = 0, done = slots.length;
 		var i = 0;
@@ -118,7 +129,8 @@ class DrawOrderFolderTimeline extends Timeline {
 			if (inFolder[drawOrder[i].data.index]) {
 				drawOrder[i] = allSlots[slots[order[found]]];
 				found++;
-				if (found == done) break;
+				if (found == done)
+					break;
 			}
 			i++;
 		}

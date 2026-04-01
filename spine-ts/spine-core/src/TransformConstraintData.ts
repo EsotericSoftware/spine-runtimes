@@ -146,7 +146,7 @@ export class TransformConstraintData extends ConstraintData<TransformConstraint,
 
 /** Source property for a {@link TransformConstraint}. */
 export abstract class FromProperty {
-	/** The value of this property that corresponds to {@link ToProperty#offset}. */
+	/** The value of this property that corresponds to {@link ToProperty.offset}. */
 	offset = 0;
 
 	/** Constrained properties. */
@@ -158,10 +158,10 @@ export abstract class FromProperty {
 
 /** Constrained property for a {@link TransformConstraint}. */
 export abstract class ToProperty {
-	/** The value of this property that corresponds to {@link FromProperty#offset}. */
+	/** The value of this property that corresponds to {@link FromProperty.offset}. */
 	offset = 0;
 
-	/** The maximum value of this property when {@link TransformConstraintData#clamp clamped}. */
+	/** The maximum value of this property when {@link TransformConstraintData.clamp clamped}. */
 	max = 0;
 
 	/** The scale of the {@link FromProperty} value in relation to this property. */

@@ -32,7 +32,7 @@
 import Foundation
 import SpineC
 
-/// Changes a slider's SliderPose::getTime().
+/// Changes a slider's time.
 @objc(SpineSliderTimeline)
 @objcMembers
 public class SliderTimeline: ConstraintTimeline1 {

@@ -37,8 +37,7 @@ import { TransformConstraintPose } from "./TransformConstraintPose.js";
 import { MathUtils } from "./Utils.js";
 
 
-/** Stores the current pose for a transform constraint. A transform constraint adjusts the world transform of the constrained
- * bones to match that of the source bone.
+/** Adjusts the world transform of the constrained bones to match that of the source bone.
  *
  * See [Transform constraints](http://esotericsoftware.com/spine-transform-constraints) in the Spine User Guide. */
 export class TransformConstraint extends Constraint<TransformConstraint, TransformConstraintData, TransformConstraintPose> {
@@ -55,7 +54,7 @@ export class TransformConstraint extends Constraint<TransformConstraint, Transfo
 
 		this.bones = [] as BonePose[];
 		for (const boneData of data.bones)
-			this.bones.push(skeleton.bones[boneData.index].constrained);
+			this.bones.push(skeleton.bones[boneData.index].constrainedPose);
 
 		const source = skeleton.bones[data.source.index];
 		if (source == null) throw new Error("source cannot be null.");
@@ -69,13 +68,13 @@ export class TransformConstraint extends Constraint<TransformConstraint, Transfo
 	}
 
 	update (skeleton: Skeleton, physics: Physics) {
-		const p = this.applied;
+		const p = this.appliedPose;
 		if (p.mixRotate === 0 && p.mixX === 0 && p.mixY === 0 && p.mixScaleX === 0 && p.mixScaleY === 0 && p.mixShearY === 0) return;
 
 		const data = this.data;
 		const localSource = data.localSource, localTarget = data.localTarget, additive = data.additive, clamp = data.clamp;
 		const offsets = data.offsets;
-		const source = this.source.applied;
+		const source = this.source.appliedPose;
 		if (localSource) source.validateLocalTransform(skeleton);
 		const fromItems = data.properties;
 		const fn = data.properties.length, update = skeleton._update;

@@ -49,14 +49,16 @@ EventTimeline::EventTimeline(size_t frameCount) : Timeline(frameCount, 1) {
 	PropertyId ids[] = {((PropertyId) Property_Event << 32)};
 	setPropertyIds(ids, 1);
 	_events.setSize(frameCount, NULL);
+	_instant = true;
 }
 
 EventTimeline::~EventTimeline() {
 	ArrayUtils::deleteElements(_events);
 }
 
-void EventTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *pEvents, float alpha, MixBlend blend,
-						  MixDirection direction, bool appliedPose) {
+void EventTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *pEvents, float alpha, bool fromSetup, bool add, bool out,
+						  bool appliedPose) {
+	SP_UNUSED(skeleton);
 	if (pEvents == NULL) return;
 
 	Array<Event *> &events = *pEvents;
@@ -65,7 +67,7 @@ void EventTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<
 
 	if (lastTime > time) {
 		// Apply after lastTime for looped animations.
-		apply(skeleton, lastTime, FLT_MAX, pEvents, alpha, blend, direction, appliedPose);
+		apply(skeleton, lastTime, FLT_MAX, pEvents, 0, false, false, false, false);
 		lastTime = -1.0f;
 	} else if (lastTime >= _frames[frameCount - 1]) {
 		// Last time is after last frame.

@@ -38,7 +38,7 @@
 
 namespace spine {
 
-	/// Changes a bone's BoneLocal::getInherit().
+	/// Changes a bone's inherit mode.
 	class SP_API InheritTimeline : public Timeline, public BoneTimeline {
 		friend class SkeletonBinary;
 
@@ -56,8 +56,8 @@ namespace spine {
 		/// @param time The frame time in seconds.
 		void setFrame(int frame, float time, Inherit inherit);
 
-		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
-						   MixDirection direction, bool appliedPose) override;
+		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+						   bool appliedPose) override;
 
 
 		virtual int getBoneIndex() const override {

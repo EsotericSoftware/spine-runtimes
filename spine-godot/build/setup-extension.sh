@@ -74,6 +74,7 @@ if [ $dev == "true" ]; then
 fi
 
 cp spine_godot_extension.gdextension example-v4-extension/bin
+rm -rf spine_godot/spine-cpp
 cp -r ../spine-cpp spine_godot
 
 popd

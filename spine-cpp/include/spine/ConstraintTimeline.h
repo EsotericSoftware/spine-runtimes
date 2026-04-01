@@ -42,7 +42,7 @@ namespace spine {
 		ConstraintTimeline();
 		virtual ~ConstraintTimeline();
 
-		/// The index of the constraint in Skeleton::getConstraints() that will be changed when this timeline is applied.
+		/// The Skeleton::getConstraints() index of the constraint that will be changed when this timeline is applied.
 		virtual int getConstraintIndex() const = 0;
 
 		virtual void setConstraintIndex(int inValue) = 0;

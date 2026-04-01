@@ -32,9 +32,7 @@
 import Foundation
 import SpineC
 
-/// Changes an IK constraint's IkConstraintPose::getMix(), IkConstraintPose::getSoftness(),
-/// IkConstraintPose::getBendDirection(), IkConstraintPose::getStretch(), and
-/// IkConstraintPose::getCompress().
+/// Changes an IK constraint's mix, softness, bend direction, stretch, and compress values.
 @objc(SpineIkConstraintTimeline)
 @objcMembers
 public class IkConstraintTimeline: CurveTimeline, ConstraintTimeline {

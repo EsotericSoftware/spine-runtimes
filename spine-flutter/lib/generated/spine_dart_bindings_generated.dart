@@ -5919,8 +5919,8 @@ class SpineDartBindings {
   late final _spine_bone_pose_update =
       _spine_bone_pose_updatePtr.asFunction<void Function(spine_bone_pose, spine_skeleton, int)>();
 
-  /// Computes the world transform using the parent bone's applied pose and this
-  /// pose. Child bones are not updated.
+  /// Computes the world transform using the parent bone's world transform and this
+  /// applied local pose. Child bones are not updated.
   ///
   /// See World transforms in the Spine Runtimes Guide.
   void spine_bone_pose_update_world_transform(
@@ -5940,11 +5940,6 @@ class SpineDartBindings {
       _spine_bone_pose_update_world_transformPtr.asFunction<void Function(spine_bone_pose, spine_skeleton)>();
 
   /// Computes the local transform values from the world transform.
-  ///
-  /// If the world transform is modified (by a constraint, rotateWorld(), etc) then
-  /// this method should be called so the local transform matches the world
-  /// transform. The local transform may be needed by other code (eg to apply
-  /// another constraint).
   ///
   /// Some information is ambiguous in the world transform, such as -1,-1 scale
   /// versus 180 rotation. The local transform after calling this method is
@@ -5966,8 +5961,10 @@ class SpineDartBindings {
   late final _spine_bone_pose_update_local_transform =
       _spine_bone_pose_update_local_transformPtr.asFunction<void Function(spine_bone_pose, spine_skeleton)>();
 
-  /// If the world transform has been modified and the local transform no longer
-  /// matches, updateLocalTransform() is called.
+  /// If the world transform has been modified by constraints and the local
+  /// transform no longer matches, updateLocalTransform() is called. Call this
+  /// after Skeleton::updateWorldTransform(Physics) before using the applied local
+  /// transform.
   void spine_bone_pose_validate_local_transform(
     spine_bone_pose self,
     spine_skeleton skeleton,
@@ -6029,8 +6026,7 @@ class SpineDartBindings {
   late final _spine_bone_pose_reset_world =
       _spine_bone_pose_reset_worldPtr.asFunction<void Function(spine_bone_pose, int)>();
 
-  /// Part of the world transform matrix for the X axis. If changed,
-  /// updateLocalTransform() should be called.
+  /// The world transform [a b][c d] x-axis x component.
   double spine_bone_pose_get_a(
     spine_bone_pose self,
   ) {
@@ -6057,8 +6053,7 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_bone_pose, ffi.Float)>>('spine_bone_pose_set_a');
   late final _spine_bone_pose_set_a = _spine_bone_pose_set_aPtr.asFunction<void Function(spine_bone_pose, double)>();
 
-  /// Part of the world transform matrix for the Y axis. If changed,
-  /// updateLocalTransform() should be called.
+  /// The world transform [a b][c d] y-axis x component.
   double spine_bone_pose_get_b(
     spine_bone_pose self,
   ) {
@@ -6085,8 +6080,7 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_bone_pose, ffi.Float)>>('spine_bone_pose_set_b');
   late final _spine_bone_pose_set_b = _spine_bone_pose_set_bPtr.asFunction<void Function(spine_bone_pose, double)>();
 
-  /// Part of the world transform matrix for the X axis. If changed,
-  /// updateLocalTransform() should be called.
+  /// The world transform [a b][c d] x-axis y component.
   double spine_bone_pose_get_c(
     spine_bone_pose self,
   ) {
@@ -6113,8 +6107,7 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_bone_pose, ffi.Float)>>('spine_bone_pose_set_c');
   late final _spine_bone_pose_set_c = _spine_bone_pose_set_cPtr.asFunction<void Function(spine_bone_pose, double)>();
 
-  /// Part of the world transform matrix for the Y axis. If changed,
-  /// updateLocalTransform() should be called.
+  /// The world transform [a b][c d] y-axis y component.
   double spine_bone_pose_get_d(
     spine_bone_pose self,
   ) {
@@ -6141,7 +6134,7 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_bone_pose, ffi.Float)>>('spine_bone_pose_set_d');
   late final _spine_bone_pose_set_d = _spine_bone_pose_set_dPtr.asFunction<void Function(spine_bone_pose, double)>();
 
-  /// The world X position. If changed, updateLocalTransform() should be called.
+  /// The world X position.
   double spine_bone_pose_get_world_x(
     spine_bone_pose self,
   ) {
@@ -6170,7 +6163,7 @@ class SpineDartBindings {
   late final _spine_bone_pose_set_world_x =
       _spine_bone_pose_set_world_xPtr.asFunction<void Function(spine_bone_pose, double)>();
 
-  /// The world Y position. If changed, updateLocalTransform() should be called.
+  /// The world Y position.
   double spine_bone_pose_get_world_y(
     spine_bone_pose self,
   ) {
@@ -6199,7 +6192,8 @@ class SpineDartBindings {
   late final _spine_bone_pose_set_world_y =
       _spine_bone_pose_set_world_yPtr.asFunction<void Function(spine_bone_pose, double)>();
 
-  /// The world rotation for the X axis, calculated using a and c.
+  /// The world rotation for the X axis, calculated using a and c. This is the
+  /// direction the bone is pointing.
   double spine_bone_pose_get_world_rotation_x(
     spine_bone_pose self,
   ) {
@@ -6389,9 +6383,6 @@ class SpineDartBindings {
       _spine_bone_pose_local_to_world_rotationPtr.asFunction<double Function(spine_bone_pose, double)>();
 
   /// Rotates the world transform the specified amount.
-  ///
-  /// After changes are made to the world transform, updateLocalTransform() should
-  /// be called on this bone and any child bones, recursively.
   void spine_bone_pose_rotate_world(
     spine_bone_pose self,
     double degrees,
@@ -6476,6 +6467,7 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_bone_pose, ffi.Float)>>('spine_bone_pose_set_y');
   late final _spine_bone_pose_set_y = _spine_bone_pose_set_yPtr.asFunction<void Function(spine_bone_pose, double)>();
 
+  /// Sets local x and y translation.
   void spine_bone_pose_set_position(
     spine_bone_pose self,
     double x,
@@ -6581,6 +6573,7 @@ class SpineDartBindings {
   late final _spine_bone_pose_set_scale_y =
       _spine_bone_pose_set_scale_yPtr.asFunction<void Function(spine_bone_pose, double)>();
 
+  /// Sets local scaleX and scaleY.
   void spine_bone_pose_set_scale_1(
     spine_bone_pose self,
     double scaleX,
@@ -6599,6 +6592,7 @@ class SpineDartBindings {
   late final _spine_bone_pose_set_scale_1 =
       _spine_bone_pose_set_scale_1Ptr.asFunction<void Function(spine_bone_pose, double, double)>();
 
+  /// Sets local scaleX and scaleY to the same value.
   void spine_bone_pose_set_scale_2(
     spine_bone_pose self,
     double scale,
@@ -7249,7 +7243,7 @@ class SpineDartBindings {
   late final _spine_skeleton_data_set_hash =
       _spine_skeleton_data_set_hashPtr.asFunction<void Function(spine_skeleton_data, ffi.Pointer<ffi.Char>)>();
 
-  /// The path to the images directory as defined in Spine, or null if nonessential
+  /// The path to the images folder as defined in Spine, or null if nonessential
   /// data was not exported.
   ffi.Pointer<ffi.Char> spine_skeleton_data_get_images_path(
     spine_skeleton_data self,
@@ -7281,7 +7275,7 @@ class SpineDartBindings {
   late final _spine_skeleton_data_set_images_path =
       _spine_skeleton_data_set_images_pathPtr.asFunction<void Function(spine_skeleton_data, ffi.Pointer<ffi.Char>)>();
 
-  /// The path to the audio directory as defined in Spine, or null if nonessential
+  /// The path to the audio folder as defined in Spine, or null if nonessential
   /// data was not exported.
   ffi.Pointer<ffi.Char> spine_skeleton_data_get_audio_path(
     spine_skeleton_data self,
@@ -15283,8 +15277,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_alpha_timeline_apply(
@@ -15294,8 +15289,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -15303,9 +15299,10 @@ class SpineDartBindings {
   late final _spine_alpha_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_alpha_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event, ffi.Float,
-              ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_alpha_timeline_apply');
+              ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_alpha_timeline_apply');
   late final _spine_alpha_timeline_apply = _spine_alpha_timeline_applyPtr.asFunction<
-      void Function(spine_alpha_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+      void Function(
+          spine_alpha_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool, bool, bool)>();
 
   int spine_alpha_timeline_get_slot_index(
     spine_alpha_timeline self,
@@ -15381,7 +15378,8 @@ class SpineDartBindings {
     spine_alpha_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -15389,7 +15387,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -15397,16 +15396,17 @@ class SpineDartBindings {
 
   late final _spine_alpha_timeline_get_relative_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_alpha_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_alpha_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_alpha_timeline_get_relative_value');
   late final _spine_alpha_timeline_get_relative_value = _spine_alpha_timeline_get_relative_valuePtr
-      .asFunction<double Function(spine_alpha_timeline, double, double, int, double, double)>();
+      .asFunction<double Function(spine_alpha_timeline, double, double, bool, bool, double, double)>();
 
   double spine_alpha_timeline_get_absolute_value_1(
     spine_alpha_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -15414,7 +15414,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -15422,16 +15423,17 @@ class SpineDartBindings {
 
   late final _spine_alpha_timeline_get_absolute_value_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_alpha_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_alpha_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_alpha_timeline_get_absolute_value_1');
   late final _spine_alpha_timeline_get_absolute_value_1 = _spine_alpha_timeline_get_absolute_value_1Ptr
-      .asFunction<double Function(spine_alpha_timeline, double, double, int, double, double)>();
+      .asFunction<double Function(spine_alpha_timeline, double, double, bool, bool, double, double)>();
 
   double spine_alpha_timeline_get_absolute_value_2(
     spine_alpha_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
     double value,
@@ -15440,7 +15442,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
       value,
@@ -15449,17 +15452,18 @@ class SpineDartBindings {
 
   late final _spine_alpha_timeline_get_absolute_value_2Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_alpha_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float, ffi.Float,
+          ffi.Float Function(spine_alpha_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float, ffi.Float,
               ffi.Float)>>('spine_alpha_timeline_get_absolute_value_2');
   late final _spine_alpha_timeline_get_absolute_value_2 = _spine_alpha_timeline_get_absolute_value_2Ptr
-      .asFunction<double Function(spine_alpha_timeline, double, double, int, double, double, double)>();
+      .asFunction<double Function(spine_alpha_timeline, double, double, bool, bool, double, double, double)>();
 
   double spine_alpha_timeline_get_scale_value(
     spine_alpha_timeline self,
     double time,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     double current,
     double setup,
   ) {
@@ -15467,8 +15471,9 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       current,
       setup,
     );
@@ -15476,10 +15481,10 @@ class SpineDartBindings {
 
   late final _spine_alpha_timeline_get_scale_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_alpha_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_alpha_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_alpha_timeline_get_scale_value');
   late final _spine_alpha_timeline_get_scale_value = _spine_alpha_timeline_get_scale_valuePtr
-      .asFunction<double Function(spine_alpha_timeline, double, double, int, int, double, double)>();
+      .asFunction<double Function(spine_alpha_timeline, double, double, bool, bool, bool, double, double)>();
 
   void spine_alpha_timeline_set_linear(
     spine_alpha_timeline self,
@@ -15585,6 +15590,35 @@ class SpineDartBindings {
   late final _spine_alpha_timeline_get_curves =
       _spine_alpha_timeline_get_curvesPtr.asFunction<spine_array_float Function(spine_alpha_timeline)>();
 
+  /// True if this timeline supports additive blending.
+  bool spine_alpha_timeline_get_additive(
+    spine_alpha_timeline self,
+  ) {
+    return _spine_alpha_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_alpha_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_alpha_timeline)>>('spine_alpha_timeline_get_additive');
+  late final _spine_alpha_timeline_get_additive =
+      _spine_alpha_timeline_get_additivePtr.asFunction<bool Function(spine_alpha_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_alpha_timeline_get_instant(
+    spine_alpha_timeline self,
+  ) {
+    return _spine_alpha_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_alpha_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_alpha_timeline)>>('spine_alpha_timeline_get_instant');
+  late final _spine_alpha_timeline_get_instant =
+      _spine_alpha_timeline_get_instantPtr.asFunction<bool Function(spine_alpha_timeline)>();
+
   int spine_alpha_timeline_get_frame_entries(
     spine_alpha_timeline self,
   ) {
@@ -15659,23 +15693,19 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<spine_rtti Function()>>('spine_alpha_timeline_rtti');
   late final _spine_alpha_timeline_rtti = _spine_alpha_timeline_rttiPtr.asFunction<spine_rtti Function()>();
 
+  /// Creates a new animation. The timelines must be set before use.
   spine_animation spine_animation_create(
     ffi.Pointer<ffi.Char> name,
-    spine_array_timeline timelines,
-    double duration,
   ) {
     return _spine_animation_create(
       name,
-      timelines,
-      duration,
     );
   }
 
   late final _spine_animation_createPtr =
-      _lookup<ffi.NativeFunction<spine_animation Function(ffi.Pointer<ffi.Char>, spine_array_timeline, ffi.Float)>>(
-          'spine_animation_create');
-  late final _spine_animation_create = _spine_animation_createPtr
-      .asFunction<spine_animation Function(ffi.Pointer<ffi.Char>, spine_array_timeline, double)>();
+      _lookup<ffi.NativeFunction<spine_animation Function(ffi.Pointer<ffi.Char>)>>('spine_animation_create');
+  late final _spine_animation_create =
+      _spine_animation_createPtr.asFunction<spine_animation Function(ffi.Pointer<ffi.Char>)>();
 
   void spine_animation_dispose(
     spine_animation self,
@@ -15689,8 +15719,11 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_animation)>>('spine_animation_dispose');
   late final _spine_animation_dispose = _spine_animation_disposePtr.asFunction<void Function(spine_animation)>();
 
-  /// If the returned array or the timelines it contains are modified,
-  /// setTimelines() must be called.
+  /// If this list or the timelines it contains are modified, the timelines and
+  /// bones must be set again to recompute the animation's bone indices and
+  /// timeline property IDs.
+  ///
+  /// See setTimelines().
   spine_array_timeline spine_animation_get_timelines(
     spine_animation self,
   ) {
@@ -15704,21 +15737,24 @@ class SpineDartBindings {
   late final _spine_animation_get_timelines =
       _spine_animation_get_timelinesPtr.asFunction<spine_array_timeline Function(spine_animation)>();
 
+  /// Sets the timelines and bone indices.
   void spine_animation_set_timelines(
     spine_animation self,
     spine_array_timeline timelines,
+    spine_array_int bones,
   ) {
     return _spine_animation_set_timelines(
       self,
       timelines,
+      bones,
     );
   }
 
   late final _spine_animation_set_timelinesPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(spine_animation, spine_array_timeline)>>(
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_animation, spine_array_timeline, spine_array_int)>>(
           'spine_animation_set_timelines');
-  late final _spine_animation_set_timelines =
-      _spine_animation_set_timelinesPtr.asFunction<void Function(spine_animation, spine_array_timeline)>();
+  late final _spine_animation_set_timelines = _spine_animation_set_timelinesPtr
+      .asFunction<void Function(spine_animation, spine_array_timeline, spine_array_int)>();
 
   /// Returns true if this animation contains a timeline with any of the specified
   /// property IDs.
@@ -15771,16 +15807,18 @@ class SpineDartBindings {
 
   /// Applies the animation's timelines to the specified skeleton.
   ///
-  /// See Timeline::apply().
+  /// See Timeline::apply() and Applying Animations in the Spine Runtimes Guide.
   ///
-  /// @param skeleton The skeleton the animation is being applied to. This provides access to the bones, slots, and other skeleton components the timelines may change.
-  /// @param lastTime The last time in seconds this animation was applied. Some timelines trigger only at specific times rather than every frame. Pass -1 the first time an animation is applied to ensure frame 0 is triggered.
-  /// @param time The time in seconds the skeleton is being posed for. Most timelines find the frame before and the frame after this time and interpolate between the frame values. If beyond the getDuration() and loop is true then the animation will repeat, else the last frame will be applied.
-  /// @param loop If true, the animation repeats after the getDuration().
-  /// @param events If any events are fired, they are added to this list. Can be null to ignore fired events or if no timelines fire events.
-  /// @param alpha 0 applies the current or setup values (depending on blend). 1 applies the timeline values. Between 0 and 1 applies values between the current or setup values and the timeline values. By adjusting alpha over time, an animation can be mixed in or out. alpha can also be useful to apply animations on top of each other (layering).
-  /// @param blend Controls how mixing is applied when alpha < 1.
-  /// @param direction Indicates whether the timelines are mixing in or out. Used by timelines which perform instant transitions, such as DrawOrderTimeline or AttachmentTimeline.
+  /// @param skeleton The skeleton the animation is applied to. This provides access to the bones, slots, and other skeleton components the timelines may change.
+  /// @param lastTime The last time in seconds this animation was applied. Some timelines trigger only at discrete times, in which case all keys are triggered between lastTime (exclusive) and time (inclusive). Pass -1 the first time an animation is applied to ensure frame 0 is triggered.
+  /// @param time The time in seconds the skeleton is being posed for. Timelines find the frame before and after this time and interpolate between the frame values.
+  /// @param loop True if time beyond the animation duration repeats the animation, else the last frame is used.
+  /// @param events If any events are fired, they are added to this list. Can be NULL to ignore fired events or if no timelines fire events.
+  /// @param alpha 0 applies setup or current values (depending on fromSetup), 1 uses timeline values, and intermediate values interpolate between them. Adjusting alpha over time can mix an animation in or out.
+  /// @param fromSetup If true, alpha transitions between setup and timeline values, setup values are used before the first frame (current values are not used). If false, alpha transitions between current and timeline values, no change is made before the first frame.
+  /// @param add If true, for timelines that support it, their values are added to the setup or current values (depending on fromSetup).
+  /// @param out True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant transitions.
+  /// @param appliedPose True to modify getAppliedPose(), else the unconstrained pose is modified.
   void spine_animation_apply(
     spine_animation self,
     spine_skeleton skeleton,
@@ -15789,8 +15827,9 @@ class SpineDartBindings {
     bool loop,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_animation_apply(
@@ -15801,8 +15840,9 @@ class SpineDartBindings {
       loop,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -15810,10 +15850,10 @@ class SpineDartBindings {
   late final _spine_animation_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_animation, spine_skeleton, ffi.Float, ffi.Float, ffi.Bool, spine_array_event,
-              ffi.Float, ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_animation_apply');
+              ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_animation_apply');
   late final _spine_animation_apply = _spine_animation_applyPtr.asFunction<
       void Function(
-          spine_animation, spine_skeleton, double, double, bool, spine_array_event, double, int, int, bool)>();
+          spine_animation, spine_skeleton, double, double, bool, spine_array_event, double, bool, bool, bool, bool)>();
 
   /// The animation's name, which is unique across all animations in the skeleton.
   ffi.Pointer<ffi.Char> spine_animation_get_name(
@@ -15829,7 +15869,9 @@ class SpineDartBindings {
   late final _spine_animation_get_name =
       _spine_animation_get_namePtr.asFunction<ffi.Pointer<ffi.Char> Function(spine_animation)>();
 
-  /// The bone indices affected by this animation.
+  /// The Skeleton::getBones() indices affected by this animation.
+  ///
+  /// See setTimelines() and BoneTimeline::getBoneIndex().
   spine_array_int spine_animation_get_bones(
     spine_animation self,
   ) {
@@ -15903,8 +15945,8 @@ class SpineDartBindings {
   late final _spine_animation_state_dispose =
       _spine_animation_state_disposePtr.asFunction<void Function(spine_animation_state)>();
 
-  /// Increments each track entry TrackEntry::getTrackTime(), setting queued
-  /// animations as current if needed.
+  /// Increments each track entry's track time, setting queued animations as
+  /// current if needed.
   void spine_animation_state_update(
     spine_animation_state self,
     double delta,
@@ -16105,11 +16147,11 @@ class SpineDartBindings {
   /// Mixing in is done by first setting an empty animation, then adding an
   /// animation using addAnimation(int, Animation, bool, float) with the desired
   /// delay (an empty animation has a duration of 0) and on the returned track
-  /// entry, set the TrackEntry::setMixDuration(float). Mixing from an empty
-  /// animation causes the new animation to be applied more and more over the mix
-  /// duration. Properties keyed in the new animation transition from the value
-  /// from lower tracks or from the setup pose value if no lower tracks key the
-  /// property to the value keyed in the new animation.
+  /// entry set TrackEntry::setMixDuration(float). Mixing from an empty animation
+  /// causes the new animation to be applied more and more over the mix duration.
+  /// Properties keyed in the new animation transition from the value from lower
+  /// tracks or from the setup pose value if no lower tracks key the property to
+  /// the value keyed in the new animation.
   ///
   /// See Empty animations in the Spine Runtimes Guide.
   spine_track_entry spine_animation_state_set_empty_animation(
@@ -16231,7 +16273,7 @@ class SpineDartBindings {
   /// Multiplier for the delta time when the animation state is updated, causing
   /// time for all animations and mixes to play slower or faster. Defaults to 1.
   ///
-  /// See TrackEntry TrackEntry::getTimeScale() for affecting a single animation.
+  /// See TrackEntry::getTimeScale() for affecting a single animation.
   double spine_animation_state_get_time_scale(
     spine_animation_state self,
   ) {
@@ -16467,8 +16509,9 @@ class SpineDartBindings {
   late final _spine_animation_state_data_set_mix_2 = _spine_animation_state_data_set_mix_2Ptr
       .asFunction<void Function(spine_animation_state_data, spine_animation, spine_animation, double)>();
 
-  /// The mix duration to use when changing from the specified animation to the
-  /// other, or the DefaultMix if no mix duration has been set.
+  /// Returns the mix duration to use when changing from the specified animation to
+  /// the other on the same track, or the default mix if no mix duration has been
+  /// set.
   double spine_animation_state_data_get_mix(
     spine_animation_state_data self,
     spine_animation from,
@@ -18045,8 +18088,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_attachment_timeline_apply(
@@ -18056,8 +18100,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -18065,10 +18110,10 @@ class SpineDartBindings {
   late final _spine_attachment_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_attachment_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event,
-              ffi.Float, ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_attachment_timeline_apply');
+              ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_attachment_timeline_apply');
   late final _spine_attachment_timeline_apply = _spine_attachment_timeline_applyPtr.asFunction<
-      void Function(
-          spine_attachment_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+      void Function(spine_attachment_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool,
+          bool, bool)>();
 
   /// Sets the time and attachment name for the specified frame.
   ///
@@ -18123,6 +18168,37 @@ class SpineDartBindings {
           'spine_attachment_timeline_set_slot_index');
   late final _spine_attachment_timeline_set_slot_index =
       _spine_attachment_timeline_set_slot_indexPtr.asFunction<void Function(spine_attachment_timeline, int)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_attachment_timeline_get_additive(
+    spine_attachment_timeline self,
+  ) {
+    return _spine_attachment_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_attachment_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_attachment_timeline)>>(
+          'spine_attachment_timeline_get_additive');
+  late final _spine_attachment_timeline_get_additive =
+      _spine_attachment_timeline_get_additivePtr.asFunction<bool Function(spine_attachment_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_attachment_timeline_get_instant(
+    spine_attachment_timeline self,
+  ) {
+    return _spine_attachment_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_attachment_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_attachment_timeline)>>(
+          'spine_attachment_timeline_get_instant');
+  late final _spine_attachment_timeline_get_instant =
+      _spine_attachment_timeline_get_instantPtr.asFunction<bool Function(spine_attachment_timeline)>();
 
   int spine_attachment_timeline_get_frame_entries(
     spine_attachment_timeline self,
@@ -18217,7 +18293,7 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<spine_bone Function(spine_bone_data, spine_bone)>>('spine_bone_create');
   late final _spine_bone_create = _spine_bone_createPtr.asFunction<spine_bone Function(spine_bone_data, spine_bone)>();
 
-  /// Copy constructor. Does not copy the children bones.
+  /// Copy constructor. Does not copy the child bones.
   spine_bone spine_bone_create2(
     spine_bone bone,
     spine_bone parent,
@@ -18315,7 +18391,7 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_bone, spine_skeleton, ffi.Int32)>>('spine_bone_update');
   late final _spine_bone_update = _spine_bone_updatePtr.asFunction<void Function(spine_bone, spine_skeleton, int)>();
 
-  /// The constraint's setup pose data.
+  /// The setup pose data. May be shared with multiple instances.
   spine_bone_data spine_bone_get_data(
     spine_bone self,
   ) {
@@ -18328,7 +18404,9 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<spine_bone_data Function(spine_bone)>>('spine_bone_get_data');
   late final _spine_bone_get_data = _spine_bone_get_dataPtr.asFunction<spine_bone_data Function(spine_bone)>();
 
-  spine_bone_local spine_bone_get_pose(
+  /// The unconstrained pose for this object, set by animations and application
+  /// code.
+  spine_bone_pose spine_bone_get_pose(
     spine_bone self,
   ) {
     return _spine_bone_get_pose(
@@ -18337,9 +18415,12 @@ class SpineDartBindings {
   }
 
   late final _spine_bone_get_posePtr =
-      _lookup<ffi.NativeFunction<spine_bone_local Function(spine_bone)>>('spine_bone_get_pose');
-  late final _spine_bone_get_pose = _spine_bone_get_posePtr.asFunction<spine_bone_local Function(spine_bone)>();
+      _lookup<ffi.NativeFunction<spine_bone_pose Function(spine_bone)>>('spine_bone_get_pose');
+  late final _spine_bone_get_pose = _spine_bone_get_posePtr.asFunction<spine_bone_pose Function(spine_bone)>();
 
+  /// The pose to use for rendering. If no constraints modify this pose, this is
+  /// the same as getPose(). Otherwise it is a copy of getPose() modified by
+  /// constraints.
   spine_bone_pose spine_bone_get_applied_pose(
     spine_bone self,
   ) {
@@ -18353,6 +18434,8 @@ class SpineDartBindings {
   late final _spine_bone_get_applied_pose =
       _spine_bone_get_applied_posePtr.asFunction<spine_bone_pose Function(spine_bone)>();
 
+  /// Sets the constrained pose to the unconstrained pose, as a starting point for
+  /// constraints to be applied.
   void spine_bone_reset_constrained(
     spine_bone self,
   ) {
@@ -18365,6 +18448,8 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_bone)>>('spine_bone_reset_constrained');
   late final _spine_bone_reset_constrained = _spine_bone_reset_constrainedPtr.asFunction<void Function(spine_bone)>();
 
+  /// Sets the applied pose to the constrained pose, in anticipation of the applied
+  /// pose being modified by constraints.
   void spine_bone_constrained(
     spine_bone self,
   ) {
@@ -18390,6 +18475,11 @@ class SpineDartBindings {
   late final _spine_bone_is_pose_equal_to_applied =
       _spine_bone_is_pose_equal_to_appliedPtr.asFunction<bool Function(spine_bone)>();
 
+  /// Returns false when this won't be updated by
+  /// Skeleton::updateWorldTransform(Physics) because a skin is required and the
+  /// active skin does not contain this item. See Skin::getBones(),
+  /// Skin::getConstraints(), PosedData::getSkinRequired(), and
+  /// Skeleton::updateCache().
   bool spine_bone_is_active(
     spine_bone self,
   ) {
@@ -18453,7 +18543,7 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_bone_data)>>('spine_bone_data_dispose');
   late final _spine_bone_data_dispose = _spine_bone_data_disposePtr.asFunction<void Function(spine_bone_data)>();
 
-  /// The index of the bone in Skeleton.Bones
+  /// The Skeleton::getBones() index for this bone.
   int spine_bone_data_get_index(
     spine_bone_data self,
   ) {
@@ -18520,6 +18610,8 @@ class SpineDartBindings {
   late final _spine_bone_data_get_color =
       _spine_bone_data_get_colorPtr.asFunction<spine_color Function(spine_bone_data)>();
 
+  /// The bone icon name as it was in Spine, or empty if nonessential data was not
+  /// exported.
   ffi.Pointer<ffi.Char> spine_bone_data_get_icon(
     spine_bone_data self,
   ) {
@@ -18577,7 +18669,8 @@ class SpineDartBindings {
   late final _spine_bone_data_set_visible =
       _spine_bone_data_set_visiblePtr.asFunction<void Function(spine_bone_data, bool)>();
 
-  spine_bone_local spine_bone_data_get_setup_pose(
+  /// The setup pose that most animations are relative to.
+  spine_bone_pose spine_bone_data_get_setup_pose(
     spine_bone_data self,
   ) {
     return _spine_bone_data_get_setup_pose(
@@ -18586,12 +18679,10 @@ class SpineDartBindings {
   }
 
   late final _spine_bone_data_get_setup_posePtr =
-      _lookup<ffi.NativeFunction<spine_bone_local Function(spine_bone_data)>>('spine_bone_data_get_setup_pose');
+      _lookup<ffi.NativeFunction<spine_bone_pose Function(spine_bone_data)>>('spine_bone_data_get_setup_pose');
   late final _spine_bone_data_get_setup_pose =
-      _spine_bone_data_get_setup_posePtr.asFunction<spine_bone_local Function(spine_bone_data)>();
+      _spine_bone_data_get_setup_posePtr.asFunction<spine_bone_pose Function(spine_bone_data)>();
 
-  /// The constraint's name, which is unique across all constraints in the skeleton
-  /// of the same type.
   ffi.Pointer<ffi.Char> spine_bone_data_get_name(
     spine_bone_data self,
   ) {
@@ -18726,6 +18817,7 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_bone_local, ffi.Float)>>('spine_bone_local_set_y');
   late final _spine_bone_local_set_y = _spine_bone_local_set_yPtr.asFunction<void Function(spine_bone_local, double)>();
 
+  /// Sets local x and y translation.
   void spine_bone_local_set_position(
     spine_bone_local self,
     double x,
@@ -18831,6 +18923,7 @@ class SpineDartBindings {
   late final _spine_bone_local_set_scale_y =
       _spine_bone_local_set_scale_yPtr.asFunction<void Function(spine_bone_local, double)>();
 
+  /// Sets local scaleX and scaleY.
   void spine_bone_local_set_scale_1(
     spine_bone_local self,
     double scaleX,
@@ -18849,6 +18942,7 @@ class SpineDartBindings {
   late final _spine_bone_local_set_scale_1 =
       _spine_bone_local_set_scale_1Ptr.asFunction<void Function(spine_bone_local, double, double)>();
 
+  /// Sets local scaleX and scaleY to the same value.
   void spine_bone_local_set_scale_2(
     spine_bone_local self,
     double scale,
@@ -18977,7 +19071,7 @@ class SpineDartBindings {
   late final _spine_bone_timeline_get_rtti =
       _spine_bone_timeline_get_rttiPtr.asFunction<spine_rtti Function(spine_bone_timeline)>();
 
-  /// The index of the bone in Skeleton::getBones() that will be changed when this
+  /// The Skeleton::getBones() index of the bone that will be changed when this
   /// timeline is applied.
   int spine_bone_timeline_get_bone_index(
     spine_bone_timeline self,
@@ -19049,8 +19143,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_bone_timeline1_apply(
@@ -19060,8 +19155,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -19069,9 +19165,10 @@ class SpineDartBindings {
   late final _spine_bone_timeline1_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_bone_timeline1, spine_skeleton, ffi.Float, ffi.Float, spine_array_event, ffi.Float,
-              ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_bone_timeline1_apply');
+              ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_bone_timeline1_apply');
   late final _spine_bone_timeline1_apply = _spine_bone_timeline1_applyPtr.asFunction<
-      void Function(spine_bone_timeline1, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+      void Function(
+          spine_bone_timeline1, spine_skeleton, double, double, spine_array_event, double, bool, bool, bool, bool)>();
 
   int spine_bone_timeline1_get_bone_index(
     spine_bone_timeline1 self,
@@ -19147,7 +19244,8 @@ class SpineDartBindings {
     spine_bone_timeline1 self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -19155,7 +19253,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -19163,16 +19262,17 @@ class SpineDartBindings {
 
   late final _spine_bone_timeline1_get_relative_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_bone_timeline1, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_bone_timeline1, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_bone_timeline1_get_relative_value');
   late final _spine_bone_timeline1_get_relative_value = _spine_bone_timeline1_get_relative_valuePtr
-      .asFunction<double Function(spine_bone_timeline1, double, double, int, double, double)>();
+      .asFunction<double Function(spine_bone_timeline1, double, double, bool, bool, double, double)>();
 
   double spine_bone_timeline1_get_absolute_value_1(
     spine_bone_timeline1 self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -19180,7 +19280,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -19188,16 +19289,17 @@ class SpineDartBindings {
 
   late final _spine_bone_timeline1_get_absolute_value_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_bone_timeline1, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_bone_timeline1, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_bone_timeline1_get_absolute_value_1');
   late final _spine_bone_timeline1_get_absolute_value_1 = _spine_bone_timeline1_get_absolute_value_1Ptr
-      .asFunction<double Function(spine_bone_timeline1, double, double, int, double, double)>();
+      .asFunction<double Function(spine_bone_timeline1, double, double, bool, bool, double, double)>();
 
   double spine_bone_timeline1_get_absolute_value_2(
     spine_bone_timeline1 self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
     double value,
@@ -19206,7 +19308,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
       value,
@@ -19215,17 +19318,18 @@ class SpineDartBindings {
 
   late final _spine_bone_timeline1_get_absolute_value_2Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_bone_timeline1, ffi.Float, ffi.Float, ffi.Int32, ffi.Float, ffi.Float,
+          ffi.Float Function(spine_bone_timeline1, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float, ffi.Float,
               ffi.Float)>>('spine_bone_timeline1_get_absolute_value_2');
   late final _spine_bone_timeline1_get_absolute_value_2 = _spine_bone_timeline1_get_absolute_value_2Ptr
-      .asFunction<double Function(spine_bone_timeline1, double, double, int, double, double, double)>();
+      .asFunction<double Function(spine_bone_timeline1, double, double, bool, bool, double, double, double)>();
 
   double spine_bone_timeline1_get_scale_value(
     spine_bone_timeline1 self,
     double time,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     double current,
     double setup,
   ) {
@@ -19233,8 +19337,9 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       current,
       setup,
     );
@@ -19242,10 +19347,10 @@ class SpineDartBindings {
 
   late final _spine_bone_timeline1_get_scale_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_bone_timeline1, ffi.Float, ffi.Float, ffi.Int32, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_bone_timeline1, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_bone_timeline1_get_scale_value');
   late final _spine_bone_timeline1_get_scale_value = _spine_bone_timeline1_get_scale_valuePtr
-      .asFunction<double Function(spine_bone_timeline1, double, double, int, int, double, double)>();
+      .asFunction<double Function(spine_bone_timeline1, double, double, bool, bool, bool, double, double)>();
 
   void spine_bone_timeline1_set_linear(
     spine_bone_timeline1 self,
@@ -19350,6 +19455,35 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<spine_array_float Function(spine_bone_timeline1)>>('spine_bone_timeline1_get_curves');
   late final _spine_bone_timeline1_get_curves =
       _spine_bone_timeline1_get_curvesPtr.asFunction<spine_array_float Function(spine_bone_timeline1)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_bone_timeline1_get_additive(
+    spine_bone_timeline1 self,
+  ) {
+    return _spine_bone_timeline1_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_bone_timeline1_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_bone_timeline1)>>('spine_bone_timeline1_get_additive');
+  late final _spine_bone_timeline1_get_additive =
+      _spine_bone_timeline1_get_additivePtr.asFunction<bool Function(spine_bone_timeline1)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_bone_timeline1_get_instant(
+    spine_bone_timeline1 self,
+  ) {
+    return _spine_bone_timeline1_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_bone_timeline1_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_bone_timeline1)>>('spine_bone_timeline1_get_instant');
+  late final _spine_bone_timeline1_get_instant =
+      _spine_bone_timeline1_get_instantPtr.asFunction<bool Function(spine_bone_timeline1)>();
 
   int spine_bone_timeline1_get_frame_entries(
     spine_bone_timeline1 self,
@@ -19458,8 +19592,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_bone_timeline2_apply(
@@ -19469,8 +19604,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -19478,9 +19614,10 @@ class SpineDartBindings {
   late final _spine_bone_timeline2_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_bone_timeline2, spine_skeleton, ffi.Float, ffi.Float, spine_array_event, ffi.Float,
-              ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_bone_timeline2_apply');
+              ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_bone_timeline2_apply');
   late final _spine_bone_timeline2_apply = _spine_bone_timeline2_applyPtr.asFunction<
-      void Function(spine_bone_timeline2, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+      void Function(
+          spine_bone_timeline2, spine_skeleton, double, double, spine_array_event, double, bool, bool, bool, bool)>();
 
   int spine_bone_timeline2_get_bone_index(
     spine_bone_timeline2 self,
@@ -19637,6 +19774,35 @@ class SpineDartBindings {
   late final _spine_bone_timeline2_get_curves =
       _spine_bone_timeline2_get_curvesPtr.asFunction<spine_array_float Function(spine_bone_timeline2)>();
 
+  /// True if this timeline supports additive blending.
+  bool spine_bone_timeline2_get_additive(
+    spine_bone_timeline2 self,
+  ) {
+    return _spine_bone_timeline2_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_bone_timeline2_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_bone_timeline2)>>('spine_bone_timeline2_get_additive');
+  late final _spine_bone_timeline2_get_additive =
+      _spine_bone_timeline2_get_additivePtr.asFunction<bool Function(spine_bone_timeline2)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_bone_timeline2_get_instant(
+    spine_bone_timeline2 self,
+  ) {
+    return _spine_bone_timeline2_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_bone_timeline2_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_bone_timeline2)>>('spine_bone_timeline2_get_instant');
+  late final _spine_bone_timeline2_get_instant =
+      _spine_bone_timeline2_get_instantPtr.asFunction<bool Function(spine_bone_timeline2)>();
+
   int spine_bone_timeline2_get_frame_entries(
     spine_bone_timeline2 self,
   ) {
@@ -19781,8 +19947,8 @@ class SpineDartBindings {
   late final _spine_bounding_box_attachment_copy =
       _spine_bounding_box_attachment_copyPtr.asFunction<spine_attachment Function(spine_bounding_box_attachment)>();
 
-  /// Transforms the attachment's local vertices to world coordinates. If the
-  /// slot's SlotPose::getDeform() is not empty, it is used to deform the vertices.
+  /// Transforms the attachment's local vertices to world coordinates. If
+  /// SlotPose::getDeform() is not empty, it is used to deform the vertices.
   ///
   /// See https://esotericsoftware.com/spine-runtime-skeletons#World-transforms
   /// World transforms in the Spine Runtimes Guide.
@@ -19869,6 +20035,9 @@ class SpineDartBindings {
   late final _spine_bounding_box_attachment_get_id =
       _spine_bounding_box_attachment_get_idPtr.asFunction<int Function(spine_bounding_box_attachment)>();
 
+  /// The bones that affect the vertices. The entries are, for each vertex, the
+  /// number of bones affecting the vertex followed by that many bone indices,
+  /// which is Skeleton::getBones() index. Empty if this attachment has no weights.
   spine_array_int spine_bounding_box_attachment_get_bones(
     spine_bounding_box_attachment self,
   ) {
@@ -19899,6 +20068,10 @@ class SpineDartBindings {
   late final _spine_bounding_box_attachment_set_bones = _spine_bounding_box_attachment_set_bonesPtr
       .asFunction<void Function(spine_bounding_box_attachment, spine_array_int)>();
 
+  /// The vertex positions in the bone's coordinate system. For a non-weighted
+  /// attachment, the values are x,y pairs for each vertex. For a weighted
+  /// attachment, the values are x,y,weight triplets for each bone affecting each
+  /// vertex.
   spine_array_float spine_bounding_box_attachment_get_vertices(
     spine_bounding_box_attachment self,
   ) {
@@ -20172,8 +20345,8 @@ class SpineDartBindings {
   late final _spine_clipping_attachment_copy =
       _spine_clipping_attachment_copyPtr.asFunction<spine_attachment Function(spine_clipping_attachment)>();
 
-  /// Transforms the attachment's local vertices to world coordinates. If the
-  /// slot's SlotPose::getDeform() is not empty, it is used to deform the vertices.
+  /// Transforms the attachment's local vertices to world coordinates. If
+  /// SlotPose::getDeform() is not empty, it is used to deform the vertices.
   ///
   /// See https://esotericsoftware.com/spine-runtime-skeletons#World-transforms
   /// World transforms in the Spine Runtimes Guide.
@@ -20259,6 +20432,9 @@ class SpineDartBindings {
   late final _spine_clipping_attachment_get_id =
       _spine_clipping_attachment_get_idPtr.asFunction<int Function(spine_clipping_attachment)>();
 
+  /// The bones that affect the vertices. The entries are, for each vertex, the
+  /// number of bones affecting the vertex followed by that many bone indices,
+  /// which is Skeleton::getBones() index. Empty if this attachment has no weights.
   spine_array_int spine_clipping_attachment_get_bones(
     spine_clipping_attachment self,
   ) {
@@ -20289,6 +20465,10 @@ class SpineDartBindings {
   late final _spine_clipping_attachment_set_bones =
       _spine_clipping_attachment_set_bonesPtr.asFunction<void Function(spine_clipping_attachment, spine_array_int)>();
 
+  /// The vertex positions in the bone's coordinate system. For a non-weighted
+  /// attachment, the values are x,y pairs for each vertex. For a weighted
+  /// attachment, the values are x,y,weight triplets for each bone affecting each
+  /// vertex.
   spine_array_float spine_clipping_attachment_get_vertices(
     spine_clipping_attachment self,
   ) {
@@ -20964,8 +21144,8 @@ class SpineDartBindings {
   late final _spine_constraint_timeline_get_rtti =
       _spine_constraint_timeline_get_rttiPtr.asFunction<spine_rtti Function(spine_constraint_timeline)>();
 
-  /// The index of the constraint in Skeleton::getConstraints() that will be
-  /// changed when this timeline is applied.
+  /// The Skeleton::getConstraints() index of the constraint that will be changed
+  /// when this timeline is applied.
   int spine_constraint_timeline_get_constraint_index(
     spine_constraint_timeline self,
   ) {
@@ -21106,7 +21286,8 @@ class SpineDartBindings {
     spine_constraint_timeline1 self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -21114,7 +21295,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -21122,16 +21304,17 @@ class SpineDartBindings {
 
   late final _spine_constraint_timeline1_get_relative_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_constraint_timeline1, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_constraint_timeline1, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_constraint_timeline1_get_relative_value');
   late final _spine_constraint_timeline1_get_relative_value = _spine_constraint_timeline1_get_relative_valuePtr
-      .asFunction<double Function(spine_constraint_timeline1, double, double, int, double, double)>();
+      .asFunction<double Function(spine_constraint_timeline1, double, double, bool, bool, double, double)>();
 
   double spine_constraint_timeline1_get_absolute_value_1(
     spine_constraint_timeline1 self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -21139,7 +21322,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -21147,16 +21331,17 @@ class SpineDartBindings {
 
   late final _spine_constraint_timeline1_get_absolute_value_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_constraint_timeline1, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_constraint_timeline1, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_constraint_timeline1_get_absolute_value_1');
   late final _spine_constraint_timeline1_get_absolute_value_1 = _spine_constraint_timeline1_get_absolute_value_1Ptr
-      .asFunction<double Function(spine_constraint_timeline1, double, double, int, double, double)>();
+      .asFunction<double Function(spine_constraint_timeline1, double, double, bool, bool, double, double)>();
 
   double spine_constraint_timeline1_get_absolute_value_2(
     spine_constraint_timeline1 self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
     double value,
@@ -21165,7 +21350,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
       value,
@@ -21174,17 +21360,18 @@ class SpineDartBindings {
 
   late final _spine_constraint_timeline1_get_absolute_value_2Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_constraint_timeline1, ffi.Float, ffi.Float, ffi.Int32, ffi.Float, ffi.Float,
+          ffi.Float Function(spine_constraint_timeline1, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float, ffi.Float,
               ffi.Float)>>('spine_constraint_timeline1_get_absolute_value_2');
   late final _spine_constraint_timeline1_get_absolute_value_2 = _spine_constraint_timeline1_get_absolute_value_2Ptr
-      .asFunction<double Function(spine_constraint_timeline1, double, double, int, double, double, double)>();
+      .asFunction<double Function(spine_constraint_timeline1, double, double, bool, bool, double, double, double)>();
 
   double spine_constraint_timeline1_get_scale_value(
     spine_constraint_timeline1 self,
     double time,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     double current,
     double setup,
   ) {
@@ -21192,8 +21379,9 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       current,
       setup,
     );
@@ -21201,10 +21389,10 @@ class SpineDartBindings {
 
   late final _spine_constraint_timeline1_get_scale_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_constraint_timeline1, ffi.Float, ffi.Float, ffi.Int32, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_constraint_timeline1, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_constraint_timeline1_get_scale_value');
   late final _spine_constraint_timeline1_get_scale_value = _spine_constraint_timeline1_get_scale_valuePtr
-      .asFunction<double Function(spine_constraint_timeline1, double, double, int, int, double, double)>();
+      .asFunction<double Function(spine_constraint_timeline1, double, double, bool, bool, bool, double, double)>();
 
   void spine_constraint_timeline1_set_linear(
     spine_constraint_timeline1 self,
@@ -21312,16 +21500,19 @@ class SpineDartBindings {
   late final _spine_constraint_timeline1_get_curves =
       _spine_constraint_timeline1_get_curvesPtr.asFunction<spine_array_float Function(spine_constraint_timeline1)>();
 
-  /// Sets the value(s) for the specified time.
+  /// Applies this timeline to the skeleton.
   ///
-  /// @param skeleton The skeleton the timeline is being applied to. This provides access to the bones, slots, and other skeleton components the timeline may change.
-  /// @param lastTime lastTime The time this timeline was last applied. Timelines such as EventTimeline trigger only at specific times rather than every frame. In that case, the timeline triggers everything between lastTime (exclusive) and time (inclusive).
-  /// @param time The time within the animation. Most timelines find the key before and the key after this time so they can interpolate between the keys.
-  /// @param events If any events are fired, they are added to this array. Can be NULL to ignore firing events or if the timeline does not fire events. May be NULL.
-  /// @param alpha alpha 0 applies the current or setup pose value (depending on pose parameter). 1 applies the timeline value. Between 0 and 1 applies a value between the current or setup pose and the timeline value. By adjusting alpha over time, an animation can be mixed in or out. alpha can also be useful to apply animations on top of each other (layered).
-  /// @param blend Controls how mixing is applied when alpha is than 1.
-  /// @param direction Indicates whether the timeline is mixing in or out. Used by timelines which perform instant transitions such as DrawOrderTimeline and AttachmentTimeline.
-  /// @param appliedPose True to modify the applied pose.
+  /// See Applying Animations in the Spine Runtimes Guide.
+  ///
+  /// @param skeleton The skeleton the timeline is applied to. This provides access to the bones, slots, and other skeleton components the timelines may change.
+  /// @param lastTime The last time in seconds this timeline was applied. Some timelines trigger only at discrete times, in which case all keys are triggered between lastTime (exclusive) and time (inclusive). Pass -1 the first time a timeline is applied to ensure frame 0 is triggered.
+  /// @param time The time in seconds the skeleton is being posed for. Timelines find the frame before and after this time and interpolate between the frame values.
+  /// @param events If any events are fired, they are added to this list. Can be NULL to ignore fired events or if no timelines fire events.
+  /// @param alpha 0 applies setup or current values (depending on fromSetup), 1 uses timeline values, and intermediate values interpolate between them. Adjusting alpha over time can mix a timeline in or out.
+  /// @param fromSetup If true, alpha transitions between setup and timeline values, setup values are used before the first frame (current values are not used). If false, alpha transitions between current and timeline values, no change is made before the first frame.
+  /// @param add If true, for timelines that support it, their values are added to the setup or current values (depending on fromSetup).
+  /// @param out True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant transitions.
+  /// @param appliedPose True to modify getAppliedPose(), else getPose() is modified.
   void spine_constraint_timeline1_apply(
     spine_constraint_timeline1 self,
     spine_skeleton skeleton,
@@ -21329,8 +21520,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_constraint_timeline1_apply(
@@ -21340,8 +21532,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -21349,10 +21542,41 @@ class SpineDartBindings {
   late final _spine_constraint_timeline1_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_constraint_timeline1, spine_skeleton, ffi.Float, ffi.Float, spine_array_event,
-              ffi.Float, ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_constraint_timeline1_apply');
+              ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_constraint_timeline1_apply');
   late final _spine_constraint_timeline1_apply = _spine_constraint_timeline1_applyPtr.asFunction<
-      void Function(
-          spine_constraint_timeline1, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+      void Function(spine_constraint_timeline1, spine_skeleton, double, double, spine_array_event, double, bool, bool,
+          bool, bool)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_constraint_timeline1_get_additive(
+    spine_constraint_timeline1 self,
+  ) {
+    return _spine_constraint_timeline1_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_constraint_timeline1_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_constraint_timeline1)>>(
+          'spine_constraint_timeline1_get_additive');
+  late final _spine_constraint_timeline1_get_additive =
+      _spine_constraint_timeline1_get_additivePtr.asFunction<bool Function(spine_constraint_timeline1)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_constraint_timeline1_get_instant(
+    spine_constraint_timeline1 self,
+  ) {
+    return _spine_constraint_timeline1_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_constraint_timeline1_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_constraint_timeline1)>>(
+          'spine_constraint_timeline1_get_instant');
+  late final _spine_constraint_timeline1_get_instant =
+      _spine_constraint_timeline1_get_instantPtr.asFunction<bool Function(spine_constraint_timeline1)>();
 
   int spine_constraint_timeline1_get_frame_entries(
     spine_constraint_timeline1 self,
@@ -21562,16 +21786,19 @@ class SpineDartBindings {
   late final _spine_curve_timeline_get_curves =
       _spine_curve_timeline_get_curvesPtr.asFunction<spine_array_float Function(spine_curve_timeline)>();
 
-  /// Sets the value(s) for the specified time.
+  /// Applies this timeline to the skeleton.
   ///
-  /// @param skeleton The skeleton the timeline is being applied to. This provides access to the bones, slots, and other skeleton components the timeline may change.
-  /// @param lastTime lastTime The time this timeline was last applied. Timelines such as EventTimeline trigger only at specific times rather than every frame. In that case, the timeline triggers everything between lastTime (exclusive) and time (inclusive).
-  /// @param time The time within the animation. Most timelines find the key before and the key after this time so they can interpolate between the keys.
-  /// @param events If any events are fired, they are added to this array. Can be NULL to ignore firing events or if the timeline does not fire events. May be NULL.
-  /// @param alpha alpha 0 applies the current or setup pose value (depending on pose parameter). 1 applies the timeline value. Between 0 and 1 applies a value between the current or setup pose and the timeline value. By adjusting alpha over time, an animation can be mixed in or out. alpha can also be useful to apply animations on top of each other (layered).
-  /// @param blend Controls how mixing is applied when alpha is than 1.
-  /// @param direction Indicates whether the timeline is mixing in or out. Used by timelines which perform instant transitions such as DrawOrderTimeline and AttachmentTimeline.
-  /// @param appliedPose True to modify the applied pose.
+  /// See Applying Animations in the Spine Runtimes Guide.
+  ///
+  /// @param skeleton The skeleton the timeline is applied to. This provides access to the bones, slots, and other skeleton components the timelines may change.
+  /// @param lastTime The last time in seconds this timeline was applied. Some timelines trigger only at discrete times, in which case all keys are triggered between lastTime (exclusive) and time (inclusive). Pass -1 the first time a timeline is applied to ensure frame 0 is triggered.
+  /// @param time The time in seconds the skeleton is being posed for. Timelines find the frame before and after this time and interpolate between the frame values.
+  /// @param events If any events are fired, they are added to this list. Can be NULL to ignore fired events or if no timelines fire events.
+  /// @param alpha 0 applies setup or current values (depending on fromSetup), 1 uses timeline values, and intermediate values interpolate between them. Adjusting alpha over time can mix a timeline in or out.
+  /// @param fromSetup If true, alpha transitions between setup and timeline values, setup values are used before the first frame (current values are not used). If false, alpha transitions between current and timeline values, no change is made before the first frame.
+  /// @param add If true, for timelines that support it, their values are added to the setup or current values (depending on fromSetup).
+  /// @param out True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant transitions.
+  /// @param appliedPose True to modify getAppliedPose(), else getPose() is modified.
   void spine_curve_timeline_apply(
     spine_curve_timeline self,
     spine_skeleton skeleton,
@@ -21579,8 +21806,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_curve_timeline_apply(
@@ -21590,8 +21818,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -21599,9 +21828,39 @@ class SpineDartBindings {
   late final _spine_curve_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_curve_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event, ffi.Float,
-              ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_curve_timeline_apply');
+              ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_curve_timeline_apply');
   late final _spine_curve_timeline_apply = _spine_curve_timeline_applyPtr.asFunction<
-      void Function(spine_curve_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+      void Function(
+          spine_curve_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool, bool, bool)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_curve_timeline_get_additive(
+    spine_curve_timeline self,
+  ) {
+    return _spine_curve_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_curve_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_curve_timeline)>>('spine_curve_timeline_get_additive');
+  late final _spine_curve_timeline_get_additive =
+      _spine_curve_timeline_get_additivePtr.asFunction<bool Function(spine_curve_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_curve_timeline_get_instant(
+    spine_curve_timeline self,
+  ) {
+    return _spine_curve_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_curve_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_curve_timeline)>>('spine_curve_timeline_get_instant');
+  late final _spine_curve_timeline_get_instant =
+      _spine_curve_timeline_get_instantPtr.asFunction<bool Function(spine_curve_timeline)>();
 
   int spine_curve_timeline_get_frame_entries(
     spine_curve_timeline self,
@@ -21748,7 +22007,8 @@ class SpineDartBindings {
     spine_curve_timeline1 self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -21756,7 +22016,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -21764,16 +22025,17 @@ class SpineDartBindings {
 
   late final _spine_curve_timeline1_get_relative_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_curve_timeline1, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_curve_timeline1, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_curve_timeline1_get_relative_value');
   late final _spine_curve_timeline1_get_relative_value = _spine_curve_timeline1_get_relative_valuePtr
-      .asFunction<double Function(spine_curve_timeline1, double, double, int, double, double)>();
+      .asFunction<double Function(spine_curve_timeline1, double, double, bool, bool, double, double)>();
 
   double spine_curve_timeline1_get_absolute_value_1(
     spine_curve_timeline1 self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -21781,7 +22043,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -21789,16 +22052,17 @@ class SpineDartBindings {
 
   late final _spine_curve_timeline1_get_absolute_value_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_curve_timeline1, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_curve_timeline1, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_curve_timeline1_get_absolute_value_1');
   late final _spine_curve_timeline1_get_absolute_value_1 = _spine_curve_timeline1_get_absolute_value_1Ptr
-      .asFunction<double Function(spine_curve_timeline1, double, double, int, double, double)>();
+      .asFunction<double Function(spine_curve_timeline1, double, double, bool, bool, double, double)>();
 
   double spine_curve_timeline1_get_absolute_value_2(
     spine_curve_timeline1 self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
     double value,
@@ -21807,7 +22071,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
       value,
@@ -21816,17 +22081,18 @@ class SpineDartBindings {
 
   late final _spine_curve_timeline1_get_absolute_value_2Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_curve_timeline1, ffi.Float, ffi.Float, ffi.Int32, ffi.Float, ffi.Float,
+          ffi.Float Function(spine_curve_timeline1, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float, ffi.Float,
               ffi.Float)>>('spine_curve_timeline1_get_absolute_value_2');
   late final _spine_curve_timeline1_get_absolute_value_2 = _spine_curve_timeline1_get_absolute_value_2Ptr
-      .asFunction<double Function(spine_curve_timeline1, double, double, int, double, double, double)>();
+      .asFunction<double Function(spine_curve_timeline1, double, double, bool, bool, double, double, double)>();
 
   double spine_curve_timeline1_get_scale_value(
     spine_curve_timeline1 self,
     double time,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     double current,
     double setup,
   ) {
@@ -21834,8 +22100,9 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       current,
       setup,
     );
@@ -21843,10 +22110,10 @@ class SpineDartBindings {
 
   late final _spine_curve_timeline1_get_scale_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_curve_timeline1, ffi.Float, ffi.Float, ffi.Int32, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_curve_timeline1, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_curve_timeline1_get_scale_value');
   late final _spine_curve_timeline1_get_scale_value = _spine_curve_timeline1_get_scale_valuePtr
-      .asFunction<double Function(spine_curve_timeline1, double, double, int, int, double, double)>();
+      .asFunction<double Function(spine_curve_timeline1, double, double, bool, bool, bool, double, double)>();
 
   void spine_curve_timeline1_set_linear(
     spine_curve_timeline1 self,
@@ -21954,16 +22221,19 @@ class SpineDartBindings {
   late final _spine_curve_timeline1_get_curves =
       _spine_curve_timeline1_get_curvesPtr.asFunction<spine_array_float Function(spine_curve_timeline1)>();
 
-  /// Sets the value(s) for the specified time.
+  /// Applies this timeline to the skeleton.
   ///
-  /// @param skeleton The skeleton the timeline is being applied to. This provides access to the bones, slots, and other skeleton components the timeline may change.
-  /// @param lastTime lastTime The time this timeline was last applied. Timelines such as EventTimeline trigger only at specific times rather than every frame. In that case, the timeline triggers everything between lastTime (exclusive) and time (inclusive).
-  /// @param time The time within the animation. Most timelines find the key before and the key after this time so they can interpolate between the keys.
-  /// @param events If any events are fired, they are added to this array. Can be NULL to ignore firing events or if the timeline does not fire events. May be NULL.
-  /// @param alpha alpha 0 applies the current or setup pose value (depending on pose parameter). 1 applies the timeline value. Between 0 and 1 applies a value between the current or setup pose and the timeline value. By adjusting alpha over time, an animation can be mixed in or out. alpha can also be useful to apply animations on top of each other (layered).
-  /// @param blend Controls how mixing is applied when alpha is than 1.
-  /// @param direction Indicates whether the timeline is mixing in or out. Used by timelines which perform instant transitions such as DrawOrderTimeline and AttachmentTimeline.
-  /// @param appliedPose True to modify the applied pose.
+  /// See Applying Animations in the Spine Runtimes Guide.
+  ///
+  /// @param skeleton The skeleton the timeline is applied to. This provides access to the bones, slots, and other skeleton components the timelines may change.
+  /// @param lastTime The last time in seconds this timeline was applied. Some timelines trigger only at discrete times, in which case all keys are triggered between lastTime (exclusive) and time (inclusive). Pass -1 the first time a timeline is applied to ensure frame 0 is triggered.
+  /// @param time The time in seconds the skeleton is being posed for. Timelines find the frame before and after this time and interpolate between the frame values.
+  /// @param events If any events are fired, they are added to this list. Can be NULL to ignore fired events or if no timelines fire events.
+  /// @param alpha 0 applies setup or current values (depending on fromSetup), 1 uses timeline values, and intermediate values interpolate between them. Adjusting alpha over time can mix a timeline in or out.
+  /// @param fromSetup If true, alpha transitions between setup and timeline values, setup values are used before the first frame (current values are not used). If false, alpha transitions between current and timeline values, no change is made before the first frame.
+  /// @param add If true, for timelines that support it, their values are added to the setup or current values (depending on fromSetup).
+  /// @param out True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant transitions.
+  /// @param appliedPose True to modify getAppliedPose(), else getPose() is modified.
   void spine_curve_timeline1_apply(
     spine_curve_timeline1 self,
     spine_skeleton skeleton,
@@ -21971,8 +22241,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_curve_timeline1_apply(
@@ -21982,8 +22253,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -21991,10 +22263,39 @@ class SpineDartBindings {
   late final _spine_curve_timeline1_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_curve_timeline1, spine_skeleton, ffi.Float, ffi.Float, spine_array_event, ffi.Float,
-              ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_curve_timeline1_apply');
+              ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_curve_timeline1_apply');
   late final _spine_curve_timeline1_apply = _spine_curve_timeline1_applyPtr.asFunction<
       void Function(
-          spine_curve_timeline1, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+          spine_curve_timeline1, spine_skeleton, double, double, spine_array_event, double, bool, bool, bool, bool)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_curve_timeline1_get_additive(
+    spine_curve_timeline1 self,
+  ) {
+    return _spine_curve_timeline1_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_curve_timeline1_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_curve_timeline1)>>('spine_curve_timeline1_get_additive');
+  late final _spine_curve_timeline1_get_additive =
+      _spine_curve_timeline1_get_additivePtr.asFunction<bool Function(spine_curve_timeline1)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_curve_timeline1_get_instant(
+    spine_curve_timeline1 self,
+  ) {
+    return _spine_curve_timeline1_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_curve_timeline1_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_curve_timeline1)>>('spine_curve_timeline1_get_instant');
+  late final _spine_curve_timeline1_get_instant =
+      _spine_curve_timeline1_get_instantPtr.asFunction<bool Function(spine_curve_timeline1)>();
 
   int spine_curve_timeline1_get_frame_entries(
     spine_curve_timeline1 self,
@@ -22138,7 +22439,7 @@ class SpineDartBindings {
   late final _spine_deform_timeline_set_frame = _spine_deform_timeline_set_framePtr
       .asFunction<void Function(spine_deform_timeline, int, double, spine_array_float)>();
 
-  /// The attachment that will be deformed.
+  /// The attachment whose vertices will be deformed.
   spine_vertex_attachment spine_deform_timeline_get_attachment(
     spine_deform_timeline self,
   ) {
@@ -22245,8 +22546,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_deform_timeline_apply(
@@ -22256,8 +22558,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -22265,10 +22568,10 @@ class SpineDartBindings {
   late final _spine_deform_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_deform_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event, ffi.Float,
-              ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_deform_timeline_apply');
+              ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_deform_timeline_apply');
   late final _spine_deform_timeline_apply = _spine_deform_timeline_applyPtr.asFunction<
       void Function(
-          spine_deform_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+          spine_deform_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool, bool, bool)>();
 
   int spine_deform_timeline_get_slot_index(
     spine_deform_timeline self,
@@ -22367,6 +22670,35 @@ class SpineDartBindings {
   late final _spine_deform_timeline_get_curves =
       _spine_deform_timeline_get_curvesPtr.asFunction<spine_array_float Function(spine_deform_timeline)>();
 
+  /// True if this timeline supports additive blending.
+  bool spine_deform_timeline_get_additive(
+    spine_deform_timeline self,
+  ) {
+    return _spine_deform_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_deform_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_deform_timeline)>>('spine_deform_timeline_get_additive');
+  late final _spine_deform_timeline_get_additive =
+      _spine_deform_timeline_get_additivePtr.asFunction<bool Function(spine_deform_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_deform_timeline_get_instant(
+    spine_deform_timeline self,
+  ) {
+    return _spine_deform_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_deform_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_deform_timeline)>>('spine_deform_timeline_get_instant');
+  late final _spine_deform_timeline_get_instant =
+      _spine_deform_timeline_get_instantPtr.asFunction<bool Function(spine_deform_timeline)>();
+
   int spine_deform_timeline_get_frame_entries(
     spine_deform_timeline self,
   ) {
@@ -22429,6 +22761,75 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<spine_rtti Function()>>('spine_deform_timeline_rtti');
   late final _spine_deform_timeline_rtti = _spine_deform_timeline_rttiPtr.asFunction<spine_rtti Function()>();
 
+  spine_draw_order spine_draw_order_create(
+    spine_array_slot setupPose,
+  ) {
+    return _spine_draw_order_create(
+      setupPose,
+    );
+  }
+
+  late final _spine_draw_order_createPtr =
+      _lookup<ffi.NativeFunction<spine_draw_order Function(spine_array_slot)>>('spine_draw_order_create');
+  late final _spine_draw_order_create =
+      _spine_draw_order_createPtr.asFunction<spine_draw_order Function(spine_array_slot)>();
+
+  void spine_draw_order_dispose(
+    spine_draw_order self,
+  ) {
+    return _spine_draw_order_dispose(
+      self,
+    );
+  }
+
+  late final _spine_draw_order_disposePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_draw_order)>>('spine_draw_order_dispose');
+  late final _spine_draw_order_dispose = _spine_draw_order_disposePtr.asFunction<void Function(spine_draw_order)>();
+
+  /// Sets the unconstrained draw order to the setup pose order.
+  void spine_draw_order_setup_pose(
+    spine_draw_order self,
+  ) {
+    return _spine_draw_order_setup_pose(
+      self,
+    );
+  }
+
+  late final _spine_draw_order_setup_posePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_draw_order)>>('spine_draw_order_setup_pose');
+  late final _spine_draw_order_setup_pose =
+      _spine_draw_order_setup_posePtr.asFunction<void Function(spine_draw_order)>();
+
+  /// The unconstrained draw order, set by animations and application code.
+  spine_array_slot spine_draw_order_get_pose(
+    spine_draw_order self,
+  ) {
+    return _spine_draw_order_get_pose(
+      self,
+    );
+  }
+
+  late final _spine_draw_order_get_posePtr =
+      _lookup<ffi.NativeFunction<spine_array_slot Function(spine_draw_order)>>('spine_draw_order_get_pose');
+  late final _spine_draw_order_get_pose =
+      _spine_draw_order_get_posePtr.asFunction<spine_array_slot Function(spine_draw_order)>();
+
+  /// The constrained draw order for rendering. If no constraints modify the draw
+  /// order, this is the same as getPose(). Otherwise it is a copy of getPose()
+  /// modified by constraints.
+  spine_array_slot spine_draw_order_get_applied_pose(
+    spine_draw_order self,
+  ) {
+    return _spine_draw_order_get_applied_pose(
+      self,
+    );
+  }
+
+  late final _spine_draw_order_get_applied_posePtr =
+      _lookup<ffi.NativeFunction<spine_array_slot Function(spine_draw_order)>>('spine_draw_order_get_applied_pose');
+  late final _spine_draw_order_get_applied_pose =
+      _spine_draw_order_get_applied_posePtr.asFunction<spine_array_slot Function(spine_draw_order)>();
+
   spine_draw_order_folder_timeline spine_draw_order_folder_timeline_create(
     int frameCount,
     spine_array_int slots,
@@ -22482,8 +22883,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_draw_order_folder_timeline_apply(
@@ -22493,8 +22895,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -22502,10 +22905,10 @@ class SpineDartBindings {
   late final _spine_draw_order_folder_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_draw_order_folder_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event,
-              ffi.Float, ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_draw_order_folder_timeline_apply');
+              ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_draw_order_folder_timeline_apply');
   late final _spine_draw_order_folder_timeline_apply = _spine_draw_order_folder_timeline_applyPtr.asFunction<
-      void Function(spine_draw_order_folder_timeline, spine_skeleton, double, double, spine_array_event, double, int,
-          int, bool)>();
+      void Function(spine_draw_order_folder_timeline, spine_skeleton, double, double, spine_array_event, double, bool,
+          bool, bool, bool)>();
 
   int spine_draw_order_folder_timeline_get_frame_count(
     spine_draw_order_folder_timeline self,
@@ -22561,6 +22964,37 @@ class SpineDartBindings {
       'spine_draw_order_folder_timeline_set_frame');
   late final _spine_draw_order_folder_timeline_set_frame = _spine_draw_order_folder_timeline_set_framePtr
       .asFunction<void Function(spine_draw_order_folder_timeline, int, double, spine_array_int)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_draw_order_folder_timeline_get_additive(
+    spine_draw_order_folder_timeline self,
+  ) {
+    return _spine_draw_order_folder_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_draw_order_folder_timeline)>>(
+          'spine_draw_order_folder_timeline_get_additive');
+  late final _spine_draw_order_folder_timeline_get_additive =
+      _spine_draw_order_folder_timeline_get_additivePtr.asFunction<bool Function(spine_draw_order_folder_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_draw_order_folder_timeline_get_instant(
+    spine_draw_order_folder_timeline self,
+  ) {
+    return _spine_draw_order_folder_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_draw_order_folder_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_draw_order_folder_timeline)>>(
+          'spine_draw_order_folder_timeline_get_instant');
+  late final _spine_draw_order_folder_timeline_get_instant =
+      _spine_draw_order_folder_timeline_get_instantPtr.asFunction<bool Function(spine_draw_order_folder_timeline)>();
 
   int spine_draw_order_folder_timeline_get_frame_entries(
     spine_draw_order_folder_timeline self,
@@ -22674,8 +23108,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_draw_order_timeline_apply(
@@ -22685,8 +23120,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -22694,10 +23130,10 @@ class SpineDartBindings {
   late final _spine_draw_order_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_draw_order_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event,
-              ffi.Float, ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_draw_order_timeline_apply');
+              ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_draw_order_timeline_apply');
   late final _spine_draw_order_timeline_apply = _spine_draw_order_timeline_applyPtr.asFunction<
-      void Function(
-          spine_draw_order_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+      void Function(spine_draw_order_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool,
+          bool, bool)>();
 
   int spine_draw_order_timeline_get_frame_count(
     spine_draw_order_timeline self,
@@ -22717,7 +23153,7 @@ class SpineDartBindings {
   ///
   /// @param frame Between 0 and frameCount, inclusive.
   /// @param time The frame time in seconds.
-  /// @param drawOrder For each slot in Skeleton::slots, the index of the slot in the new draw order. May be null to use setup pose draw order.
+  /// @param drawOrder For each slot in Skeleton::getSlots(), the index of the slot in the new draw order. May be null to use setup pose draw order.
   void spine_draw_order_timeline_set_frame(
     spine_draw_order_timeline self,
     int frame,
@@ -22737,6 +23173,37 @@ class SpineDartBindings {
           'spine_draw_order_timeline_set_frame');
   late final _spine_draw_order_timeline_set_frame = _spine_draw_order_timeline_set_framePtr
       .asFunction<void Function(spine_draw_order_timeline, int, double, spine_array_int)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_draw_order_timeline_get_additive(
+    spine_draw_order_timeline self,
+  ) {
+    return _spine_draw_order_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_draw_order_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_draw_order_timeline)>>(
+          'spine_draw_order_timeline_get_additive');
+  late final _spine_draw_order_timeline_get_additive =
+      _spine_draw_order_timeline_get_additivePtr.asFunction<bool Function(spine_draw_order_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_draw_order_timeline_get_instant(
+    spine_draw_order_timeline self,
+  ) {
+    return _spine_draw_order_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_draw_order_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_draw_order_timeline)>>(
+          'spine_draw_order_timeline_get_instant');
+  late final _spine_draw_order_timeline_get_instant =
+      _spine_draw_order_timeline_get_instantPtr.asFunction<bool Function(spine_draw_order_timeline)>();
 
   int spine_draw_order_timeline_get_frame_entries(
     spine_draw_order_timeline self,
@@ -22841,7 +23308,7 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<spine_event_data Function(spine_event)>>('spine_event_get_data');
   late final _spine_event_get_data = _spine_event_get_dataPtr.asFunction<spine_event_data Function(spine_event)>();
 
-  /// The animation time this event was keyed.
+  /// The animation time this event was keyed, or -1 for the setup pose.
   double spine_event_get_time(
     spine_event self,
   ) {
@@ -22854,6 +23321,7 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<ffi.Float Function(spine_event)>>('spine_event_get_time');
   late final _spine_event_get_time = _spine_event_get_timePtr.asFunction<double Function(spine_event)>();
 
+  /// The integer payload for this event.
   int spine_event_get_int(
     spine_event self,
   ) {
@@ -22880,6 +23348,7 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_event, ffi.Int)>>('spine_event_set_int');
   late final _spine_event_set_int = _spine_event_set_intPtr.asFunction<void Function(spine_event, int)>();
 
+  /// The float payload for this event.
   double spine_event_get_float(
     spine_event self,
   ) {
@@ -22906,6 +23375,7 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_event, ffi.Float)>>('spine_event_set_float');
   late final _spine_event_set_float = _spine_event_set_floatPtr.asFunction<void Function(spine_event, double)>();
 
+  /// The string payload for this event.
   ffi.Pointer<ffi.Char> spine_event_get_string(
     spine_event self,
   ) {
@@ -22934,6 +23404,7 @@ class SpineDartBindings {
   late final _spine_event_set_string =
       _spine_event_set_stringPtr.asFunction<void Function(spine_event, ffi.Pointer<ffi.Char>)>();
 
+  /// If an audio path is set, the volume for the audio.
   double spine_event_get_volume(
     spine_event self,
   ) {
@@ -22960,6 +23431,7 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_event, ffi.Float)>>('spine_event_set_volume');
   late final _spine_event_set_volume = _spine_event_set_volumePtr.asFunction<void Function(spine_event, double)>();
 
+  /// If an audio path is set, the left/right balance for the audio.
   double spine_event_get_balance(
     spine_event self,
   ) {
@@ -23011,7 +23483,7 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_event_data)>>('spine_event_data_dispose');
   late final _spine_event_data_dispose = _spine_event_data_disposePtr.asFunction<void Function(spine_event_data)>();
 
-  /// The name of the event, which is unique within the skeleton.
+  /// The name of the event, unique across all events in the skeleton.
   ffi.Pointer<ffi.Char> spine_event_data_get_name(
     spine_event_data self,
   ) {
@@ -23025,90 +23497,34 @@ class SpineDartBindings {
   late final _spine_event_data_get_name =
       _spine_event_data_get_namePtr.asFunction<ffi.Pointer<ffi.Char> Function(spine_event_data)>();
 
-  int spine_event_data_get_int(
+  /// The setup values that are shared by all events with this data.
+  spine_event spine_event_data_get_setup_pose_1(
     spine_event_data self,
   ) {
-    return _spine_event_data_get_int(
+    return _spine_event_data_get_setup_pose_1(
       self,
     );
   }
 
-  late final _spine_event_data_get_intPtr =
-      _lookup<ffi.NativeFunction<ffi.Int Function(spine_event_data)>>('spine_event_data_get_int');
-  late final _spine_event_data_get_int = _spine_event_data_get_intPtr.asFunction<int Function(spine_event_data)>();
+  late final _spine_event_data_get_setup_pose_1Ptr =
+      _lookup<ffi.NativeFunction<spine_event Function(spine_event_data)>>('spine_event_data_get_setup_pose_1');
+  late final _spine_event_data_get_setup_pose_1 =
+      _spine_event_data_get_setup_pose_1Ptr.asFunction<spine_event Function(spine_event_data)>();
 
-  void spine_event_data_set_int(
-    spine_event_data self,
-    int inValue,
-  ) {
-    return _spine_event_data_set_int(
-      self,
-      inValue,
-    );
-  }
-
-  late final _spine_event_data_set_intPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(spine_event_data, ffi.Int)>>('spine_event_data_set_int');
-  late final _spine_event_data_set_int =
-      _spine_event_data_set_intPtr.asFunction<void Function(spine_event_data, int)>();
-
-  double spine_event_data_get_float(
+  spine_event spine_event_data_get_setup_pose_2(
     spine_event_data self,
   ) {
-    return _spine_event_data_get_float(
+    return _spine_event_data_get_setup_pose_2(
       self,
     );
   }
 
-  late final _spine_event_data_get_floatPtr =
-      _lookup<ffi.NativeFunction<ffi.Float Function(spine_event_data)>>('spine_event_data_get_float');
-  late final _spine_event_data_get_float =
-      _spine_event_data_get_floatPtr.asFunction<double Function(spine_event_data)>();
+  late final _spine_event_data_get_setup_pose_2Ptr =
+      _lookup<ffi.NativeFunction<spine_event Function(spine_event_data)>>('spine_event_data_get_setup_pose_2');
+  late final _spine_event_data_get_setup_pose_2 =
+      _spine_event_data_get_setup_pose_2Ptr.asFunction<spine_event Function(spine_event_data)>();
 
-  void spine_event_data_set_float(
-    spine_event_data self,
-    double inValue,
-  ) {
-    return _spine_event_data_set_float(
-      self,
-      inValue,
-    );
-  }
-
-  late final _spine_event_data_set_floatPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(spine_event_data, ffi.Float)>>('spine_event_data_set_float');
-  late final _spine_event_data_set_float =
-      _spine_event_data_set_floatPtr.asFunction<void Function(spine_event_data, double)>();
-
-  ffi.Pointer<ffi.Char> spine_event_data_get_string(
-    spine_event_data self,
-  ) {
-    return _spine_event_data_get_string(
-      self,
-    );
-  }
-
-  late final _spine_event_data_get_stringPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(spine_event_data)>>('spine_event_data_get_string');
-  late final _spine_event_data_get_string =
-      _spine_event_data_get_stringPtr.asFunction<ffi.Pointer<ffi.Char> Function(spine_event_data)>();
-
-  void spine_event_data_set_string(
-    spine_event_data self,
-    ffi.Pointer<ffi.Char> inValue,
-  ) {
-    return _spine_event_data_set_string(
-      self,
-      inValue,
-    );
-  }
-
-  late final _spine_event_data_set_stringPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(spine_event_data, ffi.Pointer<ffi.Char>)>>(
-          'spine_event_data_set_string');
-  late final _spine_event_data_set_string =
-      _spine_event_data_set_stringPtr.asFunction<void Function(spine_event_data, ffi.Pointer<ffi.Char>)>();
-
+  /// Path to an audio file relative to the audio folder as defined in Spine.
   ffi.Pointer<ffi.Char> spine_event_data_get_audio_path(
     spine_event_data self,
   ) {
@@ -23137,62 +23553,6 @@ class SpineDartBindings {
           'spine_event_data_set_audio_path');
   late final _spine_event_data_set_audio_path =
       _spine_event_data_set_audio_pathPtr.asFunction<void Function(spine_event_data, ffi.Pointer<ffi.Char>)>();
-
-  double spine_event_data_get_volume(
-    spine_event_data self,
-  ) {
-    return _spine_event_data_get_volume(
-      self,
-    );
-  }
-
-  late final _spine_event_data_get_volumePtr =
-      _lookup<ffi.NativeFunction<ffi.Float Function(spine_event_data)>>('spine_event_data_get_volume');
-  late final _spine_event_data_get_volume =
-      _spine_event_data_get_volumePtr.asFunction<double Function(spine_event_data)>();
-
-  void spine_event_data_set_volume(
-    spine_event_data self,
-    double inValue,
-  ) {
-    return _spine_event_data_set_volume(
-      self,
-      inValue,
-    );
-  }
-
-  late final _spine_event_data_set_volumePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(spine_event_data, ffi.Float)>>('spine_event_data_set_volume');
-  late final _spine_event_data_set_volume =
-      _spine_event_data_set_volumePtr.asFunction<void Function(spine_event_data, double)>();
-
-  double spine_event_data_get_balance(
-    spine_event_data self,
-  ) {
-    return _spine_event_data_get_balance(
-      self,
-    );
-  }
-
-  late final _spine_event_data_get_balancePtr =
-      _lookup<ffi.NativeFunction<ffi.Float Function(spine_event_data)>>('spine_event_data_get_balance');
-  late final _spine_event_data_get_balance =
-      _spine_event_data_get_balancePtr.asFunction<double Function(spine_event_data)>();
-
-  void spine_event_data_set_balance(
-    spine_event_data self,
-    double inValue,
-  ) {
-    return _spine_event_data_set_balance(
-      self,
-      inValue,
-    );
-  }
-
-  late final _spine_event_data_set_balancePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(spine_event_data, ffi.Float)>>('spine_event_data_set_balance');
-  late final _spine_event_data_set_balance =
-      _spine_event_data_set_balancePtr.asFunction<void Function(spine_event_data, double)>();
 
   spine_event_queue_entry spine_event_queue_entry_create(
     int eventType,
@@ -23360,8 +23720,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_event_timeline_apply(
@@ -23371,8 +23732,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -23380,9 +23742,10 @@ class SpineDartBindings {
   late final _spine_event_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_event_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event, ffi.Float,
-              ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_event_timeline_apply');
+              ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_event_timeline_apply');
   late final _spine_event_timeline_apply = _spine_event_timeline_applyPtr.asFunction<
-      void Function(spine_event_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+      void Function(
+          spine_event_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool, bool, bool)>();
 
   int spine_event_timeline_get_frame_count(
     spine_event_timeline self,
@@ -23431,6 +23794,35 @@ class SpineDartBindings {
           'spine_event_timeline_set_frame');
   late final _spine_event_timeline_set_frame =
       _spine_event_timeline_set_framePtr.asFunction<void Function(spine_event_timeline, int, spine_event)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_event_timeline_get_additive(
+    spine_event_timeline self,
+  ) {
+    return _spine_event_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_event_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_event_timeline)>>('spine_event_timeline_get_additive');
+  late final _spine_event_timeline_get_additive =
+      _spine_event_timeline_get_additivePtr.asFunction<bool Function(spine_event_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_event_timeline_get_instant(
+    spine_event_timeline self,
+  ) {
+    return _spine_event_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_event_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_event_timeline)>>('spine_event_timeline_get_instant');
+  late final _spine_event_timeline_get_instant =
+      _spine_event_timeline_get_instantPtr.asFunction<bool Function(spine_event_timeline)>();
 
   int spine_event_timeline_get_frame_entries(
     spine_event_timeline self,
@@ -24133,8 +24525,9 @@ class SpineDartBindings {
   late final _spine_ik_constraint_set_target =
       _spine_ik_constraint_set_targetPtr.asFunction<void Function(spine_ik_constraint, spine_bone)>();
 
-  /// Adjusts the bone rotation so the tip is as close to the target position as
-  /// possible. The target is specified in the world coordinate system.
+  /// Adjusts the local rotation of the bone so the world position of the tip is as
+  /// close to the target position as possible. The target is specified in the
+  /// world coordinate system.
   void spine_ik_constraint_apply_1(
     spine_skeleton skeleton,
     spine_bone_pose bone,
@@ -24217,6 +24610,8 @@ class SpineDartBindings {
   late final _spine_ik_constraint_get_data =
       _spine_ik_constraint_get_dataPtr.asFunction<spine_ik_constraint_data Function(spine_ik_constraint)>();
 
+  /// The unconstrained pose for this object, set by animations and application
+  /// code.
   spine_ik_constraint_pose spine_ik_constraint_get_pose(
     spine_ik_constraint self,
   ) {
@@ -24231,6 +24626,9 @@ class SpineDartBindings {
   late final _spine_ik_constraint_get_pose =
       _spine_ik_constraint_get_posePtr.asFunction<spine_ik_constraint_pose Function(spine_ik_constraint)>();
 
+  /// The pose to use for rendering. If no constraints modify this pose, this is
+  /// the same as getPose(). Otherwise it is a copy of getPose() modified by
+  /// constraints.
   spine_ik_constraint_pose spine_ik_constraint_get_applied_pose(
     spine_ik_constraint self,
   ) {
@@ -24245,6 +24643,8 @@ class SpineDartBindings {
   late final _spine_ik_constraint_get_applied_pose =
       _spine_ik_constraint_get_applied_posePtr.asFunction<spine_ik_constraint_pose Function(spine_ik_constraint)>();
 
+  /// Sets the constrained pose to the unconstrained pose, as a starting point for
+  /// constraints to be applied.
   void spine_ik_constraint_reset_constrained(
     spine_ik_constraint self,
   ) {
@@ -24258,6 +24658,8 @@ class SpineDartBindings {
   late final _spine_ik_constraint_reset_constrained =
       _spine_ik_constraint_reset_constrainedPtr.asFunction<void Function(spine_ik_constraint)>();
 
+  /// Sets the applied pose to the constrained pose, in anticipation of the applied
+  /// pose being modified by constraints.
   void spine_ik_constraint_constrained(
     spine_ik_constraint self,
   ) {
@@ -24285,6 +24687,11 @@ class SpineDartBindings {
   late final _spine_ik_constraint_is_pose_equal_to_applied =
       _spine_ik_constraint_is_pose_equal_to_appliedPtr.asFunction<bool Function(spine_ik_constraint)>();
 
+  /// Returns false when this won't be updated by
+  /// Skeleton::updateWorldTransform(Physics) because a skin is required and the
+  /// active skin does not contain this item. See Skin::getBones(),
+  /// Skin::getConstraints(), PosedData::getSkinRequired(), and
+  /// Skeleton::updateCache().
   bool spine_ik_constraint_is_active(
     spine_ik_constraint self,
   ) {
@@ -24348,6 +24755,8 @@ class SpineDartBindings {
   late final _spine_ik_constraint_base_get_data =
       _spine_ik_constraint_base_get_dataPtr.asFunction<spine_ik_constraint_data Function(spine_ik_constraint_base)>();
 
+  /// The unconstrained pose for this object, set by animations and application
+  /// code.
   spine_ik_constraint_pose spine_ik_constraint_base_get_pose(
     spine_ik_constraint_base self,
   ) {
@@ -24362,6 +24771,9 @@ class SpineDartBindings {
   late final _spine_ik_constraint_base_get_pose =
       _spine_ik_constraint_base_get_posePtr.asFunction<spine_ik_constraint_pose Function(spine_ik_constraint_base)>();
 
+  /// The pose to use for rendering. If no constraints modify this pose, this is
+  /// the same as getPose(). Otherwise it is a copy of getPose() modified by
+  /// constraints.
   spine_ik_constraint_pose spine_ik_constraint_base_get_applied_pose(
     spine_ik_constraint_base self,
   ) {
@@ -24376,6 +24788,8 @@ class SpineDartBindings {
   late final _spine_ik_constraint_base_get_applied_pose = _spine_ik_constraint_base_get_applied_posePtr
       .asFunction<spine_ik_constraint_pose Function(spine_ik_constraint_base)>();
 
+  /// Sets the constrained pose to the unconstrained pose, as a starting point for
+  /// constraints to be applied.
   void spine_ik_constraint_base_reset_constrained(
     spine_ik_constraint_base self,
   ) {
@@ -24390,6 +24804,8 @@ class SpineDartBindings {
   late final _spine_ik_constraint_base_reset_constrained =
       _spine_ik_constraint_base_reset_constrainedPtr.asFunction<void Function(spine_ik_constraint_base)>();
 
+  /// Sets the applied pose to the constrained pose, in anticipation of the applied
+  /// pose being modified by constraints.
   void spine_ik_constraint_base_constrained(
     spine_ik_constraint_base self,
   ) {
@@ -24417,6 +24833,11 @@ class SpineDartBindings {
   late final _spine_ik_constraint_base_is_pose_equal_to_applied =
       _spine_ik_constraint_base_is_pose_equal_to_appliedPtr.asFunction<bool Function(spine_ik_constraint_base)>();
 
+  /// Returns false when this won't be updated by
+  /// Skeleton::updateWorldTransform(Physics) because a skin is required and the
+  /// active skin does not contain this item. See Skin::getBones(),
+  /// Skin::getConstraints(), PosedData::getSkinRequired(), and
+  /// Skeleton::updateCache().
   bool spine_ik_constraint_base_is_active(
     spine_ik_constraint_base self,
   ) {
@@ -24618,8 +25039,9 @@ class SpineDartBindings {
   late final _spine_ik_constraint_data_set_target =
       _spine_ik_constraint_data_set_targetPtr.asFunction<void Function(spine_ik_constraint_data, spine_bone_data)>();
 
-  /// When true and IkConstraintPose compress or stretch is used, the bone is
-  /// scaled on both the X and Y axes.
+  /// When true and IkConstraintPose::getCompress() or
+  /// IkConstraintPose::getStretch() is used, the bone is scaled on both the X and
+  /// Y axes.
   bool spine_ik_constraint_data_get_uniform(
     spine_ik_constraint_data self,
   ) {
@@ -24678,6 +25100,7 @@ class SpineDartBindings {
   late final _spine_ik_constraint_data_get_skin_required =
       _spine_ik_constraint_data_get_skin_requiredPtr.asFunction<bool Function(spine_ik_constraint_data)>();
 
+  /// The setup pose that most animations are relative to.
   spine_ik_constraint_pose spine_ik_constraint_data_get_setup_pose(
     spine_ik_constraint_data self,
   ) {
@@ -24887,7 +25310,7 @@ class SpineDartBindings {
   /// it.
   ///
   /// For two bone IK: 1) the child bone's local Y translation is set to 0, 2)
-  /// stretch is not applied if getSoftness() is > 0, and 3) if the parent bone has
+  /// stretch is not applied if softness is > 0, and 3) if the parent bone has
   /// local nonuniform scale, stretch is not applied.
   bool spine_ik_constraint_pose_get_stretch(
     spine_ik_constraint_pose self,
@@ -24971,8 +25394,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_ik_constraint_timeline_apply(
@@ -24982,8 +25406,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -24991,10 +25416,10 @@ class SpineDartBindings {
   late final _spine_ik_constraint_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_ik_constraint_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event,
-              ffi.Float, ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_ik_constraint_timeline_apply');
+              ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_ik_constraint_timeline_apply');
   late final _spine_ik_constraint_timeline_apply = _spine_ik_constraint_timeline_applyPtr.asFunction<
-      void Function(
-          spine_ik_constraint_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+      void Function(spine_ik_constraint_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool,
+          bool, bool)>();
 
   /// Sets the time, mix, softness, bend direction, compress, and stretch for the
   /// specified frame.
@@ -25179,6 +25604,37 @@ class SpineDartBindings {
   late final _spine_ik_constraint_timeline_get_curves = _spine_ik_constraint_timeline_get_curvesPtr
       .asFunction<spine_array_float Function(spine_ik_constraint_timeline)>();
 
+  /// True if this timeline supports additive blending.
+  bool spine_ik_constraint_timeline_get_additive(
+    spine_ik_constraint_timeline self,
+  ) {
+    return _spine_ik_constraint_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_ik_constraint_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_ik_constraint_timeline)>>(
+          'spine_ik_constraint_timeline_get_additive');
+  late final _spine_ik_constraint_timeline_get_additive =
+      _spine_ik_constraint_timeline_get_additivePtr.asFunction<bool Function(spine_ik_constraint_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_ik_constraint_timeline_get_instant(
+    spine_ik_constraint_timeline self,
+  ) {
+    return _spine_ik_constraint_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_ik_constraint_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_ik_constraint_timeline)>>(
+          'spine_ik_constraint_timeline_get_instant');
+  late final _spine_ik_constraint_timeline_get_instant =
+      _spine_ik_constraint_timeline_get_instantPtr.asFunction<bool Function(spine_ik_constraint_timeline)>();
+
   int spine_ik_constraint_timeline_get_frame_entries(
     spine_ik_constraint_timeline self,
   ) {
@@ -25330,8 +25786,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_inherit_timeline_apply(
@@ -25341,8 +25798,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -25350,10 +25808,10 @@ class SpineDartBindings {
   late final _spine_inherit_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_inherit_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event, ffi.Float,
-              ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_inherit_timeline_apply');
+              ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_inherit_timeline_apply');
   late final _spine_inherit_timeline_apply = _spine_inherit_timeline_applyPtr.asFunction<
       void Function(
-          spine_inherit_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+          spine_inherit_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool, bool, bool)>();
 
   int spine_inherit_timeline_get_bone_index(
     spine_inherit_timeline self,
@@ -25383,6 +25841,35 @@ class SpineDartBindings {
           'spine_inherit_timeline_set_bone_index');
   late final _spine_inherit_timeline_set_bone_index =
       _spine_inherit_timeline_set_bone_indexPtr.asFunction<void Function(spine_inherit_timeline, int)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_inherit_timeline_get_additive(
+    spine_inherit_timeline self,
+  ) {
+    return _spine_inherit_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_inherit_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_inherit_timeline)>>('spine_inherit_timeline_get_additive');
+  late final _spine_inherit_timeline_get_additive =
+      _spine_inherit_timeline_get_additivePtr.asFunction<bool Function(spine_inherit_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_inherit_timeline_get_instant(
+    spine_inherit_timeline self,
+  ) {
+    return _spine_inherit_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_inherit_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_inherit_timeline)>>('spine_inherit_timeline_get_instant');
+  late final _spine_inherit_timeline_get_instant =
+      _spine_inherit_timeline_get_instantPtr.asFunction<bool Function(spine_inherit_timeline)>();
 
   int spine_inherit_timeline_get_frame_entries(
     spine_inherit_timeline self,
@@ -25809,6 +26296,9 @@ class SpineDartBindings {
   late final _spine_mesh_attachment_set_parent_mesh = _spine_mesh_attachment_set_parent_meshPtr
       .asFunction<void Function(spine_mesh_attachment, spine_mesh_attachment)>();
 
+  /// Vertex index pairs describing edges for controlling triangulation, or empty
+  /// if nonessential data was not exported. Mesh triangles do not cross edges.
+  /// Triangulation is not performed at runtime.
   spine_array_unsigned_short spine_mesh_attachment_get_edges(
     spine_mesh_attachment self,
   ) {
@@ -25959,6 +26449,9 @@ class SpineDartBindings {
   late final _spine_mesh_attachment_get_id =
       _spine_mesh_attachment_get_idPtr.asFunction<int Function(spine_mesh_attachment)>();
 
+  /// The bones that affect the vertices. The entries are, for each vertex, the
+  /// number of bones affecting the vertex followed by that many bone indices,
+  /// which is Skeleton::getBones() index. Empty if this attachment has no weights.
   spine_array_int spine_mesh_attachment_get_bones(
     spine_mesh_attachment self,
   ) {
@@ -25988,6 +26481,10 @@ class SpineDartBindings {
   late final _spine_mesh_attachment_set_bones =
       _spine_mesh_attachment_set_bonesPtr.asFunction<void Function(spine_mesh_attachment, spine_array_int)>();
 
+  /// The vertex positions in the bone's coordinate system. For a non-weighted
+  /// attachment, the values are x,y pairs for each vertex. For a weighted
+  /// attachment, the values are x,y,weight triplets for each bone affecting each
+  /// vertex.
   spine_array_float spine_mesh_attachment_get_vertices(
     spine_mesh_attachment self,
   ) {
@@ -26256,6 +26753,8 @@ class SpineDartBindings {
   late final _spine_path_attachment_set_closed =
       _spine_path_attachment_set_closedPtr.asFunction<void Function(spine_path_attachment, bool)>();
 
+  /// If true, additional calculations are performed to make computing positions
+  /// along the path more accurate so movement along the path has a constant speed.
   bool spine_path_attachment_get_constant_speed(
     spine_path_attachment self,
   ) {
@@ -26311,8 +26810,8 @@ class SpineDartBindings {
   late final _spine_path_attachment_copy =
       _spine_path_attachment_copyPtr.asFunction<spine_attachment Function(spine_path_attachment)>();
 
-  /// Transforms the attachment's local vertices to world coordinates. If the
-  /// slot's SlotPose::getDeform() is not empty, it is used to deform the vertices.
+  /// Transforms the attachment's local vertices to world coordinates. If
+  /// SlotPose::getDeform() is not empty, it is used to deform the vertices.
   ///
   /// See https://esotericsoftware.com/spine-runtime-skeletons#World-transforms
   /// World transforms in the Spine Runtimes Guide.
@@ -26397,6 +26896,9 @@ class SpineDartBindings {
   late final _spine_path_attachment_get_id =
       _spine_path_attachment_get_idPtr.asFunction<int Function(spine_path_attachment)>();
 
+  /// The bones that affect the vertices. The entries are, for each vertex, the
+  /// number of bones affecting the vertex followed by that many bone indices,
+  /// which is Skeleton::getBones() index. Empty if this attachment has no weights.
   spine_array_int spine_path_attachment_get_bones(
     spine_path_attachment self,
   ) {
@@ -26426,6 +26928,10 @@ class SpineDartBindings {
   late final _spine_path_attachment_set_bones =
       _spine_path_attachment_set_bonesPtr.asFunction<void Function(spine_path_attachment, spine_array_int)>();
 
+  /// The vertex positions in the bone's coordinate system. For a non-weighted
+  /// attachment, the values are x,y pairs for each vertex. For a weighted
+  /// attachment, the values are x,y,weight triplets for each bone affecting each
+  /// vertex.
   spine_array_float spine_path_attachment_get_vertices(
     spine_path_attachment self,
   ) {
@@ -26758,6 +27264,8 @@ class SpineDartBindings {
   late final _spine_path_constraint_get_data =
       _spine_path_constraint_get_dataPtr.asFunction<spine_path_constraint_data Function(spine_path_constraint)>();
 
+  /// The unconstrained pose for this object, set by animations and application
+  /// code.
   spine_path_constraint_pose spine_path_constraint_get_pose(
     spine_path_constraint self,
   ) {
@@ -26772,6 +27280,9 @@ class SpineDartBindings {
   late final _spine_path_constraint_get_pose =
       _spine_path_constraint_get_posePtr.asFunction<spine_path_constraint_pose Function(spine_path_constraint)>();
 
+  /// The pose to use for rendering. If no constraints modify this pose, this is
+  /// the same as getPose(). Otherwise it is a copy of getPose() modified by
+  /// constraints.
   spine_path_constraint_pose spine_path_constraint_get_applied_pose(
     spine_path_constraint self,
   ) {
@@ -26786,6 +27297,8 @@ class SpineDartBindings {
   late final _spine_path_constraint_get_applied_pose = _spine_path_constraint_get_applied_posePtr
       .asFunction<spine_path_constraint_pose Function(spine_path_constraint)>();
 
+  /// Sets the constrained pose to the unconstrained pose, as a starting point for
+  /// constraints to be applied.
   void spine_path_constraint_reset_constrained(
     spine_path_constraint self,
   ) {
@@ -26799,6 +27312,8 @@ class SpineDartBindings {
   late final _spine_path_constraint_reset_constrained =
       _spine_path_constraint_reset_constrainedPtr.asFunction<void Function(spine_path_constraint)>();
 
+  /// Sets the applied pose to the constrained pose, in anticipation of the applied
+  /// pose being modified by constraints.
   void spine_path_constraint_constrained(
     spine_path_constraint self,
   ) {
@@ -26826,6 +27341,11 @@ class SpineDartBindings {
   late final _spine_path_constraint_is_pose_equal_to_applied =
       _spine_path_constraint_is_pose_equal_to_appliedPtr.asFunction<bool Function(spine_path_constraint)>();
 
+  /// Returns false when this won't be updated by
+  /// Skeleton::updateWorldTransform(Physics) because a skin is required and the
+  /// active skin does not contain this item. See Skin::getBones(),
+  /// Skin::getConstraints(), PosedData::getSkinRequired(), and
+  /// Skeleton::updateCache().
   bool spine_path_constraint_is_active(
     spine_path_constraint self,
   ) {
@@ -26890,6 +27410,8 @@ class SpineDartBindings {
   late final _spine_path_constraint_base_get_data = _spine_path_constraint_base_get_dataPtr
       .asFunction<spine_path_constraint_data Function(spine_path_constraint_base)>();
 
+  /// The unconstrained pose for this object, set by animations and application
+  /// code.
   spine_path_constraint_pose spine_path_constraint_base_get_pose(
     spine_path_constraint_base self,
   ) {
@@ -26904,6 +27426,9 @@ class SpineDartBindings {
   late final _spine_path_constraint_base_get_pose = _spine_path_constraint_base_get_posePtr
       .asFunction<spine_path_constraint_pose Function(spine_path_constraint_base)>();
 
+  /// The pose to use for rendering. If no constraints modify this pose, this is
+  /// the same as getPose(). Otherwise it is a copy of getPose() modified by
+  /// constraints.
   spine_path_constraint_pose spine_path_constraint_base_get_applied_pose(
     spine_path_constraint_base self,
   ) {
@@ -26918,6 +27443,8 @@ class SpineDartBindings {
   late final _spine_path_constraint_base_get_applied_pose = _spine_path_constraint_base_get_applied_posePtr
       .asFunction<spine_path_constraint_pose Function(spine_path_constraint_base)>();
 
+  /// Sets the constrained pose to the unconstrained pose, as a starting point for
+  /// constraints to be applied.
   void spine_path_constraint_base_reset_constrained(
     spine_path_constraint_base self,
   ) {
@@ -26932,6 +27459,8 @@ class SpineDartBindings {
   late final _spine_path_constraint_base_reset_constrained =
       _spine_path_constraint_base_reset_constrainedPtr.asFunction<void Function(spine_path_constraint_base)>();
 
+  /// Sets the applied pose to the constrained pose, in anticipation of the applied
+  /// pose being modified by constraints.
   void spine_path_constraint_base_constrained(
     spine_path_constraint_base self,
   ) {
@@ -26960,6 +27489,11 @@ class SpineDartBindings {
   late final _spine_path_constraint_base_is_pose_equal_to_applied =
       _spine_path_constraint_base_is_pose_equal_to_appliedPtr.asFunction<bool Function(spine_path_constraint_base)>();
 
+  /// Returns false when this won't be updated by
+  /// Skeleton::updateWorldTransform(Physics) because a skin is required and the
+  /// active skin does not contain this item. See Skin::getBones(),
+  /// Skin::getConstraints(), PosedData::getSkinRequired(), and
+  /// Skeleton::updateCache().
   bool spine_path_constraint_base_is_active(
     spine_path_constraint_base self,
   ) {
@@ -27317,6 +27851,7 @@ class SpineDartBindings {
   late final _spine_path_constraint_data_get_skin_required =
       _spine_path_constraint_data_get_skin_requiredPtr.asFunction<bool Function(spine_path_constraint_data)>();
 
+  /// The setup pose that most animations are relative to.
   spine_path_constraint_pose spine_path_constraint_data_get_setup_pose(
     spine_path_constraint_data self,
   ) {
@@ -27408,8 +27943,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_path_constraint_mix_timeline_apply(
@@ -27419,8 +27955,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -27428,10 +27965,10 @@ class SpineDartBindings {
   late final _spine_path_constraint_mix_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_path_constraint_mix_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event,
-              ffi.Float, ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_path_constraint_mix_timeline_apply');
+              ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_path_constraint_mix_timeline_apply');
   late final _spine_path_constraint_mix_timeline_apply = _spine_path_constraint_mix_timeline_applyPtr.asFunction<
-      void Function(spine_path_constraint_mix_timeline, spine_skeleton, double, double, spine_array_event, double, int,
-          int, bool)>();
+      void Function(spine_path_constraint_mix_timeline, spine_skeleton, double, double, spine_array_event, double, bool,
+          bool, bool, bool)>();
 
   /// Sets the time and color for the specified frame.
   ///
@@ -27613,6 +28150,37 @@ class SpineDartBindings {
           'spine_path_constraint_mix_timeline_get_curves');
   late final _spine_path_constraint_mix_timeline_get_curves = _spine_path_constraint_mix_timeline_get_curvesPtr
       .asFunction<spine_array_float Function(spine_path_constraint_mix_timeline)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_path_constraint_mix_timeline_get_additive(
+    spine_path_constraint_mix_timeline self,
+  ) {
+    return _spine_path_constraint_mix_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_path_constraint_mix_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_path_constraint_mix_timeline)>>(
+          'spine_path_constraint_mix_timeline_get_additive');
+  late final _spine_path_constraint_mix_timeline_get_additive = _spine_path_constraint_mix_timeline_get_additivePtr
+      .asFunction<bool Function(spine_path_constraint_mix_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_path_constraint_mix_timeline_get_instant(
+    spine_path_constraint_mix_timeline self,
+  ) {
+    return _spine_path_constraint_mix_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_path_constraint_mix_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_path_constraint_mix_timeline)>>(
+          'spine_path_constraint_mix_timeline_get_instant');
+  late final _spine_path_constraint_mix_timeline_get_instant = _spine_path_constraint_mix_timeline_get_instantPtr
+      .asFunction<bool Function(spine_path_constraint_mix_timeline)>();
 
   int spine_path_constraint_mix_timeline_get_frame_entries(
     spine_path_constraint_mix_timeline self,
@@ -27945,8 +28513,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_path_constraint_position_timeline_apply(
@@ -27956,8 +28525,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -27971,13 +28541,14 @@ class SpineDartBindings {
               ffi.Float,
               spine_array_event,
               ffi.Float,
-              ffi.Int32,
-              ffi.Int32,
+              ffi.Bool,
+              ffi.Bool,
+              ffi.Bool,
               ffi.Bool)>>('spine_path_constraint_position_timeline_apply');
   late final _spine_path_constraint_position_timeline_apply =
       _spine_path_constraint_position_timeline_applyPtr.asFunction<
           void Function(spine_path_constraint_position_timeline, spine_skeleton, double, double, spine_array_event,
-              double, int, int, bool)>();
+              double, bool, bool, bool, bool)>();
 
   int spine_path_constraint_position_timeline_get_constraint_index(
     spine_path_constraint_position_timeline self,
@@ -28058,7 +28629,8 @@ class SpineDartBindings {
     spine_path_constraint_position_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -28066,7 +28638,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -28074,17 +28647,18 @@ class SpineDartBindings {
 
   late final _spine_path_constraint_position_timeline_get_relative_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_path_constraint_position_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
-              ffi.Float)>>('spine_path_constraint_position_timeline_get_relative_value');
+          ffi.Float Function(spine_path_constraint_position_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float)>>('spine_path_constraint_position_timeline_get_relative_value');
   late final _spine_path_constraint_position_timeline_get_relative_value =
-      _spine_path_constraint_position_timeline_get_relative_valuePtr
-          .asFunction<double Function(spine_path_constraint_position_timeline, double, double, int, double, double)>();
+      _spine_path_constraint_position_timeline_get_relative_valuePtr.asFunction<
+          double Function(spine_path_constraint_position_timeline, double, double, bool, bool, double, double)>();
 
   double spine_path_constraint_position_timeline_get_absolute_value_1(
     spine_path_constraint_position_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -28092,7 +28666,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -28100,17 +28675,18 @@ class SpineDartBindings {
 
   late final _spine_path_constraint_position_timeline_get_absolute_value_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_path_constraint_position_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
-              ffi.Float)>>('spine_path_constraint_position_timeline_get_absolute_value_1');
+          ffi.Float Function(spine_path_constraint_position_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float)>>('spine_path_constraint_position_timeline_get_absolute_value_1');
   late final _spine_path_constraint_position_timeline_get_absolute_value_1 =
-      _spine_path_constraint_position_timeline_get_absolute_value_1Ptr
-          .asFunction<double Function(spine_path_constraint_position_timeline, double, double, int, double, double)>();
+      _spine_path_constraint_position_timeline_get_absolute_value_1Ptr.asFunction<
+          double Function(spine_path_constraint_position_timeline, double, double, bool, bool, double, double)>();
 
   double spine_path_constraint_position_timeline_get_absolute_value_2(
     spine_path_constraint_position_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
     double value,
@@ -28119,7 +28695,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
       value,
@@ -28128,18 +28705,20 @@ class SpineDartBindings {
 
   late final _spine_path_constraint_position_timeline_get_absolute_value_2Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_path_constraint_position_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
-              ffi.Float, ffi.Float)>>('spine_path_constraint_position_timeline_get_absolute_value_2');
+          ffi.Float Function(spine_path_constraint_position_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float, ffi.Float)>>('spine_path_constraint_position_timeline_get_absolute_value_2');
   late final _spine_path_constraint_position_timeline_get_absolute_value_2 =
       _spine_path_constraint_position_timeline_get_absolute_value_2Ptr.asFunction<
-          double Function(spine_path_constraint_position_timeline, double, double, int, double, double, double)>();
+          double Function(
+              spine_path_constraint_position_timeline, double, double, bool, bool, double, double, double)>();
 
   double spine_path_constraint_position_timeline_get_scale_value(
     spine_path_constraint_position_timeline self,
     double time,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     double current,
     double setup,
   ) {
@@ -28147,8 +28726,9 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       current,
       setup,
     );
@@ -28156,11 +28736,11 @@ class SpineDartBindings {
 
   late final _spine_path_constraint_position_timeline_get_scale_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_path_constraint_position_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Int32,
-              ffi.Float, ffi.Float)>>('spine_path_constraint_position_timeline_get_scale_value');
+          ffi.Float Function(spine_path_constraint_position_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Bool, ffi.Float, ffi.Float)>>('spine_path_constraint_position_timeline_get_scale_value');
   late final _spine_path_constraint_position_timeline_get_scale_value =
       _spine_path_constraint_position_timeline_get_scale_valuePtr.asFunction<
-          double Function(spine_path_constraint_position_timeline, double, double, int, int, double, double)>();
+          double Function(spine_path_constraint_position_timeline, double, double, bool, bool, bool, double, double)>();
 
   void spine_path_constraint_position_timeline_set_linear(
     spine_path_constraint_position_timeline self,
@@ -28284,6 +28864,39 @@ class SpineDartBindings {
   late final _spine_path_constraint_position_timeline_get_curves =
       _spine_path_constraint_position_timeline_get_curvesPtr
           .asFunction<spine_array_float Function(spine_path_constraint_position_timeline)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_path_constraint_position_timeline_get_additive(
+    spine_path_constraint_position_timeline self,
+  ) {
+    return _spine_path_constraint_position_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_path_constraint_position_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_path_constraint_position_timeline)>>(
+          'spine_path_constraint_position_timeline_get_additive');
+  late final _spine_path_constraint_position_timeline_get_additive =
+      _spine_path_constraint_position_timeline_get_additivePtr
+          .asFunction<bool Function(spine_path_constraint_position_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_path_constraint_position_timeline_get_instant(
+    spine_path_constraint_position_timeline self,
+  ) {
+    return _spine_path_constraint_position_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_path_constraint_position_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_path_constraint_position_timeline)>>(
+          'spine_path_constraint_position_timeline_get_instant');
+  late final _spine_path_constraint_position_timeline_get_instant =
+      _spine_path_constraint_position_timeline_get_instantPtr
+          .asFunction<bool Function(spine_path_constraint_position_timeline)>();
 
   int spine_path_constraint_position_timeline_get_frame_entries(
     spine_path_constraint_position_timeline self,
@@ -28422,8 +29035,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_path_constraint_spacing_timeline_apply(
@@ -28433,8 +29047,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -28448,13 +29063,14 @@ class SpineDartBindings {
               ffi.Float,
               spine_array_event,
               ffi.Float,
-              ffi.Int32,
-              ffi.Int32,
+              ffi.Bool,
+              ffi.Bool,
+              ffi.Bool,
               ffi.Bool)>>('spine_path_constraint_spacing_timeline_apply');
   late final _spine_path_constraint_spacing_timeline_apply =
       _spine_path_constraint_spacing_timeline_applyPtr.asFunction<
           void Function(spine_path_constraint_spacing_timeline, spine_skeleton, double, double, spine_array_event,
-              double, int, int, bool)>();
+              double, bool, bool, bool, bool)>();
 
   int spine_path_constraint_spacing_timeline_get_constraint_index(
     spine_path_constraint_spacing_timeline self,
@@ -28535,7 +29151,8 @@ class SpineDartBindings {
     spine_path_constraint_spacing_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -28543,7 +29160,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -28551,17 +29169,18 @@ class SpineDartBindings {
 
   late final _spine_path_constraint_spacing_timeline_get_relative_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_path_constraint_spacing_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
-              ffi.Float)>>('spine_path_constraint_spacing_timeline_get_relative_value');
+          ffi.Float Function(spine_path_constraint_spacing_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float)>>('spine_path_constraint_spacing_timeline_get_relative_value');
   late final _spine_path_constraint_spacing_timeline_get_relative_value =
-      _spine_path_constraint_spacing_timeline_get_relative_valuePtr
-          .asFunction<double Function(spine_path_constraint_spacing_timeline, double, double, int, double, double)>();
+      _spine_path_constraint_spacing_timeline_get_relative_valuePtr.asFunction<
+          double Function(spine_path_constraint_spacing_timeline, double, double, bool, bool, double, double)>();
 
   double spine_path_constraint_spacing_timeline_get_absolute_value_1(
     spine_path_constraint_spacing_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -28569,7 +29188,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -28577,17 +29197,18 @@ class SpineDartBindings {
 
   late final _spine_path_constraint_spacing_timeline_get_absolute_value_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_path_constraint_spacing_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
-              ffi.Float)>>('spine_path_constraint_spacing_timeline_get_absolute_value_1');
+          ffi.Float Function(spine_path_constraint_spacing_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float)>>('spine_path_constraint_spacing_timeline_get_absolute_value_1');
   late final _spine_path_constraint_spacing_timeline_get_absolute_value_1 =
-      _spine_path_constraint_spacing_timeline_get_absolute_value_1Ptr
-          .asFunction<double Function(spine_path_constraint_spacing_timeline, double, double, int, double, double)>();
+      _spine_path_constraint_spacing_timeline_get_absolute_value_1Ptr.asFunction<
+          double Function(spine_path_constraint_spacing_timeline, double, double, bool, bool, double, double)>();
 
   double spine_path_constraint_spacing_timeline_get_absolute_value_2(
     spine_path_constraint_spacing_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
     double value,
@@ -28596,7 +29217,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
       value,
@@ -28605,18 +29227,20 @@ class SpineDartBindings {
 
   late final _spine_path_constraint_spacing_timeline_get_absolute_value_2Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_path_constraint_spacing_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
-              ffi.Float, ffi.Float)>>('spine_path_constraint_spacing_timeline_get_absolute_value_2');
+          ffi.Float Function(spine_path_constraint_spacing_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float, ffi.Float)>>('spine_path_constraint_spacing_timeline_get_absolute_value_2');
   late final _spine_path_constraint_spacing_timeline_get_absolute_value_2 =
       _spine_path_constraint_spacing_timeline_get_absolute_value_2Ptr.asFunction<
-          double Function(spine_path_constraint_spacing_timeline, double, double, int, double, double, double)>();
+          double Function(
+              spine_path_constraint_spacing_timeline, double, double, bool, bool, double, double, double)>();
 
   double spine_path_constraint_spacing_timeline_get_scale_value(
     spine_path_constraint_spacing_timeline self,
     double time,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     double current,
     double setup,
   ) {
@@ -28624,8 +29248,9 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       current,
       setup,
     );
@@ -28633,11 +29258,11 @@ class SpineDartBindings {
 
   late final _spine_path_constraint_spacing_timeline_get_scale_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_path_constraint_spacing_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Int32,
+          ffi.Float Function(spine_path_constraint_spacing_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool,
               ffi.Float, ffi.Float)>>('spine_path_constraint_spacing_timeline_get_scale_value');
   late final _spine_path_constraint_spacing_timeline_get_scale_value =
       _spine_path_constraint_spacing_timeline_get_scale_valuePtr.asFunction<
-          double Function(spine_path_constraint_spacing_timeline, double, double, int, int, double, double)>();
+          double Function(spine_path_constraint_spacing_timeline, double, double, bool, bool, bool, double, double)>();
 
   void spine_path_constraint_spacing_timeline_set_linear(
     spine_path_constraint_spacing_timeline self,
@@ -28759,6 +29384,39 @@ class SpineDartBindings {
           'spine_path_constraint_spacing_timeline_get_curves');
   late final _spine_path_constraint_spacing_timeline_get_curves = _spine_path_constraint_spacing_timeline_get_curvesPtr
       .asFunction<spine_array_float Function(spine_path_constraint_spacing_timeline)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_path_constraint_spacing_timeline_get_additive(
+    spine_path_constraint_spacing_timeline self,
+  ) {
+    return _spine_path_constraint_spacing_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_path_constraint_spacing_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_path_constraint_spacing_timeline)>>(
+          'spine_path_constraint_spacing_timeline_get_additive');
+  late final _spine_path_constraint_spacing_timeline_get_additive =
+      _spine_path_constraint_spacing_timeline_get_additivePtr
+          .asFunction<bool Function(spine_path_constraint_spacing_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_path_constraint_spacing_timeline_get_instant(
+    spine_path_constraint_spacing_timeline self,
+  ) {
+    return _spine_path_constraint_spacing_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_path_constraint_spacing_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_path_constraint_spacing_timeline)>>(
+          'spine_path_constraint_spacing_timeline_get_instant');
+  late final _spine_path_constraint_spacing_timeline_get_instant =
+      _spine_path_constraint_spacing_timeline_get_instantPtr
+          .asFunction<bool Function(spine_path_constraint_spacing_timeline)>();
 
   int spine_path_constraint_spacing_timeline_get_frame_entries(
     spine_path_constraint_spacing_timeline self,
@@ -28949,6 +29607,8 @@ class SpineDartBindings {
   late final _spine_physics_constraint_copy = _spine_physics_constraint_copyPtr
       .asFunction<spine_physics_constraint Function(spine_physics_constraint, spine_skeleton)>();
 
+  /// Resets all physics state that was the result of previous movement. Use this
+  /// after moving a bone to prevent physics from reacting to the movement.
   void spine_physics_constraint_reset(
     spine_physics_constraint self,
     spine_skeleton skeleton,
@@ -28965,8 +29625,8 @@ class SpineDartBindings {
   late final _spine_physics_constraint_reset =
       _spine_physics_constraint_resetPtr.asFunction<void Function(spine_physics_constraint, spine_skeleton)>();
 
-  /// Translates the physics constraint so next update() forces are applied as if
-  /// the bone moved an additional amount in world space.
+  /// Translates the physics constraint so the next update() forces are applied as
+  /// if the bone moved an additional amount in world space.
   void spine_physics_constraint_translate(
     spine_physics_constraint self,
     double x,
@@ -28985,8 +29645,8 @@ class SpineDartBindings {
   late final _spine_physics_constraint_translate =
       _spine_physics_constraint_translatePtr.asFunction<void Function(spine_physics_constraint, double, double)>();
 
-  /// Rotates the physics constraint so next update() forces are applied as if the
-  /// bone rotated around the specified point in world space.
+  /// Rotates the physics constraint so the next update() forces are applied as if
+  /// the bone rotated around the specified point in world space.
   void spine_physics_constraint_rotate(
     spine_physics_constraint self,
     double x,
@@ -29052,6 +29712,8 @@ class SpineDartBindings {
   late final _spine_physics_constraint_get_data = _spine_physics_constraint_get_dataPtr
       .asFunction<spine_physics_constraint_data Function(spine_physics_constraint)>();
 
+  /// The unconstrained pose for this object, set by animations and application
+  /// code.
   spine_physics_constraint_pose spine_physics_constraint_get_pose(
     spine_physics_constraint self,
   ) {
@@ -29066,6 +29728,9 @@ class SpineDartBindings {
   late final _spine_physics_constraint_get_pose = _spine_physics_constraint_get_posePtr
       .asFunction<spine_physics_constraint_pose Function(spine_physics_constraint)>();
 
+  /// The pose to use for rendering. If no constraints modify this pose, this is
+  /// the same as getPose(). Otherwise it is a copy of getPose() modified by
+  /// constraints.
   spine_physics_constraint_pose spine_physics_constraint_get_applied_pose(
     spine_physics_constraint self,
   ) {
@@ -29080,6 +29745,8 @@ class SpineDartBindings {
   late final _spine_physics_constraint_get_applied_pose = _spine_physics_constraint_get_applied_posePtr
       .asFunction<spine_physics_constraint_pose Function(spine_physics_constraint)>();
 
+  /// Sets the constrained pose to the unconstrained pose, as a starting point for
+  /// constraints to be applied.
   void spine_physics_constraint_reset_constrained(
     spine_physics_constraint self,
   ) {
@@ -29094,6 +29761,8 @@ class SpineDartBindings {
   late final _spine_physics_constraint_reset_constrained =
       _spine_physics_constraint_reset_constrainedPtr.asFunction<void Function(spine_physics_constraint)>();
 
+  /// Sets the applied pose to the constrained pose, in anticipation of the applied
+  /// pose being modified by constraints.
   void spine_physics_constraint_constrained(
     spine_physics_constraint self,
   ) {
@@ -29121,6 +29790,11 @@ class SpineDartBindings {
   late final _spine_physics_constraint_is_pose_equal_to_applied =
       _spine_physics_constraint_is_pose_equal_to_appliedPtr.asFunction<bool Function(spine_physics_constraint)>();
 
+  /// Returns false when this won't be updated by
+  /// Skeleton::updateWorldTransform(Physics) because a skin is required and the
+  /// active skin does not contain this item. See Skin::getBones(),
+  /// Skin::getConstraints(), PosedData::getSkinRequired(), and
+  /// Skeleton::updateCache().
   bool spine_physics_constraint_is_active(
     spine_physics_constraint self,
   ) {
@@ -29186,6 +29860,8 @@ class SpineDartBindings {
   late final _spine_physics_constraint_base_get_data = _spine_physics_constraint_base_get_dataPtr
       .asFunction<spine_physics_constraint_data Function(spine_physics_constraint_base)>();
 
+  /// The unconstrained pose for this object, set by animations and application
+  /// code.
   spine_physics_constraint_pose spine_physics_constraint_base_get_pose(
     spine_physics_constraint_base self,
   ) {
@@ -29200,6 +29876,9 @@ class SpineDartBindings {
   late final _spine_physics_constraint_base_get_pose = _spine_physics_constraint_base_get_posePtr
       .asFunction<spine_physics_constraint_pose Function(spine_physics_constraint_base)>();
 
+  /// The pose to use for rendering. If no constraints modify this pose, this is
+  /// the same as getPose(). Otherwise it is a copy of getPose() modified by
+  /// constraints.
   spine_physics_constraint_pose spine_physics_constraint_base_get_applied_pose(
     spine_physics_constraint_base self,
   ) {
@@ -29214,6 +29893,8 @@ class SpineDartBindings {
   late final _spine_physics_constraint_base_get_applied_pose = _spine_physics_constraint_base_get_applied_posePtr
       .asFunction<spine_physics_constraint_pose Function(spine_physics_constraint_base)>();
 
+  /// Sets the constrained pose to the unconstrained pose, as a starting point for
+  /// constraints to be applied.
   void spine_physics_constraint_base_reset_constrained(
     spine_physics_constraint_base self,
   ) {
@@ -29228,6 +29909,8 @@ class SpineDartBindings {
   late final _spine_physics_constraint_base_reset_constrained =
       _spine_physics_constraint_base_reset_constrainedPtr.asFunction<void Function(spine_physics_constraint_base)>();
 
+  /// Sets the applied pose to the constrained pose, in anticipation of the applied
+  /// pose being modified by constraints.
   void spine_physics_constraint_base_constrained(
     spine_physics_constraint_base self,
   ) {
@@ -29257,6 +29940,11 @@ class SpineDartBindings {
       _spine_physics_constraint_base_is_pose_equal_to_appliedPtr
           .asFunction<bool Function(spine_physics_constraint_base)>();
 
+  /// Returns false when this won't be updated by
+  /// Skeleton::updateWorldTransform(Physics) because a skin is required and the
+  /// active skin does not contain this item. See Skin::getBones(),
+  /// Skin::getConstraints(), PosedData::getSkinRequired(), and
+  /// Skeleton::updateCache().
   bool spine_physics_constraint_base_is_active(
     spine_physics_constraint_base self,
   ) {
@@ -29413,8 +30101,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_physics_constraint_damping_timeline_apply(
@@ -29424,8 +30113,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -29439,13 +30129,14 @@ class SpineDartBindings {
               ffi.Float,
               spine_array_event,
               ffi.Float,
-              ffi.Int32,
-              ffi.Int32,
+              ffi.Bool,
+              ffi.Bool,
+              ffi.Bool,
               ffi.Bool)>>('spine_physics_constraint_damping_timeline_apply');
   late final _spine_physics_constraint_damping_timeline_apply =
       _spine_physics_constraint_damping_timeline_applyPtr.asFunction<
           void Function(spine_physics_constraint_damping_timeline, spine_skeleton, double, double, spine_array_event,
-              double, int, int, bool)>();
+              double, bool, bool, bool, bool)>();
 
   int spine_physics_constraint_damping_timeline_get_constraint_index(
     spine_physics_constraint_damping_timeline self,
@@ -29527,7 +30218,8 @@ class SpineDartBindings {
     spine_physics_constraint_damping_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -29535,7 +30227,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -29543,17 +30236,18 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_damping_timeline_get_relative_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_damping_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
-              ffi.Float)>>('spine_physics_constraint_damping_timeline_get_relative_value');
+          ffi.Float Function(spine_physics_constraint_damping_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float)>>('spine_physics_constraint_damping_timeline_get_relative_value');
   late final _spine_physics_constraint_damping_timeline_get_relative_value =
       _spine_physics_constraint_damping_timeline_get_relative_valuePtr.asFunction<
-          double Function(spine_physics_constraint_damping_timeline, double, double, int, double, double)>();
+          double Function(spine_physics_constraint_damping_timeline, double, double, bool, bool, double, double)>();
 
   double spine_physics_constraint_damping_timeline_get_absolute_value_1(
     spine_physics_constraint_damping_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -29561,7 +30255,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -29569,17 +30264,18 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_damping_timeline_get_absolute_value_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_damping_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
-              ffi.Float)>>('spine_physics_constraint_damping_timeline_get_absolute_value_1');
+          ffi.Float Function(spine_physics_constraint_damping_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float)>>('spine_physics_constraint_damping_timeline_get_absolute_value_1');
   late final _spine_physics_constraint_damping_timeline_get_absolute_value_1 =
       _spine_physics_constraint_damping_timeline_get_absolute_value_1Ptr.asFunction<
-          double Function(spine_physics_constraint_damping_timeline, double, double, int, double, double)>();
+          double Function(spine_physics_constraint_damping_timeline, double, double, bool, bool, double, double)>();
 
   double spine_physics_constraint_damping_timeline_get_absolute_value_2(
     spine_physics_constraint_damping_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
     double value,
@@ -29588,7 +30284,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
       value,
@@ -29597,18 +30294,20 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_damping_timeline_get_absolute_value_2Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_damping_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
-              ffi.Float, ffi.Float)>>('spine_physics_constraint_damping_timeline_get_absolute_value_2');
+          ffi.Float Function(spine_physics_constraint_damping_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float, ffi.Float)>>('spine_physics_constraint_damping_timeline_get_absolute_value_2');
   late final _spine_physics_constraint_damping_timeline_get_absolute_value_2 =
       _spine_physics_constraint_damping_timeline_get_absolute_value_2Ptr.asFunction<
-          double Function(spine_physics_constraint_damping_timeline, double, double, int, double, double, double)>();
+          double Function(
+              spine_physics_constraint_damping_timeline, double, double, bool, bool, double, double, double)>();
 
   double spine_physics_constraint_damping_timeline_get_scale_value(
     spine_physics_constraint_damping_timeline self,
     double time,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     double current,
     double setup,
   ) {
@@ -29616,8 +30315,9 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       current,
       setup,
     );
@@ -29625,11 +30325,12 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_damping_timeline_get_scale_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_damping_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Int32,
-              ffi.Float, ffi.Float)>>('spine_physics_constraint_damping_timeline_get_scale_value');
+          ffi.Float Function(spine_physics_constraint_damping_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Bool, ffi.Float, ffi.Float)>>('spine_physics_constraint_damping_timeline_get_scale_value');
   late final _spine_physics_constraint_damping_timeline_get_scale_value =
       _spine_physics_constraint_damping_timeline_get_scale_valuePtr.asFunction<
-          double Function(spine_physics_constraint_damping_timeline, double, double, int, int, double, double)>();
+          double Function(
+              spine_physics_constraint_damping_timeline, double, double, bool, bool, bool, double, double)>();
 
   void spine_physics_constraint_damping_timeline_set_linear(
     spine_physics_constraint_damping_timeline self,
@@ -29753,6 +30454,39 @@ class SpineDartBindings {
   late final _spine_physics_constraint_damping_timeline_get_curves =
       _spine_physics_constraint_damping_timeline_get_curvesPtr
           .asFunction<spine_array_float Function(spine_physics_constraint_damping_timeline)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_physics_constraint_damping_timeline_get_additive(
+    spine_physics_constraint_damping_timeline self,
+  ) {
+    return _spine_physics_constraint_damping_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_physics_constraint_damping_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_physics_constraint_damping_timeline)>>(
+          'spine_physics_constraint_damping_timeline_get_additive');
+  late final _spine_physics_constraint_damping_timeline_get_additive =
+      _spine_physics_constraint_damping_timeline_get_additivePtr
+          .asFunction<bool Function(spine_physics_constraint_damping_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_physics_constraint_damping_timeline_get_instant(
+    spine_physics_constraint_damping_timeline self,
+  ) {
+    return _spine_physics_constraint_damping_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_physics_constraint_damping_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_physics_constraint_damping_timeline)>>(
+          'spine_physics_constraint_damping_timeline_get_instant');
+  late final _spine_physics_constraint_damping_timeline_get_instant =
+      _spine_physics_constraint_damping_timeline_get_instantPtr
+          .asFunction<bool Function(spine_physics_constraint_damping_timeline)>();
 
   int spine_physics_constraint_damping_timeline_get_frame_entries(
     spine_physics_constraint_damping_timeline self,
@@ -29927,6 +30661,8 @@ class SpineDartBindings {
   late final _spine_physics_constraint_data_set_bone = _spine_physics_constraint_data_set_bonePtr
       .asFunction<void Function(spine_physics_constraint_data, spine_bone_data)>();
 
+  /// The time in milliseconds required to advanced the physics simulation one
+  /// step.
   double spine_physics_constraint_data_get_step(
     spine_physics_constraint_data self,
   ) {
@@ -29957,6 +30693,7 @@ class SpineDartBindings {
   late final _spine_physics_constraint_data_set_step =
       _spine_physics_constraint_data_set_stepPtr.asFunction<void Function(spine_physics_constraint_data, double)>();
 
+  /// Physics influence on x translation, 0-1.
   double spine_physics_constraint_data_get_x(
     spine_physics_constraint_data self,
   ) {
@@ -29987,6 +30724,7 @@ class SpineDartBindings {
   late final _spine_physics_constraint_data_set_x =
       _spine_physics_constraint_data_set_xPtr.asFunction<void Function(spine_physics_constraint_data, double)>();
 
+  /// Physics influence on y translation, 0-1.
   double spine_physics_constraint_data_get_y(
     spine_physics_constraint_data self,
   ) {
@@ -30017,6 +30755,7 @@ class SpineDartBindings {
   late final _spine_physics_constraint_data_set_y =
       _spine_physics_constraint_data_set_yPtr.asFunction<void Function(spine_physics_constraint_data, double)>();
 
+  /// Physics influence on rotation, 0-1.
   double spine_physics_constraint_data_get_rotate(
     spine_physics_constraint_data self,
   ) {
@@ -30047,6 +30786,7 @@ class SpineDartBindings {
   late final _spine_physics_constraint_data_set_rotate =
       _spine_physics_constraint_data_set_rotatePtr.asFunction<void Function(spine_physics_constraint_data, double)>();
 
+  /// Physics influence on scaleX, 0-1.
   double spine_physics_constraint_data_get_scale_x(
     spine_physics_constraint_data self,
   ) {
@@ -30077,6 +30817,7 @@ class SpineDartBindings {
   late final _spine_physics_constraint_data_set_scale_x =
       _spine_physics_constraint_data_set_scale_xPtr.asFunction<void Function(spine_physics_constraint_data, double)>();
 
+  /// Physics influence on shearX, 0-1.
   double spine_physics_constraint_data_get_shear_x(
     spine_physics_constraint_data self,
   ) {
@@ -30107,6 +30848,7 @@ class SpineDartBindings {
   late final _spine_physics_constraint_data_set_shear_x =
       _spine_physics_constraint_data_set_shear_xPtr.asFunction<void Function(spine_physics_constraint_data, double)>();
 
+  /// Movement greater than the limit will not have a greater affect on physics.
   double spine_physics_constraint_data_get_limit(
     spine_physics_constraint_data self,
   ) {
@@ -30137,6 +30879,7 @@ class SpineDartBindings {
   late final _spine_physics_constraint_data_set_limit =
       _spine_physics_constraint_data_set_limitPtr.asFunction<void Function(spine_physics_constraint_data, double)>();
 
+  /// True when this constraint's inertia is controlled by global slider timelines.
   bool spine_physics_constraint_data_get_inertia_global(
     spine_physics_constraint_data self,
   ) {
@@ -30167,6 +30910,8 @@ class SpineDartBindings {
   late final _spine_physics_constraint_data_set_inertia_global = _spine_physics_constraint_data_set_inertia_globalPtr
       .asFunction<void Function(spine_physics_constraint_data, bool)>();
 
+  /// True when this constraint's strength is controlled by global slider
+  /// timelines.
   bool spine_physics_constraint_data_get_strength_global(
     spine_physics_constraint_data self,
   ) {
@@ -30197,6 +30942,7 @@ class SpineDartBindings {
   late final _spine_physics_constraint_data_set_strength_global = _spine_physics_constraint_data_set_strength_globalPtr
       .asFunction<void Function(spine_physics_constraint_data, bool)>();
 
+  /// True when this constraint's damping is controlled by global slider timelines.
   bool spine_physics_constraint_data_get_damping_global(
     spine_physics_constraint_data self,
   ) {
@@ -30227,6 +30973,7 @@ class SpineDartBindings {
   late final _spine_physics_constraint_data_set_damping_global = _spine_physics_constraint_data_set_damping_globalPtr
       .asFunction<void Function(spine_physics_constraint_data, bool)>();
 
+  /// True when this constraint's mass is controlled by global slider timelines.
   bool spine_physics_constraint_data_get_mass_global(
     spine_physics_constraint_data self,
   ) {
@@ -30257,6 +31004,7 @@ class SpineDartBindings {
   late final _spine_physics_constraint_data_set_mass_global = _spine_physics_constraint_data_set_mass_globalPtr
       .asFunction<void Function(spine_physics_constraint_data, bool)>();
 
+  /// True when this constraint's wind is controlled by global slider timelines.
   bool spine_physics_constraint_data_get_wind_global(
     spine_physics_constraint_data self,
   ) {
@@ -30287,6 +31035,7 @@ class SpineDartBindings {
   late final _spine_physics_constraint_data_set_wind_global = _spine_physics_constraint_data_set_wind_globalPtr
       .asFunction<void Function(spine_physics_constraint_data, bool)>();
 
+  /// True when this constraint's gravity is controlled by global slider timelines.
   bool spine_physics_constraint_data_get_gravity_global(
     spine_physics_constraint_data self,
   ) {
@@ -30317,6 +31066,7 @@ class SpineDartBindings {
   late final _spine_physics_constraint_data_set_gravity_global = _spine_physics_constraint_data_set_gravity_globalPtr
       .asFunction<void Function(spine_physics_constraint_data, bool)>();
 
+  /// True when this constraint's mix is controlled by global slider timelines.
   bool spine_physics_constraint_data_get_mix_global(
     spine_physics_constraint_data self,
   ) {
@@ -30376,6 +31126,7 @@ class SpineDartBindings {
   late final _spine_physics_constraint_data_get_skin_required =
       _spine_physics_constraint_data_get_skin_requiredPtr.asFunction<bool Function(spine_physics_constraint_data)>();
 
+  /// The setup pose that most animations are relative to.
   spine_physics_constraint_pose spine_physics_constraint_data_get_setup_pose(
     spine_physics_constraint_data self,
   ) {
@@ -30469,8 +31220,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_physics_constraint_gravity_timeline_apply(
@@ -30480,8 +31232,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -30495,13 +31248,14 @@ class SpineDartBindings {
               ffi.Float,
               spine_array_event,
               ffi.Float,
-              ffi.Int32,
-              ffi.Int32,
+              ffi.Bool,
+              ffi.Bool,
+              ffi.Bool,
               ffi.Bool)>>('spine_physics_constraint_gravity_timeline_apply');
   late final _spine_physics_constraint_gravity_timeline_apply =
       _spine_physics_constraint_gravity_timeline_applyPtr.asFunction<
           void Function(spine_physics_constraint_gravity_timeline, spine_skeleton, double, double, spine_array_event,
-              double, int, int, bool)>();
+              double, bool, bool, bool, bool)>();
 
   int spine_physics_constraint_gravity_timeline_get_constraint_index(
     spine_physics_constraint_gravity_timeline self,
@@ -30583,7 +31337,8 @@ class SpineDartBindings {
     spine_physics_constraint_gravity_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -30591,7 +31346,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -30599,17 +31355,18 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_gravity_timeline_get_relative_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_gravity_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
-              ffi.Float)>>('spine_physics_constraint_gravity_timeline_get_relative_value');
+          ffi.Float Function(spine_physics_constraint_gravity_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float)>>('spine_physics_constraint_gravity_timeline_get_relative_value');
   late final _spine_physics_constraint_gravity_timeline_get_relative_value =
       _spine_physics_constraint_gravity_timeline_get_relative_valuePtr.asFunction<
-          double Function(spine_physics_constraint_gravity_timeline, double, double, int, double, double)>();
+          double Function(spine_physics_constraint_gravity_timeline, double, double, bool, bool, double, double)>();
 
   double spine_physics_constraint_gravity_timeline_get_absolute_value_1(
     spine_physics_constraint_gravity_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -30617,7 +31374,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -30625,17 +31383,18 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_gravity_timeline_get_absolute_value_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_gravity_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
-              ffi.Float)>>('spine_physics_constraint_gravity_timeline_get_absolute_value_1');
+          ffi.Float Function(spine_physics_constraint_gravity_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float)>>('spine_physics_constraint_gravity_timeline_get_absolute_value_1');
   late final _spine_physics_constraint_gravity_timeline_get_absolute_value_1 =
       _spine_physics_constraint_gravity_timeline_get_absolute_value_1Ptr.asFunction<
-          double Function(spine_physics_constraint_gravity_timeline, double, double, int, double, double)>();
+          double Function(spine_physics_constraint_gravity_timeline, double, double, bool, bool, double, double)>();
 
   double spine_physics_constraint_gravity_timeline_get_absolute_value_2(
     spine_physics_constraint_gravity_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
     double value,
@@ -30644,7 +31403,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
       value,
@@ -30653,18 +31413,20 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_gravity_timeline_get_absolute_value_2Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_gravity_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
-              ffi.Float, ffi.Float)>>('spine_physics_constraint_gravity_timeline_get_absolute_value_2');
+          ffi.Float Function(spine_physics_constraint_gravity_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float, ffi.Float)>>('spine_physics_constraint_gravity_timeline_get_absolute_value_2');
   late final _spine_physics_constraint_gravity_timeline_get_absolute_value_2 =
       _spine_physics_constraint_gravity_timeline_get_absolute_value_2Ptr.asFunction<
-          double Function(spine_physics_constraint_gravity_timeline, double, double, int, double, double, double)>();
+          double Function(
+              spine_physics_constraint_gravity_timeline, double, double, bool, bool, double, double, double)>();
 
   double spine_physics_constraint_gravity_timeline_get_scale_value(
     spine_physics_constraint_gravity_timeline self,
     double time,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     double current,
     double setup,
   ) {
@@ -30672,8 +31434,9 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       current,
       setup,
     );
@@ -30681,11 +31444,12 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_gravity_timeline_get_scale_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_gravity_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Int32,
-              ffi.Float, ffi.Float)>>('spine_physics_constraint_gravity_timeline_get_scale_value');
+          ffi.Float Function(spine_physics_constraint_gravity_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Bool, ffi.Float, ffi.Float)>>('spine_physics_constraint_gravity_timeline_get_scale_value');
   late final _spine_physics_constraint_gravity_timeline_get_scale_value =
       _spine_physics_constraint_gravity_timeline_get_scale_valuePtr.asFunction<
-          double Function(spine_physics_constraint_gravity_timeline, double, double, int, int, double, double)>();
+          double Function(
+              spine_physics_constraint_gravity_timeline, double, double, bool, bool, bool, double, double)>();
 
   void spine_physics_constraint_gravity_timeline_set_linear(
     spine_physics_constraint_gravity_timeline self,
@@ -30809,6 +31573,39 @@ class SpineDartBindings {
   late final _spine_physics_constraint_gravity_timeline_get_curves =
       _spine_physics_constraint_gravity_timeline_get_curvesPtr
           .asFunction<spine_array_float Function(spine_physics_constraint_gravity_timeline)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_physics_constraint_gravity_timeline_get_additive(
+    spine_physics_constraint_gravity_timeline self,
+  ) {
+    return _spine_physics_constraint_gravity_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_physics_constraint_gravity_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_physics_constraint_gravity_timeline)>>(
+          'spine_physics_constraint_gravity_timeline_get_additive');
+  late final _spine_physics_constraint_gravity_timeline_get_additive =
+      _spine_physics_constraint_gravity_timeline_get_additivePtr
+          .asFunction<bool Function(spine_physics_constraint_gravity_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_physics_constraint_gravity_timeline_get_instant(
+    spine_physics_constraint_gravity_timeline self,
+  ) {
+    return _spine_physics_constraint_gravity_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_physics_constraint_gravity_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_physics_constraint_gravity_timeline)>>(
+          'spine_physics_constraint_gravity_timeline_get_instant');
+  late final _spine_physics_constraint_gravity_timeline_get_instant =
+      _spine_physics_constraint_gravity_timeline_get_instantPtr
+          .asFunction<bool Function(spine_physics_constraint_gravity_timeline)>();
 
   int spine_physics_constraint_gravity_timeline_get_frame_entries(
     spine_physics_constraint_gravity_timeline self,
@@ -30948,8 +31745,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_physics_constraint_inertia_timeline_apply(
@@ -30959,8 +31757,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -30974,13 +31773,14 @@ class SpineDartBindings {
               ffi.Float,
               spine_array_event,
               ffi.Float,
-              ffi.Int32,
-              ffi.Int32,
+              ffi.Bool,
+              ffi.Bool,
+              ffi.Bool,
               ffi.Bool)>>('spine_physics_constraint_inertia_timeline_apply');
   late final _spine_physics_constraint_inertia_timeline_apply =
       _spine_physics_constraint_inertia_timeline_applyPtr.asFunction<
           void Function(spine_physics_constraint_inertia_timeline, spine_skeleton, double, double, spine_array_event,
-              double, int, int, bool)>();
+              double, bool, bool, bool, bool)>();
 
   int spine_physics_constraint_inertia_timeline_get_constraint_index(
     spine_physics_constraint_inertia_timeline self,
@@ -31062,7 +31862,8 @@ class SpineDartBindings {
     spine_physics_constraint_inertia_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -31070,7 +31871,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -31078,17 +31880,18 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_inertia_timeline_get_relative_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_inertia_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
-              ffi.Float)>>('spine_physics_constraint_inertia_timeline_get_relative_value');
+          ffi.Float Function(spine_physics_constraint_inertia_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float)>>('spine_physics_constraint_inertia_timeline_get_relative_value');
   late final _spine_physics_constraint_inertia_timeline_get_relative_value =
       _spine_physics_constraint_inertia_timeline_get_relative_valuePtr.asFunction<
-          double Function(spine_physics_constraint_inertia_timeline, double, double, int, double, double)>();
+          double Function(spine_physics_constraint_inertia_timeline, double, double, bool, bool, double, double)>();
 
   double spine_physics_constraint_inertia_timeline_get_absolute_value_1(
     spine_physics_constraint_inertia_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -31096,7 +31899,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -31104,17 +31908,18 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_inertia_timeline_get_absolute_value_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_inertia_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
-              ffi.Float)>>('spine_physics_constraint_inertia_timeline_get_absolute_value_1');
+          ffi.Float Function(spine_physics_constraint_inertia_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float)>>('spine_physics_constraint_inertia_timeline_get_absolute_value_1');
   late final _spine_physics_constraint_inertia_timeline_get_absolute_value_1 =
       _spine_physics_constraint_inertia_timeline_get_absolute_value_1Ptr.asFunction<
-          double Function(spine_physics_constraint_inertia_timeline, double, double, int, double, double)>();
+          double Function(spine_physics_constraint_inertia_timeline, double, double, bool, bool, double, double)>();
 
   double spine_physics_constraint_inertia_timeline_get_absolute_value_2(
     spine_physics_constraint_inertia_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
     double value,
@@ -31123,7 +31928,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
       value,
@@ -31132,18 +31938,20 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_inertia_timeline_get_absolute_value_2Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_inertia_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
-              ffi.Float, ffi.Float)>>('spine_physics_constraint_inertia_timeline_get_absolute_value_2');
+          ffi.Float Function(spine_physics_constraint_inertia_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float, ffi.Float)>>('spine_physics_constraint_inertia_timeline_get_absolute_value_2');
   late final _spine_physics_constraint_inertia_timeline_get_absolute_value_2 =
       _spine_physics_constraint_inertia_timeline_get_absolute_value_2Ptr.asFunction<
-          double Function(spine_physics_constraint_inertia_timeline, double, double, int, double, double, double)>();
+          double Function(
+              spine_physics_constraint_inertia_timeline, double, double, bool, bool, double, double, double)>();
 
   double spine_physics_constraint_inertia_timeline_get_scale_value(
     spine_physics_constraint_inertia_timeline self,
     double time,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     double current,
     double setup,
   ) {
@@ -31151,8 +31959,9 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       current,
       setup,
     );
@@ -31160,11 +31969,12 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_inertia_timeline_get_scale_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_inertia_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Int32,
-              ffi.Float, ffi.Float)>>('spine_physics_constraint_inertia_timeline_get_scale_value');
+          ffi.Float Function(spine_physics_constraint_inertia_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Bool, ffi.Float, ffi.Float)>>('spine_physics_constraint_inertia_timeline_get_scale_value');
   late final _spine_physics_constraint_inertia_timeline_get_scale_value =
       _spine_physics_constraint_inertia_timeline_get_scale_valuePtr.asFunction<
-          double Function(spine_physics_constraint_inertia_timeline, double, double, int, int, double, double)>();
+          double Function(
+              spine_physics_constraint_inertia_timeline, double, double, bool, bool, bool, double, double)>();
 
   void spine_physics_constraint_inertia_timeline_set_linear(
     spine_physics_constraint_inertia_timeline self,
@@ -31288,6 +32098,39 @@ class SpineDartBindings {
   late final _spine_physics_constraint_inertia_timeline_get_curves =
       _spine_physics_constraint_inertia_timeline_get_curvesPtr
           .asFunction<spine_array_float Function(spine_physics_constraint_inertia_timeline)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_physics_constraint_inertia_timeline_get_additive(
+    spine_physics_constraint_inertia_timeline self,
+  ) {
+    return _spine_physics_constraint_inertia_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_physics_constraint_inertia_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_physics_constraint_inertia_timeline)>>(
+          'spine_physics_constraint_inertia_timeline_get_additive');
+  late final _spine_physics_constraint_inertia_timeline_get_additive =
+      _spine_physics_constraint_inertia_timeline_get_additivePtr
+          .asFunction<bool Function(spine_physics_constraint_inertia_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_physics_constraint_inertia_timeline_get_instant(
+    spine_physics_constraint_inertia_timeline self,
+  ) {
+    return _spine_physics_constraint_inertia_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_physics_constraint_inertia_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_physics_constraint_inertia_timeline)>>(
+          'spine_physics_constraint_inertia_timeline_get_instant');
+  late final _spine_physics_constraint_inertia_timeline_get_instant =
+      _spine_physics_constraint_inertia_timeline_get_instantPtr
+          .asFunction<bool Function(spine_physics_constraint_inertia_timeline)>();
 
   int spine_physics_constraint_inertia_timeline_get_frame_entries(
     spine_physics_constraint_inertia_timeline self,
@@ -31426,8 +32269,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_physics_constraint_mass_timeline_apply(
@@ -31437,8 +32281,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -31452,13 +32297,14 @@ class SpineDartBindings {
               ffi.Float,
               spine_array_event,
               ffi.Float,
-              ffi.Int32,
-              ffi.Int32,
+              ffi.Bool,
+              ffi.Bool,
+              ffi.Bool,
               ffi.Bool)>>('spine_physics_constraint_mass_timeline_apply');
   late final _spine_physics_constraint_mass_timeline_apply =
       _spine_physics_constraint_mass_timeline_applyPtr.asFunction<
           void Function(spine_physics_constraint_mass_timeline, spine_skeleton, double, double, spine_array_event,
-              double, int, int, bool)>();
+              double, bool, bool, bool, bool)>();
 
   int spine_physics_constraint_mass_timeline_get_constraint_index(
     spine_physics_constraint_mass_timeline self,
@@ -31539,7 +32385,8 @@ class SpineDartBindings {
     spine_physics_constraint_mass_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -31547,7 +32394,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -31555,17 +32403,18 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_mass_timeline_get_relative_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_mass_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
-              ffi.Float)>>('spine_physics_constraint_mass_timeline_get_relative_value');
+          ffi.Float Function(spine_physics_constraint_mass_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float)>>('spine_physics_constraint_mass_timeline_get_relative_value');
   late final _spine_physics_constraint_mass_timeline_get_relative_value =
-      _spine_physics_constraint_mass_timeline_get_relative_valuePtr
-          .asFunction<double Function(spine_physics_constraint_mass_timeline, double, double, int, double, double)>();
+      _spine_physics_constraint_mass_timeline_get_relative_valuePtr.asFunction<
+          double Function(spine_physics_constraint_mass_timeline, double, double, bool, bool, double, double)>();
 
   double spine_physics_constraint_mass_timeline_get_absolute_value_1(
     spine_physics_constraint_mass_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -31573,7 +32422,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -31581,17 +32431,18 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_mass_timeline_get_absolute_value_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_mass_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
-              ffi.Float)>>('spine_physics_constraint_mass_timeline_get_absolute_value_1');
+          ffi.Float Function(spine_physics_constraint_mass_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float)>>('spine_physics_constraint_mass_timeline_get_absolute_value_1');
   late final _spine_physics_constraint_mass_timeline_get_absolute_value_1 =
-      _spine_physics_constraint_mass_timeline_get_absolute_value_1Ptr
-          .asFunction<double Function(spine_physics_constraint_mass_timeline, double, double, int, double, double)>();
+      _spine_physics_constraint_mass_timeline_get_absolute_value_1Ptr.asFunction<
+          double Function(spine_physics_constraint_mass_timeline, double, double, bool, bool, double, double)>();
 
   double spine_physics_constraint_mass_timeline_get_absolute_value_2(
     spine_physics_constraint_mass_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
     double value,
@@ -31600,7 +32451,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
       value,
@@ -31609,18 +32461,20 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_mass_timeline_get_absolute_value_2Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_mass_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
-              ffi.Float, ffi.Float)>>('spine_physics_constraint_mass_timeline_get_absolute_value_2');
+          ffi.Float Function(spine_physics_constraint_mass_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float, ffi.Float)>>('spine_physics_constraint_mass_timeline_get_absolute_value_2');
   late final _spine_physics_constraint_mass_timeline_get_absolute_value_2 =
       _spine_physics_constraint_mass_timeline_get_absolute_value_2Ptr.asFunction<
-          double Function(spine_physics_constraint_mass_timeline, double, double, int, double, double, double)>();
+          double Function(
+              spine_physics_constraint_mass_timeline, double, double, bool, bool, double, double, double)>();
 
   double spine_physics_constraint_mass_timeline_get_scale_value(
     spine_physics_constraint_mass_timeline self,
     double time,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     double current,
     double setup,
   ) {
@@ -31628,8 +32482,9 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       current,
       setup,
     );
@@ -31637,11 +32492,11 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_mass_timeline_get_scale_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_mass_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Int32,
+          ffi.Float Function(spine_physics_constraint_mass_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool,
               ffi.Float, ffi.Float)>>('spine_physics_constraint_mass_timeline_get_scale_value');
   late final _spine_physics_constraint_mass_timeline_get_scale_value =
       _spine_physics_constraint_mass_timeline_get_scale_valuePtr.asFunction<
-          double Function(spine_physics_constraint_mass_timeline, double, double, int, int, double, double)>();
+          double Function(spine_physics_constraint_mass_timeline, double, double, bool, bool, bool, double, double)>();
 
   void spine_physics_constraint_mass_timeline_set_linear(
     spine_physics_constraint_mass_timeline self,
@@ -31763,6 +32618,39 @@ class SpineDartBindings {
           'spine_physics_constraint_mass_timeline_get_curves');
   late final _spine_physics_constraint_mass_timeline_get_curves = _spine_physics_constraint_mass_timeline_get_curvesPtr
       .asFunction<spine_array_float Function(spine_physics_constraint_mass_timeline)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_physics_constraint_mass_timeline_get_additive(
+    spine_physics_constraint_mass_timeline self,
+  ) {
+    return _spine_physics_constraint_mass_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_physics_constraint_mass_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_physics_constraint_mass_timeline)>>(
+          'spine_physics_constraint_mass_timeline_get_additive');
+  late final _spine_physics_constraint_mass_timeline_get_additive =
+      _spine_physics_constraint_mass_timeline_get_additivePtr
+          .asFunction<bool Function(spine_physics_constraint_mass_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_physics_constraint_mass_timeline_get_instant(
+    spine_physics_constraint_mass_timeline self,
+  ) {
+    return _spine_physics_constraint_mass_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_physics_constraint_mass_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_physics_constraint_mass_timeline)>>(
+          'spine_physics_constraint_mass_timeline_get_instant');
+  late final _spine_physics_constraint_mass_timeline_get_instant =
+      _spine_physics_constraint_mass_timeline_get_instantPtr
+          .asFunction<bool Function(spine_physics_constraint_mass_timeline)>();
 
   int spine_physics_constraint_mass_timeline_get_frame_entries(
     spine_physics_constraint_mass_timeline self,
@@ -31900,8 +32788,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_physics_constraint_mix_timeline_apply(
@@ -31911,8 +32800,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -31926,12 +32816,13 @@ class SpineDartBindings {
               ffi.Float,
               spine_array_event,
               ffi.Float,
-              ffi.Int32,
-              ffi.Int32,
+              ffi.Bool,
+              ffi.Bool,
+              ffi.Bool,
               ffi.Bool)>>('spine_physics_constraint_mix_timeline_apply');
   late final _spine_physics_constraint_mix_timeline_apply = _spine_physics_constraint_mix_timeline_applyPtr.asFunction<
       void Function(spine_physics_constraint_mix_timeline, spine_skeleton, double, double, spine_array_event, double,
-          int, int, bool)>();
+          bool, bool, bool, bool)>();
 
   int spine_physics_constraint_mix_timeline_get_constraint_index(
     spine_physics_constraint_mix_timeline self,
@@ -32011,7 +32902,8 @@ class SpineDartBindings {
     spine_physics_constraint_mix_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -32019,7 +32911,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -32027,17 +32920,18 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_mix_timeline_get_relative_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_mix_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_physics_constraint_mix_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_physics_constraint_mix_timeline_get_relative_value');
   late final _spine_physics_constraint_mix_timeline_get_relative_value =
-      _spine_physics_constraint_mix_timeline_get_relative_valuePtr
-          .asFunction<double Function(spine_physics_constraint_mix_timeline, double, double, int, double, double)>();
+      _spine_physics_constraint_mix_timeline_get_relative_valuePtr.asFunction<
+          double Function(spine_physics_constraint_mix_timeline, double, double, bool, bool, double, double)>();
 
   double spine_physics_constraint_mix_timeline_get_absolute_value_1(
     spine_physics_constraint_mix_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -32045,7 +32939,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -32053,17 +32948,18 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_mix_timeline_get_absolute_value_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_mix_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_physics_constraint_mix_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_physics_constraint_mix_timeline_get_absolute_value_1');
   late final _spine_physics_constraint_mix_timeline_get_absolute_value_1 =
-      _spine_physics_constraint_mix_timeline_get_absolute_value_1Ptr
-          .asFunction<double Function(spine_physics_constraint_mix_timeline, double, double, int, double, double)>();
+      _spine_physics_constraint_mix_timeline_get_absolute_value_1Ptr.asFunction<
+          double Function(spine_physics_constraint_mix_timeline, double, double, bool, bool, double, double)>();
 
   double spine_physics_constraint_mix_timeline_get_absolute_value_2(
     spine_physics_constraint_mix_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
     double value,
@@ -32072,7 +32968,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
       value,
@@ -32081,18 +32978,19 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_mix_timeline_get_absolute_value_2Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_mix_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_physics_constraint_mix_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float, ffi.Float)>>('spine_physics_constraint_mix_timeline_get_absolute_value_2');
   late final _spine_physics_constraint_mix_timeline_get_absolute_value_2 =
       _spine_physics_constraint_mix_timeline_get_absolute_value_2Ptr.asFunction<
-          double Function(spine_physics_constraint_mix_timeline, double, double, int, double, double, double)>();
+          double Function(spine_physics_constraint_mix_timeline, double, double, bool, bool, double, double, double)>();
 
   double spine_physics_constraint_mix_timeline_get_scale_value(
     spine_physics_constraint_mix_timeline self,
     double time,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     double current,
     double setup,
   ) {
@@ -32100,8 +32998,9 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       current,
       setup,
     );
@@ -32109,11 +33008,11 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_mix_timeline_get_scale_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_mix_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Int32,
+          ffi.Float Function(spine_physics_constraint_mix_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool,
               ffi.Float, ffi.Float)>>('spine_physics_constraint_mix_timeline_get_scale_value');
   late final _spine_physics_constraint_mix_timeline_get_scale_value =
       _spine_physics_constraint_mix_timeline_get_scale_valuePtr.asFunction<
-          double Function(spine_physics_constraint_mix_timeline, double, double, int, int, double, double)>();
+          double Function(spine_physics_constraint_mix_timeline, double, double, bool, bool, bool, double, double)>();
 
   void spine_physics_constraint_mix_timeline_set_linear(
     spine_physics_constraint_mix_timeline self,
@@ -32234,6 +33133,38 @@ class SpineDartBindings {
           'spine_physics_constraint_mix_timeline_get_curves');
   late final _spine_physics_constraint_mix_timeline_get_curves = _spine_physics_constraint_mix_timeline_get_curvesPtr
       .asFunction<spine_array_float Function(spine_physics_constraint_mix_timeline)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_physics_constraint_mix_timeline_get_additive(
+    spine_physics_constraint_mix_timeline self,
+  ) {
+    return _spine_physics_constraint_mix_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_physics_constraint_mix_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_physics_constraint_mix_timeline)>>(
+          'spine_physics_constraint_mix_timeline_get_additive');
+  late final _spine_physics_constraint_mix_timeline_get_additive =
+      _spine_physics_constraint_mix_timeline_get_additivePtr
+          .asFunction<bool Function(spine_physics_constraint_mix_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_physics_constraint_mix_timeline_get_instant(
+    spine_physics_constraint_mix_timeline self,
+  ) {
+    return _spine_physics_constraint_mix_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_physics_constraint_mix_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_physics_constraint_mix_timeline)>>(
+          'spine_physics_constraint_mix_timeline_get_instant');
+  late final _spine_physics_constraint_mix_timeline_get_instant = _spine_physics_constraint_mix_timeline_get_instantPtr
+      .asFunction<bool Function(spine_physics_constraint_mix_timeline)>();
 
   int spine_physics_constraint_mix_timeline_get_frame_entries(
     spine_physics_constraint_mix_timeline self,
@@ -32357,6 +33288,7 @@ class SpineDartBindings {
   late final _spine_physics_constraint_pose_set = _spine_physics_constraint_pose_setPtr
       .asFunction<void Function(spine_physics_constraint_pose, spine_physics_constraint_pose)>();
 
+  /// Controls how much bone movement is converted into physics movement.
   double spine_physics_constraint_pose_get_inertia(
     spine_physics_constraint_pose self,
   ) {
@@ -32387,6 +33319,7 @@ class SpineDartBindings {
   late final _spine_physics_constraint_pose_set_inertia =
       _spine_physics_constraint_pose_set_inertiaPtr.asFunction<void Function(spine_physics_constraint_pose, double)>();
 
+  /// The amount of force used to return properties to the unconstrained value.
   double spine_physics_constraint_pose_get_strength(
     spine_physics_constraint_pose self,
   ) {
@@ -32417,6 +33350,8 @@ class SpineDartBindings {
   late final _spine_physics_constraint_pose_set_strength =
       _spine_physics_constraint_pose_set_strengthPtr.asFunction<void Function(spine_physics_constraint_pose, double)>();
 
+  /// Reduces the speed of physics movements, with more of a reduction at higher
+  /// speeds.
   double spine_physics_constraint_pose_get_damping(
     spine_physics_constraint_pose self,
   ) {
@@ -32447,6 +33382,7 @@ class SpineDartBindings {
   late final _spine_physics_constraint_pose_set_damping =
       _spine_physics_constraint_pose_set_dampingPtr.asFunction<void Function(spine_physics_constraint_pose, double)>();
 
+  /// Determines susceptibility to acceleration.
   double spine_physics_constraint_pose_get_mass_inverse(
     spine_physics_constraint_pose self,
   ) {
@@ -32477,6 +33413,8 @@ class SpineDartBindings {
   late final _spine_physics_constraint_pose_set_mass_inverse = _spine_physics_constraint_pose_set_mass_inversePtr
       .asFunction<void Function(spine_physics_constraint_pose, double)>();
 
+  /// Applies a constant force along the Skeleton::getWindX(), Skeleton::getWindY()
+  /// vector.
   double spine_physics_constraint_pose_get_wind(
     spine_physics_constraint_pose self,
   ) {
@@ -32507,6 +33445,8 @@ class SpineDartBindings {
   late final _spine_physics_constraint_pose_set_wind =
       _spine_physics_constraint_pose_set_windPtr.asFunction<void Function(spine_physics_constraint_pose, double)>();
 
+  /// Applies a constant force along the Skeleton::getGravityX(),
+  /// Skeleton::getGravityY() vector.
   double spine_physics_constraint_pose_get_gravity(
     spine_physics_constraint_pose self,
   ) {
@@ -32537,7 +33477,7 @@ class SpineDartBindings {
   late final _spine_physics_constraint_pose_set_gravity =
       _spine_physics_constraint_pose_set_gravityPtr.asFunction<void Function(spine_physics_constraint_pose, double)>();
 
-  /// A percentage (0-1) that controls the mix between the constrained and
+  /// A percentage (0+) that controls the mix between the constrained and
   /// unconstrained poses.
   double spine_physics_constraint_pose_get_mix(
     spine_physics_constraint_pose self,
@@ -32621,8 +33561,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_physics_constraint_reset_timeline_apply(
@@ -32632,8 +33573,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -32647,13 +33589,14 @@ class SpineDartBindings {
               ffi.Float,
               spine_array_event,
               ffi.Float,
-              ffi.Int32,
-              ffi.Int32,
+              ffi.Bool,
+              ffi.Bool,
+              ffi.Bool,
               ffi.Bool)>>('spine_physics_constraint_reset_timeline_apply');
   late final _spine_physics_constraint_reset_timeline_apply =
       _spine_physics_constraint_reset_timeline_applyPtr.asFunction<
           void Function(spine_physics_constraint_reset_timeline, spine_skeleton, double, double, spine_array_event,
-              double, int, int, bool)>();
+              double, bool, bool, bool, bool)>();
 
   int spine_physics_constraint_reset_timeline_get_frame_count(
     spine_physics_constraint_reset_timeline self,
@@ -32720,6 +33663,39 @@ class SpineDartBindings {
           'spine_physics_constraint_reset_timeline_set_frame');
   late final _spine_physics_constraint_reset_timeline_set_frame = _spine_physics_constraint_reset_timeline_set_framePtr
       .asFunction<void Function(spine_physics_constraint_reset_timeline, int, double)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_physics_constraint_reset_timeline_get_additive(
+    spine_physics_constraint_reset_timeline self,
+  ) {
+    return _spine_physics_constraint_reset_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_physics_constraint_reset_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_physics_constraint_reset_timeline)>>(
+          'spine_physics_constraint_reset_timeline_get_additive');
+  late final _spine_physics_constraint_reset_timeline_get_additive =
+      _spine_physics_constraint_reset_timeline_get_additivePtr
+          .asFunction<bool Function(spine_physics_constraint_reset_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_physics_constraint_reset_timeline_get_instant(
+    spine_physics_constraint_reset_timeline self,
+  ) {
+    return _spine_physics_constraint_reset_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_physics_constraint_reset_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_physics_constraint_reset_timeline)>>(
+          'spine_physics_constraint_reset_timeline_get_instant');
+  late final _spine_physics_constraint_reset_timeline_get_instant =
+      _spine_physics_constraint_reset_timeline_get_instantPtr
+          .asFunction<bool Function(spine_physics_constraint_reset_timeline)>();
 
   int spine_physics_constraint_reset_timeline_get_frame_entries(
     spine_physics_constraint_reset_timeline self,
@@ -32845,8 +33821,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_physics_constraint_strength_timeline_apply(
@@ -32856,8 +33833,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -32871,13 +33849,14 @@ class SpineDartBindings {
               ffi.Float,
               spine_array_event,
               ffi.Float,
-              ffi.Int32,
-              ffi.Int32,
+              ffi.Bool,
+              ffi.Bool,
+              ffi.Bool,
               ffi.Bool)>>('spine_physics_constraint_strength_timeline_apply');
   late final _spine_physics_constraint_strength_timeline_apply =
       _spine_physics_constraint_strength_timeline_applyPtr.asFunction<
           void Function(spine_physics_constraint_strength_timeline, spine_skeleton, double, double, spine_array_event,
-              double, int, int, bool)>();
+              double, bool, bool, bool, bool)>();
 
   int spine_physics_constraint_strength_timeline_get_constraint_index(
     spine_physics_constraint_strength_timeline self,
@@ -32959,7 +33938,8 @@ class SpineDartBindings {
     spine_physics_constraint_strength_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -32967,7 +33947,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -32975,17 +33956,18 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_strength_timeline_get_relative_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_strength_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
-              ffi.Float)>>('spine_physics_constraint_strength_timeline_get_relative_value');
+          ffi.Float Function(spine_physics_constraint_strength_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float)>>('spine_physics_constraint_strength_timeline_get_relative_value');
   late final _spine_physics_constraint_strength_timeline_get_relative_value =
       _spine_physics_constraint_strength_timeline_get_relative_valuePtr.asFunction<
-          double Function(spine_physics_constraint_strength_timeline, double, double, int, double, double)>();
+          double Function(spine_physics_constraint_strength_timeline, double, double, bool, bool, double, double)>();
 
   double spine_physics_constraint_strength_timeline_get_absolute_value_1(
     spine_physics_constraint_strength_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -32993,7 +33975,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -33001,17 +33984,18 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_strength_timeline_get_absolute_value_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_strength_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
-              ffi.Float)>>('spine_physics_constraint_strength_timeline_get_absolute_value_1');
+          ffi.Float Function(spine_physics_constraint_strength_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float)>>('spine_physics_constraint_strength_timeline_get_absolute_value_1');
   late final _spine_physics_constraint_strength_timeline_get_absolute_value_1 =
       _spine_physics_constraint_strength_timeline_get_absolute_value_1Ptr.asFunction<
-          double Function(spine_physics_constraint_strength_timeline, double, double, int, double, double)>();
+          double Function(spine_physics_constraint_strength_timeline, double, double, bool, bool, double, double)>();
 
   double spine_physics_constraint_strength_timeline_get_absolute_value_2(
     spine_physics_constraint_strength_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
     double value,
@@ -33020,7 +34004,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
       value,
@@ -33029,18 +34014,20 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_strength_timeline_get_absolute_value_2Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_strength_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
-              ffi.Float, ffi.Float)>>('spine_physics_constraint_strength_timeline_get_absolute_value_2');
+          ffi.Float Function(spine_physics_constraint_strength_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float, ffi.Float)>>('spine_physics_constraint_strength_timeline_get_absolute_value_2');
   late final _spine_physics_constraint_strength_timeline_get_absolute_value_2 =
       _spine_physics_constraint_strength_timeline_get_absolute_value_2Ptr.asFunction<
-          double Function(spine_physics_constraint_strength_timeline, double, double, int, double, double, double)>();
+          double Function(
+              spine_physics_constraint_strength_timeline, double, double, bool, bool, double, double, double)>();
 
   double spine_physics_constraint_strength_timeline_get_scale_value(
     spine_physics_constraint_strength_timeline self,
     double time,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     double current,
     double setup,
   ) {
@@ -33048,8 +34035,9 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       current,
       setup,
     );
@@ -33057,11 +34045,12 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_strength_timeline_get_scale_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_strength_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Int32,
-              ffi.Float, ffi.Float)>>('spine_physics_constraint_strength_timeline_get_scale_value');
+          ffi.Float Function(spine_physics_constraint_strength_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Bool, ffi.Float, ffi.Float)>>('spine_physics_constraint_strength_timeline_get_scale_value');
   late final _spine_physics_constraint_strength_timeline_get_scale_value =
       _spine_physics_constraint_strength_timeline_get_scale_valuePtr.asFunction<
-          double Function(spine_physics_constraint_strength_timeline, double, double, int, int, double, double)>();
+          double Function(
+              spine_physics_constraint_strength_timeline, double, double, bool, bool, bool, double, double)>();
 
   void spine_physics_constraint_strength_timeline_set_linear(
     spine_physics_constraint_strength_timeline self,
@@ -33186,6 +34175,39 @@ class SpineDartBindings {
       _spine_physics_constraint_strength_timeline_get_curvesPtr
           .asFunction<spine_array_float Function(spine_physics_constraint_strength_timeline)>();
 
+  /// True if this timeline supports additive blending.
+  bool spine_physics_constraint_strength_timeline_get_additive(
+    spine_physics_constraint_strength_timeline self,
+  ) {
+    return _spine_physics_constraint_strength_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_physics_constraint_strength_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_physics_constraint_strength_timeline)>>(
+          'spine_physics_constraint_strength_timeline_get_additive');
+  late final _spine_physics_constraint_strength_timeline_get_additive =
+      _spine_physics_constraint_strength_timeline_get_additivePtr
+          .asFunction<bool Function(spine_physics_constraint_strength_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_physics_constraint_strength_timeline_get_instant(
+    spine_physics_constraint_strength_timeline self,
+  ) {
+    return _spine_physics_constraint_strength_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_physics_constraint_strength_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_physics_constraint_strength_timeline)>>(
+          'spine_physics_constraint_strength_timeline_get_instant');
+  late final _spine_physics_constraint_strength_timeline_get_instant =
+      _spine_physics_constraint_strength_timeline_get_instantPtr
+          .asFunction<bool Function(spine_physics_constraint_strength_timeline)>();
+
   int spine_physics_constraint_strength_timeline_get_frame_entries(
     spine_physics_constraint_strength_timeline self,
   ) {
@@ -33305,8 +34327,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_physics_constraint_timeline_apply(
@@ -33316,8 +34339,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -33325,10 +34349,10 @@ class SpineDartBindings {
   late final _spine_physics_constraint_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_physics_constraint_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event,
-              ffi.Float, ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_physics_constraint_timeline_apply');
+              ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_physics_constraint_timeline_apply');
   late final _spine_physics_constraint_timeline_apply = _spine_physics_constraint_timeline_applyPtr.asFunction<
-      void Function(spine_physics_constraint_timeline, spine_skeleton, double, double, spine_array_event, double, int,
-          int, bool)>();
+      void Function(spine_physics_constraint_timeline, spine_skeleton, double, double, spine_array_event, double, bool,
+          bool, bool, bool)>();
 
   int spine_physics_constraint_timeline_get_constraint_index(
     spine_physics_constraint_timeline self,
@@ -33407,7 +34431,8 @@ class SpineDartBindings {
     spine_physics_constraint_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -33415,7 +34440,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -33423,17 +34449,18 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_timeline_get_relative_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_physics_constraint_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_physics_constraint_timeline_get_relative_value');
   late final _spine_physics_constraint_timeline_get_relative_value =
       _spine_physics_constraint_timeline_get_relative_valuePtr
-          .asFunction<double Function(spine_physics_constraint_timeline, double, double, int, double, double)>();
+          .asFunction<double Function(spine_physics_constraint_timeline, double, double, bool, bool, double, double)>();
 
   double spine_physics_constraint_timeline_get_absolute_value_1(
     spine_physics_constraint_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -33441,7 +34468,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -33449,17 +34477,18 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_timeline_get_absolute_value_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_physics_constraint_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_physics_constraint_timeline_get_absolute_value_1');
   late final _spine_physics_constraint_timeline_get_absolute_value_1 =
       _spine_physics_constraint_timeline_get_absolute_value_1Ptr
-          .asFunction<double Function(spine_physics_constraint_timeline, double, double, int, double, double)>();
+          .asFunction<double Function(spine_physics_constraint_timeline, double, double, bool, bool, double, double)>();
 
   double spine_physics_constraint_timeline_get_absolute_value_2(
     spine_physics_constraint_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
     double value,
@@ -33468,7 +34497,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
       value,
@@ -33477,18 +34507,19 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_timeline_get_absolute_value_2Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float, ffi.Float,
-              ffi.Float)>>('spine_physics_constraint_timeline_get_absolute_value_2');
+          ffi.Float Function(spine_physics_constraint_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
+              ffi.Float, ffi.Float)>>('spine_physics_constraint_timeline_get_absolute_value_2');
   late final _spine_physics_constraint_timeline_get_absolute_value_2 =
       _spine_physics_constraint_timeline_get_absolute_value_2Ptr.asFunction<
-          double Function(spine_physics_constraint_timeline, double, double, int, double, double, double)>();
+          double Function(spine_physics_constraint_timeline, double, double, bool, bool, double, double, double)>();
 
   double spine_physics_constraint_timeline_get_scale_value(
     spine_physics_constraint_timeline self,
     double time,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     double current,
     double setup,
   ) {
@@ -33496,8 +34527,9 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       current,
       setup,
     );
@@ -33505,10 +34537,11 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_timeline_get_scale_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Int32, ffi.Float,
-              ffi.Float)>>('spine_physics_constraint_timeline_get_scale_value');
-  late final _spine_physics_constraint_timeline_get_scale_value = _spine_physics_constraint_timeline_get_scale_valuePtr
-      .asFunction<double Function(spine_physics_constraint_timeline, double, double, int, int, double, double)>();
+          ffi.Float Function(spine_physics_constraint_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float)>>('spine_physics_constraint_timeline_get_scale_value');
+  late final _spine_physics_constraint_timeline_get_scale_value =
+      _spine_physics_constraint_timeline_get_scale_valuePtr.asFunction<
+          double Function(spine_physics_constraint_timeline, double, double, bool, bool, bool, double, double)>();
 
   void spine_physics_constraint_timeline_set_linear(
     spine_physics_constraint_timeline self,
@@ -33629,6 +34662,37 @@ class SpineDartBindings {
           'spine_physics_constraint_timeline_get_curves');
   late final _spine_physics_constraint_timeline_get_curves = _spine_physics_constraint_timeline_get_curvesPtr
       .asFunction<spine_array_float Function(spine_physics_constraint_timeline)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_physics_constraint_timeline_get_additive(
+    spine_physics_constraint_timeline self,
+  ) {
+    return _spine_physics_constraint_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_physics_constraint_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_physics_constraint_timeline)>>(
+          'spine_physics_constraint_timeline_get_additive');
+  late final _spine_physics_constraint_timeline_get_additive =
+      _spine_physics_constraint_timeline_get_additivePtr.asFunction<bool Function(spine_physics_constraint_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_physics_constraint_timeline_get_instant(
+    spine_physics_constraint_timeline self,
+  ) {
+    return _spine_physics_constraint_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_physics_constraint_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_physics_constraint_timeline)>>(
+          'spine_physics_constraint_timeline_get_instant');
+  late final _spine_physics_constraint_timeline_get_instant =
+      _spine_physics_constraint_timeline_get_instantPtr.asFunction<bool Function(spine_physics_constraint_timeline)>();
 
   int spine_physics_constraint_timeline_get_frame_entries(
     spine_physics_constraint_timeline self,
@@ -33764,8 +34828,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_physics_constraint_wind_timeline_apply(
@@ -33775,8 +34840,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -33790,13 +34856,14 @@ class SpineDartBindings {
               ffi.Float,
               spine_array_event,
               ffi.Float,
-              ffi.Int32,
-              ffi.Int32,
+              ffi.Bool,
+              ffi.Bool,
+              ffi.Bool,
               ffi.Bool)>>('spine_physics_constraint_wind_timeline_apply');
   late final _spine_physics_constraint_wind_timeline_apply =
       _spine_physics_constraint_wind_timeline_applyPtr.asFunction<
           void Function(spine_physics_constraint_wind_timeline, spine_skeleton, double, double, spine_array_event,
-              double, int, int, bool)>();
+              double, bool, bool, bool, bool)>();
 
   int spine_physics_constraint_wind_timeline_get_constraint_index(
     spine_physics_constraint_wind_timeline self,
@@ -33877,7 +34944,8 @@ class SpineDartBindings {
     spine_physics_constraint_wind_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -33885,7 +34953,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -33893,17 +34962,18 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_wind_timeline_get_relative_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_wind_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
-              ffi.Float)>>('spine_physics_constraint_wind_timeline_get_relative_value');
+          ffi.Float Function(spine_physics_constraint_wind_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float)>>('spine_physics_constraint_wind_timeline_get_relative_value');
   late final _spine_physics_constraint_wind_timeline_get_relative_value =
-      _spine_physics_constraint_wind_timeline_get_relative_valuePtr
-          .asFunction<double Function(spine_physics_constraint_wind_timeline, double, double, int, double, double)>();
+      _spine_physics_constraint_wind_timeline_get_relative_valuePtr.asFunction<
+          double Function(spine_physics_constraint_wind_timeline, double, double, bool, bool, double, double)>();
 
   double spine_physics_constraint_wind_timeline_get_absolute_value_1(
     spine_physics_constraint_wind_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -33911,7 +34981,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -33919,17 +34990,18 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_wind_timeline_get_absolute_value_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_wind_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
-              ffi.Float)>>('spine_physics_constraint_wind_timeline_get_absolute_value_1');
+          ffi.Float Function(spine_physics_constraint_wind_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float)>>('spine_physics_constraint_wind_timeline_get_absolute_value_1');
   late final _spine_physics_constraint_wind_timeline_get_absolute_value_1 =
-      _spine_physics_constraint_wind_timeline_get_absolute_value_1Ptr
-          .asFunction<double Function(spine_physics_constraint_wind_timeline, double, double, int, double, double)>();
+      _spine_physics_constraint_wind_timeline_get_absolute_value_1Ptr.asFunction<
+          double Function(spine_physics_constraint_wind_timeline, double, double, bool, bool, double, double)>();
 
   double spine_physics_constraint_wind_timeline_get_absolute_value_2(
     spine_physics_constraint_wind_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
     double value,
@@ -33938,7 +35010,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
       value,
@@ -33947,18 +35020,20 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_wind_timeline_get_absolute_value_2Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_wind_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
-              ffi.Float, ffi.Float)>>('spine_physics_constraint_wind_timeline_get_absolute_value_2');
+          ffi.Float Function(spine_physics_constraint_wind_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool,
+              ffi.Float, ffi.Float, ffi.Float)>>('spine_physics_constraint_wind_timeline_get_absolute_value_2');
   late final _spine_physics_constraint_wind_timeline_get_absolute_value_2 =
       _spine_physics_constraint_wind_timeline_get_absolute_value_2Ptr.asFunction<
-          double Function(spine_physics_constraint_wind_timeline, double, double, int, double, double, double)>();
+          double Function(
+              spine_physics_constraint_wind_timeline, double, double, bool, bool, double, double, double)>();
 
   double spine_physics_constraint_wind_timeline_get_scale_value(
     spine_physics_constraint_wind_timeline self,
     double time,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     double current,
     double setup,
   ) {
@@ -33966,8 +35041,9 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       current,
       setup,
     );
@@ -33975,11 +35051,11 @@ class SpineDartBindings {
 
   late final _spine_physics_constraint_wind_timeline_get_scale_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_physics_constraint_wind_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Int32,
+          ffi.Float Function(spine_physics_constraint_wind_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool,
               ffi.Float, ffi.Float)>>('spine_physics_constraint_wind_timeline_get_scale_value');
   late final _spine_physics_constraint_wind_timeline_get_scale_value =
       _spine_physics_constraint_wind_timeline_get_scale_valuePtr.asFunction<
-          double Function(spine_physics_constraint_wind_timeline, double, double, int, int, double, double)>();
+          double Function(spine_physics_constraint_wind_timeline, double, double, bool, bool, bool, double, double)>();
 
   void spine_physics_constraint_wind_timeline_set_linear(
     spine_physics_constraint_wind_timeline self,
@@ -34101,6 +35177,39 @@ class SpineDartBindings {
           'spine_physics_constraint_wind_timeline_get_curves');
   late final _spine_physics_constraint_wind_timeline_get_curves = _spine_physics_constraint_wind_timeline_get_curvesPtr
       .asFunction<spine_array_float Function(spine_physics_constraint_wind_timeline)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_physics_constraint_wind_timeline_get_additive(
+    spine_physics_constraint_wind_timeline self,
+  ) {
+    return _spine_physics_constraint_wind_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_physics_constraint_wind_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_physics_constraint_wind_timeline)>>(
+          'spine_physics_constraint_wind_timeline_get_additive');
+  late final _spine_physics_constraint_wind_timeline_get_additive =
+      _spine_physics_constraint_wind_timeline_get_additivePtr
+          .asFunction<bool Function(spine_physics_constraint_wind_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_physics_constraint_wind_timeline_get_instant(
+    spine_physics_constraint_wind_timeline self,
+  ) {
+    return _spine_physics_constraint_wind_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_physics_constraint_wind_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_physics_constraint_wind_timeline)>>(
+          'spine_physics_constraint_wind_timeline_get_instant');
+  late final _spine_physics_constraint_wind_timeline_get_instant =
+      _spine_physics_constraint_wind_timeline_get_instantPtr
+          .asFunction<bool Function(spine_physics_constraint_wind_timeline)>();
 
   int spine_physics_constraint_wind_timeline_get_frame_entries(
     spine_physics_constraint_wind_timeline self,
@@ -34225,6 +35334,7 @@ class SpineDartBindings {
   late final _spine_point_attachment_get_rtti =
       _spine_point_attachment_get_rttiPtr.asFunction<spine_rtti Function(spine_point_attachment)>();
 
+  /// The local x position.
   double spine_point_attachment_get_x(
     spine_point_attachment self,
   ) {
@@ -34253,6 +35363,7 @@ class SpineDartBindings {
   late final _spine_point_attachment_set_x =
       _spine_point_attachment_set_xPtr.asFunction<void Function(spine_point_attachment, double)>();
 
+  /// The local y position.
   double spine_point_attachment_get_y(
     spine_point_attachment self,
   ) {
@@ -34281,6 +35392,7 @@ class SpineDartBindings {
   late final _spine_point_attachment_set_y =
       _spine_point_attachment_set_yPtr.asFunction<void Function(spine_point_attachment, double)>();
 
+  /// The local rotation in degrees, counter clockwise.
   double spine_point_attachment_get_rotation(
     spine_point_attachment self,
   ) {
@@ -34323,6 +35435,7 @@ class SpineDartBindings {
   late final _spine_point_attachment_get_color =
       _spine_point_attachment_get_colorPtr.asFunction<spine_color Function(spine_point_attachment)>();
 
+  /// Computes the world position from the local position.
   void spine_point_attachment_compute_world_position(
     spine_point_attachment self,
     spine_bone_pose bone,
@@ -34345,6 +35458,7 @@ class SpineDartBindings {
       _spine_point_attachment_compute_world_positionPtr.asFunction<
           void Function(spine_point_attachment, spine_bone_pose, ffi.Pointer<ffi.Float>, ffi.Pointer<ffi.Float>)>();
 
+  /// Computes the world rotation from the local rotation.
   double spine_point_attachment_compute_world_rotation(
     spine_point_attachment self,
     spine_bone_pose bone,
@@ -34601,6 +35715,11 @@ class SpineDartBindings {
   late final _spine_posed_active_dispose =
       _spine_posed_active_disposePtr.asFunction<void Function(spine_posed_active)>();
 
+  /// Returns false when this won't be updated by
+  /// Skeleton::updateWorldTransform(Physics) because a skin is required and the
+  /// active skin does not contain this item. See Skin::getBones(),
+  /// Skin::getConstraints(), PosedData::getSkinRequired(), and
+  /// Skeleton::updateCache().
   bool spine_posed_active_is_active(
     spine_posed_active self,
   ) {
@@ -34654,8 +35773,6 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_posed_data)>>('spine_posed_data_dispose');
   late final _spine_posed_data_dispose = _spine_posed_data_disposePtr.asFunction<void Function(spine_posed_data)>();
 
-  /// The constraint's name, which is unique across all constraints in the skeleton
-  /// of the same type.
   ffi.Pointer<ffi.Char> spine_posed_data_get_name(
     spine_posed_data self,
   ) {
@@ -34935,6 +36052,7 @@ class SpineDartBindings {
   late final _spine_region_attachment_set_scale_y =
       _spine_region_attachment_set_scale_yPtr.asFunction<void Function(spine_region_attachment, double)>();
 
+  /// The local rotation in degrees, counter clockwise.
   double spine_region_attachment_get_rotation(
     spine_region_attachment self,
   ) {
@@ -35470,8 +36588,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_rgb2_timeline_apply(
@@ -35481,8 +36600,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -35490,9 +36610,10 @@ class SpineDartBindings {
   late final _spine_rgb2_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_rgb2_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event, ffi.Float,
-              ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_rgb2_timeline_apply');
+              ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_rgb2_timeline_apply');
   late final _spine_rgb2_timeline_apply = _spine_rgb2_timeline_applyPtr.asFunction<
-      void Function(spine_rgb2_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+      void Function(
+          spine_rgb2_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool, bool, bool)>();
 
   int spine_rgb2_timeline_get_slot_index(
     spine_rgb2_timeline self,
@@ -35625,6 +36746,35 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<spine_array_float Function(spine_rgb2_timeline)>>('spine_rgb2_timeline_get_curves');
   late final _spine_rgb2_timeline_get_curves =
       _spine_rgb2_timeline_get_curvesPtr.asFunction<spine_array_float Function(spine_rgb2_timeline)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_rgb2_timeline_get_additive(
+    spine_rgb2_timeline self,
+  ) {
+    return _spine_rgb2_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_rgb2_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_rgb2_timeline)>>('spine_rgb2_timeline_get_additive');
+  late final _spine_rgb2_timeline_get_additive =
+      _spine_rgb2_timeline_get_additivePtr.asFunction<bool Function(spine_rgb2_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_rgb2_timeline_get_instant(
+    spine_rgb2_timeline self,
+  ) {
+    return _spine_rgb2_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_rgb2_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_rgb2_timeline)>>('spine_rgb2_timeline_get_instant');
+  late final _spine_rgb2_timeline_get_instant =
+      _spine_rgb2_timeline_get_instantPtr.asFunction<bool Function(spine_rgb2_timeline)>();
 
   int spine_rgb2_timeline_get_frame_entries(
     spine_rgb2_timeline self,
@@ -35788,8 +36938,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_rgba2_timeline_apply(
@@ -35799,8 +36950,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -35808,9 +36960,10 @@ class SpineDartBindings {
   late final _spine_rgba2_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_rgba2_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event, ffi.Float,
-              ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_rgba2_timeline_apply');
+              ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_rgba2_timeline_apply');
   late final _spine_rgba2_timeline_apply = _spine_rgba2_timeline_applyPtr.asFunction<
-      void Function(spine_rgba2_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+      void Function(
+          spine_rgba2_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool, bool, bool)>();
 
   int spine_rgba2_timeline_get_slot_index(
     spine_rgba2_timeline self,
@@ -35944,6 +37097,35 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<spine_array_float Function(spine_rgba2_timeline)>>('spine_rgba2_timeline_get_curves');
   late final _spine_rgba2_timeline_get_curves =
       _spine_rgba2_timeline_get_curvesPtr.asFunction<spine_array_float Function(spine_rgba2_timeline)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_rgba2_timeline_get_additive(
+    spine_rgba2_timeline self,
+  ) {
+    return _spine_rgba2_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_rgba2_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_rgba2_timeline)>>('spine_rgba2_timeline_get_additive');
+  late final _spine_rgba2_timeline_get_additive =
+      _spine_rgba2_timeline_get_additivePtr.asFunction<bool Function(spine_rgba2_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_rgba2_timeline_get_instant(
+    spine_rgba2_timeline self,
+  ) {
+    return _spine_rgba2_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_rgba2_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_rgba2_timeline)>>('spine_rgba2_timeline_get_instant');
+  late final _spine_rgba2_timeline_get_instant =
+      _spine_rgba2_timeline_get_instantPtr.asFunction<bool Function(spine_rgba2_timeline)>();
 
   int spine_rgba2_timeline_get_frame_entries(
     spine_rgba2_timeline self,
@@ -36101,8 +37283,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_rgba_timeline_apply(
@@ -36112,8 +37295,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -36121,9 +37305,10 @@ class SpineDartBindings {
   late final _spine_rgba_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_rgba_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event, ffi.Float,
-              ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_rgba_timeline_apply');
+              ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_rgba_timeline_apply');
   late final _spine_rgba_timeline_apply = _spine_rgba_timeline_applyPtr.asFunction<
-      void Function(spine_rgba_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+      void Function(
+          spine_rgba_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool, bool, bool)>();
 
   int spine_rgba_timeline_get_slot_index(
     spine_rgba_timeline self,
@@ -36256,6 +37441,35 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<spine_array_float Function(spine_rgba_timeline)>>('spine_rgba_timeline_get_curves');
   late final _spine_rgba_timeline_get_curves =
       _spine_rgba_timeline_get_curvesPtr.asFunction<spine_array_float Function(spine_rgba_timeline)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_rgba_timeline_get_additive(
+    spine_rgba_timeline self,
+  ) {
+    return _spine_rgba_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_rgba_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_rgba_timeline)>>('spine_rgba_timeline_get_additive');
+  late final _spine_rgba_timeline_get_additive =
+      _spine_rgba_timeline_get_additivePtr.asFunction<bool Function(spine_rgba_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_rgba_timeline_get_instant(
+    spine_rgba_timeline self,
+  ) {
+    return _spine_rgba_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_rgba_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_rgba_timeline)>>('spine_rgba_timeline_get_instant');
+  late final _spine_rgba_timeline_get_instant =
+      _spine_rgba_timeline_get_instantPtr.asFunction<bool Function(spine_rgba_timeline)>();
 
   int spine_rgba_timeline_get_frame_entries(
     spine_rgba_timeline self,
@@ -36411,8 +37625,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_rgb_timeline_apply(
@@ -36422,8 +37637,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -36431,9 +37647,10 @@ class SpineDartBindings {
   late final _spine_rgb_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_rgb_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event, ffi.Float,
-              ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_rgb_timeline_apply');
+              ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_rgb_timeline_apply');
   late final _spine_rgb_timeline_apply = _spine_rgb_timeline_applyPtr.asFunction<
-      void Function(spine_rgb_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+      void Function(
+          spine_rgb_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool, bool, bool)>();
 
   int spine_rgb_timeline_get_slot_index(
     spine_rgb_timeline self,
@@ -36566,6 +37783,35 @@ class SpineDartBindings {
   late final _spine_rgb_timeline_get_curves =
       _spine_rgb_timeline_get_curvesPtr.asFunction<spine_array_float Function(spine_rgb_timeline)>();
 
+  /// True if this timeline supports additive blending.
+  bool spine_rgb_timeline_get_additive(
+    spine_rgb_timeline self,
+  ) {
+    return _spine_rgb_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_rgb_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_rgb_timeline)>>('spine_rgb_timeline_get_additive');
+  late final _spine_rgb_timeline_get_additive =
+      _spine_rgb_timeline_get_additivePtr.asFunction<bool Function(spine_rgb_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_rgb_timeline_get_instant(
+    spine_rgb_timeline self,
+  ) {
+    return _spine_rgb_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_rgb_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_rgb_timeline)>>('spine_rgb_timeline_get_instant');
+  late final _spine_rgb_timeline_get_instant =
+      _spine_rgb_timeline_get_instantPtr.asFunction<bool Function(spine_rgb_timeline)>();
+
   int spine_rgb_timeline_get_frame_entries(
     spine_rgb_timeline self,
   ) {
@@ -36691,8 +37937,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_rotate_timeline_apply(
@@ -36702,8 +37949,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -36711,10 +37959,10 @@ class SpineDartBindings {
   late final _spine_rotate_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_rotate_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event, ffi.Float,
-              ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_rotate_timeline_apply');
+              ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_rotate_timeline_apply');
   late final _spine_rotate_timeline_apply = _spine_rotate_timeline_applyPtr.asFunction<
       void Function(
-          spine_rotate_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+          spine_rotate_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool, bool, bool)>();
 
   int spine_rotate_timeline_get_bone_index(
     spine_rotate_timeline self,
@@ -36790,7 +38038,8 @@ class SpineDartBindings {
     spine_rotate_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -36798,7 +38047,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -36806,16 +38056,17 @@ class SpineDartBindings {
 
   late final _spine_rotate_timeline_get_relative_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_rotate_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_rotate_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_rotate_timeline_get_relative_value');
   late final _spine_rotate_timeline_get_relative_value = _spine_rotate_timeline_get_relative_valuePtr
-      .asFunction<double Function(spine_rotate_timeline, double, double, int, double, double)>();
+      .asFunction<double Function(spine_rotate_timeline, double, double, bool, bool, double, double)>();
 
   double spine_rotate_timeline_get_absolute_value_1(
     spine_rotate_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -36823,7 +38074,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -36831,16 +38083,17 @@ class SpineDartBindings {
 
   late final _spine_rotate_timeline_get_absolute_value_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_rotate_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_rotate_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_rotate_timeline_get_absolute_value_1');
   late final _spine_rotate_timeline_get_absolute_value_1 = _spine_rotate_timeline_get_absolute_value_1Ptr
-      .asFunction<double Function(spine_rotate_timeline, double, double, int, double, double)>();
+      .asFunction<double Function(spine_rotate_timeline, double, double, bool, bool, double, double)>();
 
   double spine_rotate_timeline_get_absolute_value_2(
     spine_rotate_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
     double value,
@@ -36849,7 +38102,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
       value,
@@ -36858,17 +38112,18 @@ class SpineDartBindings {
 
   late final _spine_rotate_timeline_get_absolute_value_2Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_rotate_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float, ffi.Float,
+          ffi.Float Function(spine_rotate_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float, ffi.Float,
               ffi.Float)>>('spine_rotate_timeline_get_absolute_value_2');
   late final _spine_rotate_timeline_get_absolute_value_2 = _spine_rotate_timeline_get_absolute_value_2Ptr
-      .asFunction<double Function(spine_rotate_timeline, double, double, int, double, double, double)>();
+      .asFunction<double Function(spine_rotate_timeline, double, double, bool, bool, double, double, double)>();
 
   double spine_rotate_timeline_get_scale_value(
     spine_rotate_timeline self,
     double time,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     double current,
     double setup,
   ) {
@@ -36876,8 +38131,9 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       current,
       setup,
     );
@@ -36885,10 +38141,10 @@ class SpineDartBindings {
 
   late final _spine_rotate_timeline_get_scale_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_rotate_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_rotate_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_rotate_timeline_get_scale_value');
   late final _spine_rotate_timeline_get_scale_value = _spine_rotate_timeline_get_scale_valuePtr
-      .asFunction<double Function(spine_rotate_timeline, double, double, int, int, double, double)>();
+      .asFunction<double Function(spine_rotate_timeline, double, double, bool, bool, bool, double, double)>();
 
   void spine_rotate_timeline_set_linear(
     spine_rotate_timeline self,
@@ -36995,6 +38251,35 @@ class SpineDartBindings {
           'spine_rotate_timeline_get_curves');
   late final _spine_rotate_timeline_get_curves =
       _spine_rotate_timeline_get_curvesPtr.asFunction<spine_array_float Function(spine_rotate_timeline)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_rotate_timeline_get_additive(
+    spine_rotate_timeline self,
+  ) {
+    return _spine_rotate_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_rotate_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_rotate_timeline)>>('spine_rotate_timeline_get_additive');
+  late final _spine_rotate_timeline_get_additive =
+      _spine_rotate_timeline_get_additivePtr.asFunction<bool Function(spine_rotate_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_rotate_timeline_get_instant(
+    spine_rotate_timeline self,
+  ) {
+    return _spine_rotate_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_rotate_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_rotate_timeline)>>('spine_rotate_timeline_get_instant');
+  late final _spine_rotate_timeline_get_instant =
+      _spine_rotate_timeline_get_instantPtr.asFunction<bool Function(spine_rotate_timeline)>();
 
   int spine_rotate_timeline_get_frame_entries(
     spine_rotate_timeline self,
@@ -37174,8 +38459,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_scale_timeline_apply(
@@ -37185,8 +38471,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -37194,9 +38481,10 @@ class SpineDartBindings {
   late final _spine_scale_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_scale_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event, ffi.Float,
-              ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_scale_timeline_apply');
+              ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_scale_timeline_apply');
   late final _spine_scale_timeline_apply = _spine_scale_timeline_applyPtr.asFunction<
-      void Function(spine_scale_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+      void Function(
+          spine_scale_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool, bool, bool)>();
 
   int spine_scale_timeline_get_bone_index(
     spine_scale_timeline self,
@@ -37353,6 +38641,35 @@ class SpineDartBindings {
   late final _spine_scale_timeline_get_curves =
       _spine_scale_timeline_get_curvesPtr.asFunction<spine_array_float Function(spine_scale_timeline)>();
 
+  /// True if this timeline supports additive blending.
+  bool spine_scale_timeline_get_additive(
+    spine_scale_timeline self,
+  ) {
+    return _spine_scale_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_scale_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_scale_timeline)>>('spine_scale_timeline_get_additive');
+  late final _spine_scale_timeline_get_additive =
+      _spine_scale_timeline_get_additivePtr.asFunction<bool Function(spine_scale_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_scale_timeline_get_instant(
+    spine_scale_timeline self,
+  ) {
+    return _spine_scale_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_scale_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_scale_timeline)>>('spine_scale_timeline_get_instant');
+  late final _spine_scale_timeline_get_instant =
+      _spine_scale_timeline_get_instantPtr.asFunction<bool Function(spine_scale_timeline)>();
+
   int spine_scale_timeline_get_frame_entries(
     spine_scale_timeline self,
   ) {
@@ -37478,8 +38795,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_scale_x_timeline_apply(
@@ -37489,8 +38807,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -37498,10 +38817,10 @@ class SpineDartBindings {
   late final _spine_scale_x_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_scale_x_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event, ffi.Float,
-              ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_scale_x_timeline_apply');
+              ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_scale_x_timeline_apply');
   late final _spine_scale_x_timeline_apply = _spine_scale_x_timeline_applyPtr.asFunction<
       void Function(
-          spine_scale_x_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+          spine_scale_x_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool, bool, bool)>();
 
   int spine_scale_x_timeline_get_bone_index(
     spine_scale_x_timeline self,
@@ -37577,7 +38896,8 @@ class SpineDartBindings {
     spine_scale_x_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -37585,7 +38905,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -37593,16 +38914,17 @@ class SpineDartBindings {
 
   late final _spine_scale_x_timeline_get_relative_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_scale_x_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_scale_x_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_scale_x_timeline_get_relative_value');
   late final _spine_scale_x_timeline_get_relative_value = _spine_scale_x_timeline_get_relative_valuePtr
-      .asFunction<double Function(spine_scale_x_timeline, double, double, int, double, double)>();
+      .asFunction<double Function(spine_scale_x_timeline, double, double, bool, bool, double, double)>();
 
   double spine_scale_x_timeline_get_absolute_value_1(
     spine_scale_x_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -37610,7 +38932,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -37618,16 +38941,17 @@ class SpineDartBindings {
 
   late final _spine_scale_x_timeline_get_absolute_value_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_scale_x_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_scale_x_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_scale_x_timeline_get_absolute_value_1');
   late final _spine_scale_x_timeline_get_absolute_value_1 = _spine_scale_x_timeline_get_absolute_value_1Ptr
-      .asFunction<double Function(spine_scale_x_timeline, double, double, int, double, double)>();
+      .asFunction<double Function(spine_scale_x_timeline, double, double, bool, bool, double, double)>();
 
   double spine_scale_x_timeline_get_absolute_value_2(
     spine_scale_x_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
     double value,
@@ -37636,7 +38960,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
       value,
@@ -37645,17 +38970,18 @@ class SpineDartBindings {
 
   late final _spine_scale_x_timeline_get_absolute_value_2Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_scale_x_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float, ffi.Float,
+          ffi.Float Function(spine_scale_x_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float, ffi.Float,
               ffi.Float)>>('spine_scale_x_timeline_get_absolute_value_2');
   late final _spine_scale_x_timeline_get_absolute_value_2 = _spine_scale_x_timeline_get_absolute_value_2Ptr
-      .asFunction<double Function(spine_scale_x_timeline, double, double, int, double, double, double)>();
+      .asFunction<double Function(spine_scale_x_timeline, double, double, bool, bool, double, double, double)>();
 
   double spine_scale_x_timeline_get_scale_value(
     spine_scale_x_timeline self,
     double time,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     double current,
     double setup,
   ) {
@@ -37663,8 +38989,9 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       current,
       setup,
     );
@@ -37672,10 +38999,10 @@ class SpineDartBindings {
 
   late final _spine_scale_x_timeline_get_scale_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_scale_x_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_scale_x_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_scale_x_timeline_get_scale_value');
   late final _spine_scale_x_timeline_get_scale_value = _spine_scale_x_timeline_get_scale_valuePtr
-      .asFunction<double Function(spine_scale_x_timeline, double, double, int, int, double, double)>();
+      .asFunction<double Function(spine_scale_x_timeline, double, double, bool, bool, bool, double, double)>();
 
   void spine_scale_x_timeline_set_linear(
     spine_scale_x_timeline self,
@@ -37782,6 +39109,35 @@ class SpineDartBindings {
           'spine_scale_x_timeline_get_curves');
   late final _spine_scale_x_timeline_get_curves =
       _spine_scale_x_timeline_get_curvesPtr.asFunction<spine_array_float Function(spine_scale_x_timeline)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_scale_x_timeline_get_additive(
+    spine_scale_x_timeline self,
+  ) {
+    return _spine_scale_x_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_scale_x_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_scale_x_timeline)>>('spine_scale_x_timeline_get_additive');
+  late final _spine_scale_x_timeline_get_additive =
+      _spine_scale_x_timeline_get_additivePtr.asFunction<bool Function(spine_scale_x_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_scale_x_timeline_get_instant(
+    spine_scale_x_timeline self,
+  ) {
+    return _spine_scale_x_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_scale_x_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_scale_x_timeline)>>('spine_scale_x_timeline_get_instant');
+  late final _spine_scale_x_timeline_get_instant =
+      _spine_scale_x_timeline_get_instantPtr.asFunction<bool Function(spine_scale_x_timeline)>();
 
   int spine_scale_x_timeline_get_frame_entries(
     spine_scale_x_timeline self,
@@ -37910,8 +39266,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_scale_y_timeline_apply(
@@ -37921,8 +39278,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -37930,10 +39288,10 @@ class SpineDartBindings {
   late final _spine_scale_y_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_scale_y_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event, ffi.Float,
-              ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_scale_y_timeline_apply');
+              ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_scale_y_timeline_apply');
   late final _spine_scale_y_timeline_apply = _spine_scale_y_timeline_applyPtr.asFunction<
       void Function(
-          spine_scale_y_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+          spine_scale_y_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool, bool, bool)>();
 
   int spine_scale_y_timeline_get_bone_index(
     spine_scale_y_timeline self,
@@ -38009,7 +39367,8 @@ class SpineDartBindings {
     spine_scale_y_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -38017,7 +39376,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -38025,16 +39385,17 @@ class SpineDartBindings {
 
   late final _spine_scale_y_timeline_get_relative_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_scale_y_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_scale_y_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_scale_y_timeline_get_relative_value');
   late final _spine_scale_y_timeline_get_relative_value = _spine_scale_y_timeline_get_relative_valuePtr
-      .asFunction<double Function(spine_scale_y_timeline, double, double, int, double, double)>();
+      .asFunction<double Function(spine_scale_y_timeline, double, double, bool, bool, double, double)>();
 
   double spine_scale_y_timeline_get_absolute_value_1(
     spine_scale_y_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -38042,7 +39403,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -38050,16 +39412,17 @@ class SpineDartBindings {
 
   late final _spine_scale_y_timeline_get_absolute_value_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_scale_y_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_scale_y_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_scale_y_timeline_get_absolute_value_1');
   late final _spine_scale_y_timeline_get_absolute_value_1 = _spine_scale_y_timeline_get_absolute_value_1Ptr
-      .asFunction<double Function(spine_scale_y_timeline, double, double, int, double, double)>();
+      .asFunction<double Function(spine_scale_y_timeline, double, double, bool, bool, double, double)>();
 
   double spine_scale_y_timeline_get_absolute_value_2(
     spine_scale_y_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
     double value,
@@ -38068,7 +39431,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
       value,
@@ -38077,17 +39441,18 @@ class SpineDartBindings {
 
   late final _spine_scale_y_timeline_get_absolute_value_2Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_scale_y_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float, ffi.Float,
+          ffi.Float Function(spine_scale_y_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float, ffi.Float,
               ffi.Float)>>('spine_scale_y_timeline_get_absolute_value_2');
   late final _spine_scale_y_timeline_get_absolute_value_2 = _spine_scale_y_timeline_get_absolute_value_2Ptr
-      .asFunction<double Function(spine_scale_y_timeline, double, double, int, double, double, double)>();
+      .asFunction<double Function(spine_scale_y_timeline, double, double, bool, bool, double, double, double)>();
 
   double spine_scale_y_timeline_get_scale_value(
     spine_scale_y_timeline self,
     double time,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     double current,
     double setup,
   ) {
@@ -38095,8 +39460,9 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       current,
       setup,
     );
@@ -38104,10 +39470,10 @@ class SpineDartBindings {
 
   late final _spine_scale_y_timeline_get_scale_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_scale_y_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_scale_y_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_scale_y_timeline_get_scale_value');
   late final _spine_scale_y_timeline_get_scale_value = _spine_scale_y_timeline_get_scale_valuePtr
-      .asFunction<double Function(spine_scale_y_timeline, double, double, int, int, double, double)>();
+      .asFunction<double Function(spine_scale_y_timeline, double, double, bool, bool, bool, double, double)>();
 
   void spine_scale_y_timeline_set_linear(
     spine_scale_y_timeline self,
@@ -38215,6 +39581,35 @@ class SpineDartBindings {
   late final _spine_scale_y_timeline_get_curves =
       _spine_scale_y_timeline_get_curvesPtr.asFunction<spine_array_float Function(spine_scale_y_timeline)>();
 
+  /// True if this timeline supports additive blending.
+  bool spine_scale_y_timeline_get_additive(
+    spine_scale_y_timeline self,
+  ) {
+    return _spine_scale_y_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_scale_y_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_scale_y_timeline)>>('spine_scale_y_timeline_get_additive');
+  late final _spine_scale_y_timeline_get_additive =
+      _spine_scale_y_timeline_get_additivePtr.asFunction<bool Function(spine_scale_y_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_scale_y_timeline_get_instant(
+    spine_scale_y_timeline self,
+  ) {
+    return _spine_scale_y_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_scale_y_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_scale_y_timeline)>>('spine_scale_y_timeline_get_instant');
+  late final _spine_scale_y_timeline_get_instant =
+      _spine_scale_y_timeline_get_instantPtr.asFunction<bool Function(spine_scale_y_timeline)>();
+
   int spine_scale_y_timeline_get_frame_entries(
     spine_scale_y_timeline self,
   ) {
@@ -38291,6 +39686,8 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<spine_rtti Function()>>('spine_scale_y_timeline_rtti');
   late final _spine_scale_y_timeline_rtti = _spine_scale_y_timeline_rttiPtr.asFunction<spine_rtti Function()>();
 
+  /// @param count The number of texture regions this sequence will display.
+  /// @param pathSuffix If true, getPath(String, int) has a numeric suffix. If false, all regions will use the same path, so count should be 1.
   spine_sequence spine_sequence_create(
     int count,
     bool pathSuffix,
@@ -38363,6 +39760,7 @@ class SpineDartBindings {
   late final _spine_sequence_update_2 =
       _spine_sequence_update_2Ptr.asFunction<void Function(spine_sequence, spine_mesh_attachment)>();
 
+  /// The list of texture regions this sequence will display.
   spine_array_texture_region spine_sequence_get_regions(
     spine_sequence self,
   ) {
@@ -38376,6 +39774,7 @@ class SpineDartBindings {
   late final _spine_sequence_get_regions =
       _spine_sequence_get_regionsPtr.asFunction<spine_array_texture_region Function(spine_sequence)>();
 
+  /// Returns the getRegions() index for SlotPose::getSequenceIndex().
   int spine_sequence_resolve_index(
     spine_sequence self,
     spine_slot_pose pose,
@@ -38406,6 +39805,8 @@ class SpineDartBindings {
   late final _spine_sequence_get_region =
       _spine_sequence_get_regionPtr.asFunction<spine_texture_region Function(spine_sequence, int)>();
 
+  /// Returns the UVs for the specified index. getRegions() must be populated and
+  /// update() called before calling this method.
   spine_array_float spine_sequence_get_u_vs(
     spine_sequence self,
     int index,
@@ -38438,6 +39839,7 @@ class SpineDartBindings {
   late final _spine_sequence_get_offsets =
       _spine_sequence_get_offsetsPtr.asFunction<spine_array_float Function(spine_sequence, int)>();
 
+  /// The starting number for the numeric getPath(String, int) suffix.
   int spine_sequence_get_start(
     spine_sequence self,
   ) {
@@ -38464,6 +39866,8 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_sequence, ffi.Int)>>('spine_sequence_set_start');
   late final _spine_sequence_set_start = _spine_sequence_set_startPtr.asFunction<void Function(spine_sequence, int)>();
 
+  /// The minimum number of digits in the numeric getPath(String, int) suffix, for
+  /// zero padding. 0 for no zero padding.
   int spine_sequence_get_digits(
     spine_sequence self,
   ) {
@@ -38520,6 +39924,7 @@ class SpineDartBindings {
   late final _spine_sequence_set_setup_index =
       _spine_sequence_set_setup_indexPtr.asFunction<void Function(spine_sequence, int)>();
 
+  /// Returns true if getPath(String, int) has a numeric suffix.
   bool spine_sequence_has_path_suffix(
     spine_sequence self,
   ) {
@@ -38533,6 +39938,8 @@ class SpineDartBindings {
   late final _spine_sequence_has_path_suffix =
       _spine_sequence_has_path_suffixPtr.asFunction<bool Function(spine_sequence)>();
 
+  /// Returns the specified base path with an optional numeric suffix for the
+  /// specified index.
   ffi.Pointer<ffi.Char> spine_sequence_get_path(
     spine_sequence self,
     ffi.Pointer<ffi.Char> basePath,
@@ -38551,7 +39958,7 @@ class SpineDartBindings {
   late final _spine_sequence_get_path = _spine_sequence_get_pathPtr
       .asFunction<ffi.Pointer<ffi.Char> Function(spine_sequence, ffi.Pointer<ffi.Char>, int)>();
 
-  /// Returns a unique ID for this attachment.
+  /// Returns a unique ID for this sequence.
   int spine_sequence_get_id(
     spine_sequence self,
   ) {
@@ -38615,8 +40022,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_sequence_timeline_apply(
@@ -38626,8 +40034,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -38635,10 +40044,10 @@ class SpineDartBindings {
   late final _spine_sequence_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_sequence_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event, ffi.Float,
-              ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_sequence_timeline_apply');
+              ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_sequence_timeline_apply');
   late final _spine_sequence_timeline_apply = _spine_sequence_timeline_applyPtr.asFunction<
-      void Function(
-          spine_sequence_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+      void Function(spine_sequence_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool,
+          bool, bool)>();
 
   /// Sets the time, mode, index, and frame time for the specified frame.
   ///
@@ -38669,6 +40078,9 @@ class SpineDartBindings {
   late final _spine_sequence_timeline_set_frame = _spine_sequence_timeline_set_framePtr
       .asFunction<void Function(spine_sequence_timeline, int, double, int, int, double)>();
 
+  /// The attachment for which the sequence index will be set.
+  ///
+  /// See Attachment::getTimelineAttachment().
   spine_attachment spine_sequence_timeline_get_attachment(
     spine_sequence_timeline self,
   ) {
@@ -38711,6 +40123,35 @@ class SpineDartBindings {
           'spine_sequence_timeline_set_slot_index');
   late final _spine_sequence_timeline_set_slot_index =
       _spine_sequence_timeline_set_slot_indexPtr.asFunction<void Function(spine_sequence_timeline, int)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_sequence_timeline_get_additive(
+    spine_sequence_timeline self,
+  ) {
+    return _spine_sequence_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_sequence_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_sequence_timeline)>>('spine_sequence_timeline_get_additive');
+  late final _spine_sequence_timeline_get_additive =
+      _spine_sequence_timeline_get_additivePtr.asFunction<bool Function(spine_sequence_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_sequence_timeline_get_instant(
+    spine_sequence_timeline self,
+  ) {
+    return _spine_sequence_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_sequence_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_sequence_timeline)>>('spine_sequence_timeline_get_instant');
+  late final _spine_sequence_timeline_get_instant =
+      _spine_sequence_timeline_get_instantPtr.asFunction<bool Function(spine_sequence_timeline)>();
 
   int spine_sequence_timeline_get_frame_entries(
     spine_sequence_timeline self,
@@ -38840,8 +40281,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_shear_timeline_apply(
@@ -38851,8 +40293,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -38860,9 +40303,10 @@ class SpineDartBindings {
   late final _spine_shear_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_shear_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event, ffi.Float,
-              ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_shear_timeline_apply');
+              ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_shear_timeline_apply');
   late final _spine_shear_timeline_apply = _spine_shear_timeline_applyPtr.asFunction<
-      void Function(spine_shear_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+      void Function(
+          spine_shear_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool, bool, bool)>();
 
   int spine_shear_timeline_get_bone_index(
     spine_shear_timeline self,
@@ -39019,6 +40463,35 @@ class SpineDartBindings {
   late final _spine_shear_timeline_get_curves =
       _spine_shear_timeline_get_curvesPtr.asFunction<spine_array_float Function(spine_shear_timeline)>();
 
+  /// True if this timeline supports additive blending.
+  bool spine_shear_timeline_get_additive(
+    spine_shear_timeline self,
+  ) {
+    return _spine_shear_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_shear_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_shear_timeline)>>('spine_shear_timeline_get_additive');
+  late final _spine_shear_timeline_get_additive =
+      _spine_shear_timeline_get_additivePtr.asFunction<bool Function(spine_shear_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_shear_timeline_get_instant(
+    spine_shear_timeline self,
+  ) {
+    return _spine_shear_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_shear_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_shear_timeline)>>('spine_shear_timeline_get_instant');
+  late final _spine_shear_timeline_get_instant =
+      _spine_shear_timeline_get_instantPtr.asFunction<bool Function(spine_shear_timeline)>();
+
   int spine_shear_timeline_get_frame_entries(
     spine_shear_timeline self,
   ) {
@@ -39144,8 +40617,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_shear_x_timeline_apply(
@@ -39155,8 +40629,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -39164,10 +40639,10 @@ class SpineDartBindings {
   late final _spine_shear_x_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_shear_x_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event, ffi.Float,
-              ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_shear_x_timeline_apply');
+              ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_shear_x_timeline_apply');
   late final _spine_shear_x_timeline_apply = _spine_shear_x_timeline_applyPtr.asFunction<
       void Function(
-          spine_shear_x_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+          spine_shear_x_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool, bool, bool)>();
 
   int spine_shear_x_timeline_get_bone_index(
     spine_shear_x_timeline self,
@@ -39243,7 +40718,8 @@ class SpineDartBindings {
     spine_shear_x_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -39251,7 +40727,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -39259,16 +40736,17 @@ class SpineDartBindings {
 
   late final _spine_shear_x_timeline_get_relative_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_shear_x_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_shear_x_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_shear_x_timeline_get_relative_value');
   late final _spine_shear_x_timeline_get_relative_value = _spine_shear_x_timeline_get_relative_valuePtr
-      .asFunction<double Function(spine_shear_x_timeline, double, double, int, double, double)>();
+      .asFunction<double Function(spine_shear_x_timeline, double, double, bool, bool, double, double)>();
 
   double spine_shear_x_timeline_get_absolute_value_1(
     spine_shear_x_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -39276,7 +40754,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -39284,16 +40763,17 @@ class SpineDartBindings {
 
   late final _spine_shear_x_timeline_get_absolute_value_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_shear_x_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_shear_x_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_shear_x_timeline_get_absolute_value_1');
   late final _spine_shear_x_timeline_get_absolute_value_1 = _spine_shear_x_timeline_get_absolute_value_1Ptr
-      .asFunction<double Function(spine_shear_x_timeline, double, double, int, double, double)>();
+      .asFunction<double Function(spine_shear_x_timeline, double, double, bool, bool, double, double)>();
 
   double spine_shear_x_timeline_get_absolute_value_2(
     spine_shear_x_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
     double value,
@@ -39302,7 +40782,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
       value,
@@ -39311,17 +40792,18 @@ class SpineDartBindings {
 
   late final _spine_shear_x_timeline_get_absolute_value_2Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_shear_x_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float, ffi.Float,
+          ffi.Float Function(spine_shear_x_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float, ffi.Float,
               ffi.Float)>>('spine_shear_x_timeline_get_absolute_value_2');
   late final _spine_shear_x_timeline_get_absolute_value_2 = _spine_shear_x_timeline_get_absolute_value_2Ptr
-      .asFunction<double Function(spine_shear_x_timeline, double, double, int, double, double, double)>();
+      .asFunction<double Function(spine_shear_x_timeline, double, double, bool, bool, double, double, double)>();
 
   double spine_shear_x_timeline_get_scale_value(
     spine_shear_x_timeline self,
     double time,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     double current,
     double setup,
   ) {
@@ -39329,8 +40811,9 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       current,
       setup,
     );
@@ -39338,10 +40821,10 @@ class SpineDartBindings {
 
   late final _spine_shear_x_timeline_get_scale_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_shear_x_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_shear_x_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_shear_x_timeline_get_scale_value');
   late final _spine_shear_x_timeline_get_scale_value = _spine_shear_x_timeline_get_scale_valuePtr
-      .asFunction<double Function(spine_shear_x_timeline, double, double, int, int, double, double)>();
+      .asFunction<double Function(spine_shear_x_timeline, double, double, bool, bool, bool, double, double)>();
 
   void spine_shear_x_timeline_set_linear(
     spine_shear_x_timeline self,
@@ -39448,6 +40931,35 @@ class SpineDartBindings {
           'spine_shear_x_timeline_get_curves');
   late final _spine_shear_x_timeline_get_curves =
       _spine_shear_x_timeline_get_curvesPtr.asFunction<spine_array_float Function(spine_shear_x_timeline)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_shear_x_timeline_get_additive(
+    spine_shear_x_timeline self,
+  ) {
+    return _spine_shear_x_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_shear_x_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_shear_x_timeline)>>('spine_shear_x_timeline_get_additive');
+  late final _spine_shear_x_timeline_get_additive =
+      _spine_shear_x_timeline_get_additivePtr.asFunction<bool Function(spine_shear_x_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_shear_x_timeline_get_instant(
+    spine_shear_x_timeline self,
+  ) {
+    return _spine_shear_x_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_shear_x_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_shear_x_timeline)>>('spine_shear_x_timeline_get_instant');
+  late final _spine_shear_x_timeline_get_instant =
+      _spine_shear_x_timeline_get_instantPtr.asFunction<bool Function(spine_shear_x_timeline)>();
 
   int spine_shear_x_timeline_get_frame_entries(
     spine_shear_x_timeline self,
@@ -39576,8 +41088,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_shear_y_timeline_apply(
@@ -39587,8 +41100,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -39596,10 +41110,10 @@ class SpineDartBindings {
   late final _spine_shear_y_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_shear_y_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event, ffi.Float,
-              ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_shear_y_timeline_apply');
+              ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_shear_y_timeline_apply');
   late final _spine_shear_y_timeline_apply = _spine_shear_y_timeline_applyPtr.asFunction<
       void Function(
-          spine_shear_y_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+          spine_shear_y_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool, bool, bool)>();
 
   int spine_shear_y_timeline_get_bone_index(
     spine_shear_y_timeline self,
@@ -39675,7 +41189,8 @@ class SpineDartBindings {
     spine_shear_y_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -39683,7 +41198,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -39691,16 +41207,17 @@ class SpineDartBindings {
 
   late final _spine_shear_y_timeline_get_relative_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_shear_y_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_shear_y_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_shear_y_timeline_get_relative_value');
   late final _spine_shear_y_timeline_get_relative_value = _spine_shear_y_timeline_get_relative_valuePtr
-      .asFunction<double Function(spine_shear_y_timeline, double, double, int, double, double)>();
+      .asFunction<double Function(spine_shear_y_timeline, double, double, bool, bool, double, double)>();
 
   double spine_shear_y_timeline_get_absolute_value_1(
     spine_shear_y_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -39708,7 +41225,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -39716,16 +41234,17 @@ class SpineDartBindings {
 
   late final _spine_shear_y_timeline_get_absolute_value_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_shear_y_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_shear_y_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_shear_y_timeline_get_absolute_value_1');
   late final _spine_shear_y_timeline_get_absolute_value_1 = _spine_shear_y_timeline_get_absolute_value_1Ptr
-      .asFunction<double Function(spine_shear_y_timeline, double, double, int, double, double)>();
+      .asFunction<double Function(spine_shear_y_timeline, double, double, bool, bool, double, double)>();
 
   double spine_shear_y_timeline_get_absolute_value_2(
     spine_shear_y_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
     double value,
@@ -39734,7 +41253,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
       value,
@@ -39743,17 +41263,18 @@ class SpineDartBindings {
 
   late final _spine_shear_y_timeline_get_absolute_value_2Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_shear_y_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float, ffi.Float,
+          ffi.Float Function(spine_shear_y_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float, ffi.Float,
               ffi.Float)>>('spine_shear_y_timeline_get_absolute_value_2');
   late final _spine_shear_y_timeline_get_absolute_value_2 = _spine_shear_y_timeline_get_absolute_value_2Ptr
-      .asFunction<double Function(spine_shear_y_timeline, double, double, int, double, double, double)>();
+      .asFunction<double Function(spine_shear_y_timeline, double, double, bool, bool, double, double, double)>();
 
   double spine_shear_y_timeline_get_scale_value(
     spine_shear_y_timeline self,
     double time,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     double current,
     double setup,
   ) {
@@ -39761,8 +41282,9 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       current,
       setup,
     );
@@ -39770,10 +41292,10 @@ class SpineDartBindings {
 
   late final _spine_shear_y_timeline_get_scale_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_shear_y_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_shear_y_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_shear_y_timeline_get_scale_value');
   late final _spine_shear_y_timeline_get_scale_value = _spine_shear_y_timeline_get_scale_valuePtr
-      .asFunction<double Function(spine_shear_y_timeline, double, double, int, int, double, double)>();
+      .asFunction<double Function(spine_shear_y_timeline, double, double, bool, bool, bool, double, double)>();
 
   void spine_shear_y_timeline_set_linear(
     spine_shear_y_timeline self,
@@ -39881,6 +41403,35 @@ class SpineDartBindings {
   late final _spine_shear_y_timeline_get_curves =
       _spine_shear_y_timeline_get_curvesPtr.asFunction<spine_array_float Function(spine_shear_y_timeline)>();
 
+  /// True if this timeline supports additive blending.
+  bool spine_shear_y_timeline_get_additive(
+    spine_shear_y_timeline self,
+  ) {
+    return _spine_shear_y_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_shear_y_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_shear_y_timeline)>>('spine_shear_y_timeline_get_additive');
+  late final _spine_shear_y_timeline_get_additive =
+      _spine_shear_y_timeline_get_additivePtr.asFunction<bool Function(spine_shear_y_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_shear_y_timeline_get_instant(
+    spine_shear_y_timeline self,
+  ) {
+    return _spine_shear_y_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_shear_y_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_shear_y_timeline)>>('spine_shear_y_timeline_get_instant');
+  late final _spine_shear_y_timeline_get_instant =
+      _spine_shear_y_timeline_get_instantPtr.asFunction<bool Function(spine_shear_y_timeline)>();
+
   int spine_shear_y_timeline_get_frame_entries(
     spine_shear_y_timeline self,
   ) {
@@ -39982,8 +41533,9 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_skeleton)>>('spine_skeleton_dispose');
   late final _spine_skeleton_dispose = _spine_skeleton_disposePtr.asFunction<void Function(spine_skeleton)>();
 
-  /// Caches information about bones and constraints. Must be called if bones,
-  /// constraints or weighted path attachments are added or removed.
+  /// Caches information about bones and constraints. Must be called if the active
+  /// skin is modified or if bones, constraints, or weighted path attachments are
+  /// added or removed.
   void spine_skeleton_update_cache(
     spine_skeleton self,
   ) {
@@ -40180,6 +41732,7 @@ class SpineDartBindings {
   late final _spine_skeleton_find_bone =
       _spine_skeleton_find_bonePtr.asFunction<spine_bone Function(spine_skeleton, ffi.Pointer<ffi.Char>)>();
 
+  /// The skeleton's slots. To add a slot, also add it to DrawOrder::getPose().
   spine_array_slot spine_skeleton_get_slots(
     spine_skeleton self,
   ) {
@@ -40209,7 +41762,9 @@ class SpineDartBindings {
   late final _spine_skeleton_find_slot =
       _spine_skeleton_find_slotPtr.asFunction<spine_slot Function(spine_skeleton, ffi.Pointer<ffi.Char>)>();
 
-  spine_array_slot spine_skeleton_get_draw_order(
+  /// The skeleton's draw order. Use DrawOrder::getAppliedPose() for rendering and
+  /// DrawOrder::getPose() for changing the draw order.
+  spine_draw_order spine_skeleton_get_draw_order(
     spine_skeleton self,
   ) {
     return _spine_skeleton_get_draw_order(
@@ -40218,9 +41773,9 @@ class SpineDartBindings {
   }
 
   late final _spine_skeleton_get_draw_orderPtr =
-      _lookup<ffi.NativeFunction<spine_array_slot Function(spine_skeleton)>>('spine_skeleton_get_draw_order');
+      _lookup<ffi.NativeFunction<spine_draw_order Function(spine_skeleton)>>('spine_skeleton_get_draw_order');
   late final _spine_skeleton_get_draw_order =
-      _spine_skeleton_get_draw_orderPtr.asFunction<spine_array_slot Function(spine_skeleton)>();
+      _spine_skeleton_get_draw_orderPtr.asFunction<spine_draw_order Function(spine_skeleton)>();
 
   spine_skin spine_skeleton_get_skin(
     spine_skeleton self,
@@ -40251,14 +41806,19 @@ class SpineDartBindings {
   late final _spine_skeleton_set_skin_1 =
       _spine_skeleton_set_skin_1Ptr.asFunction<void Function(spine_skeleton, ffi.Pointer<ffi.Char>)>();
 
+  /// Sets the skin used to look up attachments before looking in
+  /// SkeletonData::getDefaultSkin(). If the skin is changed, updateCache() is
+  /// called.
+  ///
   /// Attachments from the new skin are attached if the corresponding attachment
   /// from the old skin was attached. If there was no old skin, each slot's setup
-  /// mode attachment is attached from the new skin. After changing the skin, the
-  /// visible attachments can be reset to those attached in the setup pose by
-  /// calling See Skeleton::setSlotsToSetupPose() Also, often
-  /// AnimationState::apply(Skeleton & ) is called before the next time the
-  /// skeleton is rendered to allow any attachment keys in the current animation(s)
-  /// to hide or show attachments from the new skin.
+  /// pose placeholder attachment is attached from the new skin.
+  ///
+  /// After changing the skin, the visible attachments can be reset to those
+  /// attached in the setup pose by calling setupPoseSlots(). Also,
+  /// AnimationState::apply(Skeleton & ) is often called before the next time the
+  /// skeleton is rendered so attachment keys in the current animation(s) can hide
+  /// or show attachments from the new skin.
   ///
   /// @param newSkin May be NULL.
   void spine_skeleton_set_skin_2(
@@ -40279,12 +41839,12 @@ class SpineDartBindings {
   spine_attachment spine_skeleton_get_attachment_1(
     spine_skeleton self,
     ffi.Pointer<ffi.Char> slotName,
-    ffi.Pointer<ffi.Char> attachmentName,
+    ffi.Pointer<ffi.Char> placeholderName,
   ) {
     return _spine_skeleton_get_attachment_1(
       self,
       slotName,
-      attachmentName,
+      placeholderName,
     );
   }
 
@@ -40297,12 +41857,12 @@ class SpineDartBindings {
   spine_attachment spine_skeleton_get_attachment_2(
     spine_skeleton self,
     int slotIndex,
-    ffi.Pointer<ffi.Char> attachmentName,
+    ffi.Pointer<ffi.Char> placeholderName,
   ) {
     return _spine_skeleton_get_attachment_2(
       self,
       slotIndex,
-      attachmentName,
+      placeholderName,
     );
   }
 
@@ -40312,16 +41872,20 @@ class SpineDartBindings {
   late final _spine_skeleton_get_attachment_2 = _spine_skeleton_get_attachment_2Ptr
       .asFunction<spine_attachment Function(spine_skeleton, int, ffi.Pointer<ffi.Char>)>();
 
-  /// @param attachmentName May be empty.
+  /// A convenience method to set an attachment by finding the slot with
+  /// findSlot(String), finding the attachment with getAttachment(int, String),
+  /// then setting the slot's SlotPose::getAttachment().
+  ///
+  /// @param placeholderName May be empty.
   void spine_skeleton_set_attachment(
     spine_skeleton self,
     ffi.Pointer<ffi.Char> slotName,
-    ffi.Pointer<ffi.Char> attachmentName,
+    ffi.Pointer<ffi.Char> placeholderName,
   ) {
     return _spine_skeleton_set_attachment(
       self,
       slotName,
-      attachmentName,
+      placeholderName,
     );
   }
 
@@ -40344,6 +41908,7 @@ class SpineDartBindings {
   late final _spine_skeleton_get_constraints =
       _spine_skeleton_get_constraintsPtr.asFunction<spine_array_constraint Function(spine_skeleton)>();
 
+  /// The skeleton's physics constraints.
   spine_array_physics_constraint spine_skeleton_get_physics_constraints(
     spine_skeleton self,
   ) {
@@ -40359,7 +41924,7 @@ class SpineDartBindings {
       _spine_skeleton_get_physics_constraintsPtr.asFunction<spine_array_physics_constraint Function(spine_skeleton)>();
 
   /// Returns the axis aligned bounding box (AABB) of the region and mesh
-  /// attachments for the current pose.
+  /// attachments for the applied pose.
   ///
   /// @param outX The horizontal distance between the skeleton origin and the left side of the AABB.
   /// @param outY The vertical distance between the skeleton origin and the bottom side of the AABB.
@@ -40390,7 +41955,7 @@ class SpineDartBindings {
           ffi.Pointer<ffi.Float>)>();
 
   /// Returns the axis aligned bounding box (AABB) of the region and mesh
-  /// attachments for the current pose.
+  /// attachments for the applied pose.
   ///
   /// @param outX The horizontal distance between the skeleton origin and the left side of the AABB.
   /// @param outY The vertical distance between the skeleton origin and the bottom side of the AABB.
@@ -40635,6 +42200,8 @@ class SpineDartBindings {
   late final _spine_skeleton_get_position = _spine_skeleton_get_positionPtr
       .asFunction<void Function(spine_skeleton, ffi.Pointer<ffi.Float>, ffi.Pointer<ffi.Float>)>();
 
+  /// The x component of a vector that defines the direction
+  /// PhysicsConstraintPose::getWind() is applied.
   double spine_skeleton_get_wind_x(
     spine_skeleton self,
   ) {
@@ -40662,6 +42229,8 @@ class SpineDartBindings {
   late final _spine_skeleton_set_wind_x =
       _spine_skeleton_set_wind_xPtr.asFunction<void Function(spine_skeleton, double)>();
 
+  /// The y component of a vector that defines the direction
+  /// PhysicsConstraintPose::getWind() is applied.
   double spine_skeleton_get_wind_y(
     spine_skeleton self,
   ) {
@@ -40689,6 +42258,8 @@ class SpineDartBindings {
   late final _spine_skeleton_set_wind_y =
       _spine_skeleton_set_wind_yPtr.asFunction<void Function(spine_skeleton, double)>();
 
+  /// The x component of a vector that defines the direction
+  /// PhysicsConstraintPose::getGravity() is applied.
   double spine_skeleton_get_gravity_x(
     spine_skeleton self,
   ) {
@@ -40717,6 +42288,8 @@ class SpineDartBindings {
   late final _spine_skeleton_set_gravity_x =
       _spine_skeleton_set_gravity_xPtr.asFunction<void Function(spine_skeleton, double)>();
 
+  /// The y component of a vector that defines the direction
+  /// PhysicsConstraintPose::getGravity() is applied.
   double spine_skeleton_get_gravity_y(
     spine_skeleton self,
   ) {
@@ -40785,6 +42358,10 @@ class SpineDartBindings {
   late final _spine_skeleton_physics_rotate =
       _spine_skeleton_physics_rotatePtr.asFunction<void Function(spine_skeleton, double, double, double)>();
 
+  /// Returns the skeleton's time, used for time-based manipulations, such as
+  /// PhysicsConstraint.
+  ///
+  /// See update().
   double spine_skeleton_get_time(
     spine_skeleton self,
   ) {
@@ -41631,18 +43208,19 @@ class SpineDartBindings {
   late final _spine_skin_disposePtr = _lookup<ffi.NativeFunction<ffi.Void Function(spine_skin)>>('spine_skin_dispose');
   late final _spine_skin_dispose = _spine_skin_disposePtr.asFunction<void Function(spine_skin)>();
 
-  /// Adds an attachment to the skin for the specified slot index and name. If the
-  /// name already exists for the slot, the previous value is replaced.
+  /// Adds an attachment to the skin for the specified slot index and placeholder
+  /// name. If the placeholder name already exists for the slot, the previous value
+  /// is replaced.
   void spine_skin_set_attachment(
     spine_skin self,
     int slotIndex,
-    ffi.Pointer<ffi.Char> name,
+    ffi.Pointer<ffi.Char> placeholderName,
     spine_attachment attachment,
   ) {
     return _spine_skin_set_attachment(
       self,
       slotIndex,
-      name,
+      placeholderName,
       attachment,
     );
   }
@@ -41656,12 +43234,12 @@ class SpineDartBindings {
   spine_attachment spine_skin_get_attachment(
     spine_skin self,
     int slotIndex,
-    ffi.Pointer<ffi.Char> name,
+    ffi.Pointer<ffi.Char> placeholderName,
   ) {
     return _spine_skin_get_attachment(
       self,
       slotIndex,
-      name,
+      placeholderName,
     );
   }
 
@@ -41675,12 +43253,12 @@ class SpineDartBindings {
   void spine_skin_remove_attachment(
     spine_skin self,
     int slotIndex,
-    ffi.Pointer<ffi.Char> name,
+    ffi.Pointer<ffi.Char> placeholderName,
   ) {
     return _spine_skin_remove_attachment(
       self,
       slotIndex,
-      name,
+      placeholderName,
     );
   }
 
@@ -41892,6 +43470,8 @@ class SpineDartBindings {
   late final _spine_slider_is_source_active =
       _spine_slider_is_source_activePtr.asFunction<bool Function(spine_slider)>();
 
+  /// When set, the bone's transform property is used to set the slider's
+  /// SliderPose::getTime().
   spine_bone spine_slider_get_bone(
     spine_slider self,
   ) {
@@ -41930,6 +43510,8 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<spine_slider_data Function(spine_slider)>>('spine_slider_get_data');
   late final _spine_slider_get_data = _spine_slider_get_dataPtr.asFunction<spine_slider_data Function(spine_slider)>();
 
+  /// The unconstrained pose for this object, set by animations and application
+  /// code.
   spine_slider_pose spine_slider_get_pose(
     spine_slider self,
   ) {
@@ -41942,6 +43524,9 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<spine_slider_pose Function(spine_slider)>>('spine_slider_get_pose');
   late final _spine_slider_get_pose = _spine_slider_get_posePtr.asFunction<spine_slider_pose Function(spine_slider)>();
 
+  /// The pose to use for rendering. If no constraints modify this pose, this is
+  /// the same as getPose(). Otherwise it is a copy of getPose() modified by
+  /// constraints.
   spine_slider_pose spine_slider_get_applied_pose(
     spine_slider self,
   ) {
@@ -41955,6 +43540,8 @@ class SpineDartBindings {
   late final _spine_slider_get_applied_pose =
       _spine_slider_get_applied_posePtr.asFunction<spine_slider_pose Function(spine_slider)>();
 
+  /// Sets the constrained pose to the unconstrained pose, as a starting point for
+  /// constraints to be applied.
   void spine_slider_reset_constrained(
     spine_slider self,
   ) {
@@ -41968,6 +43555,8 @@ class SpineDartBindings {
   late final _spine_slider_reset_constrained =
       _spine_slider_reset_constrainedPtr.asFunction<void Function(spine_slider)>();
 
+  /// Sets the applied pose to the constrained pose, in anticipation of the applied
+  /// pose being modified by constraints.
   void spine_slider_constrained(
     spine_slider self,
   ) {
@@ -41993,6 +43582,11 @@ class SpineDartBindings {
   late final _spine_slider_is_pose_equal_to_applied =
       _spine_slider_is_pose_equal_to_appliedPtr.asFunction<bool Function(spine_slider)>();
 
+  /// Returns false when this won't be updated by
+  /// Skeleton::updateWorldTransform(Physics) because a skin is required and the
+  /// active skin does not contain this item. See Skin::getBones(),
+  /// Skin::getConstraints(), PosedData::getSkinRequired(), and
+  /// Skeleton::updateCache().
   bool spine_slider_is_active(
     spine_slider self,
   ) {
@@ -42051,6 +43645,8 @@ class SpineDartBindings {
   late final _spine_slider_base_get_data =
       _spine_slider_base_get_dataPtr.asFunction<spine_slider_data Function(spine_slider_base)>();
 
+  /// The unconstrained pose for this object, set by animations and application
+  /// code.
   spine_slider_pose spine_slider_base_get_pose(
     spine_slider_base self,
   ) {
@@ -42064,6 +43660,9 @@ class SpineDartBindings {
   late final _spine_slider_base_get_pose =
       _spine_slider_base_get_posePtr.asFunction<spine_slider_pose Function(spine_slider_base)>();
 
+  /// The pose to use for rendering. If no constraints modify this pose, this is
+  /// the same as getPose(). Otherwise it is a copy of getPose() modified by
+  /// constraints.
   spine_slider_pose spine_slider_base_get_applied_pose(
     spine_slider_base self,
   ) {
@@ -42077,6 +43676,8 @@ class SpineDartBindings {
   late final _spine_slider_base_get_applied_pose =
       _spine_slider_base_get_applied_posePtr.asFunction<spine_slider_pose Function(spine_slider_base)>();
 
+  /// Sets the constrained pose to the unconstrained pose, as a starting point for
+  /// constraints to be applied.
   void spine_slider_base_reset_constrained(
     spine_slider_base self,
   ) {
@@ -42090,6 +43691,8 @@ class SpineDartBindings {
   late final _spine_slider_base_reset_constrained =
       _spine_slider_base_reset_constrainedPtr.asFunction<void Function(spine_slider_base)>();
 
+  /// Sets the applied pose to the constrained pose, in anticipation of the applied
+  /// pose being modified by constraints.
   void spine_slider_base_constrained(
     spine_slider_base self,
   ) {
@@ -42116,6 +43719,11 @@ class SpineDartBindings {
   late final _spine_slider_base_is_pose_equal_to_applied =
       _spine_slider_base_is_pose_equal_to_appliedPtr.asFunction<bool Function(spine_slider_base)>();
 
+  /// Returns false when this won't be updated by
+  /// Skeleton::updateWorldTransform(Physics) because a skin is required and the
+  /// active skin does not contain this item. See Skin::getBones(),
+  /// Skin::getConstraints(), PosedData::getSkinRequired(), and
+  /// Skeleton::updateCache().
   bool spine_slider_base_is_active(
     spine_slider_base self,
   ) {
@@ -42266,6 +43874,7 @@ class SpineDartBindings {
   late final _spine_slider_data_create_method =
       _spine_slider_data_create_methodPtr.asFunction<spine_constraint Function(spine_slider_data, spine_skeleton)>();
 
+  /// The animation the slider will apply.
   spine_animation spine_slider_data_get_animation(
     spine_slider_data self,
   ) {
@@ -42295,6 +43904,8 @@ class SpineDartBindings {
   late final _spine_slider_data_set_animation =
       _spine_slider_data_set_animationPtr.asFunction<void Function(spine_slider_data, spine_animation)>();
 
+  /// When true, the animation is applied by adding it to the current pose rather
+  /// than overwriting it.
   bool spine_slider_data_get_additive(
     spine_slider_data self,
   ) {
@@ -42323,6 +43934,8 @@ class SpineDartBindings {
   late final _spine_slider_data_set_additive =
       _spine_slider_data_set_additivePtr.asFunction<void Function(spine_slider_data, bool)>();
 
+  /// When true, the animation repeats after its duration, otherwise the last frame
+  /// is used.
   bool spine_slider_data_get_loop(
     spine_slider_data self,
   ) {
@@ -42408,6 +44021,8 @@ class SpineDartBindings {
   late final _spine_slider_data_set_property =
       _spine_slider_data_set_propertyPtr.asFunction<void Function(spine_slider_data, spine_from_property)>();
 
+  /// When a bone is set, this is the scale of the property value in relation to
+  /// the slider time.
   double spine_slider_data_get_scale(
     spine_slider_data self,
   ) {
@@ -42436,6 +44051,7 @@ class SpineDartBindings {
   late final _spine_slider_data_set_scale =
       _spine_slider_data_set_scalePtr.asFunction<void Function(spine_slider_data, double)>();
 
+  /// When a bone is set, the offset is added to the property.
   double spine_slider_data_get_offset(
     spine_slider_data self,
   ) {
@@ -42464,6 +44080,8 @@ class SpineDartBindings {
   late final _spine_slider_data_set_offset =
       _spine_slider_data_set_offsetPtr.asFunction<void Function(spine_slider_data, double)>();
 
+  /// When true and a bone is set, the bone's local transform property is read
+  /// instead of its world transform.
   bool spine_slider_data_get_local(
     spine_slider_data self,
   ) {
@@ -42519,6 +44137,7 @@ class SpineDartBindings {
   late final _spine_slider_data_get_skin_required =
       _spine_slider_data_get_skin_requiredPtr.asFunction<bool Function(spine_slider_data)>();
 
+  /// The setup pose that most animations are relative to.
   spine_slider_pose spine_slider_data_get_setup_pose(
     spine_slider_data self,
   ) {
@@ -42606,8 +44225,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_slider_mix_timeline_apply(
@@ -42617,8 +44237,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -42626,10 +44247,10 @@ class SpineDartBindings {
   late final _spine_slider_mix_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_slider_mix_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event,
-              ffi.Float, ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_slider_mix_timeline_apply');
+              ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_slider_mix_timeline_apply');
   late final _spine_slider_mix_timeline_apply = _spine_slider_mix_timeline_applyPtr.asFunction<
-      void Function(
-          spine_slider_mix_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+      void Function(spine_slider_mix_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool,
+          bool, bool)>();
 
   int spine_slider_mix_timeline_get_constraint_index(
     spine_slider_mix_timeline self,
@@ -42706,7 +44327,8 @@ class SpineDartBindings {
     spine_slider_mix_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -42714,7 +44336,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -42722,16 +44345,17 @@ class SpineDartBindings {
 
   late final _spine_slider_mix_timeline_get_relative_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_slider_mix_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_slider_mix_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_slider_mix_timeline_get_relative_value');
   late final _spine_slider_mix_timeline_get_relative_value = _spine_slider_mix_timeline_get_relative_valuePtr
-      .asFunction<double Function(spine_slider_mix_timeline, double, double, int, double, double)>();
+      .asFunction<double Function(spine_slider_mix_timeline, double, double, bool, bool, double, double)>();
 
   double spine_slider_mix_timeline_get_absolute_value_1(
     spine_slider_mix_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -42739,7 +44363,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -42747,16 +44372,17 @@ class SpineDartBindings {
 
   late final _spine_slider_mix_timeline_get_absolute_value_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_slider_mix_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_slider_mix_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_slider_mix_timeline_get_absolute_value_1');
   late final _spine_slider_mix_timeline_get_absolute_value_1 = _spine_slider_mix_timeline_get_absolute_value_1Ptr
-      .asFunction<double Function(spine_slider_mix_timeline, double, double, int, double, double)>();
+      .asFunction<double Function(spine_slider_mix_timeline, double, double, bool, bool, double, double)>();
 
   double spine_slider_mix_timeline_get_absolute_value_2(
     spine_slider_mix_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
     double value,
@@ -42765,7 +44391,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
       value,
@@ -42774,17 +44401,18 @@ class SpineDartBindings {
 
   late final _spine_slider_mix_timeline_get_absolute_value_2Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_slider_mix_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float, ffi.Float,
+          ffi.Float Function(spine_slider_mix_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float, ffi.Float,
               ffi.Float)>>('spine_slider_mix_timeline_get_absolute_value_2');
   late final _spine_slider_mix_timeline_get_absolute_value_2 = _spine_slider_mix_timeline_get_absolute_value_2Ptr
-      .asFunction<double Function(spine_slider_mix_timeline, double, double, int, double, double, double)>();
+      .asFunction<double Function(spine_slider_mix_timeline, double, double, bool, bool, double, double, double)>();
 
   double spine_slider_mix_timeline_get_scale_value(
     spine_slider_mix_timeline self,
     double time,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     double current,
     double setup,
   ) {
@@ -42792,8 +44420,9 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       current,
       setup,
     );
@@ -42801,10 +44430,10 @@ class SpineDartBindings {
 
   late final _spine_slider_mix_timeline_get_scale_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_slider_mix_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_slider_mix_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_slider_mix_timeline_get_scale_value');
   late final _spine_slider_mix_timeline_get_scale_value = _spine_slider_mix_timeline_get_scale_valuePtr
-      .asFunction<double Function(spine_slider_mix_timeline, double, double, int, int, double, double)>();
+      .asFunction<double Function(spine_slider_mix_timeline, double, double, bool, bool, bool, double, double)>();
 
   void spine_slider_mix_timeline_set_linear(
     spine_slider_mix_timeline self,
@@ -42911,6 +44540,37 @@ class SpineDartBindings {
           'spine_slider_mix_timeline_get_curves');
   late final _spine_slider_mix_timeline_get_curves =
       _spine_slider_mix_timeline_get_curvesPtr.asFunction<spine_array_float Function(spine_slider_mix_timeline)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_slider_mix_timeline_get_additive(
+    spine_slider_mix_timeline self,
+  ) {
+    return _spine_slider_mix_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_slider_mix_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_slider_mix_timeline)>>(
+          'spine_slider_mix_timeline_get_additive');
+  late final _spine_slider_mix_timeline_get_additive =
+      _spine_slider_mix_timeline_get_additivePtr.asFunction<bool Function(spine_slider_mix_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_slider_mix_timeline_get_instant(
+    spine_slider_mix_timeline self,
+  ) {
+    return _spine_slider_mix_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_slider_mix_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_slider_mix_timeline)>>(
+          'spine_slider_mix_timeline_get_instant');
+  late final _spine_slider_mix_timeline_get_instant =
+      _spine_slider_mix_timeline_get_instantPtr.asFunction<bool Function(spine_slider_mix_timeline)>();
 
   int spine_slider_mix_timeline_get_frame_entries(
     spine_slider_mix_timeline self,
@@ -43025,6 +44685,7 @@ class SpineDartBindings {
   late final _spine_slider_pose_set =
       _spine_slider_pose_setPtr.asFunction<void Function(spine_slider_pose, spine_slider_pose)>();
 
+  /// The time in SliderData::getAnimation() to apply the animation.
   double spine_slider_pose_get_time(
     spine_slider_pose self,
   ) {
@@ -43053,6 +44714,8 @@ class SpineDartBindings {
   late final _spine_slider_pose_set_time =
       _spine_slider_pose_set_timePtr.asFunction<void Function(spine_slider_pose, double)>();
 
+  /// A percentage that controls the mix between the constrained and unconstrained
+  /// poses.
   double spine_slider_pose_get_mix(
     spine_slider_pose self,
   ) {
@@ -43132,8 +44795,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_slider_timeline_apply(
@@ -43143,8 +44807,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -43152,10 +44817,10 @@ class SpineDartBindings {
   late final _spine_slider_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_slider_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event, ffi.Float,
-              ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_slider_timeline_apply');
+              ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_slider_timeline_apply');
   late final _spine_slider_timeline_apply = _spine_slider_timeline_applyPtr.asFunction<
       void Function(
-          spine_slider_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+          spine_slider_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool, bool, bool)>();
 
   int spine_slider_timeline_get_constraint_index(
     spine_slider_timeline self,
@@ -43232,7 +44897,8 @@ class SpineDartBindings {
     spine_slider_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -43240,7 +44906,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -43248,16 +44915,17 @@ class SpineDartBindings {
 
   late final _spine_slider_timeline_get_relative_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_slider_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_slider_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_slider_timeline_get_relative_value');
   late final _spine_slider_timeline_get_relative_value = _spine_slider_timeline_get_relative_valuePtr
-      .asFunction<double Function(spine_slider_timeline, double, double, int, double, double)>();
+      .asFunction<double Function(spine_slider_timeline, double, double, bool, bool, double, double)>();
 
   double spine_slider_timeline_get_absolute_value_1(
     spine_slider_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -43265,7 +44933,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -43273,16 +44942,17 @@ class SpineDartBindings {
 
   late final _spine_slider_timeline_get_absolute_value_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_slider_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_slider_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_slider_timeline_get_absolute_value_1');
   late final _spine_slider_timeline_get_absolute_value_1 = _spine_slider_timeline_get_absolute_value_1Ptr
-      .asFunction<double Function(spine_slider_timeline, double, double, int, double, double)>();
+      .asFunction<double Function(spine_slider_timeline, double, double, bool, bool, double, double)>();
 
   double spine_slider_timeline_get_absolute_value_2(
     spine_slider_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
     double value,
@@ -43291,7 +44961,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
       value,
@@ -43300,17 +44971,18 @@ class SpineDartBindings {
 
   late final _spine_slider_timeline_get_absolute_value_2Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_slider_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float, ffi.Float,
+          ffi.Float Function(spine_slider_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float, ffi.Float,
               ffi.Float)>>('spine_slider_timeline_get_absolute_value_2');
   late final _spine_slider_timeline_get_absolute_value_2 = _spine_slider_timeline_get_absolute_value_2Ptr
-      .asFunction<double Function(spine_slider_timeline, double, double, int, double, double, double)>();
+      .asFunction<double Function(spine_slider_timeline, double, double, bool, bool, double, double, double)>();
 
   double spine_slider_timeline_get_scale_value(
     spine_slider_timeline self,
     double time,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     double current,
     double setup,
   ) {
@@ -43318,8 +44990,9 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       current,
       setup,
     );
@@ -43327,10 +45000,10 @@ class SpineDartBindings {
 
   late final _spine_slider_timeline_get_scale_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_slider_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_slider_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_slider_timeline_get_scale_value');
   late final _spine_slider_timeline_get_scale_value = _spine_slider_timeline_get_scale_valuePtr
-      .asFunction<double Function(spine_slider_timeline, double, double, int, int, double, double)>();
+      .asFunction<double Function(spine_slider_timeline, double, double, bool, bool, bool, double, double)>();
 
   void spine_slider_timeline_set_linear(
     spine_slider_timeline self,
@@ -43437,6 +45110,35 @@ class SpineDartBindings {
           'spine_slider_timeline_get_curves');
   late final _spine_slider_timeline_get_curves =
       _spine_slider_timeline_get_curvesPtr.asFunction<spine_array_float Function(spine_slider_timeline)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_slider_timeline_get_additive(
+    spine_slider_timeline self,
+  ) {
+    return _spine_slider_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_slider_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_slider_timeline)>>('spine_slider_timeline_get_additive');
+  late final _spine_slider_timeline_get_additive =
+      _spine_slider_timeline_get_additivePtr.asFunction<bool Function(spine_slider_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_slider_timeline_get_instant(
+    spine_slider_timeline self,
+  ) {
+    return _spine_slider_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_slider_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_slider_timeline)>>('spine_slider_timeline_get_instant');
+  late final _spine_slider_timeline_get_instant =
+      _spine_slider_timeline_get_instantPtr.asFunction<bool Function(spine_slider_timeline)>();
 
   int spine_slider_timeline_get_frame_entries(
     spine_slider_timeline self,
@@ -43564,7 +45266,7 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_slot)>>('spine_slot_setup_pose');
   late final _spine_slot_setup_pose = _spine_slot_setup_posePtr.asFunction<void Function(spine_slot)>();
 
-  /// The constraint's setup pose data.
+  /// The setup pose data. May be shared with multiple instances.
   spine_slot_data spine_slot_get_data(
     spine_slot self,
   ) {
@@ -43577,6 +45279,8 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<spine_slot_data Function(spine_slot)>>('spine_slot_get_data');
   late final _spine_slot_get_data = _spine_slot_get_dataPtr.asFunction<spine_slot_data Function(spine_slot)>();
 
+  /// The unconstrained pose for this object, set by animations and application
+  /// code.
   spine_slot_pose spine_slot_get_pose(
     spine_slot self,
   ) {
@@ -43589,6 +45293,9 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<spine_slot_pose Function(spine_slot)>>('spine_slot_get_pose');
   late final _spine_slot_get_pose = _spine_slot_get_posePtr.asFunction<spine_slot_pose Function(spine_slot)>();
 
+  /// The pose to use for rendering. If no constraints modify this pose, this is
+  /// the same as getPose(). Otherwise it is a copy of getPose() modified by
+  /// constraints.
   spine_slot_pose spine_slot_get_applied_pose(
     spine_slot self,
   ) {
@@ -43602,6 +45309,8 @@ class SpineDartBindings {
   late final _spine_slot_get_applied_pose =
       _spine_slot_get_applied_posePtr.asFunction<spine_slot_pose Function(spine_slot)>();
 
+  /// Sets the constrained pose to the unconstrained pose, as a starting point for
+  /// constraints to be applied.
   void spine_slot_reset_constrained(
     spine_slot self,
   ) {
@@ -43614,6 +45323,8 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_slot)>>('spine_slot_reset_constrained');
   late final _spine_slot_reset_constrained = _spine_slot_reset_constrainedPtr.asFunction<void Function(spine_slot)>();
 
+  /// Sets the applied pose to the constrained pose, in anticipation of the applied
+  /// pose being modified by constraints.
   void spine_slot_constrained(
     spine_slot self,
   ) {
@@ -43672,8 +45383,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_slot_curve_timeline_apply(
@@ -43683,8 +45395,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -43692,10 +45405,10 @@ class SpineDartBindings {
   late final _spine_slot_curve_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_slot_curve_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event,
-              ffi.Float, ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_slot_curve_timeline_apply');
+              ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_slot_curve_timeline_apply');
   late final _spine_slot_curve_timeline_apply = _spine_slot_curve_timeline_applyPtr.asFunction<
-      void Function(
-          spine_slot_curve_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+      void Function(spine_slot_curve_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool,
+          bool, bool)>();
 
   int spine_slot_curve_timeline_get_slot_index(
     spine_slot_curve_timeline self,
@@ -43833,6 +45546,37 @@ class SpineDartBindings {
   late final _spine_slot_curve_timeline_get_curves =
       _spine_slot_curve_timeline_get_curvesPtr.asFunction<spine_array_float Function(spine_slot_curve_timeline)>();
 
+  /// True if this timeline supports additive blending.
+  bool spine_slot_curve_timeline_get_additive(
+    spine_slot_curve_timeline self,
+  ) {
+    return _spine_slot_curve_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_slot_curve_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_slot_curve_timeline)>>(
+          'spine_slot_curve_timeline_get_additive');
+  late final _spine_slot_curve_timeline_get_additive =
+      _spine_slot_curve_timeline_get_additivePtr.asFunction<bool Function(spine_slot_curve_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_slot_curve_timeline_get_instant(
+    spine_slot_curve_timeline self,
+  ) {
+    return _spine_slot_curve_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_slot_curve_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_slot_curve_timeline)>>(
+          'spine_slot_curve_timeline_get_instant');
+  late final _spine_slot_curve_timeline_get_instant =
+      _spine_slot_curve_timeline_get_instantPtr.asFunction<bool Function(spine_slot_curve_timeline)>();
+
   int spine_slot_curve_timeline_get_frame_entries(
     spine_slot_curve_timeline self,
   ) {
@@ -43941,7 +45685,7 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_slot_data)>>('spine_slot_data_dispose');
   late final _spine_slot_data_dispose = _spine_slot_data_disposePtr.asFunction<void Function(spine_slot_data)>();
 
-  /// The index of the slot in Skeleton::getSlots().
+  /// The Skeleton::getSlots() index for this slot.
   int spine_slot_data_get_index(
     spine_slot_data self,
   ) {
@@ -44059,6 +45803,7 @@ class SpineDartBindings {
   late final _spine_slot_data_set_visible =
       _spine_slot_data_set_visiblePtr.asFunction<void Function(spine_slot_data, bool)>();
 
+  /// The setup pose that most animations are relative to.
   spine_slot_pose spine_slot_data_get_setup_pose(
     spine_slot_data self,
   ) {
@@ -44072,8 +45817,6 @@ class SpineDartBindings {
   late final _spine_slot_data_get_setup_pose =
       _spine_slot_data_get_setup_posePtr.asFunction<spine_slot_pose Function(spine_slot_data)>();
 
-  /// The constraint's name, which is unique across all constraints in the skeleton
-  /// of the same type.
   ffi.Pointer<ffi.Char> spine_slot_data_get_name(
     spine_slot_data self,
   ) {
@@ -44154,8 +45897,8 @@ class SpineDartBindings {
   late final _spine_slot_pose_set =
       _spine_slot_pose_setPtr.asFunction<void Function(spine_slot_pose, spine_slot_pose)>();
 
-  /// The color used to tint the slot's attachment. If getDarkColor() is set, this
-  /// is used as the light color for two color tinting.
+  /// The color used to tint the slot's attachment. If a dark color is set, this is
+  /// used as the light color for two color tinting.
   spine_color spine_slot_pose_get_color(
     spine_slot_pose self,
   ) {
@@ -44321,7 +46064,7 @@ class SpineDartBindings {
   late final _spine_slot_timeline_get_rtti =
       _spine_slot_timeline_get_rttiPtr.asFunction<spine_rtti Function(spine_slot_timeline)>();
 
-  /// The index of the slot in Skeleton::getSlots() that will be changed when this
+  /// The Skeleton::getSlots() index of the slot that will be changed when this
   /// timeline is applied.
   int spine_slot_timeline_get_slot_index(
     spine_slot_timeline self,
@@ -44627,16 +46370,19 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<spine_rtti Function(spine_timeline)>>('spine_timeline_get_rtti');
   late final _spine_timeline_get_rtti = _spine_timeline_get_rttiPtr.asFunction<spine_rtti Function(spine_timeline)>();
 
-  /// Sets the value(s) for the specified time.
+  /// Applies this timeline to the skeleton.
   ///
-  /// @param skeleton The skeleton the timeline is being applied to. This provides access to the bones, slots, and other skeleton components the timeline may change.
-  /// @param lastTime lastTime The time this timeline was last applied. Timelines such as EventTimeline trigger only at specific times rather than every frame. In that case, the timeline triggers everything between lastTime (exclusive) and time (inclusive).
-  /// @param time The time within the animation. Most timelines find the key before and the key after this time so they can interpolate between the keys.
-  /// @param events If any events are fired, they are added to this array. Can be NULL to ignore firing events or if the timeline does not fire events. May be NULL.
-  /// @param alpha alpha 0 applies the current or setup pose value (depending on pose parameter). 1 applies the timeline value. Between 0 and 1 applies a value between the current or setup pose and the timeline value. By adjusting alpha over time, an animation can be mixed in or out. alpha can also be useful to apply animations on top of each other (layered).
-  /// @param blend Controls how mixing is applied when alpha is than 1.
-  /// @param direction Indicates whether the timeline is mixing in or out. Used by timelines which perform instant transitions such as DrawOrderTimeline and AttachmentTimeline.
-  /// @param appliedPose True to modify the applied pose.
+  /// See Applying Animations in the Spine Runtimes Guide.
+  ///
+  /// @param skeleton The skeleton the timeline is applied to. This provides access to the bones, slots, and other skeleton components the timelines may change.
+  /// @param lastTime The last time in seconds this timeline was applied. Some timelines trigger only at discrete times, in which case all keys are triggered between lastTime (exclusive) and time (inclusive). Pass -1 the first time a timeline is applied to ensure frame 0 is triggered.
+  /// @param time The time in seconds the skeleton is being posed for. Timelines find the frame before and after this time and interpolate between the frame values.
+  /// @param events If any events are fired, they are added to this list. Can be NULL to ignore fired events or if no timelines fire events.
+  /// @param alpha 0 applies setup or current values (depending on fromSetup), 1 uses timeline values, and intermediate values interpolate between them. Adjusting alpha over time can mix a timeline in or out.
+  /// @param fromSetup If true, alpha transitions between setup and timeline values, setup values are used before the first frame (current values are not used). If false, alpha transitions between current and timeline values, no change is made before the first frame.
+  /// @param add If true, for timelines that support it, their values are added to the setup or current values (depending on fromSetup).
+  /// @param out True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant transitions.
+  /// @param appliedPose True to modify getAppliedPose(), else getPose() is modified.
   void spine_timeline_apply(
     spine_timeline self,
     spine_skeleton skeleton,
@@ -44644,8 +46390,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_timeline_apply(
@@ -44655,8 +46402,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -44664,9 +46412,37 @@ class SpineDartBindings {
   late final _spine_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event, ffi.Float,
-              ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_timeline_apply');
+              ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_timeline_apply');
   late final _spine_timeline_apply = _spine_timeline_applyPtr.asFunction<
-      void Function(spine_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+      void Function(
+          spine_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool, bool, bool)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_timeline_get_additive(
+    spine_timeline self,
+  ) {
+    return _spine_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_timeline)>>('spine_timeline_get_additive');
+  late final _spine_timeline_get_additive = _spine_timeline_get_additivePtr.asFunction<bool Function(spine_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_timeline_get_instant(
+    spine_timeline self,
+  ) {
+    return _spine_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_timeline)>>('spine_timeline_get_instant');
+  late final _spine_timeline_get_instant = _spine_timeline_get_instantPtr.asFunction<bool Function(spine_timeline)>();
 
   int spine_timeline_get_frame_entries(
     spine_timeline self,
@@ -45506,48 +47282,37 @@ class SpineDartBindings {
   late final _spine_track_entry_set_loop =
       _spine_track_entry_set_loopPtr.asFunction<void Function(spine_track_entry, bool)>();
 
-  /// If true, when mixing from the previous animation to this animation, the
-  /// previous animation is applied as normal instead of being mixed out.
-  ///
-  /// When mixing between animations that key the same property, if a lower track
-  /// also keys that property then the value will briefly dip toward the lower
-  /// track value during the mix. This happens because the first animation mixes
-  /// from 100% to 0% while the second animation mixes from 0% to 100%. Setting
-  /// holdPrevious to true applies the first animation at 100% during the mix so
-  /// the lower track value is overwritten. Such dipping does not occur on the
-  /// lowest track which keys the property, only when a higher track also keys the
-  /// property.
-  ///
-  /// Snapping will occur if holdPrevious is true and this animation does not key
-  /// all the same properties as the previous animation.
-  bool spine_track_entry_get_hold_previous(
+  /// When true, timelines in this animation that support additive have their
+  /// values added to the setup or current pose values instead of replacing them.
+  /// Additive can be set for a new track entry only before AnimationState::apply()
+  /// is next called.
+  bool spine_track_entry_get_additive(
     spine_track_entry self,
   ) {
-    return _spine_track_entry_get_hold_previous(
+    return _spine_track_entry_get_additive(
       self,
     );
   }
 
-  late final _spine_track_entry_get_hold_previousPtr =
-      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_track_entry)>>('spine_track_entry_get_hold_previous');
-  late final _spine_track_entry_get_hold_previous =
-      _spine_track_entry_get_hold_previousPtr.asFunction<bool Function(spine_track_entry)>();
+  late final _spine_track_entry_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_track_entry)>>('spine_track_entry_get_additive');
+  late final _spine_track_entry_get_additive =
+      _spine_track_entry_get_additivePtr.asFunction<bool Function(spine_track_entry)>();
 
-  void spine_track_entry_set_hold_previous(
+  void spine_track_entry_set_additive(
     spine_track_entry self,
     bool inValue,
   ) {
-    return _spine_track_entry_set_hold_previous(
+    return _spine_track_entry_set_additive(
       self,
       inValue,
     );
   }
 
-  late final _spine_track_entry_set_hold_previousPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Bool)>>(
-          'spine_track_entry_set_hold_previous');
-  late final _spine_track_entry_set_hold_previous =
-      _spine_track_entry_set_hold_previousPtr.asFunction<void Function(spine_track_entry, bool)>();
+  late final _spine_track_entry_set_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Bool)>>('spine_track_entry_set_additive');
+  late final _spine_track_entry_set_additive =
+      _spine_track_entry_set_additivePtr.asFunction<void Function(spine_track_entry, bool)>();
 
   bool spine_track_entry_get_reverse(
     spine_track_entry self,
@@ -45607,17 +47372,17 @@ class SpineDartBindings {
       _spine_track_entry_set_shortest_rotationPtr.asFunction<void Function(spine_track_entry, bool)>();
 
   /// Seconds to postpone playing the animation. Must be >= 0. When this track
-  /// entry is the current track entry, delay postpones incrementing the
-  /// getTrackTime(). When this track entry is queued, delay is the time from the
-  /// start of the previous animation to when this track entry will become the
-  /// current track entry (ie when the previous track entry getTrackTime() >= this
-  /// track entry's delay).
+  /// entry is the current track entry, delay postpones incrementing the track
+  /// time. When this track entry is queued, delay is the time from the start of
+  /// the previous animation to when this track entry will become the current track
+  /// entry (ie when the previous track entry's track time >= this track entry's
+  /// delay).
   ///
-  /// getTimeScale() affects the delay.
+  /// Time scale affects the delay.
   ///
   /// When passing delay < = 0 to AnimationState::addAnimation(int, Animation,
-  /// bool, float) this delay is set using a mix duration from AnimationStateData.
-  /// To change the getMixDuration() afterward, use setMixDuration(float, float) so
+  /// bool, float), this delay is set using a mix duration from AnimationStateData.
+  /// To change the mix duration afterward, use setMixDuration(float, float) so
   /// this delay is adjusted.
   double spine_track_entry_get_delay(
     spine_track_entry self,
@@ -45816,13 +47581,12 @@ class SpineDartBindings {
   late final _spine_track_entry_set_animation_last =
       _spine_track_entry_set_animation_lastPtr.asFunction<void Function(spine_track_entry, double)>();
 
-  /// Uses getTrackTime() to compute the animationTime. When the trackTime is 0,
-  /// the animationTime is equal to the animationStart time.
+  /// Uses the track time to compute animationTime. When trackTime is 0,
+  /// animationTime is equal to animationStart.
   ///
-  /// The animationTime is between getAnimationStart() and getAnimationEnd(),
-  /// except if this track entry is non-looping and getAnimationEnd() is >= to the
-  /// animation duration, then animationTime continues to increase past
-  /// getAnimationEnd().
+  /// animationTime is between animationStart and animationEnd, except if this
+  /// track entry is non-looping and animationEnd is >= the animation duration,
+  /// then animationTime continues to increase past animationEnd.
   double spine_track_entry_get_animation_time(
     spine_track_entry self,
   ) {
@@ -45839,18 +47603,17 @@ class SpineDartBindings {
   /// Multiplier for the delta time when this track entry is updated, causing time
   /// for this animation to pass slower or faster. Defaults to 1.
   ///
-  /// Values < 0 are not supported. To play an animation in reverse, use
-  /// getReverse().
+  /// Values < 0 are not supported. To play an animation in reverse, use reverse.
   ///
-  /// getMixTime() is not affected by track entry time scale, so getMixDuration()
-  /// may need to be adjusted to match the animation speed.
+  /// mixTime is not affected by track entry time scale, so mixDuration may need to
+  /// be adjusted to match the animation speed.
   ///
   /// When using AnimationState::addAnimation(int, Animation, bool, float) with a
-  /// delay < = 0, the getDelay() is set using the mix duration from the
-  /// AnimationStateData, assuming time scale to be 1. If the time scale is not 1,
-  /// the delay may need to be adjusted.
+  /// delay < = 0, delay is set using the mix duration from AnimationStateData,
+  /// assuming time scale to be 1. If the time scale is not 1, the delay may need
+  /// to be adjusted.
   ///
-  /// See AnimationState getTimeScale() for affecting all animations.
+  /// See AnimationState::getTimeScale() for affecting all animations.
   double spine_track_entry_get_time_scale(
     spine_track_entry self,
   ) {
@@ -45980,9 +47743,8 @@ class SpineDartBindings {
   late final _spine_track_entry_set_mix_attachment_threshold =
       _spine_track_entry_set_mix_attachment_thresholdPtr.asFunction<void Function(spine_track_entry, double)>();
 
-  /// When getAlpha() is greater than alphaAttachmentThreshold, attachment
-  /// timelines are applied. Defaults to 0, so attachment timelines are always
-  /// applied.
+  /// When alpha is greater than alphaAttachmentThreshold, attachment timelines are
+  /// applied. Defaults to 0, so attachment timelines are always applied.
   double spine_track_entry_get_alpha_attachment_threshold(
     spine_track_entry self,
   ) {
@@ -46075,8 +47837,8 @@ class SpineDartBindings {
       _spine_track_entry_is_completePtr.asFunction<bool Function(spine_track_entry)>();
 
   /// Seconds from 0 to the mix duration when mixing from the previous animation to
-  /// this animation. May be slightly more than TrackEntry.MixDuration when the mix
-  /// is complete.
+  /// this animation. May be slightly more than mixDuration when the mix is
+  /// complete.
   double spine_track_entry_get_mix_time(
     spine_track_entry self,
   ) {
@@ -46145,9 +47907,9 @@ class SpineDartBindings {
   late final _spine_track_entry_set_mix_duration_1 =
       _spine_track_entry_set_mix_duration_1Ptr.asFunction<void Function(spine_track_entry, double)>();
 
-  /// Sets both getMixDuration() and getDelay().
+  /// Sets both mixDuration and delay.
   ///
-  /// @param delay If > 0, sets TrackEntry::getDelay(). If < = 0, the delay set is the duration of the previous track entry minus the specified mix duration plus the specified delay (ie the mix ends at (delay = 0) or before (delay < 0) the previous track entry duration). If the previous entry is looping, its next loop completion is used instead of its duration.
+  /// @param delay If > 0, sets delay. If < = 0, the delay set is the duration of the previous track entry minus the specified mix duration plus the specified delay (ie the mix ends at (delay = 0) or before (delay < 0) the previous track entry duration). If the previous entry is looping, its next loop completion is used instead of its duration.
   void spine_track_entry_set_mix_duration_2(
     spine_track_entry self,
     double mixDuration,
@@ -46165,34 +47927,6 @@ class SpineDartBindings {
           'spine_track_entry_set_mix_duration_2');
   late final _spine_track_entry_set_mix_duration_2 =
       _spine_track_entry_set_mix_duration_2Ptr.asFunction<void Function(spine_track_entry, double, double)>();
-
-  int spine_track_entry_get_mix_blend(
-    spine_track_entry self,
-  ) {
-    return _spine_track_entry_get_mix_blend(
-      self,
-    );
-  }
-
-  late final _spine_track_entry_get_mix_blendPtr =
-      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_track_entry)>>('spine_track_entry_get_mix_blend');
-  late final _spine_track_entry_get_mix_blend =
-      _spine_track_entry_get_mix_blendPtr.asFunction<int Function(spine_track_entry)>();
-
-  void spine_track_entry_set_mix_blend(
-    spine_track_entry self,
-    int blend,
-  ) {
-    return _spine_track_entry_set_mix_blend(
-      self,
-      blend,
-    );
-  }
-
-  late final _spine_track_entry_set_mix_blendPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(spine_track_entry, ffi.Int32)>>('spine_track_entry_set_mix_blend');
-  late final _spine_track_entry_set_mix_blend =
-      _spine_track_entry_set_mix_blendPtr.asFunction<void Function(spine_track_entry, int)>();
 
   spine_track_entry spine_track_entry_get_mixing_from(
     spine_track_entry self,
@@ -46286,7 +48020,7 @@ class SpineDartBindings {
   late final _spine_track_entry_was_applied =
       _spine_track_entry_was_appliedPtr.asFunction<bool Function(spine_track_entry)>();
 
-  /// Returns true if there is a getNext() track entry that is ready to become the
+  /// Returns true if there is a next track entry that is ready to become the
   /// current track entry during the next AnimationState::update(float)}
   bool spine_track_entry_is_next_ready(
     spine_track_entry self,
@@ -46468,7 +48202,7 @@ class SpineDartBindings {
   late final _spine_transform_constraint_get_bones =
       _spine_transform_constraint_get_bonesPtr.asFunction<spine_array_bone_pose Function(spine_transform_constraint)>();
 
-  /// The bone whose world transform will be copied to the constrained bones.
+  /// The bone whose world transform will be matched by the constrained bones.
   spine_bone spine_transform_constraint_get_source(
     spine_transform_constraint self,
   ) {
@@ -46513,6 +48247,8 @@ class SpineDartBindings {
   late final _spine_transform_constraint_get_data = _spine_transform_constraint_get_dataPtr
       .asFunction<spine_transform_constraint_data Function(spine_transform_constraint)>();
 
+  /// The unconstrained pose for this object, set by animations and application
+  /// code.
   spine_transform_constraint_pose spine_transform_constraint_get_pose(
     spine_transform_constraint self,
   ) {
@@ -46527,6 +48263,9 @@ class SpineDartBindings {
   late final _spine_transform_constraint_get_pose = _spine_transform_constraint_get_posePtr
       .asFunction<spine_transform_constraint_pose Function(spine_transform_constraint)>();
 
+  /// The pose to use for rendering. If no constraints modify this pose, this is
+  /// the same as getPose(). Otherwise it is a copy of getPose() modified by
+  /// constraints.
   spine_transform_constraint_pose spine_transform_constraint_get_applied_pose(
     spine_transform_constraint self,
   ) {
@@ -46541,6 +48280,8 @@ class SpineDartBindings {
   late final _spine_transform_constraint_get_applied_pose = _spine_transform_constraint_get_applied_posePtr
       .asFunction<spine_transform_constraint_pose Function(spine_transform_constraint)>();
 
+  /// Sets the constrained pose to the unconstrained pose, as a starting point for
+  /// constraints to be applied.
   void spine_transform_constraint_reset_constrained(
     spine_transform_constraint self,
   ) {
@@ -46555,6 +48296,8 @@ class SpineDartBindings {
   late final _spine_transform_constraint_reset_constrained =
       _spine_transform_constraint_reset_constrainedPtr.asFunction<void Function(spine_transform_constraint)>();
 
+  /// Sets the applied pose to the constrained pose, in anticipation of the applied
+  /// pose being modified by constraints.
   void spine_transform_constraint_constrained(
     spine_transform_constraint self,
   ) {
@@ -46583,6 +48326,11 @@ class SpineDartBindings {
   late final _spine_transform_constraint_is_pose_equal_to_applied =
       _spine_transform_constraint_is_pose_equal_to_appliedPtr.asFunction<bool Function(spine_transform_constraint)>();
 
+  /// Returns false when this won't be updated by
+  /// Skeleton::updateWorldTransform(Physics) because a skin is required and the
+  /// active skin does not contain this item. See Skin::getBones(),
+  /// Skin::getConstraints(), PosedData::getSkinRequired(), and
+  /// Skeleton::updateCache().
   bool spine_transform_constraint_is_active(
     spine_transform_constraint self,
   ) {
@@ -46649,6 +48397,8 @@ class SpineDartBindings {
   late final _spine_transform_constraint_base_get_data = _spine_transform_constraint_base_get_dataPtr
       .asFunction<spine_transform_constraint_data Function(spine_transform_constraint_base)>();
 
+  /// The unconstrained pose for this object, set by animations and application
+  /// code.
   spine_transform_constraint_pose spine_transform_constraint_base_get_pose(
     spine_transform_constraint_base self,
   ) {
@@ -46663,6 +48413,9 @@ class SpineDartBindings {
   late final _spine_transform_constraint_base_get_pose = _spine_transform_constraint_base_get_posePtr
       .asFunction<spine_transform_constraint_pose Function(spine_transform_constraint_base)>();
 
+  /// The pose to use for rendering. If no constraints modify this pose, this is
+  /// the same as getPose(). Otherwise it is a copy of getPose() modified by
+  /// constraints.
   spine_transform_constraint_pose spine_transform_constraint_base_get_applied_pose(
     spine_transform_constraint_base self,
   ) {
@@ -46677,6 +48430,8 @@ class SpineDartBindings {
   late final _spine_transform_constraint_base_get_applied_pose = _spine_transform_constraint_base_get_applied_posePtr
       .asFunction<spine_transform_constraint_pose Function(spine_transform_constraint_base)>();
 
+  /// Sets the constrained pose to the unconstrained pose, as a starting point for
+  /// constraints to be applied.
   void spine_transform_constraint_base_reset_constrained(
     spine_transform_constraint_base self,
   ) {
@@ -46691,6 +48446,8 @@ class SpineDartBindings {
   late final _spine_transform_constraint_base_reset_constrained = _spine_transform_constraint_base_reset_constrainedPtr
       .asFunction<void Function(spine_transform_constraint_base)>();
 
+  /// Sets the applied pose to the constrained pose, in anticipation of the applied
+  /// pose being modified by constraints.
   void spine_transform_constraint_base_constrained(
     spine_transform_constraint_base self,
   ) {
@@ -46720,6 +48477,11 @@ class SpineDartBindings {
       _spine_transform_constraint_base_is_pose_equal_to_appliedPtr
           .asFunction<bool Function(spine_transform_constraint_base)>();
 
+  /// Returns false when this won't be updated by
+  /// Skeleton::updateWorldTransform(Physics) because a skin is required and the
+  /// active skin does not contain this item. See Skin::getBones(),
+  /// Skin::getConstraints(), PosedData::getSkinRequired(), and
+  /// Skeleton::updateCache().
   bool spine_transform_constraint_base_is_active(
     spine_transform_constraint_base self,
   ) {
@@ -47291,6 +49053,7 @@ class SpineDartBindings {
   late final _spine_transform_constraint_data_get_skin_required = _spine_transform_constraint_data_get_skin_requiredPtr
       .asFunction<bool Function(spine_transform_constraint_data)>();
 
+  /// The setup pose that most animations are relative to.
   spine_transform_constraint_pose spine_transform_constraint_data_get_setup_pose(
     spine_transform_constraint_data self,
   ) {
@@ -47369,8 +49132,8 @@ class SpineDartBindings {
   late final _spine_transform_constraint_pose_set = _spine_transform_constraint_pose_setPtr
       .asFunction<void Function(spine_transform_constraint_pose, spine_transform_constraint_pose)>();
 
-  /// A percentage (0-1) that controls the mix between the constrained and
-  /// unconstrained rotation.
+  /// A percentage that controls the mix between the constrained and unconstrained
+  /// rotation.
   double spine_transform_constraint_pose_get_mix_rotate(
     spine_transform_constraint_pose self,
   ) {
@@ -47401,8 +49164,8 @@ class SpineDartBindings {
   late final _spine_transform_constraint_pose_set_mix_rotate = _spine_transform_constraint_pose_set_mix_rotatePtr
       .asFunction<void Function(spine_transform_constraint_pose, double)>();
 
-  /// A percentage (0-1) that controls the mix between the constrained and
-  /// unconstrained translation X.
+  /// A percentage that controls the mix between the constrained and unconstrained
+  /// translation X.
   double spine_transform_constraint_pose_get_mix_x(
     spine_transform_constraint_pose self,
   ) {
@@ -47433,8 +49196,8 @@ class SpineDartBindings {
   late final _spine_transform_constraint_pose_set_mix_x = _spine_transform_constraint_pose_set_mix_xPtr
       .asFunction<void Function(spine_transform_constraint_pose, double)>();
 
-  /// A percentage (0-1) that controls the mix between the constrained and
-  /// unconstrained translation Y.
+  /// A percentage that controls the mix between the constrained and unconstrained
+  /// translation Y.
   double spine_transform_constraint_pose_get_mix_y(
     spine_transform_constraint_pose self,
   ) {
@@ -47465,8 +49228,8 @@ class SpineDartBindings {
   late final _spine_transform_constraint_pose_set_mix_y = _spine_transform_constraint_pose_set_mix_yPtr
       .asFunction<void Function(spine_transform_constraint_pose, double)>();
 
-  /// A percentage (0-1) that controls the mix between the constrained and
-  /// unconstrained scale X.
+  /// A percentage that controls the mix between the constrained and unconstrained
+  /// scale X.
   double spine_transform_constraint_pose_get_mix_scale_x(
     spine_transform_constraint_pose self,
   ) {
@@ -47497,8 +49260,8 @@ class SpineDartBindings {
   late final _spine_transform_constraint_pose_set_mix_scale_x = _spine_transform_constraint_pose_set_mix_scale_xPtr
       .asFunction<void Function(spine_transform_constraint_pose, double)>();
 
-  /// A percentage (0-1) that controls the mix between the constrained and
-  /// unconstrained scale Y.
+  /// A percentage that controls the mix between the constrained and unconstrained
+  /// scale Y.
   double spine_transform_constraint_pose_get_mix_scale_y(
     spine_transform_constraint_pose self,
   ) {
@@ -47529,8 +49292,8 @@ class SpineDartBindings {
   late final _spine_transform_constraint_pose_set_mix_scale_y = _spine_transform_constraint_pose_set_mix_scale_yPtr
       .asFunction<void Function(spine_transform_constraint_pose, double)>();
 
-  /// A percentage (0-1) that controls the mix between the constrained and
-  /// unconstrained shear Y.
+  /// A percentage that controls the mix between the constrained and unconstrained
+  /// shear Y.
   double spine_transform_constraint_pose_get_mix_shear_y(
     spine_transform_constraint_pose self,
   ) {
@@ -47614,8 +49377,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_transform_constraint_timeline_apply(
@@ -47625,8 +49389,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -47640,12 +49405,13 @@ class SpineDartBindings {
               ffi.Float,
               spine_array_event,
               ffi.Float,
-              ffi.Int32,
-              ffi.Int32,
+              ffi.Bool,
+              ffi.Bool,
+              ffi.Bool,
               ffi.Bool)>>('spine_transform_constraint_timeline_apply');
   late final _spine_transform_constraint_timeline_apply = _spine_transform_constraint_timeline_applyPtr.asFunction<
-      void Function(spine_transform_constraint_timeline, spine_skeleton, double, double, spine_array_event, double, int,
-          int, bool)>();
+      void Function(spine_transform_constraint_timeline, spine_skeleton, double, double, spine_array_event, double,
+          bool, bool, bool, bool)>();
 
   /// Sets the time, rotate mix, translate mix, scale mix, and shear mix for the
   /// specified frame.
@@ -47837,6 +49603,37 @@ class SpineDartBindings {
   late final _spine_transform_constraint_timeline_get_curves = _spine_transform_constraint_timeline_get_curvesPtr
       .asFunction<spine_array_float Function(spine_transform_constraint_timeline)>();
 
+  /// True if this timeline supports additive blending.
+  bool spine_transform_constraint_timeline_get_additive(
+    spine_transform_constraint_timeline self,
+  ) {
+    return _spine_transform_constraint_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_transform_constraint_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_transform_constraint_timeline)>>(
+          'spine_transform_constraint_timeline_get_additive');
+  late final _spine_transform_constraint_timeline_get_additive = _spine_transform_constraint_timeline_get_additivePtr
+      .asFunction<bool Function(spine_transform_constraint_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_transform_constraint_timeline_get_instant(
+    spine_transform_constraint_timeline self,
+  ) {
+    return _spine_transform_constraint_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_transform_constraint_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_transform_constraint_timeline)>>(
+          'spine_transform_constraint_timeline_get_instant');
+  late final _spine_transform_constraint_timeline_get_instant = _spine_transform_constraint_timeline_get_instantPtr
+      .asFunction<bool Function(spine_transform_constraint_timeline)>();
+
   int spine_transform_constraint_timeline_get_frame_entries(
     spine_transform_constraint_timeline self,
   ) {
@@ -47970,8 +49767,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_translate_timeline_apply(
@@ -47981,8 +49779,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -47990,10 +49789,10 @@ class SpineDartBindings {
   late final _spine_translate_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_translate_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event,
-              ffi.Float, ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_translate_timeline_apply');
+              ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_translate_timeline_apply');
   late final _spine_translate_timeline_apply = _spine_translate_timeline_applyPtr.asFunction<
-      void Function(
-          spine_translate_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+      void Function(spine_translate_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool,
+          bool, bool)>();
 
   int spine_translate_timeline_get_bone_index(
     spine_translate_timeline self,
@@ -48153,6 +49952,35 @@ class SpineDartBindings {
   late final _spine_translate_timeline_get_curves =
       _spine_translate_timeline_get_curvesPtr.asFunction<spine_array_float Function(spine_translate_timeline)>();
 
+  /// True if this timeline supports additive blending.
+  bool spine_translate_timeline_get_additive(
+    spine_translate_timeline self,
+  ) {
+    return _spine_translate_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_translate_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_translate_timeline)>>('spine_translate_timeline_get_additive');
+  late final _spine_translate_timeline_get_additive =
+      _spine_translate_timeline_get_additivePtr.asFunction<bool Function(spine_translate_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_translate_timeline_get_instant(
+    spine_translate_timeline self,
+  ) {
+    return _spine_translate_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_translate_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_translate_timeline)>>('spine_translate_timeline_get_instant');
+  late final _spine_translate_timeline_get_instant =
+      _spine_translate_timeline_get_instantPtr.asFunction<bool Function(spine_translate_timeline)>();
+
   int spine_translate_timeline_get_frame_entries(
     spine_translate_timeline self,
   ) {
@@ -48283,8 +50111,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_translate_x_timeline_apply(
@@ -48294,8 +50123,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -48303,10 +50133,10 @@ class SpineDartBindings {
   late final _spine_translate_x_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_translate_x_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event,
-              ffi.Float, ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_translate_x_timeline_apply');
+              ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_translate_x_timeline_apply');
   late final _spine_translate_x_timeline_apply = _spine_translate_x_timeline_applyPtr.asFunction<
-      void Function(
-          spine_translate_x_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+      void Function(spine_translate_x_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool,
+          bool, bool)>();
 
   int spine_translate_x_timeline_get_bone_index(
     spine_translate_x_timeline self,
@@ -48383,7 +50213,8 @@ class SpineDartBindings {
     spine_translate_x_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -48391,7 +50222,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -48399,16 +50231,17 @@ class SpineDartBindings {
 
   late final _spine_translate_x_timeline_get_relative_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_translate_x_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_translate_x_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_translate_x_timeline_get_relative_value');
   late final _spine_translate_x_timeline_get_relative_value = _spine_translate_x_timeline_get_relative_valuePtr
-      .asFunction<double Function(spine_translate_x_timeline, double, double, int, double, double)>();
+      .asFunction<double Function(spine_translate_x_timeline, double, double, bool, bool, double, double)>();
 
   double spine_translate_x_timeline_get_absolute_value_1(
     spine_translate_x_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -48416,7 +50249,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -48424,16 +50258,17 @@ class SpineDartBindings {
 
   late final _spine_translate_x_timeline_get_absolute_value_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_translate_x_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_translate_x_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_translate_x_timeline_get_absolute_value_1');
   late final _spine_translate_x_timeline_get_absolute_value_1 = _spine_translate_x_timeline_get_absolute_value_1Ptr
-      .asFunction<double Function(spine_translate_x_timeline, double, double, int, double, double)>();
+      .asFunction<double Function(spine_translate_x_timeline, double, double, bool, bool, double, double)>();
 
   double spine_translate_x_timeline_get_absolute_value_2(
     spine_translate_x_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
     double value,
@@ -48442,7 +50277,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
       value,
@@ -48451,17 +50287,18 @@ class SpineDartBindings {
 
   late final _spine_translate_x_timeline_get_absolute_value_2Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_translate_x_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float, ffi.Float,
+          ffi.Float Function(spine_translate_x_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float, ffi.Float,
               ffi.Float)>>('spine_translate_x_timeline_get_absolute_value_2');
   late final _spine_translate_x_timeline_get_absolute_value_2 = _spine_translate_x_timeline_get_absolute_value_2Ptr
-      .asFunction<double Function(spine_translate_x_timeline, double, double, int, double, double, double)>();
+      .asFunction<double Function(spine_translate_x_timeline, double, double, bool, bool, double, double, double)>();
 
   double spine_translate_x_timeline_get_scale_value(
     spine_translate_x_timeline self,
     double time,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     double current,
     double setup,
   ) {
@@ -48469,8 +50306,9 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       current,
       setup,
     );
@@ -48478,10 +50316,10 @@ class SpineDartBindings {
 
   late final _spine_translate_x_timeline_get_scale_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_translate_x_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_translate_x_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_translate_x_timeline_get_scale_value');
   late final _spine_translate_x_timeline_get_scale_value = _spine_translate_x_timeline_get_scale_valuePtr
-      .asFunction<double Function(spine_translate_x_timeline, double, double, int, int, double, double)>();
+      .asFunction<double Function(spine_translate_x_timeline, double, double, bool, bool, bool, double, double)>();
 
   void spine_translate_x_timeline_set_linear(
     spine_translate_x_timeline self,
@@ -48588,6 +50426,37 @@ class SpineDartBindings {
           'spine_translate_x_timeline_get_curves');
   late final _spine_translate_x_timeline_get_curves =
       _spine_translate_x_timeline_get_curvesPtr.asFunction<spine_array_float Function(spine_translate_x_timeline)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_translate_x_timeline_get_additive(
+    spine_translate_x_timeline self,
+  ) {
+    return _spine_translate_x_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_translate_x_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_translate_x_timeline)>>(
+          'spine_translate_x_timeline_get_additive');
+  late final _spine_translate_x_timeline_get_additive =
+      _spine_translate_x_timeline_get_additivePtr.asFunction<bool Function(spine_translate_x_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_translate_x_timeline_get_instant(
+    spine_translate_x_timeline self,
+  ) {
+    return _spine_translate_x_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_translate_x_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_translate_x_timeline)>>(
+          'spine_translate_x_timeline_get_instant');
+  late final _spine_translate_x_timeline_get_instant =
+      _spine_translate_x_timeline_get_instantPtr.asFunction<bool Function(spine_translate_x_timeline)>();
 
   int spine_translate_x_timeline_get_frame_entries(
     spine_translate_x_timeline self,
@@ -48719,8 +50588,9 @@ class SpineDartBindings {
     double time,
     spine_array_event events,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     bool appliedPose,
   ) {
     return _spine_translate_y_timeline_apply(
@@ -48730,8 +50600,9 @@ class SpineDartBindings {
       time,
       events,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       appliedPose,
     );
   }
@@ -48739,10 +50610,10 @@ class SpineDartBindings {
   late final _spine_translate_y_timeline_applyPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_translate_y_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event,
-              ffi.Float, ffi.Int32, ffi.Int32, ffi.Bool)>>('spine_translate_y_timeline_apply');
+              ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_translate_y_timeline_apply');
   late final _spine_translate_y_timeline_apply = _spine_translate_y_timeline_applyPtr.asFunction<
-      void Function(
-          spine_translate_y_timeline, spine_skeleton, double, double, spine_array_event, double, int, int, bool)>();
+      void Function(spine_translate_y_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool,
+          bool, bool)>();
 
   int spine_translate_y_timeline_get_bone_index(
     spine_translate_y_timeline self,
@@ -48819,7 +50690,8 @@ class SpineDartBindings {
     spine_translate_y_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -48827,7 +50699,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -48835,16 +50708,17 @@ class SpineDartBindings {
 
   late final _spine_translate_y_timeline_get_relative_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_translate_y_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_translate_y_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_translate_y_timeline_get_relative_value');
   late final _spine_translate_y_timeline_get_relative_value = _spine_translate_y_timeline_get_relative_valuePtr
-      .asFunction<double Function(spine_translate_y_timeline, double, double, int, double, double)>();
+      .asFunction<double Function(spine_translate_y_timeline, double, double, bool, bool, double, double)>();
 
   double spine_translate_y_timeline_get_absolute_value_1(
     spine_translate_y_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
   ) {
@@ -48852,7 +50726,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
     );
@@ -48860,16 +50735,17 @@ class SpineDartBindings {
 
   late final _spine_translate_y_timeline_get_absolute_value_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_translate_y_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_translate_y_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_translate_y_timeline_get_absolute_value_1');
   late final _spine_translate_y_timeline_get_absolute_value_1 = _spine_translate_y_timeline_get_absolute_value_1Ptr
-      .asFunction<double Function(spine_translate_y_timeline, double, double, int, double, double)>();
+      .asFunction<double Function(spine_translate_y_timeline, double, double, bool, bool, double, double)>();
 
   double spine_translate_y_timeline_get_absolute_value_2(
     spine_translate_y_timeline self,
     double time,
     double alpha,
-    int blend,
+    bool fromSetup,
+    bool add,
     double current,
     double setup,
     double value,
@@ -48878,7 +50754,8 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
+      fromSetup,
+      add,
       current,
       setup,
       value,
@@ -48887,17 +50764,18 @@ class SpineDartBindings {
 
   late final _spine_translate_y_timeline_get_absolute_value_2Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_translate_y_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Float, ffi.Float,
+          ffi.Float Function(spine_translate_y_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Float, ffi.Float,
               ffi.Float)>>('spine_translate_y_timeline_get_absolute_value_2');
   late final _spine_translate_y_timeline_get_absolute_value_2 = _spine_translate_y_timeline_get_absolute_value_2Ptr
-      .asFunction<double Function(spine_translate_y_timeline, double, double, int, double, double, double)>();
+      .asFunction<double Function(spine_translate_y_timeline, double, double, bool, bool, double, double, double)>();
 
   double spine_translate_y_timeline_get_scale_value(
     spine_translate_y_timeline self,
     double time,
     double alpha,
-    int blend,
-    int direction,
+    bool fromSetup,
+    bool add,
+    bool out,
     double current,
     double setup,
   ) {
@@ -48905,8 +50783,9 @@ class SpineDartBindings {
       self,
       time,
       alpha,
-      blend,
-      direction,
+      fromSetup,
+      add,
+      out,
       current,
       setup,
     );
@@ -48914,10 +50793,10 @@ class SpineDartBindings {
 
   late final _spine_translate_y_timeline_get_scale_valuePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Float Function(spine_translate_y_timeline, ffi.Float, ffi.Float, ffi.Int32, ffi.Int32, ffi.Float,
+          ffi.Float Function(spine_translate_y_timeline, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool, ffi.Float,
               ffi.Float)>>('spine_translate_y_timeline_get_scale_value');
   late final _spine_translate_y_timeline_get_scale_value = _spine_translate_y_timeline_get_scale_valuePtr
-      .asFunction<double Function(spine_translate_y_timeline, double, double, int, int, double, double)>();
+      .asFunction<double Function(spine_translate_y_timeline, double, double, bool, bool, bool, double, double)>();
 
   void spine_translate_y_timeline_set_linear(
     spine_translate_y_timeline self,
@@ -49024,6 +50903,37 @@ class SpineDartBindings {
           'spine_translate_y_timeline_get_curves');
   late final _spine_translate_y_timeline_get_curves =
       _spine_translate_y_timeline_get_curvesPtr.asFunction<spine_array_float Function(spine_translate_y_timeline)>();
+
+  /// True if this timeline supports additive blending.
+  bool spine_translate_y_timeline_get_additive(
+    spine_translate_y_timeline self,
+  ) {
+    return _spine_translate_y_timeline_get_additive(
+      self,
+    );
+  }
+
+  late final _spine_translate_y_timeline_get_additivePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_translate_y_timeline)>>(
+          'spine_translate_y_timeline_get_additive');
+  late final _spine_translate_y_timeline_get_additive =
+      _spine_translate_y_timeline_get_additivePtr.asFunction<bool Function(spine_translate_y_timeline)>();
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool spine_translate_y_timeline_get_instant(
+    spine_translate_y_timeline self,
+  ) {
+    return _spine_translate_y_timeline_get_instant(
+      self,
+    );
+  }
+
+  late final _spine_translate_y_timeline_get_instantPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_translate_y_timeline)>>(
+          'spine_translate_y_timeline_get_instant');
+  late final _spine_translate_y_timeline_get_instant =
+      _spine_translate_y_timeline_get_instantPtr.asFunction<bool Function(spine_translate_y_timeline)>();
 
   int spine_translate_y_timeline_get_frame_entries(
     spine_translate_y_timeline self,
@@ -49178,8 +51088,8 @@ class SpineDartBindings {
   late final _spine_vertex_attachment_get_rtti =
       _spine_vertex_attachment_get_rttiPtr.asFunction<spine_rtti Function(spine_vertex_attachment)>();
 
-  /// Transforms the attachment's local vertices to world coordinates. If the
-  /// slot's SlotPose::getDeform() is not empty, it is used to deform the vertices.
+  /// Transforms the attachment's local vertices to world coordinates. If
+  /// SlotPose::getDeform() is not empty, it is used to deform the vertices.
   ///
   /// See https://esotericsoftware.com/spine-runtime-skeletons#World-transforms
   /// World transforms in the Spine Runtimes Guide.
@@ -49264,6 +51174,9 @@ class SpineDartBindings {
   late final _spine_vertex_attachment_get_id =
       _spine_vertex_attachment_get_idPtr.asFunction<int Function(spine_vertex_attachment)>();
 
+  /// The bones that affect the vertices. The entries are, for each vertex, the
+  /// number of bones affecting the vertex followed by that many bone indices,
+  /// which is Skeleton::getBones() index. Empty if this attachment has no weights.
   spine_array_int spine_vertex_attachment_get_bones(
     spine_vertex_attachment self,
   ) {
@@ -49294,6 +51207,10 @@ class SpineDartBindings {
   late final _spine_vertex_attachment_set_bones =
       _spine_vertex_attachment_set_bonesPtr.asFunction<void Function(spine_vertex_attachment, spine_array_int)>();
 
+  /// The vertex positions in the bone's coordinate system. For a non-weighted
+  /// attachment, the values are x,y pairs for each vertex. For a weighted
+  /// attachment, the values are x,y,weight triplets for each bone affecting each
+  /// vertex.
   spine_array_float spine_vertex_attachment_get_vertices(
     spine_vertex_attachment self,
   ) {
@@ -49534,6 +51451,8 @@ final class spine_curve_timeline_wrapper extends ffi.Opaque {}
 final class spine_curve_timeline1_wrapper extends ffi.Opaque {}
 
 final class spine_deform_timeline_wrapper extends ffi.Opaque {}
+
+final class spine_draw_order_wrapper extends ffi.Opaque {}
 
 final class spine_draw_order_folder_timeline_wrapper extends ffi.Opaque {}
 
@@ -49783,18 +51702,6 @@ abstract class spine_inherit {
   static const int SPINE_INHERIT_NO_SCALE_OR_REFLECTION = 4;
 }
 
-abstract class spine_mix_blend {
-  static const int SPINE_MIX_BLEND_SETUP = 0;
-  static const int SPINE_MIX_BLEND_FIRST = 1;
-  static const int SPINE_MIX_BLEND_REPLACE = 2;
-  static const int SPINE_MIX_BLEND_ADD = 3;
-}
-
-abstract class spine_mix_direction {
-  static const int SPINE_MIX_DIRECTION_IN = 0;
-  static const int SPINE_MIX_DIRECTION_OUT = 1;
-}
-
 abstract class spine_physics {
   static const int SPINE_PHYSICS_NONE = 0;
   static const int SPINE_PHYSICS_RESET = 1;
@@ -49808,37 +51715,38 @@ abstract class spine_position_mode {
 }
 
 abstract class spine_property {
-  static const int SPINE_PROPERTY_ROTATE = 1;
-  static const int SPINE_PROPERTY_X = 2;
-  static const int SPINE_PROPERTY_Y = 4;
-  static const int SPINE_PROPERTY_SCALE_X = 8;
-  static const int SPINE_PROPERTY_SCALE_Y = 16;
-  static const int SPINE_PROPERTY_SHEAR_X = 32;
-  static const int SPINE_PROPERTY_SHEAR_Y = 64;
-  static const int SPINE_PROPERTY_INHERIT = 128;
-  static const int SPINE_PROPERTY_RGB = 256;
-  static const int SPINE_PROPERTY_ALPHA = 512;
-  static const int SPINE_PROPERTY_RGB2 = 1024;
-  static const int SPINE_PROPERTY_ATTACHMENT = 2048;
-  static const int SPINE_PROPERTY_DEFORM = 4096;
-  static const int SPINE_PROPERTY_EVENT = 8192;
-  static const int SPINE_PROPERTY_DRAW_ORDER = 16384;
-  static const int SPINE_PROPERTY_IK_CONSTRAINT = 32768;
-  static const int SPINE_PROPERTY_TRANSFORM_CONSTRAINT = 65536;
-  static const int SPINE_PROPERTY_PATH_CONSTRAINT_POSITION = 131072;
-  static const int SPINE_PROPERTY_PATH_CONSTRAINT_SPACING = 262144;
-  static const int SPINE_PROPERTY_PATH_CONSTRAINT_MIX = 524288;
-  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_INERTIA = 1048576;
-  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_STRENGTH = 2097152;
-  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_DAMPING = 4194304;
-  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_MASS = 8388608;
-  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_WIND = 16777216;
-  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_GRAVITY = 33554432;
-  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_MIX = 67108864;
-  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_RESET = 134217728;
-  static const int SPINE_PROPERTY_SEQUENCE = 268435456;
-  static const int SPINE_PROPERTY_SLIDER_TIME = 536870912;
-  static const int SPINE_PROPERTY_SLIDER_MIX = 1073741824;
+  static const int SPINE_PROPERTY_ROTATE = 0;
+  static const int SPINE_PROPERTY_X = 1;
+  static const int SPINE_PROPERTY_Y = 2;
+  static const int SPINE_PROPERTY_SCALE_X = 3;
+  static const int SPINE_PROPERTY_SCALE_Y = 4;
+  static const int SPINE_PROPERTY_SHEAR_X = 5;
+  static const int SPINE_PROPERTY_SHEAR_Y = 6;
+  static const int SPINE_PROPERTY_INHERIT = 7;
+  static const int SPINE_PROPERTY_RGB = 8;
+  static const int SPINE_PROPERTY_ALPHA = 9;
+  static const int SPINE_PROPERTY_RGB2 = 10;
+  static const int SPINE_PROPERTY_ATTACHMENT = 11;
+  static const int SPINE_PROPERTY_DEFORM = 12;
+  static const int SPINE_PROPERTY_EVENT = 13;
+  static const int SPINE_PROPERTY_DRAW_ORDER = 14;
+  static const int SPINE_PROPERTY_IK_CONSTRAINT = 15;
+  static const int SPINE_PROPERTY_TRANSFORM_CONSTRAINT = 16;
+  static const int SPINE_PROPERTY_PATH_CONSTRAINT_POSITION = 17;
+  static const int SPINE_PROPERTY_PATH_CONSTRAINT_SPACING = 18;
+  static const int SPINE_PROPERTY_PATH_CONSTRAINT_MIX = 19;
+  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_INERTIA = 20;
+  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_STRENGTH = 21;
+  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_DAMPING = 22;
+  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_MASS = 23;
+  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_WIND = 24;
+  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_GRAVITY = 25;
+  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_MIX = 26;
+  static const int SPINE_PROPERTY_PHYSICS_CONSTRAINT_RESET = 27;
+  static const int SPINE_PROPERTY_SEQUENCE = 28;
+  static const int SPINE_PROPERTY_SLIDER_TIME = 29;
+  static const int SPINE_PROPERTY_SLIDER_MIX = 30;
+  static const int SPINE_PROPERTY_DRAW_ORDER_FOLDER = 31;
 }
 
 abstract class spine_rotate_mode {
@@ -50344,6 +52252,9 @@ typedef spine_sequence = ffi.Pointer<spine_sequence_wrapper>;
 
 /// Forward declarations for all non-enum types
 typedef spine_color = ffi.Pointer<spine_color_wrapper>;
+
+/// Forward declarations for all non-enum types
+typedef spine_draw_order = ffi.Pointer<spine_draw_order_wrapper>;
 
 /// Forward declarations for all non-enum types
 typedef spine_event_queue_entry = ffi.Pointer<spine_event_queue_entry_wrapper>;

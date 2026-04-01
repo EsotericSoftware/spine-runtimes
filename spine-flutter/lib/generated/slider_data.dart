@@ -108,6 +108,7 @@ class SliderData extends PosedData implements ConstraintData {
     }
   }
 
+  /// The animation the slider will apply.
   Animation get animation {
     final result = SpineBindings.bindings.spine_slider_data_get_animation(_ptr);
     return Animation.fromPointer(result);
@@ -117,6 +118,8 @@ class SliderData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_slider_data_set_animation(_ptr, value.nativePtr.cast());
   }
 
+  /// When true, the animation is applied by adding it to the current pose
+  /// rather than overwriting it.
   bool get additive {
     final result = SpineBindings.bindings.spine_slider_data_get_additive(_ptr);
     return result;
@@ -126,6 +129,8 @@ class SliderData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_slider_data_set_additive(_ptr, value);
   }
 
+  /// When true, the animation repeats after its duration, otherwise the last
+  /// frame is used.
   bool get loop {
     final result = SpineBindings.bindings.spine_slider_data_get_loop(_ptr);
     return result;
@@ -135,6 +140,8 @@ class SliderData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_slider_data_set_loop(_ptr, value);
   }
 
+  /// When set, the bone's transform property is used to set the slider's
+  /// SliderPose::getTime().
   BoneData? get bone {
     final result = SpineBindings.bindings.spine_slider_data_get_bone(_ptr);
     return result.address == 0 ? null : BoneData.fromPointer(result);
@@ -144,6 +151,8 @@ class SliderData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_slider_data_set_bone(_ptr, value?.nativePtr.cast() ?? Pointer.fromAddress(0));
   }
 
+  /// When a bone is set, the specified transform property is used to set the
+  /// slider's SliderPose::getTime().
   FromProperty? get property {
     final result = SpineBindings.bindings.spine_slider_data_get_property(_ptr);
     if (result.address == 0) return null;
@@ -177,6 +186,8 @@ class SliderData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_slider_data_set_property(_ptr, value?.nativePtr.cast() ?? Pointer.fromAddress(0));
   }
 
+  /// When a bone is set, this is the scale of the property value in relation to
+  /// the slider time.
   double get scale {
     final result = SpineBindings.bindings.spine_slider_data_get_scale(_ptr);
     return result;
@@ -186,6 +197,7 @@ class SliderData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_slider_data_set_scale(_ptr, value);
   }
 
+  /// When a bone is set, the offset is added to the property.
   double get offset {
     final result = SpineBindings.bindings.spine_slider_data_get_offset(_ptr);
     return result;
@@ -195,6 +207,8 @@ class SliderData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_slider_data_set_offset(_ptr, value);
   }
 
+  /// When true and a bone is set, the bone's local transform property is read
+  /// instead of its world transform.
   bool get local {
     final result = SpineBindings.bindings.spine_slider_data_get_local(_ptr);
     return result;
@@ -204,6 +218,7 @@ class SliderData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_slider_data_set_local(_ptr, value);
   }
 
+  /// The setup pose that most animations are relative to.
   SliderPose get setupPose {
     final result = SpineBindings.bindings.spine_slider_data_get_setup_pose(_ptr);
     return SliderPose.fromPointer(result);

@@ -35,8 +35,8 @@ import com.badlogic.gdx.utils.Array;
 
 import com.esotericsoftware.spine.BoneData.Inherit;
 
-/** Stores the current pose for an IK constraint. An IK constraint adjusts the rotation of 1 or 2 constrained bones so the tip of
- * the last bone is as close to the target bone as possible.
+/** Adjusts the local rotation of 1 or 2 constrained bones so the world position of the tip of the last bone is as close to the
+ * target bone as possible.
  * <p>
  * See <a href="https://esotericsoftware.com/spine-ik-constraints">IK constraints</a> in the Spine User Guide. */
 public class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkConstraintPose> {
@@ -49,7 +49,7 @@ public class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 
 		bones = new Array(true, data.bones.size, BonePose[]::new);
 		for (BoneData boneData : data.bones)
-			bones.add(skeleton.bones.items[boneData.index].constrained);
+			bones.add(skeleton.bones.items[boneData.index].constrainedPose);
 
 		target = skeleton.bones.items[data.target.index];
 	}
@@ -62,9 +62,9 @@ public class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 
 	/** Applies the constraint to the constrained bones. */
 	public void update (Skeleton skeleton, Physics physics) {
-		IkConstraintPose p = applied;
+		IkConstraintPose p = appliedPose;
 		if (p.mix == 0) return;
-		BonePose target = this.target.applied;
+		BonePose target = this.target.appliedPose;
 		BonePose[] bones = this.bones.items;
 		switch (this.bones.size) {
 		case 1 -> apply(skeleton, bones[0], target.worldX, target.worldY, p.compress, p.stretch, data.uniform, p.mix);
@@ -108,7 +108,7 @@ public class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 		boolean uniform, float mix) {
 		if (bone == null) throw new IllegalArgumentException("bone cannot be null.");
 		bone.modifyLocal(skeleton);
-		BonePose p = bone.bone.parent.applied;
+		BonePose p = bone.bone.parent.appliedPose;
 		float pa = p.a, pb = p.b, pc = p.c, pd = p.d;
 		float rotationIK = -bone.shearX - bone.rotation, tx, ty;
 		switch (bone.inherit) {
@@ -199,7 +199,7 @@ public class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 			cwx = a * child.x + b * child.y + parent.worldX;
 			cwy = c * child.x + d * child.y + parent.worldY;
 		}
-		BonePose pp = parent.bone.parent.applied;
+		BonePose pp = parent.bone.parent.appliedPose;
 		a = pp.a;
 		b = pp.b;
 		c = pp.c;

@@ -50,6 +50,9 @@ namespace spine {
 		friend class SkeletonJson;
 
 	public:
+		/// @param count The number of texture regions this sequence will display.
+		/// @param pathSuffix If true, getPath(String, int) has a numeric suffix. If false, all regions will use the same path,
+		/// so count should be 1.
 		Sequence(int count, bool pathSuffix);
 
 		/// Copy constructor.
@@ -62,19 +65,24 @@ namespace spine {
 		void update(RegionAttachment &attachment);
 		void update(MeshAttachment &attachment);
 
+		/// The list of texture regions this sequence will display.
 		Array<TextureRegion *> &getRegions() {
 			return _regions;
 		}
 
+		/// Returns the getRegions() index for SlotPose::getSequenceIndex().
 		int resolveIndex(SlotPose &pose);
 
+		/// Returns the texture region from getRegions() for the specified index.
 		TextureRegion *getRegion(int index);
 
+		/// Returns the UVs for the specified index. getRegions() must be populated and update() called before calling this method.
 		Array<float> &getUVs(int index);
 
 		/// Returns vertex offsets from the center of a RegionAttachment. Invalid to call for a MeshAttachment.
 		Array<float> &getOffsets(int index);
 
+		/// The starting number for the numeric getPath(String, int) suffix.
 		int getStart() {
 			return _start;
 		}
@@ -83,6 +91,7 @@ namespace spine {
 			_start = start;
 		}
 
+		/// The minimum number of digits in the numeric getPath(String, int) suffix, for zero padding. 0 for no zero padding.
 		int getDigits() {
 			return _digits;
 		}
@@ -100,13 +109,15 @@ namespace spine {
 			_setupIndex = setupIndex;
 		}
 
+		/// Returns true if getPath(String, int) has a numeric suffix.
 		bool hasPathSuffix() {
 			return _pathSuffix;
 		}
 
+		/// Returns the specified base path with an optional numeric suffix for the specified index.
 		String &getPath(const String &basePath, int index);
 
-		/// Returns a unique ID for this attachment.
+		/// Returns a unique ID for this sequence.
 		int getId() {
 			return _id;
 		}
@@ -126,6 +137,7 @@ namespace spine {
 		static int nextID();
 	};
 
+	/// Controls how getRegions() are displayed over time.
 	enum SequenceMode {
 		SequenceMode_hold = 0,
 		SequenceMode_once = 1,

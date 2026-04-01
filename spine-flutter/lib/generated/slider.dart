@@ -62,6 +62,8 @@ class Slider extends SliderBase {
     return Slider.fromPointer(result);
   }
 
+  /// When set, the bone's transform property is used to set the slider's
+  /// SliderPose::getTime().
   Bone get bone {
     final result = SpineBindings.bindings.spine_slider_get_bone(_ptr);
     return Bone.fromPointer(result);

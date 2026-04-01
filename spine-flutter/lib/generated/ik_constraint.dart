@@ -79,8 +79,9 @@ class IkConstraint extends IkConstraintBase {
     SpineBindings.bindings.spine_ik_constraint_set_target(_ptr, value.nativePtr.cast());
   }
 
-  /// Adjusts the bone rotation so the tip is as close to the target position as
-  /// possible. The target is specified in the world coordinate system.
+  /// Adjusts the local rotation of the bone so the world position of the tip is
+  /// as close to the target position as possible. The target is specified in
+  /// the world coordinate system.
   static void apply(Skeleton skeleton, BonePose bone, double targetX, double targetY, bool compress, bool stretch,
       bool uniform, double mix) {
     SpineBindings.bindings.spine_ik_constraint_apply_1(

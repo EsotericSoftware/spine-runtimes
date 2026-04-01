@@ -29,7 +29,7 @@
 
 import type { Pose } from "./Pose";
 
-/** Stores the current pose for an IK constraint. */
+/** Stores a pose for an IK constraint. */
 export class IkConstraintPose implements Pose<IkConstraintPose> {
 	/** For two bone IK, controls the bend direction of the IK bones, either 1 or -1. */
 	bendDirection = 0;
@@ -39,8 +39,8 @@ export class IkConstraintPose implements Pose<IkConstraintPose> {
 
 	/** When true and the target is out of range, the parent bone is scaled to reach it.
 	 *
-	 * For two bone IK: 1) the child bone's local Y translation is set to 0, 2) stretch is not applied if {@link softness} is
-	 * > 0, and 3) if the parent bone has local nonuniform scale, stretch is not applied. */
+	 * For two bone IK: 1) the child bone's local Y translation is set to 0, 2) stretch is not applied if {@link softness} is > 0,
+	 * and 3) if the parent bone has local nonuniform scale, stretch is not applied. */
 	stretch = false;
 
 	/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotation.

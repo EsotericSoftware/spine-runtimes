@@ -36,8 +36,6 @@ import {
 	type Disposable,
 	type LoadingScreen,
 	MeshAttachment,
-	MixBlend,
-	MixDirection,
 	type NumberArrayLike,
 	Physics,
 	RegionAttachment,
@@ -1149,7 +1147,7 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 	private checkSlotInteraction (type: PointerEventTypesInput, originalEvent?: UIEvent) {
 		for (const [slot, interactionState] of this.pointerSlotEventCallbacks) {
 			if (!slot.bone.active) continue;
-			const attachment = slot.applied.attachment;
+			const attachment = slot.appliedPose.attachment;
 
 			if (!(attachment instanceof RegionAttachment || attachment instanceof MeshAttachment)) continue;
 
@@ -1160,7 +1158,7 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 
 			// we could probably cache the vertices from rendering if interaction with this slot is enabled
 			if (attachment instanceof RegionAttachment) {
-				attachment.computeWorldVertices(slot, attachment.getOffsets(slot.applied), vertices, 0, 2);
+				attachment.computeWorldVertices(slot, attachment.getOffsets(slot.appliedPose), vertices, 0, 2);
 			} else if (attachment instanceof MeshAttachment) {
 				attachment.computeWorldVertices(this.skeleton as Skeleton, slot, 0, attachment.worldVerticesLength, vertices, 0, 2);
 				hullLength = attachment.hullLength;
@@ -1236,7 +1234,7 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 		if (!slot) return;
 
 		if (hideAttachment) {
-			slot.applied.setAttachment(null);
+			slot.appliedPose.setAttachment(null);
 		}
 
 		element.style.position = 'absolute';
@@ -1280,7 +1278,7 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 		let steps = 100, stepTime = animation.duration ? animation.duration / steps : 0, time = 0;
 		let minX = 100000000, maxX = -100000000, minY = 100000000, maxY = -100000000;
 		for (let i = 0; i < steps; i++, time += stepTime) {
-			animation.apply(skeleton, time, time, false, [], 1, MixBlend.setup, MixDirection.in, false);
+			animation.apply(skeleton, time, time, false, [], 1, true, false, false, false);
 			skeleton.updateWorldTransform(Physics.update);
 			skeleton.getBounds(offset, size, tempArray, renderer.skeletonRenderer.getSkeletonClipping());
 

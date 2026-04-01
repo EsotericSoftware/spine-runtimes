@@ -33,7 +33,7 @@
 
 using namespace spine;
 
-EventData::EventData(const String &name) : _name(name), _intValue(0), _floatValue(0), _stringValue(), _audioPath(), _volume(0), _balance(0) {
+EventData::EventData(const String &name) : _name(name), _audioPath(), _setupPose(-1, *this) {
 	assert(_name.length() > 0);
 }
 
@@ -42,28 +42,12 @@ const String &EventData::getName() const {
 	return _name;
 }
 
-int EventData::getInt() const {
-	return _intValue;
+Event &EventData::getSetupPose() {
+	return _setupPose;
 }
 
-void EventData::setInt(int inValue) {
-	_intValue = inValue;
-}
-
-float EventData::getFloat() const {
-	return _floatValue;
-}
-
-void EventData::setFloat(float inValue) {
-	_floatValue = inValue;
-}
-
-const String &EventData::getString() const {
-	return _stringValue;
-}
-
-void EventData::setString(const String &inValue) {
-	this->_stringValue = inValue;
+const Event &EventData::getSetupPose() const {
+	return _setupPose;
 }
 
 const String &EventData::getAudioPath() const {
@@ -72,21 +56,4 @@ const String &EventData::getAudioPath() const {
 
 void EventData::setAudioPath(const String &inValue) {
 	_audioPath = inValue;
-}
-
-
-float EventData::getVolume() const {
-	return _volume;
-}
-
-void EventData::setVolume(float inValue) {
-	_volume = inValue;
-}
-
-float EventData::getBalance() const {
-	return _balance;
-}
-
-void EventData::setBalance(float inValue) {
-	_balance = inValue;
 }

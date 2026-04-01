@@ -235,6 +235,9 @@ namespace Spine.Unity.Editor {
 		internal const bool DEFAULT_WORKFLOW_MISMATCH_DIALOG = true;
 		public bool workflowMismatchDialog = DEFAULT_WORKFLOW_MISMATCH_DIALOG;
 
+		internal const bool DEFAULT_SKELETONDATA_ASSET_MISMATCH_WARNING = true;
+		public bool skeletonDataAssetMismatchWarning = DEFAULT_SKELETONDATA_ASSET_MISMATCH_WARNING;
+
 		internal const bool DEFAULT_SPLIT_COMPONENT_CHANGE_WARNING = true;
 		public bool splitComponentChangeWarning = DEFAULT_SPLIT_COMPONENT_CHANGE_WARNING;
 
@@ -394,6 +397,7 @@ namespace Spine.Unity.Editor {
 					EditorGUILayout.PropertyField(settings.FindProperty("textureImporterWarning"), new GUIContent("Texture Settings Warning", "Log a warning and recommendation whenever Texture Import Settings are detected that could lead to undesired effects, e.g. white border artifacts."));
 					EditorGUILayout.PropertyField(settings.FindProperty("componentMaterialWarning"), new GUIContent("Component & Material Warning", "Log a warning and recommendation whenever Component and Material settings are not compatible."));
 					EditorGUILayout.PropertyField(settings.FindProperty("skeletonDataAssetNoFileError"), new GUIContent("SkeletonDataAsset no file Error", "Log an error when querying SkeletonData from SkeletonDataAsset with no json or binary file assigned."));
+					EditorGUILayout.PropertyField(settings.FindProperty("skeletonDataAssetMismatchWarning"), new GUIContent("SkeletonDataAsset Mismatch Warning", "Highlight AnimationReferenceAsset dropdown in red when the reference asset's SkeletonDataAsset does not match the one at the skeleton component."));
 					EditorGUILayout.PropertyField(settings.FindProperty("workflowMismatchDialog"), new GUIContent("Workflow Mismatch Dialog", "Show warning dialog when PMA atlas is detected but not supported with current project settings."));
 					SkeletonDataAsset.errorIfSkeletonFileNullGlobal = settings.FindProperty("skeletonDataAssetNoFileError").boolValue;
 				}

@@ -33,7 +33,7 @@
 #include <spine/ConstraintTimeline1.h>
 
 namespace spine {
-	/// Changes a path constraint's PathConstraintPose::getSpacing().
+	/// Changes a path constraint's spacing.
 	class SP_API PathConstraintSpacingTimeline : public ConstraintTimeline1 {
 		friend class SkeletonBinary;
 
@@ -46,8 +46,8 @@ namespace spine {
 
 		virtual ~PathConstraintSpacingTimeline();
 
-		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
-						   MixDirection direction, bool appliedPose) override;
+		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+						   bool appliedPose) override;
 	};
 }
 

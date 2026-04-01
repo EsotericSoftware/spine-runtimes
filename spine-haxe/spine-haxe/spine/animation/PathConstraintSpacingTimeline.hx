@@ -39,12 +39,12 @@ class PathConstraintSpacingTimeline extends ConstraintTimeline1 {
 		super(frameCount, bezierCount, constraintIndex, Property.pathConstraintSpacing);
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend, direction:MixDirection,
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
 			appliedPose:Bool) {
 		var constraint = cast(skeleton.constraints[constraintIndex], PathConstraint);
 		if (constraint.active) {
-			var pose = appliedPose ? constraint.applied : constraint.pose;
-			pose.spacing = getAbsoluteValue(time, alpha, blend == MixBlend.add ? MixBlend.replace : blend, pose.spacing, constraint.data.setup.spacing);
+			var pose = appliedPose ? constraint.appliedPose : constraint.pose;
+			pose.spacing = getAbsoluteValue(time, alpha, fromSetup, false, pose.spacing, constraint.data.setupPose.spacing);
 		}
 	}
 }

@@ -33,6 +33,7 @@
 #include <spine/SpineObject.h>
 
 namespace spine {
+	/// Base interface for posed objects.
 	class SP_API Posed {
 	public:
 		Posed() {
@@ -52,6 +53,10 @@ namespace spine {
 		virtual void pose() = 0;
 	};
 
+	/// The base class for an object with a number of poses:
+	/// - getData(): The setup pose data.
+	/// - getPose(): The unconstrained pose. Set by animations and application code.
+	/// - getAppliedPose(): The pose to use for rendering. Possibly modified by constraints.
 	template<class D, class P, class A>
 	class PosedGeneric : public Posed, public SpineObject {
 		friend class AnimationState;
@@ -85,53 +90,58 @@ namespace spine {
 		friend class Skeleton;
 
 	public:
-		PosedGeneric(D &data) : _data(data), _pose(), _constrained(), _applied(&_pose) {
+		PosedGeneric(D &data) : _data(data), _pose(), _constrainedPose(), _appliedPose(&_pose) {
 			setupPose();
 		}
 
 		virtual ~PosedGeneric() {
 		}
 
-		/// The constraint's setup pose data.
+		/// The setup pose data. May be shared with multiple instances.
 		D &getData() {
 			return _data;
 		}
 
+		/// The unconstrained pose for this object, set by animations and application code.
 		P &getPose() {
-			// Upcast A to P (safe due to static_assert that A extends P)
-			// For most classes P==A so this is a no-op, but for Bone it casts BonePose->BoneLocal
 			return _pose;
 		}
 
+		/// The pose to use for rendering. If no constraints modify this pose, this is the same as getPose(). Otherwise it is a
+		/// copy of getPose() modified by constraints.
 		A &getAppliedPose() {
-			return *_applied;
+			return *_appliedPose;
 		}
 
+		/// Sets the constrained pose to the unconstrained pose, as a starting point for constraints to be applied.
 		virtual void resetConstrained() override {
-			_constrained.set(_pose);
+			_constrainedPose.set(_pose);
 		}
 
+		/// Sets the applied pose to the constrained pose, in anticipation of the applied pose being modified by constraints.
 		virtual void constrained() override {
-			_applied = &_constrained;
+			_appliedPose = &_constrainedPose;
 		}
 
 		virtual bool isPoseEqualToApplied() override {
-			return _applied == &_pose;
+			return _appliedPose == &_pose;
 		}
 
 	protected:
+		/// Sets the applied pose to the unconstrained pose, for when no constraints will modify the pose.
 		virtual void pose() override {
-			_applied = &_pose;
+			_appliedPose = &_pose;
 		}
+		/// Sets the unconstrained pose to the setup pose.
 		virtual void setupPose() override {
 			_pose.set(_data.getSetupPose());
 		}
 
 	protected:
 		D &_data;
-		A _pose;       ///< Stored as A type (concrete pose type) to match Java behavior
-		A _constrained;///< Stored as A type (concrete pose type) to match Java behavior
-		A *_applied;   ///< Points to either _pose or _constrained, reassignable like Java
+		A _pose;           ///< Stored as A type (concrete pose type) to match Java behavior
+		A _constrainedPose;///< Stored as A type (concrete pose type) to match Java behavior
+		A *_appliedPose;   ///< Points to either _pose or _constrainedPose, reassignable like Java
 	};
 }// namespace spine
 

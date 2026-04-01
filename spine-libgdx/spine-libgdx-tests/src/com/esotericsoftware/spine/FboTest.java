@@ -42,8 +42,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-import com.esotericsoftware.spine.Animation.MixBlend;
-import com.esotericsoftware.spine.Animation.MixDirection;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
 /** Demonstrates rendering an animation to a frame buffer (FBO) and then rendering the FBO to the screen. */
@@ -80,7 +78,7 @@ public class FboTest extends ApplicationAdapter {
 
 		// Apply the pose for the first frame of the run animation.
 		Animation animation = skeleton.getData().findAnimation("run");
-		animation.apply(skeleton, -1, 0, true, null, 1, MixBlend.first, MixDirection.in, false);
+		animation.apply(skeleton, -1, 0, true, null, 1, true, false, false, false);
 
 		// Compute the world transform for the pose.
 		skeleton.updateWorldTransform(Physics.update);

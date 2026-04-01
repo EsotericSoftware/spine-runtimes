@@ -648,7 +648,7 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 
 						// show skeleton root
 						const root = skeleton.getRootBone() as Bone;
-						renderer.circle(true, root.applied.x + worldOffsetX, root.applied.y + worldOffsetY, 10, red);
+						renderer.circle(true, root.appliedPose.x + worldOffsetX, root.appliedPose.y + worldOffsetY, 10, red);
 
 						// show shifted origin
 						renderer.circle(true, divOriginX, divOriginY, 10, green);
@@ -671,7 +671,7 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 				for (const boneFollower of widget.boneFollowerList) {
 					const { slot, bone, element, followVisibility, followRotation, followOpacity, followScale } = boneFollower;
 					const { worldX, worldY } = widget;
-					const applied = bone.applied;
+					const applied = bone.appliedPose;
 					this.worldToScreen(this.tempFollowBoneVector, applied.worldX + worldX, applied.worldY + worldY);
 
 					if (Number.isNaN(this.tempFollowBoneVector.x)) continue;
@@ -691,7 +691,7 @@ export class SpineWebComponentOverlay extends HTMLElement implements OverlayAttr
 
 					element.style.display = ""
 
-					const pose = slot.applied;
+					const pose = slot.appliedPose;
 					if (followVisibility && !pose.attachment) {
 						element.style.opacity = "0";
 					} else if (followOpacity) {

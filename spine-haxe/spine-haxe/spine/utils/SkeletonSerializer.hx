@@ -3194,12 +3194,11 @@ class SkeletonSerializer {
 			"isNullable": false
 		});
 
-		json.writeName("mixBlend");
-		writeProperty(obj, "getMixBlend()", {
-			"kind": "enum",
-			"name": "mixBlend",
-			"getter": "getMixBlend()",
-			"enumName": "MixBlend",
+		json.writeName("additive");
+		writeProperty(obj, "additive", {
+			"kind": "bool",
+			"name": "additive",
+			"getter": "additive",
 			"isNullable": false
 		});
 

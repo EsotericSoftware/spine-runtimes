@@ -46,11 +46,14 @@ open class TransformConstraintBase: PosedActive, Posed, Constraint {
         return TransformConstraintData(fromPointer: result!)
     }
 
+    /// The unconstrained pose for this object, set by animations and application code.
     public var pose: TransformConstraintPose {
         let result = spine_transform_constraint_base_get_pose(_ptr.assumingMemoryBound(to: spine_transform_constraint_base_wrapper.self))
         return TransformConstraintPose(fromPointer: result!)
     }
 
+    /// The pose to use for rendering. If no constraints modify this pose, this is the same as
+    /// getPose(). Otherwise it is a copy of getPose() modified by constraints.
     public var appliedPose: TransformConstraintPose {
         let result = spine_transform_constraint_base_get_applied_pose(_ptr.assumingMemoryBound(to: spine_transform_constraint_base_wrapper.self))
         return TransformConstraintPose(fromPointer: result!)
@@ -72,10 +75,14 @@ open class TransformConstraintBase: PosedActive, Posed, Constraint {
         return result
     }
 
+    /// Sets the constrained pose to the unconstrained pose, as a starting point for constraints to
+    /// be applied.
     public func resetConstrained() {
         spine_transform_constraint_base_reset_constrained(_ptr.assumingMemoryBound(to: spine_transform_constraint_base_wrapper.self))
     }
 
+    /// Sets the applied pose to the constrained pose, in anticipation of the applied pose being
+    /// modified by constraints.
     public func constrained() {
         spine_transform_constraint_base_constrained(_ptr.assumingMemoryBound(to: spine_transform_constraint_base_wrapper.self))
     }

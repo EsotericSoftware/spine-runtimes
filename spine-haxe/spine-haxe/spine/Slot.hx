@@ -35,7 +35,7 @@ import spine.attachments.VertexAttachment;
 /** Stores a slot's current pose. Slots organize attachments for Skeleton.drawOrder purposes and provide a place to store
  * state for an attachment. State cannot be stored in an attachment itself because attachments are stateless and may be shared
  * across multiple skeletons. */
-class Slot extends Posed<SlotData, SlotPose, SlotPose> {
+class Slot extends Posed<SlotData, SlotPose> {
 	public var skeleton:Skeleton;
 
 	/** The bone this slot belongs to. */
@@ -49,9 +49,9 @@ class Slot extends Posed<SlotData, SlotPose, SlotPose> {
 			throw new SpineException("skeleton cannot be null.");
 		this.skeleton = skeleton;
 		bone = skeleton.bones[data.boneData.index];
-		if (data.setup.darkColor != null) {
+		if (data.setupPose.darkColor != null) {
 			pose.darkColor = new Color(1, 1, 1, 1);
-			constrained.darkColor = new Color(1, 1, 1, 1);
+			constrainedPose.darkColor = new Color(1, 1, 1, 1);
 		}
 		setupPose();
 	}
@@ -64,9 +64,9 @@ class Slot extends Posed<SlotData, SlotPose, SlotPose> {
 		if (skeleton == null)
 			throw new SpineException("skeleton cannot be null.");
 		this.bone = bone;
-		if (data.setup.darkColor != null) {
+		if (data.setupPose.darkColor != null) {
 			pose.darkColor = new Color(1, 1, 1, 1);
-			constrained.darkColor = new Color(1, 1, 1, 1);
+			constrainedPose.darkColor = new Color(1, 1, 1, 1);
 		}
 		copy.pose.set(slot.pose);
 		return copy;
@@ -74,10 +74,10 @@ class Slot extends Posed<SlotData, SlotPose, SlotPose> {
 
 	/** Sets this slot to the setup pose. */
 	override public function setupPose():Void {
-		pose.color.setFromColor(data.setup.color);
+		pose.color.setFromColor(data.setupPose.color);
 		if (pose.darkColor != null)
-			pose.darkColor.setFromColor(data.setup.darkColor);
-		pose.sequenceIndex = data.setup.sequenceIndex;
+			pose.darkColor.setFromColor(data.setupPose.darkColor);
+		pose.sequenceIndex = data.setupPose.sequenceIndex;
 		if (data.attachmentName == null) {
 			pose.attachment = null;
 		} else {

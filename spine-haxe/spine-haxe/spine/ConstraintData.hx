@@ -34,8 +34,8 @@ abstract class ConstraintData< //
 	T:Constraint<Dynamic, Dynamic, Dynamic>, //
 	P:Pose<Any>> //
 extends PosedData<P> {
-	function new(name:String, setup:P) {
-		super(name, setup);
+	function new(name:String, setupPose:P) {
+		super(name, setupPose);
 	}
 
 	public abstract function create(skeleton:Skeleton):T;

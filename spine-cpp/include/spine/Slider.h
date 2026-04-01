@@ -39,9 +39,9 @@ namespace spine {
 	class Bone;
 	class Animation;
 
-	/// Stores the setup pose for a PhysicsConstraint.
+	/// Applies an animation based on either the slider's SliderPose::getTime() or a bone's transform property.
 	///
-	/// See https://esotericsoftware.com/spine-physics-constraints Physics constraints in the Spine User Guide.
+	/// See https://esotericsoftware.com/spine-sliders Sliders in the Spine User Guide.
 	// Non-exported base class that inherits from the template
 	class SliderBase : public ConstraintGeneric<Slider, SliderData, SliderPose> {
 	public:
@@ -67,6 +67,7 @@ namespace spine {
 
 		virtual bool isSourceActive() override;
 
+		/// When set, the bone's transform property is used to set the slider's SliderPose::getTime().
 		Bone &getBone();
 
 		void setBone(Bone &bone);

@@ -43,8 +43,7 @@ import com.esotericsoftware.spine.Skin.SkinEntry;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 
-/** Stores the current pose for a path constraint. A path constraint adjusts the rotation, translation, and scale of the
- * constrained bones so they follow a {@link PathAttachment}.
+/** Adjusts the rotation, translation, and scale of the constrained bones so they follow a {@link PathAttachment}.
  * <p>
  * See <a href="https://esotericsoftware.com/spine-path-constraints">Path constraints</a> in the Spine User Guide. */
 public class PathConstraint extends Constraint<PathConstraint, PathConstraintData, PathConstraintPose> {
@@ -64,7 +63,7 @@ public class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 
 		bones = new Array(true, data.bones.size, BonePose[]::new);
 		for (BoneData boneData : data.bones)
-			bones.add(skeleton.bones.items[boneData.index].constrained);
+			bones.add(skeleton.bones.items[boneData.index].constrainedPose);
 
 		slot = skeleton.slots.items[data.slot.index];
 	}
@@ -77,9 +76,9 @@ public class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 
 	/** Applies the constraint to the constrained bones. */
 	public void update (Skeleton skeleton, Physics physics) {
-		if (!(slot.applied.attachment instanceof PathAttachment pathAttachment)) return;
+		if (!(slot.appliedPose.attachment instanceof PathAttachment pathAttachment)) return;
 
-		PathConstraintPose p = applied;
+		PathConstraintPose p = appliedPose;
 		float mixRotate = p.mixRotate, mixX = p.mixX, mixY = p.mixY;
 		if (mixRotate == 0 & mixX == 0 & mixY == 0) return;
 
@@ -149,7 +148,7 @@ public class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 			tip = data.rotateMode == RotateMode.chain;
 		else {
 			tip = false;
-			BonePose bone = slot.bone.applied;
+			BonePose bone = slot.bone.appliedPose;
 			offsetRotation *= bone.a * bone.d - bone.b * bone.c > 0 ? degRad : -degRad;
 		}
 		for (int i = 0, ip = 3, u = skeleton.update; i < boneCount; i++, ip += 3) {
@@ -202,7 +201,7 @@ public class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 
 	float[] computeWorldPositions (Skeleton skeleton, PathAttachment path, int spacesCount, boolean tangents) {
 		Slot slot = this.slot;
-		float position = applied.position;
+		float position = appliedPose.position;
 		float[] spaces = this.spaces.items, out = this.positions.setSize(spacesCount * 3 + 2), world;
 		boolean closed = path.getClosed();
 		int verticesLength = path.getWorldVerticesLength(), curveCount = verticesLength / 6, prevCurve = NONE;

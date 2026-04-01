@@ -46,7 +46,7 @@ IkConstraint::IkConstraint(IkConstraintData &data, Skeleton &skeleton) : IkConst
 	_bones.ensureCapacity(data._bones.size());
 	for (size_t i = 0; i < data._bones.size(); i++) {
 		BoneData *boneData = data._bones[i];
-		_bones.add(&skeleton._bones[boneData->getIndex()]->_constrained);
+		_bones.add(&skeleton._bones[boneData->getIndex()]->_constrainedPose);
 	}
 }
 
@@ -57,9 +57,9 @@ IkConstraint &IkConstraint::copy(Skeleton &skeleton) {
 }
 
 void IkConstraint::update(Skeleton &skeleton, Physics physics) {
-	IkConstraintPose &p = *_applied;
+	IkConstraintPose &p = *_appliedPose;
 	if (p._mix == 0) return;
-	BonePose &target = *_target->_applied;
+	BonePose &target = *_target->_appliedPose;
 	switch (_bones.size()) {
 		case 1: {
 			apply(skeleton, *_bones[0], target._worldX, target._worldY, p._compress, p._stretch, _data._uniform, p._mix);
@@ -100,7 +100,7 @@ bool IkConstraint::isSourceActive() {
 
 void IkConstraint::apply(Skeleton &skeleton, BonePose &bone, float targetX, float targetY, bool compress, bool stretch, bool uniform, float mix) {
 	bone.modifyLocal(skeleton);
-	BonePose &p = *bone._bone->_parent->_applied;
+	BonePose &p = *bone._bone->_parent->_appliedPose;
 	float pa = p._a, pb = p._b, pc = p._c, pd = p._d;
 	float rotationIK = -bone._shearX - bone._rotation, tx, ty;
 	switch (bone._inherit) {
@@ -191,7 +191,7 @@ void IkConstraint::apply(Skeleton &skeleton, BonePose &parent, BonePose &child, 
 		cwx = a * child._x + b * child._y + parent._worldX;
 		cwy = c * child._x + d * child._y + parent._worldY;
 	}
-	BonePose &pp = *parent._bone->_parent->_applied;
+	BonePose &pp = *parent._bone->_parent->_appliedPose;
 	a = pp._a;
 	b = pp._b;
 	c = pp._c;

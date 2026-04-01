@@ -35,7 +35,7 @@ import type { HasSequence } from "./HasSequence.js";
 import type { Sequence } from "./Sequence.js";
 
 /** An attachment that displays a textured mesh. A mesh has hull vertices and internal vertices within the hull. Holes are not
- * supported. Each vertex has UVs (texture coordinates) and triangles are used to map an image on to the mesh.
+ * supported. Each vertex has UVs (texture coordinates) and triangles that are used to map an image on to the mesh.
  *
  * See [Mesh attachments](http://esotericsoftware.com/spine-meshes) in the Spine User Guide. */
 export class MeshAttachment extends VertexAttachment implements HasSequence {
@@ -47,7 +47,7 @@ export class MeshAttachment extends VertexAttachment implements HasSequence {
 	/** Triplets of vertex indices which describe the mesh's triangulation. */
 	triangles: Array<number> = [];
 
-	/** The number of entries at the beginning of {@link #vertices} that make up the mesh hull. */
+	/** The number of entries at the beginning of {@link vertices} that make up the mesh hull. */
 	hullLength: number = 0;
 
 	/** The name of the texture region for this attachment. */
@@ -58,8 +58,8 @@ export class MeshAttachment extends VertexAttachment implements HasSequence {
 
 	private parentMesh: MeshAttachment | null = null;
 
-	/** Vertex index pairs describing edges for controlling triangulation, or be null if nonessential data was not exported. Mesh
-	 * triangles never cross edges. Triangulation is not performed at runtime. */
+	/** Vertex index pairs describing edges for controlling triangulation, or null if nonessential data was not exported. Mesh
+	 * triangles do not never cross edges. Triangulation is not performed at runtime. */
 	edges: Array<number> = [];
 
 	/** The width of the mesh's image. Available only when nonessential data was exported. */
@@ -104,9 +104,9 @@ export class MeshAttachment extends VertexAttachment implements HasSequence {
 		this.sequence.update(this);
 	}
 
-	/** The parent mesh if this is a linked mesh, else null. A linked mesh shares the {@link #bones}, {@link #vertices},
-	 * {@link #regionUVs}, {@link #triangles}, {@link #hullLength}, {@link #edges}, {@link #width}, and {@link #height} with the
-	 * parent mesh, but may have a different {@link #name} or {@link #path} (and therefore a different texture). */
+	/** The parent mesh if this is a linked mesh, else null. A linked mesh shares the {@link bones}, {@link vertices},
+	 * {@link regionUVs}, {@link triangles}, {@link hullLength}, {@link edges}, {@link width}, and {@link height} with the
+	 * parent mesh, but may have a different {@link name} or {@link path}, and therefore a different texture region. */
 	getParentMesh () {
 		return this.parentMesh;
 	}
@@ -125,7 +125,7 @@ export class MeshAttachment extends VertexAttachment implements HasSequence {
 		}
 	}
 
-	/** Returns a new mesh with the {@link #parentMesh} set to this mesh's parent mesh, if any, else to this mesh. **/
+	/** Returns a new mesh with the {@link parentMesh} set to this mesh's parent mesh, if any, else to this mesh. **/
 	newLinkedMesh (): MeshAttachment {
 		const copy = new MeshAttachment(this.name, this.sequence.copy());
 		copy.timelineAttachment = this.timelineAttachment;
@@ -136,7 +136,7 @@ export class MeshAttachment extends VertexAttachment implements HasSequence {
 		return copy;
 	}
 
-	/** Computes {@link Sequence#getUVs(int) UVs} for a mesh attachment.
+	/** Computes {@link Sequence.getUVs | UVs} for a mesh attachment.
 	 * @param uvs Output array for the computed UVs, same length as regionUVs. */
 	static computeUVs (region: TextureRegion | null, regionUVs: NumberArrayLike, uvs: NumberArrayLike): void {
 		if (!region) throw new Error("Region not set.");

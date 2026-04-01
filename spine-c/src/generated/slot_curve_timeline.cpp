@@ -13,10 +13,9 @@ spine_rtti spine_slot_curve_timeline_get_rtti(spine_slot_curve_timeline self) {
 }
 
 void spine_slot_curve_timeline_apply(spine_slot_curve_timeline self, spine_skeleton skeleton, float lastTime, float time,
-									 /*@null*/ spine_array_event events, float alpha, spine_mix_blend blend, spine_mix_direction direction,
-									 bool appliedPose) {
+									 /*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
 	SlotCurveTimeline *_self = (SlotCurveTimeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixBlend) blend, (MixDirection) direction, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
 }
 
 int spine_slot_curve_timeline_get_slot_index(spine_slot_curve_timeline self) {
@@ -53,6 +52,16 @@ float spine_slot_curve_timeline_get_bezier_value(spine_slot_curve_timeline self,
 spine_array_float spine_slot_curve_timeline_get_curves(spine_slot_curve_timeline self) {
 	SlotCurveTimeline *_self = (SlotCurveTimeline *) self;
 	return (spine_array_float) &_self->getCurves();
+}
+
+bool spine_slot_curve_timeline_get_additive(spine_slot_curve_timeline self) {
+	SlotCurveTimeline *_self = (SlotCurveTimeline *) self;
+	return _self->getAdditive();
+}
+
+bool spine_slot_curve_timeline_get_instant(spine_slot_curve_timeline self) {
+	SlotCurveTimeline *_self = (SlotCurveTimeline *) self;
+	return _self->getInstant();
 }
 
 size_t spine_slot_curve_timeline_get_frame_entries(spine_slot_curve_timeline self) {

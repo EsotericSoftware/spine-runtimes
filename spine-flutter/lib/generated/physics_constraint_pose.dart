@@ -55,6 +55,7 @@ class PhysicsConstraintPose {
     SpineBindings.bindings.spine_physics_constraint_pose_set(_ptr, pose.nativePtr.cast());
   }
 
+  /// Controls how much bone movement is converted into physics movement.
   double get inertia {
     final result = SpineBindings.bindings.spine_physics_constraint_pose_get_inertia(_ptr);
     return result;
@@ -64,6 +65,7 @@ class PhysicsConstraintPose {
     SpineBindings.bindings.spine_physics_constraint_pose_set_inertia(_ptr, value);
   }
 
+  /// The amount of force used to return properties to the unconstrained value.
   double get strength {
     final result = SpineBindings.bindings.spine_physics_constraint_pose_get_strength(_ptr);
     return result;
@@ -73,6 +75,8 @@ class PhysicsConstraintPose {
     SpineBindings.bindings.spine_physics_constraint_pose_set_strength(_ptr, value);
   }
 
+  /// Reduces the speed of physics movements, with more of a reduction at higher
+  /// speeds.
   double get damping {
     final result = SpineBindings.bindings.spine_physics_constraint_pose_get_damping(_ptr);
     return result;
@@ -82,6 +86,7 @@ class PhysicsConstraintPose {
     SpineBindings.bindings.spine_physics_constraint_pose_set_damping(_ptr, value);
   }
 
+  /// Determines susceptibility to acceleration.
   double get massInverse {
     final result = SpineBindings.bindings.spine_physics_constraint_pose_get_mass_inverse(_ptr);
     return result;
@@ -91,6 +96,8 @@ class PhysicsConstraintPose {
     SpineBindings.bindings.spine_physics_constraint_pose_set_mass_inverse(_ptr, value);
   }
 
+  /// Applies a constant force along the Skeleton::getWindX(),
+  /// Skeleton::getWindY() vector.
   double get wind {
     final result = SpineBindings.bindings.spine_physics_constraint_pose_get_wind(_ptr);
     return result;
@@ -100,6 +107,8 @@ class PhysicsConstraintPose {
     SpineBindings.bindings.spine_physics_constraint_pose_set_wind(_ptr, value);
   }
 
+  /// Applies a constant force along the Skeleton::getGravityX(),
+  /// Skeleton::getGravityY() vector.
   double get gravity {
     final result = SpineBindings.bindings.spine_physics_constraint_pose_get_gravity(_ptr);
     return result;
@@ -109,7 +118,7 @@ class PhysicsConstraintPose {
     SpineBindings.bindings.spine_physics_constraint_pose_set_gravity(_ptr, value);
   }
 
-  /// A percentage (0-1) that controls the mix between the constrained and
+  /// A percentage (0+) that controls the mix between the constrained and
   /// unconstrained poses.
   double get mix {
     final result = SpineBindings.bindings.spine_physics_constraint_pose_get_mix(_ptr);

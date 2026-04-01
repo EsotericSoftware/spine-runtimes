@@ -30,7 +30,7 @@
 package spine;
 
 /** The setup pose for a bone. */
-class BoneData extends PosedData<BoneLocal> {
+class BoneData extends PosedData<BonePose> {
 	/** The index of the bone in spine.Skeleton.getBones(). */
 	public final index:Int;
 
@@ -52,7 +52,7 @@ class BoneData extends PosedData<BoneLocal> {
 	public var visible = false;
 
 	public function new(index:Int, name:String, parent:BoneData) {
-		super(name, new BoneLocal());
+		super(name, new BonePose());
 		if (index < 0)
 			throw new SpineException("index must be >= 0.");
 		if (name == null)
@@ -65,7 +65,7 @@ class BoneData extends PosedData<BoneLocal> {
 	public function copy(data:BoneData, parent:BoneData) {
 		var copy = new BoneData(data.index, data.name, parent);
 		length = data.length;
-		setup.set(data.setup);
+		setupPose.set(data.setupPose);
 		return copy;
 	}
 }

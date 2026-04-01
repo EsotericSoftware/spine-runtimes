@@ -43,7 +43,7 @@ namespace spine {
 
 	class ConstraintData;
 
-	/// Stores attachments by slot index and attachment name.
+	/// Stores attachments by slot index and placeholder name. Multiple Skeleton instances can use the same skins.
 	/// See SkeletonData::getDefaultSkin, Skeleton::getSkin, and
 	/// http://esotericsoftware.com/spine-runtime-skins in the Spine Runtimes Guide.
 	class SP_API Skin : public SpineObject {
@@ -56,10 +56,11 @@ namespace spine {
 		public:
 			struct SP_API Entry {
 				size_t _slotIndex;
-				String _name;
+				String _placeholderName;
 				Attachment *_attachment;
 
-				Entry(size_t slotIndex, const String &name, Attachment *attachment) : _slotIndex(slotIndex), _name(name), _attachment(attachment) {
+				Entry(size_t slotIndex, const String &placeholderName, Attachment *attachment)
+					: _slotIndex(slotIndex), _placeholderName(placeholderName), _attachment(attachment) {
 				}
 			};
 
@@ -95,11 +96,11 @@ namespace spine {
 				size_t _bucketIndex;
 			};
 
-			void put(size_t slotIndex, const String &attachmentName, Attachment *attachment);
+			void put(size_t slotIndex, const String &placeholderName, Attachment *attachment);
 
-			Attachment *get(size_t slotIndex, const String &attachmentName);
+			Attachment *get(size_t slotIndex, const String &placeholderName);
 
-			void remove(size_t slotIndex, const String &attachmentName);
+			void remove(size_t slotIndex, const String &placeholderName);
 
 			Entries getEntries();
 
@@ -107,7 +108,7 @@ namespace spine {
 			AttachmentMap();
 
 		private:
-			int findInBucket(Array<Entry> &, const String &attachmentName);
+			int findInBucket(Array<Entry> &, const String &placeholderName);
 
 			Array<Array<Entry>> _buckets;
 		};
@@ -116,19 +117,19 @@ namespace spine {
 
 		~Skin();
 
-		/// Adds an attachment to the skin for the specified slot index and name.
-		/// If the name already exists for the slot, the previous value is replaced.
-		void setAttachment(size_t slotIndex, const String &name, Attachment *attachment);
+		/// Adds an attachment to the skin for the specified slot index and placeholder name.
+		/// If the placeholder name already exists for the slot, the previous value is replaced.
+		void setAttachment(size_t slotIndex, const String &placeholderName, Attachment *attachment);
 
-		/// Returns the attachment for the specified slot index and name, or NULL.
-		Attachment *getAttachment(size_t slotIndex, const String &name);
+		/// Returns the attachment for the specified slot index and placeholder name, or NULL.
+		Attachment *getAttachment(size_t slotIndex, const String &placeholderName);
 
 		// Removes the attachment from the skin.
-		void removeAttachment(size_t slotIndex, const String &name);
+		void removeAttachment(size_t slotIndex, const String &placeholderName);
 
-		/// Finds the skin keys for a given slot. The results are added to the passed array of names.
+		/// Finds the placeholder names for a given slot. The results are added to the passed array.
 		/// @param slotIndex The target slotIndex. To find the slot index, use SkeletonData::findSlot and SlotData::getIndex.
-		/// @param names Found skin key names will be added to this array.
+		/// @param names Found placeholder names will be added to this array.
 		void findNamesForSlot(size_t slotIndex, Array<String> &names);
 
 		/// Finds the attachments for a given slot. The results are added to the passed array of Attachments.

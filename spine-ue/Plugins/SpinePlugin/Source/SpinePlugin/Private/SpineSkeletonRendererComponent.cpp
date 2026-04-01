@@ -196,7 +196,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(USpineSkeletonComponent *compon
 		attachmentColor.set(1, 1, 1, 1);
 		float *attachmentUvs = nullptr;
 
-		Slot *slot = Skeleton->getDrawOrder()[i];
+		Slot *slot = Skeleton->getDrawOrder().getAppliedPose()[i];
 		SlotPose &slotPose = slot->getAppliedPose();
 		Attachment *attachment = slotPose.getAttachment();
 

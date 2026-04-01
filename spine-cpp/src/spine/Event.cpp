@@ -33,9 +33,7 @@
 
 using namespace spine;
 
-Event::Event(float time, const EventData &data)
-	: _data(data), _time(time), _intValue(data.getInt()), _floatValue(data.getFloat()), _stringValue(data.getString()), _volume(data.getVolume()),
-	  _balance(data.getBalance()) {
+Event::Event(float time, const EventData &data) : _data(data), _time(time), _intValue(0), _floatValue(0), _stringValue(), _volume(0), _balance(0) {
 }
 
 const EventData &Event::getData() {

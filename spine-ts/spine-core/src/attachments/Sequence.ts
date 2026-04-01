@@ -34,24 +34,35 @@ import type { HasSequence } from "./HasSequence.js";
 import { MeshAttachment } from "./MeshAttachment.js";
 import { RegionAttachment } from "./RegionAttachment.js";
 
-/** Holds texture regions, UVs, and vertex offsets for rendering a region or mesh attachment. {@link #getRegions() Regions} must
- * be populated and {@link #update(HasSequence)} called before use. */
+/** Holds texture regions, UVs, and vertex offsets for rendering a region or mesh attachment. {@link regions Regions} must be
+ * populated and {@link update} called before use. */
 export class Sequence {
 	private static _nextID = 0;
 
 	id = Sequence.nextID();
+
+	/** The list of texture regions this sequence will display. */
 	regions: Array<TextureRegion | null>;
+
 	readonly pathSuffix: boolean;
 	uvs?: NumberArrayLike[];
 
 	/** Returns vertex offsets from the center of a {@link RegionAttachment}. Invalid to call for a {@link MeshAttachment}. */
 	offsets?: number[][];
 
+	/** The starting number for the numeric {@link getPath | path} suffix. */
 	start = 0;
+
+	/** The minimum number of digits in the numeric {@link getPath | path} suffix, for zero padding. 0 for no zero
+	 * padding. */
 	digits = 0;
+
 	/** The index of the region to show for the setup pose. */
 	setupIndex = 0;
 
+	/** @param count The number of texture regions this sequence will display.
+	 * @param pathSuffix If true, the {@link getPath | path} has a numeric suffix. If false, all regions will use the
+	 * same path, so `count` should be 1. */
 	constructor (count: number, pathSuffix: boolean) {
 		this.regions = new Array<TextureRegion>(count);
 		this.pathSuffix = pathSuffix;
@@ -108,6 +119,7 @@ export class Sequence {
 		}
 	}
 
+	/** Returns the {@link regions} index for the {@link SlotPose.getSequenceIndex}. */
 	resolveIndex (pose: SlotPose): number {
 		let index = pose.sequenceIndex;
 		if (index === -1) index = this.setupIndex;
@@ -115,15 +127,19 @@ export class Sequence {
 		return index;
 	}
 
+	/** Returns the UVs for the specified index. {@link regions Regions} must be populated and {@link update} called
+	  * before calling this method. */
 	getUVs (index: number): Float32Array {
 		// biome-ignore lint/style/noNonNullAssertion: uvs are always defined after updateSequence
 		return this.uvs![index] as Float32Array;
 	}
 
-	public hasPathSuffix (): boolean {
+	/** Returns true if the {@link getPath | path} has a numeric suffix. */
+	hasPathSuffix (): boolean {
 		return this.pathSuffix;
 	}
 
+	/** Returns the specified base path with an optional numeric suffix for the specified index. */
 	getPath (basePath: string, index: number): string {
 		if (!this.pathSuffix) return basePath;
 		let result = basePath;
@@ -139,6 +155,7 @@ export class Sequence {
 	}
 }
 
+/** Controls how {@link Sequence.regions} are displayed over time. */
 export enum SequenceMode {
 	hold = 0,
 	once = 1,

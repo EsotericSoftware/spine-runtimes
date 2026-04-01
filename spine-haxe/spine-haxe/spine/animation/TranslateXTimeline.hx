@@ -40,7 +40,7 @@ class TranslateXTimeline extends BoneTimeline1 {
 		this.boneIndex = boneIndex;
 	}
 
-	public function apply1(pose:BoneLocal, setup:BoneLocal, time:Float, alpha:Float, blend:MixBlend, direction:MixDirection) {
-		pose.x = getRelativeValue(time, alpha, blend, pose.x, setup.x);
+	public function apply1(pose:BonePose, setup:BonePose, time:Float, alpha:Float, fromSetup:Bool, add:Bool, out:Bool) {
+		pose.x = getRelativeValue(time, alpha, fromSetup, add, pose.x, setup.x);
 	}
 }

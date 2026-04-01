@@ -44,7 +44,7 @@ import 'sequence_mode.dart';
 import 'slot_timeline.dart';
 import 'timeline.dart';
 
-/// Changes a slot's SlotPose::getSequenceIndex() for an attachment's Sequence.
+/// Changes the sequence index for an attachment's Sequence.
 class SequenceTimeline extends Timeline implements SlotTimeline {
   final Pointer<spine_sequence_timeline_wrapper> _ptr;
 
@@ -73,6 +73,9 @@ class SequenceTimeline extends Timeline implements SlotTimeline {
     SpineBindings.bindings.spine_sequence_timeline_set_frame(_ptr, frame, time, mode.value, index, delay);
   }
 
+  /// The attachment for which the sequence index will be set.
+  ///
+  /// See Attachment::getTimelineAttachment().
   Attachment get attachment {
     final result = SpineBindings.bindings.spine_sequence_timeline_get_attachment(_ptr);
     final rtti = SpineBindings.bindings.spine_attachment_get_rtti(result);

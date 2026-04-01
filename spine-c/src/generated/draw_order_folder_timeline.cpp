@@ -17,10 +17,9 @@ spine_rtti spine_draw_order_folder_timeline_get_rtti(spine_draw_order_folder_tim
 }
 
 void spine_draw_order_folder_timeline_apply(spine_draw_order_folder_timeline self, spine_skeleton skeleton, float lastTime, float time,
-											/*@null*/ spine_array_event events, float alpha, spine_mix_blend blend, spine_mix_direction direction,
-											bool appliedPose) {
+											/*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
 	DrawOrderFolderTimeline *_self = (DrawOrderFolderTimeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixBlend) blend, (MixDirection) direction, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
 }
 
 size_t spine_draw_order_folder_timeline_get_frame_count(spine_draw_order_folder_timeline self) {
@@ -37,6 +36,16 @@ void spine_draw_order_folder_timeline_set_frame(spine_draw_order_folder_timeline
 												/*@null*/ spine_array_int drawOrder) {
 	DrawOrderFolderTimeline *_self = (DrawOrderFolderTimeline *) self;
 	_self->setFrame(frame, time, (Array<int> *) drawOrder);
+}
+
+bool spine_draw_order_folder_timeline_get_additive(spine_draw_order_folder_timeline self) {
+	DrawOrderFolderTimeline *_self = (DrawOrderFolderTimeline *) self;
+	return _self->getAdditive();
+}
+
+bool spine_draw_order_folder_timeline_get_instant(spine_draw_order_folder_timeline self) {
+	DrawOrderFolderTimeline *_self = (DrawOrderFolderTimeline *) self;
+	return _self->getInstant();
 }
 
 size_t spine_draw_order_folder_timeline_get_frame_entries(spine_draw_order_folder_timeline self) {

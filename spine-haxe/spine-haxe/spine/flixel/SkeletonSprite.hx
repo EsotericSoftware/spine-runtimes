@@ -146,7 +146,7 @@ class SkeletonSprite extends FlxTypedGroup<FlxObject> {
 
 	function renderMeshes():Void {
 		var clipper:SkeletonClipping = SkeletonSprite.clipper;
-		var drawOrder:Array<Slot> = skeleton.drawOrder;
+		var drawOrder:Array<Slot> = skeleton.drawOrder.appliedPose;
 		var attachmentColor:spine.Color;
 		var mesh:SkeletonMesh = null;
 		var numVertices:Int;
@@ -166,7 +166,7 @@ class SkeletonSprite extends FlxTypedGroup<FlxObject> {
 			}
 
 			var worldVertices:Array<Float> = _tempVertices;
-			var pose = slot.applied;
+			var pose = slot.appliedPose;
 			var attachment = pose.attachment;
 			if (Std.isOfType(attachment, RegionAttachment)) {
 				var region:RegionAttachment = cast(attachment, RegionAttachment);
@@ -315,9 +315,9 @@ class SkeletonSprite extends FlxTypedGroup<FlxObject> {
 		this.haxeWorldCoordinatesToSkeleton(point);
 		var parentBone = bone.parent;
 		if (parentBone != null) {
-			parentBone.applied.worldToLocal(point);
+			parentBone.appliedPose.worldToLocal(point);
 		} else {
-			bone.applied.worldToLocal(point);
+			bone.appliedPose.worldToLocal(point);
 		}
 	}
 

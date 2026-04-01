@@ -50,6 +50,7 @@ public class PointAttachment: Attachment {
         self.init(fromPointer: ptr!)
     }
 
+    /// The local x position.
     public var x: Float {
         get {
             let result = spine_point_attachment_get_x(_ptr.assumingMemoryBound(to: spine_point_attachment_wrapper.self))
@@ -60,6 +61,7 @@ public class PointAttachment: Attachment {
         }
     }
 
+    /// The local y position.
     public var y: Float {
         get {
             let result = spine_point_attachment_get_y(_ptr.assumingMemoryBound(to: spine_point_attachment_wrapper.self))
@@ -70,6 +72,7 @@ public class PointAttachment: Attachment {
         }
     }
 
+    /// The local rotation in degrees, counter clockwise.
     public var rotation: Float {
         get {
             let result = spine_point_attachment_get_rotation(_ptr.assumingMemoryBound(to: spine_point_attachment_wrapper.self))
@@ -85,6 +88,7 @@ public class PointAttachment: Attachment {
         return Color(fromPointer: result!)
     }
 
+    /// Computes the world rotation from the local rotation.
     public func computeWorldRotation(_ bone: BonePose) -> Float {
         let result = spine_point_attachment_compute_world_rotation(
             _ptr.assumingMemoryBound(to: spine_point_attachment_wrapper.self), bone._ptr.assumingMemoryBound(to: spine_bone_pose_wrapper.self))

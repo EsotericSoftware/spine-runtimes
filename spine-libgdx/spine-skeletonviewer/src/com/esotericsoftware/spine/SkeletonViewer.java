@@ -50,7 +50,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-import com.esotericsoftware.spine.Animation.MixBlend;
 import com.esotericsoftware.spine.AnimationState.AnimationStateAdapter;
 import com.esotericsoftware.spine.AnimationState.TrackEntry;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
@@ -212,11 +211,9 @@ public class SkeletonViewer extends ApplicationAdapter {
 			state.setEmptyAnimation(track, 0);
 			entry = state.addAnimation(track, ui.animationList.getSelected(), ui.loopCheckbox.isChecked(), 0);
 			entry.setMixDuration(ui.mixSlider.getValue());
-		} else {
+		} else
 			entry = state.setAnimation(track, ui.animationList.getSelected(), ui.loopCheckbox.isChecked());
-			entry.setHoldPrevious(track > 0 && ui.holdPrevCheckbox.isChecked());
-		}
-		entry.setMixBlend(track > 0 && ui.addCheckbox.isChecked() ? MixBlend.add : MixBlend.replace);
+		entry.setAdditive(track > 0 && ui.addCheckbox.isChecked());
 		entry.setReverse(ui.reverseCheckbox.isChecked());
 		entry.setAlpha(ui.alphaSlider.getValue());
 	}

@@ -29,51 +29,47 @@
 
 package spine;
 
-/** Stores a bone's local pose. */
-class BoneLocal implements Pose<BoneLocal> {
-	/** The local x translation. */
-	public var x:Float = 0;
+/** Stores the skeleton's draw order, which is the order that each slot's attachment is rendered. */
+class DrawOrder {
+	public final _setupPose:Array<Slot>;
 
-	/** The local y translation. */
-	public var y:Float = 0;
+	/** The unconstrained draw order, set by animations and application code. */
+	public final pose:Array<Slot>;
 
-	/** The local rotation in degrees, counter clockwise. */
-	public var rotation:Float = 0;
+	public final constrainedPose:Array<Slot>;
 
-	/** The local scaleX. */
-	public var scaleX:Float = 0;
+	/** The constrained draw order for rendering. If no constraints modify the draw order, this is the same as pose.
+	 * Otherwise it is a copy of pose modified by constraints. */
+	public var appliedPose:Array<Slot>;
 
-	/** The local scaleY. */
-	public var scaleY:Float = 0;
-
-	/** The local shearX. */
-	public var shearX:Float = 0;
-
-	/** The local shearY. */
-	public var shearY:Float = 0;
-
-	/** Determines how parent world transforms affect this bone. */
-	public var inherit(default, set):Inherit;
-
-	function set_inherit(value:Inherit):Inherit {
-		if (value == null)
-			throw new SpineException("inherit cannot be null.");
-		inherit = value;
-		return value;
+	public function new(setupPose:Array<Slot>) {
+		this._setupPose = setupPose;
+		this.pose = setupPose.copy();
+		this.constrainedPose = new Array<Slot>();
+		this.appliedPose = this.pose;
 	}
 
-	public function new() {}
+	/** Sets the unconstrained draw order to the setup pose order. */
+	public function setupPose():Void {
+		pose.resize(_setupPose.length);
+		for (i in 0..._setupPose.length)
+			pose[i] = _setupPose[i];
+	}
 
-	public function set(pose:BoneLocal):Void {
-		if (pose == null)
-			throw new SpineException("pose cannot be null.");
-		x = pose.x;
-		y = pose.y;
-		rotation = pose.rotation;
-		scaleX = pose.scaleX;
-		scaleY = pose.scaleY;
-		shearX = pose.shearX;
-		shearY = pose.shearY;
-		inherit = pose.inherit;
+	/** Sets the applied pose to the unconstrained pose, for when no constraints will modify the draw order. */
+	public function unconstrained():Void {
+		appliedPose = pose;
+	}
+
+	/** Sets the applied pose to the constrained pose, in anticipation of the applied pose being modified by constraints. */
+	public function constrained():Void {
+		appliedPose = constrainedPose;
+	}
+
+	/** Copies the unconstrained pose to the constrained pose, as a starting point for constraints to be applied. */
+	public function resetConstrained():Void {
+		constrainedPose.resize(pose.length);
+		for (i in 0...pose.length)
+			constrainedPose[i] = pose[i];
 	}
 }

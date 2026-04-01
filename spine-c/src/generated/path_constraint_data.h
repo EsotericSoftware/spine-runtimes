@@ -49,6 +49,9 @@ SPINE_C_API void spine_path_constraint_data_set_offset_rotation(spine_path_const
  */
 SPINE_C_API const char *spine_path_constraint_data_get_name(spine_path_constraint_data self);
 SPINE_C_API bool spine_path_constraint_data_get_skin_required(spine_path_constraint_data self);
+/**
+ * The setup pose that most animations are relative to.
+ */
 SPINE_C_API spine_path_constraint_pose spine_path_constraint_data_get_setup_pose(spine_path_constraint_data self);
 SPINE_C_API void spine_path_constraint_data_set_skin_required(spine_path_constraint_data self, bool skinRequired);
 SPINE_C_API spine_rtti spine_path_constraint_data_rtti(void);

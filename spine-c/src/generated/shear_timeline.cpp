@@ -17,9 +17,9 @@ spine_rtti spine_shear_timeline_get_rtti(spine_shear_timeline self) {
 }
 
 void spine_shear_timeline_apply(spine_shear_timeline self, spine_skeleton skeleton, float lastTime, float time, /*@null*/ spine_array_event events,
-								float alpha, spine_mix_blend blend, spine_mix_direction direction, bool appliedPose) {
+								float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
 	ShearTimeline *_self = (ShearTimeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixBlend) blend, (MixDirection) direction, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
 }
 
 int spine_shear_timeline_get_bone_index(spine_shear_timeline self) {
@@ -61,6 +61,16 @@ float spine_shear_timeline_get_bezier_value(spine_shear_timeline self, float tim
 spine_array_float spine_shear_timeline_get_curves(spine_shear_timeline self) {
 	ShearTimeline *_self = (ShearTimeline *) self;
 	return (spine_array_float) &_self->getCurves();
+}
+
+bool spine_shear_timeline_get_additive(spine_shear_timeline self) {
+	ShearTimeline *_self = (ShearTimeline *) self;
+	return _self->getAdditive();
+}
+
+bool spine_shear_timeline_get_instant(spine_shear_timeline self) {
+	ShearTimeline *_self = (ShearTimeline *) self;
+	return _self->getInstant();
 }
 
 size_t spine_shear_timeline_get_frame_entries(spine_shear_timeline self) {

@@ -34,7 +34,7 @@ import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
 import 'bone_timeline1.dart';
 
-/// Changes a bone's local BoneLocal::getShearX().
+/// Changes a bone's local shearX.
 class ShearXTimeline extends BoneTimeline1 {
   final Pointer<spine_shear_x_timeline_wrapper> _ptr;
 

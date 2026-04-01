@@ -168,6 +168,8 @@ public class SkeletonData {
 		return constraints;
 	}
 
+	/** Finds a constraint of the specified type by comparing each constraints's name. It is more efficient to cache the results of
+	 * this method than to call it multiple times. */
 	public @Null <T extends ConstraintData> T findConstraint (String constraintName, Class<T> type) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		if (type == null) throw new IllegalArgumentException("type cannot be null.");
@@ -255,7 +257,7 @@ public class SkeletonData {
 		this.hash = hash;
 	}
 
-	/** The path to the images directory as defined in Spine, or null if nonessential data was not exported. */
+	/** The path to the images folder as defined in Spine, or null if nonessential data was not exported. */
 	public @Null String getImagesPath () {
 		return imagesPath;
 	}
@@ -264,7 +266,7 @@ public class SkeletonData {
 		this.imagesPath = imagesPath;
 	}
 
-	/** The path to the audio directory as defined in Spine, or null if nonessential data was not exported. */
+	/** The path to the audio folder as defined in Spine, or null if nonessential data was not exported. */
 	public @Null String getAudioPath () {
 		return audioPath;
 	}

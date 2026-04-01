@@ -56,7 +56,7 @@ class EventTimeline extends Timeline {
 	}
 
 	/** Fires events for frames > lastTime and <= time. */
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, firedEvents:Array<Event>, alpha:Float, blend:MixBlend, direction:MixDirection,
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, firedEvents:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
 			appliedPose:Bool) {
 		if (firedEvents == null)
 			return;
@@ -64,7 +64,7 @@ class EventTimeline extends Timeline {
 		var frameCount:Int = frames.length;
 
 		if (lastTime > time) { // Apply events after lastTime for looped animations.
-			apply(skeleton, lastTime, 2147483647, firedEvents, alpha, blend, direction, appliedPose);
+			apply(skeleton, lastTime, 2147483647, firedEvents, alpha, fromSetup, add, out, appliedPose);
 			lastTime = -1;
 		} else if (lastTime >= frames[frameCount - 1]) // Last time is after last frame.
 			return;

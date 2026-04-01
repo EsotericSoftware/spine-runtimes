@@ -13,9 +13,19 @@ spine_rtti spine_timeline_get_rtti(spine_timeline self) {
 }
 
 void spine_timeline_apply(spine_timeline self, spine_skeleton skeleton, float lastTime, float time, /*@null*/ spine_array_event events, float alpha,
-						  spine_mix_blend blend, spine_mix_direction direction, bool appliedPose) {
+						  bool fromSetup, bool add, bool out, bool appliedPose) {
 	Timeline *_self = (Timeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixBlend) blend, (MixDirection) direction, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
+}
+
+bool spine_timeline_get_additive(spine_timeline self) {
+	Timeline *_self = (Timeline *) self;
+	return _self->getAdditive();
+}
+
+bool spine_timeline_get_instant(spine_timeline self) {
+	Timeline *_self = (Timeline *) self;
+	return _self->getInstant();
 }
 
 size_t spine_timeline_get_frame_entries(spine_timeline self) {

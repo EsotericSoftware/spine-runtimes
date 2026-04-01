@@ -32,8 +32,7 @@
 import Foundation
 import SpineC
 
-/// Changes a path constraint's PathConstraintPose::getMixRotate(), PathConstraintPose::getMixX(),
-/// and PathConstraintPose::getMixY().
+/// Changes a path constraint's rotate, x, and y mix values.
 @objc(SpinePathConstraintMixTimeline)
 @objcMembers
 public class PathConstraintMixTimeline: CurveTimeline, ConstraintTimeline {

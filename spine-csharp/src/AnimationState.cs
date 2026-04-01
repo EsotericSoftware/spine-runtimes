@@ -237,13 +237,13 @@ namespace Spine {
 				if (current == null || current.delay > 0) continue;
 				applied = true;
 
-				// Track 0 animations aren't for layering, so do not show the previously applied animations before the first key.
+				// Track 0 animations aren't for layering, so never use current values before the first key.
 				MixBlend blend = i == 0 ? MixBlend.First : current.mixBlend;
 
 				// Apply mixing from entries first.
 				float alpha = current.alpha;
 				if (current.mixingFrom != null)
-					alpha *= ApplyMixingFrom(current, skeleton, blend);
+					alpha *= ApplyMixingFrom(current, skeleton);
 				else if (current.trackTime >= current.trackEnd && current.next == null) //
 					alpha = 0; // Set to setup pose the last time the entry will be applied.
 				bool attachments = alpha >= current.alphaAttachmentThreshold;
@@ -279,7 +279,7 @@ namespace Spine {
 
 					for (int ii = 0; ii < timelineCount; ii++) {
 						Timeline timeline = timelines[ii];
-						MixBlend timelineBlend = timelineMode[ii] == AnimationState.Subsequent ? blend : MixBlend.Setup;
+						MixBlend timelineBlend = timelineMode[ii] == AnimationState.Subsequent ? current.mixBlend : MixBlend.Setup;
 						RotateTimeline rotateTimeline = timeline as RotateTimeline;
 						if (!shortestRotation && rotateTimeline != null)
 							ApplyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, timelineBlend, timelinesRotation,
@@ -355,18 +355,16 @@ namespace Spine {
 			return applied;
 		}
 
-		private float ApplyMixingFrom (TrackEntry to, Skeleton skeleton, MixBlend blend) {
+		private float ApplyMixingFrom (TrackEntry to, Skeleton skeleton) {
 			TrackEntry from = to.mixingFrom;
-			if (from.mixingFrom != null) ApplyMixingFrom(from, skeleton, blend);
+			if (from.mixingFrom != null) ApplyMixingFrom(from, skeleton);
 
 			float mix;
-			if (to.mixDuration == 0) { // Single frame mix to undo mixingFrom changes.
+			if (to.mixDuration == 0) // Single frame mix to undo mixingFrom changes.
 				mix = 1;
-				if (blend == MixBlend.First) blend = MixBlend.Setup; // Tracks > 0 are transparent and can't reset to setup pose.
-			} else {
+			else {
 				mix = to.mixTime / to.mixDuration;
 				if (mix > 1) mix = 1;
-				if (blend != MixBlend.First) blend = from.mixBlend; // Track 0 ignores track mix blend.
 			}
 
 			bool attachments = mix < from.mixAttachmentThreshold, drawOrder = mix < from.mixDrawOrderThreshold;
@@ -381,6 +379,7 @@ namespace Spine {
 				if (mix < from.eventThreshold) events = this.events;
 			}
 
+			MixBlend blend = from.mixBlend;
 			if (blend == MixBlend.Add) {
 				for (int i = 0; i < timelineCount; i++)
 					timelines[i].Apply(skeleton, animationLast, applyTime, events, alphaMix, blend, MixDirection.Out, false);
@@ -910,9 +909,12 @@ namespace Spine {
 			HashSet<string> propertyIds = this.propertyIds;
 
 			if (to != null && to.holdPrevious) {
-				for (int i = 0; i < timelinesCount; i++)
-					timelineMode[i] = propertyIds.AddAll(timelines[i].PropertyIds) ? AnimationState.HoldFirst : AnimationState.HoldSubsequent;
-
+				for (int i = 0; i < timelinesCount; i++) {
+					bool first = propertyIds.AddAll(timelines[i].PropertyIds);
+					if (first && timelines[i] is DrawOrderFolderTimeline && propertyIds.Contains(DrawOrderTimeline.propertyID))
+						first = false; // DrawOrderTimeline changed.
+					timelineMode[i] = first ? AnimationState.HoldFirst : AnimationState.HoldSubsequent;
+				}
 				return;
 			}
 
@@ -922,6 +924,8 @@ namespace Spine {
 				String[] ids = timeline.PropertyIds;
 				if (!propertyIds.AddAll(ids))
 					timelineMode[i] = AnimationState.Subsequent;
+				else if (timeline is DrawOrderFolderTimeline && propertyIds.Contains(DrawOrderTimeline.propertyID))
+					timelineMode[i] = AnimationState.Subsequent; // DrawOrderTimeline changed.
 				else if (to == null || timeline is AttachmentTimeline || timeline is DrawOrderTimeline
 						|| timeline is DrawOrderFolderTimeline || timeline is EventTimeline
 						|| !to.animation.HasTimeline(ids)) {
@@ -1293,8 +1297,6 @@ namespace Spine {
 		/// <summary>
 		/// <para>
 		/// Controls how properties keyed in the animation are mixed with lower tracks. Defaults to <see cref="MixBlend.Replace"/>.
-		/// </para><para>
-		/// Track entries on track 0 ignore this setting and always use <see cref="MixBlend.First"/>.
 		/// </para><para>
 		///  The <c>MixBlend</c> can be set for a new track entry only before <see cref="AnimationState.Apply(Skeleton)"/> is next
 		///  called.</para>

@@ -28,13 +28,14 @@
  *****************************************************************************/
 
 #include <spine/BoneData.h>
+#include <spine/BonePose.h>
 
 #include <assert.h>
 
 using namespace spine;
 
 BoneData::BoneData(int index, const String &name, BoneData *parent)
-	: PosedDataGeneric<BoneLocal>(name), _index(index), _parent(parent), _length(0), _color(0.61f, 0.61f, 0.61f, 1.0f), _icon(), _visible(true) {
+	: PosedDataGeneric<BonePose>(name), _index(index), _parent(parent), _length(0), _color(0.61f, 0.61f, 0.61f, 1.0f), _icon(), _visible(true) {
 	assert(index >= 0);
 }
 

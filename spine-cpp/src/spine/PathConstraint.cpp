@@ -56,7 +56,7 @@ PathConstraint::PathConstraint(PathConstraintData &data, Skeleton &skeleton) : P
 	_bones.ensureCapacity(data.getBones().size());
 	for (size_t i = 0; i < data.getBones().size(); i++) {
 		BoneData *boneData = data.getBones()[i];
-		_bones.add(&skeleton._bones[boneData->getIndex()]->_constrained);
+		_bones.add(&skeleton._bones[boneData->getIndex()]->_constrainedPose);
 	}
 
 	_slot = skeleton._slots[data._slot->_index];
@@ -70,13 +70,13 @@ PathConstraint &PathConstraint::copy(Skeleton &skeleton) {
 }
 
 void PathConstraint::update(Skeleton &skeleton, Physics physics) {
-	Attachment *baseAttachment = _slot->_applied->_attachment;
+	Attachment *baseAttachment = _slot->_appliedPose->_attachment;
 	if (baseAttachment == NULL || !baseAttachment->getRTTI().instanceOf(PathAttachment::rtti)) {
 		return;
 	}
 	PathAttachment *pathAttachment = static_cast<PathAttachment *>(baseAttachment);
 
-	PathConstraintPose &p = *_applied;
+	PathConstraintPose &p = *_appliedPose;
 	float mixRotate = p._mixRotate, mixX = p._mixX, mixY = p._mixY;
 	if (mixRotate == 0 && mixX == 0 && mixY == 0) return;
 
@@ -248,7 +248,7 @@ void PathConstraint::setSlot(Slot &slot) {
 }
 
 Array<float> &PathConstraint::computeWorldPositions(Skeleton &skeleton, PathAttachment &path, int spacesCount, bool tangents) {
-	float position = _applied->_position;
+	float position = _appliedPose->_position;
 	float *spaces = _spaces.buffer();
 	_positions.setSize(spacesCount * 3 + 2, 0);
 	Array<float> &out = _positions;

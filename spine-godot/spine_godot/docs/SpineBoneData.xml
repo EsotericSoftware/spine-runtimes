@@ -39,9 +39,9 @@
 			</description>
 		</method>
 		<method name="get_setup_pose">
-			<return type="SpineBoneLocal" />
+			<return type="SpineBonePose" />
 			<description>
-				Returns the local setup pose for this bone, containing position, rotation, scale, and shear.
+				Returns the setup pose for this bone, containing position, rotation, scale, and shear.
 			</description>
 		</method>
 		<method name="is_skin_required">

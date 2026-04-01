@@ -33,7 +33,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Null;
 
 /** The setup pose for a bone. */
-public class BoneData extends PosedData<BoneLocal> {
+public class BoneData extends PosedData<BonePose> {
 	final int index;
 	@Null final BoneData parent;
 	float length;
@@ -44,7 +44,7 @@ public class BoneData extends PosedData<BoneLocal> {
 	boolean visible;
 
 	public BoneData (int index, String name, @Null BoneData parent) {
-		super(name, new BoneLocal());
+		super(name, new BonePose());
 		if (index < 0) throw new IllegalArgumentException("index must be >= 0.");
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
 		this.index = index;
@@ -55,14 +55,22 @@ public class BoneData extends PosedData<BoneLocal> {
 	public BoneData (BoneData data, @Null BoneData parent) {
 		this(data.index, data.name, parent);
 		length = data.length;
-		setup.set(data.setup);
+		setupPose.set(data.setupPose);
 	}
 
-	/** The index of the bone in {@link Skeleton#getBones()}. */
+	/** The bone's name, unique across all bones in the skeleton.
+	 * <p>
+	 * See {@link SkeletonData#findBone(String)} and {@link Skeleton#findBone(String)}. */
+	public String getName () { // Do not port.
+		return super.getName();
+	}
+
+	/** The {@link Skeleton#bones} index. */
 	public int getIndex () {
 		return index;
 	}
 
+	/** The parent bone, or null if this bone is the root. */
 	public @Null BoneData getParent () {
 		return parent;
 	}
@@ -82,7 +90,7 @@ public class BoneData extends PosedData<BoneLocal> {
 		return color;
 	}
 
-	/** The bone icon as it was in Spine, or null if nonessential data was not exported. */
+	/** The bone icon name as it was in Spine, or null if nonessential data was not exported. */
 	public @Null String getIcon () {
 		return icon;
 	}

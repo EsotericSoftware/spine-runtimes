@@ -65,6 +65,7 @@ SPINE_OPAQUE_TYPE(spine_constraint_timeline1)
 SPINE_OPAQUE_TYPE(spine_curve_timeline)
 SPINE_OPAQUE_TYPE(spine_curve_timeline1)
 SPINE_OPAQUE_TYPE(spine_deform_timeline)
+SPINE_OPAQUE_TYPE(spine_draw_order)
 SPINE_OPAQUE_TYPE(spine_draw_order_folder_timeline)
 SPINE_OPAQUE_TYPE(spine_draw_order_timeline)
 SPINE_OPAQUE_TYPE(spine_event)
@@ -174,8 +175,6 @@ SPINE_OPAQUE_TYPE(spine_vertex_attachment)
 #include "event_type.h"
 #include "format.h"
 #include "inherit.h"
-#include "mix_blend.h"
-#include "mix_direction.h"
 #include "physics.h"
 #include "position_mode.h"
 #include "property.h"

@@ -42,9 +42,10 @@ namespace spine {
 	class Skeleton;
 	class Attachment;
 
-	/// Stores a slot's current pose. Slots organize attachments for Skeleton drawOrder purposes and provide a place to store
-	/// state for an attachment. State cannot be stored in an attachment itself because attachments are stateless and may be shared
-	/// across multiple skeletons.
+	/// Organizes attachments for Skeleton drawOrder purposes and provide a place to store state for an attachment.
+	///
+	/// State cannot be stored in an attachment itself because attachments are stateless and may be shared across multiple
+	/// skeletons.
 	class SP_API Slot : public PosedGeneric<SlotData, SlotPose, SlotPose> {
 		friend class VertexAttachment;
 

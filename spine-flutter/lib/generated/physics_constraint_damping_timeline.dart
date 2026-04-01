@@ -34,7 +34,7 @@ import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
 import 'physics_constraint_timeline.dart';
 
-/// Changes a physics constraint's PhysicsConstraintPose::getDamping().
+/// Changes a physics constraint's damping.
 class PhysicsConstraintDampingTimeline extends PhysicsConstraintTimeline {
   final Pointer<spine_physics_constraint_damping_timeline_wrapper> _ptr;
 

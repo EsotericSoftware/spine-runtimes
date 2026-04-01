@@ -28,13 +28,14 @@
  *****************************************************************************/
 
 import type { Pose } from "./Pose.js";
+import type { Skeleton } from "./Skeleton.js";
+import type { Skin } from "./Skin.js";
 
-/** The base class for all constrained datas. */
+/** The base class for storing setup data for a posed object. May be shared with multiple instances. */
 export abstract class PosedData<P extends Pose<P>> {
-	/** The constraint's name, which is unique across all constraints in the skeleton of the same type. */
 	readonly name: string;
 
-	readonly setup: P;
+	readonly setupPose: P;
 
 	/** When true, {@link Skeleton.updateWorldTransform} only updates this constraint if the {@link Skeleton.skin}
 	 * contains this constraint.
@@ -42,10 +43,10 @@ export abstract class PosedData<P extends Pose<P>> {
 	 * See {@link Skin.constraints}. */
 	skinRequired = false;
 
-	constructor (name: string, setup: P) {
+	constructor (name: string, setupPose: P) {
 		if (name == null) throw new Error("name cannot be null.");
 		this.name = name;
-		this.setup = setup;
+		this.setupPose = setupPose;
 	}
 
 }

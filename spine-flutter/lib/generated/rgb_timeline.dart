@@ -34,7 +34,7 @@ import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
 import 'slot_curve_timeline.dart';
 
-/// Changes the RGB for a slot's SlotPose::getColor().
+/// Changes RGB for a slot's color.
 class RgbTimeline extends SlotCurveTimeline {
   final Pointer<spine_rgb_timeline_wrapper> _ptr;
 

@@ -19,10 +19,10 @@ spine_rtti spine_physics_constraint_mix_timeline_get_rtti(spine_physics_constrai
 }
 
 void spine_physics_constraint_mix_timeline_apply(spine_physics_constraint_mix_timeline self, spine_skeleton skeleton, float lastTime, float time,
-												 /*@null*/ spine_array_event events, float alpha, spine_mix_blend blend,
-												 spine_mix_direction direction, bool appliedPose) {
+												 /*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out,
+												 bool appliedPose) {
 	PhysicsConstraintMixTimeline *_self = (PhysicsConstraintMixTimeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixBlend) blend, (MixDirection) direction, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
 }
 
 int spine_physics_constraint_mix_timeline_get_constraint_index(spine_physics_constraint_mix_timeline self) {
@@ -45,28 +45,28 @@ float spine_physics_constraint_mix_timeline_get_curve_value(spine_physics_constr
 	return _self->getCurveValue(time);
 }
 
-float spine_physics_constraint_mix_timeline_get_relative_value(spine_physics_constraint_mix_timeline self, float time, float alpha,
-															   spine_mix_blend blend, float current, float setup) {
+float spine_physics_constraint_mix_timeline_get_relative_value(spine_physics_constraint_mix_timeline self, float time, float alpha, bool fromSetup,
+															   bool add, float current, float setup) {
 	PhysicsConstraintMixTimeline *_self = (PhysicsConstraintMixTimeline *) self;
-	return _self->getRelativeValue(time, alpha, (MixBlend) blend, current, setup);
+	return _self->getRelativeValue(time, alpha, fromSetup, add, current, setup);
 }
 
-float spine_physics_constraint_mix_timeline_get_absolute_value_1(spine_physics_constraint_mix_timeline self, float time, float alpha,
-																 spine_mix_blend blend, float current, float setup) {
+float spine_physics_constraint_mix_timeline_get_absolute_value_1(spine_physics_constraint_mix_timeline self, float time, float alpha, bool fromSetup,
+																 bool add, float current, float setup) {
 	PhysicsConstraintMixTimeline *_self = (PhysicsConstraintMixTimeline *) self;
-	return _self->getAbsoluteValue(time, alpha, (MixBlend) blend, current, setup);
+	return _self->getAbsoluteValue(time, alpha, fromSetup, add, current, setup);
 }
 
-float spine_physics_constraint_mix_timeline_get_absolute_value_2(spine_physics_constraint_mix_timeline self, float time, float alpha,
-																 spine_mix_blend blend, float current, float setup, float value) {
+float spine_physics_constraint_mix_timeline_get_absolute_value_2(spine_physics_constraint_mix_timeline self, float time, float alpha, bool fromSetup,
+																 bool add, float current, float setup, float value) {
 	PhysicsConstraintMixTimeline *_self = (PhysicsConstraintMixTimeline *) self;
-	return _self->getAbsoluteValue(time, alpha, (MixBlend) blend, current, setup, value);
+	return _self->getAbsoluteValue(time, alpha, fromSetup, add, current, setup, value);
 }
 
-float spine_physics_constraint_mix_timeline_get_scale_value(spine_physics_constraint_mix_timeline self, float time, float alpha,
-															spine_mix_blend blend, spine_mix_direction direction, float current, float setup) {
+float spine_physics_constraint_mix_timeline_get_scale_value(spine_physics_constraint_mix_timeline self, float time, float alpha, bool fromSetup,
+															bool add, bool out, float current, float setup) {
 	PhysicsConstraintMixTimeline *_self = (PhysicsConstraintMixTimeline *) self;
-	return _self->getScaleValue(time, alpha, (MixBlend) blend, (MixDirection) direction, current, setup);
+	return _self->getScaleValue(time, alpha, fromSetup, add, out, current, setup);
 }
 
 void spine_physics_constraint_mix_timeline_set_linear(spine_physics_constraint_mix_timeline self, size_t frame) {
@@ -95,6 +95,16 @@ float spine_physics_constraint_mix_timeline_get_bezier_value(spine_physics_const
 spine_array_float spine_physics_constraint_mix_timeline_get_curves(spine_physics_constraint_mix_timeline self) {
 	PhysicsConstraintMixTimeline *_self = (PhysicsConstraintMixTimeline *) self;
 	return (spine_array_float) &_self->getCurves();
+}
+
+bool spine_physics_constraint_mix_timeline_get_additive(spine_physics_constraint_mix_timeline self) {
+	PhysicsConstraintMixTimeline *_self = (PhysicsConstraintMixTimeline *) self;
+	return _self->getAdditive();
+}
+
+bool spine_physics_constraint_mix_timeline_get_instant(spine_physics_constraint_mix_timeline self) {
+	PhysicsConstraintMixTimeline *_self = (PhysicsConstraintMixTimeline *) self;
+	return _self->getInstant();
 }
 
 size_t spine_physics_constraint_mix_timeline_get_frame_entries(spine_physics_constraint_mix_timeline self) {

@@ -33,6 +33,7 @@ import 'package:universal_ffi/ffi.dart';
 import 'package:universal_ffi/ffi_utils.dart';
 import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
+import 'event.dart';
 
 /// Stores the setup pose values for an Event.
 class EventData {
@@ -52,39 +53,13 @@ class EventData {
     SpineBindings.bindings.spine_event_data_dispose(_ptr);
   }
 
-  /// The name of the event, which is unique within the skeleton.
+  /// The name of the event, unique across all events in the skeleton.
   String get name {
     final result = SpineBindings.bindings.spine_event_data_get_name(_ptr);
     return result.cast<Utf8>().toDartString();
   }
 
-  int get intValue {
-    final result = SpineBindings.bindings.spine_event_data_get_int(_ptr);
-    return result;
-  }
-
-  set intValue(int value) {
-    SpineBindings.bindings.spine_event_data_set_int(_ptr, value);
-  }
-
-  double get floatValue {
-    final result = SpineBindings.bindings.spine_event_data_get_float(_ptr);
-    return result;
-  }
-
-  set floatValue(double value) {
-    SpineBindings.bindings.spine_event_data_set_float(_ptr, value);
-  }
-
-  String get stringValue {
-    final result = SpineBindings.bindings.spine_event_data_get_string(_ptr);
-    return result.cast<Utf8>().toDartString();
-  }
-
-  set stringValue(String value) {
-    SpineBindings.bindings.spine_event_data_set_string(_ptr, value.toNativeUtf8().cast<Char>());
-  }
-
+  /// Path to an audio file relative to the audio folder as defined in Spine.
   String get audioPath {
     final result = SpineBindings.bindings.spine_event_data_get_audio_path(_ptr);
     return result.cast<Utf8>().toDartString();
@@ -94,21 +69,14 @@ class EventData {
     SpineBindings.bindings.spine_event_data_set_audio_path(_ptr, value.toNativeUtf8().cast<Char>());
   }
 
-  double get volume {
-    final result = SpineBindings.bindings.spine_event_data_get_volume(_ptr);
-    return result;
+  /// The setup values that are shared by all events with this data.
+  Event get getSetupPose {
+    final result = SpineBindings.bindings.spine_event_data_get_setup_pose_1(_ptr);
+    return Event.fromPointer(result);
   }
 
-  set volume(double value) {
-    SpineBindings.bindings.spine_event_data_set_volume(_ptr, value);
-  }
-
-  double get balance {
-    final result = SpineBindings.bindings.spine_event_data_get_balance(_ptr);
-    return result;
-  }
-
-  set balance(double value) {
-    SpineBindings.bindings.spine_event_data_set_balance(_ptr, value);
+  Event get setupPose2 {
+    final result = SpineBindings.bindings.spine_event_data_get_setup_pose_2(_ptr);
+    return Event.fromPointer(result);
   }
 }

@@ -32,7 +32,7 @@
 import Foundation
 import SpineC
 
-/// SlotPose wrapper
+/// Stores a slot's pose.
 @objc(SpineSlotPose)
 @objcMembers
 public class SlotPose: NSObject {
@@ -48,7 +48,7 @@ public class SlotPose: NSObject {
         self.init(fromPointer: ptr!)
     }
 
-    /// The color used to tint the slot's attachment. If getDarkColor() is set, this is used as the
+    /// The color used to tint the slot's attachment. If a dark color is set, this is used as the
     /// light color for two color tinting.
     public var color: Color {
         let result = spine_slot_pose_get_color(_ptr.assumingMemoryBound(to: spine_slot_pose_wrapper.self))

@@ -294,9 +294,9 @@ export class SpineGameObject extends DepthMixin(
 	phaserWorldCoordinatesToBone (point: { x: number; y: number }, bone: Bone) {
 		this.phaserWorldCoordinatesToSkeleton(point);
 		if (bone.parent) {
-			bone.parent.applied.worldToLocal(point as Vector2);
+			bone.parent.appliedPose.worldToLocal(point as Vector2);
 		} else {
-			bone.applied.worldToLocal(point as Vector2);
+			bone.appliedPose.worldToLocal(point as Vector2);
 		}
 	}
 
@@ -416,7 +416,7 @@ export class SpineGameObject extends DepthMixin(
 		skeleton.scaleX = transform.scaleX;
 		skeleton.scaleY = transform.scaleY;
 		const root = skeleton.getRootBone() as Bone;
-		root.applied.rotation = -MathUtils.radiansToDegrees * transform.rotationNormalized;
+		root.appliedPose.rotation = -MathUtils.radiansToDegrees * transform.rotationNormalized;
 		this.skeleton.updateWorldTransform(Physics.update);
 
 		context.save();

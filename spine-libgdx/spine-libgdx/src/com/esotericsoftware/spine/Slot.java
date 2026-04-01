@@ -31,10 +31,11 @@ package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.graphics.Color;
 
-/** Stores a slot's current pose. Slots organize attachments for {@link Skeleton#drawOrder} purposes and provide a place to store
- * state for an attachment. State cannot be stored in an attachment itself because attachments are stateless and may be shared
- * across multiple skeletons. */
-public class Slot extends Posed<SlotData, SlotPose, SlotPose> {
+/** Organizes attachments for {@link Skeleton#drawOrder} purposes and provide a place to store state for an attachment.
+ * <p>
+ * State cannot be stored in an attachment itself because attachments are stateless and may be shared across multiple
+ * skeletons. */
+public class Slot extends Posed<SlotData, SlotPose> {
 	final Skeleton skeleton;
 	final Bone bone;
 	int attachmentState;
@@ -44,9 +45,9 @@ public class Slot extends Posed<SlotData, SlotPose, SlotPose> {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		this.skeleton = skeleton;
 		bone = skeleton.bones.items[data.boneData.index];
-		if (data.setup.darkColor != null) {
+		if (data.setupPose.darkColor != null) {
 			pose.darkColor = new Color();
-			constrained.darkColor = new Color();
+			constrainedPose.darkColor = new Color();
 		}
 		setupPose();
 	}
@@ -58,9 +59,9 @@ public class Slot extends Posed<SlotData, SlotPose, SlotPose> {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		this.bone = bone;
 		this.skeleton = skeleton;
-		if (data.setup.darkColor != null) {
+		if (data.setupPose.darkColor != null) {
 			pose.darkColor = new Color();
-			constrained.darkColor = new Color();
+			constrainedPose.darkColor = new Color();
 		}
 		pose.set(slot.pose);
 	}
@@ -71,9 +72,9 @@ public class Slot extends Posed<SlotData, SlotPose, SlotPose> {
 	}
 
 	public void setupPose () {
-		pose.color.set(data.setup.color);
-		if (pose.darkColor != null) pose.darkColor.set(data.setup.darkColor);
-		pose.sequenceIndex = data.setup.sequenceIndex;
+		pose.color.set(data.setupPose.color);
+		if (pose.darkColor != null) pose.darkColor.set(data.setupPose.darkColor);
+		pose.sequenceIndex = data.setupPose.sequenceIndex;
 		if (data.attachmentName == null)
 			pose.setAttachment(null);
 		else {

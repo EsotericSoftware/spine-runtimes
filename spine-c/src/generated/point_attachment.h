@@ -14,14 +14,29 @@ SPINE_C_API spine_point_attachment spine_point_attachment_create(const char *nam
 SPINE_C_API void spine_point_attachment_dispose(spine_point_attachment self);
 
 SPINE_C_API spine_rtti spine_point_attachment_get_rtti(spine_point_attachment self);
+/**
+ * The local x position.
+ */
 SPINE_C_API float spine_point_attachment_get_x(spine_point_attachment self);
 SPINE_C_API void spine_point_attachment_set_x(spine_point_attachment self, float inValue);
+/**
+ * The local y position.
+ */
 SPINE_C_API float spine_point_attachment_get_y(spine_point_attachment self);
 SPINE_C_API void spine_point_attachment_set_y(spine_point_attachment self, float inValue);
+/**
+ * The local rotation in degrees, counter clockwise.
+ */
 SPINE_C_API float spine_point_attachment_get_rotation(spine_point_attachment self);
 SPINE_C_API void spine_point_attachment_set_rotation(spine_point_attachment self, float inValue);
 SPINE_C_API spine_color spine_point_attachment_get_color(spine_point_attachment self);
+/**
+ * Computes the world position from the local position.
+ */
 SPINE_C_API void spine_point_attachment_compute_world_position(spine_point_attachment self, spine_bone_pose bone, float *ox, float *oy);
+/**
+ * Computes the world rotation from the local rotation.
+ */
 SPINE_C_API float spine_point_attachment_compute_world_rotation(spine_point_attachment self, spine_bone_pose bone);
 SPINE_C_API spine_attachment spine_point_attachment_copy(spine_point_attachment self);
 SPINE_C_API const char *spine_point_attachment_get_name(spine_point_attachment self);

@@ -36,7 +36,6 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
@@ -51,8 +50,6 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-import com.esotericsoftware.spine.Animation.MixBlend;
-import com.esotericsoftware.spine.Animation.MixDirection;
 import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.Sequence;
@@ -144,7 +141,7 @@ public class Box2DExample extends ApplicationAdapter {
 		batch.setTransformMatrix(camera.view);
 		batch.begin();
 
-		animation.apply(skeleton, time, time, true, events, 1, MixBlend.first, MixDirection.in, false);
+		animation.apply(skeleton, time, time, true, events, 1, true, false, false, false);
 		skeleton.x += 8 * delta;
 		skeleton.update(delta);
 		skeleton.updateWorldTransform(Physics.update);

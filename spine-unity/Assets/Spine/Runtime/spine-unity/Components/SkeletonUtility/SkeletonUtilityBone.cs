@@ -32,6 +32,7 @@
 #endif
 
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Spine.Unity {
 	/// <summary>Sets a GameObject's transform to match a bone on a Spine skeleton.</summary>
@@ -58,7 +59,17 @@ namespace Spine.Unity {
 		/// <summary>If a bone isn't set, boneName is used to find the bone.</summary>
 		public string boneName;
 		public Transform parentReference;
-		public Mode mode;
+		[SerializeField, FormerlySerializedAs("mode")] Mode boneMode;
+		public Mode mode {
+			get { return boneMode; }
+			set {
+				if (boneMode != value) {
+					boneMode = value;
+					if (hierarchy != null)
+						hierarchy.OnUtilityBoneChanged();
+				}
+			}
+		}
 		public bool position, rotation, scale, zPosition = true;
 		[Range(0f, 1f)]
 		public float overrideAlpha = 1;

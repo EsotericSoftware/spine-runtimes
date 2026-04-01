@@ -35,18 +35,19 @@ abstract class BoneTimeline1 extends CurveTimeline1 implements BoneTimeline {
 	public function new(frameCount:Int, bezierCount:Int, boneIndex:Int, property:Property) {
 		super(frameCount, bezierCount, property + "|" + boneIndex);
 		this.boneIndex = boneIndex;
+		this.additive = true;
 	}
 
 	public function getBoneIndex() {
 		return boneIndex;
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend, direction:MixDirection,
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
 			appliedPose:Bool) {
 		var bone = skeleton.bones[boneIndex];
 		if (bone.active)
-			apply1(appliedPose ? bone.applied : bone.pose, bone.data.setup, time, alpha, blend, direction);
+			apply1(appliedPose ? bone.appliedPose : bone.pose, bone.data.setupPose, time, alpha, fromSetup, add, out);
 	}
 
-	abstract function apply1(pose:BoneLocal, setup:BoneLocal, time:Float, alpha:Float, blend:MixBlend, direction:MixDirection):Void;
+	abstract function apply1(pose:BonePose, setup:BonePose, time:Float, alpha:Float, fromSetup:Bool, add:Bool, out:Bool):Void;
 }

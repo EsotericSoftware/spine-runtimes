@@ -17,9 +17,9 @@ spine_rtti spine_rotate_timeline_get_rtti(spine_rotate_timeline self) {
 }
 
 void spine_rotate_timeline_apply(spine_rotate_timeline self, spine_skeleton skeleton, float lastTime, float time, /*@null*/ spine_array_event events,
-								 float alpha, spine_mix_blend blend, spine_mix_direction direction, bool appliedPose) {
+								 float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
 	RotateTimeline *_self = (RotateTimeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixBlend) blend, (MixDirection) direction, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
 }
 
 int spine_rotate_timeline_get_bone_index(spine_rotate_timeline self) {
@@ -42,28 +42,28 @@ float spine_rotate_timeline_get_curve_value(spine_rotate_timeline self, float ti
 	return _self->getCurveValue(time);
 }
 
-float spine_rotate_timeline_get_relative_value(spine_rotate_timeline self, float time, float alpha, spine_mix_blend blend, float current,
+float spine_rotate_timeline_get_relative_value(spine_rotate_timeline self, float time, float alpha, bool fromSetup, bool add, float current,
 											   float setup) {
 	RotateTimeline *_self = (RotateTimeline *) self;
-	return _self->getRelativeValue(time, alpha, (MixBlend) blend, current, setup);
+	return _self->getRelativeValue(time, alpha, fromSetup, add, current, setup);
 }
 
-float spine_rotate_timeline_get_absolute_value_1(spine_rotate_timeline self, float time, float alpha, spine_mix_blend blend, float current,
+float spine_rotate_timeline_get_absolute_value_1(spine_rotate_timeline self, float time, float alpha, bool fromSetup, bool add, float current,
 												 float setup) {
 	RotateTimeline *_self = (RotateTimeline *) self;
-	return _self->getAbsoluteValue(time, alpha, (MixBlend) blend, current, setup);
+	return _self->getAbsoluteValue(time, alpha, fromSetup, add, current, setup);
 }
 
-float spine_rotate_timeline_get_absolute_value_2(spine_rotate_timeline self, float time, float alpha, spine_mix_blend blend, float current,
+float spine_rotate_timeline_get_absolute_value_2(spine_rotate_timeline self, float time, float alpha, bool fromSetup, bool add, float current,
 												 float setup, float value) {
 	RotateTimeline *_self = (RotateTimeline *) self;
-	return _self->getAbsoluteValue(time, alpha, (MixBlend) blend, current, setup, value);
+	return _self->getAbsoluteValue(time, alpha, fromSetup, add, current, setup, value);
 }
 
-float spine_rotate_timeline_get_scale_value(spine_rotate_timeline self, float time, float alpha, spine_mix_blend blend, spine_mix_direction direction,
-											float current, float setup) {
+float spine_rotate_timeline_get_scale_value(spine_rotate_timeline self, float time, float alpha, bool fromSetup, bool add, bool out, float current,
+											float setup) {
 	RotateTimeline *_self = (RotateTimeline *) self;
-	return _self->getScaleValue(time, alpha, (MixBlend) blend, (MixDirection) direction, current, setup);
+	return _self->getScaleValue(time, alpha, fromSetup, add, out, current, setup);
 }
 
 void spine_rotate_timeline_set_linear(spine_rotate_timeline self, size_t frame) {
@@ -90,6 +90,16 @@ float spine_rotate_timeline_get_bezier_value(spine_rotate_timeline self, float t
 spine_array_float spine_rotate_timeline_get_curves(spine_rotate_timeline self) {
 	RotateTimeline *_self = (RotateTimeline *) self;
 	return (spine_array_float) &_self->getCurves();
+}
+
+bool spine_rotate_timeline_get_additive(spine_rotate_timeline self) {
+	RotateTimeline *_self = (RotateTimeline *) self;
+	return _self->getAdditive();
+}
+
+bool spine_rotate_timeline_get_instant(spine_rotate_timeline self) {
+	RotateTimeline *_self = (RotateTimeline *) self;
+	return _self->getInstant();
 }
 
 size_t spine_rotate_timeline_get_frame_entries(spine_rotate_timeline self) {

@@ -32,9 +32,11 @@
 import Foundation
 import SpineC
 
-/// Stores a slot's current pose. Slots organize attachments for Skeleton drawOrder purposes and
-/// provide a place to store state for an attachment. State cannot be stored in an attachment itself
-/// because attachments are stateless and may be shared across multiple skeletons.
+/// Organizes attachments for Skeleton drawOrder purposes and provide a place to store state for an
+/// attachment.
+///
+/// State cannot be stored in an attachment itself because attachments are stateless and may be
+/// shared across multiple skeletons.
 @objc(SpineSlot)
 @objcMembers
 public class Slot: NSObject, Posed {
@@ -57,17 +59,20 @@ public class Slot: NSObject, Posed {
         return Bone(fromPointer: result!)
     }
 
-    /// The constraint's setup pose data.
+    /// The setup pose data. May be shared with multiple instances.
     public var data: SlotData {
         let result = spine_slot_get_data(_ptr.assumingMemoryBound(to: spine_slot_wrapper.self))
         return SlotData(fromPointer: result!)
     }
 
+    /// The unconstrained pose for this object, set by animations and application code.
     public var pose: SlotPose {
         let result = spine_slot_get_pose(_ptr.assumingMemoryBound(to: spine_slot_wrapper.self))
         return SlotPose(fromPointer: result!)
     }
 
+    /// The pose to use for rendering. If no constraints modify this pose, this is the same as
+    /// getPose(). Otherwise it is a copy of getPose() modified by constraints.
     public var appliedPose: SlotPose {
         let result = spine_slot_get_applied_pose(_ptr.assumingMemoryBound(to: spine_slot_wrapper.self))
         return SlotPose(fromPointer: result!)
@@ -82,10 +87,14 @@ public class Slot: NSObject, Posed {
         spine_slot_setup_pose(_ptr.assumingMemoryBound(to: spine_slot_wrapper.self))
     }
 
+    /// Sets the constrained pose to the unconstrained pose, as a starting point for constraints to
+    /// be applied.
     public func resetConstrained() {
         spine_slot_reset_constrained(_ptr.assumingMemoryBound(to: spine_slot_wrapper.self))
     }
 
+    /// Sets the applied pose to the constrained pose, in anticipation of the applied pose being
+    /// modified by constraints.
     public func constrained() {
         spine_slot_constrained(_ptr.assumingMemoryBound(to: spine_slot_wrapper.self))
     }

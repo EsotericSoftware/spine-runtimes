@@ -32,8 +32,7 @@
 import Foundation
 import SpineC
 
-/// Changes the RGB for a slot's SlotPose::getColor() and SlotPose::getDarkColor() for two color
-/// tinting.
+/// Changes RGB for a slot's light and dark colors for two color tinting.
 @objc(SpineRgb2Timeline)
 @objcMembers
 public class Rgb2Timeline: SlotCurveTimeline {

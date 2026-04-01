@@ -32,7 +32,7 @@
 import Foundation
 import SpineC
 
-/// Stores the current pose for a physics constraint. A physics constraint applies physics to bones.
+/// Applies physics to a bone.
 ///
 /// See https://esotericsoftware.com/spine-physics-constraints Physics constraints in the Spine User
 /// Guide. Non-exported base class that inherits from the template
@@ -49,11 +49,14 @@ open class PhysicsConstraintBase: PosedActive, Posed, Constraint {
         return PhysicsConstraintData(fromPointer: result!)
     }
 
+    /// The unconstrained pose for this object, set by animations and application code.
     public var pose: PhysicsConstraintPose {
         let result = spine_physics_constraint_base_get_pose(_ptr.assumingMemoryBound(to: spine_physics_constraint_base_wrapper.self))
         return PhysicsConstraintPose(fromPointer: result!)
     }
 
+    /// The pose to use for rendering. If no constraints modify this pose, this is the same as
+    /// getPose(). Otherwise it is a copy of getPose() modified by constraints.
     public var appliedPose: PhysicsConstraintPose {
         let result = spine_physics_constraint_base_get_applied_pose(_ptr.assumingMemoryBound(to: spine_physics_constraint_base_wrapper.self))
         return PhysicsConstraintPose(fromPointer: result!)
@@ -74,10 +77,14 @@ open class PhysicsConstraintBase: PosedActive, Posed, Constraint {
         return result
     }
 
+    /// Sets the constrained pose to the unconstrained pose, as a starting point for constraints to
+    /// be applied.
     public func resetConstrained() {
         spine_physics_constraint_base_reset_constrained(_ptr.assumingMemoryBound(to: spine_physics_constraint_base_wrapper.self))
     }
 
+    /// Sets the applied pose to the constrained pose, in anticipation of the applied pose being
+    /// modified by constraints.
     public func constrained() {
         spine_physics_constraint_base_constrained(_ptr.assumingMemoryBound(to: spine_physics_constraint_base_wrapper.self))
     }

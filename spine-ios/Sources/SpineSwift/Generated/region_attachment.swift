@@ -86,6 +86,7 @@ public class RegionAttachment: Attachment {
         }
     }
 
+    /// The local rotation in degrees, counter clockwise.
     public var rotation: Float {
         get {
             let result = spine_region_attachment_get_rotation(_ptr.assumingMemoryBound(to: spine_region_attachment_wrapper.self))

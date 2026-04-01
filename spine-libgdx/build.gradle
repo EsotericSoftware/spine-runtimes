@@ -65,9 +65,13 @@ allprojects {
         }
     }
 
-    // Clean Eclipse files before compiling
-    tasks.compileJava.dependsOn cleanEclipse
-    tasks.processResources.dependsOn cleanEclipse
+    tasks.register('cleanIdeOutput', Delete) {
+        delete file("$projectDir/bin")
+    }
+
+    // Clean Eclipse metadata and output before compiling so deleted classes don't linger on IDE classpaths.
+    tasks.compileJava.dependsOn cleanEclipse, cleanIdeOutput
+    tasks.processResources.dependsOn cleanEclipse, cleanIdeOutput
 
     dependencies {
         annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:0.4.2'

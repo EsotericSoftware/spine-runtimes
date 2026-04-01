@@ -86,6 +86,9 @@ SPINE_C_API spine_array_from_property spine_transform_constraint_data_get_proper
  */
 SPINE_C_API const char *spine_transform_constraint_data_get_name(spine_transform_constraint_data self);
 SPINE_C_API bool spine_transform_constraint_data_get_skin_required(spine_transform_constraint_data self);
+/**
+ * The setup pose that most animations are relative to.
+ */
 SPINE_C_API spine_transform_constraint_pose spine_transform_constraint_data_get_setup_pose(spine_transform_constraint_data self);
 SPINE_C_API void spine_transform_constraint_data_set_skin_required(spine_transform_constraint_data self, bool skinRequired);
 SPINE_C_API spine_rtti spine_transform_constraint_data_rtti(void);

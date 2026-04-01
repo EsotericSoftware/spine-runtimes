@@ -122,7 +122,8 @@ namespace spine {
 		/// The skeleton's constraints.
 		Array<ConstraintData *> &getConstraints();
 
-		/// Finds a constraint by name and type.
+		/// Finds a constraint of the specified type by comparing each constraint's name. It is more efficient to cache the results of
+		/// this method than to call it multiple times.
 		/// @return May be NULL.
 		template<class T>
 		T *findConstraint(const String &constraintName) {
@@ -172,12 +173,12 @@ namespace spine {
 
 		void setHash(const String &inValue);
 
-		/// The path to the images directory as defined in Spine, or null if nonessential data was not exported.
+		/// The path to the images folder as defined in Spine, or null if nonessential data was not exported.
 		const String &getImagesPath();
 
 		void setImagesPath(const String &inValue);
 
-		/// The path to the audio directory as defined in Spine, or null if nonessential data was not exported.
+		/// The path to the audio folder as defined in Spine, or null if nonessential data was not exported.
 		const String &getAudioPath();
 
 		void setAudioPath(const String &inValue);

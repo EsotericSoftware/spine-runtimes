@@ -36,8 +36,8 @@ void SpineTrackEntry::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_previous"), &SpineTrackEntry::get_previous);
 	ClassDB::bind_method(D_METHOD("get_loop"), &SpineTrackEntry::get_loop);
 	ClassDB::bind_method(D_METHOD("set_loop", "v"), &SpineTrackEntry::set_loop);
-	ClassDB::bind_method(D_METHOD("get_hold_previous"), &SpineTrackEntry::get_hold_previous);
-	ClassDB::bind_method(D_METHOD("set_hold_previous", "v"), &SpineTrackEntry::set_hold_previous);
+	ClassDB::bind_method(D_METHOD("get_additive"), &SpineTrackEntry::get_additive);
+	ClassDB::bind_method(D_METHOD("set_additive", "v"), &SpineTrackEntry::set_additive);
 	ClassDB::bind_method(D_METHOD("get_reverse"), &SpineTrackEntry::get_reverse);
 	ClassDB::bind_method(D_METHOD("set_reverse", "v"), &SpineTrackEntry::set_reverse);
 	ClassDB::bind_method(D_METHOD("get_shortest_rotation"), &SpineTrackEntry::get_shortest_rotation);
@@ -74,8 +74,7 @@ void SpineTrackEntry::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_mix_duration"), &SpineTrackEntry::get_mix_duration);
 	ClassDB::bind_method(D_METHOD("set_mix_duration", "v"), &SpineTrackEntry::set_mix_duration);
 	ClassDB::bind_method(D_METHOD("set_mix_duration_and_delay", "v", "delay"), &SpineTrackEntry::set_mix_duration_and_delay);
-	ClassDB::bind_method(D_METHOD("get_mix_blend"), &SpineTrackEntry::get_mix_blend);
-	ClassDB::bind_method(D_METHOD("set_mix_blend", "v"), &SpineTrackEntry::set_mix_blend);
+
 	ClassDB::bind_method(D_METHOD("get_mixing_from"), &SpineTrackEntry::get_mixing_from);
 	ClassDB::bind_method(D_METHOD("get_mixing_to"), &SpineTrackEntry::get_mixing_to);
 	ClassDB::bind_method(D_METHOD("reset_rotation_directions"), &SpineTrackEntry::reset_rotation_directions);
@@ -115,14 +114,14 @@ void SpineTrackEntry::set_loop(bool v) {
 	get_spine_object()->setLoop(v);
 }
 
-bool SpineTrackEntry::get_hold_previous() {
+bool SpineTrackEntry::get_additive() {
 	SPINE_CHECK(get_spine_object(), false)
-	return get_spine_object()->getHoldPrevious();
+	return get_spine_object()->getAdditive();
 }
 
-void SpineTrackEntry::set_hold_previous(bool v) {
+void SpineTrackEntry::set_additive(bool v) {
 	SPINE_CHECK(get_spine_object(), )
-	get_spine_object()->setHoldPrevious(v);
+	get_spine_object()->setAdditive(v);
 }
 
 bool SpineTrackEntry::get_reverse() {
@@ -307,16 +306,6 @@ void SpineTrackEntry::set_mix_duration(float v) {
 void SpineTrackEntry::set_mix_duration_and_delay(float v, float delay) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setMixDuration(v, delay);
-}
-
-SpineConstant::MixBlend SpineTrackEntry::get_mix_blend() {
-	SPINE_CHECK(get_spine_object(), SpineConstant::MixBlend_Setup)
-	return (SpineConstant::MixBlend) get_spine_object()->getMixBlend();
-}
-
-void SpineTrackEntry::set_mix_blend(SpineConstant::MixBlend v) {
-	SPINE_CHECK(get_spine_object(), )
-	get_spine_object()->setMixBlend((spine::MixBlend) v);
 }
 
 Ref<SpineTrackEntry> SpineTrackEntry::get_mixing_from() {

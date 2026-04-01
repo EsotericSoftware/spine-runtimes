@@ -46,16 +46,17 @@ export class SkeletonRendererCore {
 
 		const clipper = this.clipping;
 
+		const drawOrder = skeleton.drawOrder.appliedPose;
 		for (let i = 0; i < skeleton.slots.length; i++) {
-			const slot = skeleton.drawOrder[i];
-			const attachment = slot.applied.attachment;
+			const slot = drawOrder[i];
+			const attachment = slot.appliedPose.attachment;
 
 			if (!attachment) {
 				clipper.clipEnd(slot);
 				continue;
 			}
 
-			const pose = slot.applied;
+			const pose = slot.appliedPose;
 			const slotColor = pose.color;
 			const alpha = slotColor.a;
 			if ((alpha === 0 || !slot.bone.active) && !(attachment instanceof ClippingAttachment)) {

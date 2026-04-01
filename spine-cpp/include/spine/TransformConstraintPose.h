@@ -64,27 +64,27 @@ namespace spine {
 
 		virtual void set(TransformConstraintPose &pose) override;
 
-		/// A percentage (0-1) that controls the mix between the constrained and unconstrained rotation.
+		/// A percentage that controls the mix between the constrained and unconstrained rotation.
 		float getMixRotate();
 		void setMixRotate(float mixRotate);
 
-		/// A percentage (0-1) that controls the mix between the constrained and unconstrained translation X.
+		/// A percentage that controls the mix between the constrained and unconstrained translation X.
 		float getMixX();
 		void setMixX(float mixX);
 
-		/// A percentage (0-1) that controls the mix between the constrained and unconstrained translation Y.
+		/// A percentage that controls the mix between the constrained and unconstrained translation Y.
 		float getMixY();
 		void setMixY(float mixY);
 
-		/// A percentage (0-1) that controls the mix between the constrained and unconstrained scale X.
+		/// A percentage that controls the mix between the constrained and unconstrained scale X.
 		float getMixScaleX();
 		void setMixScaleX(float mixScaleX);
 
-		/// A percentage (0-1) that controls the mix between the constrained and unconstrained scale Y.
+		/// A percentage that controls the mix between the constrained and unconstrained scale Y.
 		float getMixScaleY();
 		void setMixScaleY(float mixScaleY);
 
-		/// A percentage (0-1) that controls the mix between the constrained and unconstrained shear Y.
+		/// A percentage that controls the mix between the constrained and unconstrained shear Y.
 		float getMixShearY();
 		void setMixShearY(float mixShearY);
 	};

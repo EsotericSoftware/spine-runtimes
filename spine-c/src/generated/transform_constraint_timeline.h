@@ -16,8 +16,8 @@ SPINE_C_API void spine_transform_constraint_timeline_dispose(spine_transform_con
 
 SPINE_C_API spine_rtti spine_transform_constraint_timeline_get_rtti(spine_transform_constraint_timeline self);
 SPINE_C_API void spine_transform_constraint_timeline_apply(spine_transform_constraint_timeline self, spine_skeleton skeleton, float lastTime,
-														   float time, /*@null*/ spine_array_event events, float alpha, spine_mix_blend blend,
-														   spine_mix_direction direction, bool appliedPose);
+														   float time, /*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add,
+														   bool out, bool appliedPose);
 /**
  * Sets the time, rotate mix, translate mix, scale mix, and shear mix for the
  * specified frame.
@@ -37,6 +37,15 @@ SPINE_C_API void spine_transform_constraint_timeline_set_bezier(spine_transform_
 SPINE_C_API float spine_transform_constraint_timeline_get_bezier_value(spine_transform_constraint_timeline self, float time, size_t frame,
 																	   size_t valueOffset, size_t i);
 SPINE_C_API spine_array_float spine_transform_constraint_timeline_get_curves(spine_transform_constraint_timeline self);
+/**
+ * True if this timeline supports additive blending.
+ */
+SPINE_C_API bool spine_transform_constraint_timeline_get_additive(spine_transform_constraint_timeline self);
+/**
+ * True if this timeline sets values instantaneously and does not support
+ * interpolation between frames.
+ */
+SPINE_C_API bool spine_transform_constraint_timeline_get_instant(spine_transform_constraint_timeline self);
 SPINE_C_API size_t spine_transform_constraint_timeline_get_frame_entries(spine_transform_constraint_timeline self);
 SPINE_C_API size_t spine_transform_constraint_timeline_get_frame_count(spine_transform_constraint_timeline self);
 SPINE_C_API spine_array_float spine_transform_constraint_timeline_get_frames(spine_transform_constraint_timeline self);

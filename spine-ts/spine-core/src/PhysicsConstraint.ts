@@ -36,8 +36,8 @@ import { Skeleton } from "./Skeleton.js";
 import { MathUtils } from "./Utils.js";
 
 
-/** Stores the current pose for a physics constraint. A physics constraint applies physics to bones.
- * <p>
+/** Applies physics to a bone.
+ *
  * See <a href="http://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide. */
 export class PhysicsConstraint extends Constraint<PhysicsConstraint, PhysicsConstraintData, PhysicsConstraintPose> {
 	bone: BonePose;
@@ -68,7 +68,7 @@ export class PhysicsConstraint extends Constraint<PhysicsConstraint, PhysicsCons
 		super(data, new PhysicsConstraintPose(), new PhysicsConstraintPose());
 		if (skeleton == null) throw new Error("skeleton cannot be null.");
 
-		this.bone = skeleton.bones[data.bone.index].constrained;
+		this.bone = skeleton.bones[data.bone.index].constrainedPose;
 	}
 
 	public copy (skeleton: Skeleton) {
@@ -77,6 +77,8 @@ export class PhysicsConstraint extends Constraint<PhysicsConstraint, PhysicsCons
 		return copy;
 	}
 
+	/** Resets all physics state that was the result of previous movement. Use this after moving a bone to prevent physics from
+	 * reacting to the movement. */
 	reset (skeleton: Skeleton) {
 		this.remaining = 0;
 		this.lastTime = skeleton.time;
@@ -95,7 +97,7 @@ export class PhysicsConstraint extends Constraint<PhysicsConstraint, PhysicsCons
 		this.scaleVelocity = 0;
 	}
 
-	/** Translates the physics constraint so next {@link update} forces are applied as if the bone moved an
+	/** Translates the physics constraint so the next {@link update} forces are applied as if the bone moved an
 	 * additional amount in world space. */
 	translate (x: number, y: number) {
 		this.ux -= x;
@@ -104,8 +106,8 @@ export class PhysicsConstraint extends Constraint<PhysicsConstraint, PhysicsCons
 		this.cy -= y;
 	}
 
-	/** Rotates the physics constraint so next {@link update} forces are applied as if the bone rotated around the
-	 * specified point in world space. */
+	/** Rotates the physics constraint so the next {@link update} forces are applied as if the bone rotated
+	 * around the specified point in world space. */
 	rotate (x: number, y: number, degrees: number) {
 		const r = degrees * MathUtils.degRad, cos = Math.cos(r), sin = Math.sin(r);
 		const dx = this.cx - x, dy = this.cy - y;
@@ -114,7 +116,7 @@ export class PhysicsConstraint extends Constraint<PhysicsConstraint, PhysicsCons
 
 	/** Applies the constraint to the constrained bones. */
 	update (skeleton: Skeleton, physics: Physics) {
-		const p = this.applied;
+		const p = this.appliedPose;
 		const mix = p.mix;
 		if (mix === 0) return;
 

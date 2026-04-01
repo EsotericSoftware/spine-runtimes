@@ -32,7 +32,7 @@
 import Foundation
 import SpineC
 
-/// Changes a skeleton's Skeleton::getDrawOrder().
+/// Changes the Skeleton::getDrawOrder().
 @objc(SpineDrawOrderTimeline)
 @objcMembers
 public class DrawOrderTimeline: Timeline {
@@ -50,7 +50,7 @@ public class DrawOrderTimeline: Timeline {
     ///
     /// - Parameter frame: Between 0 and frameCount, inclusive.
     /// - Parameter time: The frame time in seconds.
-    /// - Parameter drawOrder: For each slot in Skeleton::slots, the index of the slot in the new draw order. May be null to use setup pose draw order.
+    /// - Parameter drawOrder: For each slot in Skeleton::getSlots(), the index of the slot in the new draw order. May be null to use setup pose draw order.
     public func setFrame(_ frame: Int, _ time: Float, _ drawOrder: ArrayInt?) {
         spine_draw_order_timeline_set_frame(
             _ptr.assumingMemoryBound(to: spine_draw_order_timeline_wrapper.self), frame, time,

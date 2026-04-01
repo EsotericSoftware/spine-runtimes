@@ -17,10 +17,9 @@ spine_rtti spine_path_constraint_mix_timeline_get_rtti(spine_path_constraint_mix
 }
 
 void spine_path_constraint_mix_timeline_apply(spine_path_constraint_mix_timeline self, spine_skeleton skeleton, float lastTime, float time,
-											  /*@null*/ spine_array_event events, float alpha, spine_mix_blend blend, spine_mix_direction direction,
-											  bool appliedPose) {
+											  /*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
 	PathConstraintMixTimeline *_self = (PathConstraintMixTimeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixBlend) blend, (MixDirection) direction, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
 }
 
 void spine_path_constraint_mix_timeline_set_frame(spine_path_constraint_mix_timeline self, int frame, float time, float mixRotate, float mixX,
@@ -64,6 +63,16 @@ float spine_path_constraint_mix_timeline_get_bezier_value(spine_path_constraint_
 spine_array_float spine_path_constraint_mix_timeline_get_curves(spine_path_constraint_mix_timeline self) {
 	PathConstraintMixTimeline *_self = (PathConstraintMixTimeline *) self;
 	return (spine_array_float) &_self->getCurves();
+}
+
+bool spine_path_constraint_mix_timeline_get_additive(spine_path_constraint_mix_timeline self) {
+	PathConstraintMixTimeline *_self = (PathConstraintMixTimeline *) self;
+	return _self->getAdditive();
+}
+
+bool spine_path_constraint_mix_timeline_get_instant(spine_path_constraint_mix_timeline self) {
+	PathConstraintMixTimeline *_self = (PathConstraintMixTimeline *) self;
+	return _self->getInstant();
 }
 
 size_t spine_path_constraint_mix_timeline_get_frame_entries(spine_path_constraint_mix_timeline self) {

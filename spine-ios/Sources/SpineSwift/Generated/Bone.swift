@@ -32,12 +32,12 @@
 import Foundation
 import SpineC
 
-/// The current pose for a bone, before constraints are applied.
-///
-/// A bone has a local transform which is used to compute its world transform. A bone also has an
-/// applied transform, which is a local transform that can be applied to compute the world
-/// transform. The local transform and applied transform may differ if a constraint or application
-/// code modifies the world transform after it was computed from the local transform.
+/// A node in a skeleton's hierarchy with a transform that affects its children and their
+/// attachments. A bone has a number of poses: - getData(): The setup pose data. - getPose(): The
+/// unconstrained local pose. Set by animations and application code. - getAppliedPose(): The local
+/// pose to use for rendering. Possibly modified by constraints. - World transform: the local pose
+/// combined with the parent world transform. Computed on a pose by
+/// BonePose::updateWorldTransform(Skeleton) and Skeleton::updateWorldTransform(Physics).
 @objc(SpineBone)
 @objcMembers
 public class Bone: PosedActive, Posed, Update {
@@ -53,7 +53,7 @@ public class Bone: PosedActive, Posed, Update {
         self.init(fromPointer: ptr!)
     }
 
-    /// Copy constructor. Does not copy the children bones.
+    /// Copy constructor. Does not copy the child bones.
     public static func from(_ bone: Bone, _ parent: Bone?) -> Bone {
         let ptr = spine_bone_create2(
             bone._ptr.assumingMemoryBound(to: spine_bone_wrapper.self), parent?._ptr.assumingMemoryBound(to: spine_bone_wrapper.self))
@@ -77,17 +77,20 @@ public class Bone: PosedActive, Posed, Update {
         return ArrayBone(fromPointer: result!)
     }
 
-    /// The constraint's setup pose data.
+    /// The setup pose data. May be shared with multiple instances.
     public var data: BoneData {
         let result = spine_bone_get_data(_ptr.assumingMemoryBound(to: spine_bone_wrapper.self))
         return BoneData(fromPointer: result!)
     }
 
-    public var pose: BoneLocal {
+    /// The unconstrained pose for this object, set by animations and application code.
+    public var pose: BonePose {
         let result = spine_bone_get_pose(_ptr.assumingMemoryBound(to: spine_bone_wrapper.self))
-        return BoneLocal(fromPointer: result!)
+        return BonePose(fromPointer: result!)
     }
 
+    /// The pose to use for rendering. If no constraints modify this pose, this is the same as
+    /// getPose(). Otherwise it is a copy of getPose() modified by constraints.
     public var appliedPose: BonePose {
         let result = spine_bone_get_applied_pose(_ptr.assumingMemoryBound(to: spine_bone_wrapper.self))
         return BonePose(fromPointer: result!)
@@ -113,10 +116,14 @@ public class Bone: PosedActive, Posed, Update {
             spine_physics(rawValue: UInt32(physics.rawValue)))
     }
 
+    /// Sets the constrained pose to the unconstrained pose, as a starting point for constraints to
+    /// be applied.
     public func resetConstrained() {
         spine_bone_reset_constrained(_ptr.assumingMemoryBound(to: spine_bone_wrapper.self))
     }
 
+    /// Sets the applied pose to the constrained pose, in anticipation of the applied pose being
+    /// modified by constraints.
     public func constrained() {
         spine_bone_constrained(_ptr.assumingMemoryBound(to: spine_bone_wrapper.self))
     }

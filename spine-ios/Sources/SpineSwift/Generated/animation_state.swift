@@ -32,7 +32,10 @@
 import Foundation
 import SpineC
 
-/// AnimationState wrapper
+/// Applies animations over time, queues animations for later playback, mixes (crossfading) between
+/// animations, and applies multiple animations on top of each other (layering).
+///
+/// See Applying Animations in the Spine Runtimes Guide.
 @objc(SpineAnimationState)
 @objcMembers
 public class AnimationState: NSObject {
@@ -75,7 +78,7 @@ public class AnimationState: NSObject {
     /// Multiplier for the delta time when the animation state is updated, causing time for all
     /// animations and mixes to play slower or faster. Defaults to 1.
     ///
-    /// See TrackEntry TrackEntry::getTimeScale() for affecting a single animation.
+    /// See TrackEntry::getTimeScale() for affecting a single animation.
     public var timeScale: Float {
         get {
             let result = spine_animation_state_get_time_scale(_ptr.assumingMemoryBound(to: spine_animation_state_wrapper.self))
@@ -101,8 +104,7 @@ public class AnimationState: NSObject {
         return result
     }
 
-    /// Increments each track entry TrackEntry::getTrackTime(), setting queued animations as current
-    /// if needed.
+    /// Increments each track entry's track time, setting queued animations as current if needed.
     public func update(_ delta: Float) {
         spine_animation_state_update(_ptr.assumingMemoryBound(to: spine_animation_state_wrapper.self), delta)
     }
@@ -146,11 +148,11 @@ public class AnimationState: NSObject {
     ///
     /// Mixing in is done by first setting an empty animation, then adding an animation using
     /// addAnimation(int, Animation, bool, float) with the desired delay (an empty animation has a
-    /// duration of 0) and on the returned track entry, set the TrackEntry::setMixDuration(float).
-    /// Mixing from an empty animation causes the new animation to be applied more and more over the
-    /// mix duration. Properties keyed in the new animation transition from the value from lower
-    /// tracks or from the setup pose value if no lower tracks key the property to the value keyed
-    /// in the new animation.
+    /// duration of 0) and on the returned track entry set TrackEntry::setMixDuration(float). Mixing
+    /// from an empty animation causes the new animation to be applied more and more over the mix
+    /// duration. Properties keyed in the new animation transition from the value from lower tracks
+    /// or from the setup pose value if no lower tracks key the property to the value keyed in the
+    /// new animation.
     ///
     /// See Empty animations in the Spine Runtimes Guide.
     public func setEmptyAnimation(_ trackIndex: Int, _ mixDuration: Float) -> TrackEntry {

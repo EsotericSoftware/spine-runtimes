@@ -38,8 +38,15 @@ namespace spine {
 	class Bone;
 	class Skeleton;
 
-	/// The applied pose for a bone. This is the Bone pose with constraints applied and the world transform computed by
-	/// Skeleton::updateWorldTransform(Physics).
+	/// The applied local pose and world transform for a bone. This is the bone's unconstrained pose with constraints applied and
+	/// the world transform computed by Skeleton::updateWorldTransform(Physics) and updateWorldTransform(Skeleton).
+	///
+	/// If the world transform is changed, call updateLocalTransform(Skeleton) before using the local transform. The local
+	/// transform may be needed by other code (eg to apply another constraint).
+	///
+	/// After changing the world transform, call updateWorldTransform(Skeleton) on every descendant bone. It may be more
+	/// convenient to modify the local transform instead, then call Skeleton::updateWorldTransform(Physics) to update the world
+	/// transforms for all bones and apply constraints.
 	class SP_API BonePose : public BoneLocal, public Update {
 		friend class IkConstraint;
 		friend class PathConstraint;
@@ -72,7 +79,8 @@ namespace spine {
 		/// Called by Skeleton::updateCache() to compute the world transform, if needed.
 		virtual void update(Skeleton &skeleton, Physics physics) override;
 
-		/// Computes the world transform using the parent bone's applied pose and this pose. Child bones are not updated.
+		/// Computes the world transform using the parent bone's world transform and this applied local pose. Child bones are not
+		/// updated.
 		///
 		/// See <a href="https://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 		/// Runtimes Guide.
@@ -80,46 +88,44 @@ namespace spine {
 
 		/// Computes the local transform values from the world transform.
 		///
-		/// If the world transform is modified (by a constraint, rotateWorld(), etc) then this method should be called so
-		/// the local transform matches the world transform. The local transform may be needed by other code (eg to apply another
-		/// constraint).
-		///
 		/// Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation. The local transform after
 		/// calling this method is equivalent to the local transform used to compute the world transform, but may not be identical.
 		void updateLocalTransform(Skeleton &skeleton);
 
-		/// If the world transform has been modified and the local transform no longer matches, updateLocalTransform() is called.
+		/// If the world transform has been modified by constraints and the local transform no longer matches,
+		/// updateLocalTransform() is called. Call this after Skeleton::updateWorldTransform(Physics) before using the applied
+		/// local transform.
 		void validateLocalTransform(Skeleton &skeleton);
 
 		void modifyLocal(Skeleton &skeleton);
 		void modifyWorld(int update);
 		void resetWorld(int update);
 
-		/// Part of the world transform matrix for the X axis. If changed, updateLocalTransform() should be called.
+		/// The world transform <code>[a b][c d]</code> x-axis x component.
 		float getA();
 		void setA(float a);
 
-		/// Part of the world transform matrix for the Y axis. If changed, updateLocalTransform() should be called.
+		/// The world transform <code>[a b][c d]</code> y-axis x component.
 		float getB();
 		void setB(float b);
 
-		/// Part of the world transform matrix for the X axis. If changed, updateLocalTransform() should be called.
+		/// The world transform <code>[a b][c d]</code> x-axis y component.
 		float getC();
 		void setC(float c);
 
-		/// Part of the world transform matrix for the Y axis. If changed, updateLocalTransform() should be called.
+		/// The world transform <code>[a b][c d]</code> y-axis y component.
 		float getD();
 		void setD(float d);
 
-		/// The world X position. If changed, updateLocalTransform() should be called.
+		/// The world X position.
 		float getWorldX();
 		void setWorldX(float worldX);
 
-		/// The world Y position. If changed, updateLocalTransform() should be called.
+		/// The world Y position.
 		float getWorldY();
 		void setWorldY(float worldY);
 
-		/// The world rotation for the X axis, calculated using a and c.
+		/// The world rotation for the X axis, calculated using a and c. This is the direction the bone is pointing.
 		float getWorldRotationX();
 
 		/// The world rotation for the Y axis, calculated using b and d.
@@ -150,9 +156,6 @@ namespace spine {
 		float localToWorldRotation(float localRotation);
 
 		/// Rotates the world transform the specified amount.
-		///
-		/// After changes are made to the world transform, updateLocalTransform() should be called on this bone and any
-		/// child bones, recursively.
 		void rotateWorld(float degrees);
 
 	protected:

@@ -49,6 +49,8 @@ class Sequence {
   /// Get the native pointer for FFI calls
   Pointer get nativePtr => _ptr;
 
+  /// [count] The number of texture regions this sequence will display.
+  /// [pathSuffix] If true, getPath(String, int) has a numeric suffix. If false, all regions will use the same path, so count should be 1.
   factory Sequence(int count, bool pathSuffix) {
     final ptr = SpineBindings.bindings.spine_sequence_create(count, pathSuffix);
     return Sequence.fromPointer(ptr);
@@ -64,21 +66,26 @@ class Sequence {
     SpineBindings.bindings.spine_sequence_dispose(_ptr);
   }
 
+  /// The list of texture regions this sequence will display.
   ArrayTextureRegion get regions {
     final result = SpineBindings.bindings.spine_sequence_get_regions(_ptr);
     return ArrayTextureRegion.fromPointer(result);
   }
 
+  /// Returns the getRegions() index for SlotPose::getSequenceIndex().
   int resolveIndex(SlotPose pose) {
     final result = SpineBindings.bindings.spine_sequence_resolve_index(_ptr, pose.nativePtr.cast());
     return result;
   }
 
+  /// Returns the texture region from getRegions() for the specified index.
   TextureRegion? getRegion(int index) {
     final result = SpineBindings.bindings.spine_sequence_get_region(_ptr, index);
     return result.address == 0 ? null : TextureRegion.fromPointer(result);
   }
 
+  /// Returns the UVs for the specified index. getRegions() must be populated
+  /// and update() called before calling this method.
   ArrayFloat getUVs(int index) {
     final result = SpineBindings.bindings.spine_sequence_get_u_vs(_ptr, index);
     return ArrayFloat.fromPointer(result);
@@ -91,6 +98,7 @@ class Sequence {
     return ArrayFloat.fromPointer(result);
   }
 
+  /// The starting number for the numeric getPath(String, int) suffix.
   int get start {
     final result = SpineBindings.bindings.spine_sequence_get_start(_ptr);
     return result;
@@ -100,6 +108,8 @@ class Sequence {
     SpineBindings.bindings.spine_sequence_set_start(_ptr, value);
   }
 
+  /// The minimum number of digits in the numeric getPath(String, int) suffix,
+  /// for zero padding. 0 for no zero padding.
   int get digits {
     final result = SpineBindings.bindings.spine_sequence_get_digits(_ptr);
     return result;
@@ -119,17 +129,20 @@ class Sequence {
     SpineBindings.bindings.spine_sequence_set_setup_index(_ptr, value);
   }
 
+  /// Returns true if getPath(String, int) has a numeric suffix.
   bool get hasPathSuffix {
     final result = SpineBindings.bindings.spine_sequence_has_path_suffix(_ptr);
     return result;
   }
 
+  /// Returns the specified base path with an optional numeric suffix for the
+  /// specified index.
   String getPath(String basePath, int index) {
     final result = SpineBindings.bindings.spine_sequence_get_path(_ptr, basePath.toNativeUtf8().cast<Char>(), index);
     return result.cast<Utf8>().toDartString();
   }
 
-  /// Returns a unique ID for this attachment.
+  /// Returns a unique ID for this sequence.
   int get id {
     final result = SpineBindings.bindings.spine_sequence_get_id(_ptr);
     return result;

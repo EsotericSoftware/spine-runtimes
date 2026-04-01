@@ -36,7 +36,7 @@ namespace spine {
 		/// Physics are not updated or applied.
 		Physics_None,
 
-		/// Physics are reset to the current pose.
+		/// Physics are reset via PhysicsConstraint::reset().
 		Physics_Reset,
 
 		/// Physics are updated and the pose from physics is applied.

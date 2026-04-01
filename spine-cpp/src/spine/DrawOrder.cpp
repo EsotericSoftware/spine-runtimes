@@ -25,22 +25,45 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*****************************************************************************/
+ *****************************************************************************/
 
-package spine.animation;
+#include <spine/DrawOrder.h>
 
-/** Indicates whether a timeline's alpha is mixing out over time toward 0 (the setup or current pose value) or
- * mixing in toward 1 (the timeline's value). Some timelines use this to decide how values are applied.
- *
- * @see spine.animation.Timeline.apply()
- */
-class MixDirection {
-	public var ordinal:Int = 0;
+#include <spine/Slot.h>
 
-	public function new(ordinal:Int) {
-		this.ordinal = ordinal;
+using namespace spine;
+
+DrawOrder::DrawOrder(Array<Slot *> &setupPose) : _setupPose(setupPose), _pose(), _constrainedPose(), _appliedPose(&_pose) {
+}
+
+void DrawOrder::setupPose() {
+	_pose.clear();
+	_pose.setSize(_setupPose.size(), NULL);
+	for (size_t i = 0, n = _setupPose.size(); i < n; ++i) {
+		_pose[i] = _setupPose[i];
 	}
+}
 
-	public static var mixIn(default, never):MixDirection = new MixDirection(0);
-	public static var mixOut(default, never):MixDirection = new MixDirection(1);
+Array<Slot *> &DrawOrder::getPose() {
+	return _pose;
+}
+
+Array<Slot *> &DrawOrder::getAppliedPose() {
+	return *_appliedPose;
+}
+
+void DrawOrder::pose() {
+	_appliedPose = &_pose;
+}
+
+void DrawOrder::constrained() {
+	_appliedPose = &_constrainedPose;
+}
+
+void DrawOrder::reset() {
+	_constrainedPose.clear();
+	_constrainedPose.setSize(_pose.size(), NULL);
+	for (size_t i = 0, n = _pose.size(); i < n; ++i) {
+		_constrainedPose[i] = _pose[i];
+	}
 }

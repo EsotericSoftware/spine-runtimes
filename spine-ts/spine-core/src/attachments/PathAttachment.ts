@@ -27,6 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+import type { PathConstraint } from "../PathConstraint.js";
 import { Color, Utils } from "../Utils.js";
 import { type Attachment, VertexAttachment } from "./Attachment.js";
 
@@ -41,8 +42,8 @@ export class PathAttachment extends VertexAttachment {
 	/** If true, the start and end knots are connected. */
 	closed = false;
 
-	/** If true, additional calculations are performed to make calculating positions along the path more accurate. If false, fewer
-	 * calculations are performed but calculating positions along the path is less accurate. */
+	/** If true, additional calculations are performed to make computing positions along the path more accurate so movement along
+	 * the path has a constant speed. */
 	constantSpeed = false;
 
 	/** The color of the path as it was in Spine. Available only when nonessential data was exported. Paths are not usually

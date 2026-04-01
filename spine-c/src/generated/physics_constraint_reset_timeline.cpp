@@ -17,10 +17,10 @@ spine_rtti spine_physics_constraint_reset_timeline_get_rtti(spine_physics_constr
 }
 
 void spine_physics_constraint_reset_timeline_apply(spine_physics_constraint_reset_timeline self, spine_skeleton skeleton, float lastTime, float time,
-												   /*@null*/ spine_array_event events, float alpha, spine_mix_blend blend,
-												   spine_mix_direction direction, bool appliedPose) {
+												   /*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out,
+												   bool appliedPose) {
 	PhysicsConstraintResetTimeline *_self = (PhysicsConstraintResetTimeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixBlend) blend, (MixDirection) direction, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
 }
 
 int spine_physics_constraint_reset_timeline_get_frame_count(spine_physics_constraint_reset_timeline self) {
@@ -41,6 +41,16 @@ void spine_physics_constraint_reset_timeline_set_constraint_index(spine_physics_
 void spine_physics_constraint_reset_timeline_set_frame(spine_physics_constraint_reset_timeline self, int frame, float time) {
 	PhysicsConstraintResetTimeline *_self = (PhysicsConstraintResetTimeline *) self;
 	_self->setFrame(frame, time);
+}
+
+bool spine_physics_constraint_reset_timeline_get_additive(spine_physics_constraint_reset_timeline self) {
+	PhysicsConstraintResetTimeline *_self = (PhysicsConstraintResetTimeline *) self;
+	return _self->getAdditive();
+}
+
+bool spine_physics_constraint_reset_timeline_get_instant(spine_physics_constraint_reset_timeline self) {
+	PhysicsConstraintResetTimeline *_self = (PhysicsConstraintResetTimeline *) self;
+	return _self->getInstant();
 }
 
 size_t spine_physics_constraint_reset_timeline_get_frame_entries(spine_physics_constraint_reset_timeline self) {

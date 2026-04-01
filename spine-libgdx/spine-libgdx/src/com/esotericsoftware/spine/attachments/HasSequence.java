@@ -31,15 +31,21 @@ package com.esotericsoftware.spine.attachments;
 
 import com.badlogic.gdx.graphics.Color;
 
+import com.esotericsoftware.spine.SlotPose;
+
+/** Interface for an attachment that gets 1 or more texture regions from a {@link Sequence}. */
 public interface HasSequence {
+	/** The base path for the attachment's texture region. */
 	public String getPath ();
 
 	public void setPath (String path);
 
+	/** The color the attachment is tinted, to be combined with {@link SlotPose#getColor()}. */
 	public Color getColor ();
 
 	/** Calls {@link Sequence#update(HasSequence)} on this attachment's sequence. */
 	public void updateSequence ();
 
+	/** The sequence that provides texture regions, UVs, and vertex offsets for rendering this attachment. */
 	public Sequence getSequence ();
 }

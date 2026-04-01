@@ -32,8 +32,8 @@
 import Foundation
 import SpineC
 
-/// An attachment with vertices that are transformed by one or more bones and can be deformed by a
-/// slot's SlotPose::getDeform().
+/// An attachment with vertices that are transformed by one or more bones and can be deformed by
+/// SlotPose::getDeform().
 @objc(SpineVertexAttachment)
 @objcMembers
 open class VertexAttachment: Attachment {
@@ -48,6 +48,9 @@ open class VertexAttachment: Attachment {
         return result
     }
 
+    /// The bones that affect the vertices. The entries are, for each vertex, the number of bones
+    /// affecting the vertex followed by that many bone indices, which is Skeleton::getBones()
+    /// index. Empty if this attachment has no weights.
     public var bones: ArrayInt {
         get {
             let result = spine_vertex_attachment_get_bones(_ptr.assumingMemoryBound(to: spine_vertex_attachment_wrapper.self))
@@ -60,6 +63,9 @@ open class VertexAttachment: Attachment {
         }
     }
 
+    /// The vertex positions in the bone's coordinate system. For a non-weighted attachment, the
+    /// values are x,y pairs for each vertex. For a weighted attachment, the values are x,y,weight
+    /// triplets for each bone affecting each vertex.
     public var vertices: ArrayFloat {
         get {
             let result = spine_vertex_attachment_get_vertices(_ptr.assumingMemoryBound(to: spine_vertex_attachment_wrapper.self))

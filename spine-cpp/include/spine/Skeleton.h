@@ -39,6 +39,7 @@
 #include <spine/Update.h>
 #include <spine/Posed.h>
 #include <spine/Constraint.h>
+#include <spine/DrawOrder.h>
 
 namespace spine {
 	class SkeletonData;
@@ -50,6 +51,8 @@ namespace spine {
 	class Updatable;
 
 	class Slot;
+
+	class DrawOrder;
 
 	class IkConstraint;
 
@@ -65,6 +68,10 @@ namespace spine {
 
 	class SkeletonClipping;
 
+	/// Stores bones and slots to be posed by animations and application code. Multiple skeleton instances can share the same
+	/// SkeletonData, including animations, attachments, and skins.
+	///
+	/// After posing, call updateWorldTransform(Physics) to apply constraints and compute world transforms for rendering.
 	class SP_API Skeleton : public SpineObject {
 		friend class AnimationState;
 
@@ -157,8 +164,8 @@ namespace spine {
 
 		~Skeleton();
 
-		/// Caches information about bones and constraints. Must be called if bones, constraints or weighted path attachments are added
-		/// or removed.
+		/// Caches information about bones and constraints. Must be called if the active skin is modified or if bones, constraints, or
+		/// weighted path attachments are added or removed.
 		void updateCache();
 
 		void printUpdateCache();
@@ -195,40 +202,55 @@ namespace spine {
 		/// @return May be NULL.
 		Bone *findBone(const String &boneName);
 
+		/// The skeleton's slots. To add a slot, also add it to DrawOrder::getPose().
 		Array<Slot *> &getSlots();
 
 		/// @return May be NULL.
 		Slot *findSlot(const String &slotName);
 
-		Array<Slot *> &getDrawOrder();
+		/// The skeleton's draw order. Use DrawOrder::getAppliedPose() for rendering and DrawOrder::getPose() for changing the
+		/// draw order.
+		DrawOrder &getDrawOrder();
 
 		Skin *getSkin();
 
 		/// Sets a skin by name (see setSkin).
 		void setSkin(const String &skinName);
 
-		/// Attachments from the new skin are attached if the corresponding attachment from the old skin was attached.
-		/// If there was no old skin, each slot's setup mode attachment is attached from the new skin.
+		/// Sets the skin used to look up attachments before looking in SkeletonData::getDefaultSkin(). If the skin is changed,
+		/// updateCache() is called.
+		///
+		/// Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was
+		/// no old skin, each slot's setup pose placeholder attachment is attached from the new skin.
+		///
 		/// After changing the skin, the visible attachments can be reset to those attached in the setup pose by calling
-		/// See Skeleton::setSlotsToSetupPose()
-		/// Also, often AnimationState::apply(Skeleton&) is called before the next time the
-		/// skeleton is rendered to allow any attachment keys in the current animation(s) to hide or show attachments from the new skin.
+		/// setupPoseSlots(). Also, AnimationState::apply(Skeleton&) is often called before the next time the skeleton is rendered
+		/// so attachment keys in the current animation(s) can hide or show attachments from the new skin.
 		/// @param newSkin May be NULL.
 		void setSkin(Skin *newSkin);
 
+		/// Finds an attachment by looking in getSkin() and SkeletonData::getDefaultSkin() using the slot name and skin
+		/// placeholder name. First the skin is checked and if the attachment was not found, the default skin is checked.
 		/// @return May be NULL.
-		Attachment *getAttachment(const String &slotName, const String &attachmentName);
+		Attachment *getAttachment(const String &slotName, const String &placeholderName);
 
+		/// Finds an attachment by looking in getSkin() and SkeletonData::getDefaultSkin() using the slot index and skin
+		/// placeholder name. First the skin is checked and if the attachment was not found, the default skin is checked.
 		/// @return May be NULL.
-		Attachment *getAttachment(int slotIndex, const String &attachmentName);
+		Attachment *getAttachment(int slotIndex, const String &placeholderName);
 
-		/// @param attachmentName May be empty.
-		void setAttachment(const String &slotName, const String &attachmentName);
+		/// A convenience method to set an attachment by finding the slot with findSlot(String), finding the attachment with
+		/// getAttachment(int, String), then setting the slot's SlotPose::getAttachment().
+		/// @param placeholderName May be empty.
+		void setAttachment(const String &slotName, const String &placeholderName);
 
 		Array<Constraint *> &getConstraints();
 
+		/// The skeleton's physics constraints.
 		Array<PhysicsConstraint *> &getPhysicsConstraints();
 
+		/// Finds a constraint of the specified type by comparing each constraint's name. It is more efficient to cache the results of
+		/// this method than to call it multiple times.
 		template<class T>
 		T *findConstraint(const String &constraintName) {
 			if (constraintName.isEmpty()) return NULL;
@@ -243,14 +265,14 @@ namespace spine {
 			return NULL;
 		}
 
-		/// Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.
+		/// Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the applied pose.
 		/// @param outX The horizontal distance between the skeleton origin and the left side of the AABB.
 		/// @param outY The vertical distance between the skeleton origin and the bottom side of the AABB.
 		/// @param outWidth The width of the AABB
 		/// @param outHeight The height of the AABB.
 		void getBounds(float &outX, float &outY, float &outWidth, float &outHeight);
 
-		/// Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.
+		/// Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the applied pose.
 		/// @param outX The horizontal distance between the skeleton origin and the left side of the AABB.
 		/// @param outY The vertical distance between the skeleton origin and the bottom side of the AABB.
 		/// @param outWidth The width of the AABB
@@ -287,18 +309,22 @@ namespace spine {
 
 		void getPosition(float &x, float &y);
 
+		/// The x component of a vector that defines the direction PhysicsConstraintPose::getWind() is applied.
 		float getWindX();
 
 		void setWindX(float windX);
 
+		/// The y component of a vector that defines the direction PhysicsConstraintPose::getWind() is applied.
 		float getWindY();
 
 		void setWindY(float windY);
 
+		/// The x component of a vector that defines the direction PhysicsConstraintPose::getGravity() is applied.
 		float getGravityX();
 
 		void setGravityX(float gravityX);
 
+		/// The y component of a vector that defines the direction PhysicsConstraintPose::getGravity() is applied.
 		float getGravityY();
 
 		void setGravityY(float gravityY);
@@ -310,6 +336,9 @@ namespace spine {
 		/// Calls {@link PhysicsConstraint#rotate(float, float, float)} for each physics constraint. */
 		void physicsRotate(float x, float y, float degrees);
 
+		/// Returns the skeleton's time, used for time-based manipulations, such as PhysicsConstraint.
+		///
+		/// See update().
 		float getTime();
 
 		void setTime(float time);
@@ -320,7 +349,7 @@ namespace spine {
 		SkeletonData &_data;
 		Array<Bone *> _bones;
 		Array<Slot *> _slots;
-		Array<Slot *> _drawOrder;
+		DrawOrder _drawOrder;
 		Array<Constraint *> _constraints;
 		Array<PhysicsConstraint *> _physics;
 		Array<Update *> _updateCache;

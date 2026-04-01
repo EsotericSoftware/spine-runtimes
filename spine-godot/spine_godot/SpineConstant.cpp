@@ -30,14 +30,6 @@
 #include "SpineConstant.h"
 
 void SpineConstant::_bind_methods() {
-	BIND_ENUM_CONSTANT(MixBlend_Setup)
-	BIND_ENUM_CONSTANT(MixBlend_First)
-	BIND_ENUM_CONSTANT(MixBlend_Replace)
-	BIND_ENUM_CONSTANT(MixBlend_Add)
-
-	BIND_ENUM_CONSTANT(MixDirection_In)
-	BIND_ENUM_CONSTANT(MixDirection_Out)
-
 	BIND_ENUM_CONSTANT(Property_Rotate)
 	BIND_ENUM_CONSTANT(Property_X)
 	BIND_ENUM_CONSTANT(Property_Y)

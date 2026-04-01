@@ -41,14 +41,14 @@ void spine_track_entry_set_loop(spine_track_entry self, bool inValue) {
 	_self->setLoop(inValue);
 }
 
-bool spine_track_entry_get_hold_previous(spine_track_entry self) {
+bool spine_track_entry_get_additive(spine_track_entry self) {
 	TrackEntry *_self = (TrackEntry *) self;
-	return _self->getHoldPrevious();
+	return _self->getAdditive();
 }
 
-void spine_track_entry_set_hold_previous(spine_track_entry self, bool inValue) {
+void spine_track_entry_set_additive(spine_track_entry self, bool inValue) {
 	TrackEntry *_self = (TrackEntry *) self;
-	_self->setHoldPrevious(inValue);
+	_self->setAdditive(inValue);
 }
 
 bool spine_track_entry_get_reverse(spine_track_entry self) {
@@ -229,16 +229,6 @@ void spine_track_entry_set_mix_duration_1(spine_track_entry self, float inValue)
 void spine_track_entry_set_mix_duration_2(spine_track_entry self, float mixDuration, float delay) {
 	TrackEntry *_self = (TrackEntry *) self;
 	_self->setMixDuration(mixDuration, delay);
-}
-
-spine_mix_blend spine_track_entry_get_mix_blend(spine_track_entry self) {
-	TrackEntry *_self = (TrackEntry *) self;
-	return (spine_mix_blend) _self->getMixBlend();
-}
-
-void spine_track_entry_set_mix_blend(spine_track_entry self, spine_mix_blend blend) {
-	TrackEntry *_self = (TrackEntry *) self;
-	_self->setMixBlend((MixBlend) blend);
 }
 
 /*@null*/ spine_track_entry spine_track_entry_get_mixing_from(spine_track_entry self) {

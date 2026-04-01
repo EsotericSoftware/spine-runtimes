@@ -81,9 +81,9 @@
 			</description>
 		</method>
 		<method name="get_pose">
-			<return type="SpineBoneLocal" />
+			<return type="SpineBonePose" />
 			<description>
-				Returns the local pose for this bone. The pose contains the local transform (position, rotation, scale, shear).
+				Returns the unconstrained local pose for this bone. The pose contains the local transform (position, rotation, scale, shear).
 			</description>
 		</method>
 		<method name="get_applied_pose">

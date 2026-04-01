@@ -33,7 +33,9 @@
 #include <spine/Timeline.h>
 
 namespace spine {
-	/// Changes a subset of a skeleton's Skeleton::getDrawOrder().
+	class Slot;
+
+	/// Changes a subset of the Skeleton::getDrawOrder() draw order.
 	class SP_API DrawOrderFolderTimeline : public Timeline {
 		friend class SkeletonBinary;
 
@@ -44,8 +46,8 @@ namespace spine {
 	public:
 		DrawOrderFolderTimeline(size_t frameCount, Array<int> &slots, size_t slotCount);
 
-		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
-						   MixDirection direction, bool appliedPose) override;
+		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+						   bool appliedPose) override;
 
 		size_t getFrameCount();
 
@@ -66,8 +68,8 @@ namespace spine {
 		Array<bool> _inFolder;
 		Array<Array<int>> _drawOrders;
 
-		void setup(Skeleton &skeleton);
-		void apply(Skeleton &skeleton, Array<int> &drawOrder);
+		void setup(Array<Slot *> &pose, Array<Slot *> &setupPose);
+		void apply(Array<Slot *> &pose, Array<Slot *> &setupPose, Array<int> &drawOrder);
 	};
 }
 

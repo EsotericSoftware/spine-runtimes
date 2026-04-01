@@ -191,7 +191,7 @@ public class SkeletonData: NSObject {
         }
     }
 
-    /// The path to the images directory as defined in Spine, or null if nonessential data was not
+    /// The path to the images folder as defined in Spine, or null if nonessential data was not
     /// exported.
     public var imagesPath: String {
         get {
@@ -203,7 +203,7 @@ public class SkeletonData: NSObject {
         }
     }
 
-    /// The path to the audio directory as defined in Spine, or null if nonessential data was not
+    /// The path to the audio folder as defined in Spine, or null if nonessential data was not
     /// exported.
     public var audioPath: String {
         get {

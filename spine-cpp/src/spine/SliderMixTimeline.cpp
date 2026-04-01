@@ -46,21 +46,22 @@ SliderMixTimeline::SliderMixTimeline(size_t frameCount, size_t bezierCount, int 
 	: ConstraintTimeline1(frameCount, bezierCount, sliderIndex, Property_SliderMix) {
 	PropertyId ids[] = {((PropertyId) Property_SliderMix << 32) | sliderIndex};
 	setPropertyIds(ids, 1);
+	_additive = true;
 }
 
 SliderMixTimeline::~SliderMixTimeline() {
 }
 
-void SliderMixTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
-							  MixDirection direction, bool appliedPose) {
+void SliderMixTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+							  bool appliedPose) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(events);
-	SP_UNUSED(direction);
+	SP_UNUSED(out);
 
 	Slider *constraint = (Slider *) skeleton._constraints[_constraintIndex];
 	if (constraint->isActive()) {
-		SliderPose &pose = appliedPose ? *constraint->_applied : constraint->_pose;
+		SliderPose &pose = appliedPose ? *constraint->_appliedPose : constraint->_pose;
 		SliderData &data = constraint->_data;
-		pose._mix = getAbsoluteValue(time, alpha, blend, pose._mix, data._setup._mix);
+		pose._mix = getAbsoluteValue(time, alpha, fromSetup, add, pose._mix, data._setupPose._mix);
 	}
 }

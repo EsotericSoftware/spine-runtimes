@@ -33,7 +33,7 @@
 #include <spine/ConstraintTimeline1.h>
 
 namespace spine {
-	/// Changes a slider's SliderPose::getMix().
+	/// Changes a slider's mix.
 	class SP_API SliderMixTimeline : public ConstraintTimeline1 {
 		friend class SkeletonBinary;
 		friend class SkeletonJson;
@@ -45,8 +45,8 @@ namespace spine {
 
 		virtual ~SliderMixTimeline();
 
-		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
-						   MixDirection direction, bool appliedPose) override;
+		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+						   bool appliedPose) override;
 	};
 }
 

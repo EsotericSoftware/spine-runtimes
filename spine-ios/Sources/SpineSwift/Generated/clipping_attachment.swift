@@ -46,6 +46,8 @@ public class ClippingAttachment: VertexAttachment {
         self.init(fromPointer: ptr!)
     }
 
+    /// Clipping is performed between the clipping attachment's slot and the end slot. If NULL,
+    /// clipping is done until the end of the skeleton's rendering.
     public var endSlot: SlotData? {
         get {
             let result = spine_clipping_attachment_get_end_slot(_ptr.assumingMemoryBound(to: spine_clipping_attachment_wrapper.self))

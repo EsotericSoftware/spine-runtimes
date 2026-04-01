@@ -13,9 +13,9 @@ spine_rtti spine_bone_timeline2_get_rtti(spine_bone_timeline2 self) {
 }
 
 void spine_bone_timeline2_apply(spine_bone_timeline2 self, spine_skeleton skeleton, float lastTime, float time, /*@null*/ spine_array_event events,
-								float alpha, spine_mix_blend blend, spine_mix_direction direction, bool appliedPose) {
+								float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
 	BoneTimeline2 *_self = (BoneTimeline2 *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixBlend) blend, (MixDirection) direction, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
 }
 
 int spine_bone_timeline2_get_bone_index(spine_bone_timeline2 self) {
@@ -57,6 +57,16 @@ float spine_bone_timeline2_get_bezier_value(spine_bone_timeline2 self, float tim
 spine_array_float spine_bone_timeline2_get_curves(spine_bone_timeline2 self) {
 	BoneTimeline2 *_self = (BoneTimeline2 *) self;
 	return (spine_array_float) &_self->getCurves();
+}
+
+bool spine_bone_timeline2_get_additive(spine_bone_timeline2 self) {
+	BoneTimeline2 *_self = (BoneTimeline2 *) self;
+	return _self->getAdditive();
+}
+
+bool spine_bone_timeline2_get_instant(spine_bone_timeline2 self) {
+	BoneTimeline2 *_self = (BoneTimeline2 *) self;
+	return _self->getInstant();
 }
 
 size_t spine_bone_timeline2_get_frame_entries(spine_bone_timeline2 self) {

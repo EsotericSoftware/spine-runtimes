@@ -62,8 +62,8 @@ public class IkConstraintData extends ConstraintData<IkConstraint, IkConstraintP
 		this.target = target;
 	}
 
-	/** When true and {@link IkConstraintPose#getCompress()} or {@link IkConstraintPose#getStretch()} is used, the bone is scaled
-	 * on both the X and Y axes. */
+	/** When true and {@link IkConstraintPose#compress} or {@link IkConstraintPose#stretch} is used, the bone is scaled on both the
+	 * X and Y axes. */
 	public boolean getUniform () {
 		return uniform;
 	}

@@ -225,7 +225,7 @@ export class SkeletonMesh extends THREE.Object3D {
 		let triangles: Array<number> | null = null;
 		let uvs: NumberArrayLike | null = null;
 		const skeleton = this.skeleton;
-		const drawOrder = skeleton.drawOrder;
+		const drawOrder = skeleton.drawOrder.appliedPose;
 		let batch = this.nextBatch();
 		batch.begin();
 		let z = 0;
@@ -237,7 +237,7 @@ export class SkeletonMesh extends THREE.Object3D {
 				clipper.clipEnd(slot);
 				continue;
 			}
-			const pose = slot.applied;
+			const pose = slot.appliedPose;
 			const attachment = pose.attachment;
 			let attachmentColor: Color | null;
 			let texture: ThreeJsTexture | null;

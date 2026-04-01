@@ -67,6 +67,7 @@ public class PhysicsConstraintData: PosedData, ConstraintData {
         }
     }
 
+    /// The time in milliseconds required to advanced the physics simulation one step.
     public var step: Float {
         get {
             let result = spine_physics_constraint_data_get_step(_ptr.assumingMemoryBound(to: spine_physics_constraint_data_wrapper.self))
@@ -77,6 +78,7 @@ public class PhysicsConstraintData: PosedData, ConstraintData {
         }
     }
 
+    /// Physics influence on x translation, 0-1.
     public var x: Float {
         get {
             let result = spine_physics_constraint_data_get_x(_ptr.assumingMemoryBound(to: spine_physics_constraint_data_wrapper.self))
@@ -87,6 +89,7 @@ public class PhysicsConstraintData: PosedData, ConstraintData {
         }
     }
 
+    /// Physics influence on y translation, 0-1.
     public var y: Float {
         get {
             let result = spine_physics_constraint_data_get_y(_ptr.assumingMemoryBound(to: spine_physics_constraint_data_wrapper.self))
@@ -97,6 +100,7 @@ public class PhysicsConstraintData: PosedData, ConstraintData {
         }
     }
 
+    /// Physics influence on rotation, 0-1.
     public var rotate: Float {
         get {
             let result = spine_physics_constraint_data_get_rotate(_ptr.assumingMemoryBound(to: spine_physics_constraint_data_wrapper.self))
@@ -107,6 +111,7 @@ public class PhysicsConstraintData: PosedData, ConstraintData {
         }
     }
 
+    /// Physics influence on scaleX, 0-1.
     public var scaleX: Float {
         get {
             let result = spine_physics_constraint_data_get_scale_x(_ptr.assumingMemoryBound(to: spine_physics_constraint_data_wrapper.self))
@@ -117,6 +122,7 @@ public class PhysicsConstraintData: PosedData, ConstraintData {
         }
     }
 
+    /// Physics influence on shearX, 0-1.
     public var shearX: Float {
         get {
             let result = spine_physics_constraint_data_get_shear_x(_ptr.assumingMemoryBound(to: spine_physics_constraint_data_wrapper.self))
@@ -127,6 +133,7 @@ public class PhysicsConstraintData: PosedData, ConstraintData {
         }
     }
 
+    /// Movement greater than the limit will not have a greater affect on physics.
     public var limit: Float {
         get {
             let result = spine_physics_constraint_data_get_limit(_ptr.assumingMemoryBound(to: spine_physics_constraint_data_wrapper.self))
@@ -137,6 +144,7 @@ public class PhysicsConstraintData: PosedData, ConstraintData {
         }
     }
 
+    /// True when this constraint's inertia is controlled by global slider timelines.
     public var inertiaGlobal: Bool {
         get {
             let result = spine_physics_constraint_data_get_inertia_global(_ptr.assumingMemoryBound(to: spine_physics_constraint_data_wrapper.self))
@@ -147,6 +155,7 @@ public class PhysicsConstraintData: PosedData, ConstraintData {
         }
     }
 
+    /// True when this constraint's strength is controlled by global slider timelines.
     public var strengthGlobal: Bool {
         get {
             let result = spine_physics_constraint_data_get_strength_global(_ptr.assumingMemoryBound(to: spine_physics_constraint_data_wrapper.self))
@@ -157,6 +166,7 @@ public class PhysicsConstraintData: PosedData, ConstraintData {
         }
     }
 
+    /// True when this constraint's damping is controlled by global slider timelines.
     public var dampingGlobal: Bool {
         get {
             let result = spine_physics_constraint_data_get_damping_global(_ptr.assumingMemoryBound(to: spine_physics_constraint_data_wrapper.self))
@@ -167,6 +177,7 @@ public class PhysicsConstraintData: PosedData, ConstraintData {
         }
     }
 
+    /// True when this constraint's mass is controlled by global slider timelines.
     public var massGlobal: Bool {
         get {
             let result = spine_physics_constraint_data_get_mass_global(_ptr.assumingMemoryBound(to: spine_physics_constraint_data_wrapper.self))
@@ -177,6 +188,7 @@ public class PhysicsConstraintData: PosedData, ConstraintData {
         }
     }
 
+    /// True when this constraint's wind is controlled by global slider timelines.
     public var windGlobal: Bool {
         get {
             let result = spine_physics_constraint_data_get_wind_global(_ptr.assumingMemoryBound(to: spine_physics_constraint_data_wrapper.self))
@@ -187,6 +199,7 @@ public class PhysicsConstraintData: PosedData, ConstraintData {
         }
     }
 
+    /// True when this constraint's gravity is controlled by global slider timelines.
     public var gravityGlobal: Bool {
         get {
             let result = spine_physics_constraint_data_get_gravity_global(_ptr.assumingMemoryBound(to: spine_physics_constraint_data_wrapper.self))
@@ -197,6 +210,7 @@ public class PhysicsConstraintData: PosedData, ConstraintData {
         }
     }
 
+    /// True when this constraint's mix is controlled by global slider timelines.
     public var mixGlobal: Bool {
         get {
             let result = spine_physics_constraint_data_get_mix_global(_ptr.assumingMemoryBound(to: spine_physics_constraint_data_wrapper.self))
@@ -207,6 +221,7 @@ public class PhysicsConstraintData: PosedData, ConstraintData {
         }
     }
 
+    /// The setup pose that most animations are relative to.
     public var setupPose: PhysicsConstraintPose {
         let result = spine_physics_constraint_data_get_setup_pose(_ptr.assumingMemoryBound(to: spine_physics_constraint_data_wrapper.self))
         return PhysicsConstraintPose(fromPointer: result!)

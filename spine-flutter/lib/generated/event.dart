@@ -35,11 +35,10 @@ import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
 import 'event_data.dart';
 
-/// Stores the current pose values for an Event.
+/// Fired by EventTimeline when specific animation times are reached.
 ///
 /// See Timeline::apply(), AnimationStateListener::event(), and
-///
-/// See also: https://esotericsoftware.com/spine-events Events in the Spine User Guide.
+/// https://esotericsoftware.com/spine-events Events in the Spine User Guide.
 class Event {
   final Pointer<spine_event_wrapper> _ptr;
 
@@ -63,12 +62,13 @@ class Event {
     return EventData.fromPointer(result);
   }
 
-  /// The animation time this event was keyed.
+  /// The animation time this event was keyed, or -1 for the setup pose.
   double get time {
     final result = SpineBindings.bindings.spine_event_get_time(_ptr);
     return result;
   }
 
+  /// The integer payload for this event.
   int get intValue {
     final result = SpineBindings.bindings.spine_event_get_int(_ptr);
     return result;
@@ -78,6 +78,7 @@ class Event {
     SpineBindings.bindings.spine_event_set_int(_ptr, value);
   }
 
+  /// The float payload for this event.
   double get floatValue {
     final result = SpineBindings.bindings.spine_event_get_float(_ptr);
     return result;
@@ -87,6 +88,7 @@ class Event {
     SpineBindings.bindings.spine_event_set_float(_ptr, value);
   }
 
+  /// The string payload for this event.
   String get stringValue {
     final result = SpineBindings.bindings.spine_event_get_string(_ptr);
     return result.cast<Utf8>().toDartString();
@@ -96,6 +98,7 @@ class Event {
     SpineBindings.bindings.spine_event_set_string(_ptr, value.toNativeUtf8().cast<Char>());
   }
 
+  /// If an audio path is set, the volume for the audio.
   double get volume {
     final result = SpineBindings.bindings.spine_event_get_volume(_ptr);
     return result;
@@ -105,6 +108,7 @@ class Event {
     SpineBindings.bindings.spine_event_set_volume(_ptr, value);
   }
 
+  /// If an audio path is set, the left/right balance for the audio.
   double get balance {
     final result = SpineBindings.bindings.spine_event_get_balance(_ptr);
     return result;

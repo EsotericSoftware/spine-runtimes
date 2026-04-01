@@ -32,8 +32,8 @@
 import Foundation
 import SpineC
 
-/// Stores the current pose for a path constraint. A path constraint adjusts the rotation,
-/// translation, and scale of the constrained bones so they follow a PathAttachment.
+/// Adjusts the rotation, translation, and scale of the constrained bones so they follow a
+/// PathAttachment.
 ///
 /// See https://esotericsoftware.com/spine-path-constraints Path constraints in the Spine User
 /// Guide. Non-exported base class that inherits from the template
@@ -50,11 +50,14 @@ open class PathConstraintBase: PosedActive, Posed, Constraint {
         return PathConstraintData(fromPointer: result!)
     }
 
+    /// The unconstrained pose for this object, set by animations and application code.
     public var pose: PathConstraintPose {
         let result = spine_path_constraint_base_get_pose(_ptr.assumingMemoryBound(to: spine_path_constraint_base_wrapper.self))
         return PathConstraintPose(fromPointer: result!)
     }
 
+    /// The pose to use for rendering. If no constraints modify this pose, this is the same as
+    /// getPose(). Otherwise it is a copy of getPose() modified by constraints.
     public var appliedPose: PathConstraintPose {
         let result = spine_path_constraint_base_get_applied_pose(_ptr.assumingMemoryBound(to: spine_path_constraint_base_wrapper.self))
         return PathConstraintPose(fromPointer: result!)
@@ -75,10 +78,14 @@ open class PathConstraintBase: PosedActive, Posed, Constraint {
         return result
     }
 
+    /// Sets the constrained pose to the unconstrained pose, as a starting point for constraints to
+    /// be applied.
     public func resetConstrained() {
         spine_path_constraint_base_reset_constrained(_ptr.assumingMemoryBound(to: spine_path_constraint_base_wrapper.self))
     }
 
+    /// Sets the applied pose to the constrained pose, in anticipation of the applied pose being
+    /// modified by constraints.
     public func constrained() {
         spine_path_constraint_base_constrained(_ptr.assumingMemoryBound(to: spine_path_constraint_base_wrapper.self))
     }

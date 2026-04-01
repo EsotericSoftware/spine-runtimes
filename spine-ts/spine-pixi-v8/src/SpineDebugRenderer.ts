@@ -259,7 +259,7 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 		for (let i = 0, len = bones.length; i < len; i++) {
 			const bone = bones[i];
 			const boneLen = bone.data.length;
-			const applied = bone.applied;
+			const applied = bone.appliedPose;
 			const starX = skeletonX + applied.worldX;
 			const starY = skeletonY + applied.worldY;
 			const endX = skeletonX + (boneLen * applied.a) + applied.worldX;
@@ -360,7 +360,7 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 
 		for (let i = 0, len = slots.length; i < len; i++) {
 			const slot = slots[i];
-			const attachment = slot.applied.attachment;
+			const attachment = slot.appliedPose.attachment;
 
 			if (attachment === null || !(attachment instanceof RegionAttachment)) {
 				continue;
@@ -368,7 +368,7 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 
 			const vertices = new Float32Array(8);
 
-			attachment.computeWorldVertices(slot, attachment.getOffsets(slot.applied), vertices, 0, 2);
+			attachment.computeWorldVertices(slot, attachment.getOffsets(slot.appliedPose), vertices, 0, 2);
 			debugDisplayObjects.regionAttachmentsShape.poly(Array.from(vertices.slice(0, 8)));
 		}
 
@@ -388,7 +388,7 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 			if (!slot.bone.active) {
 				continue;
 			}
-			const attachment = slot.applied.attachment;
+			const attachment = slot.appliedPose.attachment;
 
 			if (attachment === null || !(attachment instanceof MeshAttachment)) {
 				continue;
@@ -448,7 +448,7 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 			if (!slot.bone.active) {
 				continue;
 			}
-			const attachment = slot.applied.attachment;
+			const attachment = slot.appliedPose.attachment;
 
 			if (attachment === null || !(attachment instanceof ClippingAttachment)) {
 				continue;
@@ -533,7 +533,7 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 			if (!slot.bone.active) {
 				continue;
 			}
-			const attachment = slot.applied.attachment;
+			const attachment = slot.appliedPose.attachment;
 
 			if (attachment === null || !(attachment instanceof PathAttachment)) {
 				continue;

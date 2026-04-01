@@ -41,8 +41,7 @@ import 'posed.dart';
 import 'posed_active.dart';
 import 'skeleton.dart';
 
-/// Stores the current pose for a physics constraint. A physics constraint
-/// applies physics to bones.
+/// Applies physics to a bone.
 ///
 /// See https://esotericsoftware.com/spine-physics-constraints Physics
 /// constraints in the Spine User Guide. Non-exported base class that inherits
@@ -63,21 +62,30 @@ abstract class PhysicsConstraintBase extends PosedActive implements Posed, Const
     return PhysicsConstraintData.fromPointer(result);
   }
 
+  /// The unconstrained pose for this object, set by animations and application
+  /// code.
   PhysicsConstraintPose get pose {
     final result = SpineBindings.bindings.spine_physics_constraint_base_get_pose(_ptr);
     return PhysicsConstraintPose.fromPointer(result);
   }
 
+  /// The pose to use for rendering. If no constraints modify this pose, this is
+  /// the same as getPose(). Otherwise it is a copy of getPose() modified by
+  /// constraints.
   PhysicsConstraintPose get appliedPose {
     final result = SpineBindings.bindings.spine_physics_constraint_base_get_applied_pose(_ptr);
     return PhysicsConstraintPose.fromPointer(result);
   }
 
+  /// Sets the constrained pose to the unconstrained pose, as a starting point
+  /// for constraints to be applied.
   @override
   void resetConstrained() {
     SpineBindings.bindings.spine_physics_constraint_base_reset_constrained(_ptr);
   }
 
+  /// Sets the applied pose to the constrained pose, in anticipation of the
+  /// applied pose being modified by constraints.
   @override
   void constrained() {
     SpineBindings.bindings.spine_physics_constraint_base_constrained(_ptr);

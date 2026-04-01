@@ -34,7 +34,7 @@ import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
 import 'constraint_timeline1.dart';
 
-/// Changes a slider's SliderPose::getMix().
+/// Changes a slider's mix.
 class SliderMixTimeline extends ConstraintTimeline1 {
   final Pointer<spine_slider_mix_timeline_wrapper> _ptr;
 

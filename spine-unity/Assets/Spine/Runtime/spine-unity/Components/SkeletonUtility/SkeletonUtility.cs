@@ -253,6 +253,10 @@ namespace Spine.Unity {
 		bool hasConstraintTargetBones;
 		bool needToReprocessBones;
 
+		public void OnUtilityBoneChanged () {
+			needToReprocessBones = true;
+		}
+
 		public void ResubscribeEvents () {
 			ResubscribeIndependentEvents();
 			ResubscribeDependentEvents();
@@ -362,6 +366,9 @@ namespace Spine.Unity {
 			if (skeleton == null) return;
 
 			if (boneRoot != null) {
+				hasOverrideBones = false;
+				hasConstraintTargetBones = false;
+
 				List<Bone> constrainedBones = new List<Bone>();
 				ExposedList<IConstraint> constraints = skeleton.Constraints;
 				for (int i = 0, n = constraints.Count; i < n; i++) {

@@ -29,45 +29,110 @@
 
 import type { Bone } from "./Bone.js";
 import { Inherit } from "./BoneData.js";
-import { BoneLocal } from "./BoneLocal.js";
 import type { Physics } from "./Physics.js";
+import type { Pose } from "./Pose.js";
 import type { Skeleton } from "./Skeleton.js";
 import type { Update } from "./Update.js";
 import { MathUtils, type Vector2 } from "./Utils.js";
 
-/** The applied pose for a bone. This is the {@link Bone} pose with constraints applied and the world transform computed by
- * {@link Skeleton#updateWorldTransform()}. */
-export class BonePose extends BoneLocal implements Update {
+/** The applied local pose and world transform for a bone. This is the {@link Bone.getPose} with constraints applied and the
+ * world transform computed by {@link Skeleton.updateWorldTransform} and {@link updateWorldTransform}.
+ *
+ * If the world transform is changed, call {@link updateLocalTransform} before using the local transform. The local
+ * transform may be needed by other code (eg to apply another constraint).
+ *
+ * After changing the world transform, call {@link updateWorldTransform} on every descendant bone. It may be more
+ * convenient to modify the local transform instead, then call {@link Skeleton.updateWorldTransform} to update the world
+ * transforms for all bones and apply constraints. */
+export class BonePose implements Pose<BonePose>, Update {
 	bone!: Bone;
 
-	/** Part of the world transform matrix for the X axis. If changed, {@link updateLocalTransform()} should be called. */
+	/** The local x translation. */
+	x = 0;
+
+	/** The local y translation. */
+	y = 0;
+
+	/** The local rotation in degrees, counter clockwise. */
+	rotation = 0;
+
+	/** The local scaleX. */
+	scaleX = 0;
+
+	/** The local scaleY. */
+	scaleY = 0;
+
+	/** The local shearX. */
+	shearX = 0;
+
+	/** The local shearY. */
+	shearY = 0;
+
+	inherit = Inherit.Normal;
+
+	/** The world transform `[a b][c d]` x-axis x component. */
 	a = 0;
 
-	/** Part of the world transform matrix for the Y axis. If changed, {@link updateLocalTransform()} should be called. */
+	/** The world transform `[a b][c d]` y-axis x component. */
 	b = 0;
 
-	/** Part of the world transform matrix for the X axis. If changed, {@link updateLocalTransform()} should be called. */
+	/** The world transform `[a b][c d]` x-axis y component. */
 	c = 0;
 
-	/** Part of the world transform matrix for the Y axis. If changed, {@link updateLocalTransform()} should be called. */
+	/** The world transform `[a b][c d]` y-axis y component. */
 	d = 0;
 
-	/** The world X position. If changed, {@link updateLocalTransform()} should be called. */
+	/** The world X position. If changed, {@link updateLocalTransform} should be called. */
 	worldY = 0;
 
-	/** The world Y position. If changed, {@link updateLocalTransform()} should be called. */
+	/** The world Y position. If changed, {@link updateLocalTransform} should be called. */
 	worldX = 0;
 
 	world = 0;
 	local = 0;
 
-	/** Called by {@link Skeleton#updateCache()} to compute the world transform, if needed. */
+	set (pose: BonePose): void {
+		if (pose == null) throw new Error("pose cannot be null.");
+		this.x = pose.x;
+		this.y = pose.y;
+		this.rotation = pose.rotation;
+		this.scaleX = pose.scaleX;
+		this.scaleY = pose.scaleY;
+		this.shearX = pose.shearX;
+		this.shearY = pose.shearY;
+		this.inherit = pose.inherit;
+	}
+
+	setPosition (x: number, y: number): void {
+		this.x = x;
+		this.y = y;
+	}
+
+	setScale (scaleX: number, scaleY: number): void;
+	setScale (scale: number): void;
+	setScale (scaleOrX: number, scaleY?: number): void {
+		this.scaleX = scaleOrX;
+		this.scaleY = scaleY === undefined ? scaleOrX : scaleY;
+	}
+
+	/** Determines how parent world transforms affect this bone. */
+	public getInherit (): Inherit {
+		return this.inherit;
+	}
+
+	public setInherit (inherit: Inherit): void {
+		if (inherit == null) throw new Error("inherit cannot be null.");
+		this.inherit = inherit;
+	}
+
+	/** Called by {@link Skeleton.updateCache} to compute the world transform, if needed. */
 	public update (skeleton: Skeleton, physics: Physics): void {
 		if (this.world !== skeleton._update) this.updateWorldTransform(skeleton);
 	}
 
-	/** Computes the world transform using the parent bone's applied pose and this pose. Child bones are not updated.
-	 * <p>
+	/** Computes the world transform using the parent bone's world transform and this applied local pose. Child bones are not
+	 * updated.
+	 *
 	 * See <a href="https://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide. */
 	updateWorldTransform (skeleton: Skeleton): void {
@@ -94,7 +159,7 @@ export class BonePose extends BoneLocal implements Update {
 			return;
 		}
 
-		const parent = this.bone.parent.applied;
+		const parent = this.bone.parent.appliedPose;
 		let pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
 		this.worldX = pa * this.x + pb * this.y + parent.worldX;
 		this.worldY = pc * this.x + pd * this.y + parent.worldY;
@@ -184,11 +249,11 @@ export class BonePose extends BoneLocal implements Update {
 	}
 
 	/** Computes the local transform values from the world transform.
-	 * <p>
-	 * If the world transform is modified (by a constraint, {@link #rotateWorld(float)}, etc) then this method should be called so
+	 *
+	 * If the world transform is modified (by a constraint, {@link rotateWorld}, etc) then this method should be called so
 	 * the local transform matches the world transform. The local transform may be needed by other code (eg to apply another
 	 * constraint).
-	 * <p>
+	 *
 	 * Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation. The local transform after
 	 * calling this method is equivalent to the local transform used to compute the world transform, but may not be identical. */
 	public updateLocalTransform (skeleton: Skeleton): void {
@@ -207,7 +272,7 @@ export class BonePose extends BoneLocal implements Update {
 			return;
 		}
 
-		const parent = this.bone.parent.applied;
+		const parent = this.bone.parent.appliedPose;
 		let pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
 		let pid = 1 / (pa * pd - pb * pc);
 		let ia = pd * pid, ib = pb * pid, ic = pc * pid, id = pa * pid;
@@ -274,8 +339,9 @@ export class BonePose extends BoneLocal implements Update {
 		}
 	}
 
-	/** If the world transform has been modified and the local transform no longer matches, {@link #updateLocalTransform(Skeleton)}
-	 * is called. */
+	/** If the world transform has been modified by constraints and the local transform no longer matches,
+	 * {@link updateLocalTransform} is called. Call this after {@link Skeleton.updateWorldTransform} before
+	 * using the applied local transform. */
 	public validateLocalTransform (skeleton: Skeleton): void {
 		if (this.local === skeleton._update) this.updateLocalTransform(skeleton);
 	}
@@ -295,7 +361,7 @@ export class BonePose extends BoneLocal implements Update {
 	resetWorld (update: number): void {
 		const children = this.bone.children;
 		for (let i = 0, n = children.length; i < n; i++) {
-			const child = children[i].applied;
+			const child = children[i].appliedPose;
 			if (child.world === update) {
 				child.world = 0;
 				child.local = 0;
@@ -304,7 +370,8 @@ export class BonePose extends BoneLocal implements Update {
 		}
 	}
 
-	/** The world rotation for the X axis, calculated using {@link a} and {@link c}. */
+	/** The world rotation for the X axis, calculated using {@link a} and {@link c}. This is the direction the bone is
+	 * pointing. */
 	public getWorldRotationX (): number {
 		return MathUtils.atan2Deg(this.c, this.a);
 	}
@@ -361,13 +428,13 @@ export class BonePose extends BoneLocal implements Update {
 	/** Transforms a point from world coordinates to the parent bone's local coordinates. */
 	public worldToParent (world: Vector2): Vector2 {
 		if (world == null) throw new Error("world cannot be null.");
-		return this.bone.parent == null ? world : this.bone.parent.applied.worldToLocal(world);
+		return this.bone.parent == null ? world : this.bone.parent.appliedPose.worldToLocal(world);
 	}
 
 	/** Transforms a point from the parent bone's coordinates to world coordinates. */
 	public parentToWorld (world: Vector2): Vector2 {
 		if (world == null) throw new Error("world cannot be null.");
-		return this.bone.parent == null ? world : this.bone.parent.applied.localToWorld(world);
+		return this.bone.parent == null ? world : this.bone.parent.appliedPose.localToWorld(world);
 	}
 
 	/** Transforms a world rotation to a local rotation. */
@@ -384,10 +451,7 @@ export class BonePose extends BoneLocal implements Update {
 		return MathUtils.atan2Deg(cos * this.c + sin * this.d, cos * this.a + sin * this.b);
 	}
 
-	/** Rotates the world transform the specified amount.
-	 * <p>
-	 * After changes are made to the world transform, {@link updateLocalTransform} should be called on this bone and any
-	 * child bones, recursively. */
+	/** Rotates the world transform the specified amount. */
 	rotateWorld (degrees: number) {
 		degrees *= MathUtils.degRad;
 		const sin = Math.sin(degrees), cos = Math.cos(degrees);

@@ -162,6 +162,7 @@ class PathConstraintData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_path_constraint_data_set_offset_rotation(_ptr, value);
   }
 
+  /// The setup pose that most animations are relative to.
   PathConstraintPose get setupPose {
     final result = SpineBindings.bindings.spine_path_constraint_data_get_setup_pose(_ptr);
     return PathConstraintPose.fromPointer(result);

@@ -33,7 +33,7 @@
 #include <spine/dll.h>
 
 namespace spine {
-	/// Simple mixin class that adds active state tracking
+	/// A posed object that may be active or inactive.
 	class SP_API PosedActive {
 	protected:
 		bool _active;
@@ -44,6 +44,9 @@ namespace spine {
 		virtual ~PosedActive() {
 		}
 
+		/// Returns false when this won't be updated by Skeleton::updateWorldTransform(Physics) because a skin is
+		/// required and the active skin does not contain this item. See Skin::getBones(), Skin::getConstraints(),
+		/// PosedData::getSkinRequired(), and Skeleton::updateCache().
 		bool isActive() const {
 			return _active;
 		}

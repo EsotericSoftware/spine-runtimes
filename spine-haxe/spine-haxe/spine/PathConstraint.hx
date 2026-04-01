@@ -63,7 +63,7 @@ class PathConstraint extends Constraint<PathConstraint, PathConstraintData, Path
 
 		bones = new Array<BonePose>();
 		for (boneData in data.bones)
-			bones.push(skeleton.bones[boneData.index].constrained);
+			bones.push(skeleton.bones[boneData.index].constrainedPose);
 
 		slot = skeleton.slots[data.slot.index];
 	}
@@ -76,12 +76,12 @@ class PathConstraint extends Constraint<PathConstraint, PathConstraintData, Path
 
 	/** Applies the constraint to the constrained bones. */
 	public function update(skeleton:Skeleton, physics:Physics):Void {
-		var attachment = slot.applied.attachment;
+		var attachment = slot.appliedPose.attachment;
 		if (!Std.isOfType(attachment, PathAttachment))
 			return;
 		var pathAttachment = cast(attachment, PathAttachment);
 
-		var p = applied;
+		var p = appliedPose;
 		var mixRotate = p.mixRotate, mixX = p.mixX, mixY = p.mixY;
 		if (mixRotate == 0 && mixX == 0 && mixY == 0)
 			return;
@@ -163,7 +163,7 @@ class PathConstraint extends Constraint<PathConstraint, PathConstraintData, Path
 			tip = data.rotateMode == RotateMode.chain;
 		else {
 			tip = false;
-			var bone = slot.bone.applied;
+			var bone = slot.bone.appliedPose;
 			offsetRotation *= bone.a * bone.d - bone.b * bone.c > 0 ? MathUtils.degRad : -MathUtils.degRad;
 		}
 		var i = 0, ip = 3, u = skeleton._update;
@@ -218,7 +218,7 @@ class PathConstraint extends Constraint<PathConstraint, PathConstraintData, Path
 	}
 
 	private function computeWorldPositions(skeleton:Skeleton, path:PathAttachment, spacesCount:Int, tangents:Bool):Array<Float> {
-		var position = applied.position;
+		var position = appliedPose.position;
 		ArrayUtils.resize(positions, spacesCount * 3 + 2, 0);
 		var out:Array<Float> = positions, world = new Array<Float>();
 		var closed = path.closed;

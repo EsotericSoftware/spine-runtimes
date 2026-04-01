@@ -48,8 +48,6 @@ public class PosedData: NSObject {
         self.init(fromPointer: ptr!)
     }
 
-    /// The constraint's name, which is unique across all constraints in the skeleton of the same
-    /// type.
     public var name: String {
         let result = spine_posed_data_get_name(_ptr.assumingMemoryBound(to: spine_posed_data_wrapper.self))
         return String(cString: result!)

@@ -17,10 +17,9 @@ spine_rtti spine_ik_constraint_timeline_get_rtti(spine_ik_constraint_timeline se
 }
 
 void spine_ik_constraint_timeline_apply(spine_ik_constraint_timeline self, spine_skeleton skeleton, float lastTime, float time,
-										/*@null*/ spine_array_event events, float alpha, spine_mix_blend blend, spine_mix_direction direction,
-										bool appliedPose) {
+										/*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
 	IkConstraintTimeline *_self = (IkConstraintTimeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixBlend) blend, (MixDirection) direction, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
 }
 
 void spine_ik_constraint_timeline_set_frame(spine_ik_constraint_timeline self, int frame, float time, float mix, float softness, int bendDirection,
@@ -63,6 +62,16 @@ float spine_ik_constraint_timeline_get_bezier_value(spine_ik_constraint_timeline
 spine_array_float spine_ik_constraint_timeline_get_curves(spine_ik_constraint_timeline self) {
 	IkConstraintTimeline *_self = (IkConstraintTimeline *) self;
 	return (spine_array_float) &_self->getCurves();
+}
+
+bool spine_ik_constraint_timeline_get_additive(spine_ik_constraint_timeline self) {
+	IkConstraintTimeline *_self = (IkConstraintTimeline *) self;
+	return _self->getAdditive();
+}
+
+bool spine_ik_constraint_timeline_get_instant(spine_ik_constraint_timeline self) {
+	IkConstraintTimeline *_self = (IkConstraintTimeline *) self;
+	return _self->getInstant();
 }
 
 size_t spine_ik_constraint_timeline_get_frame_entries(spine_ik_constraint_timeline self) {

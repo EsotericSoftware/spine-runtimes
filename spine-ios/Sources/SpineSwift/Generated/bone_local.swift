@@ -137,6 +137,7 @@ public class BoneLocal: NSObject {
         }
     }
 
+    /// Sets local scaleX and scaleY to the same value.
     public var scale2: Float {
         get { fatalError("Setter-only property") }
         set(newValue) {
@@ -149,10 +150,12 @@ public class BoneLocal: NSObject {
             _ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self), pose._ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self))
     }
 
+    /// Sets local x and y translation.
     public func setPosition(_ x: Float, _ y: Float) {
         spine_bone_local_set_position(_ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self), x, y)
     }
 
+    /// Sets local scaleX and scaleY.
     public func setScale(_ scaleX: Float, _ scaleY: Float) {
         spine_bone_local_set_scale_1(_ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self), scaleX, scaleY)
     }

@@ -29,7 +29,6 @@
 
 /** biome-ignore-all lint/complexity/noStaticOnlyClass: too much things to update */
 
-import type { MixBlend } from "./Animation.js";
 import type { Skeleton } from "./Skeleton.js";
 
 export interface StringMap<T> {
@@ -335,7 +334,7 @@ export class Utils {
 	}
 
 	// This function is used to fix WebKit 602 specific issue described at https://esotericsoftware.com/forum/d/10109-ios-10-disappearing-graphics
-	static webkit602BugfixHelper (alpha: number, blend: MixBlend) {
+	static webkit602BugfixHelper (alpha: number) {
 	}
 
 	static contains<T> (array: Array<T>, element: T, identity = true) {
@@ -353,7 +352,7 @@ export class Utils {
 export class DebugUtils {
 	static logBones (skeleton: Skeleton) {
 		for (let i = 0; i < skeleton.bones.length; i++) {
-			const bone = skeleton.bones[i].applied;
+			const bone = skeleton.bones[i].appliedPose;
 			console.log(`${bone.bone.data.name}, ${bone.a}, ${bone.b}, ${bone.c}, ${bone.d}, ${bone.worldX}, ${bone.worldY}`);
 		}
 	}

@@ -30,10 +30,10 @@
 package spine;
 
 import spine.animation.ConstraintTimeline;
+import spine.animation.DrawOrderFolderTimeline;
+import spine.animation.DrawOrderTimeline;
 import spine.animation.PhysicsConstraintTimeline;
 import spine.animation.SlotTimeline;
-import spine.animation.MixDirection;
-import spine.animation.MixBlend;
 
 /** Stores the setup pose for a {@link PhysicsConstraint}.
  * <p>
@@ -59,7 +59,7 @@ class Slider extends Constraint<Slider, SliderData, SliderPose> {
 	}
 
 	public function update(skeleton:Skeleton, physics:Physics) {
-		var p = applied;
+		var p = appliedPose;
 		if (p.mix == 0)
 			return;
 
@@ -68,8 +68,8 @@ class Slider extends Constraint<Slider, SliderData, SliderPose> {
 			if (!bone.active)
 				return;
 			if (data.local)
-				bone.applied.validateLocalTransform(skeleton);
-			p.time = data.offset + (data.property.value(skeleton, bone.applied, data.local, offsets) - data.property.offset) * data.scale;
+				bone.appliedPose.validateLocalTransform(skeleton);
+			p.time = data.offset + (data.property.value(skeleton, bone.appliedPose, data.local, offsets) - data.property.offset) * data.scale;
 			if (data.loop)
 				p.time = animation.duration + (p.time % animation.duration);
 			else
@@ -80,9 +80,9 @@ class Slider extends Constraint<Slider, SliderData, SliderPose> {
 		var indices = animation.bones;
 		var i = 0, n = animation.bones.length;
 		while (i < n)
-			bones[indices[i++]].applied.modifyLocal(skeleton);
+			bones[indices[i++]].appliedPose.modifyLocal(skeleton);
 
-		animation.apply(skeleton, p.time, p.time, data.loop, null, p.mix, data.additive ? MixBlend.add : MixBlend.replace, MixDirection.mixIn, true);
+		animation.apply(skeleton, p.time, p.time, data.loop, null, p.mix, false, data.additive, false, true);
 	}
 
 	function sort(skeleton:Skeleton) {
@@ -110,6 +110,8 @@ class Slider extends Constraint<Slider, SliderData, SliderPose> {
 			var t = timelines[i++];
 			if (Std.isOfType(t, SlotTimeline))
 				skeleton.constrained(slots[cast(t, SlotTimeline).getSlotIndex()]);
+			else if (Std.isOfType(t, DrawOrderTimeline) || Std.isOfType(t, DrawOrderFolderTimeline))
+				skeleton.drawOrder.constrained();
 			else if (Std.isOfType(t, PhysicsConstraintTimeline)) {
 				var timeline = cast(t, PhysicsConstraintTimeline);
 				if (timeline.constraintIndex == -1) {

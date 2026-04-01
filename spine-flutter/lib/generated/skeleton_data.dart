@@ -238,8 +238,8 @@ class SkeletonData {
     SpineBindings.bindings.spine_skeleton_data_set_hash(_ptr, value.toNativeUtf8().cast<Char>());
   }
 
-  /// The path to the images directory as defined in Spine, or null if
-  /// nonessential data was not exported.
+  /// The path to the images folder as defined in Spine, or null if nonessential
+  /// data was not exported.
   String get imagesPath {
     final result = SpineBindings.bindings.spine_skeleton_data_get_images_path(_ptr);
     return result.cast<Utf8>().toDartString();
@@ -249,8 +249,8 @@ class SkeletonData {
     SpineBindings.bindings.spine_skeleton_data_set_images_path(_ptr, value.toNativeUtf8().cast<Char>());
   }
 
-  /// The path to the audio directory as defined in Spine, or null if
-  /// nonessential data was not exported.
+  /// The path to the audio folder as defined in Spine, or null if nonessential
+  /// data was not exported.
   String get audioPath {
     final result = SpineBindings.bindings.spine_skeleton_data_get_audio_path(_ptr);
     return result.cast<Utf8>().toDartString();

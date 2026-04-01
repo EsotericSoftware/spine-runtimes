@@ -74,9 +74,14 @@ namespace spine {
 
 		Color &getColor();
 
+		/// The parent mesh if this is a linked mesh, else NULL. A linked mesh shares the bones, vertices, regionUVs,
+		/// triangles, hullLength, edges, width, and height with the parent mesh, but may have a different name or path,
+		/// and therefore a different texture region.
 		MeshAttachment *getParentMesh();
 		void setParentMesh(MeshAttachment *inValue);
 
+		/// Vertex index pairs describing edges for controlling triangulation, or empty if nonessential data was not
+		/// exported. Mesh triangles do not cross edges. Triangulation is not performed at runtime.
 		Array<unsigned short> &getEdges();
 		void setEdges(Array<unsigned short> &inValue);
 

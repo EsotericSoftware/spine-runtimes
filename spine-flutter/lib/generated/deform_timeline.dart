@@ -41,7 +41,7 @@ import 'path_attachment.dart';
 import 'slot_curve_timeline.dart';
 import 'vertex_attachment.dart';
 
-/// Changes a slot's SlotPose::getDeform() to deform a VertexAttachment.
+/// Changes a slot's deform to deform a VertexAttachment.
 class DeformTimeline extends SlotCurveTimeline {
   final Pointer<spine_deform_timeline_wrapper> _ptr;
 
@@ -67,7 +67,7 @@ class DeformTimeline extends SlotCurveTimeline {
     SpineBindings.bindings.spine_deform_timeline_set_frame(_ptr, frameIndex, time, vertices.nativePtr.cast());
   }
 
-  /// The attachment that will be deformed.
+  /// The attachment whose vertices will be deformed.
   VertexAttachment get attachment {
     final result = SpineBindings.bindings.spine_deform_timeline_get_attachment(_ptr);
     final rtti = SpineBindings.bindings.spine_vertex_attachment_get_rtti(result);

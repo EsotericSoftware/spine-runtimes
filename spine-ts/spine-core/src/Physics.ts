@@ -27,12 +27,13 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+import type { PhysicsConstraint } from "./PhysicsConstraint.js";
 /** Determines how physics and other non-deterministic updates are applied. */
 export enum Physics {
 	/** Physics are not updated or applied. */
 	none,
 
-	/** Physics are reset to the current pose. */
+	/** Physics are {@link PhysicsConstraint.reset | reset}. */
 	reset,
 
 	/** Physics are updated and the pose from physics is applied. */

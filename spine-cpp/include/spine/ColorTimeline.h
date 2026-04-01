@@ -34,7 +34,7 @@
 #include <spine/SlotTimeline.h>
 
 namespace spine {
-	/// Changes a slot's SlotPose::getColor().
+	/// Changes a slot's color.
 	class SP_API RGBATimeline : public SlotCurveTimeline {
 		friend class SkeletonBinary;
 
@@ -53,7 +53,7 @@ namespace spine {
 		void setFrame(int frame, float time, float r, float g, float b, float a);
 
 	protected:
-		virtual void _apply(Slot &slot, SlotPose &pose, float time, float alpha, MixBlend blend) override;
+		virtual void _apply(Slot &slot, SlotPose &pose, float time, float alpha, bool fromSetup, bool add) override;
 
 		static const int ENTRIES = 5;
 		static const int R = 1;
@@ -62,7 +62,7 @@ namespace spine {
 		static const int A = 4;
 	};
 
-	/// Changes the RGB for a slot's SlotPose::getColor().
+	/// Changes RGB for a slot's color.
 	class SP_API RGBTimeline : public SlotCurveTimeline {
 		friend class SkeletonBinary;
 
@@ -81,7 +81,7 @@ namespace spine {
 		void setFrame(int frame, float time, float r, float g, float b);
 
 	protected:
-		virtual void _apply(Slot &slot, SlotPose &pose, float time, float alpha, MixBlend blend) override;
+		virtual void _apply(Slot &slot, SlotPose &pose, float time, float alpha, bool fromSetup, bool add) override;
 
 		static const int ENTRIES = 4;
 		static const int R = 1;
@@ -101,8 +101,8 @@ namespace spine {
 
 		virtual ~AlphaTimeline();
 
-		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
-						   MixDirection direction, bool appliedPose) override;
+		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+						   bool appliedPose) override;
 
 		virtual int getSlotIndex() override;
 
@@ -112,7 +112,7 @@ namespace spine {
 		int _slotIndex;
 	};
 
-	/// Changes a slot's SlotPose::getColor() and SlotPose::getDarkColor() for two color tinting.
+	/// Changes a slot's light and dark colors for two color tinting.
 	class SP_API RGBA2Timeline : public SlotCurveTimeline {
 		friend class SkeletonBinary;
 
@@ -131,7 +131,7 @@ namespace spine {
 		void setFrame(int frame, float time, float r, float g, float b, float a, float r2, float g2, float b2);
 
 	protected:
-		virtual void _apply(Slot &slot, SlotPose &pose, float time, float alpha, MixBlend blend) override;
+		virtual void _apply(Slot &slot, SlotPose &pose, float time, float alpha, bool fromSetup, bool add) override;
 
 		static const int ENTRIES = 8;
 		static const int R = 1;
@@ -143,7 +143,7 @@ namespace spine {
 		static const int B2 = 7;
 	};
 
-	/// Changes the RGB for a slot's SlotPose::getColor() and SlotPose::getDarkColor() for two color tinting.
+	/// Changes RGB for a slot's light and dark colors for two color tinting.
 	class SP_API RGB2Timeline : public SlotCurveTimeline {
 		friend class SkeletonBinary;
 
@@ -162,7 +162,7 @@ namespace spine {
 		void setFrame(int frame, float time, float r, float g, float b, float r2, float g2, float b2);
 
 	protected:
-		virtual void _apply(Slot &slot, SlotPose &pose, float time, float alpha, MixBlend blend) override;
+		virtual void _apply(Slot &slot, SlotPose &pose, float time, float alpha, bool fromSetup, bool add) override;
 
 		static const int ENTRIES = 7;
 		static const int R = 1;

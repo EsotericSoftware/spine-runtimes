@@ -43,6 +43,7 @@ class AttachmentTimeline extends Timeline implements SlotTimeline {
 	public function new(frameCount:Int, slotIndex:Int) {
 		super(frameCount, Property.attachment + "|" + slotIndex);
 		this.slotIndex = slotIndex;
+		this.instant = true;
 		attachmentNames = new Array<String>();
 		attachmentNames.resize(frameCount);
 	}
@@ -63,18 +64,18 @@ class AttachmentTimeline extends Timeline implements SlotTimeline {
 		attachmentNames[frame] = attachmentName;
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend, direction:MixDirection,
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
 			appliedPose:Bool) {
 		var slot = skeleton.slots[slotIndex];
 		if (!slot.bone.active)
 			return;
-		var pose = appliedPose ? slot.applied : slot.pose;
+		var pose = appliedPose ? slot.appliedPose : slot.pose;
 
-		if (direction == MixDirection.mixOut) {
-			if (blend == MixBlend.setup)
+		if (out) {
+			if (fromSetup)
 				setAttachment(skeleton, pose, slot.data.attachmentName);
 		} else if (time < frames[0]) {
-			if (blend == MixBlend.setup || blend == MixBlend.first)
+			if (fromSetup)
 				setAttachment(skeleton, pose, slot.data.attachmentName);
 		} else
 			setAttachment(skeleton, pose, attachmentNames[Timeline.search1(frames, time)]);

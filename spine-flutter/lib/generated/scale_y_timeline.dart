@@ -34,7 +34,7 @@ import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
 import 'bone_timeline1.dart';
 
-/// Changes a bone's local BoneLocal::getScaleY().
+/// Changes a bone's local scaleY.
 class ScaleYTimeline extends BoneTimeline1 {
   final Pointer<spine_scale_y_timeline_wrapper> _ptr;
 

@@ -112,6 +112,8 @@ class PhysicsConstraintData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_physics_constraint_data_set_bone(_ptr, value.nativePtr.cast());
   }
 
+  /// The time in milliseconds required to advanced the physics simulation one
+  /// step.
   double get step {
     final result = SpineBindings.bindings.spine_physics_constraint_data_get_step(_ptr);
     return result;
@@ -121,6 +123,7 @@ class PhysicsConstraintData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_physics_constraint_data_set_step(_ptr, value);
   }
 
+  /// Physics influence on x translation, 0-1.
   double get x {
     final result = SpineBindings.bindings.spine_physics_constraint_data_get_x(_ptr);
     return result;
@@ -130,6 +133,7 @@ class PhysicsConstraintData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_physics_constraint_data_set_x(_ptr, value);
   }
 
+  /// Physics influence on y translation, 0-1.
   double get y {
     final result = SpineBindings.bindings.spine_physics_constraint_data_get_y(_ptr);
     return result;
@@ -139,6 +143,7 @@ class PhysicsConstraintData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_physics_constraint_data_set_y(_ptr, value);
   }
 
+  /// Physics influence on rotation, 0-1.
   double get rotate {
     final result = SpineBindings.bindings.spine_physics_constraint_data_get_rotate(_ptr);
     return result;
@@ -148,6 +153,7 @@ class PhysicsConstraintData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_physics_constraint_data_set_rotate(_ptr, value);
   }
 
+  /// Physics influence on scaleX, 0-1.
   double get scaleX {
     final result = SpineBindings.bindings.spine_physics_constraint_data_get_scale_x(_ptr);
     return result;
@@ -157,6 +163,7 @@ class PhysicsConstraintData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_physics_constraint_data_set_scale_x(_ptr, value);
   }
 
+  /// Physics influence on shearX, 0-1.
   double get shearX {
     final result = SpineBindings.bindings.spine_physics_constraint_data_get_shear_x(_ptr);
     return result;
@@ -166,6 +173,7 @@ class PhysicsConstraintData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_physics_constraint_data_set_shear_x(_ptr, value);
   }
 
+  /// Movement greater than the limit will not have a greater affect on physics.
   double get limit {
     final result = SpineBindings.bindings.spine_physics_constraint_data_get_limit(_ptr);
     return result;
@@ -175,6 +183,8 @@ class PhysicsConstraintData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_physics_constraint_data_set_limit(_ptr, value);
   }
 
+  /// True when this constraint's inertia is controlled by global slider
+  /// timelines.
   bool get inertiaGlobal {
     final result = SpineBindings.bindings.spine_physics_constraint_data_get_inertia_global(_ptr);
     return result;
@@ -184,6 +194,8 @@ class PhysicsConstraintData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_physics_constraint_data_set_inertia_global(_ptr, value);
   }
 
+  /// True when this constraint's strength is controlled by global slider
+  /// timelines.
   bool get strengthGlobal {
     final result = SpineBindings.bindings.spine_physics_constraint_data_get_strength_global(_ptr);
     return result;
@@ -193,6 +205,8 @@ class PhysicsConstraintData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_physics_constraint_data_set_strength_global(_ptr, value);
   }
 
+  /// True when this constraint's damping is controlled by global slider
+  /// timelines.
   bool get dampingGlobal {
     final result = SpineBindings.bindings.spine_physics_constraint_data_get_damping_global(_ptr);
     return result;
@@ -202,6 +216,7 @@ class PhysicsConstraintData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_physics_constraint_data_set_damping_global(_ptr, value);
   }
 
+  /// True when this constraint's mass is controlled by global slider timelines.
   bool get massGlobal {
     final result = SpineBindings.bindings.spine_physics_constraint_data_get_mass_global(_ptr);
     return result;
@@ -211,6 +226,7 @@ class PhysicsConstraintData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_physics_constraint_data_set_mass_global(_ptr, value);
   }
 
+  /// True when this constraint's wind is controlled by global slider timelines.
   bool get windGlobal {
     final result = SpineBindings.bindings.spine_physics_constraint_data_get_wind_global(_ptr);
     return result;
@@ -220,6 +236,8 @@ class PhysicsConstraintData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_physics_constraint_data_set_wind_global(_ptr, value);
   }
 
+  /// True when this constraint's gravity is controlled by global slider
+  /// timelines.
   bool get gravityGlobal {
     final result = SpineBindings.bindings.spine_physics_constraint_data_get_gravity_global(_ptr);
     return result;
@@ -229,6 +247,7 @@ class PhysicsConstraintData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_physics_constraint_data_set_gravity_global(_ptr, value);
   }
 
+  /// True when this constraint's mix is controlled by global slider timelines.
   bool get mixGlobal {
     final result = SpineBindings.bindings.spine_physics_constraint_data_get_mix_global(_ptr);
     return result;
@@ -238,6 +257,7 @@ class PhysicsConstraintData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_physics_constraint_data_set_mix_global(_ptr, value);
   }
 
+  /// The setup pose that most animations are relative to.
   PhysicsConstraintPose get setupPose {
     final result = SpineBindings.bindings.spine_physics_constraint_data_get_setup_pose(_ptr);
     return PhysicsConstraintPose.fromPointer(result);

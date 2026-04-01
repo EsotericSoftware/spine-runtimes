@@ -193,6 +193,7 @@ public class TransformConstraintData: PosedData, ConstraintData {
         return ArrayFromProperty(fromPointer: result!)
     }
 
+    /// The setup pose that most animations are relative to.
     public var setupPose: TransformConstraintPose {
         let result = spine_transform_constraint_data_get_setup_pose(_ptr.assumingMemoryBound(to: spine_transform_constraint_data_wrapper.self))
         return TransformConstraintPose(fromPointer: result!)

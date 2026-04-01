@@ -32,7 +32,7 @@
 import Foundation
 import SpineC
 
-/// Changes a slot's SlotPose::getSequenceIndex() for an attachment's Sequence.
+/// Changes the sequence index for an attachment's Sequence.
 @objc(SpineSequenceTimeline)
 @objcMembers
 public class SequenceTimeline: Timeline, SlotTimeline {
@@ -46,6 +46,9 @@ public class SequenceTimeline: Timeline, SlotTimeline {
         self.init(fromPointer: ptr!)
     }
 
+    /// The attachment for which the sequence index will be set.
+    ///
+    /// See Attachment::getTimelineAttachment().
     public var attachment: Attachment {
         let result = spine_sequence_timeline_get_attachment(_ptr.assumingMemoryBound(to: spine_sequence_timeline_wrapper.self))
         let rtti = spine_attachment_get_rtti(result!)

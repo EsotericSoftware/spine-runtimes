@@ -35,8 +35,7 @@ import '../spine_bindings.dart';
 import 'constraint_timeline.dart';
 import 'curve_timeline.dart';
 
-/// Changes a path constraint's PathConstraintPose::getMixRotate(),
-/// PathConstraintPose::getMixX(), and PathConstraintPose::getMixY().
+/// Changes a path constraint's rotate, x, and y mix values.
 class PathConstraintMixTimeline extends CurveTimeline implements ConstraintTimeline {
   final Pointer<spine_path_constraint_mix_timeline_wrapper> _ptr;
 

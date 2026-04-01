@@ -33,37 +33,38 @@ import Foundation
 
 /// Property enum
 public enum Property: Int32, CaseIterable {
-    case rotate = 1
-    case x = 2
-    case y = 4
-    case scaleX = 8
-    case scaleY = 16
-    case shearX = 32
-    case shearY = 64
-    case inherit = 128
-    case rgb = 256
-    case alpha = 512
-    case rgb2 = 1024
-    case attachment = 2048
-    case deform = 4096
-    case event = 8192
-    case drawOrder = 16384
-    case ikConstraint = 32768
-    case transformConstraint = 65536
-    case pathConstraintPosition = 131072
-    case pathConstraintSpacing = 262144
-    case pathConstraintMix = 524288
-    case physicsConstraintInertia = 1_048_576
-    case physicsConstraintStrength = 2_097_152
-    case physicsConstraintDamping = 4_194_304
-    case physicsConstraintMass = 8_388_608
-    case physicsConstraintWind = 16_777_216
-    case physicsConstraintGravity = 33_554_432
-    case physicsConstraintMix = 67_108_864
-    case physicsConstraintReset = 134_217_728
-    case sequence = 268_435_456
-    case sliderTime = 536_870_912
-    case sliderMix = 1_073_741_824
+    case rotate = 0
+    case x = 1
+    case y = 2
+    case scaleX = 3
+    case scaleY = 4
+    case shearX = 5
+    case shearY = 6
+    case inherit = 7
+    case rgb = 8
+    case alpha = 9
+    case rgb2 = 10
+    case attachment = 11
+    case deform = 12
+    case event = 13
+    case drawOrder = 14
+    case ikConstraint = 15
+    case transformConstraint = 16
+    case pathConstraintPosition = 17
+    case pathConstraintSpacing = 18
+    case pathConstraintMix = 19
+    case physicsConstraintInertia = 20
+    case physicsConstraintStrength = 21
+    case physicsConstraintDamping = 22
+    case physicsConstraintMass = 23
+    case physicsConstraintWind = 24
+    case physicsConstraintGravity = 25
+    case physicsConstraintMix = 26
+    case physicsConstraintReset = 27
+    case sequence = 28
+    case sliderTime = 29
+    case sliderMix = 30
+    case drawOrderFolder = 31
 
     public static func fromValue(_ value: Int32) -> Property? {
         return Property(rawValue: value)

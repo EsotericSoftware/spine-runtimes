@@ -430,7 +430,7 @@ export class Spine extends ViewContainer {
 
 		// dark tint can be enabled by options, otherwise is enable if at least one slot has tint black
 		this.darkTint = darkTint === undefined
-			? this.skeleton.slots.some(slot => !!slot.data.setup.darkColor)
+			? this.skeleton.slots.some(slot => !!slot.data.setupPose.darkColor)
 			: darkTint;
 
 		const slots = this.skeleton.slots;
@@ -471,9 +471,9 @@ export class Spine extends ViewContainer {
 		if (!bone) throw Error(`Cant set bone position, bone ${String(boneAux)} not found`);
 		vectorAux.set(position.x, position.y);
 
-		const applied = bone.applied;
+		const applied = bone.appliedPose;
 		if (bone.parent) {
-			const aux = bone.parent.applied.worldToLocal(vectorAux);
+			const aux = bone.parent.appliedPose.worldToLocal(vectorAux);
 
 			applied.x = aux.x;
 			applied.y = -aux.y;
@@ -507,8 +507,8 @@ export class Spine extends ViewContainer {
 			outPos = { x: 0, y: 0 };
 		}
 
-		outPos.x = bone.applied.worldX;
-		outPos.y = bone.applied.worldY;
+		outPos.x = bone.appliedPose.worldX;
+		outPos.y = bone.appliedPose.worldY;
 
 		return outPos;
 	}
@@ -556,7 +556,7 @@ export class Spine extends ViewContainer {
 
 	private validateAttachments () {
 
-		const currentDrawOrder = this.skeleton.drawOrder;
+		const currentDrawOrder = this.skeleton.drawOrder.appliedPose;
 
 		const lastAttachments = this._lastAttachments;
 
@@ -566,7 +566,7 @@ export class Spine extends ViewContainer {
 
 		for (let i = 0; i < currentDrawOrder.length; i++) {
 			const slot = currentDrawOrder[i];
-			const attachment = slot.applied.attachment;
+			const attachment = slot.appliedPose.attachment;
 
 			if (attachment) {
 				if (attachment !== lastAttachments[index]) {
@@ -589,7 +589,7 @@ export class Spine extends ViewContainer {
 	private currentClippingSlot: SlotsToClipping | undefined;
 	private updateAndSetPixiMask (slot: Slot, last: boolean) {
 		// assign/create the currentClippingSlot
-		const pose = slot.applied;
+		const pose = slot.appliedPose;
 		const attachment = pose.attachment;
 		if (attachment && attachment instanceof ClippingAttachment) {
 			const clip = (this.clippingSlotToPixiMasks[slot.data.name] ||= { slot, vertices: [] as number[] });
@@ -628,7 +628,7 @@ export class Spine extends ViewContainer {
 		}
 
 		// if current slot is the ending one of the currentClippingSlot mask, set currentClippingSlot to undefined
-		if (currentClippingSlot && (currentClippingSlot.slot.applied.attachment as ClippingAttachment).endSlot === slot.data) {
+		if (currentClippingSlot && (currentClippingSlot.slot.appliedPose.attachment as ClippingAttachment).endSlot === slot.data) {
 			this.currentClippingSlot = undefined;
 		}
 
@@ -636,7 +636,7 @@ export class Spine extends ViewContainer {
 		if (last) {
 			for (const key in this.clippingSlotToPixiMasks) {
 				const clippingSlotToPixiMask = this.clippingSlotToPixiMasks[key];
-				if ((!(clippingSlotToPixiMask.slot.applied.attachment instanceof ClippingAttachment) || !clippingSlotToPixiMask.maskComputed) && clippingSlotToPixiMask.mask) {
+				if ((!(clippingSlotToPixiMask.slot.appliedPose.attachment instanceof ClippingAttachment) || !clippingSlotToPixiMask.maskComputed) && clippingSlotToPixiMask.mask) {
 					this.removeChild(clippingSlotToPixiMask.mask);
 					maskPool.free(clippingSlotToPixiMask.mask);
 					clippingSlotToPixiMask.mask = undefined;
@@ -647,7 +647,7 @@ export class Spine extends ViewContainer {
 	}
 
 	private transformAttachments () {
-		const currentDrawOrder = this.skeleton.drawOrder;
+		const currentDrawOrder = this.skeleton.drawOrder.appliedPose;
 		const skeleton = this.skeleton;
 
 		for (let i = 0; i < currentDrawOrder.length; i++) {
@@ -655,7 +655,7 @@ export class Spine extends ViewContainer {
 
 			this.updateAndSetPixiMask(slot, i === currentDrawOrder.length - 1);
 
-			const pose = slot.applied;
+			const pose = slot.appliedPose;
 			const attachment = pose.attachment;
 
 			if (attachment) {
@@ -800,12 +800,15 @@ export class Spine extends ViewContainer {
 	private updateSlotObject (slotAttachment: { slot: Slot, container: Container, followAttachmentTimeline: boolean }) {
 		const { slot, container } = slotAttachment;
 
-		const pose = slot.applied;
+		const pose = slot.appliedPose;
 		const followAttachmentValue = slotAttachment.followAttachmentTimeline ? Boolean(pose.attachment) : true;
-		container.visible = this.skeleton.drawOrder.includes(slot) && followAttachmentValue;
+		const slotAlpha = this.skeleton.color.a * pose.color.a;
+
+		container.visible = this.skeleton.drawOrder.appliedPose.includes(slot) && followAttachmentValue
+			&& this.alpha > 0 && slotAlpha > 0;
 
 		if (container.visible) {
-			const applied = slot.bone.applied;
+			const applied = slot.bone.appliedPose;
 
 			const matrix = container.localTransform;
 			matrix.a = applied.a;
@@ -816,7 +819,7 @@ export class Spine extends ViewContainer {
 			matrix.ty = applied.worldY;
 			container.setFromMatrix(matrix);
 
-			container.alpha = this.skeleton.color.a * pose.color.a;
+			container.alpha = slotAlpha;
 		}
 	}
 
@@ -1003,7 +1006,7 @@ export class Spine extends ViewContainer {
 			}
 			this._validateAndTransformAttachments();
 
-			const drawOrder = this.skeleton.drawOrder;
+			const drawOrder = this.skeleton.drawOrder.appliedPose;
 			const bounds = this._bounds;
 
 			bounds.clear();
@@ -1011,7 +1014,7 @@ export class Spine extends ViewContainer {
 			for (let i = 0; i < drawOrder.length; i++) {
 				const slot = drawOrder[i];
 
-				const attachment = slot.applied.attachment;
+				const attachment = slot.appliedPose.attachment;
 
 				if (attachment && (attachment instanceof RegionAttachment || attachment instanceof MeshAttachment)) {
 					const cacheData = this._getCachedData(slot, attachment);
@@ -1068,10 +1071,10 @@ export class Spine extends ViewContainer {
 	public pixiWorldCoordinatesToBone (point: { x: number; y: number }, bone: Bone) {
 		this.pixiWorldCoordinatesToSkeleton(point);
 		if (bone.parent) {
-			bone.parent.applied.worldToLocal(point as Vector2);
+			bone.parent.appliedPose.worldToLocal(point as Vector2);
 		}
 		else {
-			bone.applied.worldToLocal(point as Vector2);
+			bone.appliedPose.worldToLocal(point as Vector2);
 		}
 	}
 

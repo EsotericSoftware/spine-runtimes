@@ -45,6 +45,7 @@ RTTI_IMPL_MULTI(SequenceTimeline, Timeline, SlotTimeline)
 
 SequenceTimeline::SequenceTimeline(size_t frameCount, int slotIndex, Attachment &attachment)
 	: Timeline(frameCount, ENTRIES), SlotTimeline(), _slotIndex(slotIndex), _attachment((HasTextureRegion *) &attachment) {
+	_instant = true;
 	int sequenceId = 0;
 	if (attachment.getRTTI().instanceOf(RegionAttachment::rtti)) sequenceId = ((RegionAttachment *) &attachment)->getSequence().getId();
 	if (attachment.getRTTI().instanceOf(MeshAttachment::rtti)) sequenceId = ((MeshAttachment *) &attachment)->getSequence().getId();
@@ -71,11 +72,12 @@ void SequenceTimeline::setSlotIndex(int inValue) {
 	_slotIndex = inValue;
 }
 
-void SequenceTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
-							 MixDirection direction, bool appliedPose) {
+void SequenceTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+							 bool appliedPose) {
 	SP_UNUSED(alpha);
 	SP_UNUSED(lastTime);
 	SP_UNUSED(events);
+	SP_UNUSED(add);
 
 	Slot *slot = skeleton.getSlots()[getSlotIndex()];
 	if (!slot->getBone().isActive()) return;
@@ -90,14 +92,14 @@ void SequenceTimeline::apply(Skeleton &skeleton, float lastTime, float time, Arr
 	if (((Attachment *) _attachment)->getRTTI().instanceOf(MeshAttachment::rtti)) sequence = &((MeshAttachment *) _attachment)->getSequence();
 	if (!sequence) return;
 
-	if (direction == MixDirection_Out) {
-		if (blend == MixBlend_Setup) pose.setSequenceIndex(-1);
+	if (out) {
+		if (fromSetup) pose.setSequenceIndex(-1);
 		return;
 	}
 
 	Array<float> &frames = this->_frames;
 	if (time < frames[0]) {
-		if (blend == MixBlend_Setup || blend == MixBlend_First) pose.setSequenceIndex(-1);
+		if (fromSetup) pose.setSequenceIndex(-1);
 		return;
 	}
 

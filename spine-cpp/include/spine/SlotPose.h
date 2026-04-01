@@ -40,6 +40,7 @@ namespace spine {
 	class Attachment;
 	class VertexAttachment;
 
+	/// Stores a slot's pose.
 	class SP_API SlotPose : public Pose<SlotPose> {
 		friend class Slot;
 		friend class SlotCurveTimeline;
@@ -68,8 +69,8 @@ namespace spine {
 
 		virtual void set(SlotPose &pose) override;
 
-		/// The color used to tint the slot's attachment. If getDarkColor() is set, this is used as the light color for two
-		/// color tinting.
+		/// The color used to tint the slot's attachment. If a dark color is set, this is used as the light color for two color
+		/// tinting.
 		Color &getColor();
 
 		/// The dark color used to tint the slot's attachment for two color tinting. The dark

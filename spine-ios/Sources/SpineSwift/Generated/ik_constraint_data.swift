@@ -70,8 +70,8 @@ public class IkConstraintData: PosedData, ConstraintData {
         }
     }
 
-    /// When true and IkConstraintPose compress or stretch is used, the bone is scaled on both the X
-    /// and Y axes.
+    /// When true and IkConstraintPose::getCompress() or IkConstraintPose::getStretch() is used, the
+    /// bone is scaled on both the X and Y axes.
     public var uniform: Bool {
         get {
             let result = spine_ik_constraint_data_get_uniform(_ptr.assumingMemoryBound(to: spine_ik_constraint_data_wrapper.self))
@@ -82,6 +82,7 @@ public class IkConstraintData: PosedData, ConstraintData {
         }
     }
 
+    /// The setup pose that most animations are relative to.
     public var setupPose: IkConstraintPose {
         let result = spine_ik_constraint_data_get_setup_pose(_ptr.assumingMemoryBound(to: spine_ik_constraint_data_wrapper.self))
         return IkConstraintPose(fromPointer: result!)

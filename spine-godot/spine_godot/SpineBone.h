@@ -31,7 +31,6 @@
 
 #include "SpineCommon.h"
 #include "SpineBoneData.h"
-#include "SpineBoneLocal.h"
 #include "SpineBonePose.h"
 #include "SpineConstant.h"
 #ifdef SPINE_GODOT_EXTENSION
@@ -71,7 +70,7 @@ public:
 
 	Array get_children();
 
-	Ref<SpineBoneLocal> get_pose();
+	Ref<SpineBonePose> get_pose();
 
 	Ref<SpineBonePose> get_applied_pose();
 

@@ -82,13 +82,13 @@ namespace spine {
 		/// Returns the interpolated value for the specified time.
 		float getCurveValue(float time);
 
-		float getRelativeValue(float time, float alpha, MixBlend blend, float current, float setup);
+		float getRelativeValue(float time, float alpha, bool fromSetup, bool add, float current, float setup);
 
-		float getAbsoluteValue(float time, float alpha, MixBlend blend, float current, float setup);
+		float getAbsoluteValue(float time, float alpha, bool fromSetup, bool add, float current, float setup);
 
-		float getAbsoluteValue(float time, float alpha, MixBlend blend, float current, float setup, float value);
+		float getAbsoluteValue(float time, float alpha, bool fromSetup, bool add, float current, float setup, float value);
 
-		float getScaleValue(float time, float alpha, MixBlend blend, MixDirection direction, float current, float setup);
+		float getScaleValue(float time, float alpha, bool fromSetup, bool add, bool out, float current, float setup);
 
 	protected:
 		static const int ENTRIES = 2;

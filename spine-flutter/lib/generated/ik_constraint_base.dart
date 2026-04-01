@@ -58,21 +58,30 @@ abstract class IkConstraintBase extends PosedActive implements Posed, Constraint
     return IkConstraintData.fromPointer(result);
   }
 
+  /// The unconstrained pose for this object, set by animations and application
+  /// code.
   IkConstraintPose get pose {
     final result = SpineBindings.bindings.spine_ik_constraint_base_get_pose(_ptr);
     return IkConstraintPose.fromPointer(result);
   }
 
+  /// The pose to use for rendering. If no constraints modify this pose, this is
+  /// the same as getPose(). Otherwise it is a copy of getPose() modified by
+  /// constraints.
   IkConstraintPose get appliedPose {
     final result = SpineBindings.bindings.spine_ik_constraint_base_get_applied_pose(_ptr);
     return IkConstraintPose.fromPointer(result);
   }
 
+  /// Sets the constrained pose to the unconstrained pose, as a starting point
+  /// for constraints to be applied.
   @override
   void resetConstrained() {
     SpineBindings.bindings.spine_ik_constraint_base_reset_constrained(_ptr);
   }
 
+  /// Sets the applied pose to the constrained pose, in anticipation of the
+  /// applied pose being modified by constraints.
   @override
   void constrained() {
     SpineBindings.bindings.spine_ik_constraint_base_constrained(_ptr);

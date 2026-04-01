@@ -116,8 +116,9 @@ class IkConstraintData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_ik_constraint_data_set_target(_ptr, value.nativePtr.cast());
   }
 
-  /// When true and IkConstraintPose compress or stretch is used, the bone is
-  /// scaled on both the X and Y axes.
+  /// When true and IkConstraintPose::getCompress() or
+  /// IkConstraintPose::getStretch() is used, the bone is scaled on both the X
+  /// and Y axes.
   bool get uniform {
     final result = SpineBindings.bindings.spine_ik_constraint_data_get_uniform(_ptr);
     return result;
@@ -127,6 +128,7 @@ class IkConstraintData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_ik_constraint_data_set_uniform(_ptr, value);
   }
 
+  /// The setup pose that most animations are relative to.
   IkConstraintPose get setupPose {
     final result = SpineBindings.bindings.spine_ik_constraint_data_get_setup_pose(_ptr);
     return IkConstraintPose.fromPointer(result);

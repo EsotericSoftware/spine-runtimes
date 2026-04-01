@@ -83,25 +83,16 @@ public class TrackEntry: NSObject {
         }
     }
 
-    /// If true, when mixing from the previous animation to this animation, the previous animation
-    /// is applied as normal instead of being mixed out.
-    ///
-    /// When mixing between animations that key the same property, if a lower track also keys that
-    /// property then the value will briefly dip toward the lower track value during the mix. This
-    /// happens because the first animation mixes from 100% to 0% while the second animation mixes
-    /// from 0% to 100%. Setting holdPrevious to true applies the first animation at 100% during the
-    /// mix so the lower track value is overwritten. Such dipping does not occur on the lowest track
-    /// which keys the property, only when a higher track also keys the property.
-    ///
-    /// Snapping will occur if holdPrevious is true and this animation does not key all the same
-    /// properties as the previous animation.
-    public var holdPrevious: Bool {
+    /// When true, timelines in this animation that support additive have their values added to the
+    /// setup or current pose values instead of replacing them. Additive can be set for a new track
+    /// entry only before AnimationState::apply() is next called.
+    public var additive: Bool {
         get {
-            let result = spine_track_entry_get_hold_previous(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))
+            let result = spine_track_entry_get_additive(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))
             return result
         }
         set {
-            spine_track_entry_set_hold_previous(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self), newValue)
+            spine_track_entry_set_additive(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self), newValue)
         }
     }
 
@@ -126,15 +117,15 @@ public class TrackEntry: NSObject {
     }
 
     /// Seconds to postpone playing the animation. Must be >= 0. When this track entry is the
-    /// current track entry, delay postpones incrementing the getTrackTime(). When this track entry
-    /// is queued, delay is the time from the start of the previous animation to when this track
-    /// entry will become the current track entry (ie when the previous track entry getTrackTime()
-    /// >= this track entry's delay).
+    /// current track entry, delay postpones incrementing the track time. When this track entry is
+    /// queued, delay is the time from the start of the previous animation to when this track entry
+    /// will become the current track entry (ie when the previous track entry's track time >= this
+    /// track entry's delay).
     ///
-    /// getTimeScale() affects the delay.
+    /// Time scale affects the delay.
     ///
-    /// When passing delay < = 0 to AnimationState::addAnimation(int, Animation, bool, float) this
-    /// delay is set using a mix duration from AnimationStateData. To change the getMixDuration()
+    /// When passing delay < = 0 to AnimationState::addAnimation(int, Animation, bool, float), this
+    /// delay is set using a mix duration from AnimationStateData. To change the mix duration
     /// afterward, use setMixDuration(float, float) so this delay is adjusted.
     public var delay: Float {
         get {
@@ -219,12 +210,12 @@ public class TrackEntry: NSObject {
         }
     }
 
-    /// Uses getTrackTime() to compute the animationTime. When the trackTime is 0, the animationTime
-    /// is equal to the animationStart time.
+    /// Uses the track time to compute animationTime. When trackTime is 0, animationTime is equal to
+    /// animationStart.
     ///
-    /// The animationTime is between getAnimationStart() and getAnimationEnd(), except if this track
-    /// entry is non-looping and getAnimationEnd() is >= to the animation duration, then
-    /// animationTime continues to increase past getAnimationEnd().
+    /// animationTime is between animationStart and animationEnd, except if this track entry is
+    /// non-looping and animationEnd is >= the animation duration, then animationTime continues to
+    /// increase past animationEnd.
     public var animationTime: Float {
         let result = spine_track_entry_get_animation_time(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))
         return result
@@ -233,16 +224,16 @@ public class TrackEntry: NSObject {
     /// Multiplier for the delta time when this track entry is updated, causing time for this
     /// animation to pass slower or faster. Defaults to 1.
     ///
-    /// Values < 0 are not supported. To play an animation in reverse, use getReverse().
+    /// Values < 0 are not supported. To play an animation in reverse, use reverse.
     ///
-    /// getMixTime() is not affected by track entry time scale, so getMixDuration() may need to be
-    /// adjusted to match the animation speed.
+    /// mixTime is not affected by track entry time scale, so mixDuration may need to be adjusted to
+    /// match the animation speed.
     ///
-    /// When using AnimationState::addAnimation(int, Animation, bool, float) with a delay < = 0, the
-    /// getDelay() is set using the mix duration from the AnimationStateData, assuming time scale to
-    /// be 1. If the time scale is not 1, the delay may need to be adjusted.
+    /// When using AnimationState::addAnimation(int, Animation, bool, float) with a delay < = 0,
+    /// delay is set using the mix duration from AnimationStateData, assuming time scale to be 1. If
+    /// the time scale is not 1, the delay may need to be adjusted.
     ///
-    /// See AnimationState getTimeScale() for affecting all animations.
+    /// See AnimationState::getTimeScale() for affecting all animations.
     public var timeScale: Float {
         get {
             let result = spine_track_entry_get_time_scale(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))
@@ -295,7 +286,7 @@ public class TrackEntry: NSObject {
         }
     }
 
-    /// When getAlpha() is greater than alphaAttachmentThreshold, attachment timelines are applied.
+    /// When alpha is greater than alphaAttachmentThreshold, attachment timelines are applied.
     /// Defaults to 0, so attachment timelines are always applied.
     public var alphaAttachmentThreshold: Float {
         get {
@@ -333,7 +324,7 @@ public class TrackEntry: NSObject {
     }
 
     /// Seconds from 0 to the mix duration when mixing from the previous animation to this
-    /// animation. May be slightly more than TrackEntry.MixDuration when the mix is complete.
+    /// animation. May be slightly more than mixDuration when the mix is complete.
     public var mixTime: Float {
         get {
             let result = spine_track_entry_get_mix_time(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))
@@ -358,27 +349,16 @@ public class TrackEntry: NSObject {
         return result
     }
 
-    public var mixBlend: MixBlend {
-        get {
-            let result = spine_track_entry_get_mix_blend(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))
-            return MixBlend(rawValue: Int32(result.rawValue))!
-        }
-        set {
-            spine_track_entry_set_mix_blend(
-                _ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self), spine_mix_blend(rawValue: UInt32(newValue.rawValue)))
-        }
-    }
-
-    /// The track entry for the previous animation when mixing from the previous animation to this
-    /// animation, or NULL if no mixing is currently occuring. When mixing from multiple animations,
-    /// MixingFrom makes up a double linked list with MixingTo.
+    /// The track entry for the previous animation when mixing to this animation, or NULL if no
+    /// mixing is currently occurring. When mixing from multiple animations, MixingFrom makes up a
+    /// doubly linked list with MixingTo.
     public var mixingFrom: TrackEntry? {
         let result = spine_track_entry_get_mixing_from(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))
         return result.map { TrackEntry(fromPointer: $0) }
     }
 
     /// The track entry for the next animation when mixing from this animation, or NULL if no mixing
-    /// is currently occuring. When mixing from multiple animations, MixingTo makes up a double
+    /// is currently occurring. When mixing to multiple animations, MixingTo makes up a doubly
     /// linked list with MixingFrom.
     public var mixingTo: TrackEntry? {
         let result = spine_track_entry_get_mixing_to(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))
@@ -404,8 +384,8 @@ public class TrackEntry: NSObject {
         return result
     }
 
-    /// Returns true if there is a getNext() track entry that is ready to become the current track
-    /// entry during the next AnimationState::update(float)}
+    /// Returns true if there is a next track entry that is ready to become the current track entry
+    /// during the next AnimationState::update(float)}
     public var isNextReady: Bool {
         let result = spine_track_entry_is_next_ready(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))
         return result
@@ -450,9 +430,9 @@ public class TrackEntry: NSObject {
         spine_track_entry_reset_rotation_directions(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))
     }
 
-    /// Sets both getMixDuration() and getDelay().
+    /// Sets both mixDuration and delay.
     ///
-    /// - Parameter delay: If > 0, sets TrackEntry::getDelay(). If < = 0, the delay set is the duration of the previous track entry minus the specified mix duration plus the specified delay (ie the mix ends at (delay = 0) or before (delay < 0) the previous track entry duration). If the previous entry is looping, its next loop completion is used instead of its duration.
+    /// - Parameter delay: If > 0, sets delay. If < = 0, the delay set is the duration of the previous track entry minus the specified mix duration plus the specified delay (ie the mix ends at (delay = 0) or before (delay < 0) the previous track entry duration). If the previous entry is looping, its next loop completion is used instead of its duration.
     public func setMixDuration2(_ mixDuration: Float, _ delay: Float) {
         spine_track_entry_set_mix_duration_2(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self), mixDuration, delay)
     }

@@ -22,10 +22,9 @@ void spine_inherit_timeline_set_frame(spine_inherit_timeline self, int frame, fl
 }
 
 void spine_inherit_timeline_apply(spine_inherit_timeline self, spine_skeleton skeleton, float lastTime, float time,
-								  /*@null*/ spine_array_event events, float alpha, spine_mix_blend blend, spine_mix_direction direction,
-								  bool appliedPose) {
+								  /*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
 	InheritTimeline *_self = (InheritTimeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixBlend) blend, (MixDirection) direction, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
 }
 
 int spine_inherit_timeline_get_bone_index(spine_inherit_timeline self) {
@@ -36,6 +35,16 @@ int spine_inherit_timeline_get_bone_index(spine_inherit_timeline self) {
 void spine_inherit_timeline_set_bone_index(spine_inherit_timeline self, int inValue) {
 	InheritTimeline *_self = (InheritTimeline *) self;
 	_self->setBoneIndex(inValue);
+}
+
+bool spine_inherit_timeline_get_additive(spine_inherit_timeline self) {
+	InheritTimeline *_self = (InheritTimeline *) self;
+	return _self->getAdditive();
+}
+
+bool spine_inherit_timeline_get_instant(spine_inherit_timeline self) {
+	InheritTimeline *_self = (InheritTimeline *) self;
+	return _self->getInstant();
 }
 
 size_t spine_inherit_timeline_get_frame_entries(spine_inherit_timeline self) {

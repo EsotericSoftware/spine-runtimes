@@ -15,17 +15,26 @@ SPINE_C_API void spine_draw_order_timeline_dispose(spine_draw_order_timeline sel
 
 SPINE_C_API spine_rtti spine_draw_order_timeline_get_rtti(spine_draw_order_timeline self);
 SPINE_C_API void spine_draw_order_timeline_apply(spine_draw_order_timeline self, spine_skeleton skeleton, float lastTime, float time,
-												 /*@null*/ spine_array_event events, float alpha, spine_mix_blend blend,
-												 spine_mix_direction direction, bool appliedPose);
+												 /*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out,
+												 bool appliedPose);
 SPINE_C_API size_t spine_draw_order_timeline_get_frame_count(spine_draw_order_timeline self);
 /**
  * Sets the time and draw order for the specified frame.
  *
  * @param frame Between 0 and frameCount, inclusive.
  * @param time The frame time in seconds.
- * @param drawOrder For each slot in Skeleton::slots, the index of the slot in the new draw order. May be null to use setup pose draw order.
+ * @param drawOrder For each slot in Skeleton::getSlots(), the index of the slot in the new draw order. May be null to use setup pose draw order.
  */
 SPINE_C_API void spine_draw_order_timeline_set_frame(spine_draw_order_timeline self, size_t frame, float time, /*@null*/ spine_array_int drawOrder);
+/**
+ * True if this timeline supports additive blending.
+ */
+SPINE_C_API bool spine_draw_order_timeline_get_additive(spine_draw_order_timeline self);
+/**
+ * True if this timeline sets values instantaneously and does not support
+ * interpolation between frames.
+ */
+SPINE_C_API bool spine_draw_order_timeline_get_instant(spine_draw_order_timeline self);
 SPINE_C_API size_t spine_draw_order_timeline_get_frame_entries(spine_draw_order_timeline self);
 SPINE_C_API spine_array_float spine_draw_order_timeline_get_frames(spine_draw_order_timeline self);
 SPINE_C_API float spine_draw_order_timeline_get_duration(spine_draw_order_timeline self);

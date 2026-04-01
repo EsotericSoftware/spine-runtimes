@@ -57,16 +57,11 @@ class RGBATimeline extends SlotCurveTimeline {
 		frames[frame + A] = a;
 	}
 
-	public function apply1(slot:Slot, pose:SlotPose, time:Float, alpha:Float, blend:MixBlend) {
+	public function apply1(slot:Slot, pose:SlotPose, time:Float, alpha:Float, fromSetup:Bool, add:Bool) {
 		var color = pose.color;
 		if (time < frames[0]) {
-			var setup:Color = slot.data.setup.color;
-			switch (blend) {
-				case MixBlend.setup:
-					color.setFromColor(setup);
-				case MixBlend.first:
-					color.add((setup.r - color.r) * alpha, (setup.g - color.g) * alpha, (setup.b - color.b) * alpha, (setup.a - color.a) * alpha);
-			}
+			if (fromSetup)
+				color.setFromColor(slot.data.setupPose.color);
 			return;
 		}
 
@@ -100,10 +95,13 @@ class RGBATimeline extends SlotCurveTimeline {
 		if (alpha == 1)
 			color.set(r, g, b, a);
 		else {
-			if (blend == MixBlend.setup) {
-				var setup = slot.data.setup.color;
-				color.set(setup.r + (r - setup.r) * alpha, setup.g + (g - setup.g) * alpha, setup.b + (b - setup.b) * alpha,
-					setup.a + (a - setup.a) * alpha);
+			if (fromSetup) {
+				var setup = slot.data.setupPose.color;
+				color.set(setup.r
+					+ (r - setup.r) * alpha, setup.g
+					+ (g - setup.g) * alpha, setup.b
+					+ (b - setup.b) * alpha, setup.a
+					+ (a - setup.a) * alpha);
 			} else
 				color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
 		}

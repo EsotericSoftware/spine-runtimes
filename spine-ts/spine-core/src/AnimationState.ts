@@ -29,7 +29,7 @@
 
 /** biome-ignore-all lint/style/noNonNullAssertion: reference runtime expects some nullable to not be null */
 
-import { Animation, AttachmentTimeline, DrawOrderFolderTimeline, DrawOrderTimeline, EventTimeline, MixBlend, MixDirection, RotateTimeline, Timeline } from "./Animation.js";
+import { Animation, AttachmentTimeline, DrawOrderFolderTimeline, DrawOrderTimeline, RotateTimeline, Timeline } from "./Animation.js";
 import type { AnimationStateData } from "./AnimationStateData.js";
 import type { Event } from "./Event.js";
 import type { Skeleton } from "./Skeleton.js";
@@ -40,27 +40,27 @@ import { MathUtils, Pool, StringSet, Utils } from "./Utils.js";
 /** Applies animations over time, queues animations for later playback, mixes (crossfading) between animations, and applies
  * multiple animations on top of each other (layering).
  *
- * See [Applying Animations](http://esotericsoftware.com/spine-applying-animations/) in the Spine Runtimes Guide. */
+ * See [Applying Animations](http://esotericsoftware.com/spine-applying-animations#AnimationState-API) in the Spine Runtimes Guide. */
 export class AnimationState {
 	static readonly emptyAnimation = new Animation("<empty>", [], 0);
 
 	/** The AnimationStateData to look up mix durations. */
 	data: AnimationStateData;
 
-	/** The list of tracks that currently have animations, which may contain null entries. */
+	/** The list of tracks that have had animations. May contain null entries for tracks that currently have no animation. */
 	readonly tracks = [] as (TrackEntry | null)[];
 
 	/** Multiplier for the delta time when the animation state is updated, causing time for all animations and mixes to play slower
 	 * or faster. Defaults to 1.
 	 *
-	 * See TrackEntry {@link TrackEntry#timeScale} for affecting a single animation. */
+	 * See {@link TrackEntry.timeScale} to affect a single animation. */
 	timeScale = 1;
 	unkeyedState = 0;
 
 	readonly events = [] as Event[];
 	readonly listeners = [] as AnimationStateListener[];
 	queue = new EventQueue(this);
-	propertyIDs = new StringSet();
+	propertyIds = new StringSet();
 	animationsChanged = false;
 
 	trackEntryPool = new Pool<TrackEntry>(() => new TrackEntry());
@@ -69,7 +69,7 @@ export class AnimationState {
 		this.data = data;
 	}
 
-	/** Increments each track entry {@link TrackEntry#trackTime()}, setting queued animations as current if needed. */
+	/** Increments each track entry {@link TrackEntry.trackTime}, setting queued animations as current if needed. */
 	update (delta: number) {
 		delta *= this.timeScale;
 		const tracks = this.tracks;
@@ -143,7 +143,10 @@ export class AnimationState {
 			if (from.totalAlpha === 0 || to.mixDuration === 0) {
 				to.mixingFrom = from.mixingFrom;
 				if (from.mixingFrom != null) from.mixingFrom.mixingTo = to;
-				to.interruptAlpha = from.interruptAlpha;
+				if (from.totalAlpha === 0) {
+					for (let next = to; next.mixingTo != null; next = next.mixingTo)
+						next.keepHold = true;
+				}
 				this.queue.end(from);
 			}
 			return finished;
@@ -154,8 +157,8 @@ export class AnimationState {
 		return false;
 	}
 
-	/** Poses the skeleton using the track entry animations. There are no side effects other than invoking listeners, so the
-	 * animation state can be applied to multiple skeletons to pose them identically.
+	/** Poses the skeleton using the track entry animations. The animation state is not changed, so can be applied to multiple
+	 * skeletons to pose them identically.
 	 * @returns True if any animations were applied. */
 	apply (skeleton: Skeleton): boolean {
 		if (!skeleton) throw new Error("skeleton cannot be null.");
@@ -169,16 +172,13 @@ export class AnimationState {
 			const current = tracks[i];
 			if (!current || current.delay > 0) continue;
 			applied = true;
-			const blend: MixBlend = i === 0 ? MixBlend.first : current.mixBlend;
 
 			// Apply mixing from entries first.
 			let alpha = current.alpha;
 			if (current.mixingFrom)
-				alpha *= this.applyMixingFrom(current, skeleton, blend);
+				alpha *= this.applyMixingFrom(current, skeleton);
 			else if (current.trackTime >= current.trackEnd && !current.next)
 				alpha = 0;
-			let attachments = alpha >= current.alphaAttachmentThreshold;
-
 
 			// Apply current entry.
 			let animationLast = current.animationLast, animationTime = current.getAnimationTime(), applyTime = animationTime;
@@ -189,37 +189,36 @@ export class AnimationState {
 			}
 			const timelines = current.animation!.timelines;
 			const timelineCount = timelines.length;
-			if ((i === 0 && alpha === 1) || blend === MixBlend.add) {
-				if (i === 0) attachments = true;
+			if ((i === 0 && alpha === 1)) {
 				for (let ii = 0; ii < timelineCount; ii++) {
 					// Fixes issue #302 on IOS9 where mix, blend sometimes became undefined and caused assets
 					// to sometimes stop rendering when using color correction, as their RGBA values become NaN.
 					// (https://github.com/pixijs/pixi-spine/issues/302)
-					Utils.webkit602BugfixHelper(alpha, blend);
+					Utils.webkit602BugfixHelper(alpha);
 					const timeline = timelines[ii];
 					if (timeline instanceof AttachmentTimeline)
-						this.applyAttachmentTimeline(timeline, skeleton, applyTime, blend, false, attachments);
+						this.applyAttachmentTimeline(timeline, skeleton, applyTime, true, false, true);
 					else
-						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, blend, MixDirection.in, false);
+						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, true, false, false, false);
 				}
 			} else {
 				const timelineMode = current.timelineMode;
-
-				const shortestRotation = current.shortestRotation;
+				const attachments = alpha >= current.alphaAttachmentThreshold;
+				const add = current.additive, shortestRotation = add || current.shortestRotation;
 				const firstFrame = !shortestRotation && current.timelinesRotation.length !== timelineCount << 1;
 				if (firstFrame) current.timelinesRotation.length = timelineCount << 1;
 
 				for (let ii = 0; ii < timelineCount; ii++) {
 					const timeline = timelines[ii];
-					const timelineBlend = timelineMode[ii] === SUBSEQUENT ? blend : MixBlend.setup;
+					const fromSetup = (timelineMode[ii] & FIRST) !== 0;
 					if (!shortestRotation && timeline instanceof RotateTimeline) {
-						this.applyRotateTimeline(timeline, skeleton, applyTime, alpha, timelineBlend, current.timelinesRotation, ii << 1, firstFrame);
+						this.applyRotateTimeline(timeline, skeleton, applyTime, alpha, fromSetup, current.timelinesRotation, ii << 1, firstFrame);
 					} else if (timeline instanceof AttachmentTimeline) {
-						this.applyAttachmentTimeline(timeline, skeleton, applyTime, blend, false, attachments);
+						this.applyAttachmentTimeline(timeline, skeleton, applyTime, fromSetup, false, attachments);
 					} else {
 						// This fixes the WebKit 602 specific issue described at https://esotericsoftware.com/forum/d/10109-ios-10-disappearing-graphics
-						Utils.webkit602BugfixHelper(alpha, blend);
-						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, timelineBlend, MixDirection.in, false);
+						Utils.webkit602BugfixHelper(alpha);
+						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, fromSetup, add, false, false);
 					}
 				}
 			}
@@ -247,106 +246,77 @@ export class AnimationState {
 		return applied;
 	}
 
-	applyMixingFrom (to: TrackEntry, skeleton: Skeleton, blend: MixBlend) {
+	applyMixingFrom (to: TrackEntry, skeleton: Skeleton) {
 		const from = to.mixingFrom!;
-		if (from.mixingFrom) this.applyMixingFrom(from, skeleton, blend);
+		const fromMix = from.mixingFrom !== null ? this.applyMixingFrom(from, skeleton) : 1;
+		const mix: number = to.mixDuration === 0 ? 1 : Math.min(1, to.mixTime / to.mixDuration);
 
-		let mix = 0;
-		if (to.mixDuration === 0) { // Single frame mix to undo mixingFrom changes.
-			mix = 1;
-			if (blend === MixBlend.first) blend = MixBlend.setup;
-		} else {
-			mix = to.mixTime / to.mixDuration;
-			if (mix > 1) mix = 1;
-			if (blend !== MixBlend.first) blend = from.mixBlend;
-		}
+		const a = from.alpha * fromMix, keep = 1 - mix * to.alpha;
+		const alphaMix = a * (1 - mix), alphaHold = keep > 0 ? alphaMix / keep : a;
 
-		const attachments = mix < from.mixAttachmentThreshold, drawOrder = mix < from.mixDrawOrderThreshold;
 		const timelines = from.animation!.timelines;
 		const timelineCount = timelines.length;
-		const alphaHold = from.alpha * to.interruptAlpha, alphaMix = alphaHold * (1 - mix);
+		const timelineMode = from.timelineMode;
+		const timelineHoldMix = from.timelineHoldMix;
+
+		const attachments = mix < from.mixAttachmentThreshold, drawOrder = mix < from.mixDrawOrderThreshold;
+		const add = from.additive, shortestRotation = add || from.shortestRotation;
+		const firstFrame = !shortestRotation && from.timelinesRotation.length !== timelineCount << 1;
+		if (firstFrame) from.timelinesRotation.length = timelineCount << 1;
+		const timelinesRotation = from.timelinesRotation;
+
 		let animationLast = from.animationLast, animationTime = from.getAnimationTime(), applyTime = animationTime;
 		let events = null;
 		if (from.reverse)
 			applyTime = from.animation!.duration - applyTime;
-		else if (mix < from.eventThreshold)
+		else if (mix < from.eventThreshold) //
 			events = this.events;
 
-		if (blend === MixBlend.add) {
-			for (let i = 0; i < timelineCount; i++)
-				timelines[i].apply(skeleton, animationLast, applyTime, events, alphaMix, blend, MixDirection.out, false);
-		} else {
-			const timelineMode = from.timelineMode;
-			const timelineHoldMix = from.timelineHoldMix;
+		from.totalAlpha = 0;
 
-			const shortestRotation = from.shortestRotation;
-			const firstFrame = !shortestRotation && from.timelinesRotation.length !== timelineCount << 1;
-			if (firstFrame) from.timelinesRotation.length = timelineCount << 1;
-
-			from.totalAlpha = 0;
-			for (let i = 0; i < timelineCount; i++) {
-				const timeline = timelines[i];
-				let timelineBlend: MixBlend;
-				let alpha = 0;
-				switch (timelineMode[i]) {
-					case SUBSEQUENT:
-						if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
-						timelineBlend = blend;
-						alpha = alphaMix;
-						break;
-					case FIRST:
-						timelineBlend = MixBlend.setup;
-						alpha = alphaMix;
-						break;
-					case HOLD_SUBSEQUENT:
-						timelineBlend = blend;
-						alpha = alphaHold;
-						break;
-					case HOLD_FIRST:
-						timelineBlend = MixBlend.setup;
-						alpha = alphaHold;
-						break;
-					default: { // HOLD_MIX
-						timelineBlend = MixBlend.setup;
-						const holdMix = timelineHoldMix[i];
-						alpha = alphaHold * Math.max(0, 1 - holdMix.mixTime / holdMix.mixDuration);
-						break;
-					}
-				}
-				from.totalAlpha += alpha;
-
-				if (!shortestRotation && timeline instanceof RotateTimeline)
-					this.applyRotateTimeline(timeline, skeleton, applyTime, alpha, timelineBlend, from.timelinesRotation, i << 1, firstFrame);
-				else if (timeline instanceof AttachmentTimeline)
-					this.applyAttachmentTimeline(timeline, skeleton, applyTime, timelineBlend, true, attachments && alpha >= from.alphaAttachmentThreshold);
-				else {
-					let direction = MixDirection.out;
-					// This fixes the WebKit 602 specific issue described at https://esotericsoftware.com/forum/d/10109-ios-10-disappearing-graphics
-					Utils.webkit602BugfixHelper(alpha, blend);
-					if (drawOrder && timeline instanceof DrawOrderTimeline && timelineBlend === MixBlend.setup)
-						direction = MixDirection.in;
-					timeline.apply(skeleton, animationLast, applyTime, events, alpha, timelineBlend, direction, false);
-				}
+		for (let i = 0; i < timelineCount; i++) {
+			const timeline = timelines[i];
+			const mode = timelineMode[i];
+			let alpha = 0;
+			if ((mode & HOLD) !== 0) {
+				const holdMix = timelineHoldMix[i];
+				alpha = holdMix == null ? alphaHold : alphaHold * Math.max(0, 1 - holdMix.mixTime / holdMix.mixDuration);
+			} else {
+				if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
+				alpha = alphaMix;
+			}
+			from.totalAlpha += alpha;
+			const fromSetup = (mode & FIRST) !== 0;
+			if (!shortestRotation && timeline instanceof RotateTimeline) {
+				this.applyRotateTimeline(timeline, skeleton, applyTime, alpha, fromSetup, timelinesRotation, i << 1, firstFrame);
+			} else if (timeline instanceof AttachmentTimeline)
+				this.applyAttachmentTimeline(timeline, skeleton, applyTime, fromSetup, true,
+					attachments && alpha >= from.alphaAttachmentThreshold);
+			else {
+				const out = !drawOrder || !(timeline instanceof DrawOrderTimeline) || !fromSetup;
+				timeline.apply(skeleton, animationLast, applyTime, events, alpha, fromSetup, add, out, false);
 			}
 		}
 
 		if (to.mixDuration > 0) this.queueEvents(from, animationTime);
 		this.events.length = 0;
+
 		from.nextAnimationLast = animationTime;
 		from.nextTrackLast = from.trackTime;
-
 		return mix;
 	}
 
-	applyAttachmentTimeline (timeline: AttachmentTimeline, skeleton: Skeleton, time: number, blend: MixBlend, out: boolean, attachments: boolean) {
+	/** Applies the attachment timeline and sets {@link Slot.attachmentState}.
+	 * @param attachments False when: 1) the attachment timeline is mixing out, 2) mix < attachmentThreshold, and 3) the timeline
+	 * is not the last timeline to set the slot's attachment. In that case the timeline is applied only so subsequent
+	 * timelines see any deform. */
+	applyAttachmentTimeline (timeline: AttachmentTimeline, skeleton: Skeleton, time: number, fromSetup: boolean,
+		out: boolean, attachments: boolean) {
 		const slot = skeleton.slots[timeline.slotIndex];
 		if (!slot.bone.active) return;
 
-		if (out) {
-			if (blend === MixBlend.setup) this.setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
-		} else if (time < timeline.frames[0]) { // Time is before first frame.
-			if (blend === MixBlend.setup || blend === MixBlend.first)
-				this.setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
+		if (out || time < timeline.frames[0]) {
+			if (fromSetup) this.setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
 		} else
 			this.setAttachment(skeleton, slot, timeline.attachmentNames[Timeline.search(timeline.frames, time)], attachments);
 
@@ -359,37 +329,28 @@ export class AnimationState {
 		if (attachments) slot.attachmentState = this.unkeyedState + CURRENT;
 	}
 
-	applyRotateTimeline (timeline: RotateTimeline, skeleton: Skeleton, time: number, alpha: number, blend: MixBlend,
+	/** Applies the rotate timeline, mixing with the current pose while keeping the same rotation direction chosen as the shortest
+	 * the first time the mixing was applied. */
+	applyRotateTimeline (timeline: RotateTimeline, skeleton: Skeleton, time: number, alpha: number, fromSetup: boolean,
 		timelinesRotation: Array<number>, i: number, firstFrame: boolean) {
 
 		if (firstFrame) timelinesRotation[i] = 0;
 
 		if (alpha === 1) {
-			timeline.apply(skeleton, 0, time, null, 1, blend, MixDirection.in, false);
+			timeline.apply(skeleton, 0, time, null, 1, fromSetup, false, false, false);
 			return;
 		}
 
 		const bone = skeleton.bones[timeline.boneIndex];
 		if (!bone.active) return;
-		const pose = bone.pose, setup = bone.data.setup;
+		const pose = bone.pose, setup = bone.data.setupPose;
 		const frames = timeline.frames;
-		let r1 = 0, r2 = 0;
-		if (time < frames[0]) {
-			switch (blend) {
-				// biome-ignore lint/suspicious/noFallthroughSwitchClause: reference runtime does fall through
-				case MixBlend.setup:
-					pose.rotation = setup.rotation;
-				// biome-ignore lint/suspicious/useDefaultSwitchClauseLast: needed for fall through
-				default:
-					return;
-				case MixBlend.first:
-					r1 = pose.rotation;
-					r2 = setup.rotation;
-			}
-		} else {
-			r1 = blend === MixBlend.setup ? setup.rotation : pose.rotation;
-			r2 = setup.rotation + timeline.getCurveValue(time);
+		if (time < frames[0]) { // Time is before first frame.
+			if (fromSetup) pose.rotation = setup.rotation;
+			return;
 		}
+		const r1 = fromSetup ? setup.rotation : pose.rotation;
+		const r2 = setup.rotation + timeline.getCurveValue(time);
 
 		// Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.
 		let total = 0, diff = r2 - r1;
@@ -462,8 +423,8 @@ export class AnimationState {
 
 	/** Removes all animations from all tracks, leaving skeletons in their current pose.
 	 *
-	 * It may be desired to use {@link AnimationState#setEmptyAnimation()} to mix the skeletons back to the setup pose,
-	 * rather than leaving them in their current pose. */
+	 * Usually you want to use {@link setEmptyAnimations} to mix the skeletons back to the setup pose, rather than leaving
+	 * them in their current pose. */
 	clearTracks () {
 		const oldDrainDisabled = this.queue.drainDisabled;
 		this.queue.drainDisabled = true;
@@ -476,8 +437,8 @@ export class AnimationState {
 
 	/** Removes all animations from the track, leaving skeletons in their current pose.
 	 *
-	 * It may be desired to use {@link AnimationState#setEmptyAnimation()} to mix the skeletons back to the setup pose,
-	 * rather than leaving them in their current pose. */
+	 * Usually you want to use {@link setEmptyAnimation} to mix the skeletons back to the setup pose, rather than
+	 * leaving them in their current pose. */
 	clearTrack (trackIndex: number) {
 		if (trackIndex >= this.tracks.length) return;
 		const current = this.tracks[trackIndex];
@@ -513,10 +474,6 @@ export class AnimationState {
 			from.mixingTo = current;
 			current.mixTime = 0;
 
-			// Store the interrupted mix percentage.
-			if (from.mixingFrom && from.mixDuration > 0)
-				current.interruptAlpha *= Math.min(1, from.mixTime / from.mixDuration);
-
 			from.timelinesRotation.length = 0; // Reset rotation for mixing out, in case entry was mixed in.
 		}
 
@@ -551,13 +508,13 @@ export class AnimationState {
 	}
 
 	/** Sets the current animation for a track, discarding any queued animations.
-	 * <p>
+	 *
 	 * If the formerly current track entry is for the same animation and was never applied to a skeleton, it is replaced (not mixed
 	 * from).
 	 * @param loop If true, the animation will repeat. If false it will not, instead its last frame is applied if played beyond its
-	 *           duration. In either case {@link TrackEntry#getTrackEnd()} determines when the track is cleared.
+	 *           duration. In either case {@link TrackEntry.getTrackEnd} determines when the track is cleared.
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
-	 *         after the {@link AnimationStateListener#dispose(TrackEntry)} event occurs. */
+	 *         after the {@link AnimationStateListener.dispose} event occurs. */
 	private setAnimation2 (trackIndex: number, animation: Animation, loop: boolean = false) {
 		if (trackIndex < 0) throw new Error("trackIndex must be >= 0.");
 		if (!animation) throw new Error("animation cannot be null.");
@@ -589,8 +546,8 @@ export class AnimationState {
 	/** Adds an animation to be played after the current or last queued animation for a track. If the track has no entries, this is
 	 * equivalent to calling {@link setAnimation}.
 	 * @param delay If > 0, sets {@link TrackEntry.delay}. If <= 0, the delay set is the duration of the previous track entry
-	 *           minus any mix duration (from the {@link AnimationStateData}) plus the specified <code>delay</code> (ie the mix
-	 *           ends at (<code>delay</code> = 0) or before (<code>delay</code> < 0) the previous track entry duration). If the
+	 *           minus any mix duration (from {@link data}) plus the specified `delay` (ie the mix ends at (when
+	 *           `delay` = 0) or before (when `delay` < 0) the previous track entry duration). If the
 	 *           previous entry is looping, its next loop completion is used instead of its duration.
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
 	 *         after the {@link AnimationStateListener.dispose} event occurs. */
@@ -634,21 +591,21 @@ export class AnimationState {
 	}
 
 	/** Sets an empty animation for a track, discarding any queued animations, and sets the track entry's
-	 * {@link TrackEntry#mixduration}. An empty animation has no timelines and serves as a placeholder for mixing in or out.
+	 * {@link TrackEntry.mixduration}. An empty animation has no timelines and serves as a placeholder for mixing in or out.
 	 *
-	 * Mixing out is done by setting an empty animation with a mix duration using either {@link #setEmptyAnimation()},
-	 * {@link #setEmptyAnimations()}, or {@link #addEmptyAnimation()}. Mixing to an empty animation causes
+	 * Mixing out is done by setting an empty animation with a mix duration using either {@link setEmptyAnimation},
+	 * {@link setEmptyAnimations}, or {@link addEmptyAnimation}. Mixing to an empty animation causes
 	 * the previous animation to be applied less and less over the mix duration. Properties keyed in the previous animation
 	 * transition to the value from lower tracks or to the setup pose value if no lower tracks key the property. A mix duration of
-	 * 0 still mixes out over one frame.
+	 * 0 still needs to be applied one more time to mix out, so the properties it was animating are reverted.
 	 *
 	 * Mixing in is done by first setting an empty animation, then adding an animation using
-	 * {@link #addAnimation()} and on the returned track entry, set the
-	 * {@link TrackEntry#setMixDuration()}. Mixing from an empty animation causes the new animation to be applied more and
-	 * more over the mix duration. Properties keyed in the new animation transition from the value from lower tracks or from the
-	 * setup pose value if no lower tracks key the property to the value keyed in the new animation.
+	 * {@link addAnimation} with the desired delay (an empty animation has a duration of 0) and on
+	 * the returned track entry, set the {@link TrackEntry.setMixDuration}. Mixing from an empty animation causes the new
+	 * animation to be applied more and more over the mix duration. Properties keyed in the new animation transition from the value
+	 * from lower tracks or from the setup pose value if no lower tracks key the property to the value keyed in the new animation.
 	 *
-	 * See <a href='https://esotericsoftware.com/spine-applying-animations/#Empty-animations'>Empty animations</a> in the Spine
+	 * See <a href='https://esotericsoftware.com/spine-applying-animations#Empty-animations'>Empty animations</a> in the Spine
 	 * Runtimes Guide. */
 	setEmptyAnimation (trackIndex: number, mixDuration: number = 0) {
 		const entry = this.setAnimation(trackIndex, AnimationState.emptyAnimation, false);
@@ -658,18 +615,18 @@ export class AnimationState {
 	}
 
 	/** Adds an empty animation to be played after the current or last queued animation for a track, and sets the track entry's
-	 * {@link TrackEntry#getMixDuration()}. If the track has no entries, it is equivalent to calling
-	 * {@link #setEmptyAnimation(int, float)}.
+	 * {@link TrackEntry.mixDuration}. If the track has no entries, it is equivalent to calling
+	 * {@link setEmptyAnimation}.
 	 *
-	 * See {@link #setEmptyAnimation(int, float)} and
-	 * <a href='https://esotericsoftware.com/spine-applying-animations/#Empty-animations'>Empty animations</a> in the Spine
-	 * Runtimes Guide.
-	 * @param delay If > 0, sets {@link TrackEntry#getDelay()}. If <= 0, the delay set is the duration of the previous track entry
-	 *           minus any mix duration plus the specified <code>delay</code> (ie the mix ends at (<code>delay</code> = 0) or
-	 *           before (<code>delay</code> < 0) the previous track entry duration). If the previous entry is looping, its next
-	 *           loop completion is used instead of its duration.
+	 * See {@link setEmptyAnimation} and
+	 * <a href='https://esotericsoftware.com/spine-applying-animations#Empty-animations'>Empty animations</a> in the Spine Runtimes
+	 * Guide.
+	 * @param delay If > 0, sets {@link TrackEntry.delay}. If <= 0, the delay set is the duration of the previous track entry minus
+	 *           any mix duration plus the specified `delay` (ie the mix ends at (when `delay` = 0) or before
+	 *           (when `delay` < 0) the previous track entry duration). If the previous entry is looping, its next loop
+	 *           completion is used instead of its duration.
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
-	 *         after the {@link AnimationStateListener#dispose(TrackEntry)} event occurs. */
+	 *         after the {@link AnimationStateListener.dispose} event occurs. */
 	addEmptyAnimation (trackIndex: number, mixDuration: number = 0, delay: number = 0) {
 		const entry = this.addAnimation(trackIndex, AnimationState.emptyAnimation, false, delay);
 		if (delay <= 0) entry.delay = Math.max(entry.delay + entry.mixDuration - mixDuration, 0);
@@ -680,7 +637,7 @@ export class AnimationState {
 
 	/** Sets an empty animation for every track, discarding any queued animations, and mixes to it over the specified mix duration.
 	 *
-	 * See <a href='https://esotericsoftware.com/spine-applying-animations/#Empty-animations'>Empty animations</a> in the Spine
+	 * See <a href='https://esotericsoftware.com/spine-applying-animations#Empty-animations'>Empty animations</a> in the Spine
 	 * Runtimes Guide. */
 	setEmptyAnimations (mixDuration: number = 0) {
 		const oldDrainDisabled = this.queue.drainDisabled;
@@ -707,8 +664,8 @@ export class AnimationState {
 		entry.trackIndex = trackIndex;
 		entry.animation = animation;
 		entry.loop = loop;
-		entry.holdPrevious = false;
 
+		entry.additive = false;
 		entry.reverse = false;
 		entry.shortestRotation = false;
 
@@ -732,13 +689,12 @@ export class AnimationState {
 		entry.alpha = 1;
 		entry.mixTime = 0;
 		entry.mixDuration = !last ? 0 : this.data.getMix(last.animation!, animation);
-		entry.interruptAlpha = 1;
 		entry.totalAlpha = 0;
-		entry.mixBlend = MixBlend.replace;
+		entry.keepHold = false;
 		return entry;
 	}
 
-	/** Removes the {@link TrackEntry#getNext() next entry} and all entries after it for the specified entry. */
+	/** Removes {@link TrackEntry.next} and all entries after it for the specified entry. */
 	clearNext (entry: TrackEntry) {
 		let next = entry.next;
 		while (next) {
@@ -751,7 +707,6 @@ export class AnimationState {
 	_animationsChanged () {
 		this.animationsChanged = false;
 
-		this.propertyIDs.clear();
 		const tracks = this.tracks;
 		for (let i = 0, n = tracks.length; i < n; i++) {
 			let entry = tracks[i];
@@ -759,50 +714,60 @@ export class AnimationState {
 			while (entry.mixingFrom)
 				entry = entry.mixingFrom;
 			do {
-				if (!entry.mixingTo || entry.mixBlend !== MixBlend.add) this.computeHold(entry);
+				this.computeHold(entry);
 				entry = entry.mixingTo;
 			} while (entry);
 		}
+		this.propertyIds.clear();
 	}
 
 	computeHold (entry: TrackEntry) {
-		const to = entry.mixingTo;
 		const timelines = entry.animation!.timelines;
 		const timelinesCount = entry.animation!.timelines.length;
 		const timelineMode = entry.timelineMode;
 		timelineMode.length = timelinesCount;
 		const timelineHoldMix = entry.timelineHoldMix;
 		timelineHoldMix.length = 0;
-		const propertyIDs = this.propertyIDs;
-
-		if (to?.holdPrevious) {
-			for (let i = 0; i < timelinesCount; i++)
-				timelineMode[i] = propertyIDs.addAll(timelines[i].getPropertyIds()) ? HOLD_FIRST : HOLD_SUBSEQUENT;
-			return;
-		}
+		const propertyIds = this.propertyIds;
+		const add = entry.additive, keepHold = entry.keepHold;
+		const to = entry.mixingTo;
 
 		outer:
 		for (let i = 0; i < timelinesCount; i++) {
 			const timeline = timelines[i];
-			const ids = timeline.getPropertyIds();
-			if (!propertyIDs.addAll(ids))
-				timelineMode[i] = SUBSEQUENT;
-			else if (!to || timeline instanceof AttachmentTimeline || timeline instanceof DrawOrderTimeline
-				|| timeline instanceof DrawOrderFolderTimeline || timeline instanceof EventTimeline
-				|| !to.animation!.hasTimeline(ids)) {
-				timelineMode[i] = FIRST;
-			} else {
-				for (let next = to.mixingTo; next; next = next!.mixingTo) {
-					if (next.animation!.hasTimeline(ids)) continue;
-					if (entry.mixDuration > 0) {
-						timelineMode[i] = HOLD_MIX;
-						timelineHoldMix[i] = next;
-						continue outer;
-					}
-					break;
-				}
-				timelineMode[i] = HOLD_FIRST;
+			const ids = timeline.propertyIds;
+			const first = propertyIds.addAll(ids)
+				&& !(timeline instanceof DrawOrderFolderTimeline && propertyIds.contains(DrawOrderTimeline.propertyID));
+
+			if (add && timeline.additive) {
+				timelineMode[i] = first ? FIRST : SUBSEQUENT;
+				continue;
 			}
+
+			for (let from = entry.mixingFrom; from != null; from = from.mixingFrom) {
+				if (from.animation!.hasTimeline(ids)) {
+					// An earlier entry on this track keys this property, isolating it from lower tracks.
+					timelineMode[i] = SUBSEQUENT;
+					continue outer;
+				}
+			}
+
+			// Hold if the next entry will overwrite this property.
+			let mode: number;
+			if (to === null || timeline.instant || (to.additive && timeline.additive) || !to.animation?.hasTimeline(ids))
+				mode = first ? FIRST : SUBSEQUENT;
+			else {
+				mode = first ? HOLD_FIRST : HOLD;
+				// Find next entry that doesn't overwrite this property. Its mix fades out the hold, instead of it ending abruptly.
+				for (let next = to.mixingTo; next != null; next = next.mixingTo) {
+					if ((next.additive && timeline.additive) || !next.animation?.hasTimeline(ids)) {
+						if (next.mixDuration > 0) timelineHoldMix[i] = next;
+						break;
+					}
+				}
+			}
+			if (keepHold) mode = (mode & ~HOLD) | (timelineMode[i] & HOLD);
+			timelineMode[i] = mode;
 		}
 	}
 
@@ -818,13 +783,13 @@ export class AnimationState {
 		this.listeners.push(listener);
 	}
 
-	/** Removes the listener added with {@link #addListener()}. */
+	/** Removes the listener added with {@link addListener}. */
 	removeListener (listener: AnimationStateListener) {
 		const index = this.listeners.indexOf(listener);
 		if (index >= 0) this.listeners.splice(index, 1);
 	}
 
-	/** Removes all listeners added with {@link #addListener()}. */
+	/** Removes all listeners added with {@link addListener}. */
 	clearListeners () {
 		this.listeners.length = 0;
 	}
@@ -839,7 +804,7 @@ export class AnimationState {
 
 /** Stores settings and other state for the playback of an animation on an {@link AnimationState} track.
  *
- * References to a track entry must not be kept after the {@link AnimationStateListener#dispose()} event occurs. */
+ * References to a track entry must not be kept after the {@link AnimationStateListener.dispose} event occurs. */
 export class TrackEntry {
 	/** The animation to apply for this track entry. */
 	animation: Animation | null = null;
@@ -849,175 +814,190 @@ export class TrackEntry {
 	/** The animation queued to start after this animation, or null. `next` makes up a linked list. */
 	next: TrackEntry | null = null;
 
-	/** The track entry for the previous animation when mixing from the previous animation to this animation, or null if no
-	 * mixing is currently occuring. When mixing from multiple animations, `mixingFrom` makes up a linked list. */
+	/** The track entry for the previous animation when mixing to this animation, or null if no mixing is currently occurring.
+	 * When mixing from multiple animations, `mixingFrom` makes up a doubly linked list. */
 	mixingFrom: TrackEntry | null = null;
 
-	/** The track entry for the next animation when mixing from this animation to the next animation, or null if no mixing is
-	 * currently occuring. When mixing to multiple animations, `mixingTo` makes up a linked list. */
+	/** The track entry for the next animation when mixing from this animation, or null if no mixing is currently occurring.
+	 * When mixing to multiple animations, `mixingTo` makes up a doubly linked list. */
 	mixingTo: TrackEntry | null = null;
 
 	/** The listener for events generated by this track entry, or null.
 	 *
-	 * A track entry returned from {@link AnimationState#setAnimation()} is already the current animation
-	 * for the track, so the track entry listener {@link AnimationStateListener#start()} will not be called. */
+	 * A track entry returned from {@link AnimationState.setAnimation} is already the current animation
+	 * for the track, so the callback for listener {@link AnimationStateListener.start} will not be called. */
 	listener: AnimationStateListener | null = null;
 
 	/** The index of the track where this track entry is either current or queued.
 	 *
-	 * See {@link AnimationState#getCurrent()}. */
-	trackIndex: number = 0;
+	 * See {@link AnimationState.getCurrent}. */
+	trackIndex = 0;
 
 	/** If true, the animation will repeat. If false it will not, instead its last frame is applied if played beyond its
 	 * duration. */
-	loop: boolean = false;
+	loop = false;
 
-	/** If true, when mixing from the previous animation to this animation, the previous animation is applied as normal instead
-	 * of being mixed out.
+	/** When true, timelines in this animation that support additive have their values added to the setup or current pose values
+	 * instead of replacing them. Additive can be set for a new track entry only before {@link AnimationState.apply}
+	 * is next called. */
+	additive = false;
+
+	/** If true, the animation will be applied in reverse and events will not be fired. */
+	reverse = false;
+
+	/** If true, mixing rotation between tracks always uses the shortest rotation direction. If the rotation is animated, the
+	 * shortest rotation direction may change during the mix.
 	 *
-	 * When mixing between animations that key the same property, if a lower track also keys that property then the value will
-	 * briefly dip toward the lower track value during the mix. This happens because the first animation mixes from 100% to 0%
-	 * while the second animation mixes from 0% to 100%. Setting `holdPrevious` to true applies the first animation
-	 * at 100% during the mix so the lower track value is overwritten. Such dipping does not occur on the lowest track which
-	 * keys the property, only when a higher track also keys the property.
+	 * If false, the shortest rotation direction is remembered when the mix starts and the same direction is used for the rest
+	 * of the mix. Defaults to false.
 	 *
-	 * Snapping will occur if `holdPrevious` is true and this animation does not key all the same properties as the
-	 * previous animation. */
-	holdPrevious: boolean = false;
+	 * See {@link resetRotationDirections}. */
+	shortestRotation = false;
 
-	reverse: boolean = false;
+	keepHold = false;
 
-	shortestRotation: boolean = false;
+	/** When the mix percentage ({@link mixTime} / {@link mixDuration}) is less than the `eventThreshold`, event
+	 * timelines are applied while this animation is being mixed out. Defaults to 0, so event timelines are not applied while
+	 * this animation is being mixed out. */
+	eventThreshold = 0;
 
-	/** When the mix percentage ({@link #mixTime} / {@link #mixDuration}) is less than the
-	 * `eventThreshold`, event timelines are applied while this animation is being mixed out. Defaults to 0, so event
-	 * timelines are not applied while this animation is being mixed out. */
-	eventThreshold: number = 0;
+	/** When the mix percentage ({@link mixTime} / {@link mixDuration}) is less than the `mixAttachmentThreshold`,
+	 * attachment timelines are applied while this animation is being mixed out. Defaults to 0, so attachment timelines are not
+	 * applied while this animation is being mixed out. */
+	mixAttachmentThreshold = 0;
 
-	/** When the mix percentage ({@link #mixtime} / {@link #mixDuration}) is less than the
-	 * `attachmentThreshold`, attachment timelines are applied while this animation is being mixed out. Defaults to
-	 * 0, so attachment timelines are not applied while this animation is being mixed out. */
-	mixAttachmentThreshold: number = 0;
+	/** When the computed alpha is greater than `alphaAttachmentThreshold`, attachment timelines are applied. The
+	 * computed alpha includes {@link alpha} and the mix percentage. Defaults to 0, so attachment timelines are always
+	 * applied. */
+	alphaAttachmentThreshold = 0;
 
-	/** When {@link #getAlpha()} is greater than <code>alphaAttachmentThreshold</code>, attachment timelines are applied.
-	 * Defaults to 0, so attachment timelines are always applied. */
-	alphaAttachmentThreshold: number = 0;
-
-	/** When the mix percentage ({@link #getMixTime()} / {@link #getMixDuration()}) is less than the
-	 * <code>mixDrawOrderThreshold</code>, draw order timelines are applied while this animation is being mixed out. Defaults to
-	 * 0, so draw order timelines are not applied while this animation is being mixed out. */
-	mixDrawOrderThreshold: number = 0;
+	/** When the mix percentage ({@link mixTime} / {@link mixDuration}) is less than the `mixDrawOrderThreshold`,
+	 * draw order timelines are applied while this animation is being mixed out. Defaults to 0, so draw order timelines are not
+	 * applied while this animation is being mixed out. */
+	mixDrawOrderThreshold = 0;
 
 	/** Seconds when this animation starts, both initially and after looping. Defaults to 0.
 	 *
-	 * When changing the `animationStart` time, it often makes sense to set {@link #animationLast} to the same
-	 * value to prevent timeline keys before the start time from triggering. */
-	animationStart: number = 0;
+	 * When changing the `animationStart` time, it often makes sense to set {@link animationLast} to the same value
+	 * to prevent timeline keys before the start time from triggering. */
+	animationStart = 0;
 
 	/** Seconds for the last frame of this animation. Non-looping animations won't play past this time. Looping animations will
-	 * loop back to {@link #animationStart} at this time. Defaults to the animation {@link Animation#duration}. */
-	animationEnd: number = 0;
+	 * loop back to {@link animationStart} at this time. Defaults to the animation {@link Animation.duration}. */
+	animationEnd = 0;
 
 
 	/** The time in seconds this animation was last applied. Some timelines use this for one-time triggers. Eg, when this
 	 * animation is applied, event timelines will fire all events between the `animationLast` time (exclusive) and
 	 * `animationTime` (inclusive). Defaults to -1 to ensure triggers on frame 0 happen the first time this animation
 	 * is applied. */
-	animationLast: number = 0;
+	animationLast = 0;
 
-	nextAnimationLast: number = 0;
+	nextAnimationLast = 0;
 
-	/** Seconds to postpone playing the animation. When this track entry is the current track entry, `delay`
-	 * postpones incrementing the {@link #trackTime}. When this track entry is queued, `delay` is the time from
-	 * the start of the previous animation to when this track entry will become the current track entry (ie when the previous
-	 * track entry {@link TrackEntry#trackTime} >= this track entry's `delay`).
+	/** Seconds to postpone playing the animation. Must be >= 0. When this track entry is the current track entry,
+	 * `delay` postpones incrementing the {@link trackTime}. When this track entry is queued, `delay` is
+	 * the time from the start of the previous animation to when this track entry will become the current track entry (ie when
+	 * the previous track entry {@link trackTime} >= this track entry's `delay`).
 	 *
-	 * {@link #timeScale} affects the delay. */
-	delay: number = 0;
+	 * {@link timeScale} affects the delay.
+	 *
+	 * When passing `delay` <= 0 to {@link AnimationState.addAnimation} this
+	 * `delay` is set using a mix duration from {@link AnimationStateData}. To change the {@link mixDuration}
+	 * afterward, use {@link setMixDuration} so this `delay` is adjusted. */
+	delay = 0;
 
 	/** Current time in seconds this track entry has been the current track entry. The track time determines
-	 * {@link #animationTime}. The track time can be set to start the animation at a time other than 0, without affecting
+	 * {@link animationTime}. The track time can be set to start the animation at a time other than 0, without affecting
 	 * looping. */
-	trackTime: number = 0;
+	trackTime = 0;
 
-	trackLast: number = 0; nextTrackLast: number = 0;
+	trackLast = 0; nextTrackLast = 0;
 
 	/** The track time in seconds when this animation will be removed from the track. Defaults to the highest possible float
 	 * value, meaning the animation will be applied until a new animation is set or the track is cleared. If the track end time
 	 * is reached, no other animations are queued for playback, and mixing from any previous animations is complete, then the
 	 * properties keyed by the animation are set to the setup pose and the track is cleared.
 	 *
-	 * It may be desired to use {@link AnimationState#addEmptyAnimation()} rather than have the animation
+	 * Usually you want to use {@link AnimationState.addEmptyAnimation} rather than have the animation
 	 * abruptly cease being applied. */
-	trackEnd: number = 0;
+	trackEnd = 0;
 
 	/** Multiplier for the delta time when this track entry is updated, causing time for this animation to pass slower or
 	 * faster. Defaults to 1.
 	 *
-	 * {@link #mixTime} is not affected by track entry time scale, so {@link #mixDuration} may need to be adjusted to
-	 * match the animation speed.
+	 * Values < 0 are not supported. To play an animation in reverse, use {@link reverse}.
 	 *
-	 * When using {@link AnimationState#addAnimation()} with a `delay` <= 0, note the
-	 * {@link #delay} is set using the mix duration from the {@link AnimationStateData}, assuming time scale to be 1. If
-	 * the time scale is not 1, the delay may need to be adjusted.
+	 * {@link mixTime} is not affected by track entry time scale, so {@link mixDuration} may need to be adjusted to match the
+	 * animation speed.
 	 *
-	 * See AnimationState {@link AnimationState#timeScale} for affecting all animations. */
-	timeScale: number = 0;
+	 * When using {@link AnimationState.addAnimation} with a `delay` <= 0, the
+	 * {@link delay} is set using the mix duration from {@link AnimationState.data}, assuming time scale to be 1. If the time
+	 * scale is not 1, the delay may need to be adjusted.
+	 *
+	 * See {@link AnimationState.timeScale} to affect all animations. */
+	timeScale = 0;
 
-	/** Values < 1 mix this animation with the skeleton's current pose (usually the pose resulting from lower tracks). Defaults
-	 * to 1, which overwrites the skeleton's current pose with this animation.
+	/** Values < 1 mix this animation with the skeleton's current pose (either the setup pose or the pose from lower tracks).
+	 * Defaults to 1, which overwrites the skeleton's current pose with this animation.
 	 *
-	 * Typically track 0 is used to completely pose the skeleton, then alpha is used on higher tracks. It doesn't make sense to
-	 * use alpha on track 0 if the skeleton pose is from the last frame render.
-	 * @see alphaAttachmentThreshold */
-	alpha: number = 0;
-
-	/** Seconds from 0 to the {@link #getMixDuration()} when mixing from the previous animation to this animation. May be
-	 * slightly more than `mixDuration` when the mix is complete. */
-	mixTime: number = 0;
-
-	/** Seconds for mixing from the previous animation to this animation. Defaults to the value provided by AnimationStateData
-	 * {@link AnimationStateData#getMix()} based on the animation before this animation (if any).
+	 * Alpha should be 1 on track 0.
 	 *
-	 * A mix duration of 0 still mixes out over one frame to provide the track entry being mixed out a chance to revert the
-	 * properties it was animating.
+	 * See {@link getAlphaAttachmentThreshold}. */
+	alpha = 0;
+
+	/** Seconds elapsed from 0 to the {@link mixDuration} when mixing from the previous animation to this animation. May
+	 * be slightly more than `mixDuration` when the mix is complete. */
+	mixTime = 0;
+
+	/** Seconds for mixing from the previous animation to this animation. Defaults to the value provided by
+	 * {@link AnimationStateData.getMix} based on the animation before this animation (if any).
+	 *
+	 * A mix duration of 0 still needs to be applied one more time to mix out, so the the properties it was animating are
+	 * reverted. A mix duration of 0 can be set at any time to end the mix on the next
+	 * {@link AnimationState.update | update}.
 	 *
 	 * The `mixDuration` can be set manually rather than use the value from
-	 * {@link AnimationStateData#getMix()}. In that case, the `mixDuration` can be set for a new
-	 * track entry only before {@link AnimationState#update(float)} is next called.
+	 * {@link AnimationStateData.getMix}. In that case, the `mixDuration` can be set for a new
+	 * track entry only before {@link AnimationState.update} is next called.
 	 *
-	 * When using {@link AnimationState#addAnimation()} with a `delay` <= 0, note the
-	 * {@link #delay} is set using the mix duration from the {@link AnimationStateData}, not a mix duration set
-	 * afterward. */
-	mixDuration: number = 0;
+	 * When using {@link AnimationState.addAnimation} with a `delay` <= 0, the
+	 * {@link getDelay} is set using the mix duration from {@link AnimationState.data}. If `mixDuration` is set
+	 * afterward, the delay needs to be adjusted:
+	 *
+	 * <pre>
+	 * entry.mixDuration = 0.25;<br>
+	 * entry.delay = entry.previous.getTrackComplete() - entry.mixDuration + 0;
+	 * </pre>
+	 *
+	 * Alternatively, use {@link setMixDuration} to set both the mix duration and recompute the delay:<br>
+	 *
+	 * <pre>
+	  entry.setMixDuration(0.25f, 0); // mixDuration, delay
+	 * </pre>
+	 */
+	mixDuration = 0;
 
-	interruptAlpha: number = 0; totalAlpha: number = 0;
+	totalAlpha = 0;
 
-	/** Sets both {@link #getMixDuration()} and {@link #getDelay()}.
-	 * @param delay If > 0, sets {@link TrackEntry#getDelay()}. If <= 0, the delay set is the duration of the previous track
-	 *           entry minus the specified mix duration plus the specified <code>delay</code> (ie the mix ends at
-	 *           (<code>delay</code> = 0) or before (<code>delay</code> < 0) the previous track entry duration). If the previous
-	 *           entry is looping, its next loop completion is used instead of its duration. */
+	/** Sets both {@link getMixDuration} and {@link getDelay}.
+	 * @param delay If > 0, sets {@link getDelay}. If <= 0, the delay set is the duration of the previous track entry minus
+	 *           the specified mix duration plus the specified `delay` (ie the mix ends at (when `delay` =
+	 *           0) or before (when `delay` < 0) the previous track entry duration). If the previous entry is
+	 *           looping, its next loop completion is used instead of its duration. */
 	setMixDuration (mixDuration: number, delay?: number) {
 		this.mixDuration = mixDuration;
 		if (delay !== undefined) {
-			if (delay <= 0) {
-				if (this.previous != null)
-					delay = Math.max(delay + this.previous.getTrackComplete() - mixDuration, 0);
-				else
-					delay = 0;
-			}
+			if (delay <= 0) delay = this.previous == null ? 0 : Math.max(delay + this.previous.getTrackComplete() - mixDuration, 0);
 			this.delay = delay;
 		}
 	}
 
-	/** Controls how properties keyed in the animation are mixed with lower tracks. Defaults to {@link MixBlend#replace}, which
-	 * replaces the values from the lower tracks with the animation values. {@link MixBlend#add} adds the animation values to
-	 * the values from the lower tracks.
-	 *
-	 * The `mixBlend` can be set for a new track entry only before {@link AnimationState#apply()} is next
-	 * called. */
-	mixBlend = MixBlend.replace;
+	/** For each timeline:
+	 * - Bit 0, FIRST: 0 = mix from current pose, 1 = mix from setup pose. Timeline is first to set the property.
+	 * - Bit 1, HOLD: 0 = mix out using alphaMix, 1 = apply full alpha to prevent dipping. Timeline is first on its track to
+	 * set the property and the next entry (mixingTo) also sets it. When held, timelineHoldMix's mix controls how the hold fades
+	 * out (for 3+ entry chains where the chain eventually stops setting the property). */
 	timelineMode = [] as number[];
 	timelineHoldMix = [] as TrackEntry[];
 	timelinesRotation = [] as number[];
@@ -1034,9 +1014,12 @@ export class TrackEntry {
 		this.timelinesRotation.length = 0;
 	}
 
-	/** Uses {@link #trackTime} to compute the `animationTime`, which is between {@link #animationStart}
-	 * and {@link #animationEnd}. When the `trackTime` is 0, the `animationTime` is equal to the
-	 * `animationStart` time. */
+	/** Uses {@link trackTime} to compute the `animationTime`. When the `trackTime` is 0, the
+	 * `animationTime` is equal to the `animationStart` time.
+	 *
+	 * The `animationTime` is between {@link animationStart} and {@link animationEnd}, except if this track entry
+	 * is non-looping and {@link animationEnd} is >= to the {@link Animation.duration}, then `animationTime`
+	 * continues to increase past {@link animationEnd}. */
 	getAnimationTime () {
 		if (this.loop) {
 			const duration = this.animationEnd - this.animationStart;
@@ -1053,22 +1036,28 @@ export class TrackEntry {
 
 	/** Returns true if at least one loop has been completed.
 	 *
-	 * See {@link AnimationStateListener#complete()}. */
+	 * See {@link AnimationStateListener.complete}. */
 	isComplete () {
 		return this.trackTime >= this.animationEnd - this.animationStart;
 	}
 
-	/** Resets the rotation directions for mixing this entry's rotate timelines. This can be useful to avoid bones rotating the
-	 * long way around when using {@link #alpha} and starting animations on other tracks.
+	/** When {@link shortestRotation} is false, this clears the directions for mixing this entry's rotation. This can be useful
+	 * to avoid bones rotating the long way around when using {@link getAlpha} and starting animations on other tracks.
 	 *
-	 * Mixing with {@link MixBlend#replace} involves finding a rotation between two others, which has two possible solutions:
-	 * the short way or the long way around. The two rotations likely change over time, so which direction is the short or long
-	 * way also changes. If the short way was always chosen, bones would flip to the other side when that direction became the
-	 * long way. TrackEntry chooses the short way the first time it is applied and remembers that direction. */
+	 * Mixing involves finding a rotation between two others. There are two possible solutions: the short or the long way
+	 * around. When the two rotations change over time, which direction is the short or long way can also change. If the short
+	 * way was always chosen, bones flip to the other side when that direction became the long way. TrackEntry chooses the short
+	 * way the first time it is applied and remembers that direction. Resetting that direction makes it choose a new short way
+	 * on the next apply. */
 	resetRotationDirections () {
 		this.timelinesRotation.length = 0;
 	}
 
+	/** If this track entry is non-looping, this is the track time in seconds when {@link animationEnd} is reached, or the
+	 * current {@link trackTime} if it has already been reached.
+	 *
+	 * If this track entry is looping, this is the track time when this animation will reach its next {@link animationEnd} (the
+	 * next loop completion). */
 	getTrackComplete () {
 		const duration = this.animationEnd - this.animationStart;
 		if (duration !== 0) {
@@ -1079,14 +1068,14 @@ export class TrackEntry {
 	}
 
 	/** Returns true if this track entry has been applied at least once.
-	 * <p>
-	 * See {@link AnimationState#apply(Skeleton)}. */
+	 *
+	 * See {@link AnimationState.apply}. */
 	wasApplied () {
 		return this.nextTrackLast !== -1;
 	}
 
-	/** Returns true if there is a {@link #getNext()} track entry and it will become the current track entry during the next
-	 * {@link AnimationState#update(float)}. */
+	/** Returns true if there is a {@link next} track entry and it will become the current track entry during the next
+	 * {@link AnimationState.update}. */
 	isNextReady () {
 		return this.next != null && this.nextTrackLast - this.next.delay >= 0;
 	}
@@ -1209,12 +1198,12 @@ export enum EventType {
 
 /** The interface to implement for receiving TrackEntry events. It is always safe to call AnimationState methods when receiving
  * events.
- * <p>
- * TrackEntry events are collected during {@link AnimationState#update} and {@link AnimationState#apply} and
+ *
+ * TrackEntry events are collected during {@link AnimationState.update} and {@link AnimationState.apply} and
  * fired only after those methods are finished.
- * <p>
- * See TrackEntry {@link TrackEntry#listener} and AnimationState
- * {@link AnimationState#addListener}. */
+ *
+ * See {@link TrackEntry.listener} and
+ * {@link AnimationState.addListener}. */
 export interface AnimationStateListener {
 	/** Invoked when this entry has been set as the current entry. {@link end} will occur when this entry will no
 	 * longer be applied.
@@ -1227,14 +1216,21 @@ export interface AnimationStateListener {
 	 * mixing. */
 	interrupt?: (entry: TrackEntry) => void;
 
-	/** Invoked when this entry is no longer the current entry and will never be applied again. */
+	/** Invoked when this entry will never be applied again. This only occurs if this entry has previously been set as the
+	 * current entry ({@link start} was invoked). */
 	end?: (entry: TrackEntry) => void;
 
 	/** Invoked when this entry will be disposed. This may occur without the entry ever being set as the current entry.
 	 * References to the entry should not be kept after dispose is called, as it may be destroyed or reused. */
 	dispose?: (entry: TrackEntry) => void;
 
-	/** Invoked every time this entry's animation completes a loop. */
+	/** Invoked every time this entry's animation completes a loop. This may occur during mixing (after
+	 * {@link interrupt}).
+	 *
+	 * If this entry's {@link TrackEntry.mixingTo} is not null, this entry is mixing out (it is not the current entry).
+	 *
+	 * Because this event is triggered at the end of {@link AnimationState.apply}, any animations set in response to
+	 * the event won't be applied until the next time the AnimationState is applied. */
 	complete?: (entry: TrackEntry) => void;
 
 	/** Invoked when this entry's animation triggers an event. */
@@ -1261,40 +1257,10 @@ export abstract class AnimationStateAdapter implements AnimationStateListener {
 	}
 }
 
-/** 1. A previously applied timeline has set this property.
- *
- * Result: Mix from the current pose to the timeline pose. */
 export const SUBSEQUENT = 0;
-/** 1. This is the first timeline to set this property.
- * 2. The next track entry applied after this one does not have a timeline to set this property.
- *
- * Result: Mix from the setup pose to the timeline pose. */
 export const FIRST = 1;
-/** 1) A previously applied timeline has set this property.<br>
- * 2) The next track entry to be applied does have a timeline to set this property.<br>
- * 3) The next track entry after that one does not have a timeline to set this property.<br>
- * Result: Mix from the current pose to the timeline pose, but do not mix out. This avoids "dipping" when crossfading
- * animations that key the same property. A subsequent timeline will set this property using a mix. */
-export const HOLD_SUBSEQUENT = 2;
-/** 1) This is the first timeline to set this property.<br>
- * 2) The next track entry to be applied does have a timeline to set this property.<br>
- * 3) The next track entry after that one does not have a timeline to set this property.<br>
- * Result: Mix from the setup pose to the timeline pose, but do not mix out. This avoids "dipping" when crossfading animations
- * that key the same property. A subsequent timeline will set this property using a mix. */
+export const HOLD = 2;
 export const HOLD_FIRST = 3;
-/** 1. This is the first timeline to set this property.
- * 2. The next track entry to be applied does have a timeline to set this property.
- * 3. The next track entry after that one does have a timeline to set this property.
- * 4. timelineHoldMix stores the first subsequent track entry that does not have a timeline to set this property.
- *
- * Result: The same as HOLD except the mix percentage from the timelineHoldMix track entry is used. This handles when more than
- * 2 track entries in a row have a timeline that sets the same property.
- *
- * Eg, A -> B -> C -> D where A, B, and C have a timeline setting same property, but D does not. When A is applied, to avoid
- * "dipping" A is not mixed out, however D (the first entry that doesn't set the property) mixing in is used to mix out A
- * (which affects B and C). Without using D to mix out, A would be applied fully until mixing completes, then snap into
- * place. */
-export const HOLD_MIX = 4;
 
 export const SETUP = 1;
 export const CURRENT = 2;

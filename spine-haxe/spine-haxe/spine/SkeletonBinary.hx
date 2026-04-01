@@ -190,7 +190,7 @@ class SkeletonBinary {
 			var boneName = input.readString();
 			var boneParent:BoneData = i == 0 ? null : bones[input.readInt(true)];
 			var data = new BoneData(i, boneName, boneParent);
-			var setup = data.setup;
+			var setup = data.setupPose;
 			setup.rotation = input.readFloat();
 			setup.x = input.readFloat() * scale;
 			setup.y = input.readFloat() * scale;
@@ -217,11 +217,11 @@ class SkeletonBinary {
 
 			var boneData = bones[input.readInt(true)];
 			var data = new SlotData(i, slotName, boneData);
-			data.setup.color.setFromRgba8888(input.readInt32());
+			data.setupPose.color.setFromRgba8888(input.readInt32());
 
 			var darkColor = input.readInt32();
 			if (darkColor != -1)
-				data.setup.darkColor = new Color(0, 0, 0).setFromRgb888(darkColor);
+				data.setupPose.darkColor = new Color(0, 0, 0).setFromRgb888(darkColor);
 
 			data.attachmentName = input.readStringRef();
 			data.blendMode = BlendMode.values[input.readInt(true)];
@@ -247,7 +247,7 @@ class SkeletonBinary {
 					var flags = input.readByte();
 					data.skinRequired = (flags & 1) != 0;
 					data.uniform = (flags & 2) != 0;
-					var setup = data.setup;
+					var setup = data.setupPose;
 					setup.bendDirection = (flags & 4) != 0 ? -1 : 1;
 					setup.compress = (flags & 8) != 0;
 					setup.stretch = (flags & 16) != 0;
@@ -327,7 +327,7 @@ class SkeletonBinary {
 					if ((flags & 32) != 0)
 						data.offsets[TransformConstraintData.SHEARY] = input.readFloat();
 					flags = input.readByte();
-					var setup = data.setup;
+					var setup = data.setupPose;
 					if ((flags & 1) != 0)
 						setup.mixRotate = input.readFloat();
 					if ((flags & 2) != 0)
@@ -355,7 +355,7 @@ class SkeletonBinary {
 					data.rotateMode = RotateMode.values[(flags >> 4) & 3];
 					if ((flags & 128) != 0)
 						data.offsetRotation = input.readFloat();
-					var setup = data.setup;
+					var setup = data.setupPose;
 					setup.position = input.readFloat();
 					if (data.positionMode == PositionMode.fixed)
 						setup.position *= scale;
@@ -383,7 +383,7 @@ class SkeletonBinary {
 						data.shearX = input.readFloat();
 					data.limit = ((flags & 64) != 0 ? input.readFloat() : 5000) * scale;
 					data.step = .1 / input.readUnsignedByte();
-					var setup = data.setup;
+					var setup = data.setupPose;
 					setup.inertia = input.readFloat();
 					setup.strength = input.readFloat();
 					setup.damping = input.readFloat();
@@ -414,9 +414,9 @@ class SkeletonBinary {
 					data.loop = (flags & 2) != 0;
 					data.additive = (flags & 4) != 0;
 					if ((flags & 8) != 0)
-						data.setup.time = input.readFloat();
+						data.setupPose.time = input.readFloat();
 					if ((flags & 16) != 0)
-						data.setup.mix = (flags & 32) != 0 ? input.readFloat() : 1;
+						data.setupPose.mix = (flags & 32) != 0 ? input.readFloat() : 1;
 					if ((flags & 64) != 0) {
 						data.local = (flags & 128) != 0;
 						data.bone = bones[input.readInt(true)];
@@ -476,13 +476,14 @@ class SkeletonBinary {
 		n = input.readInt(true);
 		for (i in 0...n) {
 			var data:EventData = new EventData(input.readString());
-			data.intValue = input.readInt(false);
-			data.floatValue = input.readFloat();
-			data.stringValue = input.readString();
+			var setup = data.setupPose;
+			setup.intValue = input.readInt(false);
+			setup.floatValue = input.readFloat();
+			setup.stringValue = input.readString();
 			data.audioPath = input.readString();
 			if (data.audioPath != null) {
-				data.volume = input.readFloat();
-				data.balance = input.readFloat();
+				setup.volume = input.readFloat();
+				setup.balance = input.readFloat();
 			}
 			skeletonData.events.push(data);
 		}
@@ -1415,7 +1416,7 @@ class SkeletonBinary {
 				event.floatValue = input.readFloat();
 				event.stringValue = input.readString();
 				if (event.stringValue == null)
-					event.stringValue = eventData.stringValue;
+					event.stringValue = eventData.setupPose.stringValue;
 				if (event.data.audioPath != null) {
 					event.volume = input.readFloat();
 					event.balance = input.readFloat();

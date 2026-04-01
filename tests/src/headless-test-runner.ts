@@ -152,6 +152,7 @@ interface TestArgs {
 	skeletonPath: string;
 	atlasPath: string;
 	animationName?: string;
+	animationName2?: string;
 }
 
 interface SkeletonFiles {
@@ -212,7 +213,7 @@ function findSkeletonFiles (skeletonName: string): SkeletonFiles {
 	};
 }
 
-function validateArgs (): { language: string; files?: SkeletonFiles; skeletonPath?: string; atlasPath?: string; animationName?: string; fixFloats?: boolean } {
+function validateArgs (): { language: string; files?: SkeletonFiles; skeletonPath?: string; atlasPath?: string; animationName?: string; animationName2?: string; fixFloats?: boolean } {
 	const args = process.argv.slice(2);
 
 	if (args.length < 2) {
@@ -241,13 +242,14 @@ function validateArgs (): { language: string; files?: SkeletonFiles; skeletonPat
 			process.exit(1);
 		}
 
-		const [, skeletonName, animationName] = restArgs;
+		const [, skeletonName, animationName, animationName2] = restArgs;
 		const files = findSkeletonFiles(skeletonName);
 
 		return {
 			language,
 			files,
 			animationName,
+			animationName2,
 			fixFloats
 		};
 	} else {
@@ -257,7 +259,7 @@ function validateArgs (): { language: string; files?: SkeletonFiles; skeletonPat
 			process.exit(1);
 		}
 
-		const [skeletonPath, atlasPath, animationName] = restArgs;
+		const [skeletonPath, atlasPath, animationName, animationName2] = restArgs;
 		const resolvedSkeletonPath = resolve(skeletonPath);
 		const resolvedAtlasPath = resolve(atlasPath);
 
@@ -276,6 +278,7 @@ function validateArgs (): { language: string; files?: SkeletonFiles; skeletonPat
 			skeletonPath: resolvedSkeletonPath,
 			atlasPath: resolvedAtlasPath,
 			animationName,
+			animationName2,
 			fixFloats
 		};
 	}
@@ -328,6 +331,10 @@ function executeJava (args: TestArgs): string {
 		testArgs.push(args.animationName);
 	}
 
+	if (args.animationName2) {
+		testArgs.push(args.animationName2);
+	}
+
 	log_action('Running Java HeadlessTest');
 	try {
 		const output = execSync(`java -cp "${jarFile}" com.esotericsoftware.spine.HeadlessTest ${testArgs.join(' ')}`, {
@@ -373,6 +380,9 @@ function executeCpp (args: TestArgs): string {
 	const testArgs = [args.skeletonPath, args.atlasPath];
 	if (args.animationName) {
 		testArgs.push(args.animationName);
+	}
+	if (args.animationName2) {
+		testArgs.push(args.animationName2);
 	}
 
 	const buildDir = join(cppDir, 'build');
@@ -452,9 +462,15 @@ function executeHaxe (args: TestArgs): string {
 	}
 }
 
-function parseOutput (output: string): { skeletonData: any, skeletonState: any, animationState?: any } {
-	// Split output into sections
-	const sections = output.split(/=== [A-Z ]+? ===/);
+function parseOutput (output: string): { skeletonData: any, skeletonState: any, animationState?: any, transitionFrames?: any[] } {
+	// Split output by section headers, keeping the headers
+	const headerRegex = /=== ([A-Z 0-9]+?) ===/g;
+	const headers: string[] = [];
+	let match;
+	while ((match = headerRegex.exec(output)) !== null) {
+		headers.push(match[1]);
+	}
+	const sections = output.split(/=== [A-Z 0-9]+? ===/);
 
 	if (sections.length < 3) {
 		log_detail(`Expected at least 2 sections in output, got: ${sections.length - 1}`);
@@ -462,7 +478,7 @@ function parseOutput (output: string): { skeletonData: any, skeletonState: any, 
 	}
 
 	try {
-		const result: { skeletonData: any, skeletonState: any, animationState?: any } = {
+		const result: { skeletonData: any, skeletonState: any, animationState?: any, transitionFrames?: any[] } = {
 			skeletonData: JSON.parse(sections[1].trim()),
 			skeletonState: JSON.parse(sections[2].trim())
 		};
@@ -471,6 +487,16 @@ function parseOutput (output: string): { skeletonData: any, skeletonState: any, 
 		if (sections.length >= 4 && sections[3].trim()) {
 			result.animationState = JSON.parse(sections[3].trim());
 		}
+
+		// Transition frames
+		const transitionFrames: any[] = [];
+		for (let i = 0; i < headers.length; i++) {
+			if (headers[i].startsWith('TRANSITION FRAME')) {
+				const sectionContent = sections[i + 1].trim();
+				if (sectionContent) transitionFrames.push(JSON.parse(sectionContent));
+			}
+		}
+		if (transitionFrames.length > 0) result.transitionFrames = transitionFrames;
 
 		return result;
 	} catch (error) {
@@ -566,7 +592,10 @@ function saveJsonFiles (args: TestArgs, parsed: any, javaParsed?: any, fixFloats
 			skeletonData: fixFloatsAndPropertyIds(parsed.skeletonData, javaParsed.skeletonData, '', args.language),
 			skeletonState: fixFloatsAndPropertyIds(parsed.skeletonState, javaParsed.skeletonState, '', args.language),
 			animationState: parsed.animationState && javaParsed.animationState ?
-				fixFloatsAndPropertyIds(parsed.animationState, javaParsed.animationState, '', args.language) : parsed.animationState
+				fixFloatsAndPropertyIds(parsed.animationState, javaParsed.animationState, '', args.language) : parsed.animationState,
+			transitionFrames: parsed.transitionFrames && javaParsed.transitionFrames ?
+				parsed.transitionFrames.map((frame: any, i: number) =>
+					fixFloatsAndPropertyIds(frame, javaParsed.transitionFrames[i], '', args.language)) : parsed.transitionFrames
 		};
 		log_ok();
 	}
@@ -579,14 +608,22 @@ function saveJsonFiles (args: TestArgs, parsed: any, javaParsed?: any, fixFloats
 	if (outputData.animationState) {
 		writeFileSync(join(outputDir, `animation-state-${args.language}-${format}.json`), JSON.stringify(outputData.animationState, null, 2));
 	}
+
+	// Save transition frames if they exist
+	if (outputData.transitionFrames) {
+		for (let i = 0; i < outputData.transitionFrames.length; i++) {
+			writeFileSync(join(outputDir, `transition-frame-${i}-${args.language}-${format}.json`), JSON.stringify(outputData.transitionFrames[i], null, 2));
+		}
+	}
 }
 
-function runTestsForFiles (language: string, skeletonPath: string, atlasPath: string, animationName?: string, fixFloats?: boolean): void {
+function runTestsForFiles (language: string, skeletonPath: string, atlasPath: string, animationName?: string, animationName2?: string, fixFloats?: boolean): void {
 	const testArgs: TestArgs = {
 		language,
 		skeletonPath,
 		atlasPath,
-		animationName
+		animationName,
+		animationName2
 	};
 
 	const fileType = skeletonPath.endsWith('.json') ? 'JSON' : 'BINARY';
@@ -636,12 +673,26 @@ function verifyOutputsMatch (targetLanguage: string): void {
 
 	log_action(`Verifying Java and ${targetLanguage} outputs match`);
 
-	const comparisons = [
+	const comparisons: string[][] = [
 		[`skeleton-data-java-json.json`, `skeleton-data-${targetLanguage}-json.json`],
 		[`skeleton-state-java-json.json`, `skeleton-state-${targetLanguage}-json.json`],
 		[`skeleton-data-java-skel.json`, `skeleton-data-${targetLanguage}-skel.json`],
 		[`skeleton-state-java-skel.json`, `skeleton-state-${targetLanguage}-skel.json`]
 	];
+
+	// Add transition frame comparisons
+	for (let i = 0; ; i++) {
+		const javaFile = `transition-frame-${i}-java-json.json`;
+		const targetFile = `transition-frame-${i}-${targetLanguage}-json.json`;
+		if (!existsSync(join(outputDir, javaFile)) || !existsSync(join(outputDir, targetFile))) break;
+		comparisons.push([javaFile, targetFile]);
+	}
+	for (let i = 0; ; i++) {
+		const javaFile = `transition-frame-${i}-java-skel.json`;
+		const targetFile = `transition-frame-${i}-${targetLanguage}-skel.json`;
+		if (!existsSync(join(outputDir, javaFile)) || !existsSync(join(outputDir, targetFile))) break;
+		comparisons.push([javaFile, targetFile]);
+	}
 
 	let allMatch = true;
 
@@ -686,14 +737,14 @@ function main (): void {
 
 		log_detail(`Files: ${jsonFile}, ${skelFile}, ${atlasFile}`);
 
-		runTestsForFiles(args.language, args.files.jsonPath, args.files.atlasPath, args.animationName, args.fixFloats);
-		runTestsForFiles(args.language, args.files.skelPath, args.files.atlasPath, args.animationName, args.fixFloats);
+		runTestsForFiles(args.language, args.files.jsonPath, args.files.atlasPath, args.animationName, args.animationName2, args.fixFloats);
+		runTestsForFiles(args.language, args.files.skelPath, args.files.atlasPath, args.animationName, args.animationName2, args.fixFloats);
 
 		log_summary('✓ All tests completed');
 		log_detail(`JSON files saved to: ${join(SPINE_ROOT, 'tests', 'output')}`);
 	} else {
 		// Explicit paths mode: run test for single file
-		runTestsForFiles(args.language, args.skeletonPath!, args.atlasPath!, args.animationName, args.fixFloats);
+		runTestsForFiles(args.language, args.skeletonPath!, args.atlasPath!, args.animationName, args.animationName2, args.fixFloats);
 		log_summary('✓ Test completed');
 		log_detail(`JSON files saved to: ${join(SPINE_ROOT, 'tests', 'output')}`);
 	}

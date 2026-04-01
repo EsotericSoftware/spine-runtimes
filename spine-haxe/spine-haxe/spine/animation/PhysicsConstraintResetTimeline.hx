@@ -58,7 +58,7 @@ class PhysicsConstraintResetTimeline extends Timeline implements ConstraintTimel
 	}
 
 	/** Resets the physics constraint when frames > lastTime and <= time. */
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend, direction:MixDirection,
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
 			appliedPose:Bool) {
 		var constraint:PhysicsConstraint = null;
 		if (constraintIndex != -1) {
@@ -70,7 +70,7 @@ class PhysicsConstraintResetTimeline extends Timeline implements ConstraintTimel
 		var frames:Array<Float> = this.frames;
 
 		if (lastTime > time) { // Apply events after lastTime for looped animations.
-			apply(skeleton, lastTime, 2147483647, [], alpha, blend, direction, appliedPose);
+			apply(skeleton, lastTime, 2147483647, [], alpha, false, false, false, false);
 			lastTime = -1;
 		} else if (lastTime >= frames[frames.length - 1]) // Last time is after last frame.
 			return;

@@ -48,6 +48,7 @@ public class PhysicsConstraintPose: NSObject {
         self.init(fromPointer: ptr!)
     }
 
+    /// Controls how much bone movement is converted into physics movement.
     public var inertia: Float {
         get {
             let result = spine_physics_constraint_pose_get_inertia(_ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self))
@@ -58,6 +59,7 @@ public class PhysicsConstraintPose: NSObject {
         }
     }
 
+    /// The amount of force used to return properties to the unconstrained value.
     public var strength: Float {
         get {
             let result = spine_physics_constraint_pose_get_strength(_ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self))
@@ -68,6 +70,7 @@ public class PhysicsConstraintPose: NSObject {
         }
     }
 
+    /// Reduces the speed of physics movements, with more of a reduction at higher speeds.
     public var damping: Float {
         get {
             let result = spine_physics_constraint_pose_get_damping(_ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self))
@@ -78,6 +81,7 @@ public class PhysicsConstraintPose: NSObject {
         }
     }
 
+    /// Determines susceptibility to acceleration.
     public var massInverse: Float {
         get {
             let result = spine_physics_constraint_pose_get_mass_inverse(_ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self))
@@ -88,6 +92,7 @@ public class PhysicsConstraintPose: NSObject {
         }
     }
 
+    /// Applies a constant force along the Skeleton::getWindX(), Skeleton::getWindY() vector.
     public var wind: Float {
         get {
             let result = spine_physics_constraint_pose_get_wind(_ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self))
@@ -98,6 +103,7 @@ public class PhysicsConstraintPose: NSObject {
         }
     }
 
+    /// Applies a constant force along the Skeleton::getGravityX(), Skeleton::getGravityY() vector.
     public var gravity: Float {
         get {
             let result = spine_physics_constraint_pose_get_gravity(_ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self))
@@ -108,7 +114,7 @@ public class PhysicsConstraintPose: NSObject {
         }
     }
 
-    /// A percentage (0-1) that controls the mix between the constrained and unconstrained poses.
+    /// A percentage (0+) that controls the mix between the constrained and unconstrained poses.
     public var mix: Float {
         get {
             let result = spine_physics_constraint_pose_get_mix(_ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self))

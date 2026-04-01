@@ -33,7 +33,7 @@
 #include <spine/BoneTimeline.h>
 
 namespace spine {
-	/// Changes a bone's local BoneLocal::getScaleX() and BoneLocal::getScaleY().
+	/// Changes a bone's local scaleX and scaleY.
 	class SP_API ScaleTimeline : public BoneTimeline2 {
 		friend class SkeletonBinary;
 
@@ -45,10 +45,10 @@ namespace spine {
 		explicit ScaleTimeline(size_t frameCount, size_t bezierCount, int boneIndex);
 
 	protected:
-		virtual void _apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, MixBlend blend, MixDirection direction) override;
+		virtual void _apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) override;
 	};
 
-	/// Changes a bone's local BoneLocal::getScaleX().
+	/// Changes a bone's local scaleX.
 	class SP_API ScaleXTimeline : public BoneTimeline1 {
 		friend class SkeletonBinary;
 
@@ -60,10 +60,10 @@ namespace spine {
 		explicit ScaleXTimeline(size_t frameCount, size_t bezierCount, int boneIndex);
 
 	protected:
-		virtual void _apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, MixBlend blend, MixDirection direction) override;
+		virtual void _apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) override;
 	};
 
-	/// Changes a bone's local BoneLocal::getScaleY().
+	/// Changes a bone's local scaleY.
 	class SP_API ScaleYTimeline : public BoneTimeline1 {
 		friend class SkeletonBinary;
 
@@ -75,7 +75,7 @@ namespace spine {
 		explicit ScaleYTimeline(size_t frameCount, size_t bezierCount, int boneIndex);
 
 	protected:
-		virtual void _apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, MixBlend blend, MixDirection direction) override;
+		virtual void _apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) override;
 	};
 }
 

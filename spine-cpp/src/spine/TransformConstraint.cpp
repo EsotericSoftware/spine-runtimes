@@ -46,7 +46,7 @@ TransformConstraint::TransformConstraint(TransformConstraintData &data, Skeleton
 	_bones.ensureCapacity(data.getBones().size());
 	for (size_t i = 0; i < data.getBones().size(); i++) {
 		BoneData *boneData = data.getBones()[i];
-		_bones.add(&skeleton._bones[boneData->getIndex()]->_constrained);
+		_bones.add(&skeleton._bones[boneData->getIndex()]->_constrainedPose);
 	}
 
 	_source = skeleton._bones[data._source->getIndex()];
@@ -60,13 +60,13 @@ TransformConstraint &TransformConstraint::copy(Skeleton &skeleton) {
 
 /// Applies the constraint to the constrained bones.
 void TransformConstraint::update(Skeleton &skeleton, Physics physics) {
-	TransformConstraintPose &p = *_applied;
+	TransformConstraintPose &p = *_appliedPose;
 	if (p._mixRotate == 0 && p._mixX == 0 && p._mixY == 0 && p._mixScaleX == 0 && p._mixScaleY == 0 && p._mixShearY == 0) return;
 
 	TransformConstraintData &data = _data;
 	bool localSource = data._localSource, localTarget = data._localTarget, additive = data._additive, clamp = data._clamp;
 	float *offsets = data._offsets;
-	BonePose &source = *_source->_applied;
+	BonePose &source = *_source->_appliedPose;
 	if (localSource) {
 		source.validateLocalTransform(skeleton);
 	}

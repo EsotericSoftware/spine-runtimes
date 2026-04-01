@@ -38,7 +38,7 @@ export abstract class Constraint<
 	T extends Constraint<T, D, P>,
 	D extends ConstraintData<T, P>,
 	P extends Pose<P>>
-	extends PosedActive<D, P, P> implements Update {
+	extends PosedActive<D, P> implements Update {
 
 	constructor (data: D, pose: P, constrained: P) {
 		super(data, pose, constrained);

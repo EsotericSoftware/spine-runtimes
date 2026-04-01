@@ -39,15 +39,11 @@ class TranslateTimeline extends BoneTimeline2 {
 		super(frameCount, bezierCount, boneIndex, Property.x, Property.y);
 	}
 
-	public function apply1(pose:BoneLocal, setup:BoneLocal, time:Float, alpha:Float, blend:MixBlend, direction:MixDirection):Void {
+	public function apply1(pose:BonePose, setup:BonePose, time:Float, alpha:Float, fromSetup:Bool, add:Bool, out:Bool):Void {
 		if (time < frames[0]) {
-			switch (blend) {
-				case MixBlend.setup:
-					pose.x = setup.x;
-					pose.y = setup.y;
-				case MixBlend.first:
-					pose.x += (setup.x - pose.x) * alpha;
-					pose.y += (setup.y - pose.y) * alpha;
+			if (fromSetup) {
+				pose.x = setup.x;
+				pose.y = setup.y;
 			}
 			return;
 		}
@@ -72,16 +68,15 @@ class TranslateTimeline extends BoneTimeline2 {
 				y = getBezierValue(time, i, BoneTimeline2.VALUE2, curveType + CurveTimeline.BEZIER_SIZE - CurveTimeline.BEZIER);
 		}
 
-		switch (blend) {
-			case MixBlend.setup:
-				pose.x = setup.x + x * alpha;
-				pose.y = setup.y + y * alpha;
-			case MixBlend.first, MixBlend.replace:
-				pose.x += (setup.x + x - pose.x) * alpha;
-				pose.y += (setup.y + y - pose.y) * alpha;
-			case MixBlend.add:
-				pose.x += x * alpha;
-				pose.y += y * alpha;
+		if (fromSetup) {
+			pose.x = setup.x + x * alpha;
+			pose.y = setup.y + y * alpha;
+		} else if (add) {
+			pose.x += x * alpha;
+			pose.y += y * alpha;
+		} else {
+			pose.x += (setup.x + x - pose.x) * alpha;
+			pose.y += (setup.y + y - pose.y) * alpha;
 		}
 	}
 }

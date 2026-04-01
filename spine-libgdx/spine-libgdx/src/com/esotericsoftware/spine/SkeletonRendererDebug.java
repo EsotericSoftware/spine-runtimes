@@ -96,7 +96,7 @@ public class SkeletonRendererDebug {
 					shapes.setColor(boneOriginColor);
 				} else
 					shapes.setColor(boneLineColor);
-				BonePose applied = bone.applied;
+				BonePose applied = bone.appliedPose;
 				float x = length * applied.a + applied.worldX;
 				float y = length * applied.c + applied.worldY;
 				shapes.rectLine(applied.worldX, applied.worldY, x, y, width * scale);
@@ -109,9 +109,9 @@ public class SkeletonRendererDebug {
 			for (int i = 0; i < slotCount; i++) {
 				Slot slot = slots[i];
 				if (!slot.bone.active) continue;
-				if (!(slot.applied.attachment instanceof PointAttachment point)) continue;
-				point.computeWorldPosition(slot.bone.applied, temp1);
-				temp2.set(8, 0).rotate(point.computeWorldRotation(slot.bone.applied));
+				if (!(slot.appliedPose.attachment instanceof PointAttachment point)) continue;
+				point.computeWorldPosition(slot.bone.appliedPose, temp1);
+				temp2.set(8, 0).rotate(point.computeWorldRotation(slot.bone.appliedPose));
 				shapes.rectLine(temp1, temp2, boneWidth / 2 * scale);
 			}
 		}
@@ -126,7 +126,7 @@ public class SkeletonRendererDebug {
 				if (!slot.bone.active) continue;
 				if (slot.pose.attachment instanceof RegionAttachment region) {
 					float[] vertices = this.vertices.items;
-					float[] offsets = region.getOffsets(slot.applied);
+					float[] offsets = region.getOffsets(slot.appliedPose);
 					region.computeWorldVertices(slot, offsets, vertices, 0, 2);
 					shapes.line(vertices[0], vertices[1], vertices[2], vertices[3]);
 					shapes.line(vertices[2], vertices[3], vertices[4], vertices[5]);
@@ -241,7 +241,7 @@ public class SkeletonRendererDebug {
 			for (int i = 0; i < boneCount; i++) {
 				Bone bone = bones[i];
 				if (!bone.active) continue;
-				shapes.circle(bone.applied.worldX, bone.applied.worldY, 3 * scale, 8);
+				shapes.circle(bone.appliedPose.worldX, bone.appliedPose.worldY, 3 * scale, 8);
 			}
 		}
 
@@ -251,7 +251,7 @@ public class SkeletonRendererDebug {
 				Slot slot = slots[i];
 				if (!slot.bone.active) continue;
 				if (!(slot.pose.attachment instanceof PointAttachment point)) continue;
-				point.computeWorldPosition(slot.bone.applied, temp1);
+				point.computeWorldPosition(slot.bone.appliedPose, temp1);
 				shapes.circle(temp1.x, temp1.y, 3 * scale, 8);
 			}
 		}

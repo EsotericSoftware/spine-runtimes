@@ -47,7 +47,7 @@ class TransformConstraint extends Constraint<TransformConstraint, TransformConst
 
 		bones = new Array<BonePose>();
 		for (boneData in data.bones)
-			bones.push(skeleton.bones[boneData.index].constrained);
+			bones.push(skeleton.bones[boneData.index].constrainedPose);
 		source = skeleton.bones[data.source.index];
 	}
 
@@ -59,7 +59,7 @@ class TransformConstraint extends Constraint<TransformConstraint, TransformConst
 
 	/** Applies the constraint to the constrained bones. */
 	public function update(skeleton:Skeleton, physics:Physics):Void {
-		var p = applied;
+		var p = appliedPose;
 		if (p.mixRotate == 0 && p.mixX == 0 && p.mixY == 0 && p.mixScaleX == 0 && p.mixScaleY == 0 && p.mixShearY == 0)
 			return;
 
@@ -68,7 +68,7 @@ class TransformConstraint extends Constraint<TransformConstraint, TransformConst
 			additive = data.additive,
 			clamp = data.clamp;
 		var offsets = data.offsets;
-		var source = this.source.applied;
+		var source = this.source.appliedPose;
 		if (localSource)
 			source.validateLocalTransform(skeleton);
 		var fromItems = data.properties;

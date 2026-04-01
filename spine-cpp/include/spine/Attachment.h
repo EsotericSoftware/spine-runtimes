@@ -35,6 +35,7 @@
 #include <spine/SpineString.h>
 
 namespace spine {
+	/// The base class for all attachments. Multiple Skeleton instances, slots, or skins can use the same attachments.
 	class SP_API Attachment : public SpineObject {
 		RTTI_DECL_NOPARENT
 

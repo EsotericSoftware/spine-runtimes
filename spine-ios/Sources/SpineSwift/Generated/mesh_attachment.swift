@@ -100,6 +100,9 @@ public class MeshAttachment: VertexAttachment {
         return Color(fromPointer: result!)
     }
 
+    /// The parent mesh if this is a linked mesh, else NULL. A linked mesh shares the bones,
+    /// vertices, regionUVs, triangles, hullLength, edges, width, and height with the parent mesh,
+    /// but may have a different name or path, and therefore a different texture region.
     public var parentMesh: MeshAttachment? {
         get {
             let result = spine_mesh_attachment_get_parent_mesh(_ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self))
@@ -112,6 +115,9 @@ public class MeshAttachment: VertexAttachment {
         }
     }
 
+    /// Vertex index pairs describing edges for controlling triangulation, or empty if nonessential
+    /// data was not exported. Mesh triangles do not cross edges. Triangulation is not performed at
+    /// runtime.
     public var edges: ArrayUnsignedShort {
         get {
             let result = spine_mesh_attachment_get_edges(_ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self))

@@ -163,7 +163,7 @@ Array SpineSkin::get_attachments() {
 			attachment_ref = Ref<SpineAttachment>(memnew(SpineAttachment));
 			attachment_ref->set_spine_object(get_spine_owner(), entry._attachment);
 		}
-		entry_ref->init(entry._slotIndex, entry._name.buffer(), attachment_ref);
+		entry_ref->init(entry._slotIndex, entry._placeholderName.buffer(), attachment_ref);
 		result.push_back(entry_ref);
 	}
 	return result;

@@ -37,7 +37,7 @@ import 'animation.dart';
 import 'skeleton_data.dart';
 
 /// Stores mix (crossfade) durations to be applied when AnimationState
-/// animations are changed.
+/// animations are changed on the same track.
 class AnimationStateData {
   final Pointer<spine_animation_state_data_wrapper> _ptr;
 
@@ -72,8 +72,9 @@ class AnimationStateData {
     SpineBindings.bindings.spine_animation_state_data_set_default_mix(_ptr, value);
   }
 
-  /// The mix duration to use when changing from the specified animation to the
-  /// other, or the DefaultMix if no mix duration has been set.
+  /// Returns the mix duration to use when changing from the specified animation
+  /// to the other on the same track, or the default mix if no mix duration has
+  /// been set.
   double getMix(Animation from, Animation to) {
     final result =
         SpineBindings.bindings.spine_animation_state_data_get_mix(_ptr, from.nativePtr.cast(), to.nativePtr.cast());

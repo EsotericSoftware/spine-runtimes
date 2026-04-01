@@ -79,6 +79,7 @@ namespace spine {
 		float getScaleY();
 		void setScaleY(float inValue);
 
+		/// The local rotation in degrees, counter clockwise.
 		float getRotation();
 		void setRotation(float inValue);
 

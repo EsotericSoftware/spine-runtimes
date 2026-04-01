@@ -79,7 +79,7 @@
 #include <spine/SliderData.h>
 #include <spine/SliderPose.h>
 #include <spine/SliderTimeline.h>
-#include <spine/BoneLocal.h>
+#include <spine/BonePose.h>
 #include <spine/PathConstraintPose.h>
 #include <spine/SliderMixTimeline.h>
 
@@ -215,7 +215,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 			}
 			BoneData *data = new (__FILE__, __LINE__) BoneData(bonesCount, Json::getString(boneMap, "name", 0), parent);
 			data->_length = Json::getFloat(boneMap, "length", 0) * _scale;
-			BoneLocal &setup = data->_setup;
+			BonePose &setup = data->_setupPose;
 			setup._x = Json::getFloat(boneMap, "x", 0) * _scale;
 			setup._y = Json::getFloat(boneMap, "y", 0) * _scale;
 			setup._rotation = Json::getFloat(boneMap, "rotation", 0);
@@ -250,12 +250,12 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 			SlotData *data = new (__FILE__, __LINE__) SlotData(slotCount, slotName, *boneData);
 
 			const char *color = Json::getString(slotMap, "color", 0);
-			if (color) Color::valueOf(color, data->_setup.getColor());
+			if (color) Color::valueOf(color, data->_setupPose.getColor());
 
 			const char *dark = Json::getString(slotMap, "dark", 0);
 			if (dark) {
-				data->_setup._darkColor = Color::valueOf(dark);
-				data->_setup._hasDarkColor = true;
+				data->_setupPose._darkColor = Color::valueOf(dark);
+				data->_setupPose._hasDarkColor = true;
 			}
 
 			data->setAttachmentName(Json::getString(slotMap, "attachment", NULL));
@@ -289,7 +289,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 				if (!data->_target) SKELETON_JSON_ERROR(root, "IK target bone not found: ", targetName);
 
 				data->_uniform = Json::getBoolean(constraintMap, "uniform", false);
-				IkConstraintPose &setup = data->_setup;
+				IkConstraintPose &setup = data->_setupPose;
 				setup._mix = Json::getFloat(constraintMap, "mix", 1);
 				setup._softness = Json::getFloat(constraintMap, "softness", 0) * _scale;
 				setup._bendDirection = Json::getBoolean(constraintMap, "bendPositive", true) ? 1 : -1;
@@ -377,7 +377,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 				data->_offsets[TransformConstraintData::SCALEY] = Json::getFloat(constraintMap, "scaleY", 0);
 				data->_offsets[TransformConstraintData::SHEARY] = Json::getFloat(constraintMap, "shearY", 0);
 
-				TransformConstraintPose &setup = data->_setup;
+				TransformConstraintPose &setup = data->_setupPose;
 				if (rotate) setup._mixRotate = Json::getFloat(constraintMap, "mixRotate", 1);
 				if (x) setup._mixX = Json::getFloat(constraintMap, "mixX", 1);
 				if (y) setup._mixY = Json::getFloat(constraintMap, "mixY", setup._mixX);
@@ -406,7 +406,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 				data->_spacingMode = SpacingMode_valueOf(Json::getString(constraintMap, "spacingMode", "length"));
 				data->_rotateMode = RotateMode_valueOf(Json::getString(constraintMap, "rotateMode", "tangent"));
 				data->_offsetRotation = Json::getFloat(constraintMap, "rotation", 0);
-				PathConstraintPose &setup = data->_setup;
+				PathConstraintPose &setup = data->_setupPose;
 				setup._position = Json::getFloat(constraintMap, "position", 0);
 				if (data->_positionMode == PositionMode_Fixed) setup._position *= _scale;
 				setup._spacing = Json::getFloat(constraintMap, "spacing", 0);
@@ -431,7 +431,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 				data->_shearX = Json::getFloat(constraintMap, "shearX", 0);
 				data->_limit = Json::getFloat(constraintMap, "limit", 5000) * _scale;
 				data->_step = 1.0f / Json::getInt(constraintMap, "fps", 60);
-				PhysicsConstraintPose &setup = data->_setup;
+				PhysicsConstraintPose &setup = data->_setupPose;
 				setup._inertia = Json::getFloat(constraintMap, "inertia", 0.5f);
 				setup._strength = Json::getFloat(constraintMap, "strength", 100);
 				setup._damping = Json::getFloat(constraintMap, "damping", 0.85f);
@@ -453,8 +453,8 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 				data->setSkinRequired(skinRequired);
 				data->_additive = Json::getBoolean(constraintMap, "additive", false);
 				data->_loop = Json::getBoolean(constraintMap, "loop", false);
-				data->_setup._time = Json::getFloat(constraintMap, "time", 0);
-				data->_setup._mix = Json::getFloat(constraintMap, "mix", 1);
+				data->_setupPose._time = Json::getFloat(constraintMap, "time", 0);
+				data->_setupPose._mix = Json::getFloat(constraintMap, "mix", 1);
 
 				const char *boneName = Json::getString(constraintMap, "bone", NULL);
 				if (boneName != NULL) {
@@ -574,13 +574,14 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 		int eventIndex = 0;
 		for (Json *eventMap = events->_child; eventMap; eventMap = eventMap->_next) {
 			EventData *eventData = new (__FILE__, __LINE__) EventData(String(eventMap->_name));
-			eventData->_intValue = Json::getInt(eventMap, "int", 0);
-			eventData->_floatValue = Json::getFloat(eventMap, "float", 0);
-			eventData->_stringValue = Json::getString(eventMap, "string", 0);
+			Event &setup = eventData->_setupPose;
+			setup._intValue = Json::getInt(eventMap, "int", 0);
+			setup._floatValue = Json::getFloat(eventMap, "float", 0);
+			setup._stringValue = Json::getString(eventMap, "string", 0);
 			eventData->_audioPath = Json::getString(eventMap, "audio", 0);
 			if (eventData->_audioPath != NULL) {
-				eventData->_volume = Json::getFloat(eventMap, "volume", 1);
-				eventData->_balance = Json::getFloat(eventMap, "balance", 0);
+				setup._volume = Json::getFloat(eventMap, "volume", 1);
+				setup._balance = Json::getFloat(eventMap, "balance", 0);
 			}
 			skeletonData->_events[eventIndex] = eventData;
 			eventIndex++;
@@ -785,6 +786,7 @@ void SkeletonJson::readVertices(Json *map, VertexAttachment *attachment, size_t 
 
 Animation *SkeletonJson::readAnimation(Json *map, SkeletonData *skeletonData) {
 	Array<Timeline *> timelines;
+	Array<int> bones;
 
 	// Slot timelines.
 	for (Json *slotMap = Json::getItem(map, "slots") ? Json::getItem(map, "slots")->_child : NULL; slotMap; slotMap = slotMap->_next) {
@@ -972,12 +974,15 @@ Animation *SkeletonJson::readAnimation(Json *map, SkeletonData *skeletonData) {
 	}
 
 	// Bone timelines.
-	for (Json *boneMap = Json::getItem(map, "bones") ? Json::getItem(map, "bones")->_child : NULL; boneMap; boneMap = boneMap->_next) {
+	Json *boneMaps = Json::getItem(map, "bones");
+	bones.ensureCapacity(boneMaps ? boneMaps->_size : 0);
+	for (Json *boneMap = boneMaps ? boneMaps->_child : NULL; boneMap; boneMap = boneMap->_next) {
 		int boneIndex = ArrayUtils::findIndexWithName(skeletonData->_bones, boneMap->_name);
 		if (boneIndex == -1) {
 			ArrayUtils::deleteElements(timelines);
 			return NULL;
 		}
+		bones.add(boneIndex);
 
 		for (Json *timelineMap = boneMap->_child; timelineMap; timelineMap = timelineMap->_next) {
 			Json *keyMap = timelineMap->_child;
@@ -1386,13 +1391,14 @@ Animation *SkeletonJson::readAnimation(Json *map, SkeletonData *skeletonData) {
 				ArrayUtils::deleteElements(timelines);
 				return NULL;
 			}
+			Event &setup = eventData->_setupPose;
 			Event *event = new (__FILE__, __LINE__) Event(Json::getFloat(keyMap, "time", 0), *eventData);
-			event->_intValue = Json::getInt(keyMap, "int", eventData->_intValue);
-			event->_floatValue = Json::getFloat(keyMap, "float", eventData->_floatValue);
-			event->_stringValue = Json::getString(keyMap, "string", eventData->_stringValue.buffer());
+			event->_intValue = Json::getInt(keyMap, "int", setup._intValue);
+			event->_floatValue = Json::getFloat(keyMap, "float", setup._floatValue);
+			event->_stringValue = Json::getString(keyMap, "string", setup._stringValue.buffer());
 			if (!eventData->_audioPath.isEmpty()) {
-				event->_volume = Json::getFloat(keyMap, "volume", eventData->_volume);
-				event->_balance = Json::getFloat(keyMap, "balance", eventData->_balance);
+				event->_volume = Json::getFloat(keyMap, "volume", setup._volume);
+				event->_balance = Json::getFloat(keyMap, "balance", setup._balance);
 			}
 			timeline->setFrame(frame, *event);
 		}
@@ -1401,7 +1407,10 @@ Animation *SkeletonJson::readAnimation(Json *map, SkeletonData *skeletonData) {
 
 	float duration = 0;
 	for (size_t i = 0; i < timelines.size(); i++) duration = MathUtil::max(duration, timelines[i]->getDuration());
-	return new (__FILE__, __LINE__) Animation(String(map->_name), timelines, duration);
+	Animation *animation = new (__FILE__, __LINE__) Animation(String(map->_name));
+	animation->setTimelines(timelines, bones);
+	animation->setDuration(duration);
+	return animation;
 }
 
 void SkeletonJson::readTimeline(Array<Timeline *> &timelines, Json *keyMap, CurveTimeline1 *timeline, float defaultValue, float scale) {

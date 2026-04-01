@@ -59,27 +59,35 @@ namespace spine {
 		/// Creates a slider instance.
 		virtual Constraint &create(Skeleton &skeleton) override;
 
+		/// The animation the slider will apply.
 		Animation &getAnimation();
 		void setAnimation(Animation &animation);
 
+		/// When true, the animation is applied by adding it to the current pose rather than overwriting it.
 		bool getAdditive();
 		void setAdditive(bool additive);
 
+		/// When true, the animation repeats after its duration, otherwise the last frame is used.
 		bool getLoop();
 		void setLoop(bool loop);
 
+		/// When set, the bone's transform property is used to set the slider's SliderPose::getTime().
 		BoneData *getBone();
 		void setBone(BoneData *bone);
 
+		/// When a bone is set, the specified transform property is used to set the slider's SliderPose::getTime().
 		FromProperty *getProperty();
 		void setProperty(FromProperty *property);
 
+		/// When a bone is set, this is the scale of the property value in relation to the slider time.
 		float getScale();
 		void setScale(float scale);
 
+		/// When a bone is set, the offset is added to the property.
 		float getOffset();
 		void setOffset(float offset);
 
+		/// When true and a bone is set, the bone's local transform property is read instead of its world transform.
 		bool getLocal();
 		void setLocal(bool local);
 

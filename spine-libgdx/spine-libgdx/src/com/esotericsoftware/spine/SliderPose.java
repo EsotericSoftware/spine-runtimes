@@ -38,6 +38,7 @@ public class SliderPose implements Pose<SliderPose> {
 		mix = pose.mix;
 	}
 
+	/** The time in the {@link SliderData#animation} to apply the animation. */
 	public float getTime () {
 		return time;
 	}
@@ -46,6 +47,7 @@ public class SliderPose implements Pose<SliderPose> {
 		this.time = time;
 	}
 
+	/** A percentage that controls the mix between the constrained and unconstrained poses. */
 	public float getMix () {
 		return mix;
 	}

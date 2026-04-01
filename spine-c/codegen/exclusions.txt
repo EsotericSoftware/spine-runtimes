@@ -56,6 +56,7 @@ method: Bone::pose
 
 # Methods that return objects by value (not supported - would need heap allocation)
 method: Color::valueOf
+method: DrawOrderTimeline::getPropertyId
 
 # Exclude const versions of getSetupPose() - we'll only expose the non-const version
 method: BoneData::getSetupPose const

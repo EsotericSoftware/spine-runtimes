@@ -30,13 +30,43 @@
 // AUTO GENERATED FILE, DO NOT EDIT.
 
 import Foundation
+import SpineC
 
-/// MixDirection enum
-public enum MixDirection: Int32, CaseIterable {
-    case `in` = 0
-    case `out` = 1
+/// Stores the skeleton's draw order, which is the order that each slot's attachment is rendered.
+@objc(SpineDrawOrder)
+@objcMembers
+public class DrawOrder: NSObject {
+    public let _ptr: UnsafeMutableRawPointer
 
-    public static func fromValue(_ value: Int32) -> MixDirection? {
-        return MixDirection(rawValue: value)
+    public init(fromPointer ptr: spine_draw_order) {
+        self._ptr = UnsafeMutableRawPointer(ptr)
+        super.init()
+    }
+
+    public convenience init(_ setupPose: ArraySlot) {
+        let ptr = spine_draw_order_create(setupPose._ptr.assumingMemoryBound(to: spine_array_slot_wrapper.self))
+        self.init(fromPointer: ptr!)
+    }
+
+    /// The unconstrained draw order, set by animations and application code.
+    public var pose: ArraySlot {
+        let result = spine_draw_order_get_pose(_ptr.assumingMemoryBound(to: spine_draw_order_wrapper.self))
+        return ArraySlot(fromPointer: result!)
+    }
+
+    /// The constrained draw order for rendering. If no constraints modify the draw order, this is
+    /// the same as getPose(). Otherwise it is a copy of getPose() modified by constraints.
+    public var appliedPose: ArraySlot {
+        let result = spine_draw_order_get_applied_pose(_ptr.assumingMemoryBound(to: spine_draw_order_wrapper.self))
+        return ArraySlot(fromPointer: result!)
+    }
+
+    /// Sets the unconstrained draw order to the setup pose order.
+    public func setupPose() {
+        spine_draw_order_setup_pose(_ptr.assumingMemoryBound(to: spine_draw_order_wrapper.self))
+    }
+
+    public func dispose() {
+        spine_draw_order_dispose(_ptr.assumingMemoryBound(to: spine_draw_order_wrapper.self))
     }
 }

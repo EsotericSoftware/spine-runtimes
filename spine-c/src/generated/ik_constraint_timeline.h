@@ -15,8 +15,8 @@ SPINE_C_API void spine_ik_constraint_timeline_dispose(spine_ik_constraint_timeli
 
 SPINE_C_API spine_rtti spine_ik_constraint_timeline_get_rtti(spine_ik_constraint_timeline self);
 SPINE_C_API void spine_ik_constraint_timeline_apply(spine_ik_constraint_timeline self, spine_skeleton skeleton, float lastTime, float time,
-													/*@null*/ spine_array_event events, float alpha, spine_mix_blend blend,
-													spine_mix_direction direction, bool appliedPose);
+													/*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out,
+													bool appliedPose);
 /**
  * Sets the time, mix, softness, bend direction, compress, and stretch for the
  * specified frame.
@@ -36,6 +36,15 @@ SPINE_C_API void spine_ik_constraint_timeline_set_bezier(spine_ik_constraint_tim
 SPINE_C_API float spine_ik_constraint_timeline_get_bezier_value(spine_ik_constraint_timeline self, float time, size_t frame, size_t valueOffset,
 																size_t i);
 SPINE_C_API spine_array_float spine_ik_constraint_timeline_get_curves(spine_ik_constraint_timeline self);
+/**
+ * True if this timeline supports additive blending.
+ */
+SPINE_C_API bool spine_ik_constraint_timeline_get_additive(spine_ik_constraint_timeline self);
+/**
+ * True if this timeline sets values instantaneously and does not support
+ * interpolation between frames.
+ */
+SPINE_C_API bool spine_ik_constraint_timeline_get_instant(spine_ik_constraint_timeline self);
 SPINE_C_API size_t spine_ik_constraint_timeline_get_frame_entries(spine_ik_constraint_timeline self);
 SPINE_C_API size_t spine_ik_constraint_timeline_get_frame_count(spine_ik_constraint_timeline self);
 SPINE_C_API spine_array_float spine_ik_constraint_timeline_get_frames(spine_ik_constraint_timeline self);

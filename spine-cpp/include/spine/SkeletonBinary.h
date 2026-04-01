@@ -171,9 +171,9 @@ namespace spine {
 			}
 
 			inline long long readLong() {
-				unsigned long long result = (unsigned long long) readInt();
+				unsigned long long result = (unsigned int) readInt();
 				result <<= 32;
-				result |= (unsigned long long) readInt();
+				result |= (unsigned int) readInt();
 				return (long long) result;
 			}
 

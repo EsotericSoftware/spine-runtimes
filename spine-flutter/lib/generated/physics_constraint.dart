@@ -64,18 +64,20 @@ class PhysicsConstraint extends PhysicsConstraintBase {
     return PhysicsConstraint.fromPointer(result);
   }
 
+  /// Resets all physics state that was the result of previous movement. Use
+  /// this after moving a bone to prevent physics from reacting to the movement.
   void reset(Skeleton skeleton) {
     SpineBindings.bindings.spine_physics_constraint_reset(_ptr, skeleton.nativePtr.cast());
   }
 
-  /// Translates the physics constraint so next update() forces are applied as
-  /// if the bone moved an additional amount in world space.
+  /// Translates the physics constraint so the next update() forces are applied
+  /// as if the bone moved an additional amount in world space.
   void translate(double x, double y) {
     SpineBindings.bindings.spine_physics_constraint_translate(_ptr, x, y);
   }
 
-  /// Rotates the physics constraint so next update() forces are applied as if
-  /// the bone rotated around the specified point in world space.
+  /// Rotates the physics constraint so the next update() forces are applied as
+  /// if the bone rotated around the specified point in world space.
   void rotate(double x, double y, double degrees) {
     SpineBindings.bindings.spine_physics_constraint_rotate(_ptr, x, y, degrees);
   }

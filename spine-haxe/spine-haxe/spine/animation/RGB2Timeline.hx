@@ -61,32 +61,24 @@ class RGB2Timeline extends SlotCurveTimeline {
 		frames[frame + B2] = b2;
 	}
 
-	public function apply1(slot:Slot, pose:SlotPose, time:Float, alpha:Float, blend:MixBlend) {
+	public function apply1(slot:Slot, pose:SlotPose, time:Float, alpha:Float, fromSetup:Bool, add:Bool) {
 		var light:Color = pose.color, dark:Color = pose.darkColor;
 		var r:Float = 0, g:Float = 0, b:Float = 0, r2:Float = 0, g2:Float = 0, b2:Float = 0;
 		if (time < frames[0]) {
-			var setup = slot.data.setup;
-			var setupLight:Color = setup.color, setupDark:Color = setup.darkColor;
-			switch (blend) {
-				case MixBlend.setup:
-					light.r = setupLight.r;
-					light.g = setupLight.g;
-					light.b = setupLight.b;
-					dark.r = setupDark.r;
-					dark.g = setupDark.g;
-					dark.b = setupDark.b;
-					return;
-				case MixBlend.first:
-					r = light.r + (setupLight.r - light.r) * alpha;
-					g = light.g + (setupLight.g - light.g) * alpha;
-					b = light.b + (setupLight.b - light.b) * alpha;
-					r2 = dark.r + (setupDark.r - dark.r) * alpha;
-					g2 = dark.g + (setupDark.g - dark.g) * alpha;
-					b2 = dark.b + (setupDark.b - dark.b) * alpha;
-				default:
-					return;
+			if (fromSetup) {
+				var setupPose = slot.data.setupPose;
+				var setupLight:Color = setupPose.color,
+					setupDark:Color = setupPose.darkColor;
+				light.r = setupLight.r;
+				light.g = setupLight.g;
+				light.b = setupLight.b;
+				dark.r = setupDark.r;
+				dark.g = setupDark.g;
+				dark.b = setupDark.b;
 			}
-		} else {
+			return;
+		}
+		{
 			var i:Int = Timeline.search(frames, time, ENTRIES);
 			var curveType:Int = Std.int(curves[Std.int(i / ENTRIES)]);
 			switch (curveType) {
@@ -122,8 +114,8 @@ class RGB2Timeline extends SlotCurveTimeline {
 			}
 
 			if (alpha != 1) {
-				if (blend == MixBlend.setup) {
-					var setupPose = slot.data.setup;
+				if (fromSetup) {
+					var setupPose = slot.data.setupPose;
 					var setup = setupPose.color;
 					r = setup.r + (r - setup.r) * alpha;
 					g = setup.g + (g - setup.g) * alpha;

@@ -56,25 +56,31 @@ namespace spine {
 
 		virtual void set(PhysicsConstraintPose &pose) override;
 
+		/// Controls how much bone movement is converted into physics movement.
 		float getInertia();
 		void setInertia(float inertia);
 
+		/// The amount of force used to return properties to the unconstrained value.
 		float getStrength();
 		void setStrength(float strength);
 
+		/// Reduces the speed of physics movements, with more of a reduction at higher speeds.
 		float getDamping();
 		void setDamping(float damping);
 
+		/// Determines susceptibility to acceleration.
 		float getMassInverse();
 		void setMassInverse(float massInverse);
 
+		/// Applies a constant force along the Skeleton::getWindX(), Skeleton::getWindY() vector.
 		float getWind();
 		void setWind(float wind);
 
+		/// Applies a constant force along the Skeleton::getGravityX(), Skeleton::getGravityY() vector.
 		float getGravity();
 		void setGravity(float gravity);
 
-		/// A percentage (0-1) that controls the mix between the constrained and unconstrained poses.
+		/// A percentage (0+) that controls the mix between the constrained and unconstrained poses.
 		float getMix();
 		void setMix(float mix);
 	};

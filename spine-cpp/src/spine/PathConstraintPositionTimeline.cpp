@@ -45,21 +45,22 @@ RTTI_IMPL(PathConstraintPositionTimeline, ConstraintTimeline1)
 
 PathConstraintPositionTimeline::PathConstraintPositionTimeline(size_t frameCount, size_t bezierCount, int constraintIndex)
 	: ConstraintTimeline1(frameCount, bezierCount, constraintIndex, Property_PathConstraintPosition) {
+	_additive = true;
 }
 
 PathConstraintPositionTimeline::~PathConstraintPositionTimeline() {
 }
 
-void PathConstraintPositionTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
-										   MixDirection direction, bool appliedPose) {
+void PathConstraintPositionTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup,
+										   bool add, bool out, bool appliedPose) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(events);
-	SP_UNUSED(direction);
+	SP_UNUSED(out);
 
 	PathConstraint *constraint = (PathConstraint *) skeleton._constraints[_constraintIndex];
 	if (constraint->isActive()) {
-		PathConstraintPose &pose = appliedPose ? *constraint->_applied : constraint->_pose;
+		PathConstraintPose &pose = appliedPose ? *constraint->_appliedPose : constraint->_pose;
 		PathConstraintData &data = constraint->_data;
-		pose._position = getAbsoluteValue(time, alpha, blend, pose._position, data._setup._position);
+		pose._position = getAbsoluteValue(time, alpha, fromSetup, add, pose._position, data._setupPose._position);
 	}
 }

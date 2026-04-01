@@ -34,7 +34,7 @@ import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
 import 'physics_constraint_timeline.dart';
 
-/// Changes a physics constraint's PhysicsConstraintPose::getInertia().
+/// Changes a physics constraint's inertia.
 class PhysicsConstraintInertiaTimeline extends PhysicsConstraintTimeline {
   final Pointer<spine_physics_constraint_inertia_timeline_wrapper> _ptr;
 

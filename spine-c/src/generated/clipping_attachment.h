@@ -14,13 +14,17 @@ SPINE_C_API spine_clipping_attachment spine_clipping_attachment_create(const cha
 SPINE_C_API void spine_clipping_attachment_dispose(spine_clipping_attachment self);
 
 SPINE_C_API spine_rtti spine_clipping_attachment_get_rtti(spine_clipping_attachment self);
+/**
+ * Clipping is performed between the clipping attachment's slot and the end
+ * slot. If NULL, clipping is done until the end of the skeleton's rendering.
+ */
 SPINE_C_API /*@null*/ spine_slot_data spine_clipping_attachment_get_end_slot(spine_clipping_attachment self);
 SPINE_C_API void spine_clipping_attachment_set_end_slot(spine_clipping_attachment self, /*@null*/ spine_slot_data inValue);
 SPINE_C_API spine_color spine_clipping_attachment_get_color(spine_clipping_attachment self);
 SPINE_C_API spine_attachment spine_clipping_attachment_copy(spine_clipping_attachment self);
 /**
- * Transforms the attachment's local vertices to world coordinates. If the
- * slot's SlotPose::getDeform() is not empty, it is used to deform the vertices.
+ * Transforms the attachment's local vertices to world coordinates. If
+ * SlotPose::getDeform() is not empty, it is used to deform the vertices.
  *
  * See https://esotericsoftware.com/spine-runtime-skeletons#World-transforms
  * World transforms in the Spine Runtimes Guide.
@@ -41,8 +45,19 @@ SPINE_C_API void spine_clipping_attachment_compute_world_vertices_2(spine_clippi
  * Gets a unique ID for this attachment.
  */
 SPINE_C_API int spine_clipping_attachment_get_id(spine_clipping_attachment self);
+/**
+ * The bones that affect the vertices. The entries are, for each vertex, the
+ * number of bones affecting the vertex followed by that many bone indices,
+ * which is Skeleton::getBones() index. Empty if this attachment has no weights.
+ */
 SPINE_C_API spine_array_int spine_clipping_attachment_get_bones(spine_clipping_attachment self);
 SPINE_C_API void spine_clipping_attachment_set_bones(spine_clipping_attachment self, spine_array_int bones);
+/**
+ * The vertex positions in the bone's coordinate system. For a non-weighted
+ * attachment, the values are x,y pairs for each vertex. For a weighted
+ * attachment, the values are x,y,weight triplets for each bone affecting each
+ * vertex.
+ */
 SPINE_C_API spine_array_float spine_clipping_attachment_get_vertices(spine_clipping_attachment self);
 SPINE_C_API void spine_clipping_attachment_set_vertices(spine_clipping_attachment self, spine_array_float vertices);
 SPINE_C_API size_t spine_clipping_attachment_get_world_vertices_length(spine_clipping_attachment self);

@@ -48,6 +48,9 @@ namespace spine {
 		}
 	};
 
+	/// Adjusts the world transform of the constrained bones to match that of the source bone.
+	///
+	/// See https://esotericsoftware.com/spine-transform-constraints Transform constraints in the Spine User Guide.
 	class SP_API TransformConstraint : public TransformConstraintBase {
 		friend class Skeleton;
 		friend class TransformConstraintTimeline;
@@ -69,7 +72,7 @@ namespace spine {
 		/// The bones that will be modified by this transform constraint.
 		Array<BonePose *> &getBones();
 
-		/// The bone whose world transform will be copied to the constrained bones.
+		/// The bone whose world transform will be matched by the constrained bones.
 		Bone &getSource();
 
 		void setSource(Bone &source);

@@ -49,7 +49,14 @@ public class SlotData extends PosedData<SlotPose> {
 		this.boneData = boneData;
 	}
 
-	/** The index of the slot in {@link Skeleton#getSlots()}. */
+	/** The slot's name, unique across all slots in the skeleton.
+	 * <p>
+	 * See {@link SkeletonData#findSlot(String)} and {@link Skeleton#findSlot(String)}. */
+	public String getName () { // Do not port.
+		return super.getName();
+	}
+
+	/** The {@link Skeleton#slots} index. */
 	public int getIndex () {
 		return index;
 	}

@@ -34,8 +34,8 @@ import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
 import 'physics_constraint_timeline.dart';
 
-/// Changes a physics constraint's PhysicsConstraintPose::getMassInverse(). The
-/// timeline values are not inverted.
+/// Changes a physics constraint's mass inverse. The timeline values are not
+/// inverted.
 class PhysicsConstraintMassTimeline extends PhysicsConstraintTimeline {
   final Pointer<spine_physics_constraint_mass_timeline_wrapper> _ptr;
 

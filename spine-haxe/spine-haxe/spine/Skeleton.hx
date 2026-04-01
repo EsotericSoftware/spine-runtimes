@@ -51,8 +51,8 @@ class Skeleton {
 	/** The skeleton's slots. */
 	public final slots:Array<Slot>; // Setup pose draw order.
 
-	/** The skeleton's slots in the order they should be drawn. The returned array may be modified to change the draw order. */
-	public var drawOrder:Array<Slot>;
+	/** The skeleton's draw order. Use drawOrder.appliedPose for rendering and drawOrder.pose for changing the draw order. */
+	public var drawOrder:DrawOrder;
 
 	/** The skeleton's constraints. */
 	public final constraints:Array<Constraint<Dynamic, Dynamic, Dynamic>>;
@@ -63,7 +63,7 @@ class Skeleton {
 	/** The list of bones and constraints, sorted in the order they should be updated, as computed by Skeleton.updateCache(). */
 	public final _updateCache = new Array<Dynamic>();
 
-	private final resetCache = new Array<Posed<Dynamic, Dynamic, Dynamic>>();
+	private final resetCache = new Array<Posed<Dynamic, Dynamic>>();
 
 	/** The skeleton's current skin. */
 	public var skin(default, set):Skin = null;
@@ -127,12 +127,11 @@ class Skeleton {
 		}
 
 		slots = new Array<Slot>();
-		drawOrder = new Array<Slot>();
 		for (slotData in data.slots) {
 			var slot = new Slot(slotData, this);
 			slots.push(slot);
-			drawOrder.push(slot);
 		}
+		drawOrder = new DrawOrder(slots);
 
 		physics = new Array<PhysicsConstraint>();
 		constraints = new Array<Constraint<Dynamic, Dynamic, Dynamic>>();
@@ -154,13 +153,14 @@ class Skeleton {
 		_updateCache.resize(0);
 		resetCache.resize(0);
 
+		drawOrder.unconstrained();
 		for (slot in slots)
-			slot.usePose();
+			slot.unconstrained();
 
 		for (bone in bones) {
 			bone.sorted = bone.data.skinRequired;
 			bone.active = !bone.sorted;
-			bone.usePose();
+			bone.unconstrained();
 		}
 
 		if (skin != null) {
@@ -176,7 +176,7 @@ class Skeleton {
 		}
 
 		for (constraint in constraints)
-			constraint.usePose();
+			constraint.unconstrained();
 		for (c in constraints) {
 			var constraint:Constraint<Dynamic, Dynamic, Dynamic> = c;
 			constraint.active = constraint.isSourceActive()
@@ -194,18 +194,18 @@ class Skeleton {
 			var updatable = updateCache[i];
 			if (Std.isOfType(updatable, Bone)) {
 				var b:Bone = cast updatable;
-				updateCache[i] = b.applied;
+				updateCache[i] = b.appliedPose;
 			}
 		}
 	}
 
-	private static function contains(list:Array<ConstraintData<Dynamic, Dynamic>>, element:ConstraintData<Dynamic, Dynamic>):Bool {
+	private static function contains(list:Array<ConstraintData<Dynamic, Dynamic>>, element:Dynamic):Bool {
 		return list.indexOf(element) != -1;
 	}
 
-	public function constrained(object:Posed<Dynamic, Dynamic, Dynamic>) {
-		if (object.pose == object.applied) {
-			object.useConstrained();
+	public function constrained(object:Posed<Dynamic, Dynamic>) {
+		if (object.pose == object.appliedPose) {
+			object.constrained();
 			resetCache.push(object);
 		}
 	}
@@ -237,6 +237,7 @@ class Skeleton {
 	public function updateWorldTransform(physics:Physics):Void {
 		_update++;
 
+		drawOrder.resetConstrained();
 		for (resetable in resetCache)
 			resetable.resetConstrained();
 
@@ -260,11 +261,9 @@ class Skeleton {
 
 	/** Sets the slots and draw order to their setup pose values. */
 	public function setupPoseSlots():Void {
-		var i:Int = 0;
-		for (slot in slots) {
-			drawOrder[i++] = slot;
+		drawOrder.setupPose();
+		for (slot in slots)
 			slot.setupPose();
-		}
 	}
 
 	/** Returns the root bone, or null if the skeleton has no bones. */
@@ -433,18 +432,18 @@ class Skeleton {
 		var minY = Math.POSITIVE_INFINITY;
 		var maxX = Math.NEGATIVE_INFINITY;
 		var maxY = Math.NEGATIVE_INFINITY;
-		for (slot in drawOrder) {
+		for (slot in drawOrder.appliedPose) {
 			var verticesLength:Int = 0;
 			var vertices:Array<Float> = null;
 			var triangles:Array<Int> = null;
-			var attachment:Attachment = slot.pose.attachment;
+			var attachment:Attachment = slot.appliedPose.attachment;
 			if (attachment != null) {
 				if (Std.isOfType(attachment, RegionAttachment)) {
 					verticesLength = 8;
 					_tempVertices.resize(verticesLength);
 					vertices = _tempVertices;
 					var region:RegionAttachment = cast(attachment, RegionAttachment);
-					region.computeWorldVertices(slot, region.getOffsets(slot.applied), vertices, 0, 2);
+					region.computeWorldVertices(slot, region.getOffsets(slot.appliedPose), vertices, 0, 2);
 					triangles = Skeleton.quadTriangles;
 				} else if (Std.isOfType(attachment, MeshAttachment)) {
 					var mesh:MeshAttachment = cast(attachment, MeshAttachment);

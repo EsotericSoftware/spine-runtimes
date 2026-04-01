@@ -34,11 +34,11 @@ import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
 import 'rtti.dart';
 import 'arrays.dart';
-import 'mix_blend.dart';
-import 'mix_direction.dart';
 import 'skeleton.dart';
 
-/// Timeline wrapper
+/// The base class for all timelines.
+///
+/// See Applying Animations in the Spine Runtimes Guide.
 abstract class Timeline {
   final Pointer<spine_timeline_wrapper> _ptr;
 
@@ -52,20 +52,36 @@ abstract class Timeline {
     return Rtti.fromPointer(result);
   }
 
-  /// Sets the value(s) for the specified time.
+  /// Applies this timeline to the skeleton.
   ///
-  /// [skeleton] The skeleton the timeline is being applied to. This provides access to the bones, slots, and other skeleton components the timeline may change.
-  /// [lastTime] lastTime The time this timeline was last applied. Timelines such as EventTimeline trigger only at specific times rather than every frame. In that case, the timeline triggers everything between lastTime (exclusive) and time (inclusive).
-  /// [time] The time within the animation. Most timelines find the key before and the key after this time so they can interpolate between the keys.
-  /// [events] If any events are fired, they are added to this array. Can be NULL to ignore firing events or if the timeline does not fire events. May be NULL.
-  /// [alpha] alpha 0 applies the current or setup pose value (depending on pose parameter). 1 applies the timeline value. Between 0 and 1 applies a value between the current or setup pose and the timeline value. By adjusting alpha over time, an animation can be mixed in or out. alpha can also be useful to apply animations on top of each other (layered).
-  /// [blend] Controls how mixing is applied when alpha is than 1.
-  /// [direction] Indicates whether the timeline is mixing in or out. Used by timelines which perform instant transitions such as DrawOrderTimeline and AttachmentTimeline.
-  /// [appliedPose] True to modify the applied pose.
-  void apply(Skeleton skeleton, double lastTime, double time, ArrayEvent? events, double alpha, MixBlend blend,
-      MixDirection direction, bool appliedPose) {
+  /// See Applying Animations in the Spine Runtimes Guide.
+  ///
+  /// [skeleton] The skeleton the timeline is applied to. This provides access to the bones, slots, and other skeleton components the timelines may change.
+  /// [lastTime] The last time in seconds this timeline was applied. Some timelines trigger only at discrete times, in which case all keys are triggered between lastTime (exclusive) and time (inclusive). Pass -1 the first time a timeline is applied to ensure frame 0 is triggered.
+  /// [time] The time in seconds the skeleton is being posed for. Timelines find the frame before and after this time and interpolate between the frame values.
+  /// [events] If any events are fired, they are added to this list. Can be NULL to ignore fired events or if no timelines fire events.
+  /// [alpha] 0 applies setup or current values (depending on fromSetup), 1 uses timeline values, and intermediate values interpolate between them. Adjusting alpha over time can mix a timeline in or out.
+  /// [fromSetup] If true, alpha transitions between setup and timeline values, setup values are used before the first frame (current values are not used). If false, alpha transitions between current and timeline values, no change is made before the first frame.
+  /// [add] If true, for timelines that support it, their values are added to the setup or current values (depending on fromSetup).
+  /// [out] True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant transitions.
+  /// [appliedPose] True to modify getAppliedPose(), else getPose() is modified.
+  void apply(Skeleton skeleton, double lastTime, double time, ArrayEvent? events, double alpha, bool fromSetup,
+      bool add, bool out, bool appliedPose) {
     SpineBindings.bindings.spine_timeline_apply(_ptr, skeleton.nativePtr.cast(), lastTime, time,
-        events?.nativePtr.cast() ?? Pointer.fromAddress(0), alpha, blend.value, direction.value, appliedPose);
+        events?.nativePtr.cast() ?? Pointer.fromAddress(0), alpha, fromSetup, add, out, appliedPose);
+  }
+
+  /// True if this timeline supports additive blending.
+  bool get additive {
+    final result = SpineBindings.bindings.spine_timeline_get_additive(_ptr);
+    return result;
+  }
+
+  /// True if this timeline sets values instantaneously and does not support
+  /// interpolation between frames.
+  bool get instant {
+    final result = SpineBindings.bindings.spine_timeline_get_instant(_ptr);
+    return result;
   }
 
   int get frameEntries {

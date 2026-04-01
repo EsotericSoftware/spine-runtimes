@@ -90,9 +90,9 @@ spine_array_slot spine_skeleton_get_slots(spine_skeleton self) {
 	return (spine_slot) _self->findSlot(String(slotName));
 }
 
-spine_array_slot spine_skeleton_get_draw_order(spine_skeleton self) {
+spine_draw_order spine_skeleton_get_draw_order(spine_skeleton self) {
 	Skeleton *_self = (Skeleton *) self;
-	return (spine_array_slot) &_self->getDrawOrder();
+	return (spine_draw_order) &_self->getDrawOrder();
 }
 
 /*@null*/ spine_skin spine_skeleton_get_skin(spine_skeleton self) {
@@ -110,19 +110,19 @@ void spine_skeleton_set_skin_2(spine_skeleton self, /*@null*/ spine_skin newSkin
 	_self->setSkin((Skin *) newSkin);
 }
 
-/*@null*/ spine_attachment spine_skeleton_get_attachment_1(spine_skeleton self, const char *slotName, const char *attachmentName) {
+/*@null*/ spine_attachment spine_skeleton_get_attachment_1(spine_skeleton self, const char *slotName, const char *placeholderName) {
 	Skeleton *_self = (Skeleton *) self;
-	return (spine_attachment) _self->getAttachment(String(slotName), String(attachmentName));
+	return (spine_attachment) _self->getAttachment(String(slotName), String(placeholderName));
 }
 
-/*@null*/ spine_attachment spine_skeleton_get_attachment_2(spine_skeleton self, int slotIndex, const char *attachmentName) {
+/*@null*/ spine_attachment spine_skeleton_get_attachment_2(spine_skeleton self, int slotIndex, const char *placeholderName) {
 	Skeleton *_self = (Skeleton *) self;
-	return (spine_attachment) _self->getAttachment(slotIndex, String(attachmentName));
+	return (spine_attachment) _self->getAttachment(slotIndex, String(placeholderName));
 }
 
-void spine_skeleton_set_attachment(spine_skeleton self, const char *slotName, const char *attachmentName) {
+void spine_skeleton_set_attachment(spine_skeleton self, const char *slotName, const char *placeholderName) {
 	Skeleton *_self = (Skeleton *) self;
-	_self->setAttachment(String(slotName), String(attachmentName));
+	_self->setAttachment(String(slotName), String(placeholderName));
 }
 
 spine_array_constraint spine_skeleton_get_constraints(spine_skeleton self) {

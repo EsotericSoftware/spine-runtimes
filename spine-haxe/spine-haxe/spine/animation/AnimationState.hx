@@ -42,50 +42,10 @@ import spine.Skeleton;
  * @see https://esotericsoftware.com/spine-applying-animations/ Applying Animations in the Spine Runtimes Guide
  */
 class AnimationState {
-	/**
-	 * 1) A previously applied timeline has set this property.
-	 * Result: Mix from the current pose to the timeline pose.
-	 */
 	public static inline var SUBSEQUENT:Int = 0;
-
-	/**
-	 * 1) This is the first timeline to set this property.
-	 * 2) The next track entry applied after this one does not have a timeline to set this property.
-	 * Result: Mix from the setup pose to the timeline pose.
-	 */
 	public static inline var FIRST:Int = 1;
-
-	/**
-	 * 1) A previously applied timeline has set this property.
-	 * 2) The next track entry to be applied does have a timeline to set this property.
-	 * 3) The next track entry after that one does not have a timeline to set this property.
-	 * Result: Mix from the current pose to the timeline pose, but do not mix out. This avoids "dipping" when crossfading
-	 * animations that key the same property. A subsequent timeline will set this property using a mix.
-	 */
-	public static inline var HOLD_SUBSEQUENT:Int = 2;
-
-	/**
-	 * 1) This is the first timeline to set this property.
-	 * 2) The next track entry to be applied does have a timeline to set this property.
-	 * 3) The next track entry after that one does not have a timeline to set this property.
-	 * Result: Mix from the setup pose to the timeline pose, but do not mix out. This avoids "dipping" when crossfading animations
-	 * that key the same property. A subsequent timeline will set this property using a mix.
-	 */
+	public static inline var HOLD:Int = 2;
 	public static inline var HOLD_FIRST:Int = 3;
-
-	/**
-	 * 1) This is the first timeline to set this property.
-	 * 2) The next track entry to be applied does have a timeline to set this property.
-	 * 3) The next track entry after that one does have a timeline to set this property.
-	 * 4) timelineHoldMix stores the first subsequent track entry that does not have a timeline to set this property.
-	 * Result: The same as HOLD except the mix percentage from the timelineHoldMix track entry is used. This handles when more than
-	 * 2 track entries in a row have a timeline that sets the same property.
-	 * Eg, A -> B -> C -> D where A, B, and C have a timeline setting same property, but D does not. When A is applied, to avoid
-	 * "dipping" A is not mixed out, however D (the first entry that doesn't set the property) mixing in is used to mix out A
-	 * (which affects B and C). Without using D to mix out, A would be applied fully until mixing completes, then snap to the mixed
-	 * out position.
-	 */
-	public static inline var HOLD_MIX:Int = 4;
 
 	public static inline var SETUP:Int = 1;
 	public static inline var CURRENT:Int = 2;
@@ -210,7 +170,13 @@ class AnimationState {
 				to.mixingFrom = from.mixingFrom;
 				if (from.mixingFrom != null)
 					from.mixingFrom.mixingTo = to;
-				to.interruptAlpha = from.interruptAlpha;
+				if (from.totalAlpha == 0) {
+					var next = to;
+					while (next.mixingTo != null) {
+						next.keepHold = true;
+						next = next.mixingTo;
+					}
+				}
 				queue.end(from);
 			}
 			return finished;
@@ -238,16 +204,14 @@ class AnimationState {
 			if (current == null || current.delay > 0)
 				continue;
 			applied = true;
-			var blend:MixBlend = i == 0 ? MixBlend.first : current.mixBlend;
 
 			// Apply mixing from entries first.
 			var alpha:Float = current.alpha;
 			if (current.mixingFrom != null) {
-				alpha *= applyMixingFrom(current, skeleton, blend);
+				alpha *= applyMixingFrom(current, skeleton);
 			} else if (current.trackTime >= current.trackEnd && current.next == null) {
 				alpha = 0;
 			}
-			var attachments:Bool = alpha >= current.alphaAttachmentThreshold;
 
 			// Apply current entry.
 			var animationLast:Float = current.animationLast,
@@ -260,35 +224,32 @@ class AnimationState {
 			}
 			var timelines:Array<Timeline> = current.animation.timelines;
 			var timelineCount:Int = timelines.length;
-			var timeline:Timeline;
-			if ((i == 0 && alpha == 1) || blend == MixBlend.add) {
-				if (i == 0)
-					attachments = true;
+			if (i == 0 && alpha == 1) {
 				for (timeline in timelines) {
-					if (Std.isOfType(timeline, AttachmentTimeline)) {
-						applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, blend, false, attachments);
-					} else {
-						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, blend, MixDirection.mixIn, false);
-					}
+					if (Std.isOfType(timeline, AttachmentTimeline))
+						applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, true, false, true);
+					else
+						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, true, false, false, false);
 				}
 			} else {
 				var timelineMode:Array<Int> = current.timelineMode;
-
-				var shortestRotation = current.shortestRotation;
+				var attachments:Bool = alpha >= current.alphaAttachmentThreshold;
+				var add = current.additive,
+					shortestRotation = add || current.shortestRotation;
 				var firstFrame:Bool = !shortestRotation && current.timelinesRotation.length != timelineCount << 1;
 				if (firstFrame)
 					current.timelinesRotation.resize(timelineCount << 1);
 
 				for (ii in 0...timelineCount) {
 					var timeline:Timeline = timelines[ii];
-					var timelineBlend:MixBlend = timelineMode[ii] == SUBSEQUENT ? blend : MixBlend.setup;
+					var fromSetup = (timelineMode[ii] & FIRST) != 0;
 					if (!shortestRotation && Std.isOfType(timeline, RotateTimeline)) {
-						this.applyRotateTimeline(cast(timeline, RotateTimeline), skeleton, applyTime, alpha, timelineBlend, current.timelinesRotation,
-							ii << 1, firstFrame);
+						applyRotateTimeline(cast(timeline, RotateTimeline), skeleton, applyTime, alpha, fromSetup, current.timelinesRotation, ii << 1,
+							firstFrame);
 					} else if (Std.isOfType(timeline, AttachmentTimeline)) {
-						this.applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, blend, false, attachments);
+						applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, fromSetup, false, attachments);
 					} else {
-						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, timelineBlend, MixDirection.mixIn, false);
+						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, fromSetup, add, false, false);
 					}
 				}
 			}
@@ -314,93 +275,62 @@ class AnimationState {
 		return applied;
 	}
 
-	private function applyMixingFrom(to:TrackEntry, skeleton:Skeleton, blend:MixBlend):Float {
+	private function applyMixingFrom(to:TrackEntry, skeleton:Skeleton):Float {
 		var from:TrackEntry = to.mixingFrom;
-		if (from.mixingFrom != null)
-			applyMixingFrom(from, skeleton, blend);
+		var fromMix:Float = from.mixingFrom != null ? applyMixingFrom(from, skeleton) : 1;
+		var mix:Float = to.mixDuration == 0 ? 1 : Math.min(1, to.mixTime / to.mixDuration);
 
-		var mix:Float = 0;
-		if (to.mixDuration == 0) // Single frame mix to undo mixingFrom changes.
-		{
-			mix = 1;
-			if (blend == MixBlend.first)
-				blend = MixBlend.setup;
-		} else {
-			mix = to.mixTime / to.mixDuration;
-			if (mix > 1)
-				mix = 1;
-			if (blend != MixBlend.first)
-				blend = from.mixBlend;
-		}
+		var a = from.alpha * fromMix, keep = 1 - mix * to.alpha;
+		var alphaMix = a * (1 - mix),
+			alphaHold = keep > 0 ? alphaMix / keep : a;
+
+		var timelines:Array<Timeline> = from.animation.timelines;
+		var timelineCount:Int = timelines.length;
+		var timelineMode:Array<Int> = from.timelineMode;
+		var timelineHoldMix:Array<TrackEntry> = from.timelineHoldMix;
 
 		var attachments:Bool = mix < from.mixAttachmentThreshold,
 			drawOrder:Bool = mix < from.mixDrawOrderThreshold;
-		var timelineCount:Int = from.animation.timelines.length;
-		var timelines:Array<Timeline> = from.animation.timelines;
-		var alphaHold:Float = from.alpha * to.interruptAlpha,
-			alphaMix:Float = alphaHold * (1 - mix);
+		var add = from.additive,
+			shortestRotation = add || from.shortestRotation;
+		var firstFrame:Bool = !shortestRotation && from.timelinesRotation.length != timelineCount << 1;
+		if (firstFrame)
+			from.timelinesRotation.resize(timelineCount << 1);
+		var timelinesRotation:Array<Float> = from.timelinesRotation;
+
 		var animationLast:Float = from.animationLast,
 			animationTime:Float = from.getAnimationTime(),
 			applyTime:Float = animationTime;
 		var applyEvents:Array<Event> = null;
-		if (from.reverse) {
+		if (from.reverse)
 			applyTime = from.animation.duration - applyTime;
-		} else if (mix < from.eventThreshold) {
+		else if (mix < from.eventThreshold)
 			applyEvents = events;
-		}
 
-		if (blend == MixBlend.add) {
-			for (timeline in timelines) {
-				timeline.apply(skeleton, animationLast, applyTime, applyEvents, alphaMix, blend, MixDirection.mixOut, false);
+		from.totalAlpha = 0;
+
+		for (i in 0...timelineCount) {
+			var timeline:Timeline = timelines[i];
+			var mode = timelineMode[i];
+			var alpha:Float = 0;
+			if ((mode & HOLD) != 0) {
+				var holdMix:TrackEntry = timelineHoldMix[i];
+				alpha = holdMix == null ? alphaHold : alphaHold * Math.max(0, 1 - holdMix.mixTime / holdMix.mixDuration);
+			} else {
+				if (!drawOrder && Std.isOfType(timeline, DrawOrderTimeline))
+					continue;
+				alpha = alphaMix;
 			}
-		} else {
-			var timelineMode:Array<Int> = from.timelineMode;
-			var timelineHoldMix:Array<TrackEntry> = from.timelineHoldMix;
-			var shortestRotation = from.shortestRotation;
-
-			var firstFrame:Bool = !shortestRotation && from.timelinesRotation.length != timelineCount << 1;
-			if (firstFrame)
-				from.timelinesRotation.resize(timelineCount << 1);
-			var timelinesRotation:Array<Float> = from.timelinesRotation;
-
-			from.totalAlpha = 0;
-			for (i in 0...timelineCount) {
-				var timeline:Timeline = timelines[i];
-				var timelineBlend:MixBlend;
-				var alpha:Float = 0;
-				switch (timelineMode[i]) {
-					case SUBSEQUENT:
-						if (!drawOrder && Std.isOfType(timeline, DrawOrderTimeline))
-							continue;
-						timelineBlend = blend;
-						alpha = alphaMix;
-					case FIRST:
-						timelineBlend = MixBlend.setup;
-						alpha = alphaMix;
-					case HOLD_SUBSEQUENT:
-						timelineBlend = blend;
-						alpha = alphaHold;
-					case HOLD_FIRST:
-						timelineBlend = MixBlend.setup;
-						alpha = alphaHold;
-					default:
-						timelineBlend = MixBlend.setup;
-						var holdMix:TrackEntry = timelineHoldMix[i];
-						alpha = alphaHold * Math.max(0, 1 - holdMix.mixTime / holdMix.mixDuration);
-				}
-				from.totalAlpha += alpha;
-
-				if (!shortestRotation && Std.isOfType(timeline, RotateTimeline)) {
-					applyRotateTimeline(cast(timeline, RotateTimeline), skeleton, applyTime, alpha, timelineBlend, from.timelinesRotation, i << 1, firstFrame);
-				} else if (Std.isOfType(timeline, AttachmentTimeline)) {
-					applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime,
-						timelineBlend, true, attachments && alpha >= from.alphaAttachmentThreshold);
-				} else {
-					var direction = MixDirection.mixOut;
-					if (drawOrder && Std.isOfType(timeline, DrawOrderTimeline) && timelineBlend == MixBlend.setup)
-						direction = MixDirection.mixIn;
-					timeline.apply(skeleton, animationLast, applyTime, events, alpha, timelineBlend, direction, false);
-				}
+			from.totalAlpha += alpha;
+			var fromSetup = (mode & FIRST) != 0;
+			if (!shortestRotation && Std.isOfType(timeline, RotateTimeline)) {
+				applyRotateTimeline(cast(timeline, RotateTimeline), skeleton, applyTime, alpha, fromSetup, timelinesRotation, i << 1, firstFrame);
+			} else if (Std.isOfType(timeline, AttachmentTimeline)) {
+				applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, fromSetup,
+					true, attachments && alpha >= from.alphaAttachmentThreshold);
+			} else {
+				var out = !drawOrder || !Std.isOfType(timeline, DrawOrderTimeline) || !fromSetup;
+				timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, fromSetup, add, out, false);
 			}
 		}
 
@@ -419,15 +349,13 @@ class AnimationState {
 	 *           is not the last timeline to set the slot's attachment. In that case the timeline is applied only so subsequent
 	 *           timelines see any deform.
 	 */
-	public function applyAttachmentTimeline(timeline:AttachmentTimeline, skeleton:Skeleton, time:Float, blend:MixBlend, out:Bool, attachments:Bool) {
+	public function applyAttachmentTimeline(timeline:AttachmentTimeline, skeleton:Skeleton, time:Float, fromSetup:Bool, out:Bool, attachments:Bool) {
 		var slot = skeleton.slots[timeline.slotIndex];
 		if (!slot.bone.active)
 			return;
 
-		if (out) {
-			if (blend == MixBlend.setup) this.setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
-		} else if (time < timeline.frames[0]) { // Time is before first frame.
-			if (blend == MixBlend.setup || blend == MixBlend.first)
+		if (out || time < timeline.frames[0]) {
+			if (fromSetup)
 				this.setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
 		} else
 			this.setAttachment(skeleton, slot, timeline.attachmentNames[Timeline.search1(timeline.frames, time)], attachments);
@@ -441,36 +369,28 @@ class AnimationState {
 	 * Applies the rotate timeline, mixing with the current pose while keeping the same rotation direction chosen as the shortest
 	 * the first time the mixing was applied.
 	 */
-	public function applyRotateTimeline(timeline:RotateTimeline, skeleton:Skeleton, time:Float, alpha:Float, blend:MixBlend, timelinesRotation:Array<Float>,
+	public function applyRotateTimeline(timeline:RotateTimeline, skeleton:Skeleton, time:Float, alpha:Float, fromSetup:Bool, timelinesRotation:Array<Float>,
 			i:Int, firstFrame:Bool) {
 		if (firstFrame)
 			timelinesRotation[i] = 0;
 
 		if (alpha == 1) {
-			timeline.apply(skeleton, 0, time, null, 1, blend, MixDirection.mixIn, false);
+			timeline.apply(skeleton, 0, time, null, 1, fromSetup, false, false, false);
 			return;
 		}
 
 		var bone = skeleton.bones[timeline.boneIndex];
 		if (!bone.active)
 			return;
-		var pose = bone.pose, setup = bone.data.setup;
+		var pose = bone.pose, setup = bone.data.setupPose;
 		var frames = timeline.frames;
-		var r1:Float = 0, r2:Float = 0;
 		if (time < frames[0]) {
-			switch (blend) {
-				case MixBlend.setup:
-					pose.rotation = setup.rotation;
-				default:
-					return;
-				case MixBlend.first:
-					r1 = pose.rotation;
-					r2 = setup.rotation;
-			}
-		} else {
-			r1 = blend == MixBlend.setup ? setup.rotation : pose.rotation;
-			r2 = setup.rotation + timeline.getCurveValue(time);
+			if (fromSetup)
+				pose.rotation = setup.rotation;
+			return;
 		}
+		var r1:Float = fromSetup ? setup.rotation : pose.rotation;
+		var r2:Float = setup.rotation + timeline.getCurveValue(time);
 
 		// Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.
 		var total:Float = 0, diff:Float = r2 - r1;
@@ -617,11 +537,6 @@ class AnimationState {
 			current.mixingFrom = from;
 			from.mixingTo = current;
 			current.mixTime = 0;
-
-			// Store the interrupted mix percentage.
-			if (from.mixingFrom != null && from.mixDuration > 0) {
-				current.interruptAlpha *= Math.min(1, from.mixTime / from.mixDuration);
-			}
 
 			from.timelinesRotation.resize(0); // Reset rotation for mixing out, in case entry was mixed in.
 		}
@@ -801,8 +716,8 @@ class AnimationState {
 		entry.trackIndex = trackIndex;
 		entry.animation = animation;
 		entry.loop = loop;
-		entry.holdPrevious = false;
 
+		entry.additive = false;
 		entry.reverse = false;
 		entry.shortestRotation = false;
 
@@ -826,9 +741,8 @@ class AnimationState {
 		entry.alpha = 1;
 		entry.mixTime = 0;
 		entry.mixDuration = last == null ? 0 : data.getMix(last.animation, animation);
-		entry.interruptAlpha = 1;
 		entry.totalAlpha = 0;
-		entry.mixBlend = MixBlend.replace;
+		entry.keepHold = false;
 		return entry;
 	}
 
@@ -847,21 +761,19 @@ class AnimationState {
 	private function _animationsChanged():Void {
 		animationsChanged = false;
 
-		propertyIDs.clear();
 		var entry:TrackEntry = null;
 		for (i in 0...tracks.length) {
 			entry = tracks[i];
 			if (entry == null)
 				continue;
-			while (entry.mixingFrom != null) {
+			while (entry.mixingFrom != null)
 				entry = entry.mixingFrom;
-			}
 			do {
-				if (entry.mixingTo == null || entry.mixBlend != MixBlend.add)
-					computeHold(entry);
+				computeHold(entry);
 				entry = entry.mixingTo;
 			} while (entry != null);
 		}
+		propertyIDs.clear();
 	}
 
 	private function computeHold(entry:TrackEntry):Void {
@@ -873,47 +785,51 @@ class AnimationState {
 		entry.timelineHoldMix.resize(0);
 		var timelineHoldMix:Array<TrackEntry> = entry.timelineHoldMix;
 		timelineHoldMix.resize(timelinesCount);
+		var propertyIDs = this.propertyIDs;
+		var add = entry.additive, keepHold = entry.keepHold;
 
-		if (to != null && to.holdPrevious) {
-			for (i in 0...timelinesCount) {
-				timelineMode[i] = propertyIDs.addAll(timelines[i].propertyIds) ? HOLD_FIRST : HOLD_SUBSEQUENT;
-			}
-			return;
-		}
-
-		var continueOuter:Bool;
 		for (i in 0...timelinesCount) {
-			continueOuter = false;
 			var timeline:Timeline = timelines[i];
 			var ids:Array<String> = timeline.propertyIds;
-			if (!propertyIDs.addAll(ids)) {
-				timelineMode[i] = SUBSEQUENT;
-			} else if (to == null
-				|| Std.isOfType(timeline, AttachmentTimeline)
-				|| Std.isOfType(timeline, DrawOrderTimeline)
-				|| Std.isOfType(timeline, DrawOrderFolderTimeline)
-				|| Std.isOfType(timeline, EventTimeline)
-				|| !to.animation.hasTimeline(ids)) {
-				timelineMode[i] = FIRST;
-			} else {
-				var next:TrackEntry = to.mixingTo;
-				while (next != null) {
-					if (next.animation.hasTimeline(ids)) {
-						next = next.mixingTo;
-						continue;
-					}
-					if (entry.mixDuration > 0) {
-						timelineMode[i] = HOLD_MIX;
-						timelineHoldMix[i] = next;
-						continueOuter = true;
-						break;
-					}
+			var first = propertyIDs.addAll(ids)
+				&& !(Std.isOfType(timeline, DrawOrderFolderTimeline) && propertyIDs.contains(DrawOrderTimeline.propertyID));
+
+			if (add && timeline.additive) {
+				timelineMode[i] = first ? FIRST : SUBSEQUENT;
+				continue;
+			}
+
+			var continueOuter = false;
+			var from = entry.mixingFrom;
+			while (from != null) {
+				if (from.animation.hasTimeline(ids)) {
+					timelineMode[i] = SUBSEQUENT;
+					continueOuter = true;
 					break;
 				}
-				if (continueOuter)
-					continue;
-				timelineMode[i] = HOLD_FIRST;
+				from = from.mixingFrom;
 			}
+			if (continueOuter)
+				continue;
+
+			var mode:Int;
+			if (to == null || timeline.instant || (to.additive && timeline.additive) || !to.animation.hasTimeline(ids))
+				mode = first ? FIRST : SUBSEQUENT;
+			else {
+				mode = first ? HOLD_FIRST : HOLD;
+				var next:TrackEntry = to.mixingTo;
+				while (next != null) {
+					if ((next.additive && timeline.additive) || !next.animation.hasTimeline(ids)) {
+						if (next.mixDuration > 0)
+							timelineHoldMix[i] = next;
+						break;
+					}
+					next = next.mixingTo;
+				}
+			}
+			if (keepHold)
+				mode = (mode & ~HOLD) | (timelineMode[i] & HOLD);
+			timelineMode[i] = mode;
 		}
 	}
 

@@ -34,7 +34,6 @@ import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
 import 'animation.dart';
 import 'animation_state.dart';
-import 'mix_blend.dart';
 
 /// State for the playback of an animation
 class TrackEntry {
@@ -87,27 +86,17 @@ class TrackEntry {
     SpineBindings.bindings.spine_track_entry_set_loop(_ptr, value);
   }
 
-  /// If true, when mixing from the previous animation to this animation, the
-  /// previous animation is applied as normal instead of being mixed out.
-  ///
-  /// When mixing between animations that key the same property, if a lower
-  /// track also keys that property then the value will briefly dip toward the
-  /// lower track value during the mix. This happens because the first animation
-  /// mixes from 100% to 0% while the second animation mixes from 0% to 100%.
-  /// Setting holdPrevious to true applies the first animation at 100% during
-  /// the mix so the lower track value is overwritten. Such dipping does not
-  /// occur on the lowest track which keys the property, only when a higher
-  /// track also keys the property.
-  ///
-  /// Snapping will occur if holdPrevious is true and this animation does not
-  /// key all the same properties as the previous animation.
-  bool get holdPrevious {
-    final result = SpineBindings.bindings.spine_track_entry_get_hold_previous(_ptr);
+  /// When true, timelines in this animation that support additive have their
+  /// values added to the setup or current pose values instead of replacing
+  /// them. Additive can be set for a new track entry only before
+  /// AnimationState::apply() is next called.
+  bool get additive {
+    final result = SpineBindings.bindings.spine_track_entry_get_additive(_ptr);
     return result;
   }
 
-  set holdPrevious(bool value) {
-    SpineBindings.bindings.spine_track_entry_set_hold_previous(_ptr, value);
+  set additive(bool value) {
+    SpineBindings.bindings.spine_track_entry_set_additive(_ptr, value);
   }
 
   bool get reverse {
@@ -129,17 +118,17 @@ class TrackEntry {
   }
 
   /// Seconds to postpone playing the animation. Must be >= 0. When this track
-  /// entry is the current track entry, delay postpones incrementing the
-  /// getTrackTime(). When this track entry is queued, delay is the time from
-  /// the start of the previous animation to when this track entry will become
-  /// the current track entry (ie when the previous track entry getTrackTime()
-  /// >= this track entry's delay).
+  /// entry is the current track entry, delay postpones incrementing the track
+  /// time. When this track entry is queued, delay is the time from the start of
+  /// the previous animation to when this track entry will become the current
+  /// track entry (ie when the previous track entry's track time >= this track
+  /// entry's delay).
   ///
-  /// getTimeScale() affects the delay.
+  /// Time scale affects the delay.
   ///
   /// When passing delay < = 0 to AnimationState::addAnimation(int, Animation,
-  /// bool, float) this delay is set using a mix duration from
-  /// AnimationStateData. To change the getMixDuration() afterward, use
+  /// bool, float), this delay is set using a mix duration from
+  /// AnimationStateData. To change the mix duration afterward, use
   /// setMixDuration(float, float) so this delay is adjusted.
   double get delay {
     final result = SpineBindings.bindings.spine_track_entry_get_delay(_ptr);
@@ -223,13 +212,12 @@ class TrackEntry {
     SpineBindings.bindings.spine_track_entry_set_animation_last(_ptr, value);
   }
 
-  /// Uses getTrackTime() to compute the animationTime. When the trackTime is 0,
-  /// the animationTime is equal to the animationStart time.
+  /// Uses the track time to compute animationTime. When trackTime is 0,
+  /// animationTime is equal to animationStart.
   ///
-  /// The animationTime is between getAnimationStart() and getAnimationEnd(),
-  /// except if this track entry is non-looping and getAnimationEnd() is >= to
-  /// the animation duration, then animationTime continues to increase past
-  /// getAnimationEnd().
+  /// animationTime is between animationStart and animationEnd, except if this
+  /// track entry is non-looping and animationEnd is >= the animation duration,
+  /// then animationTime continues to increase past animationEnd.
   double get animationTime {
     final result = SpineBindings.bindings.spine_track_entry_get_animation_time(_ptr);
     return result;
@@ -239,17 +227,17 @@ class TrackEntry {
   /// time for this animation to pass slower or faster. Defaults to 1.
   ///
   /// Values < 0 are not supported. To play an animation in reverse, use
-  /// getReverse().
+  /// reverse.
   ///
-  /// getMixTime() is not affected by track entry time scale, so
-  /// getMixDuration() may need to be adjusted to match the animation speed.
+  /// mixTime is not affected by track entry time scale, so mixDuration may need
+  /// to be adjusted to match the animation speed.
   ///
   /// When using AnimationState::addAnimation(int, Animation, bool, float) with
-  /// a delay < = 0, the getDelay() is set using the mix duration from the
+  /// a delay < = 0, delay is set using the mix duration from
   /// AnimationStateData, assuming time scale to be 1. If the time scale is not
   /// 1, the delay may need to be adjusted.
   ///
-  /// See AnimationState getTimeScale() for affecting all animations.
+  /// See AnimationState::getTimeScale() for affecting all animations.
   double get timeScale {
     final result = SpineBindings.bindings.spine_track_entry_get_time_scale(_ptr);
     return result;
@@ -301,9 +289,8 @@ class TrackEntry {
     SpineBindings.bindings.spine_track_entry_set_mix_attachment_threshold(_ptr, value);
   }
 
-  /// When getAlpha() is greater than alphaAttachmentThreshold, attachment
-  /// timelines are applied. Defaults to 0, so attachment timelines are always
-  /// applied.
+  /// When alpha is greater than alphaAttachmentThreshold, attachment timelines
+  /// are applied. Defaults to 0, so attachment timelines are always applied.
   double get alphaAttachmentThreshold {
     final result = SpineBindings.bindings.spine_track_entry_get_alpha_attachment_threshold(_ptr);
     return result;
@@ -339,8 +326,8 @@ class TrackEntry {
   }
 
   /// Seconds from 0 to the mix duration when mixing from the previous animation
-  /// to this animation. May be slightly more than TrackEntry.MixDuration when
-  /// the mix is complete.
+  /// to this animation. May be slightly more than mixDuration when the mix is
+  /// complete.
   double get mixTime {
     final result = SpineBindings.bindings.spine_track_entry_get_mix_time(_ptr);
     return result;
@@ -366,27 +353,17 @@ class TrackEntry {
     return result;
   }
 
-  MixBlend get mixBlend {
-    final result = SpineBindings.bindings.spine_track_entry_get_mix_blend(_ptr);
-    return MixBlend.fromValue(result);
-  }
-
-  set mixBlend(MixBlend value) {
-    SpineBindings.bindings.spine_track_entry_set_mix_blend(_ptr, value.value);
-  }
-
-  /// The track entry for the previous animation when mixing from the previous
-  /// animation to this animation, or NULL if no mixing is currently occuring.
-  /// When mixing from multiple animations, MixingFrom makes up a double linked
-  /// list with MixingTo.
+  /// The track entry for the previous animation when mixing to this animation,
+  /// or NULL if no mixing is currently occurring. When mixing from multiple
+  /// animations, MixingFrom makes up a doubly linked list with MixingTo.
   TrackEntry? get mixingFrom {
     final result = SpineBindings.bindings.spine_track_entry_get_mixing_from(_ptr);
     return result.address == 0 ? null : TrackEntry.fromPointer(result);
   }
 
   /// The track entry for the next animation when mixing from this animation, or
-  /// NULL if no mixing is currently occuring. When mixing from multiple
-  /// animations, MixingTo makes up a double linked list with MixingFrom.
+  /// NULL if no mixing is currently occurring. When mixing to multiple
+  /// animations, MixingTo makes up a doubly linked list with MixingFrom.
   TrackEntry? get mixingTo {
     final result = SpineBindings.bindings.spine_track_entry_get_mixing_to(_ptr);
     return result.address == 0 ? null : TrackEntry.fromPointer(result);
@@ -425,8 +402,8 @@ class TrackEntry {
     return result;
   }
 
-  /// Returns true if there is a getNext() track entry that is ready to become
-  /// the current track entry during the next AnimationState::update(float)}
+  /// Returns true if there is a next track entry that is ready to become the
+  /// current track entry during the next AnimationState::update(float)}
   bool get isNextReady {
     final result = SpineBindings.bindings.spine_track_entry_is_next_ready(_ptr);
     return result;
@@ -453,9 +430,9 @@ class TrackEntry {
     SpineBindings.bindings.spine_track_entry_set_mix_duration_1(_ptr, value);
   }
 
-  /// Sets both getMixDuration() and getDelay().
+  /// Sets both mixDuration and delay.
   ///
-  /// [delay] If > 0, sets TrackEntry::getDelay(). If < = 0, the delay set is the duration of the previous track entry minus the specified mix duration plus the specified delay (ie the mix ends at (delay = 0) or before (delay < 0) the previous track entry duration). If the previous entry is looping, its next loop completion is used instead of its duration.
+  /// [delay] If > 0, sets delay. If < = 0, the delay set is the duration of the previous track entry minus the specified mix duration plus the specified delay (ie the mix ends at (delay = 0) or before (delay < 0) the previous track entry duration). If the previous entry is looping, its next loop completion is used instead of its duration.
   void setMixDuration2(double mixDuration, double delay) {
     SpineBindings.bindings.spine_track_entry_set_mix_duration_2(_ptr, mixDuration, delay);
   }

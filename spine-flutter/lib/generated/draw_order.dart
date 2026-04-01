@@ -29,20 +29,46 @@
 
 // AUTO GENERATED FILE, DO NOT EDIT.
 
-/// MixBlend enum
-enum MixBlend {
-  setup(0),
-  first(1),
-  replace(2),
-  add(3);
+import 'package:universal_ffi/ffi.dart';
+import 'spine_dart_bindings_generated.dart';
+import '../spine_bindings.dart';
+import 'arrays.dart';
 
-  const MixBlend(this.value);
-  final int value;
+/// Stores the skeleton's draw order, which is the order that each slot's
+/// attachment is rendered.
+class DrawOrder {
+  final Pointer<spine_draw_order_wrapper> _ptr;
 
-  static MixBlend fromValue(int value) {
-    return values.firstWhere(
-      (e) => e.value == value,
-      orElse: () => throw ArgumentError('Invalid MixBlend value: $value'),
-    );
+  DrawOrder.fromPointer(this._ptr);
+
+  /// Get the native pointer for FFI calls
+  Pointer get nativePtr => _ptr;
+
+  factory DrawOrder(ArraySlot setupPose) {
+    final ptr = SpineBindings.bindings.spine_draw_order_create(setupPose.nativePtr.cast());
+    return DrawOrder.fromPointer(ptr);
+  }
+
+  void dispose() {
+    SpineBindings.bindings.spine_draw_order_dispose(_ptr);
+  }
+
+  /// Sets the unconstrained draw order to the setup pose order.
+  void setupPose() {
+    SpineBindings.bindings.spine_draw_order_setup_pose(_ptr);
+  }
+
+  /// The unconstrained draw order, set by animations and application code.
+  ArraySlot get pose {
+    final result = SpineBindings.bindings.spine_draw_order_get_pose(_ptr);
+    return ArraySlot.fromPointer(result);
+  }
+
+  /// The constrained draw order for rendering. If no constraints modify the
+  /// draw order, this is the same as getPose(). Otherwise it is a copy of
+  /// getPose() modified by constraints.
+  ArraySlot get appliedPose {
+    final result = SpineBindings.bindings.spine_draw_order_get_applied_pose(_ptr);
+    return ArraySlot.fromPointer(result);
   }
 }

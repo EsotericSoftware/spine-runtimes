@@ -16,34 +16,14 @@ const char *spine_event_data_get_name(spine_event_data self) {
 	return _self->getName().buffer();
 }
 
-int spine_event_data_get_int(spine_event_data self) {
+spine_event spine_event_data_get_setup_pose_1(spine_event_data self) {
 	EventData *_self = (EventData *) self;
-	return _self->getInt();
+	return (spine_event) &_self->getSetupPose();
 }
 
-void spine_event_data_set_int(spine_event_data self, int inValue) {
+spine_event spine_event_data_get_setup_pose_2(spine_event_data self) {
 	EventData *_self = (EventData *) self;
-	_self->setInt(inValue);
-}
-
-float spine_event_data_get_float(spine_event_data self) {
-	EventData *_self = (EventData *) self;
-	return _self->getFloat();
-}
-
-void spine_event_data_set_float(spine_event_data self, float inValue) {
-	EventData *_self = (EventData *) self;
-	_self->setFloat(inValue);
-}
-
-const char *spine_event_data_get_string(spine_event_data self) {
-	EventData *_self = (EventData *) self;
-	return _self->getString().buffer();
-}
-
-void spine_event_data_set_string(spine_event_data self, const char *inValue) {
-	EventData *_self = (EventData *) self;
-	_self->setString(String(inValue));
+	return (spine_event) &_self->getSetupPose();
 }
 
 const char *spine_event_data_get_audio_path(spine_event_data self) {
@@ -54,24 +34,4 @@ const char *spine_event_data_get_audio_path(spine_event_data self) {
 void spine_event_data_set_audio_path(spine_event_data self, const char *inValue) {
 	EventData *_self = (EventData *) self;
 	_self->setAudioPath(String(inValue));
-}
-
-float spine_event_data_get_volume(spine_event_data self) {
-	EventData *_self = (EventData *) self;
-	return _self->getVolume();
-}
-
-void spine_event_data_set_volume(spine_event_data self, float inValue) {
-	EventData *_self = (EventData *) self;
-	_self->setVolume(inValue);
-}
-
-float spine_event_data_get_balance(spine_event_data self) {
-	EventData *_self = (EventData *) self;
-	return _self->getBalance();
-}
-
-void spine_event_data_set_balance(spine_event_data self, float inValue) {
-	EventData *_self = (EventData *) self;
-	_self->setBalance(inValue);
 }

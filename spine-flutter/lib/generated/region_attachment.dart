@@ -104,6 +104,7 @@ class RegionAttachment extends Attachment {
     SpineBindings.bindings.spine_region_attachment_set_scale_y(_ptr, value);
   }
 
+  /// The local rotation in degrees, counter clockwise.
   double get rotation {
     final result = SpineBindings.bindings.spine_region_attachment_get_rotation(_ptr);
     return result;

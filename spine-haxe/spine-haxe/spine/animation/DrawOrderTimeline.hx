@@ -35,6 +35,8 @@ import spine.Slot;
 
 /** Changes a skeleton's Skeleton#drawOrder. */
 class DrawOrderTimeline extends Timeline {
+	public static final propertyID = Property.drawOrder;
+
 	/** The draw order for each frame. See setFrame(). */
 	public var drawOrders:Array<Array<Int>>;
 
@@ -59,39 +61,35 @@ class DrawOrderTimeline extends Timeline {
 		drawOrders[frame] = drawOrder;
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend, direction:MixDirection,
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
 			appliedPose:Bool) {
-		var drawOrder:Array<Slot> = skeleton.drawOrder;
+		var drawOrder = appliedPose ? skeleton.drawOrder.appliedPose : skeleton.drawOrder.pose;
 		var slots:Array<Slot> = skeleton.slots;
 		var i:Int = 0, n:Int = slots.length;
 
-		if (direction == MixDirection.mixOut) {
-			if (blend == MixBlend.setup) {
-				for (i in 0...n) {
+		if (out) {
+			if (fromSetup) {
+				for (i in 0...n)
 					drawOrder[i] = slots[i];
-				}
 			}
 			return;
 		}
 
 		if (time < frames[0]) {
-			if (blend == MixBlend.setup || blend == MixBlend.first) {
-				for (i in 0...n) {
+			if (fromSetup) {
+				for (i in 0...n)
 					drawOrder[i] = slots[i];
-				}
 			}
 			return;
 		}
 
 		var drawOrderToSetupIndex:Array<Int> = drawOrders[Timeline.search1(frames, time)];
 		if (drawOrderToSetupIndex == null) {
-			for (i in 0...n) {
+			for (i in 0...n)
 				drawOrder[i] = slots[i];
-			}
 		} else {
-			for (i in 0...n) {
+			for (i in 0...n)
 				drawOrder[i] = slots[drawOrderToSetupIndex[i]];
-			}
 		}
 	}
 }

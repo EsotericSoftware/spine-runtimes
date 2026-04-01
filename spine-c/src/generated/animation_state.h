@@ -14,8 +14,8 @@ SPINE_C_API spine_animation_state spine_animation_state_create(spine_animation_s
 SPINE_C_API void spine_animation_state_dispose(spine_animation_state self);
 
 /**
- * Increments each track entry TrackEntry::getTrackTime(), setting queued
- * animations as current if needed.
+ * Increments each track entry's track time, setting queued animations as
+ * current if needed.
  */
 SPINE_C_API void spine_animation_state_update(spine_animation_state self, float delta);
 /**
@@ -97,11 +97,11 @@ SPINE_C_API spine_track_entry spine_animation_state_add_animation_2(spine_animat
  * Mixing in is done by first setting an empty animation, then adding an
  * animation using addAnimation(int, Animation, bool, float) with the desired
  * delay (an empty animation has a duration of 0) and on the returned track
- * entry, set the TrackEntry::setMixDuration(float). Mixing from an empty
- * animation causes the new animation to be applied more and more over the mix
- * duration. Properties keyed in the new animation transition from the value
- * from lower tracks or from the setup pose value if no lower tracks key the
- * property to the value keyed in the new animation.
+ * entry set TrackEntry::setMixDuration(float). Mixing from an empty animation
+ * causes the new animation to be applied more and more over the mix duration.
+ * Properties keyed in the new animation transition from the value from lower
+ * tracks or from the setup pose value if no lower tracks key the property to
+ * the value keyed in the new animation.
  *
  * See Empty animations in the Spine Runtimes Guide.
  */
@@ -146,7 +146,7 @@ SPINE_C_API spine_array_track_entry spine_animation_state_get_tracks(spine_anima
  * Multiplier for the delta time when the animation state is updated, causing
  * time for all animations and mixes to play slower or faster. Defaults to 1.
  *
- * See TrackEntry TrackEntry::getTimeScale() for affecting a single animation.
+ * See TrackEntry::getTimeScale() for affecting a single animation.
  */
 SPINE_C_API float spine_animation_state_get_time_scale(spine_animation_state self);
 SPINE_C_API void spine_animation_state_set_time_scale(spine_animation_state self, float inValue);

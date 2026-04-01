@@ -75,18 +75,11 @@ class TrackEntry implements Poolable {
 	/** If true, the animation will be applied in reverse. Events are not fired when an animation is applied in reverse. */
 	public var reverse:Bool = false;
 
-	/** If true, when mixing from the previous animation to this animation, the previous animation is applied as normal instead
-	 * of being mixed out.
-	 *
-	 * When mixing between animations that key the same property, if a lower track also keys that property then the value will
-	 * briefly dip toward the lower track value during the mix. This happens because the first animation mixes from 100% to 0%
-	 * while the second animation mixes from 0% to 100%. Setting holdPrevious to true applies the first animation
-	 * at 100% during the mix so the lower track value is overwritten. Such dipping does not occur on the lowest track which
-	 * keys the property, only when a higher track also keys the property.
-	 *
-	 * Snapping will occur if holdPrevious is true and this animation does not key all the same properties as the
-	 * previous animation. */
-	public var holdPrevious:Bool = false;
+	/** When true, timelines in this animation that support additive have their values added to the setup or current pose values
+	 * rather than replacing them. */
+	public var additive:Bool = false;
+
+	public var keepHold:Bool = false;
 
 	/** When the mix percentage (TrackEntry.getMixTime() / TrackEntry.getMixDuration()) is less than the
 	 * eventThreshold, event timelines are applied while this animation is being mixed out. Defaults to 0, so event
@@ -200,16 +193,7 @@ class TrackEntry implements Poolable {
 	 * entry.setMixDuration(0.25f, 0); */
 	public var mixDuration:Float = 0;
 
-	public var interruptAlpha:Float = 0;
 	public var totalAlpha:Float = 0;
-
-	/** Controls how properties keyed in the animation are mixed with lower tracks. Defaults to spine.animation.MixBlend.replace.
-	 *
-	 * Track entries on track 0 ignore this setting and always use spine.animation.MixBlend.first.
-	 *
-	 * The mixBlend can be set for a new track entry only before spine.animation.AnimationState.apply(Skeleton) is first
-	 * called. */
-	public var mixBlend:MixBlend = MixBlend.replace;
 
 	public var timelineMode:Array<Int> = new Array<Int>();
 	public var timelineHoldMix:Array<TrackEntry> = new Array<TrackEntry>();
@@ -293,7 +277,7 @@ class TrackEntry implements Poolable {
 	/** Resets the rotation directions for mixing this entry's rotate timelines. This can be useful to avoid bones rotating the
 	 * long way around when using TrackEntry.getAlpha() and starting animations on other tracks.
 	 *
-	 * Mixing with spine.animation.MixBlend.replace involves finding a rotation between two others, which has two possible solutions:
+	 * Mixing involves finding a rotation between two others, which has two possible solutions:
 	 * the short way or the long way around. The two rotations likely change over time, so which direction is the short or long
 	 * way also changes. If the short way was always chosen, bones would flip to the other side when that direction became the
 	 * long way. TrackEntry chooses the short way the first time it is applied and remembers that direction. */

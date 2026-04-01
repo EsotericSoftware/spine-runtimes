@@ -51,6 +51,7 @@ public class SliderData: PosedData, ConstraintData {
         return Rtti(fromPointer: result!)
     }
 
+    /// The animation the slider will apply.
     public var animation: Animation {
         get {
             let result = spine_slider_data_get_animation(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self))
@@ -62,6 +63,8 @@ public class SliderData: PosedData, ConstraintData {
         }
     }
 
+    /// When true, the animation is applied by adding it to the current pose rather than overwriting
+    /// it.
     public var additive: Bool {
         get {
             let result = spine_slider_data_get_additive(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self))
@@ -72,6 +75,7 @@ public class SliderData: PosedData, ConstraintData {
         }
     }
 
+    /// When true, the animation repeats after its duration, otherwise the last frame is used.
     public var loop: Bool {
         get {
             let result = spine_slider_data_get_loop(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self))
@@ -82,6 +86,7 @@ public class SliderData: PosedData, ConstraintData {
         }
     }
 
+    /// When set, the bone's transform property is used to set the slider's SliderPose::getTime().
     public var bone: BoneData? {
         get {
             let result = spine_slider_data_get_bone(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self))
@@ -93,6 +98,8 @@ public class SliderData: PosedData, ConstraintData {
         }
     }
 
+    /// When a bone is set, the specified transform property is used to set the slider's
+    /// SliderPose::getTime().
     public var property: FromProperty? {
         get {
             let result = spine_slider_data_get_property(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self))
@@ -129,6 +136,7 @@ public class SliderData: PosedData, ConstraintData {
         }
     }
 
+    /// When a bone is set, this is the scale of the property value in relation to the slider time.
     public var scale: Float {
         get {
             let result = spine_slider_data_get_scale(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self))
@@ -139,6 +147,7 @@ public class SliderData: PosedData, ConstraintData {
         }
     }
 
+    /// When a bone is set, the offset is added to the property.
     public var offset: Float {
         get {
             let result = spine_slider_data_get_offset(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self))
@@ -149,6 +158,8 @@ public class SliderData: PosedData, ConstraintData {
         }
     }
 
+    /// When true and a bone is set, the bone's local transform property is read instead of its
+    /// world transform.
     public var local: Bool {
         get {
             let result = spine_slider_data_get_local(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self))
@@ -159,6 +170,7 @@ public class SliderData: PosedData, ConstraintData {
         }
     }
 
+    /// The setup pose that most animations are relative to.
     public var setupPose: SliderPose {
         let result = spine_slider_data_get_setup_pose(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self))
         return SliderPose(fromPointer: result!)

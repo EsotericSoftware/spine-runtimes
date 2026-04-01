@@ -35,8 +35,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import com.esotericsoftware.spine.SlotPose;
 
-/** Holds texture regions, UVs, and vertex offsets for rendering a region or mesh attachment. {@link #getRegions() Regions} must
- * be populated and {@link #update(HasSequence)} called before use. */
+/** Holds texture regions, UVs, and vertex offsets for rendering a region or mesh attachment. {@link #regions Regions} must be
+ * populated and {@link #update(HasSequence)} called before use. */
 public class Sequence {
 	static private int nextID;
 
@@ -46,6 +46,9 @@ public class Sequence {
 	private float[][] uvs, offsets;
 	private int start, digits, setupIndex;
 
+	/** @param count The number of texture regions this sequence will display.
+	 * @param pathSuffix If true, the {@link #getPath(String, int) path} has a numeric suffix. If false, all regions will use the
+	 *           same path, so <code>count</code> should be 1. */
 	public Sequence (int count, boolean pathSuffix) {
 		regions = new TextureRegion[count];
 		this.pathSuffix = pathSuffix;
@@ -95,10 +98,12 @@ public class Sequence {
 		}
 	}
 
+	/** The list of texture regions this sequence will display. */
 	public TextureRegion[] getRegions () {
 		return regions;
 	}
 
+	/** Returns the {@link #regions} index for the {@link SlotPose#getSequenceIndex()}. */
 	public int resolveIndex (SlotPose pose) {
 		int index = pose.getSequenceIndex();
 		if (index == -1) index = setupIndex;
@@ -106,10 +111,13 @@ public class Sequence {
 		return index;
 	}
 
+	/** Returns the texture region from {@link #regions} for the specified index. */
 	public TextureRegion getRegion (int index) {
 		return regions[index];
 	}
 
+	/** Returns the UVs for the specified index. {@link #regions Regions} must be populated and {@link #update(HasSequence)} called
+	 * before calling this method. */
 	public float[] getUVs (int index) {
 		return uvs[index];
 	}
@@ -119,6 +127,7 @@ public class Sequence {
 		return offsets[index];
 	}
 
+	/** The starting number for the numeric {@link #getPath(String, int) path} suffix. */
 	public int getStart () {
 		return start;
 	}
@@ -127,6 +136,8 @@ public class Sequence {
 		this.start = start;
 	}
 
+	/** The minimum number of digits in the numeric {@link #getPath(String, int) path} suffix, for zero padding. 0 for no zero
+	 * padding. */
 	public int getDigits () {
 		return digits;
 	}
@@ -144,10 +155,12 @@ public class Sequence {
 		this.setupIndex = index;
 	}
 
+	/** Returns true if the {@link #getPath(String, int) path} has a numeric suffix. */
 	public boolean hasPathSuffix () {
 		return pathSuffix;
 	}
 
+	/** Returns the specified base path with an optional numeric suffix for the specified index. */
 	public String getPath (String basePath, int index) {
 		if (!pathSuffix) return basePath;
 		var buffer = new StringBuilder(basePath.length() + digits);
@@ -168,6 +181,7 @@ public class Sequence {
 		return nextID++;
 	}
 
+	/** Controls how {@link Sequence#regions} are displayed over time. */
 	static public enum SequenceMode {
 		hold, once, loop, pingpong, onceReverse, loopReverse, pingpongReverse;
 

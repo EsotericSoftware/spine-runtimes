@@ -33,7 +33,7 @@ import 'package:universal_ffi/ffi.dart';
 import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
 
-/// Simple mixin class that adds active state tracking
+/// A posed object that may be active or inactive.
 class PosedActive {
   final Pointer<spine_posed_active_wrapper> _ptr;
 
@@ -46,6 +46,11 @@ class PosedActive {
     SpineBindings.bindings.spine_posed_active_dispose(_ptr);
   }
 
+  /// Returns false when this won't be updated by
+  /// Skeleton::updateWorldTransform(Physics) because a skin is required and the
+  /// active skin does not contain this item. See Skin::getBones(),
+  /// Skin::getConstraints(), PosedData::getSkinRequired(), and
+  /// Skeleton::updateCache().
   bool get isActive {
     final result = SpineBindings.bindings.spine_posed_active_is_active(_ptr);
     return result;

@@ -33,9 +33,9 @@ abstract class Constraint< //
 	T:Constraint<T, D, P>, //
 	D:ConstraintData<T, P>, //
 	P:Pose<Any>> //
-extends PosedActive<D, P, P> implements Update {
-	public function new(data:D, pose:P, constrained:P) {
-		super(data, pose, constrained);
+extends PosedActive<D, P> implements Update {
+	public function new(data:D, pose:P, constrainedPose:P) {
+		super(data, pose, constrainedPose);
 	}
 
 	public abstract function copy(skeleton:Skeleton):T;

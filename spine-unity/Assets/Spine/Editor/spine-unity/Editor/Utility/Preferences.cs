@@ -218,6 +218,9 @@ namespace Spine.Unity.Editor {
 			const string WORKFLOW_MISMATCH_DIALOG_KEY = "SPINE_WORKFLOW_MISMATCH_DIALOG";
 			public static bool workflowMismatchDialog = SpinePreferences.DEFAULT_WORKFLOW_MISMATCH_DIALOG;
 
+			const string SKELETONDATA_ASSET_MISMATCH_WARNING_KEY = "SPINE_SKELETONDATA_ASSET_MISMATCH_WARNING";
+			public static bool skeletonDataAssetMismatchWarning = SpinePreferences.DEFAULT_SKELETONDATA_ASSET_MISMATCH_WARNING;
+
 			const string SPLIT_COMPONENT_CHANGE_WARNING_KEY = "SPINE_SPLIT_COMPONENT_CHANGE_WARNING";
 			public static bool splitComponentChangeWarning = SpinePreferences.DEFAULT_SPLIT_COMPONENT_CHANGE_WARNING;
 
@@ -267,6 +270,7 @@ namespace Spine.Unity.Editor {
 				componentMaterialWarning = EditorPrefs.GetBool(COMPONENTMATERIAL_WARNING_KEY, SpinePreferences.DEFAULT_COMPONENTMATERIAL_WARNING);
 				skeletonDataAssetNoFileError = EditorPrefs.GetBool(SKELETONDATA_ASSET_NO_FILE_ERROR_KEY, SpinePreferences.DEFAULT_SKELETONDATA_ASSET_NO_FILE_ERROR);
 				workflowMismatchDialog = EditorPrefs.GetBool(WORKFLOW_MISMATCH_DIALOG_KEY, SpinePreferences.DEFAULT_WORKFLOW_MISMATCH_DIALOG);
+				skeletonDataAssetMismatchWarning = EditorPrefs.GetBool(SKELETONDATA_ASSET_MISMATCH_WARNING_KEY, SpinePreferences.DEFAULT_SKELETONDATA_ASSET_MISMATCH_WARNING);
 				splitComponentChangeWarning = EditorPrefs.GetBool(SPLIT_COMPONENT_CHANGE_WARNING_KEY, SpinePreferences.DEFAULT_SPLIT_COMPONENT_CHANGE_WARNING);
 				timelineDefaultMixDuration = EditorPrefs.GetBool(TIMELINE_DEFAULT_MIX_DURATION_KEY, SpinePreferences.DEFAULT_TIMELINE_DEFAULT_MIX_DURATION);
 				timelineUseBlendDuration = EditorPrefs.GetBool(TIMELINE_USE_BLEND_DURATION_KEY, SpinePreferences.DEFAULT_TIMELINE_USE_BLEND_DURATION);
@@ -295,6 +299,7 @@ namespace Spine.Unity.Editor {
 				newPreferences.componentMaterialWarning = EditorPrefs.GetBool(COMPONENTMATERIAL_WARNING_KEY, SpinePreferences.DEFAULT_COMPONENTMATERIAL_WARNING);
 				newPreferences.skeletonDataAssetNoFileError = EditorPrefs.GetBool(SKELETONDATA_ASSET_NO_FILE_ERROR_KEY, SpinePreferences.DEFAULT_SKELETONDATA_ASSET_NO_FILE_ERROR);
 				newPreferences.workflowMismatchDialog = EditorPrefs.GetBool(WORKFLOW_MISMATCH_DIALOG_KEY, SpinePreferences.DEFAULT_WORKFLOW_MISMATCH_DIALOG);
+				newPreferences.skeletonDataAssetMismatchWarning = EditorPrefs.GetBool(SKELETONDATA_ASSET_MISMATCH_WARNING_KEY, SpinePreferences.DEFAULT_SKELETONDATA_ASSET_MISMATCH_WARNING);
 				newPreferences.timelineDefaultMixDuration = EditorPrefs.GetBool(TIMELINE_DEFAULT_MIX_DURATION_KEY, SpinePreferences.DEFAULT_TIMELINE_DEFAULT_MIX_DURATION);
 				newPreferences.timelineUseBlendDuration = EditorPrefs.GetBool(TIMELINE_USE_BLEND_DURATION_KEY, SpinePreferences.DEFAULT_TIMELINE_USE_BLEND_DURATION);
 				newPreferences.handleScale = EditorPrefs.GetFloat(SCENE_ICONS_SCALE_KEY, SpinePreferences.DEFAULT_SCENE_ICONS_SCALE);
@@ -320,6 +325,7 @@ namespace Spine.Unity.Editor {
 				EditorPrefs.SetBool(COMPONENTMATERIAL_WARNING_KEY, preferences.componentMaterialWarning);
 				EditorPrefs.SetBool(SKELETONDATA_ASSET_NO_FILE_ERROR_KEY, preferences.skeletonDataAssetNoFileError);
 				EditorPrefs.SetBool(WORKFLOW_MISMATCH_DIALOG_KEY, preferences.workflowMismatchDialog);
+				EditorPrefs.SetBool(SKELETONDATA_ASSET_MISMATCH_WARNING_KEY, preferences.skeletonDataAssetMismatchWarning);
 				EditorPrefs.SetBool(SPLIT_COMPONENT_CHANGE_WARNING_KEY, preferences.splitComponentChangeWarning);
 				EditorPrefs.SetBool(TIMELINE_DEFAULT_MIX_DURATION_KEY, preferences.timelineDefaultMixDuration);
 				EditorPrefs.SetBool(TIMELINE_USE_BLEND_DURATION_KEY, preferences.timelineUseBlendDuration);
@@ -399,6 +405,7 @@ namespace Spine.Unity.Editor {
 					SpineEditorUtilities.BoolPrefsField(ref textureImporterWarning, TEXTUREIMPORTER_WARNING_KEY, new GUIContent("Texture Settings Warning", "Log a warning and recommendation whenever Texture Import Settings are detected that could lead to undesired effects, e.g. white border artifacts."));
 					SpineEditorUtilities.BoolPrefsField(ref componentMaterialWarning, COMPONENTMATERIAL_WARNING_KEY, new GUIContent("Component & Material Warning", "Log a warning and recommendation whenever Component and Material settings are not compatible."));
 					SpineEditorUtilities.BoolPrefsField(ref skeletonDataAssetNoFileError, SKELETONDATA_ASSET_NO_FILE_ERROR_KEY, new GUIContent("SkeletonDataAsset no file Error", "Log an error when querying SkeletonData from SkeletonDataAsset with no json or binary file assigned."));
+					SpineEditorUtilities.BoolPrefsField(ref skeletonDataAssetMismatchWarning, SKELETONDATA_ASSET_MISMATCH_WARNING_KEY, new GUIContent("SkeletonDataAsset Mismatch Warning", "Highlight AnimationReferenceAsset dropdown in red when the reference asset's SkeletonDataAsset does not match the one at the skeleton component."));
 					SpineEditorUtilities.BoolPrefsField(ref workflowMismatchDialog, WORKFLOW_MISMATCH_DIALOG_KEY, new GUIContent("Workflow Mismatch Dialog", "Show warning dialog when PMA atlas is detected but not supported with current project settings."));
 					SkeletonDataAsset.errorIfSkeletonFileNullGlobal = skeletonDataAssetNoFileError;
 				}

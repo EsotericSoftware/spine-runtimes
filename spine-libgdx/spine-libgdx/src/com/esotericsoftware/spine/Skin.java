@@ -37,9 +37,9 @@ import com.badlogic.gdx.utils.OrderedSet;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 
-/** Stores attachments by slot index and attachment name.
+/** Stores attachments by slot index and placeholder name. Multiple {@link Skeleton} instances can use the same skins.
  * <p>
- * See SkeletonData {@link SkeletonData#defaultSkin}, Skeleton {@link Skeleton#skin}, and
+ * See {@link SkeletonData#defaultSkin}, {@link Skeleton#skin}, and
  * <a href="https://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide. */
 public class Skin {
 	final String name;
@@ -57,10 +57,10 @@ public class Skin {
 		attachments.orderedItems().ordered = false;
 	}
 
-	/** Adds an attachment to the skin for the specified slot index and name. */
-	public void setAttachment (int slotIndex, String name, Attachment attachment) {
+	/** Adds an attachment to the skin for the specified slot index and placeholder name. */
+	public void setAttachment (int slotIndex, String placeholderName, Attachment attachment) {
 		if (attachment == null) throw new IllegalArgumentException("attachment cannot be null.");
-		var entry = new SkinEntry(slotIndex, name, attachment);
+		var entry = new SkinEntry(slotIndex, placeholderName, attachment);
 		if (!attachments.add(entry)) attachments.get(entry).attachment = attachment;
 	}
 
@@ -75,7 +75,7 @@ public class Skin {
 			if (!constraints.contains(data, true)) constraints.add(data);
 
 		for (SkinEntry entry : skin.attachments.orderedItems())
-			setAttachment(entry.slotIndex, entry.name, entry.attachment);
+			setAttachment(entry.slotIndex, entry.placeholderName, entry.attachment);
 	}
 
 	/** Adds all bones and constraints and copies of all attachments from the specified skin to this skin. Mesh attachments are not
@@ -91,22 +91,22 @@ public class Skin {
 
 		for (SkinEntry entry : skin.attachments.orderedItems()) {
 			if (entry.attachment instanceof MeshAttachment mesh)
-				setAttachment(entry.slotIndex, entry.name, mesh.newLinkedMesh());
+				setAttachment(entry.slotIndex, entry.placeholderName, mesh.newLinkedMesh());
 			else
-				setAttachment(entry.slotIndex, entry.name, entry.attachment != null ? entry.attachment.copy() : null);
+				setAttachment(entry.slotIndex, entry.placeholderName, entry.attachment != null ? entry.attachment.copy() : null);
 		}
 	}
 
-	/** Returns the attachment for the specified slot index and name, or null. */
-	public @Null Attachment getAttachment (int slotIndex, String name) {
-		lookup.set(slotIndex, name);
+	/** Returns the attachment for the specified slot index and placeholder name, or null. */
+	public @Null Attachment getAttachment (int slotIndex, String placeholderName) {
+		lookup.set(slotIndex, placeholderName);
 		SkinEntry entry = attachments.get(lookup);
 		return entry != null ? entry.attachment : null;
 	}
 
-	/** Removes the attachment in the skin for the specified slot index and name, if any. */
-	public void removeAttachment (int slotIndex, String name) {
-		lookup.set(slotIndex, name);
+	/** Removes the attachment in the skin for the specified slot index and placeholder name, if any. */
+	public void removeAttachment (int slotIndex, String placeholderName) {
+		lookup.set(slotIndex, placeholderName);
 		attachments.remove(lookup);
 	}
 
@@ -138,7 +138,9 @@ public class Skin {
 		return constraints;
 	}
 
-	/** The skin's name, which is unique across all skins in the skeleton. */
+	/** The skin's name, unique across all skins in the skeleton.
+	 * <p>
+	 * See {@link SkeletonData#findSkin(String)}. */
 	public String getName () {
 		return name;
 	}
@@ -158,41 +160,43 @@ public class Skin {
 		for (SkinEntry entry : oldSkin.attachments.orderedItems()) {
 			SlotPose slot = slots[entry.slotIndex].pose;
 			if (slot.attachment == entry.attachment) {
-				Attachment attachment = getAttachment(entry.slotIndex, entry.name);
+				Attachment attachment = getAttachment(entry.slotIndex, entry.placeholderName);
 				if (attachment != null) slot.setAttachment(attachment);
 			}
 		}
 	}
 
-	/** Stores an entry in the skin consisting of the slot index and the attachment name. */
+	/** Stores an entry in the skin consisting of the slot index and placeholder name. */
 	static public class SkinEntry {
 		int slotIndex;
-		String name;
+		String placeholderName;
 		@Null Attachment attachment;
 		private int hashCode;
 
-		SkinEntry (int slotIndex, String name, @Null Attachment attachment) {
-			set(slotIndex, name);
+		SkinEntry (int slotIndex, String placeholderName, @Null Attachment attachment) {
+			set(slotIndex, placeholderName);
 			this.attachment = attachment;
 		}
 
-		void set (int slotIndex, String name) {
+		void set (int slotIndex, String placeholderName) {
 			if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
-			if (name == null) throw new IllegalArgumentException("name cannot be null.");
+			if (placeholderName == null) throw new IllegalArgumentException("placeholderName cannot be null.");
 			this.slotIndex = slotIndex;
-			this.name = name;
-			hashCode = name.hashCode() + slotIndex * 37;
+			this.placeholderName = placeholderName;
+			hashCode = placeholderName.hashCode() + slotIndex * 37;
 		}
 
+		/** The {@link Skeleton#slots} index. */
 		public int getSlotIndex () {
 			return slotIndex;
 		}
 
-		/** The name the attachment is associated with, equivalent to the skin placeholder name in the Spine editor. */
-		public String getName () {
-			return name;
+		/** The placeholder name that the attachment is associated with. */
+		public String getPlaceholderName () {
+			return placeholderName;
 		}
 
+		/** The attachment for this skin entry. */
 		public Attachment getAttachment () {
 			return attachment;
 		}
@@ -205,11 +209,11 @@ public class Skin {
 			if (object == null) return false;
 			var other = (SkinEntry)object;
 			if (slotIndex != other.slotIndex) return false;
-			return name.equals(other.name);
+			return placeholderName.equals(other.placeholderName);
 		}
 
 		public String toString () {
-			return slotIndex + ":" + name;
+			return slotIndex + ":" + placeholderName;
 		}
 	}
 }

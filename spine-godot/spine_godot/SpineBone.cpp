@@ -129,10 +129,10 @@ Array SpineBone::get_children() {
 	return result;
 }
 
-Ref<SpineBoneLocal> SpineBone::get_pose() {
+Ref<SpineBonePose> SpineBone::get_pose() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto &pose = get_spine_object()->getPose();
-	Ref<SpineBoneLocal> pose_ref(memnew(SpineBoneLocal));
+	Ref<SpineBonePose> pose_ref(memnew(SpineBonePose));
 	pose_ref->set_spine_object(get_spine_owner(), &pose);
 	return pose_ref;
 }

@@ -32,7 +32,7 @@
 import Foundation
 import SpineC
 
-/// Posed wrapper
+/// Base interface for posed objects.
 public protocol Posed {
     var _ptr: UnsafeMutableRawPointer { get }
     var isPoseEqualToApplied: Bool { get }

@@ -37,9 +37,6 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-import com.esotericsoftware.spine.Animation.MixBlend;
-import com.esotericsoftware.spine.Animation.MixDirection;
-
 /** Demonstrates using the timeline API. See {@link SimpleTest1} for a higher level API using {@link AnimationState}.
  * <p>
  * See: https://esotericsoftware.com/spine-applying-animations */
@@ -108,24 +105,23 @@ public class TimelineApiTest extends ApplicationAdapter {
 			skeleton.setX(-50);
 		} else if (time > beforeJump + jump) {
 			// just walk after jump
-			walkAnimation.apply(skeleton, time, time, true, events, 1, MixBlend.first, MixDirection.in, false);
+			walkAnimation.apply(skeleton, time, time, true, events, 1, true, false, false, false);
 		} else if (time > blendOutStart) {
 			// blend out jump
-			walkAnimation.apply(skeleton, time, time, true, events, 1, MixBlend.first, MixDirection.in, false);
+			walkAnimation.apply(skeleton, time, time, true, events, 1, true, false, false, false);
 			jumpAnimation.apply(skeleton, time - beforeJump, time - beforeJump, false, events, 1 - (time - blendOutStart) / blendOut,
-				MixBlend.first, MixDirection.in, false);
+				true, false, false, false);
 		} else if (time > beforeJump + blendIn) {
 			// just jump
-			jumpAnimation.apply(skeleton, time - beforeJump, time - beforeJump, false, events, 1, MixBlend.first, MixDirection.in,
-				false);
+			jumpAnimation.apply(skeleton, time - beforeJump, time - beforeJump, false, events, 1, true, false, false, false);
 		} else if (time > beforeJump) {
 			// blend in jump
-			walkAnimation.apply(skeleton, time, time, true, events, 1, MixBlend.first, MixDirection.in, false);
-			jumpAnimation.apply(skeleton, time - beforeJump, time - beforeJump, false, events, (time - beforeJump) / blendIn,
-				MixBlend.first, MixDirection.in, false);
+			walkAnimation.apply(skeleton, time, time, true, events, 1, true, false, false, false);
+			jumpAnimation.apply(skeleton, time - beforeJump, time - beforeJump, false, events, (time - beforeJump) / blendIn, true,
+				false, false, false);
 		} else {
 			// just walk before jump
-			walkAnimation.apply(skeleton, time, time, true, events, 1, MixBlend.first, MixDirection.in, false);
+			walkAnimation.apply(skeleton, time, time, true, events, 1, true, false, false, false);
 		}
 
 		skeleton.update(delta);

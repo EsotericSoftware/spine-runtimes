@@ -11,19 +11,19 @@ void spine_skin_dispose(spine_skin self) {
 	delete (Skin *) self;
 }
 
-void spine_skin_set_attachment(spine_skin self, size_t slotIndex, const char *name, /*@null*/ spine_attachment attachment) {
+void spine_skin_set_attachment(spine_skin self, size_t slotIndex, const char *placeholderName, /*@null*/ spine_attachment attachment) {
 	Skin *_self = (Skin *) self;
-	_self->setAttachment(slotIndex, String(name), (Attachment *) attachment);
+	_self->setAttachment(slotIndex, String(placeholderName), (Attachment *) attachment);
 }
 
-/*@null*/ spine_attachment spine_skin_get_attachment(spine_skin self, size_t slotIndex, const char *name) {
+/*@null*/ spine_attachment spine_skin_get_attachment(spine_skin self, size_t slotIndex, const char *placeholderName) {
 	Skin *_self = (Skin *) self;
-	return (spine_attachment) _self->getAttachment(slotIndex, String(name));
+	return (spine_attachment) _self->getAttachment(slotIndex, String(placeholderName));
 }
 
-void spine_skin_remove_attachment(spine_skin self, size_t slotIndex, const char *name) {
+void spine_skin_remove_attachment(spine_skin self, size_t slotIndex, const char *placeholderName) {
 	Skin *_self = (Skin *) self;
-	_self->removeAttachment(slotIndex, String(name));
+	_self->removeAttachment(slotIndex, String(placeholderName));
 }
 
 void spine_skin_find_attachments_for_slot(spine_skin self, size_t slotIndex, spine_array_attachment attachments) {

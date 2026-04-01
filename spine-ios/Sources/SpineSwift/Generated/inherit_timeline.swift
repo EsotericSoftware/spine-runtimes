@@ -32,7 +32,7 @@
 import Foundation
 import SpineC
 
-/// Changes a bone's BoneLocal::getInherit().
+/// Changes a bone's inherit mode.
 @objc(SpineInheritTimeline)
 @objcMembers
 public class InheritTimeline: Timeline, BoneTimeline {

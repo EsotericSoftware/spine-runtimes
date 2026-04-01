@@ -66,7 +66,7 @@ class PhysicsConstraint extends Constraint<PhysicsConstraint, PhysicsConstraintD
 		if (skeleton == null)
 			throw new SpineException("skeleton cannot be null.");
 
-		bone = skeleton.bones[data.bone.index].constrained;
+		bone = skeleton.bones[data.bone.index].constrainedPose;
 	}
 
 	public function copy(skeleton:Skeleton) {
@@ -114,7 +114,7 @@ class PhysicsConstraint extends Constraint<PhysicsConstraint, PhysicsConstraintD
 
 	/** Applies the constraint to the constrained bones. */
 	public function update(skeleton:Skeleton, physics:Physics):Void {
-		var p = applied;
+		var p = appliedPose;
 		var mix = p.mix;
 		if (mix == 0)
 			return;

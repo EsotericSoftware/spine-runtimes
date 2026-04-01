@@ -57,45 +57,59 @@ namespace spine {
 		BoneData &getBone();
 		void setBone(BoneData &bone);
 
+		/// The time in milliseconds required to advanced the physics simulation one step.
 		float getStep();
 		void setStep(float step);
 
+		/// Physics influence on x translation, 0-1.
 		float getX();
 		void setX(float x);
 
+		/// Physics influence on y translation, 0-1.
 		float getY();
 		void setY(float y);
 
+		/// Physics influence on rotation, 0-1.
 		float getRotate();
 		void setRotate(float rotate);
 
+		/// Physics influence on scaleX, 0-1.
 		float getScaleX();
 		void setScaleX(float scaleX);
 
+		/// Physics influence on shearX, 0-1.
 		float getShearX();
 		void setShearX(float shearX);
 
+		/// Movement greater than the limit will not have a greater affect on physics.
 		float getLimit();
 		void setLimit(float limit);
 
+		/// True when this constraint's inertia is controlled by global slider timelines.
 		bool getInertiaGlobal();
 		void setInertiaGlobal(bool inertiaGlobal);
 
+		/// True when this constraint's strength is controlled by global slider timelines.
 		bool getStrengthGlobal();
 		void setStrengthGlobal(bool strengthGlobal);
 
+		/// True when this constraint's damping is controlled by global slider timelines.
 		bool getDampingGlobal();
 		void setDampingGlobal(bool dampingGlobal);
 
+		/// True when this constraint's mass is controlled by global slider timelines.
 		bool getMassGlobal();
 		void setMassGlobal(bool massGlobal);
 
+		/// True when this constraint's wind is controlled by global slider timelines.
 		bool getWindGlobal();
 		void setWindGlobal(bool windGlobal);
 
+		/// True when this constraint's gravity is controlled by global slider timelines.
 		bool getGravityGlobal();
 		void setGravityGlobal(bool gravityGlobal);
 
+		/// True when this constraint's mix is controlled by global slider timelines.
 		bool getMixGlobal();
 		void setMixGlobal(bool mixGlobal);
 

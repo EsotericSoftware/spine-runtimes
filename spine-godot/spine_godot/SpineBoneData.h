@@ -30,7 +30,7 @@
 #pragma once
 
 #include "SpineCommon.h"
-#include "SpineBoneLocal.h"
+#include "SpineBonePose.h"
 #include "SpineConstant.h"
 #include <spine/BoneData.h>
 
@@ -53,7 +53,7 @@ public:
 
 	void set_length(float v);
 
-	Ref<SpineBoneLocal> get_setup_pose();
+	Ref<SpineBonePose> get_setup_pose();
 
 	bool is_skin_required();
 

@@ -1,12 +1,10 @@
 import { DynamicBorder, type ExtensionAPI, type ExtensionContext } from "@mariozechner/pi-coding-agent";
 import { Container, Text } from "@mariozechner/pi-tui";
 
-const PR_PROMPT_PATTERN = /^\s*You are given one or more GitHub PR URLs:\s*(\S+)/im;
-const ISSUE_PROMPT_PATTERN = /^\s*Analyze GitHub issue\(s\):\s*(\S+)/im;
-
 type PromptMatch = {
-	kind: "pr" | "issue";
+	kind: "pr" | "issue" | "forum";
 	url: string;
+	forumId?: string;
 };
 
 type GhMetadata = {
@@ -17,18 +15,37 @@ type GhMetadata = {
 	};
 };
 
+const URL_PATTERNS: { kind: PromptMatch["kind"]; pattern: RegExp }[] = [
+	{ kind: "pr", pattern: /https?:\/\/github\.com\/[^\s/]+\/[^\s/]+\/pull\/\d+[^\s]*/gi },
+	{ kind: "issue", pattern: /https?:\/\/github\.com\/[^\s/]+\/[^\s/]+\/issues\/\d+[^\s]*/gi },
+	{ kind: "forum", pattern: /https?:\/\/(?:www\.)?esotericsoftware\.com\/forum\/d\/(\d+)[^\s]*/gi },
+];
+
 function extractPromptMatch(prompt: string): PromptMatch | undefined {
-	const prMatch = prompt.match(PR_PROMPT_PATTERN);
-	if (prMatch?.[1]) {
-		return { kind: "pr", url: prMatch[1].trim() };
+	let last: PromptMatch | undefined;
+
+	for (const { kind, pattern } of URL_PATTERNS) {
+		pattern.lastIndex = 0;
+		let m;
+		while ((m = pattern.exec(prompt)) !== null) {
+			const url = m[0].trim();
+			const forumId = kind === "forum" ? m[1] : undefined;
+			last = { kind, url, forumId };
+		}
 	}
 
-	const issueMatch = prompt.match(ISSUE_PROMPT_PATTERN);
-	if (issueMatch?.[1]) {
-		return { kind: "issue", url: issueMatch[1].trim() };
-	}
+	return last;
+}
 
-	return undefined;
+async function fetchForumMetadata(forumId: string): Promise<{ title?: string } | undefined> {
+	try {
+		const res = await fetch(`https://esotericsoftware.com/forum/api/discussions/${forumId}`);
+		if (!res.ok) return undefined;
+		const data = (await res.json()) as { data?: { attributes?: { title?: string } } };
+		return { title: data?.data?.attributes?.title };
+	} catch {
+		return undefined;
+	}
 }
 
 async function fetchGhMetadata(
@@ -76,8 +93,20 @@ export default function promptUrlWidgetExtension(pi: ExtensionAPI) {
 		});
 	};
 
+	const fetchMetadata = async (
+		api: ExtensionAPI,
+		match: PromptMatch,
+	): Promise<{ title?: string; authorText?: string }> => {
+		if (match.kind === "forum" && match.forumId) {
+			const meta = await fetchForumMetadata(match.forumId);
+			return { title: meta?.title?.trim() };
+		}
+		const meta = await fetchGhMetadata(api, match.kind as "pr" | "issue", match.url);
+		return { title: meta?.title?.trim(), authorText: formatAuthor(meta?.author) };
+	};
+
 	const applySessionName = (ctx: ExtensionContext, match: PromptMatch, title?: string) => {
-		const label = match.kind === "pr" ? "PR" : "Issue";
+		const label = match.kind === "pr" ? "PR" : match.kind === "issue" ? "Issue" : "Forum";
 		const trimmedTitle = title?.trim();
 		const fallbackName = `${label}: ${match.url}`;
 		const desiredName = trimmedTitle ? `${label}: ${trimmedTitle} (${match.url})` : fallbackName;
@@ -100,9 +129,7 @@ export default function promptUrlWidgetExtension(pi: ExtensionAPI) {
 
 		setWidget(ctx, match);
 		applySessionName(ctx, match);
-		void fetchGhMetadata(pi, match.kind, match.url).then((meta) => {
-			const title = meta?.title?.trim();
-			const authorText = formatAuthor(meta?.author);
+		void fetchMetadata(pi, match).then(({ title, authorText }) => {
 			setWidget(ctx, match, title, authorText);
 			applySessionName(ctx, match, title);
 		});
@@ -144,9 +171,7 @@ export default function promptUrlWidgetExtension(pi: ExtensionAPI) {
 
 		setWidget(ctx, match);
 		applySessionName(ctx, match);
-		void fetchGhMetadata(pi, match.kind, match.url).then((meta) => {
-			const title = meta?.title?.trim();
-			const authorText = formatAuthor(meta?.author);
+		void fetchMetadata(pi, match).then(({ title, authorText }) => {
 			setWidget(ctx, match, title, authorText);
 			applySessionName(ctx, match, title);
 		});

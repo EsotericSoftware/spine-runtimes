@@ -47,8 +47,8 @@ namespace spine {
 		~EventTimeline();
 
 		/// Fires events for frames > lastTime and <= time.
-		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
-						   MixDirection direction, bool appliedPose) override;
+		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+						   bool appliedPose) override;
 
 		size_t getFrameCount();
 

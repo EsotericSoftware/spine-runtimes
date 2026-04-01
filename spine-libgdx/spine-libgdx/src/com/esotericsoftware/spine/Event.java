@@ -29,22 +29,22 @@
 
 package com.esotericsoftware.spine;
 
+import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 import com.esotericsoftware.spine.AnimationState.AnimationStateListener;
 
-/** Stores the current pose values for an {@link Event}.
+/** Fired by {@link EventTimeline} when specific animation times are reached.
  * <p>
- * See Timeline
- * {@link Timeline#apply(Skeleton, float, float, com.badlogic.gdx.utils.Array, float, com.esotericsoftware.spine.Animation.MixBlend, com.esotericsoftware.spine.Animation.MixDirection, boolean)},
- * AnimationStateListener {@link AnimationStateListener#event(com.esotericsoftware.spine.AnimationState.TrackEntry, Event)}, and
+ * See {@link Timeline#apply(Skeleton, float, float, com.badlogic.gdx.utils.Array, float, boolean, boolean, boolean, boolean)},
+ * {@link AnimationStateListener#event(com.esotericsoftware.spine.AnimationState.TrackEntry, Event)}, and
  * <a href="https://esotericsoftware.com/spine-events">Events</a> in the Spine User Guide. */
 public class Event {
+	final float time;
 	final EventData data;
 	int intValue;
 	float floatValue;
 	String stringValue;
 	float volume, balance;
-	final float time;
 
 	public Event (float time, EventData data) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
@@ -52,6 +52,7 @@ public class Event {
 		this.data = data;
 	}
 
+	/** The integer payload for this event. */
 	public int getInt () {
 		return intValue;
 	}
@@ -60,6 +61,7 @@ public class Event {
 		this.intValue = intValue;
 	}
 
+	/** The float payload for this event. */
 	public float getFloat () {
 		return floatValue;
 	}
@@ -68,6 +70,7 @@ public class Event {
 		this.floatValue = floatValue;
 	}
 
+	/** The string payload for this event. */
 	public String getString () {
 		return stringValue;
 	}
@@ -77,6 +80,7 @@ public class Event {
 		this.stringValue = stringValue;
 	}
 
+	/** If an audio path is set, the volume for the audio. */
 	public float getVolume () {
 		return volume;
 	}
@@ -85,6 +89,7 @@ public class Event {
 		this.volume = volume;
 	}
 
+	/** If an audio path is set, the left/right balance for the audio. */
 	public float getBalance () {
 		return balance;
 	}
@@ -93,7 +98,7 @@ public class Event {
 		this.balance = balance;
 	}
 
-	/** The animation time this event was keyed. */
+	/** The animation time this event was keyed, or -1 for the setup pose. */
 	public float getTime () {
 		return time;
 	}

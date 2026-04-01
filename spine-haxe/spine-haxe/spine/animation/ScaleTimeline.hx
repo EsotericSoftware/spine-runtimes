@@ -40,15 +40,11 @@ class ScaleTimeline extends BoneTimeline2 {
 		super(frameCount, bezierCount, boneIndex, Property.scaleX, Property.scaleY);
 	}
 
-	public function apply1(pose:BoneLocal, setup:BoneLocal, time:Float, alpha:Float, blend:MixBlend, direction:MixDirection) {
+	public function apply1(pose:BonePose, setup:BonePose, time:Float, alpha:Float, fromSetup:Bool, add:Bool, out:Bool) {
 		if (time < frames[0]) {
-			switch (blend) {
-				case MixBlend.setup:
-					pose.scaleX = setup.scaleX;
-					pose.scaleY = setup.scaleY;
-				case MixBlend.first:
-					pose.scaleX += (setup.scaleX - pose.scaleX) * alpha;
-					pose.scaleY += (setup.scaleY - pose.scaleY) * alpha;
+			if (fromSetup) {
+				pose.scaleX = setup.scaleX;
+				pose.scaleY = setup.scaleY;
 			}
 			return;
 		}
@@ -74,48 +70,23 @@ class ScaleTimeline extends BoneTimeline2 {
 		x *= setup.scaleX;
 		y *= setup.scaleY;
 
-		if (alpha == 1) {
-			if (blend == MixBlend.add) {
-				pose.scaleX += x - setup.scaleX;
-				pose.scaleY += y - setup.scaleY;
-			} else {
-				pose.scaleX = x;
-				pose.scaleY = y;
-			}
+		if (alpha == 1 && !add) {
+			pose.scaleX = x;
+			pose.scaleY = y;
 		} else {
-			var bx:Float = 0, by:Float = 0;
-			if (direction == MixDirection.mixOut) {
-				switch (blend) {
-					case MixBlend.setup:
-						bx = setup.scaleX;
-						by = setup.scaleY;
-						pose.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bx) * alpha;
-						pose.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - by) * alpha;
-					case MixBlend.first, MixBlend.replace:
-						bx = pose.scaleX;
-						by = pose.scaleY;
-						pose.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bx) * alpha;
-						pose.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - by) * alpha;
-					case MixBlend.add:
-						pose.scaleX = (x - setup.scaleX) * alpha;
-						pose.scaleY = (y - setup.scaleY) * alpha;
-				}
+			var bx:Float = fromSetup ? setup.scaleX : pose.scaleX;
+			var by:Float = fromSetup ? setup.scaleY : pose.scaleY;
+			if (add) {
+				pose.scaleX = bx + (x - setup.scaleX) * alpha;
+				pose.scaleY = by + (y - setup.scaleY) * alpha;
+			} else if (out) {
+				pose.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bx) * alpha;
+				pose.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - by) * alpha;
 			} else {
-				switch (blend) {
-					case MixBlend.setup:
-						bx = Math.abs(setup.scaleX) * MathUtils.signum(x);
-						by = Math.abs(setup.scaleY) * MathUtils.signum(y);
-						pose.scaleX = bx + (x - bx) * alpha;
-						pose.scaleY = by + (y - by) * alpha;
-					case MixBlend.first, MixBlend.replace:
-						bx = Math.abs(pose.scaleX) * MathUtils.signum(x);
-						by = Math.abs(pose.scaleY) * MathUtils.signum(y);
-						pose.scaleX = bx + (x - bx) * alpha;
-						pose.scaleY = by + (y - by) * alpha;
-					case MixBlend.add:
-						pose.scaleX += (x - setup.scaleX) * alpha;
-						pose.scaleY += (y - setup.scaleY) * alpha;
-				}
+				bx = Math.abs(bx) * MathUtils.signum(x);
+				by = Math.abs(by) * MathUtils.signum(y);
+				pose.scaleX = bx + (x - bx) * alpha;
+				pose.scaleY = by + (y - by) * alpha;
 			}
 		}
 	}

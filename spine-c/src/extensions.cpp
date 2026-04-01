@@ -497,7 +497,7 @@ spine_skin_entries spine_skin_get_entries(spine_skin skin) {
 		while (entries.hasNext()) {
 			Skin::AttachmentMap::Entry &entry = entries.next();
 			result->entries[index].slotIndex = (int32_t) entry._slotIndex;
-			result->entries[index].name = SpineExtension::strdup(entry._name.buffer(), __FILE__, __LINE__);
+			result->entries[index].name = SpineExtension::strdup(entry._placeholderName.buffer(), __FILE__, __LINE__);
 			result->entries[index].attachment = (spine_attachment) entry._attachment;
 			index++;
 		}

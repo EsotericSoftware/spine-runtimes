@@ -229,6 +229,7 @@ class TransformConstraintData extends PosedData implements ConstraintData {
     return ArrayFromProperty.fromPointer(result);
   }
 
+  /// The setup pose that most animations are relative to.
   TransformConstraintPose get setupPose {
     final result = SpineBindings.bindings.spine_transform_constraint_data_get_setup_pose(_ptr);
     return TransformConstraintPose.fromPointer(result);

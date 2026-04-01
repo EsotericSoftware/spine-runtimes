@@ -29,10 +29,41 @@
 
 package spine;
 
-/** The applied pose for a bone. This is the {@link Bone} pose with constraints applied and the world transform computed by
- * Skeleton.updateWorldTransform(Physics). */
-class BonePose extends BoneLocal implements Update {
+/** The applied local pose and world transform for a bone. This is the Bone.pose with constraints applied and the world
+ * transform computed by Skeleton.updateWorldTransform(Physics) and updateWorldTransform(Skeleton). */
+class BonePose implements Pose<BonePose> implements Update {
 	public var bone:Bone;
+
+	/** The local x translation. */
+	public var x:Float = 0;
+
+	/** The local y translation. */
+	public var y:Float = 0;
+
+	/** The local rotation in degrees, counter clockwise. */
+	public var rotation:Float = 0;
+
+	/** The local scaleX. */
+	public var scaleX:Float = 0;
+
+	/** The local scaleY. */
+	public var scaleY:Float = 0;
+
+	/** The local shearX. */
+	public var shearX:Float = 0;
+
+	/** The local shearY. */
+	public var shearY:Float = 0;
+
+	/** Determines how parent world transforms affect this bone. */
+	public var inherit(default, set):Inherit;
+
+	function set_inherit(value:Inherit):Inherit {
+		if (value == null)
+			throw new SpineException("inherit cannot be null.");
+		inherit = value;
+		return value;
+	}
 
 	/** Part of the world transform matrix for the X axis. If changed, updateAppliedTransform() should be called. */
 	public var a:Float = 0;
@@ -55,9 +86,20 @@ class BonePose extends BoneLocal implements Update {
 	public var world:Int;
 	public var local:Int;
 
-	// public function new () {
-	// 	super();
-	// }
+	public function new() {}
+
+	public function set(pose:BonePose):Void {
+		if (pose == null)
+			throw new SpineException("pose cannot be null.");
+		x = pose.x;
+		y = pose.y;
+		rotation = pose.rotation;
+		scaleX = pose.scaleX;
+		scaleY = pose.scaleY;
+		shearX = pose.shearX;
+		shearY = pose.shearY;
+		inherit = pose.inherit;
+	}
 
 	/** Called by Skeleton.updateCache() to compute the world transform, if needed. */
 	public function update(skeleton:Skeleton, physics:Physics):Void {
@@ -88,7 +130,7 @@ class BonePose extends BoneLocal implements Update {
 			return;
 		}
 
-		var parent = bone.parent.applied;
+		var parent = bone.parent.appliedPose;
 		var pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
 		worldX = pa * x + pb * y + parent.worldX;
 		worldY = pc * x + pd * y + parent.worldY;
@@ -195,7 +237,7 @@ class BonePose extends BoneLocal implements Update {
 			return;
 		}
 
-		var parent = bone.parent.applied;
+		var parent = bone.parent.appliedPose;
 		var pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
 		var pid:Float = 1 / (pa * pd - pb * pc);
 		var ia = pd * pid, ib = pb * pid, ic = pc * pid, id = pa * pid;
@@ -262,7 +304,7 @@ class BonePose extends BoneLocal implements Update {
 		}
 	}
 
-	/** If the world transform has been modified and the local transform no longer matches, {@link #updateLocalTransform(Skeleton)}
+	/** If the world transform has been modified and the local transform no longer matches, updateLocalTransform(Skeleton)
 	 * is called. */
 	public function validateLocalTransform(skeleton:Skeleton) {
 		if (local == skeleton._update)
@@ -285,7 +327,7 @@ class BonePose extends BoneLocal implements Update {
 	public function resetWorld(update:Int) {
 		var children = bone.children;
 		for (i in 0...bone.children.length) {
-			var child = children[i].applied;
+			var child = children[i].appliedPose;
 			if (child.world == update) {
 				child.world = 0;
 				child.local = 0;
@@ -344,14 +386,14 @@ class BonePose extends BoneLocal implements Update {
 	public function worldToParent(world:Array<Float>):Array<Float> {
 		if (world == null)
 			throw new SpineException("world cannot be null.");
-		return bone.parent == null ? world : bone.parent.applied.worldToLocal(world);
+		return bone.parent == null ? world : bone.parent.appliedPose.worldToLocal(world);
 	}
 
 	/** Transforms a point from the parent bone's coordinates to world coordinates. */
 	public function parentToWorld(world:Array<Float>):Array<Float> {
 		if (world == null)
 			throw new SpineException("world cannot be null.");
-		return bone.parent == null ? world : bone.parent.applied.localToWorld(world);
+		return bone.parent == null ? world : bone.parent.appliedPose.localToWorld(world);
 	}
 
 	/** Transforms a world rotation to a local rotation. */

@@ -20,7 +20,7 @@ SPINE_C_API spine_rtti spine_deform_timeline_get_rtti(spine_deform_timeline self
  */
 SPINE_C_API void spine_deform_timeline_set_frame(spine_deform_timeline self, int frameIndex, float time, spine_array_float vertices);
 /**
- * The attachment that will be deformed.
+ * The attachment whose vertices will be deformed.
  */
 SPINE_C_API spine_vertex_attachment spine_deform_timeline_get_attachment(spine_deform_timeline self);
 SPINE_C_API void spine_deform_timeline_set_attachment(spine_deform_timeline self, spine_vertex_attachment inValue);
@@ -29,14 +29,22 @@ SPINE_C_API void spine_deform_timeline_set_bezier(spine_deform_timeline self, si
 SPINE_C_API float spine_deform_timeline_get_curve_percent(spine_deform_timeline self, float time, int frame);
 SPINE_C_API size_t spine_deform_timeline_get_frame_count(spine_deform_timeline self);
 SPINE_C_API void spine_deform_timeline_apply(spine_deform_timeline self, spine_skeleton skeleton, float lastTime, float time,
-											 /*@null*/ spine_array_event events, float alpha, spine_mix_blend blend, spine_mix_direction direction,
-											 bool appliedPose);
+											 /*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out, bool appliedPose);
 SPINE_C_API int spine_deform_timeline_get_slot_index(spine_deform_timeline self);
 SPINE_C_API void spine_deform_timeline_set_slot_index(spine_deform_timeline self, int inValue);
 SPINE_C_API void spine_deform_timeline_set_linear(spine_deform_timeline self, size_t frame);
 SPINE_C_API void spine_deform_timeline_set_stepped(spine_deform_timeline self, size_t frame);
 SPINE_C_API float spine_deform_timeline_get_bezier_value(spine_deform_timeline self, float time, size_t frame, size_t valueOffset, size_t i);
 SPINE_C_API spine_array_float spine_deform_timeline_get_curves(spine_deform_timeline self);
+/**
+ * True if this timeline supports additive blending.
+ */
+SPINE_C_API bool spine_deform_timeline_get_additive(spine_deform_timeline self);
+/**
+ * True if this timeline sets values instantaneously and does not support
+ * interpolation between frames.
+ */
+SPINE_C_API bool spine_deform_timeline_get_instant(spine_deform_timeline self);
 SPINE_C_API size_t spine_deform_timeline_get_frame_entries(spine_deform_timeline self);
 SPINE_C_API spine_array_float spine_deform_timeline_get_frames(spine_deform_timeline self);
 SPINE_C_API float spine_deform_timeline_get_duration(spine_deform_timeline self);

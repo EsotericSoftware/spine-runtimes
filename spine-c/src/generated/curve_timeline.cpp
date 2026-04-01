@@ -39,9 +39,19 @@ spine_array_float spine_curve_timeline_get_curves(spine_curve_timeline self) {
 }
 
 void spine_curve_timeline_apply(spine_curve_timeline self, spine_skeleton skeleton, float lastTime, float time, /*@null*/ spine_array_event events,
-								float alpha, spine_mix_blend blend, spine_mix_direction direction, bool appliedPose) {
+								float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
 	CurveTimeline *_self = (CurveTimeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixBlend) blend, (MixDirection) direction, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
+}
+
+bool spine_curve_timeline_get_additive(spine_curve_timeline self) {
+	CurveTimeline *_self = (CurveTimeline *) self;
+	return _self->getAdditive();
+}
+
+bool spine_curve_timeline_get_instant(spine_curve_timeline self) {
+	CurveTimeline *_self = (CurveTimeline *) self;
+	return _self->getInstant();
 }
 
 size_t spine_curve_timeline_get_frame_entries(spine_curve_timeline self) {

@@ -38,18 +38,6 @@ protected:
 	static void _bind_methods();
 
 public:
-	enum MixBlend {
-		MixBlend_Setup = 0,
-		MixBlend_First,
-		MixBlend_Replace,
-		MixBlend_Add
-	};
-
-	enum MixDirection {
-		MixDirection_In = 0,
-		MixDirection_Out
-	};
-
 	enum PropertyId {
 		Property_Rotate = 1 << 0,
 		Property_X = 1 << 1,
@@ -124,8 +112,6 @@ public:
 	};
 };
 
-VARIANT_ENUM_CAST(SpineConstant::MixBlend)
-VARIANT_ENUM_CAST(SpineConstant::MixDirection)
 VARIANT_ENUM_CAST(SpineConstant::PropertyId)
 VARIANT_ENUM_CAST(SpineConstant::Inherit)
 VARIANT_ENUM_CAST(SpineConstant::PositionMode)

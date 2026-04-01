@@ -35,8 +35,7 @@
 
 namespace spine {
 
-	/// Changes an IK constraint's IkConstraintPose::getMix(), IkConstraintPose::getSoftness(),
-	/// IkConstraintPose::getBendDirection(), IkConstraintPose::getStretch(), and IkConstraintPose::getCompress().
+	/// Changes an IK constraint's mix, softness, bend direction, stretch, and compress values.
 	class SP_API IkConstraintTimeline : public CurveTimeline, public ConstraintTimeline {
 		friend class SkeletonBinary;
 
@@ -49,8 +48,8 @@ namespace spine {
 
 		virtual ~IkConstraintTimeline();
 
-		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
-						   MixDirection direction, bool appliedPose) override;
+		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+						   bool appliedPose) override;
 
 		/// Sets the time, mix, softness, bend direction, compress, and stretch for the specified frame.
 		/// @param frame Between 0 and frameCount, inclusive.

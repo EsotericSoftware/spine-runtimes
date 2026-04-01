@@ -32,28 +32,28 @@ float spine_constraint_timeline1_get_curve_value(spine_constraint_timeline1 self
 	return _self->getCurveValue(time);
 }
 
-float spine_constraint_timeline1_get_relative_value(spine_constraint_timeline1 self, float time, float alpha, spine_mix_blend blend, float current,
+float spine_constraint_timeline1_get_relative_value(spine_constraint_timeline1 self, float time, float alpha, bool fromSetup, bool add, float current,
 													float setup) {
 	ConstraintTimeline1 *_self = (ConstraintTimeline1 *) self;
-	return _self->getRelativeValue(time, alpha, (MixBlend) blend, current, setup);
+	return _self->getRelativeValue(time, alpha, fromSetup, add, current, setup);
 }
 
-float spine_constraint_timeline1_get_absolute_value_1(spine_constraint_timeline1 self, float time, float alpha, spine_mix_blend blend, float current,
-													  float setup) {
+float spine_constraint_timeline1_get_absolute_value_1(spine_constraint_timeline1 self, float time, float alpha, bool fromSetup, bool add,
+													  float current, float setup) {
 	ConstraintTimeline1 *_self = (ConstraintTimeline1 *) self;
-	return _self->getAbsoluteValue(time, alpha, (MixBlend) blend, current, setup);
+	return _self->getAbsoluteValue(time, alpha, fromSetup, add, current, setup);
 }
 
-float spine_constraint_timeline1_get_absolute_value_2(spine_constraint_timeline1 self, float time, float alpha, spine_mix_blend blend, float current,
-													  float setup, float value) {
+float spine_constraint_timeline1_get_absolute_value_2(spine_constraint_timeline1 self, float time, float alpha, bool fromSetup, bool add,
+													  float current, float setup, float value) {
 	ConstraintTimeline1 *_self = (ConstraintTimeline1 *) self;
-	return _self->getAbsoluteValue(time, alpha, (MixBlend) blend, current, setup, value);
+	return _self->getAbsoluteValue(time, alpha, fromSetup, add, current, setup, value);
 }
 
-float spine_constraint_timeline1_get_scale_value(spine_constraint_timeline1 self, float time, float alpha, spine_mix_blend blend,
-												 spine_mix_direction direction, float current, float setup) {
+float spine_constraint_timeline1_get_scale_value(spine_constraint_timeline1 self, float time, float alpha, bool fromSetup, bool add, bool out,
+												 float current, float setup) {
 	ConstraintTimeline1 *_self = (ConstraintTimeline1 *) self;
-	return _self->getScaleValue(time, alpha, (MixBlend) blend, (MixDirection) direction, current, setup);
+	return _self->getScaleValue(time, alpha, fromSetup, add, out, current, setup);
 }
 
 void spine_constraint_timeline1_set_linear(spine_constraint_timeline1 self, size_t frame) {
@@ -83,10 +83,19 @@ spine_array_float spine_constraint_timeline1_get_curves(spine_constraint_timelin
 }
 
 void spine_constraint_timeline1_apply(spine_constraint_timeline1 self, spine_skeleton skeleton, float lastTime, float time,
-									  /*@null*/ spine_array_event events, float alpha, spine_mix_blend blend, spine_mix_direction direction,
-									  bool appliedPose) {
+									  /*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
 	ConstraintTimeline1 *_self = (ConstraintTimeline1 *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixBlend) blend, (MixDirection) direction, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
+}
+
+bool spine_constraint_timeline1_get_additive(spine_constraint_timeline1 self) {
+	ConstraintTimeline1 *_self = (ConstraintTimeline1 *) self;
+	return _self->getAdditive();
+}
+
+bool spine_constraint_timeline1_get_instant(spine_constraint_timeline1 self) {
+	ConstraintTimeline1 *_self = (ConstraintTimeline1 *) self;
+	return _self->getInstant();
 }
 
 size_t spine_constraint_timeline1_get_frame_entries(spine_constraint_timeline1 self) {

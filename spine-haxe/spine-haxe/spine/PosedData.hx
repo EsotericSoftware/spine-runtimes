@@ -34,7 +34,8 @@ abstract class PosedData<P:Pose<Any>> {
 	/** The constraint's name, which is unique across all constraints in the skeleton of the same type. */
 	public var name:String;
 
-	public final setup:P;
+	/** The setup pose that most animations are relative to. */
+	public final setupPose:P;
 
 	/** When true, `Skeleton.updateWorldTransform(Physics)` only updates this constraint if the `Skeleton.getSkin()`
 	 * contains this constraint.
@@ -42,11 +43,11 @@ abstract class PosedData<P:Pose<Any>> {
 	 * See `Skin.getConstraints()`. */
 	public var skinRequired:Bool;
 
-	public function new(name:String, setup:P) {
+	public function new(name:String, setupPose:P) {
 		if (name == null)
 			throw new SpineException("name cannot be null.");
 		this.name = name;
-		this.setup = setup;
+		this.setupPose = setupPose;
 	}
 
 	public function toString():String {

@@ -373,7 +373,7 @@ export class Spine extends Container {
 
 		// dark tint can be enabled by options, otherwise is enable if at least one slot has tint black
 		this.darkTint = darkTint === undefined
-			? this.skeleton.slots.some(slot => !!slot.data.setup.darkColor)
+			? this.skeleton.slots.some(slot => !!slot.data.setupPose.darkColor)
 			: darkTint;
 		if (this.darkTint) this.slotMeshFactory = () => new DarkSlotMesh();
 	}
@@ -563,12 +563,13 @@ export class Spine extends Container {
 	private updateSlotObject (element: { container: Container, followAttachmentTimeline: boolean }, slot: Slot, zIndex: number) {
 		const { container: slotObject, followAttachmentTimeline } = element
 
-		const pose = slot.applied;
+		const pose = slot.appliedPose;
 		const followAttachmentValue = followAttachmentTimeline ? Boolean(pose.attachment) : true;
-		slotObject.visible = this.skeleton.drawOrder.includes(slot) && followAttachmentValue;
+		const drawOrder = this.skeleton.drawOrder.appliedPose;
+		slotObject.visible = drawOrder.includes(slot) && followAttachmentValue;
 
 		if (slotObject.visible) {
-			const applied = slot.bone.applied;
+			const applied = slot.bone.appliedPose;
 
 			const matrix = slotObject.localTransform;
 			matrix.a = applied.a;
@@ -594,7 +595,7 @@ export class Spine extends Container {
 			}
 			if (!pixiMaskSource.computed) {
 				pixiMaskSource.computed = true;
-				const clippingAttachment = pixiMaskSource.slot.applied.attachment as ClippingAttachment;
+				const clippingAttachment = pixiMaskSource.slot.appliedPose.attachment as ClippingAttachment;
 				const worldVerticesLength = clippingAttachment.worldVerticesLength;
 				if (this.clippingVertAux.length < worldVerticesLength) this.clippingVertAux = new Float32Array(worldVerticesLength);
 				clippingAttachment.computeWorldVertices(this.skeleton, pixiMaskSource.slot, 0, worldVerticesLength, this.clippingVertAux, 0, 2);
@@ -628,10 +629,11 @@ export class Spine extends Container {
 		let triangles: Array<number> | null = null;
 		let uvs: NumberArrayLike | null = null;
 		let pixiMaskSource: PixiMaskSource | null = null;
-		const drawOrder = this.skeleton.drawOrder;
+		const drawOrder = this.skeleton.drawOrder.appliedPose;
+		const slots = drawOrder;
 
 		for (let i = 0, n = drawOrder.length, slotObjectsCounter = 0; i < n; i++) {
-			const slot = drawOrder[i];
+			const slot = slots[i];
 
 			// render pixi object on the current slot on top of the slot attachment
 			const pixiObject = this.slotsObject.get(slot);
@@ -642,7 +644,7 @@ export class Spine extends Container {
 				this.updateAndSetPixiMask(pixiMaskSource, pixiObject.container);
 			}
 
-			const pose = slot.applied;
+			const pose = slot.appliedPose;
 			const useDarkColor = !!pose.darkColor;
 			const vertexSize = useDarkColor ? Spine.DARK_VERTEX_SIZE : Spine.VERTEX_SIZE;
 			if (!slot.bone.active) {
@@ -826,9 +828,9 @@ export class Spine extends Container {
 		if (!actualBone) throw Error(`Cannot set bone position, bone ${String(bone)} not found`);
 		Spine.vectorAux.set(position.x, position.y);
 
-		const applied = actualBone.applied;
+		const applied = actualBone.appliedPose;
 		if (actualBone.parent) {
-			const aux = actualBone.parent.applied.worldToLocal(Spine.vectorAux);
+			const aux = actualBone.parent.appliedPose.worldToLocal(Spine.vectorAux);
 			applied.x = aux.x;
 			applied.y = aux.y;
 		} else {
@@ -855,8 +857,8 @@ export class Spine extends Container {
 			outPos = { x: 0, y: 0 };
 		}
 
-		outPos.x = actualBone.applied.worldX;
-		outPos.y = actualBone.applied.worldY;
+		outPos.x = actualBone.appliedPose.worldX;
+		outPos.y = actualBone.appliedPose.worldY;
 		return outPos;
 	}
 
@@ -874,9 +876,9 @@ export class Spine extends Container {
 	pixiWorldCoordinatesToBone (point: { x: number; y: number }, bone: Bone) {
 		this.pixiWorldCoordinatesToSkeleton(point);
 		if (bone.parent) {
-			bone.parent.applied.worldToLocal(point as Vector2);
+			bone.parent.appliedPose.worldToLocal(point as Vector2);
 		} else {
-			bone.applied.worldToLocal(point as Vector2);
+			bone.appliedPose.worldToLocal(point as Vector2);
 		}
 	}
 

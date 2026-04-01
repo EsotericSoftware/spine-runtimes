@@ -51,12 +51,16 @@ export class AtlasAttachmentLoader implements AttachmentLoader {
 		this.allowMissingRegions = allowMissingRegions;
 	}
 
+	/** Sets each {@link Sequence.regions} by calling {@link findRegion} for each texture region using
+	 * {@link Sequence.getPath}. */
 	protected findRegions (name: string, basePath: string, sequence: Sequence) {
 		const regions = sequence.regions;
 		for (let i = 0, n = regions.length; i < n; i++)
 			regions[i] = this.findRegion(name, sequence.getPath(basePath, i));
 	}
 
+	/** Looks for the region with the specified path. If not found and {@link allowMissingRegions} is false, an error is
+	 * raised. */
 	protected findRegion (name: string, path: string) {
 		const region = this.atlas.findRegion(path);
 		if (!region && !this.allowMissingRegions)

@@ -48,6 +48,8 @@ namespace spine {
 	public:
 		explicit ClippingAttachment(const String &name);
 
+		/// Clipping is performed between the clipping attachment's slot and the end slot. If NULL, clipping is done until
+		/// the end of the skeleton's rendering.
 		SlotData *getEndSlot();
 
 		void setEndSlot(SlotData *inValue);

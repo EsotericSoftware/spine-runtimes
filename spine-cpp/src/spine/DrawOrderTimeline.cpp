@@ -41,9 +41,14 @@ using namespace spine;
 
 RTTI_IMPL(DrawOrderTimeline, Timeline)
 
+PropertyId DrawOrderTimeline::getPropertyId() {
+	return ((PropertyId) Property_DrawOrder << 32);
+}
+
 DrawOrderTimeline::DrawOrderTimeline(size_t frameCount) : Timeline(frameCount, 1) {
-	PropertyId ids[] = {((PropertyId) Property_DrawOrder << 32)};
+	PropertyId ids[] = {getPropertyId()};
 	setPropertyIds(ids, 1);
+	_instant = true;
 
 	_drawOrders.ensureCapacity(frameCount);
 	for (size_t i = 0; i < frameCount; ++i) {
@@ -52,42 +57,31 @@ DrawOrderTimeline::DrawOrderTimeline(size_t frameCount) : Timeline(frameCount, 1
 	}
 }
 
-void DrawOrderTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
-							  MixDirection direction, bool appliedPose) {
+void DrawOrderTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+							  bool appliedPose) {
 	SP_UNUSED(appliedPose);
 	SP_UNUSED(lastTime);
 	SP_UNUSED(events);
 	SP_UNUSED(alpha);
+	SP_UNUSED(add);
 
-	Array<Slot *> &drawOrder = skeleton._drawOrder;
-	Array<Slot *> &slots = skeleton._slots;
-	if (direction == MixDirection_Out) {
-		if (blend == MixBlend_Setup) {
-			drawOrder.clear();
-			drawOrder.ensureCapacity(slots.size());
-			for (size_t i = 0, n = slots.size(); i < n; ++i) drawOrder.add(slots[i]);
-		}
-		return;
-	}
-
-	if (time < _frames[0]) {
-		if (blend == MixBlend_Setup || blend == MixBlend_First) {
-			drawOrder.clear();
-			drawOrder.ensureCapacity(slots.size());
-			for (size_t i = 0, n = slots.size(); i < n; ++i) drawOrder.add(slots[i]);
+	Array<Slot *> &pose = appliedPose ? skeleton._drawOrder.getAppliedPose() : skeleton._drawOrder.getPose();
+	Array<Slot *> &setup = skeleton._slots;
+	if (out || time < _frames[0]) {
+		if (fromSetup) {
+			pose.setSize(setup.size(), NULL);
+			for (size_t i = 0, n = setup.size(); i < n; ++i) pose[i] = setup[i];
 		}
 		return;
 	}
 
 	Array<int> &drawOrderToSetupIndex = _drawOrders[Animation::search(_frames, time)];
 	if (drawOrderToSetupIndex.size() == 0) {
-		drawOrder.clear();
-		drawOrder.ensureCapacity(slots.size());
-		for (size_t i = 0, n = slots.size(); i < n; ++i) drawOrder.add(slots[i]);
+		pose.setSize(setup.size(), NULL);
+		for (size_t i = 0, n = setup.size(); i < n; ++i) pose[i] = setup[i];
 	} else {
-		drawOrder.clear();
-		drawOrder.ensureCapacity(drawOrderToSetupIndex.size());
-		for (size_t i = 0, n = drawOrderToSetupIndex.size(); i < n; ++i) drawOrder.add(slots[drawOrderToSetupIndex[i]]);
+		pose.setSize(drawOrderToSetupIndex.size(), NULL);
+		for (size_t i = 0, n = drawOrderToSetupIndex.size(); i < n; ++i) pose[i] = setup[drawOrderToSetupIndex[i]];
 	}
 }
 

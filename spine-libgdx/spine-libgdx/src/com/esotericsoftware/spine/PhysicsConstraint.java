@@ -31,7 +31,7 @@ package com.esotericsoftware.spine;
 
 import static com.esotericsoftware.spine.utils.SpineUtils.*;
 
-/** Stores the current pose for a physics constraint. A physics constraint applies physics to bones.
+/** Applies physics to a bone.
  * <p>
  * See <a href="https://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide. */
 public class PhysicsConstraint extends Constraint<PhysicsConstraint, PhysicsConstraintData, PhysicsConstraintPose> {
@@ -49,7 +49,7 @@ public class PhysicsConstraint extends Constraint<PhysicsConstraint, PhysicsCons
 		super(data, new PhysicsConstraintPose(), new PhysicsConstraintPose());
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 
-		bone = skeleton.bones.items[data.bone.index].constrained;
+		bone = skeleton.bones.items[data.bone.index].constrainedPose;
 	}
 
 	public PhysicsConstraint copy (Skeleton skeleton) {
@@ -58,6 +58,8 @@ public class PhysicsConstraint extends Constraint<PhysicsConstraint, PhysicsCons
 		return copy;
 	}
 
+	/** Resets all physics state that was the result of previous movement. Use this after moving a bone to prevent physics from
+	 * reacting to the movement. */
 	public void reset (Skeleton skeleton) {
 		remaining = 0;
 		lastTime = skeleton.time;
@@ -76,7 +78,7 @@ public class PhysicsConstraint extends Constraint<PhysicsConstraint, PhysicsCons
 		scaleVelocity = 0;
 	}
 
-	/** Translates the physics constraint so next {@link #update(Skeleton, Physics)} forces are applied as if the bone moved an
+	/** Translates the physics constraint so the next {@link #update(Skeleton, Physics)} forces are applied as if the bone moved an
 	 * additional amount in world space. */
 	public void translate (float x, float y) {
 		ux -= x;
@@ -85,8 +87,8 @@ public class PhysicsConstraint extends Constraint<PhysicsConstraint, PhysicsCons
 		cy -= y;
 	}
 
-	/** Rotates the physics constraint so next {@link #update(Skeleton, Physics)} forces are applied as if the bone rotated around
-	 * the specified point in world space. */
+	/** Rotates the physics constraint so the next {@link #update(Skeleton, Physics)} forces are applied as if the bone rotated
+	 * around the specified point in world space. */
 	public void rotate (float x, float y, float degrees) {
 		float r = degrees * degRad, cos = cos(r), sin = sin(r);
 		float dx = cx - x, dy = cy - y;
@@ -95,7 +97,7 @@ public class PhysicsConstraint extends Constraint<PhysicsConstraint, PhysicsCons
 
 	/** Applies the constraint to the constrained bones. */
 	public void update (Skeleton skeleton, Physics physics) {
-		PhysicsConstraintPose p = applied;
+		PhysicsConstraintPose p = appliedPose;
 		float mix = p.mix;
 		if (mix == 0) return;
 

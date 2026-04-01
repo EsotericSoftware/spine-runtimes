@@ -48,37 +48,30 @@ PathConstraintMixTimeline::PathConstraintMixTimeline(size_t frameCount, size_t b
 	: CurveTimeline(frameCount, PathConstraintMixTimeline::ENTRIES, bezierCount), ConstraintTimeline(), _constraintIndex(constraintIndex) {
 	PropertyId ids[] = {((PropertyId) Property_PathConstraintMix << 32) | constraintIndex};
 	setPropertyIds(ids, 1);
+	_additive = true;
 }
 
 PathConstraintMixTimeline::~PathConstraintMixTimeline() {
 }
 
-void PathConstraintMixTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
-									  MixDirection direction, bool appliedPose) {
+void PathConstraintMixTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add,
+									  bool out, bool appliedPose) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(events);
-	SP_UNUSED(direction);
+	SP_UNUSED(out);
 
 	PathConstraint *constraint = (PathConstraint *) skeleton._constraints[_constraintIndex];
 	if (!constraint->isActive()) return;
-	PathConstraintPose &pose = appliedPose ? *constraint->_applied : constraint->_pose;
+	PathConstraintPose &pose = appliedPose ? *constraint->_appliedPose : constraint->_pose;
 
 	if (time < _frames[0]) {
-		PathConstraintPose &setup = constraint->_data._setup;
-		switch (blend) {
-			case MixBlend_Setup:
-				pose._mixRotate = setup._mixRotate;
-				pose._mixX = setup._mixX;
-				pose._mixY = setup._mixY;
-				return;
-			case MixBlend_First:
-				pose._mixRotate += (setup._mixRotate - pose._mixRotate) * alpha;
-				pose._mixX += (setup._mixX - pose._mixX) * alpha;
-				pose._mixY += (setup._mixY - pose._mixY) * alpha;
-				return;
-			default:
-				return;
+		if (fromSetup) {
+			PathConstraintPose &setup = constraint->_data._setupPose;
+			pose._mixRotate = setup._mixRotate;
+			pose._mixX = setup._mixX;
+			pose._mixY = setup._mixY;
 		}
+		return;
 	}
 
 	float rotate, x, y;
@@ -109,15 +102,15 @@ void PathConstraintMixTimeline::apply(Skeleton &skeleton, float lastTime, float 
 		}
 	}
 
-	if (blend == MixBlend_Setup) {
-		PathConstraintPose &setup = constraint->_data._setup;
-		pose._mixRotate = setup._mixRotate + (rotate - setup._mixRotate) * alpha;
-		pose._mixX = setup._mixX + (x - setup._mixX) * alpha;
-		pose._mixY = setup._mixY + (y - setup._mixY) * alpha;
+	PathConstraintPose &base = fromSetup ? constraint->_data._setupPose : pose;
+	if (add) {
+		pose._mixRotate = base._mixRotate + rotate * alpha;
+		pose._mixX = base._mixX + x * alpha;
+		pose._mixY = base._mixY + y * alpha;
 	} else {
-		pose._mixRotate += (rotate - pose._mixRotate) * alpha;
-		pose._mixX += (x - pose._mixX) * alpha;
-		pose._mixY += (y - pose._mixY) * alpha;
+		pose._mixRotate = base._mixRotate + (rotate - base._mixRotate) * alpha;
+		pose._mixX = base._mixX + (x - base._mixX) * alpha;
+		pose._mixY = base._mixY + (y - base._mixY) * alpha;
 	}
 }
 

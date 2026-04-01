@@ -36,17 +36,20 @@ import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+
 import com.esotericsoftware.spine.utils.SkeletonSerializer;
 
 public class HeadlessTest implements ApplicationListener {
 	private String skeletonPath;
 	private String atlasPath;
 	private String animationName;
+	private String animationName2;
 
-	public HeadlessTest (String skeletonPath, String atlasPath, String animationName) {
+	public HeadlessTest (String skeletonPath, String atlasPath, String animationName, String animationName2) {
 		this.skeletonPath = skeletonPath;
 		this.atlasPath = atlasPath;
 		this.animationName = animationName;
+		this.animationName2 = animationName2;
 	}
 
 	static class MockTexture extends Texture {
@@ -168,6 +171,43 @@ public class HeadlessTest implements ApplicationListener {
 				System.out.println(serializer.serializeAnimationState(state));
 			}
 
+			// Transition test: if a second animation is provided, play A for 10 frames, transition to B,
+			// then sample skeleton state at frames 5, 10, 15, 20 during the mix.
+			if (state != null && animationName2 != null) {
+				Animation animation2 = skeletonData.findAnimation(animationName2);
+				if (animation2 == null) {
+					System.err.println("Animation not found: " + animationName2);
+					System.exit(1);
+				}
+
+				// Reset skeleton and state
+				skeleton.setupPose();
+				state.clearTracks();
+				state.setAnimation(0, skeletonData.findAnimation(animationName), true);
+
+				// Run 10 frames of animation A
+				for (int i = 0; i < 10; i++) {
+					state.update(1 / 60f);
+					state.apply(skeleton);
+					skeleton.updateWorldTransform(Physics.update);
+				}
+
+				// Transition to animation B
+				state.setAnimation(0, animation2, true);
+
+				// Run 20 frames through the mix, serializing at frames 5, 10, 15, 20
+				for (int i = 1; i <= 20; i++) {
+					state.update(1 / 60f);
+					state.apply(skeleton);
+					skeleton.updateWorldTransform(Physics.update);
+					if (i == 5 || i == 10 || i == 15 || i == 20) {
+						serializer = new SkeletonSerializer();
+						System.out.println("\n=== TRANSITION FRAME " + i + " ===");
+						System.out.println(serializer.serializeSkeleton(skeleton));
+					}
+				}
+			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -206,6 +246,7 @@ public class HeadlessTest implements ApplicationListener {
 		HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
 		config.updatesPerSecond = 60;
 		String animationName = args.length >= 3 ? args[2] : null;
-		new HeadlessApplication(new HeadlessTest(args[0], args[1], animationName), config);
+		String animationName2 = args.length >= 4 ? args[3] : null;
+		new HeadlessApplication(new HeadlessTest(args[0], args[1], animationName, animationName2), config);
 	}
 }

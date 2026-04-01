@@ -29,25 +29,23 @@
 
 package spine;
 
-/** Stores the setup pose values for an spine.Event.
- * 
- * 
+/** Stores the setup pose values for an Event.
+ *
  * @see https://esotericsoftware.com/spine-events Events in the Spine User Guide
  */
 class EventData {
 	private var _name:String;
 
-	public var intValue:Int = 0;
-	public var floatValue:Float = 0;
-	public var stringValue:String;
 	public var audioPath:String;
-	public var volume:Float = 1;
-	public var balance:Float = 0;
+
+	/** The setup values that are shared by all events with this data. */
+	public var setupPose:Event;
 
 	public function new(name:String) {
 		if (name == null)
 			throw new SpineException("name cannot be null.");
 		_name = name;
+		setupPose = new Event(-1, this);
 	}
 
 	/** The name of the event, which is unique across all events in the skeleton. */

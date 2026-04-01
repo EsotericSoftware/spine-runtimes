@@ -35,7 +35,7 @@ class ShearYTimeline extends BoneTimeline1 {
 		super(frameCount, bezierCount, boneIndex, Property.shearY);
 	}
 
-	public function apply1(pose:BoneLocal, setup:BoneLocal, time:Float, alpha:Float, blend:MixBlend, direction:MixDirection) {
-		pose.shearY = getRelativeValue(time, alpha, blend, pose.shearY, setup.shearY);
+	public function apply1(pose:BonePose, setup:BonePose, time:Float, alpha:Float, fromSetup:Bool, add:Bool, out:Bool) {
+		pose.shearY = getRelativeValue(time, alpha, fromSetup, add, pose.shearY, setup.shearY);
 	}
 }

@@ -32,16 +32,20 @@ package com.esotericsoftware.spine.attachments;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Null;
 
 import com.esotericsoftware.spine.Skin;
 
-/** An {@link AttachmentLoader} that configures attachments using texture regions from an {@link Atlas}.
+/** An {@link AttachmentLoader} that configures attachments using texture regions from an {@link TextureAtlas}.
  * <p>
  * See <a href='https://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data'>Loading skeleton data</a> in the
  * Spine Runtimes Guide. */
 @SuppressWarnings("javadoc")
 public class AtlasAttachmentLoader implements AttachmentLoader {
 	private TextureAtlas atlas;
+
+	/** If true, {@link #findRegion(String, String)} may return null. If false, an error is raised if the texture region is not
+	 * found. Default is false. */
 	public boolean allowMissingRegions;
 
 	public AtlasAttachmentLoader (TextureAtlas atlas) {
@@ -54,13 +58,17 @@ public class AtlasAttachmentLoader implements AttachmentLoader {
 		this.allowMissingRegions = allowMissingRegions;
 	}
 
+	/** Sets each {@link Sequence#regions} by calling {@link #findRegion(String, String)} for each texture region using
+	 * {@link Sequence#getPath(String, int)}. */
 	protected void findRegions (String name, String basePath, Sequence sequence) {
 		TextureRegion[] regions = sequence.getRegions();
 		for (int i = 0, n = regions.length; i < n; i++)
 			regions[i] = findRegion(name, sequence.getPath(basePath, i));
 	}
 
-	protected AtlasRegion findRegion (String name, String path) {
+	/** Looks for the region with the specified path. If not found and {@link #allowMissingRegions} is false, an error is
+	 * raised. */
+	protected @Null AtlasRegion findRegion (String name, String path) {
 		AtlasRegion region = atlas.findRegion(path);
 		if (region == null && !allowMissingRegions)
 			throw new RuntimeException("Region not found in atlas: " + path + " (attachment: " + name + ")");

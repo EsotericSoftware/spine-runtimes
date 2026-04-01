@@ -50,16 +50,16 @@ PathConstraintSpacingTimeline::PathConstraintSpacingTimeline(size_t frameCount, 
 PathConstraintSpacingTimeline::~PathConstraintSpacingTimeline() {
 }
 
-void PathConstraintSpacingTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
-										  MixDirection direction, bool appliedPose) {
+void PathConstraintSpacingTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup,
+										  bool add, bool out, bool appliedPose) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(events);
-	SP_UNUSED(direction);
+	SP_UNUSED(out);
 
 	PathConstraint *constraint = (PathConstraint *) skeleton._constraints[_constraintIndex];
 	if (constraint->isActive()) {
-		PathConstraintPose &pose = appliedPose ? *constraint->_applied : constraint->_pose;
+		PathConstraintPose &pose = appliedPose ? *constraint->_appliedPose : constraint->_pose;
 		PathConstraintData &data = constraint->_data;
-		pose._spacing = getAbsoluteValue(time, alpha, blend == MixBlend_Add ? MixBlend_Replace : blend, pose._spacing, data._setup._spacing);
+		pose._spacing = getAbsoluteValue(time, alpha, fromSetup, false, pose._spacing, data._setupPose._spacing);
 	}
 }

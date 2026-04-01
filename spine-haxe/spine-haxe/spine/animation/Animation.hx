@@ -110,7 +110,7 @@ class Animation {
 	 * @param blend Controls how mixing is applied when alpha < 1.
 	 * @param direction Indicates whether the timelines are mixing in or out. Used by timelines which perform instant transitions,
 	 *           such as DrawOrderTimeline or AttachmentTimeline. */
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, loop:Bool, events:Array<Event>, alpha:Float, blend:MixBlend, direction:MixDirection,
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, loop:Bool, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
 			appliedPose:Bool):Void {
 		if (skeleton == null)
 			throw new SpineException("skeleton cannot be null.");
@@ -122,7 +122,7 @@ class Animation {
 		}
 
 		for (timeline in timelines) {
-			timeline.apply(skeleton, lastTime, time, events, alpha, blend, direction, appliedPose);
+			timeline.apply(skeleton, lastTime, time, events, alpha, fromSetup, add, out, appliedPose);
 		}
 	}
 }

@@ -31,13 +31,13 @@
 #define Spine_BoneData_h
 
 #include <spine/PosedData.h>
-#include <spine/BoneLocal.h>
+#include <spine/BonePose.h>
 #include <spine/SpineString.h>
 #include <spine/Color.h>
 #include <spine/RTTI.h>
 
 namespace spine {
-	class SP_API BoneData : public PosedDataGeneric<BoneLocal> {
+	class SP_API BoneData : public PosedDataGeneric<BonePose> {
 		friend class SkeletonBinary;
 
 		friend class SkeletonJson;
@@ -69,10 +69,10 @@ namespace spine {
 	public:
 		BoneData(int index, const String &name, BoneData *parent = NULL);
 
-		/// The index of the bone in Skeleton.Bones
+		/// The Skeleton::getBones() index for this bone.
 		int getIndex();
 
-		/// May be NULL.
+		/// The parent bone, or NULL if this bone is the root.
 		BoneData *getParent();
 
 		float getLength();
@@ -81,6 +81,7 @@ namespace spine {
 
 		Color &getColor();
 
+		/// The bone icon name as it was in Spine, or empty if nonessential data was not exported.
 		const String &getIcon();
 
 		void setIcon(const String &icon);

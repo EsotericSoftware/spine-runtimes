@@ -34,7 +34,7 @@ import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
 import 'constraint_timeline1.dart';
 
-/// Changes a path constraint's PathConstraintPose::getSpacing().
+/// Changes a path constraint's spacing.
 class PathConstraintSpacingTimeline extends ConstraintTimeline1 {
   final Pointer<spine_path_constraint_spacing_timeline_wrapper> _ptr;
 

@@ -36,7 +36,7 @@ class RotateTimeline extends BoneTimeline1 {
 		this.boneIndex = boneIndex;
 	}
 
-	public function apply1(pose:BoneLocal, setup:BoneLocal, time:Float, alpha:Float, blend:MixBlend, direction:MixDirection):Void {
-		pose.rotation = getRelativeValue(time, alpha, blend, pose.rotation, setup.rotation);
+	public function apply1(pose:BonePose, setup:BonePose, time:Float, alpha:Float, fromSetup:Bool, add:Bool, out:Bool):Void {
+		pose.rotation = getRelativeValue(time, alpha, fromSetup, add, pose.rotation, setup.rotation);
 	}
 }

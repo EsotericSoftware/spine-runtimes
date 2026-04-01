@@ -35,7 +35,7 @@
 #include <spine/Property.h>
 
 namespace spine {
-	/// Base class for single-value constraint timelines.
+	/// The base class for timelines that change 1 constraint property with a curve.
 	class SP_API ConstraintTimeline1 : public CurveTimeline1, public ConstraintTimeline {
 		RTTI_DECL
 

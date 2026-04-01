@@ -70,12 +70,12 @@ class SequenceTimeline extends Timeline implements SlotTimeline {
 		frames[frame + SequenceTimeline.DELAY] = delay;
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend, direction:MixDirection,
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
 			appliedPose:Bool) {
 		var slot = skeleton.slots[this.slotIndex];
 		if (!slot.bone.active)
 			return;
-		var pose = appliedPose ? slot.applied : slot.pose;
+		var pose = appliedPose ? slot.appliedPose : slot.pose;
 
 		var slotAttachment:Attachment = cast(pose.attachment, Attachment);
 		var attachmentRef:Attachment = cast(this.attachment, Attachment);
@@ -83,14 +83,14 @@ class SequenceTimeline extends Timeline implements SlotTimeline {
 		if (!Std.isOfType(slotAttachment, HasSequence) || slotAttachment.timelineAttachment != attachmentRef)
 			return;
 
-		if (direction == MixDirection.mixOut) {
-			if (blend == MixBlend.setup)
+		if (out) {
+			if (fromSetup)
 				pose.sequenceIndex = -1;
 			return;
 		}
 
 		if (time < frames[0]) {
-			if (blend == MixBlend.setup || blend == MixBlend.first)
+			if (fromSetup)
 				pose.sequenceIndex = -1;
 			return;
 		}

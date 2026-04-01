@@ -48,42 +48,13 @@ public class EventData: NSObject {
         self.init(fromPointer: ptr!)
     }
 
-    /// The name of the event, which is unique within the skeleton.
+    /// The name of the event, unique across all events in the skeleton.
     public var name: String {
         let result = spine_event_data_get_name(_ptr.assumingMemoryBound(to: spine_event_data_wrapper.self))
         return String(cString: result!)
     }
 
-    public var intValue: Int32 {
-        get {
-            let result = spine_event_data_get_int(_ptr.assumingMemoryBound(to: spine_event_data_wrapper.self))
-            return result
-        }
-        set {
-            spine_event_data_set_int(_ptr.assumingMemoryBound(to: spine_event_data_wrapper.self), newValue)
-        }
-    }
-
-    public var floatValue: Float {
-        get {
-            let result = spine_event_data_get_float(_ptr.assumingMemoryBound(to: spine_event_data_wrapper.self))
-            return result
-        }
-        set {
-            spine_event_data_set_float(_ptr.assumingMemoryBound(to: spine_event_data_wrapper.self), newValue)
-        }
-    }
-
-    public var stringValue: String {
-        get {
-            let result = spine_event_data_get_string(_ptr.assumingMemoryBound(to: spine_event_data_wrapper.self))
-            return String(cString: result!)
-        }
-        set {
-            spine_event_data_set_string(_ptr.assumingMemoryBound(to: spine_event_data_wrapper.self), newValue)
-        }
-    }
-
+    /// Path to an audio file relative to the audio folder as defined in Spine.
     public var audioPath: String {
         get {
             let result = spine_event_data_get_audio_path(_ptr.assumingMemoryBound(to: spine_event_data_wrapper.self))
@@ -94,24 +65,15 @@ public class EventData: NSObject {
         }
     }
 
-    public var volume: Float {
-        get {
-            let result = spine_event_data_get_volume(_ptr.assumingMemoryBound(to: spine_event_data_wrapper.self))
-            return result
-        }
-        set {
-            spine_event_data_set_volume(_ptr.assumingMemoryBound(to: spine_event_data_wrapper.self), newValue)
-        }
+    /// The setup values that are shared by all events with this data.
+    public var getSetupPose: Event {
+        let result = spine_event_data_get_setup_pose_1(_ptr.assumingMemoryBound(to: spine_event_data_wrapper.self))
+        return Event(fromPointer: result!)
     }
 
-    public var balance: Float {
-        get {
-            let result = spine_event_data_get_balance(_ptr.assumingMemoryBound(to: spine_event_data_wrapper.self))
-            return result
-        }
-        set {
-            spine_event_data_set_balance(_ptr.assumingMemoryBound(to: spine_event_data_wrapper.self), newValue)
-        }
+    public var setupPose2: Event {
+        let result = spine_event_data_get_setup_pose_2(_ptr.assumingMemoryBound(to: spine_event_data_wrapper.self))
+        return Event(fromPointer: result!)
     }
 
     public func dispose() {

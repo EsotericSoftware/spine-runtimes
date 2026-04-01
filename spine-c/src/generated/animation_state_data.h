@@ -33,8 +33,9 @@ SPINE_C_API void spine_animation_state_data_set_mix_1(spine_animation_state_data
  */
 SPINE_C_API void spine_animation_state_data_set_mix_2(spine_animation_state_data self, spine_animation from, spine_animation to, float duration);
 /**
- * The mix duration to use when changing from the specified animation to the
- * other, or the DefaultMix if no mix duration has been set.
+ * Returns the mix duration to use when changing from the specified animation to
+ * the other on the same track, or the default mix if no mix duration has been
+ * set.
  */
 SPINE_C_API float spine_animation_state_data_get_mix(spine_animation_state_data self, spine_animation from, spine_animation to);
 /**

@@ -32,8 +32,6 @@
 
 #include <spine/Array.h>
 #include <spine/HashMap.h>
-#include <spine/MixBlend.h>
-#include <spine/MixDirection.h>
 #include <spine/SpineObject.h>
 #include <spine/SpineString.h>
 #include <spine/Property.h>
@@ -49,6 +47,9 @@ namespace spine {
 	class AnimationState;
 
 	/// Stores a list of timelines to animate a skeleton's pose over time.
+	///
+	/// See <a href='https://esotericsoftware.com/spine-applying-animations#Timeline-API'>Applying Animations</a> in the Spine
+	/// Runtimes Guide.
 	class SP_API Animation : public SpineObject {
 		friend class AnimationState;
 
@@ -101,14 +102,19 @@ namespace spine {
 		friend class Slider;
 
 	public:
-		Animation(const String &name, Array<Timeline *> &timelines, float duration);
+		/// Creates a new animation. The timelines must be set before use.
+		Animation(const String &name);
 
 		~Animation();
 
-		/// If the returned array or the timelines it contains are modified, setTimelines() must be called.
+		/// If this list or the timelines it contains are modified, the timelines and bones must be set again to recompute the
+		/// animation's bone indices and timeline property IDs.
+		///
+		/// See setTimelines().
 		Array<Timeline *> &getTimelines();
 
-		void setTimelines(Array<Timeline *> &timelines);
+		/// Sets the timelines and bone indices.
+		void setTimelines(Array<Timeline *> &timelines, Array<int> &bones);
 
 		/// Returns true if this animation contains a timeline with any of the specified property IDs.
 		bool hasTimeline(Array<PropertyId> &ids);
@@ -121,31 +127,38 @@ namespace spine {
 
 		/// Applies the animation's timelines to the specified skeleton.
 		///
-		/// See Timeline::apply().
-		/// @param skeleton The skeleton the animation is being applied to. This provides access to the bones, slots, and other skeleton
+		/// See Timeline::apply() and
+		/// <a href='https://esotericsoftware.com/spine-applying-animations#Timeline-API'>Applying Animations</a> in the Spine
+		/// Runtimes Guide.
+		/// @param skeleton The skeleton the animation is applied to. This provides access to the bones, slots, and other skeleton
 		///           components the timelines may change.
-		/// @param lastTime The last time in seconds this animation was applied. Some timelines trigger only at specific times rather
-		///           than every frame. Pass -1 the first time an animation is applied to ensure frame 0 is triggered.
-		/// @param time The time in seconds the skeleton is being posed for. Most timelines find the frame before and the frame after
-		///           this time and interpolate between the frame values. If beyond the getDuration() and loop is
-		///           true then the animation will repeat, else the last frame will be applied.
-		/// @param loop If true, the animation repeats after the getDuration().
-		/// @param events If any events are fired, they are added to this list. Can be null to ignore fired events or if no timelines
+		/// @param lastTime The last time in seconds this animation was applied. Some timelines trigger only at discrete times, in
+		///           which case all keys are triggered between lastTime (exclusive) and time (inclusive). Pass -1 the first time an
+		///           animation is applied to ensure frame 0 is triggered.
+		/// @param time The time in seconds the skeleton is being posed for. Timelines find the frame before and after this time and
+		///           interpolate between the frame values.
+		/// @param loop True if time beyond the animation duration repeats the animation, else the last frame is used.
+		/// @param events If any events are fired, they are added to this list. Can be NULL to ignore fired events or if no timelines
 		///           fire events.
-		/// @param alpha 0 applies the current or setup values (depending on blend). 1 applies the timeline values. Between
-		///           0 and 1 applies values between the current or setup values and the timeline values. By adjusting
-		///           alpha over time, an animation can be mixed in or out. alpha can also be useful to apply
-		///           animations on top of each other (layering).
-		/// @param blend Controls how mixing is applied when alpha < 1.
-		/// @param direction Indicates whether the timelines are mixing in or out. Used by timelines which perform instant transitions,
-		///           such as DrawOrderTimeline or AttachmentTimeline.
-		void apply(Skeleton &skeleton, float lastTime, float time, bool loop, Array<Event *> *events, float alpha, MixBlend blend,
-				   MixDirection direction, bool appliedPose);
+		/// @param alpha 0 applies setup or current values (depending on fromSetup), 1 uses timeline values, and intermediate values
+		///           interpolate between them. Adjusting alpha over time can mix an animation in or out.
+		/// @param fromSetup If true, alpha transitions between setup and timeline values, setup values are used before the first
+		///           frame (current values are not used). If false, alpha transitions between current and timeline values, no change
+		///           is made before the first frame.
+		/// @param add If true, for timelines that support it, their values are added to the setup or current values (depending on
+		///           fromSetup).
+		/// @param out True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant
+		///           transitions.
+		/// @param appliedPose True to modify getAppliedPose(), else the unconstrained pose is modified.
+		void apply(Skeleton &skeleton, float lastTime, float time, bool loop, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+				   bool appliedPose);
 
 		/// The animation's name, which is unique across all animations in the skeleton.
 		const String &getName();
 
-		/// The bone indices affected by this animation.
+		/// The Skeleton::getBones() indices affected by this animation.
+		///
+		/// See setTimelines() and BoneTimeline::getBoneIndex().
 		const Array<int> &getBones();
 
 		/// @param target After the first and before the last entry.

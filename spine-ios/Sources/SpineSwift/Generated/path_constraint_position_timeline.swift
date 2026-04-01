@@ -32,7 +32,7 @@
 import Foundation
 import SpineC
 
-/// Changes a path constraint's PathConstraintPose::getPosition().
+/// Changes a path constraint's position.
 @objc(SpinePathConstraintPositionTimeline)
 @objcMembers
 public class PathConstraintPositionTimeline: ConstraintTimeline1 {

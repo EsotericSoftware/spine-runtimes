@@ -48,6 +48,7 @@ public class SliderPose: NSObject {
         self.init(fromPointer: ptr!)
     }
 
+    /// The time in SliderData::getAnimation() to apply the animation.
     public var time: Float {
         get {
             let result = spine_slider_pose_get_time(_ptr.assumingMemoryBound(to: spine_slider_pose_wrapper.self))
@@ -58,6 +59,7 @@ public class SliderPose: NSObject {
         }
     }
 
+    /// A percentage that controls the mix between the constrained and unconstrained poses.
     public var mix: Float {
         get {
             let result = spine_slider_pose_get_mix(_ptr.assumingMemoryBound(to: spine_slider_pose_wrapper.self))

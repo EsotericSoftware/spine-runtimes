@@ -31,7 +31,7 @@
 
 import 'package:universal_ffi/ffi.dart';
 
-/// Posed wrapper
+/// Base interface for posed objects.
 abstract class Posed {
   Pointer get nativePtr;
   void constrained();

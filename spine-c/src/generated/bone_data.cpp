@@ -56,9 +56,9 @@ void spine_bone_data_set_visible(spine_bone_data self, bool inValue) {
 	_self->setVisible(inValue);
 }
 
-spine_bone_local spine_bone_data_get_setup_pose(spine_bone_data self) {
+spine_bone_pose spine_bone_data_get_setup_pose(spine_bone_data self) {
 	BoneData *_self = (BoneData *) self;
-	return (spine_bone_local) &_self->getSetupPose();
+	return (spine_bone_pose) &_self->getSetupPose();
 }
 
 const char *spine_bone_data_get_name(spine_bone_data self) {

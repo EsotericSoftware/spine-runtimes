@@ -18,10 +18,10 @@ spine_rtti spine_transform_constraint_timeline_get_rtti(spine_transform_constrai
 }
 
 void spine_transform_constraint_timeline_apply(spine_transform_constraint_timeline self, spine_skeleton skeleton, float lastTime, float time,
-											   /*@null*/ spine_array_event events, float alpha, spine_mix_blend blend, spine_mix_direction direction,
+											   /*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out,
 											   bool appliedPose) {
 	TransformConstraintTimeline *_self = (TransformConstraintTimeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixBlend) blend, (MixDirection) direction, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
 }
 
 void spine_transform_constraint_timeline_set_frame(spine_transform_constraint_timeline self, int frame, float time, float mixRotate, float mixX,
@@ -65,6 +65,16 @@ float spine_transform_constraint_timeline_get_bezier_value(spine_transform_const
 spine_array_float spine_transform_constraint_timeline_get_curves(spine_transform_constraint_timeline self) {
 	TransformConstraintTimeline *_self = (TransformConstraintTimeline *) self;
 	return (spine_array_float) &_self->getCurves();
+}
+
+bool spine_transform_constraint_timeline_get_additive(spine_transform_constraint_timeline self) {
+	TransformConstraintTimeline *_self = (TransformConstraintTimeline *) self;
+	return _self->getAdditive();
+}
+
+bool spine_transform_constraint_timeline_get_instant(spine_transform_constraint_timeline self) {
+	TransformConstraintTimeline *_self = (TransformConstraintTimeline *) self;
+	return _self->getInstant();
 }
 
 size_t spine_transform_constraint_timeline_get_frame_entries(spine_transform_constraint_timeline self) {

@@ -53,6 +53,8 @@ namespace spine {
 
 		void setClosed(bool inValue);
 
+		/// If true, additional calculations are performed to make computing positions along the path more accurate so
+		/// movement along the path has a constant speed.
 		bool getConstantSpeed();
 
 		void setConstantSpeed(bool inValue);

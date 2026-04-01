@@ -44,6 +44,8 @@ public class Sequence: NSObject {
         super.init()
     }
 
+    /// - Parameter count: The number of texture regions this sequence will display.
+    /// - Parameter pathSuffix: If true, getPath(String, int) has a numeric suffix. If false, all regions will use the same path, so count should be 1.
     public convenience init(_ count: Int32, _ pathSuffix: Bool) {
         let ptr = spine_sequence_create(count, pathSuffix)
         self.init(fromPointer: ptr!)
@@ -55,11 +57,13 @@ public class Sequence: NSObject {
         return Sequence(fromPointer: ptr!)
     }
 
+    /// The list of texture regions this sequence will display.
     public var regions: ArrayTextureRegion {
         let result = spine_sequence_get_regions(_ptr.assumingMemoryBound(to: spine_sequence_wrapper.self))
         return ArrayTextureRegion(fromPointer: result!)
     }
 
+    /// The starting number for the numeric getPath(String, int) suffix.
     public var start: Int32 {
         get {
             let result = spine_sequence_get_start(_ptr.assumingMemoryBound(to: spine_sequence_wrapper.self))
@@ -70,6 +74,8 @@ public class Sequence: NSObject {
         }
     }
 
+    /// The minimum number of digits in the numeric getPath(String, int) suffix, for zero padding. 0
+    /// for no zero padding.
     public var digits: Int32 {
         get {
             let result = spine_sequence_get_digits(_ptr.assumingMemoryBound(to: spine_sequence_wrapper.self))
@@ -91,28 +97,33 @@ public class Sequence: NSObject {
         }
     }
 
+    /// Returns true if getPath(String, int) has a numeric suffix.
     public var hasPathSuffix: Bool {
         let result = spine_sequence_has_path_suffix(_ptr.assumingMemoryBound(to: spine_sequence_wrapper.self))
         return result
     }
 
-    /// Returns a unique ID for this attachment.
+    /// Returns a unique ID for this sequence.
     public var id: Int32 {
         let result = spine_sequence_get_id(_ptr.assumingMemoryBound(to: spine_sequence_wrapper.self))
         return result
     }
 
+    /// Returns the getRegions() index for SlotPose::getSequenceIndex().
     public func resolveIndex(_ pose: SlotPose) -> Int32 {
         let result = spine_sequence_resolve_index(
             _ptr.assumingMemoryBound(to: spine_sequence_wrapper.self), pose._ptr.assumingMemoryBound(to: spine_slot_pose_wrapper.self))
         return result
     }
 
+    /// Returns the texture region from getRegions() for the specified index.
     public func getRegion(_ index: Int32) -> TextureRegion? {
         let result = spine_sequence_get_region(_ptr.assumingMemoryBound(to: spine_sequence_wrapper.self), index)
         return result.map { TextureRegion(fromPointer: $0) }
     }
 
+    /// Returns the UVs for the specified index. getRegions() must be populated and update() called
+    /// before calling this method.
     public func getUVs(_ index: Int32) -> ArrayFloat {
         let result = spine_sequence_get_u_vs(_ptr.assumingMemoryBound(to: spine_sequence_wrapper.self), index)
         return ArrayFloat(fromPointer: result!)
@@ -125,6 +136,7 @@ public class Sequence: NSObject {
         return ArrayFloat(fromPointer: result!)
     }
 
+    /// Returns the specified base path with an optional numeric suffix for the specified index.
     public func getPath(_ basePath: String, _ index: Int32) -> String {
         let result = spine_sequence_get_path(_ptr.assumingMemoryBound(to: spine_sequence_wrapper.self), basePath, index)
         return String(cString: result!)

@@ -46,6 +46,7 @@ RTTI_IMPL_MULTI(AttachmentTimeline, Timeline, SlotTimeline)
 AttachmentTimeline::AttachmentTimeline(size_t frameCount, int slotIndex) : Timeline(frameCount, 1), SlotTimeline(), _slotIndex(slotIndex) {
 	PropertyId ids[] = {((PropertyId) Property_Attachment << 32) | slotIndex};
 	setPropertyIds(ids, 1);
+	_instant = true;
 
 	_attachmentNames.ensureCapacity(frameCount);
 	for (size_t i = 0; i < frameCount; ++i) {
@@ -60,20 +61,19 @@ void AttachmentTimeline::setAttachment(Skeleton &skeleton, SlotPose &pose, Strin
 	pose.setAttachment(attachmentName == NULL || attachmentName->isEmpty() ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName));
 }
 
-void AttachmentTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
-							   MixDirection direction, bool appliedPose) {
+void AttachmentTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add,
+							   bool out, bool appliedPose) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(events);
 	SP_UNUSED(alpha);
+	SP_UNUSED(add);
 
 	Slot *slot = skeleton._slots[_slotIndex];
 	if (!slot->_bone.isActive()) return;
-	SlotPose &pose = appliedPose ? *slot->_applied : slot->_pose;
+	SlotPose &pose = appliedPose ? *slot->_appliedPose : slot->_pose;
 
-	if (direction == MixDirection_Out) {
-		if (blend == MixBlend_Setup) setAttachment(skeleton, pose, &slot->_data._attachmentName);
-	} else if (time < _frames[0]) {
-		if (blend == MixBlend_Setup || blend == MixBlend_First) setAttachment(skeleton, pose, &slot->_data._attachmentName);
+	if (out || time < _frames[0]) {
+		if (fromSetup) setAttachment(skeleton, pose, &slot->_data._attachmentName);
 	} else {
 		setAttachment(skeleton, pose, &_attachmentNames[Animation::search(_frames, time)]);
 	}

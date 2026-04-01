@@ -17,10 +17,9 @@ spine_rtti spine_attachment_timeline_get_rtti(spine_attachment_timeline self) {
 }
 
 void spine_attachment_timeline_apply(spine_attachment_timeline self, spine_skeleton skeleton, float lastTime, float time,
-									 /*@null*/ spine_array_event events, float alpha, spine_mix_blend blend, spine_mix_direction direction,
-									 bool appliedPose) {
+									 /*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
 	AttachmentTimeline *_self = (AttachmentTimeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixBlend) blend, (MixDirection) direction, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
 }
 
 void spine_attachment_timeline_set_frame(spine_attachment_timeline self, int frame, float time, const char *attachmentName) {
@@ -36,6 +35,16 @@ int spine_attachment_timeline_get_slot_index(spine_attachment_timeline self) {
 void spine_attachment_timeline_set_slot_index(spine_attachment_timeline self, int inValue) {
 	AttachmentTimeline *_self = (AttachmentTimeline *) self;
 	_self->setSlotIndex(inValue);
+}
+
+bool spine_attachment_timeline_get_additive(spine_attachment_timeline self) {
+	AttachmentTimeline *_self = (AttachmentTimeline *) self;
+	return _self->getAdditive();
+}
+
+bool spine_attachment_timeline_get_instant(spine_attachment_timeline self) {
+	AttachmentTimeline *_self = (AttachmentTimeline *) self;
+	return _self->getInstant();
 }
 
 size_t spine_attachment_timeline_get_frame_entries(spine_attachment_timeline self) {

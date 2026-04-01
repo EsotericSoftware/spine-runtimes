@@ -60,8 +60,8 @@
 using namespace spine;
 
 Skeleton::Skeleton(SkeletonData &skeletonData)
-	: _data(skeletonData), _skin(NULL), _color(1, 1, 1, 1), _x(0), _y(0), _scaleX(1), _scaleY(1), _windX(1), _windY(0), _gravityX(0), _gravityY(1),
-	  _time(0), _update(0) {
+	: _data(skeletonData), _drawOrder(_slots), _skin(NULL), _color(1, 1, 1, 1), _x(0), _y(0), _scaleX(1), _scaleY(1), _windX(1), _windY(0),
+	  _gravityX(0), _gravityY(1), _time(0), _update(0) {
 
 	_bones.ensureCapacity(_data.getBones().size());
 	for (size_t i = 0; i < _data.getBones().size(); ++i) {
@@ -80,13 +80,12 @@ Skeleton::Skeleton(SkeletonData &skeletonData)
 	}
 
 	_slots.ensureCapacity(_data.getSlots().size());
-	_drawOrder.ensureCapacity(_data.getSlots().size());
 	for (size_t i = 0; i < _data.getSlots().size(); ++i) {
 		SlotData *data = _data.getSlots()[i];
 		Slot *slot = new (__FILE__, __LINE__) Slot(*data, *this);
 		_slots.add(slot);
-		_drawOrder.add(slot);
 	}
+	_drawOrder.setupPose();
 
 	_physics.ensureCapacity(8);
 	_constraints.ensureCapacity(_data.getConstraints().size());
@@ -112,6 +111,7 @@ void Skeleton::updateCache() {
 	_updateCache.clear();
 	_resetCache.clear();
 
+	_drawOrder.pose();
 	Slot **slots = _slots.buffer();
 	for (size_t i = 0, n = _slots.size(); i < n; i++) {
 		slots[i]->pose();
@@ -160,7 +160,7 @@ void Skeleton::updateCache() {
 		const RTTI &rtti = updateCache[i]->getRTTI();
 		if (rtti.instanceOf(Bone::rtti)) {
 			Bone *bone = (Bone *) (updateCache[i]);
-			updateCache[i] = bone->_applied;
+			updateCache[i] = bone->_appliedPose;
 		}
 	}
 }
@@ -213,6 +213,7 @@ void Skeleton::sortReset(Array<Bone *> &bones) {
 void Skeleton::updateWorldTransform(Physics physics) {
 	_update++;
 
+	_drawOrder.reset();
 	Posed **resetCache = _resetCache.buffer();
 	for (size_t i = 0, n = _resetCache.size(); i < n; i++) {
 		resetCache[i]->resetConstrained();
@@ -244,12 +245,7 @@ void Skeleton::setupPoseBones() {
 void Skeleton::setupPoseSlots() {
 	Slot **slots = _slots.buffer();
 	size_t n = _slots.size();
-	_drawOrder.clear();
-	_drawOrder.setSize(n, 0);
-	for (size_t i = 0; i < n; ++i) {
-		_drawOrder[i] = _slots[i];
-	}
-
+	_drawOrder.setupPose();
 	for (size_t i = 0; i < n; ++i) {
 		slots[i]->setupPose();
 	}
@@ -293,7 +289,7 @@ Slot *Skeleton::findSlot(const String &slotName) {
 	return NULL;
 }
 
-Array<Slot *> &Skeleton::getDrawOrder() {
+DrawOrder &Skeleton::getDrawOrder() {
 	return _drawOrder;
 }
 
@@ -378,15 +374,16 @@ void Skeleton::getBounds(float &outX, float &outY, float &outWidth, float &outHe
 	float maxX = -FLT_MAX;
 	float maxY = -FLT_MAX;
 
-	Slot **drawOrder = _drawOrder.buffer();
-	for (size_t i = 0, n = _drawOrder.size(); i < n; ++i) {
-		Slot *slot = drawOrder[i];
+	Array<Slot *> &drawOrder = _drawOrder.getAppliedPose();
+	Slot **drawOrderSlots = drawOrder.buffer();
+	for (size_t i = 0, n = drawOrder.size(); i < n; ++i) {
+		Slot *slot = drawOrderSlots[i];
 		if (!slot->_bone._active) continue;
 		size_t verticesLength = 0;
 		float *vertices = NULL;
 		unsigned short *triangles = NULL;
 		size_t trianglesLength = 0;
-		Attachment *attachment = slot->_pose.getAttachment();
+		Attachment *attachment = slot->getAppliedPose().getAttachment();
 
 		if (attachment != NULL) {
 			if (attachment->getRTTI().instanceOf(RegionAttachment::rtti)) {

@@ -42,7 +42,7 @@ public class TransformConstraintPose implements Pose<TransformConstraintPose> {
 		mixShearY = pose.mixShearY;
 	}
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotation. */
+	/** A percentage that controls the mix between the constrained and unconstrained rotation. */
 	public float getMixRotate () {
 		return mixRotate;
 	}
@@ -51,7 +51,7 @@ public class TransformConstraintPose implements Pose<TransformConstraintPose> {
 		this.mixRotate = mixRotate;
 	}
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained translation X. */
+	/** A percentage that controls the mix between the constrained and unconstrained translation X. */
 	public float getMixX () {
 		return mixX;
 	}
@@ -60,7 +60,7 @@ public class TransformConstraintPose implements Pose<TransformConstraintPose> {
 		this.mixX = mixX;
 	}
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained translation Y. */
+	/** A percentage that controls the mix between the constrained and unconstrained translation Y. */
 	public float getMixY () {
 		return mixY;
 	}
@@ -69,7 +69,7 @@ public class TransformConstraintPose implements Pose<TransformConstraintPose> {
 		this.mixY = mixY;
 	}
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained scale X. */
+	/** A percentage that controls the mix between the constrained and unconstrained scale X. */
 	public float getMixScaleX () {
 		return mixScaleX;
 	}
@@ -78,7 +78,7 @@ public class TransformConstraintPose implements Pose<TransformConstraintPose> {
 		this.mixScaleX = mixScaleX;
 	}
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained scale X. */
+	/** A percentage that controls the mix between the constrained and unconstrained scale X. */
 	public float getMixScaleY () {
 		return mixScaleY;
 	}
@@ -87,7 +87,7 @@ public class TransformConstraintPose implements Pose<TransformConstraintPose> {
 		this.mixScaleY = mixScaleY;
 	}
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained shear Y. */
+	/** A percentage that controls the mix between the constrained and unconstrained shear Y. */
 	public float getMixShearY () {
 		return mixShearY;
 	}

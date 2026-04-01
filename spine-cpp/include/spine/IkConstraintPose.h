@@ -35,7 +35,7 @@
 
 namespace spine {
 
-	/// Stores the current pose for an IK constraint.
+	/// Stores a pose for an IK constraint.
 	class SP_API IkConstraintPose : public Pose<IkConstraintPose> {
 		friend class IkConstraint;
 		friend class IkConstraintTimeline;
@@ -69,7 +69,7 @@ namespace spine {
 
 		/// When true and the target is out of range, the parent bone is scaled to reach it.
 		///
-		/// For two bone IK: 1) the child bone's local Y translation is set to 0, 2) stretch is not applied if getSoftness() is
+		/// For two bone IK: 1) the child bone's local Y translation is set to 0, 2) stretch is not applied if softness is
 		/// > 0, and 3) if the parent bone has local nonuniform scale, stretch is not applied.
 		bool getStretch();
 		void setStretch(bool stretch);

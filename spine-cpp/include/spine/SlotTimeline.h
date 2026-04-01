@@ -48,7 +48,7 @@ namespace spine {
 		SlotTimeline();
 		virtual ~SlotTimeline();
 
-		/// The index of the slot in Skeleton::getSlots() that will be changed when this timeline is applied.
+		/// The Skeleton::getSlots() index of the slot that will be changed when this timeline is applied.
 		virtual int getSlotIndex() = 0;
 
 		virtual void setSlotIndex(int inValue) = 0;

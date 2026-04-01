@@ -59,32 +59,32 @@ String SpineEventData::get_event_name() {
 
 int SpineEventData::get_int_value() {
 	SPINE_CHECK(get_spine_object(), 0)
-	return get_spine_object()->getInt();
+	return get_spine_object()->getSetupPose().getInt();
 }
 
 void SpineEventData::set_int_value(int v) {
 	SPINE_CHECK(get_spine_object(), )
-	get_spine_object()->setInt(v);
+	get_spine_object()->getSetupPose().setInt(v);
 }
 
 float SpineEventData::get_float_value() {
 	SPINE_CHECK(get_spine_object(), 0)
-	return get_spine_object()->getFloat();
+	return get_spine_object()->getSetupPose().getFloat();
 }
 
 void SpineEventData::set_float_value(float v) {
 	SPINE_CHECK(get_spine_object(), )
-	get_spine_object()->setFloat(v);
+	get_spine_object()->getSetupPose().setFloat(v);
 }
 
 String SpineEventData::get_string_value() {
 	SPINE_CHECK(get_spine_object(), "")
-	return get_spine_object()->getString().buffer();
+	return get_spine_object()->getSetupPose().getString().buffer();
 }
 
 void SpineEventData::set_string_value(const String &v) {
 	SPINE_CHECK(get_spine_object(), )
-	get_spine_object()->setString(spine::String(v.utf8().ptr()));
+	get_spine_object()->getSetupPose().setString(spine::String(v.utf8().ptr()));
 }
 
 String SpineEventData::get_audio_path() {
@@ -99,20 +99,20 @@ void SpineEventData::set_audio_path(const String &v) {
 
 float SpineEventData::get_volume() {
 	SPINE_CHECK(get_spine_object(), 0)
-	return get_spine_object()->getVolume();
+	return get_spine_object()->getSetupPose().getVolume();
 }
 
 void SpineEventData::set_volume(float v) {
 	SPINE_CHECK(get_spine_object(), )
-	get_spine_object()->setVolume(v);
+	get_spine_object()->getSetupPose().setVolume(v);
 }
 
 float SpineEventData::get_balance() {
 	SPINE_CHECK(get_spine_object(), 0)
-	return get_spine_object()->getBalance();
+	return get_spine_object()->getSetupPose().getBalance();
 }
 
 void SpineEventData::set_balance(float v) {
 	SPINE_CHECK(get_spine_object(), )
-	get_spine_object()->setBalance(v);
+	get_spine_object()->getSetupPose().setBalance(v);
 }

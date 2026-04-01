@@ -33,8 +33,6 @@ import 'package:universal_ffi/ffi.dart';
 import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
 import 'curve_timeline.dart';
-import 'mix_blend.dart';
-import 'mix_direction.dart';
 
 /// The base class for a CurveTimeline that sets one property.
 abstract class CurveTimeline1 extends CurveTimeline {
@@ -61,28 +59,28 @@ abstract class CurveTimeline1 extends CurveTimeline {
     return result;
   }
 
-  double getRelativeValue(double time, double alpha, MixBlend blend, double current, double setup) {
-    final result =
-        SpineBindings.bindings.spine_curve_timeline1_get_relative_value(_ptr, time, alpha, blend.value, current, setup);
+  double getRelativeValue(double time, double alpha, bool fromSetup, bool add, double current, double setup) {
+    final result = SpineBindings.bindings
+        .spine_curve_timeline1_get_relative_value(_ptr, time, alpha, fromSetup, add, current, setup);
     return result;
   }
 
-  double getScaleValue(
-      double time, double alpha, MixBlend blend, MixDirection direction, double current, double setup) {
+  double getScaleValue(double time, double alpha, bool fromSetup, bool add, bool out, double current, double setup) {
     final result = SpineBindings.bindings
-        .spine_curve_timeline1_get_scale_value(_ptr, time, alpha, blend.value, direction.value, current, setup);
+        .spine_curve_timeline1_get_scale_value(_ptr, time, alpha, fromSetup, add, out, current, setup);
     return result;
   }
 
-  double getAbsoluteValue(double time, double alpha, MixBlend blend, double current, double setup) {
+  double getAbsoluteValue(double time, double alpha, bool fromSetup, bool add, double current, double setup) {
     final result = SpineBindings.bindings
-        .spine_curve_timeline1_get_absolute_value_1(_ptr, time, alpha, blend.value, current, setup);
+        .spine_curve_timeline1_get_absolute_value_1(_ptr, time, alpha, fromSetup, add, current, setup);
     return result;
   }
 
-  double getAbsoluteValue2(double time, double alpha, MixBlend blend, double current, double setup, double value) {
+  double getAbsoluteValue2(
+      double time, double alpha, bool fromSetup, bool add, double current, double setup, double value) {
     final result = SpineBindings.bindings
-        .spine_curve_timeline1_get_absolute_value_2(_ptr, time, alpha, blend.value, current, setup, value);
+        .spine_curve_timeline1_get_absolute_value_2(_ptr, time, alpha, fromSetup, add, current, setup, value);
     return result;
   }
 }

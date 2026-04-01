@@ -48,14 +48,14 @@ protected:
 	// These can be set by the user.
 	int track_index;
 	float mix_duration;
-	bool hold_previous;
+	bool additive;
 	bool reverse;
 	bool shortest_rotation;
 	float time_scale;
 	float alpha;
 	float mix_attachment_threshold;
 	float mix_draw_order_threshold;
-	SpineConstant::MixBlend mix_blend;
+
 	bool blend_tree_mode;
 	bool debug;
 
@@ -96,9 +96,9 @@ public:
 
 	float get_mix_duration();
 
-	void set_hold_previous(bool _hold_previous);
+	void set_additive(bool _additive);
 
-	bool get_hold_previous();
+	bool get_additive();
 
 	void set_reverse(bool _reverse);
 
@@ -124,9 +124,6 @@ public:
 
 	float get_mix_draw_order_threshold();
 
-	void set_mix_blend(SpineConstant::MixBlend _blend);
-
-	SpineConstant::MixBlend get_mix_blend();
 
 	void set_blend_tree_mode(bool _blend_tree_mode);
 

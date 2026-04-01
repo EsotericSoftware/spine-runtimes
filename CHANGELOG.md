@@ -4,6 +4,15 @@
 
 - **Additions**
   - Added `spine_slider` and `spine_slider_data` types for slider constraints
+  - Regenerated C bindings for the AnimationState additive/hold rework and Skin placeholder name rename in spine-cpp.
+
+- **Breaking changes**
+  - `spine_track_entry_get_mix_blend()` / `spine_track_entry_set_mix_blend()` removed. Use `spine_track_entry_get_additive()` / `spine_track_entry_set_additive()` instead.
+  - `spine_track_entry_get_hold_previous()` / `spine_track_entry_set_hold_previous()` removed.
+  - `spine_skin_entry_get_name()` renamed to `spine_skin_entry_get_placeholder_name()`.
+  - Timeline `apply()` signature changed: `spine_mix_blend` and `spine_mix_direction` parameters replaced with `bool fromSetup, bool add, bool out`.
+  - `spine_animation_apply()` signature changed to match.
+  - `spine_curve_timeline1_get_absolute_value()`, `spine_curve_timeline1_get_relative_value()`, `spine_curve_timeline1_get_scale_value()` signatures changed.
   - Added `spine_slider_timeline` and `spine_slider_mix_timeline` for animating sliders
   - Added new pose system with `spine_bone_local`, `spine_bone_pose`, and related types
   - Added `spine_pose`, `spine_posed`, and `spine_posed_active` base types
@@ -14,10 +23,13 @@
   - All types, functions, and headers have been restructured
   - The new runtime provides full feature parity with C++ through automatic code generation, has nullability annotations and documentation, and supports lightweight RTTI, allowing language specific wrappers to be built around it that expose the full type hierarchy idiomatically. See spine-ios and spine-flutter for examples.
   - Sequence attachments now follow the spine-cpp sequence refactor. Region and mesh attachments no longer use the old mutable region/UV update path.
+  - Bone setup and unconstrained pose APIs now use `spine_bone_pose` instead of `spine_bone_local`. Generated bindings such as `spine_bone_data_get_setup_pose()` and `spine_bone_get_pose()` now return `spine_bone_pose`.
   - Renamed setup pose functions:
     - `spSkeleton_setToSetupPose()` → `spine_skeleton_setup_pose()`
     - `spSkeleton_setBonesToSetupPose()` → `spine_skeleton_setup_pose_bones()`
     - `spSkeleton_setSlotsToSetupPose()` → `spine_skeleton_setup_pose_slots()`
+  - `spine_event_data` no longer stores event payload values directly. Use `spine_event_data_get_setup_pose()` and the returned `spine_event` for setup int, float, string, volume, and balance values.
+  - `spine_animation_create()` now takes only the animation name. `spine_animation_set_timelines()` now also requires the animation's bone indices.
 
 ### SFML
 
@@ -77,12 +89,25 @@
   - Added `HasRendererObject` interface for attachments with renderer-specific data
   - Ported the latest parser fixes from spine-libgdx, including the 4.3 path constraint flag fix and the weighted mesh binary vertex allocation/count fix.
   - Ported the latest additive timeline updates and alpha/RGB timeline flicker fixes from spine-libgdx.
+  - Ported the AnimationState additive/hold rework from spine-libgdx. `MixBlend` and `MixDirection` are no longer used by timelines. The new system uses `bool fromSetup, bool add, bool out` parameters and a bitmask-based hold system that replaces `holdPrevious` and `interruptAlpha`.
+  - Added `Timeline::getAdditive()` and `Timeline::getInstant()` to query timeline blending capabilities.
+  - Added `TrackEntry::getAdditive()` / `TrackEntry::setAdditive()` to control additive blending per track entry.
+  - Ported the Skin placeholder name rename from spine-libgdx. `Skin::AttachmentMap::Entry::_name` renamed to `_placeholderName`.
+  - Fixed `SkeletonBinary::readLong()` sign extension bug that truncated 64-bit hash values to 32 bits.
   - Ported the sequence attachment refactor from spine-libgdx. `Sequence` now precomputes per-frame regions, UVs, and region offsets, and `RegionAttachment` / `MeshAttachment` now mirror the libgdx implementation.
 
 - **Breaking changes**
   - Headers reorganized from `spine-cpp/spine-cpp/include/spine/` to `spine-cpp/include/spine/`
-  - Timeline `apply()` methods now take an additional `appliedPose` parameter
+  - Timeline `apply()` signature changed: `MixBlend blend, MixDirection direction` replaced with `bool fromSetup, bool add, bool out`. All timeline subclasses updated.
+  - `Animation::apply()` signature changed to match the new timeline parameters.
+  - `CurveTimeline1::getRelativeValue()`, `getAbsoluteValue()`, and `getScaleValue()` signatures changed from `MixBlend`/`MixDirection` to `bool fromSetup, bool add, bool out`.
+  - `TrackEntry::getHoldPrevious()` / `setHoldPrevious()` removed. Use `TrackEntry::getAdditive()` / `setAdditive()` instead for additive blending.
+  - `TrackEntry::getMixBlend()` / `setMixBlend()` removed.
+  - `TrackEntry::_interruptAlpha` removed.
+  - `Skin::AttachmentMap::Entry::_name` renamed to `_placeholderName`. All `Skin` methods use `placeholderName` parameter names instead of `name`/`attachmentName`.
+  - `AnimationState` hold constants changed: `HoldSubsequent` and `HoldMix` removed, replaced with bitmask system (`Subsequent=0, First=1, Hold=2, HoldFirst=3`).
   - `Bone` now extends `PosedActive` with separate pose, constrained, and applied states
+  - `BoneData::getSetupPose()` and `Bone::getPose()` now use `BonePose` instead of `BoneLocal`. Bone timelines and parser setup pose data were updated to match the spine-libgdx `BoneLocal` removal.
   - Renamed timeline constraint index methods to use unified `getConstraintIndex()`
   - Changed timeline class hierarchy with new base classes `BoneTimeline`, `SlotCurveTimeline`, and `ConstraintTimeline`
   - Sequence attachments now use the new non-null `Sequence` model. `RegionAttachment` and `MeshAttachment` were refactored to match spine-libgdx and no longer use the old lazy mutable region update path.
@@ -95,6 +120,8 @@
     | Bone::setToSetupPose()                |→| Bone::setupPose() |
     | Slot::setToSetupPose()                |→| Slot::setupPose() |
     | IkConstraint::setToSetupPose()        |→| IkConstraint::setupPose() |
+  - `EventData` now stores shared payload defaults in `EventData::getSetupPose()` instead of directly on `EventData`. Use the returned `Event` for setup int, float, string, volume, and balance values.
+  - `Animation` now constructs with only a name. Call `setTimelines(timelines, bones)` and `setDuration()` after loading timelines.
     | TransformConstraint::setToSetupPose() |→| TransformConstraint::setupPose() |
     | PathConstraint::setToSetupPose()      |→| PathConstraint::setupPose() |
     | PhysicsConstraint::setToSetupPose()   |→| PhysicsConstraint::setupPose() |
@@ -217,11 +244,24 @@
 
 - **Additions**
   - Added `SpineSlider` and `SpineSliderData` classes for slider constraints
+  - Added `SpineTrackEntry.get_additive()` / `set_additive()` for additive blending per track entry.
+
+- **Bug fixes**
+  - Fixed Godot 4.6 GDExtension builds with the latest `godot-cpp` by including the required `Ref` support header in `SpineCommon.h`, updated `SpineEventData` for the `EventData.setupPose` API change, and refreshed vendored `spine-cpp` sources during clean setup.
+
+- **Breaking changes (since previous 4.3 beta)**
+  - `SpineTrackEntry.get_hold_previous()` / `set_hold_previous()` removed.
+  - `SpineTrackEntry.get_mix_blend()` / `set_mix_blend()` removed. Use `get_additive()` / `set_additive()` for additive blending.
+  - `SpineConstant.MixBlend` and `SpineConstant.MixDirection` enums removed.
+  - `SpineTimeline.apply()` signature changed: `blend` and `direction` parameters replaced with `from_setup`, `add`, `out`.
+  - `SpineAnimation.apply()` signature changed to match.
+  - `SpineAnimationTrack` property `hold_previous` replaced with `additive`, property `mix_blend` removed.
   - Added `SpineBoneLocal` and `SpineBonePose` classes for new pose system
   - Added pose classes for constraints: `SpineIkConstraintPose`, `SpinePathConstraintPose`, `SpinePhysicsConstraintPose`, `SpineSliderPose`, `SpineTransformConstraintPose`
 
 - **Breaking changes**
   - Updated to use new C++ pose system internally
+  - `SpineBone.get_pose()` and `SpineBoneData.get_setup_pose()` now return `SpineBonePose` to match the updated spine-cpp bone pose API.
   - Removed from `SpineBone`: `update_world_transform()`, `set_to_setup_pose()`, `get_world_to_local_rotation_x()`, `get_world_to_local_rotation_y()`
   - Removed direct property access from `SpineBone`: `get_x()`, `set_x()`, `get_y()`, `set_y()`, `get_rotation()`, `set_rotation()`, etc. - use pose objects instead
   - `SpineAnimation.apply()` now takes an additional `appliedPose` parameter
@@ -393,8 +433,9 @@
   - Every Spine URP shader now has an `Outline` option to switch to the respective Outline shader variant. Uses multi-pass support of newer URP versions. Requires spine-unity core package version 4.3.44 or newer due to required modifications in custom Sprite Shader GUI.
   - Added new variants of `GetRepackedSkin` and `GetRepackedAttachments` supporting blend modes. These new variants take a packing configuration input struct `RepackAttachmentsSettings` which provides optional `additiveMaterialSource`, `multiplyMaterialSource` and `screenMaterialSource` properties, enabling blend mode repacking when any is non-null. Create your `RepackAttachmentsSettings` from default settings via `RepackAttachmentsSettings.Default` and then customize settings as needed. Blend mode materials can be set at once using `UseSourceMaterialsFrom(SkeletonDataAsset)` or `UseBlendModeMaterialsFrom(SkeletonDataAsset)`. Uses new `RepackAttachmentsOutput` struct providing `DestroyGeneratedAssets` to easily destroy any previously generated assets.
   - Updated example scenes to demonstrate new `GetRepackedSkin` variant usage.
-  - AnimationReferenceAsset: Added animation selector drop-down popup next to object assignment field for easy initial assignment and animation switching. Shows red warning color if the assigned AnimationReferenceAsset's SkeletonDataAsset does not match the one at the GameObjects `SkeletonAnimation` component. A mismatch may be intentional for a special split SkeletonDataAsset setup.
+  - AnimationReferenceAsset: Added animation selector drop-down popup next to object assignment field for easy initial assignment and animation switching. Shows red warning color if the assigned AnimationReferenceAsset's SkeletonDataAsset does not match the one at the GameObjects `SkeletonAnimation` component. A mismatch may be intentional for a special split SkeletonDataAsset setup. Warning color can be disabled in `Edit - Preferences - Spine`, `Warnings - SkeletonDataAsset Mismatch Warning`.
   - AnimationReferenceAssets: The `SkeletonDataAsset` Inspector now generates the set of AnimationReferenceAssets as nested assets below a single asset `<skeletonname>_AnimationReferences.asset` to avoid cluttering the project with hundreds of asset files. This also makes searching the project for a suitable `AnimationReferenceAsset` of a given `SkeletonDataAsset` much faster. Use of existing old individual assets is still supported alongside nested new ones. If you require the old way of creating assets in your project, add `SPINE_INDIVIDUAL_ANIMATION_REFERENCE_ASSETS` to your project's Scripting Define Symbols.
+  - AnimationReferenceAssets: Added Spine Preferences setting `Editor Instantiation` - `Warnings - SkeletonDataAsset Mismatch Warning` to disable the warning color when a different SkeletonDataAsset is detected at the `AnimationReferenceAsset` than at the `SkeletonRenderer` component at the same GameObject or any parent GameObject. Might be valid setup for special AnimationReferenceAsset re-use for identical skeletons.
 
 - **Deprecated**
 
@@ -428,6 +469,7 @@
     - `Skeleton.setBonesToSetupPose()` → `Skeleton.setupPoseBones()`
     - `Skeleton.setSlotsToSetupPose()` → `Skeleton.setupPoseSlots()`
   - Timeline `apply()` methods now take an additional `appliedPose` parameter
+  - `EventData` setup payload access moved to `data.setupPose`
 
 ### Flutter
 
@@ -437,6 +479,9 @@
 
 - **Breaking changes**
   - Updated to use the new auto-generated Dart runtime with all the Dart API changes above
+  - Generated Flutter bindings now use `BonePose` for bone setup and unconstrained pose accessors to match spine-cpp.
+  - Generated Flutter bindings now expose event setup payloads via `EventData.setupPose` instead of directly on `EventData`.
+  - Generated Flutter bindings now construct `Animation` with only a name, and setting timelines also requires the animation's bone indices.
 
 ## Haxe
 
@@ -597,6 +642,19 @@
 
 - **Additions**
   - Added `Slider` and `SliderData` classes for slider constraints
+  - Reworked AnimationState hold system. Replaced `MixBlend`/`MixDirection` in timeline `apply()` with `boolean fromSetup, boolean add, boolean out`. The new bitmask-based hold system prevents dipping during crossfades without requiring `holdPrevious`.
+  - Added `Timeline.getAdditive()` and `Timeline.getInstant()` to query timeline blending capabilities.
+  - Added `TrackEntry.getAdditive()` / `TrackEntry.setAdditive()` for additive blending per track entry.
+  - Renamed `Skin.SkinEntry.getName()` to `getPlaceholderName()`. All `Skin` methods now use `placeholderName` parameter names.
+
+- **Breaking changes (since previous 4.3 beta)**
+  - `TrackEntry.getHoldPrevious()` / `setHoldPrevious()` removed.
+  - `TrackEntry.getMixBlend()` / `setMixBlend()` removed. Use `TrackEntry.getAdditive()` / `setAdditive()` for additive blending.
+  - `MixBlend` and `MixDirection` enums removed from `Animation`.
+  - Timeline `apply()` signature changed: `MixBlend blend, MixDirection direction` replaced with `boolean fromSetup, boolean add, boolean out`.
+  - `Animation.apply()` signature changed to match.
+  - `CurveTimeline1.getRelativeValue()`, `getAbsoluteValue()`, `getScaleValue()` signatures changed.
+  - `Skin.SkinEntry.getName()` renamed to `getPlaceholderName()`.
   - Added `SliderTimeline` and `SliderMixTimeline` for animating sliders
   - Added new pose system with `BoneLocal`, `BonePose`, and related classes
   - Added `Pose`, `Posed`, and `PosedActive` base classes for unified pose management
@@ -746,6 +804,9 @@
 - **Breaking changes**
   - Updated to use new pose system from Java runtime
 
+- **Bug fixes**
+  - Gradle builds now delete stale Eclipse `bin/` output before compiling so removed classes don't linger on Java headless test classpaths.
+
 ### Android
 
 - **Breaking changes**
@@ -762,6 +823,7 @@
 - **Breaking changes**
   - The Swift runtime is now fully auto-generated from the C runtime, maintaining the full C++ type hierarchy with proper nullability annotations
   - All properties are now exposed as getters and setters instead of methods
+  - Event setup payloads now live on `EventData.setupPose` instead of directly on `EventData`
   - API changes to match C++ naming conventions:
     - `AnimationState.setAnimationByName()` → `AnimationState.setAnimation()`
     - `AnimationState.addAnimationByName()` → `AnimationState.addAnimation()`
@@ -776,6 +838,9 @@
 
 - **Breaking changes**
   - Updated to use the new auto-generated Swift runtime with all the Swift API changes above
+  - Generated Swift bindings now use `BonePose` for bone setup and unconstrained pose accessors to match spine-cpp.
+  - Generated Swift bindings now expose event setup payloads via `EventData.setupPose` instead of directly on `EventData`.
+  - Generated Swift bindings now construct `Animation` with only a name, and setting timelines also requires the animation's bone indices.
 
 ## TypeScript/JavaScript
 

@@ -59,7 +59,7 @@ class SlotData extends PosedData {
     SpineBindings.bindings.spine_slot_data_dispose(_ptr);
   }
 
-  /// The index of the slot in Skeleton::getSlots().
+  /// The Skeleton::getSlots() index for this slot.
   int get index {
     final result = SpineBindings.bindings.spine_slot_data_get_index(_ptr);
     return result;
@@ -103,6 +103,7 @@ class SlotData extends PosedData {
     SpineBindings.bindings.spine_slot_data_set_visible(_ptr, value);
   }
 
+  /// The setup pose that most animations are relative to.
   SlotPose get setupPose {
     final result = SpineBindings.bindings.spine_slot_data_get_setup_pose(_ptr);
     return SlotPose.fromPointer(result);

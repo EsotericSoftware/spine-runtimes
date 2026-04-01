@@ -41,8 +41,7 @@ import type { Slot } from "./Slot.js";
 import { MathUtils, Utils } from "./Utils.js";
 
 
-/** Stores the current pose for a path constraint. A path constraint adjusts the rotation, translation, and scale of the
- * constrained bones so they follow a {@link PathAttachment}.
+/** Adjusts the rotation, translation, and scale of the constrained bones so they follow a {@link PathAttachment}.
  *
  * See [Path constraints](http://esotericsoftware.com/spine-path-constraints) in the Spine User Guide. */
 export class PathConstraint extends Constraint<PathConstraint, PathConstraintData, PathConstraintPose> {
@@ -69,7 +68,7 @@ export class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 
 		this.bones = [] as BonePose[];
 		for (const boneData of this.data.bones)
-			this.bones.push(skeleton.bones[boneData.index].constrained);
+			this.bones.push(skeleton.bones[boneData.index].constrainedPose);
 
 		this.slot = skeleton.slots[data.slot.index];
 	}
@@ -81,10 +80,10 @@ export class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 	}
 
 	update (skeleton: Skeleton, physics: Physics) {
-		const attachment = this.slot.applied.attachment;
+		const attachment = this.slot.appliedPose.attachment;
 		if (!(attachment instanceof PathAttachment)) return;
 
-		const p = this.applied;
+		const p = this.appliedPose;
 		const mixRotate = p.mixRotate, mixX = p.mixX, mixY = p.mixY;
 		if (mixRotate === 0 && mixX === 0 && mixY === 0) return;
 
@@ -156,7 +155,7 @@ export class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 			tip = data.rotateMode === RotateMode.Chain;
 		else {
 			tip = false;
-			const bone = this.slot.bone.applied;
+			const bone = this.slot.bone.appliedPose;
 			offsetRotation *= bone.a * bone.d - bone.b * bone.c > 0 ? MathUtils.degRad : -MathUtils.degRad;
 		}
 		for (let i = 0, ip = 3, u = skeleton._update; i < boneCount; i++, ip += 3) {
@@ -210,7 +209,7 @@ export class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 
 	computeWorldPositions (skeleton: Skeleton, path: PathAttachment, spacesCount: number, tangents: boolean) {
 		const slot = this.slot;
-		let position = this.applied.position;
+		let position = this.appliedPose.position;
 		let spaces = this.spaces, out = Utils.setArraySize(this.positions, spacesCount * 3 + 2), world: Array<number> = this.world;
 		const closed = path.closed;
 		let verticesLength = path.worldVerticesLength, curveCount = verticesLength / 6, prevCurve = PathConstraint.NONE;

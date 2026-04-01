@@ -46,18 +46,11 @@ ScaleTimeline::ScaleTimeline(size_t frameCount, size_t bezierCount, int boneInde
 	: BoneTimeline2(frameCount, bezierCount, boneIndex, Property_ScaleX, Property_ScaleY) {
 }
 
-void ScaleTimeline::_apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, MixBlend blend, MixDirection direction) {
+void ScaleTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
 	if (time < _frames[0]) {
-		switch (blend) {
-			case MixBlend_Setup:
-				pose._scaleX = setup._scaleX;
-				pose._scaleY = setup._scaleY;
-				return;
-			case MixBlend_First:
-				pose._scaleX += (setup._scaleX - pose._scaleX) * alpha;
-				pose._scaleY += (setup._scaleY - pose._scaleY) * alpha;
-			default: {
-			}
+		if (fromSetup) {
+			pose._scaleX = setup._scaleX;
+			pose._scaleY = setup._scaleY;
 		}
 		return;
 	}
@@ -88,54 +81,29 @@ void ScaleTimeline::_apply(BoneLocal &pose, BoneLocal &setup, float time, float 
 	x *= setup._scaleX;
 	y *= setup._scaleY;
 
-	if (alpha == 1) {
-		if (blend == MixBlend_Add) {
-			pose._scaleX += x - setup._scaleX;
-			pose._scaleY += y - setup._scaleY;
-		} else {
-			pose._scaleX = x;
-			pose._scaleY = y;
-		}
+	if (alpha == 1 && !add) {
+		pose._scaleX = x;
+		pose._scaleY = y;
 	} else {
 		float bx, by;
-		if (direction == MixDirection_Out) {
-			switch (blend) {
-				case MixBlend_Setup:
-					bx = setup._scaleX;
-					by = setup._scaleY;
-					pose._scaleX = bx + (MathUtil::abs(x) * MathUtil::sign(bx) - bx) * alpha;
-					pose._scaleY = by + (MathUtil::abs(y) * MathUtil::sign(by) - by) * alpha;
-					break;
-				case MixBlend_First:
-				case MixBlend_Replace:
-					bx = pose._scaleX;
-					by = pose._scaleY;
-					pose._scaleX = bx + (MathUtil::abs(x) * MathUtil::sign(bx) - bx) * alpha;
-					pose._scaleY = by + (MathUtil::abs(y) * MathUtil::sign(by) - by) * alpha;
-					break;
-				case MixBlend_Add:
-					pose._scaleX += (x - setup._scaleX) * alpha;
-					pose._scaleY += (y - setup._scaleY) * alpha;
-			}
+		if (fromSetup) {
+			bx = setup._scaleX;
+			by = setup._scaleY;
 		} else {
-			switch (blend) {
-				case MixBlend_Setup:
-					bx = MathUtil::abs(setup._scaleX) * MathUtil::sign(x);
-					by = MathUtil::abs(setup._scaleY) * MathUtil::sign(y);
-					pose._scaleX = bx + (x - bx) * alpha;
-					pose._scaleY = by + (y - by) * alpha;
-					break;
-				case MixBlend_First:
-				case MixBlend_Replace:
-					bx = MathUtil::abs(pose._scaleX) * MathUtil::sign(x);
-					by = MathUtil::abs(pose._scaleY) * MathUtil::sign(y);
-					pose._scaleX = bx + (x - bx) * alpha;
-					pose._scaleY = by + (y - by) * alpha;
-					break;
-				case MixBlend_Add:
-					pose._scaleX += (x - setup._scaleX) * alpha;
-					pose._scaleY += (y - setup._scaleY) * alpha;
-			}
+			bx = pose._scaleX;
+			by = pose._scaleY;
+		}
+		if (add) {
+			pose._scaleX = bx + (x - setup._scaleX) * alpha;
+			pose._scaleY = by + (y - setup._scaleY) * alpha;
+		} else if (out) {
+			pose._scaleX = bx + (MathUtil::abs(x) * MathUtil::sign(bx) - bx) * alpha;
+			pose._scaleY = by + (MathUtil::abs(y) * MathUtil::sign(by) - by) * alpha;
+		} else {
+			bx = MathUtil::abs(bx) * MathUtil::sign(x);
+			by = MathUtil::abs(by) * MathUtil::sign(y);
+			pose._scaleX = bx + (x - bx) * alpha;
+			pose._scaleY = by + (y - by) * alpha;
 		}
 	}
 }
@@ -146,8 +114,8 @@ ScaleXTimeline::ScaleXTimeline(size_t frameCount, size_t bezierCount, int boneIn
 	: BoneTimeline1(frameCount, bezierCount, boneIndex, Property_ScaleX) {
 }
 
-void ScaleXTimeline::_apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, MixBlend blend, MixDirection direction) {
-	pose._scaleX = getScaleValue(time, alpha, blend, direction, pose._scaleX, setup._scaleX);
+void ScaleXTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
+	pose._scaleX = getScaleValue(time, alpha, fromSetup, add, out, pose._scaleX, setup._scaleX);
 }
 
 RTTI_IMPL(ScaleYTimeline, BoneTimeline1)
@@ -156,6 +124,6 @@ ScaleYTimeline::ScaleYTimeline(size_t frameCount, size_t bezierCount, int boneIn
 	: BoneTimeline1(frameCount, bezierCount, boneIndex, Property_ScaleY) {
 }
 
-void ScaleYTimeline::_apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, MixBlend blend, MixDirection direction) {
-	pose._scaleY = getScaleValue(time, alpha, blend, direction, pose._scaleY, setup._scaleY);
+void ScaleYTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
+	pose._scaleY = getScaleValue(time, alpha, fromSetup, add, out, pose._scaleY, setup._scaleY);
 }

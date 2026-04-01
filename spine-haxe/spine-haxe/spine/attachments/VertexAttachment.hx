@@ -71,12 +71,12 @@ class VertexAttachment extends Attachment {
 	 * @param stride The number of `worldVertices` entries between the value pairs written. */
 	public function computeWorldVertices(skeleton:Skeleton, slot:Slot, start:Int, count:Int, worldVertices:Array<Float>, offset:Int, stride:Int):Void {
 		count = offset + (count >> 1) * stride;
-		var deform:Array<Float> = slot.applied.deform;
+		var deform:Array<Float> = slot.appliedPose.deform;
 		var vertices = vertices;
 		if (bones == null) {
 			if (deform.length > 0)
 				vertices = deform;
-			var bone = slot.bone.applied;
+			var bone = slot.bone.appliedPose;
 			var x = bone.worldX, y = bone.worldY;
 			var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
 			var v = start, w = offset;
@@ -104,7 +104,7 @@ class VertexAttachment extends Attachment {
 				var n = bones[v++];
 				n += v;
 				while (v < n) {
-					var bone = skeletonBones[bones[v]].applied;
+					var bone = skeletonBones[bones[v]].appliedPose;
 					var vx = vertices[b],
 						vy = vertices[b + 1],
 						weight = vertices[b + 2];
@@ -124,7 +124,7 @@ class VertexAttachment extends Attachment {
 				var n = bones[v++];
 				n += v;
 				while (v < n) {
-					var bone = skeletonBones[bones[v]].applied;
+					var bone = skeletonBones[bones[v]].appliedPose;
 					var vx = vertices[b] + deform[f],
 						vy = vertices[b + 1] + deform[f + 1],
 						weight = vertices[b + 2];

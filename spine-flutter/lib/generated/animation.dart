@@ -34,11 +34,11 @@ import 'package:universal_ffi/ffi_utils.dart';
 import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
 import 'arrays.dart';
-import 'mix_blend.dart';
-import 'mix_direction.dart';
 import 'skeleton.dart';
 
 /// Stores a list of timelines to animate a skeleton's pose over time.
+///
+/// See Applying Animations in the Spine Runtimes Guide.
 class Animation {
   final Pointer<spine_animation_wrapper> _ptr;
 
@@ -47,9 +47,9 @@ class Animation {
   /// Get the native pointer for FFI calls
   Pointer get nativePtr => _ptr;
 
-  factory Animation(String name, ArrayTimeline timelines, double duration) {
-    final ptr = SpineBindings.bindings
-        .spine_animation_create(name.toNativeUtf8().cast<Char>(), timelines.nativePtr.cast(), duration);
+  /// Creates a new animation. The timelines must be set before use.
+  factory Animation(String name) {
+    final ptr = SpineBindings.bindings.spine_animation_create(name.toNativeUtf8().cast<Char>());
     return Animation.fromPointer(ptr);
   }
 
@@ -57,15 +57,19 @@ class Animation {
     SpineBindings.bindings.spine_animation_dispose(_ptr);
   }
 
-  /// If the returned array or the timelines it contains are modified,
-  /// setTimelines() must be called.
+  /// If this list or the timelines it contains are modified, the timelines and
+  /// bones must be set again to recompute the animation's bone indices and
+  /// timeline property IDs.
+  ///
+  /// See setTimelines().
   ArrayTimeline get timelines {
     final result = SpineBindings.bindings.spine_animation_get_timelines(_ptr);
     return ArrayTimeline.fromPointer(result);
   }
 
-  set timelines(ArrayTimeline value) {
-    SpineBindings.bindings.spine_animation_set_timelines(_ptr, value.nativePtr.cast());
+  /// Sets the timelines and bone indices.
+  void setTimelines(ArrayTimeline timelines, ArrayInt bones) {
+    SpineBindings.bindings.spine_animation_set_timelines(_ptr, timelines.nativePtr.cast(), bones.nativePtr.cast());
   }
 
   /// Returns true if this animation contains a timeline with any of the
@@ -89,20 +93,22 @@ class Animation {
 
   /// Applies the animation's timelines to the specified skeleton.
   ///
-  /// See Timeline::apply().
+  /// See Timeline::apply() and Applying Animations in the Spine Runtimes Guide.
   ///
-  /// [skeleton] The skeleton the animation is being applied to. This provides access to the bones, slots, and other skeleton components the timelines may change.
-  /// [lastTime] The last time in seconds this animation was applied. Some timelines trigger only at specific times rather than every frame. Pass -1 the first time an animation is applied to ensure frame 0 is triggered.
-  /// [time] The time in seconds the skeleton is being posed for. Most timelines find the frame before and the frame after this time and interpolate between the frame values. If beyond the getDuration() and loop is true then the animation will repeat, else the last frame will be applied.
-  /// [loop] If true, the animation repeats after the getDuration().
-  /// [events] If any events are fired, they are added to this list. Can be null to ignore fired events or if no timelines fire events.
-  /// [alpha] 0 applies the current or setup values (depending on blend). 1 applies the timeline values. Between 0 and 1 applies values between the current or setup values and the timeline values. By adjusting alpha over time, an animation can be mixed in or out. alpha can also be useful to apply animations on top of each other (layering).
-  /// [blend] Controls how mixing is applied when alpha < 1.
-  /// [direction] Indicates whether the timelines are mixing in or out. Used by timelines which perform instant transitions, such as DrawOrderTimeline or AttachmentTimeline.
+  /// [skeleton] The skeleton the animation is applied to. This provides access to the bones, slots, and other skeleton components the timelines may change.
+  /// [lastTime] The last time in seconds this animation was applied. Some timelines trigger only at discrete times, in which case all keys are triggered between lastTime (exclusive) and time (inclusive). Pass -1 the first time an animation is applied to ensure frame 0 is triggered.
+  /// [time] The time in seconds the skeleton is being posed for. Timelines find the frame before and after this time and interpolate between the frame values.
+  /// [loop] True if time beyond the animation duration repeats the animation, else the last frame is used.
+  /// [events] If any events are fired, they are added to this list. Can be NULL to ignore fired events or if no timelines fire events.
+  /// [alpha] 0 applies setup or current values (depending on fromSetup), 1 uses timeline values, and intermediate values interpolate between them. Adjusting alpha over time can mix an animation in or out.
+  /// [fromSetup] If true, alpha transitions between setup and timeline values, setup values are used before the first frame (current values are not used). If false, alpha transitions between current and timeline values, no change is made before the first frame.
+  /// [add] If true, for timelines that support it, their values are added to the setup or current values (depending on fromSetup).
+  /// [out] True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant transitions.
+  /// [appliedPose] True to modify getAppliedPose(), else the unconstrained pose is modified.
   void apply(Skeleton skeleton, double lastTime, double time, bool loop, ArrayEvent? events, double alpha,
-      MixBlend blend, MixDirection direction, bool appliedPose) {
+      bool fromSetup, bool add, bool out, bool appliedPose) {
     SpineBindings.bindings.spine_animation_apply(_ptr, skeleton.nativePtr.cast(), lastTime, time, loop,
-        events?.nativePtr.cast() ?? Pointer.fromAddress(0), alpha, blend.value, direction.value, appliedPose);
+        events?.nativePtr.cast() ?? Pointer.fromAddress(0), alpha, fromSetup, add, out, appliedPose);
   }
 
   /// The animation's name, which is unique across all animations in the
@@ -112,7 +118,9 @@ class Animation {
     return result.cast<Utf8>().toDartString();
   }
 
-  /// The bone indices affected by this animation.
+  /// The Skeleton::getBones() indices affected by this animation.
+  ///
+  /// See setTimelines() and BoneTimeline::getBoneIndex().
   ArrayInt get bones {
     final result = SpineBindings.bindings.spine_animation_get_bones(_ptr);
     return ArrayInt.fromPointer(result);

@@ -45,8 +45,7 @@ namespace spine {
 	class Skin;
 	class Attachment;
 
-	/// Stores the current pose for a path constraint. A path constraint adjusts the rotation, translation, and scale of the
-	/// constrained bones so they follow a PathAttachment.
+	/// Adjusts the rotation, translation, and scale of the constrained bones so they follow a PathAttachment.
 	///
 	/// See https://esotericsoftware.com/spine-path-constraints Path constraints in the Spine User Guide.
 	// Non-exported base class that inherits from the template

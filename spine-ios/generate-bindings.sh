@@ -41,6 +41,11 @@ else
     exit 1
 fi
 
+# Clean SwiftPM build state so removed generated sources don't remain in stale source lists.
+log_action "Cleaning Swift build directories"
+rm -rf ../.build test/.build
+log_ok
+
 # Build and run tests
 log_action "Building and running tests"
 if LOG=$(cd test && ./build.sh 2>&1); then

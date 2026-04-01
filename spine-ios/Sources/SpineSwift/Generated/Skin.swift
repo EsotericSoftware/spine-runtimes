@@ -32,9 +32,9 @@
 import Foundation
 import SpineC
 
-/// Stores attachments by slot index and attachment name. See SkeletonData::getDefaultSkin,
-/// Skeleton::getSkin, and http://esotericsoftware.com/spine-runtime-skins in the Spine Runtimes
-/// Guide.
+/// Stores attachments by slot index and placeholder name. Multiple Skeleton instances can use the
+/// same skins. See SkeletonData::getDefaultSkin, Skeleton::getSkin, and
+/// http://esotericsoftware.com/spine-runtime-skins in the Spine Runtimes Guide.
 @objc(SpineSkin)
 @objcMembers
 public class Skin: NSObject {
@@ -70,17 +70,17 @@ public class Skin: NSObject {
         return Color(fromPointer: result!)
     }
 
-    /// Adds an attachment to the skin for the specified slot index and name. If the name already
-    /// exists for the slot, the previous value is replaced.
-    public func setAttachment(_ slotIndex: Int, _ name: String, _ attachment: Attachment?) {
+    /// Adds an attachment to the skin for the specified slot index and placeholder name. If the
+    /// placeholder name already exists for the slot, the previous value is replaced.
+    public func setAttachment(_ slotIndex: Int, _ placeholderName: String, _ attachment: Attachment?) {
         spine_skin_set_attachment(
-            _ptr.assumingMemoryBound(to: spine_skin_wrapper.self), slotIndex, name,
+            _ptr.assumingMemoryBound(to: spine_skin_wrapper.self), slotIndex, placeholderName,
             attachment?._ptr.assumingMemoryBound(to: spine_attachment_wrapper.self))
     }
 
-    /// Returns the attachment for the specified slot index and name, or NULL.
-    public func getAttachment(_ slotIndex: Int, _ name: String) -> Attachment? {
-        let result = spine_skin_get_attachment(_ptr.assumingMemoryBound(to: spine_skin_wrapper.self), slotIndex, name)
+    /// Returns the attachment for the specified slot index and placeholder name, or NULL.
+    public func getAttachment(_ slotIndex: Int, _ placeholderName: String) -> Attachment? {
+        let result = spine_skin_get_attachment(_ptr.assumingMemoryBound(to: spine_skin_wrapper.self), slotIndex, placeholderName)
         guard let ptr = result else { return nil }
         let rtti = spine_attachment_get_rtti(ptr)
         let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
@@ -109,8 +109,8 @@ public class Skin: NSObject {
     }
 
     /// Removes the attachment from the skin.
-    public func removeAttachment(_ slotIndex: Int, _ name: String) {
-        spine_skin_remove_attachment(_ptr.assumingMemoryBound(to: spine_skin_wrapper.self), slotIndex, name)
+    public func removeAttachment(_ slotIndex: Int, _ placeholderName: String) {
+        spine_skin_remove_attachment(_ptr.assumingMemoryBound(to: spine_skin_wrapper.self), slotIndex, placeholderName)
     }
 
     /// Finds the attachments for a given slot. The results are added to the passed array of

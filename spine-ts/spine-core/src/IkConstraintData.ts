@@ -48,8 +48,8 @@ export class IkConstraintData extends ConstraintData<IkConstraint, IkConstraintP
 		else return this._target;
 	}
 
-	/** When true and {@link IkConstraintPose.compress} or {@link IkConstraintPose.stretch} is used, the bone is scaled
-	 * on both the X and Y axes. */
+	/** When true and {@link IkConstraintPose.compress} or {@link IkConstraintPose.stretch} is used, the bone is scaled on both the
+	 * X and Y axes. */
 	uniform = false;
 
 	constructor (name: string) {

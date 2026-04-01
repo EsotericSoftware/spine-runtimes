@@ -35,7 +35,8 @@
 #endif
 
 void SpineTimeline::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("apply", "skeleton", "last_time", "time", "events", "alpha", "blend", "direction"), &SpineTimeline::apply);
+	ClassDB::bind_method(D_METHOD("apply", "skeleton", "last_time", "time", "events", "alpha", "from_setup", "add", "out", "applied_pose"),
+						 &SpineTimeline::apply);
 	ClassDB::bind_method(D_METHOD("get_frame_entries"), &SpineTimeline::get_frame_entries);
 	ClassDB::bind_method(D_METHOD("get_frame_count"), &SpineTimeline::get_frame_count);
 	ClassDB::bind_method(D_METHOD("get_frames"), &SpineTimeline::get_frames);
@@ -44,8 +45,8 @@ void SpineTimeline::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_type"), &SpineTimeline::get_type);
 }
 
-void SpineTimeline::apply(Ref<SpineSkeleton> skeleton, float last_time, float time, Array events, float alpha, SpineConstant::MixBlend blend,
-						  SpineConstant::MixDirection direction, bool applied_pose) {
+void SpineTimeline::apply(Ref<SpineSkeleton> skeleton, float last_time, float time, Array events, float alpha, bool from_setup, bool add, bool out,
+						  bool applied_pose) {
 	SPINE_CHECK(get_spine_object(), )
 	if (!skeleton->get_spine_object()) return;
 	spine::Array<spine::Event *> spine_events;
@@ -53,8 +54,7 @@ void SpineTimeline::apply(Ref<SpineSkeleton> skeleton, float last_time, float ti
 	for (int i = 0; i < events.size(); ++i) {
 		events[i] = ((Ref<SpineEvent>) spine_events[i])->get_spine_object();
 	}
-	get_spine_object()->apply(*(skeleton->get_spine_object()), last_time, time, &spine_events, alpha, (spine::MixBlend) blend,
-							  (spine::MixDirection) direction, applied_pose);
+	get_spine_object()->apply(*(skeleton->get_spine_object()), last_time, time, &spine_events, alpha, from_setup, add, out, applied_pose);
 }
 
 int SpineTimeline::get_frame_entries() {

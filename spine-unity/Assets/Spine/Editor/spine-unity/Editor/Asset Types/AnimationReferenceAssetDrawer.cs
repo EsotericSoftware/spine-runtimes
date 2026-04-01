@@ -81,7 +81,9 @@ namespace Spine.Unity.Editor {
 					new GUIContent(NoneString, SpineEditorUtilities.Icons.animation) :
 					new GUIContent(currentAnimationName, SpineEditorUtilities.Icons.animation);
 
-				GUIStyle usedStyle = isSkeletonDataMismatch ? ErrorPopupStyle : EditorStyles.popup;
+				GUIStyle usedStyle =
+					(isSkeletonDataMismatch && SpineEditorUtilities.Preferences.skeletonDataAssetMismatchWarning) ?
+					ErrorPopupStyle : EditorStyles.popup;
 				if (GUI.Button(dropdownRect, dropdownLabel, usedStyle)) {
 					ShowAnimationMenu(property, skeletonDataAsset, skeletonData);
 				}
@@ -103,7 +105,7 @@ namespace Spine.Unity.Editor {
 			if (currentAsset != null && currentAsset.SkeletonDataAsset != null) {
 				resolvedSkeletonDataAsset = currentAsset.SkeletonDataAsset;
 				// If other SkeletonDataAsset than expected, use assigned asset but show warning color in Inspector.
-				if (resolvedSkeletonDataAsset != expectedSkeletonDataAsset)
+				if (expectedSkeletonDataAsset && resolvedSkeletonDataAsset != expectedSkeletonDataAsset)
 					skeletonDataAssetMismatch = true;
 			} else {
 				resolvedSkeletonDataAsset = expectedSkeletonDataAsset;

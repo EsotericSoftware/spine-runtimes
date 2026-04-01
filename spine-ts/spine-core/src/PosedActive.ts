@@ -32,27 +32,25 @@ import { Posed } from "./Posed.js";
 import type { PosedData } from "./PosedData.js";
 
 import type { Skeleton } from "./Skeleton";
+import type { Skin } from "./Skin.js";
 
+/** A posed object that may be active or inactive. */
 export abstract class PosedActive<
 	D extends PosedData<P>,
-	P extends Pose<P>,
-	A extends P>
-	extends Posed<D, P, A> {
+	P extends Pose<P>>
+	extends Posed<D, P> {
 
 	active = false;
 
-	constructor (data: D, pose: A, constrained: A) {
+	protected constructor (data: D, pose: P, constrained: P) {
 		super(data, pose, constrained);
 		this.setupPose();
 	}
 
 	/** Returns false when this constraint won't be updated by
-	 * {@link Skeleton.updateWorldTransform()} because a skin is required and the
-	 * {@link Skeleton.getSkin() active skin} does not contain this item.
-	 * @see Skin.getBones()
-	 * @see Skin.getConstraints()
-	 * @see PosedData.getSkinRequired()
-	 * @see Skeleton.updateCache() */
+	 * {@link Skeleton.updateWorldTransform} because a skin is required and the
+	 * {@link Skeleton.skin active skin} does not contain this item. See {@link Skin.bones}, {@link Skin.constraints},
+	 * {@link PosedData.skinRequired}, and {@link Skeleton.updateCache}. */
 	public isActive (): boolean {
 		return this.active;
 	}

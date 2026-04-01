@@ -39,6 +39,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.DataInput;
+import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.SerializationException;
 
@@ -230,7 +231,7 @@ public class SkeletonBinary extends SkeletonLoader {
 				String name = input.readString();
 				BoneData parent = i == 0 ? null : bones[input.readInt(true)];
 				var data = new BoneData(i, name, parent);
-				BoneLocal setup = data.setup;
+				BonePose setup = data.setupPose;
 				setup.rotation = input.readFloat();
 				setup.x = input.readFloat() * scale;
 				setup.y = input.readFloat() * scale;
@@ -255,10 +256,10 @@ public class SkeletonBinary extends SkeletonLoader {
 				String slotName = input.readString();
 				var boneData = bones[input.readInt(true)];
 				var data = new SlotData(i, slotName, boneData);
-				Color.rgba8888ToColor(data.setup.color, input.readInt());
+				Color.rgba8888ToColor(data.setupPose.color, input.readInt());
 
 				int darkColor = input.readInt();
-				if (darkColor != -1) Color.rgb888ToColor(data.setup.darkColor = new Color(), darkColor);
+				if (darkColor != -1) Color.rgb888ToColor(data.setupPose.darkColor = new Color(), darkColor);
 
 				data.attachmentName = input.readStringRef();
 				data.blendMode = BlendMode.values[input.readInt(true)];
@@ -282,7 +283,7 @@ public class SkeletonBinary extends SkeletonLoader {
 					int flags = input.read();
 					data.skinRequired = (flags & 1) != 0;
 					data.uniform = (flags & 2) != 0;
-					IkConstraintPose setup = data.setup;
+					IkConstraintPose setup = data.setupPose;
 					setup.bendDirection = (flags & 4) != 0 ? -1 : 1;
 					setup.compress = (flags & 8) != 0;
 					setup.stretch = (flags & 16) != 0;
@@ -354,7 +355,7 @@ public class SkeletonBinary extends SkeletonLoader {
 					if ((flags & 16) != 0) data.offsets[TransformConstraintData.SCALEY] = input.readFloat();
 					if ((flags & 32) != 0) data.offsets[TransformConstraintData.SHEARY] = input.readFloat();
 					flags = input.read();
-					TransformConstraintPose setup = data.setup;
+					TransformConstraintPose setup = data.setupPose;
 					if ((flags & 1) != 0) setup.mixRotate = input.readFloat();
 					if ((flags & 2) != 0) setup.mixX = input.readFloat();
 					if ((flags & 4) != 0) setup.mixY = input.readFloat();
@@ -375,7 +376,7 @@ public class SkeletonBinary extends SkeletonLoader {
 					data.spacingMode = SpacingMode.values[(flags >> 2) & 0b11];
 					data.rotateMode = RotateMode.values[(flags >> 4) & 0b11];
 					if ((flags & 128) != 0) data.offsetRotation = input.readFloat();
-					PathConstraintPose setup = data.setup;
+					PathConstraintPose setup = data.setupPose;
 					setup.position = input.readFloat();
 					if (data.positionMode == PositionMode.fixed) setup.position *= scale;
 					setup.spacing = input.readFloat();
@@ -397,7 +398,7 @@ public class SkeletonBinary extends SkeletonLoader {
 					if ((flags & 32) != 0) data.shearX = input.readFloat();
 					data.limit = ((flags & 64) != 0 ? input.readFloat() : 5000) * scale;
 					data.step = 1f / input.readUnsignedByte();
-					PhysicsConstraintPose setup = data.setup;
+					PhysicsConstraintPose setup = data.setupPose;
 					setup.inertia = input.readFloat();
 					setup.strength = input.readFloat();
 					setup.damping = input.readFloat();
@@ -421,8 +422,8 @@ public class SkeletonBinary extends SkeletonLoader {
 					data.skinRequired = (flags & 1) != 0;
 					data.loop = (flags & 2) != 0;
 					data.additive = (flags & 4) != 0;
-					if ((flags & 8) != 0) data.setup.time = input.readFloat();
-					if ((flags & 16) != 0) data.setup.mix = (flags & 32) != 0 ? input.readFloat() : 1;
+					if ((flags & 8) != 0) data.setupPose.time = input.readFloat();
+					if ((flags & 16) != 0) data.setupPose.mix = (flags & 32) != 0 ? input.readFloat() : 1;
 					if ((flags & 64) != 0) {
 						data.local = (flags & 128) != 0;
 						data.bone = bones[input.readInt(true)];
@@ -485,13 +486,14 @@ public class SkeletonBinary extends SkeletonLoader {
 			o = skeletonData.events.setSize(n = input.readInt(true));
 			for (int i = 0; i < n; i++) {
 				var data = new EventData(input.readString());
-				data.intValue = input.readInt(false);
-				data.floatValue = input.readFloat();
-				data.stringValue = input.readString();
+				Event setup = data.setupPose;
+				setup.intValue = input.readInt(false);
+				setup.floatValue = input.readFloat();
+				setup.stringValue = input.readString();
 				data.audioPath = input.readString();
 				if (data.audioPath != null) {
-					data.volume = input.readFloat();
-					data.balance = input.readFloat();
+					setup.volume = input.readFloat();
+					setup.balance = input.readFloat();
 				}
 				o[i] = data;
 			}
@@ -923,8 +925,11 @@ public class SkeletonBinary extends SkeletonLoader {
 		}
 
 		// Bone timelines.
-		for (int i = 0, n = input.readInt(true); i < n; i++) {
+		int boneCount = input.readInt(true);
+		var bones = new IntArray(boneCount);
+		for (int i = 0; i < boneCount; i++) {
 			int boneIndex = input.readInt(true);
+			bones.add(boneIndex);
 			for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 				int type = input.readByte(), frameCount = input.readInt(true);
 				if (type == BONE_INHERIT) {
@@ -1196,7 +1201,7 @@ public class SkeletonBinary extends SkeletonLoader {
 				event.intValue = input.readInt(false);
 				event.floatValue = input.readFloat();
 				event.stringValue = input.readString();
-				if (event.stringValue == null) event.stringValue = eventData.stringValue;
+				if (event.stringValue == null) event.stringValue = eventData.setupPose.stringValue;
 				if (event.data.audioPath != null) {
 					event.volume = input.readFloat();
 					event.balance = input.readFloat();
@@ -1210,7 +1215,11 @@ public class SkeletonBinary extends SkeletonLoader {
 		Timeline[] items = timelines.items;
 		for (int i = 0, n = timelines.size; i < n; i++)
 			duration = Math.max(duration, items[i].getDuration());
-		return new Animation(name, timelines, duration);
+
+		Animation animation = new Animation(name);
+		animation.setTimelines(timelines, bones);
+		animation.setDuration(duration);
+		return animation;
 	}
 
 	private void readTimeline (SkeletonInput input, Array<Timeline> timelines, CurveTimeline1 timeline, float scale)

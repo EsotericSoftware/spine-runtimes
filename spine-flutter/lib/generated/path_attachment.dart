@@ -77,6 +77,9 @@ class PathAttachment extends VertexAttachment {
     SpineBindings.bindings.spine_path_attachment_set_closed(_ptr, value);
   }
 
+  /// If true, additional calculations are performed to make computing positions
+  /// along the path more accurate so movement along the path has a constant
+  /// speed.
   bool get constantSpeed {
     final result = SpineBindings.bindings.spine_path_attachment_get_constant_speed(_ptr);
     return result;

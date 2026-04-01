@@ -27,66 +27,52 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Inherit } from "./BoneData.js";
-import type { Pose } from "./Pose.js"
+package com.esotericsoftware.spine;
 
-/** Stores a bone's local pose. */
-export class BoneLocal implements Pose<BoneLocal> {
+import static com.esotericsoftware.spine.utils.SpineUtils.*;
 
-	/** The local x translation. */
-	x = 0;
+import com.badlogic.gdx.utils.Array;
 
-	/** The local y translation. */
-	y = 0;
+/** Stores the skeleton's draw order, which is the order that each slot's attachment is rendered. */
+public class DrawOrder {
+	final Array<Slot> setupPose, pose, constrainedPose;
+	Array<Slot> appliedPose;
 
-	/** The local rotation in degrees, counter clockwise. */
-	rotation = 0;
-
-	/** The local scaleX. */
-	scaleX = 0;
-
-	/** The local scaleY. */
-	scaleY = 0;
-
-	/** The local shearX. */
-	shearX = 0;
-
-	/** The local shearY. */
-	shearY = 0;
-
-	inherit = Inherit.Normal;
-
-	set (pose: BoneLocal): void {
-		if (pose == null) throw new Error("pose cannot be null.");
-		this.x = pose.x;
-		this.y = pose.y;
-		this.rotation = pose.rotation;
-		this.scaleX = pose.scaleX;
-		this.scaleY = pose.scaleY;
-		this.shearX = pose.shearX;
-		this.shearY = pose.shearY;
-		this.inherit = pose.inherit;
+	DrawOrder (Array<Slot> setupPose) {
+		this.setupPose = setupPose;
+		pose = new Array(setupPose);
+		constrainedPose = new Array(true, 0, Slot[]::new);
+		appliedPose = pose;
 	}
 
-	setPosition (x: number, y: number): void {
-		this.x = x;
-		this.y = y;
+	/** Sets the unconstrained draw order to the setup pose order. */
+	public void setupPose () {
+		arraycopy(setupPose.items, 0, pose.setSize(setupPose.size), 0, setupPose.size);
 	}
 
-	setScale (scaleX: number, scaleY: number): void;
-	setScale (scale: number): void;
-	setScale (scaleOrX: number, scaleY?: number): void {
-		this.scaleX = scaleOrX;
-		this.scaleY = scaleY === undefined ? scaleOrX : scaleY;
+	/** The unconstrained draw order, set by animations and application code. */
+	public Array<Slot> getPose () {
+		return pose;
 	}
 
-	/** Determines how parent world transforms affect this bone. */
-	public getInherit (): Inherit {
-		return this.inherit;
+	/** The constrained draw order for rendering. If no constraints modify the draw order, this is the same as {@link #pose}.
+	 * Otherwise it is a copy of {@link #pose} modified by constraints. */
+	public Array<Slot> getAppliedPose () {
+		return appliedPose;
 	}
 
-	public setInherit (inherit: Inherit): void {
-		if (inherit == null) throw new Error("inherit cannot be null.");
-		this.inherit = inherit;
+	/** Sets the applied pose to the unconstrained pose, for when no constraints will modify the draw order. */
+	void unconstrained () {
+		appliedPose = pose;
+	}
+
+	/** Sets the applied pose to the constrained pose, in anticipation of the applied pose being modified by constraints. */
+	void constrained () {
+		appliedPose = constrainedPose;
+	}
+
+	/** Copies the unconstrained pose to the constrained pose, as a starting point for constraints to be applied. */
+	void reset () { // Port: resetConstrained
+		arraycopy(pose.items, 0, constrainedPose.setSize(pose.size), 0, pose.size);
 	}
 }

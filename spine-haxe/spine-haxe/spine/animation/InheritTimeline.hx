@@ -43,6 +43,7 @@ class InheritTimeline extends Timeline implements BoneTimeline {
 	public function new(frameCount:Int, boneIndex:Int) {
 		super(frameCount, Property.inherit + "|" + boneIndex);
 		this.boneIndex = boneIndex;
+		this.instant = true;
 	}
 
 	public function getBoneIndex() {
@@ -62,24 +63,23 @@ class InheritTimeline extends Timeline implements BoneTimeline {
 		frames[frame + INHERIT] = inherit.ordinal;
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend, direction:MixDirection,
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
 			appliedPose:Bool):Void {
 		var bone:Bone = skeleton.bones[boneIndex];
 		if (!bone.active)
 			return;
-		var pose = appliedPose ? bone.applied : bone.pose;
+		var pose = appliedPose ? bone.appliedPose : bone.pose;
 
-		if (direction == MixDirection.mixOut) {
-			if (blend == MixBlend.setup)
-				pose.inherit = bone.data.setup.inherit;
-			return;
+		if (out) {
+			if (fromSetup)
+				pose.inherit = bone.data.setupPose.inherit;
+		} else {
+			var frames:Array<Float> = frames;
+			if (time < frames[0]) {
+				if (fromSetup)
+					pose.inherit = bone.data.setupPose.inherit;
+			} else
+				pose.inherit = Inherit.values[Std.int(frames[Timeline.search(frames, time, ENTRIES) + INHERIT])];
 		}
-
-		var frames:Array<Float> = frames;
-		if (time < frames[0]) {
-			if (blend == MixBlend.setup || blend == MixBlend.first)
-				pose.inherit = bone.data.setup.inherit;
-		} else
-			pose.inherit = Inherit.values[Std.int(frames[Timeline.search(frames, time, ENTRIES) + INHERIT])];
 	}
 }

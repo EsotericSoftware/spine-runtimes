@@ -46,7 +46,7 @@ SPINE_C_API void spine_ik_constraint_pose_set_compress(spine_ik_constraint_pose 
  * it.
  *
  * For two bone IK: 1) the child bone's local Y translation is set to 0, 2)
- * stretch is not applied if getSoftness() is > 0, and 3) if the parent bone has
+ * stretch is not applied if softness is > 0, and 3) if the parent bone has
  * local nonuniform scale, stretch is not applied.
  */
 SPINE_C_API bool spine_ik_constraint_pose_get_stretch(spine_ik_constraint_pose self);

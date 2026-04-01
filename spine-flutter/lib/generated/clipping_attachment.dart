@@ -57,6 +57,8 @@ class ClippingAttachment extends VertexAttachment {
     SpineBindings.bindings.spine_clipping_attachment_dispose(_ptr);
   }
 
+  /// Clipping is performed between the clipping attachment's slot and the end
+  /// slot. If NULL, clipping is done until the end of the skeleton's rendering.
   SlotData? get endSlot {
     final result = SpineBindings.bindings.spine_clipping_attachment_get_end_slot(_ptr);
     return result.address == 0 ? null : SlotData.fromPointer(result);

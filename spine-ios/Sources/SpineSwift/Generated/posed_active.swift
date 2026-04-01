@@ -32,7 +32,7 @@
 import Foundation
 import SpineC
 
-/// Simple mixin class that adds active state tracking
+/// A posed object that may be active or inactive.
 @objc(SpinePosedActive)
 @objcMembers
 open class PosedActive: NSObject {
@@ -43,6 +43,9 @@ open class PosedActive: NSObject {
         super.init()
     }
 
+    /// Returns false when this won't be updated by Skeleton::updateWorldTransform(Physics) because
+    /// a skin is required and the active skin does not contain this item. See Skin::getBones(),
+    /// Skin::getConstraints(), PosedData::getSkinRequired(), and Skeleton::updateCache().
     public var isActive: Bool {
         let result = spine_posed_active_is_active(_ptr.assumingMemoryBound(to: spine_posed_active_wrapper.self))
         return result

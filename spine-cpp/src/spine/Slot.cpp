@@ -42,7 +42,7 @@ Slot::Slot(SlotData &data, Skeleton &skeleton)
 
 	if (data.getSetupPose().hasDarkColor()) {
 		_pose._hasDarkColor = true;
-		_constrained._hasDarkColor = true;
+		_constrainedPose._hasDarkColor = true;
 	}
 	setupPose();
 }
@@ -52,9 +52,9 @@ Bone &Slot::getBone() {
 }
 
 void Slot::setupPose() {
-	_pose._color.set(_data._setup._color);
-	if (_pose._hasDarkColor) _pose._darkColor.set(_data._setup._darkColor);
-	_pose._sequenceIndex = _data._setup._sequenceIndex;
+	_pose._color.set(_data._setupPose._color);
+	if (_pose._hasDarkColor) _pose._darkColor.set(_data._setupPose._darkColor);
+	_pose._sequenceIndex = _data._setupPose._sequenceIndex;
 	if (_data._attachmentName.isEmpty())
 		_pose.setAttachment(NULL);
 	else {

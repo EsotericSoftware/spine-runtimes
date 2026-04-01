@@ -48,9 +48,9 @@ spine_bone_data spine_bone_get_data(spine_bone self) {
 	return (spine_bone_data) &_self->getData();
 }
 
-spine_bone_local spine_bone_get_pose(spine_bone self) {
+spine_bone_pose spine_bone_get_pose(spine_bone self) {
 	Bone *_self = (Bone *) self;
-	return (spine_bone_local) &_self->getPose();
+	return (spine_bone_pose) &_self->getPose();
 }
 
 spine_bone_pose spine_bone_get_applied_pose(spine_bone self) {

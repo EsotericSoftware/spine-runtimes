@@ -35,7 +35,7 @@ class ScaleXTimeline extends BoneTimeline1 {
 		super(frameCount, bezierCount, boneIndex, Property.scaleX);
 	}
 
-	public function apply1(pose:BoneLocal, setup:BoneLocal, time:Float, alpha:Float, blend:MixBlend, direction:MixDirection) {
-		pose.scaleX = getScaleValue(time, alpha, blend, direction, pose.scaleX, setup.scaleX);
+	public function apply1(pose:BonePose, setup:BonePose, time:Float, alpha:Float, fromSetup:Bool, add:Bool, out:Bool) {
+		pose.scaleX = getScaleValue(time, alpha, fromSetup, add, out, pose.scaleX, setup.scaleX);
 	}
 }

@@ -67,7 +67,8 @@ namespace spine {
 
 		void setTarget(BoneData &inValue);
 
-		/// When true and IkConstraintPose compress or stretch is used, the bone is scaled on both the X and Y axes.
+		/// When true and IkConstraintPose::getCompress() or IkConstraintPose::getStretch() is used, the bone is scaled on both the
+		/// X and Y axes.
 		bool getUniform();
 
 		void setUniform(bool uniform);

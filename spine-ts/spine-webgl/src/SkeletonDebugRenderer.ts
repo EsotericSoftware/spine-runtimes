@@ -74,7 +74,7 @@ export class SkeletonDebugRenderer implements Disposable {
 				const bone = bones[i];
 				if (ignoredBones && ignoredBones.indexOf(bone.data.name) > -1) continue;
 				if (!bone.parent) continue;
-				const boneApplied = bone.applied;
+				const boneApplied = bone.appliedPose;
 				const x = bone.data.length * boneApplied.a + boneApplied.worldX;
 				const y = bone.data.length * boneApplied.c + boneApplied.worldY;
 				shapes.rectLine(true, boneApplied.worldX, boneApplied.worldY, x, y, this.boneWidth * this.scale);
@@ -88,11 +88,11 @@ export class SkeletonDebugRenderer implements Disposable {
 			for (let i = 0, n = slots.length; i < n; i++) {
 				const slot = slots[i];
 				if (!slot.bone.active) continue;
-				const attachment = slot.applied.attachment;
+				const attachment = slot.appliedPose.attachment;
 				if (attachment instanceof RegionAttachment) {
 					const vertices = this.vertices;
 
-					attachment.computeWorldVertices(slot, attachment.getOffsets(slot.applied), vertices, 0, 2);
+					attachment.computeWorldVertices(slot, attachment.getOffsets(slot.appliedPose), vertices, 0, 2);
 					shapes.line(vertices[0], vertices[1], vertices[2], vertices[3]);
 					shapes.line(vertices[2], vertices[3], vertices[4], vertices[5]);
 					shapes.line(vertices[4], vertices[5], vertices[6], vertices[7]);
@@ -106,7 +106,7 @@ export class SkeletonDebugRenderer implements Disposable {
 			for (let i = 0, n = slots.length; i < n; i++) {
 				const slot = slots[i];
 				if (!slot.bone.active) continue;
-				const attachment = slot.applied.attachment;
+				const attachment = slot.appliedPose.attachment;
 				if (!(attachment instanceof MeshAttachment)) continue;
 				const vertices = this.vertices;
 				attachment.computeWorldVertices(skeleton, slot, 0, attachment.worldVerticesLength, vertices, 0, 2);
@@ -155,7 +155,7 @@ export class SkeletonDebugRenderer implements Disposable {
 			for (let i = 0, n = slots.length; i < n; i++) {
 				const slot = slots[i];
 				if (!slot.bone.active) continue;
-				const attachment = slot.applied.attachment;
+				const attachment = slot.appliedPose.attachment;
 				if (!(attachment instanceof PathAttachment)) continue;
 				let nn = attachment.worldVerticesLength;
 				const world = this.temp = Utils.setArraySize(this.temp, nn, 0);
@@ -193,7 +193,7 @@ export class SkeletonDebugRenderer implements Disposable {
 			for (let i = 0, n = bones.length; i < n; i++) {
 				const bone = bones[i];
 				if (ignoredBones && ignoredBones.indexOf(bone.data.name) > -1) continue;
-				const boneApplied = bone.applied;
+				const boneApplied = bone.appliedPose;
 				shapes.circle(true, boneApplied.worldX, boneApplied.worldY, 3 * this.scale, this.boneOriginColor, 8);
 			}
 		}
@@ -204,7 +204,7 @@ export class SkeletonDebugRenderer implements Disposable {
 			for (let i = 0, n = slots.length; i < n; i++) {
 				const slot = slots[i];
 				if (!slot.bone.active) continue;
-				const attachment = slot.applied.attachment;
+				const attachment = slot.appliedPose.attachment;
 				if (!(attachment instanceof ClippingAttachment)) continue;
 				const nn = attachment.worldVerticesLength;
 				const world = this.temp = Utils.setArraySize(this.temp, nn, 0);

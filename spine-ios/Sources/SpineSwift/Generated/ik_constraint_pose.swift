@@ -32,7 +32,7 @@
 import Foundation
 import SpineC
 
-/// Stores the current pose for an IK constraint.
+/// Stores a pose for an IK constraint.
 @objc(SpineIkConstraintPose)
 @objcMembers
 public class IkConstraintPose: NSObject {
@@ -100,8 +100,8 @@ public class IkConstraintPose: NSObject {
     /// When true and the target is out of range, the parent bone is scaled to reach it.
     ///
     /// For two bone IK: 1) the child bone's local Y translation is set to 0, 2) stretch is not
-    /// applied if getSoftness() is > 0, and 3) if the parent bone has local nonuniform scale,
-    /// stretch is not applied.
+    /// applied if softness is > 0, and 3) if the parent bone has local nonuniform scale, stretch is
+    /// not applied.
     public var stretch: Bool {
         get {
             let result = spine_ik_constraint_pose_get_stretch(_ptr.assumingMemoryBound(to: spine_ik_constraint_pose_wrapper.self))

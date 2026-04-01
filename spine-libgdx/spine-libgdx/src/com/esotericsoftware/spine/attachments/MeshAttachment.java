@@ -37,7 +37,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Null;
 
 /** An attachment that displays a textured mesh. A mesh has hull vertices and internal vertices within the hull. Holes are not
- * supported. Each vertex has UVs (texture coordinates) and triangles are used to map an image on to the mesh.
+ * supported. Each vertex has UVs (texture coordinates) and triangles that are used to map an image on to the mesh.
  * <p>
  * See <a href="https://esotericsoftware.com/spine-meshes">Mesh attachments</a> in the Spine User Guide. */
 public class MeshAttachment extends VertexAttachment implements HasSequence {
@@ -138,8 +138,8 @@ public class MeshAttachment extends VertexAttachment implements HasSequence {
 		this.edges = edges;
 	}
 
-	/** Vertex index pairs describing edges for controlling triangulation, or be null if nonessential data was not exported. Mesh
-	 * triangles never cross edges. Triangulation is not performed at runtime. */
+	/** Vertex index pairs describing edges for controlling triangulation, or null if nonessential data was not exported. Mesh
+	 * triangles do not cross edges. Triangulation is not performed at runtime. */
 	public @Null short[] getEdges () {
 		return edges;
 	}
@@ -164,7 +164,7 @@ public class MeshAttachment extends VertexAttachment implements HasSequence {
 
 	/** The parent mesh if this is a linked mesh, else null. A linked mesh shares the {@link #bones}, {@link #vertices},
 	 * {@link #regionUVs}, {@link #triangles}, {@link #hullLength}, {@link #edges}, {@link #width}, and {@link #height} with the
-	 * parent mesh, but may have a different {@link #name} or {@link #path} (and therefore a different texture). */
+	 * parent mesh, but may have a different {@link #name} or {@link #path}, and therefore a different texture region. */
 	public @Null MeshAttachment getParentMesh () {
 		return parentMesh;
 	}

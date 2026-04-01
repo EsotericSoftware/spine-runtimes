@@ -35,8 +35,7 @@
 
 namespace spine {
 
-	/// Changes a path constraint's PathConstraintPose::getMixRotate(), PathConstraintPose::getMixX(), and
-	/// PathConstraintPose::getMixY().
+	/// Changes a path constraint's rotate, x, and y mix values.
 	class SP_API PathConstraintMixTimeline : public CurveTimeline, public ConstraintTimeline {
 		friend class SkeletonBinary;
 
@@ -49,8 +48,8 @@ namespace spine {
 
 		virtual ~PathConstraintMixTimeline();
 
-		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
-						   MixDirection direction, bool appliedPose) override;
+		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+						   bool appliedPose) override;
 
 		/// Sets the time and color for the specified frame.
 		/// @param frame Between 0 and frameCount, inclusive.

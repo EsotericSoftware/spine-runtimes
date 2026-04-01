@@ -13,7 +13,7 @@ SPINE_C_API void spine_slot_timeline_dispose(spine_slot_timeline self);
 
 SPINE_C_API spine_rtti spine_slot_timeline_get_rtti(spine_slot_timeline self);
 /**
- * The index of the slot in Skeleton::getSlots() that will be changed when this
+ * The Skeleton::getSlots() index of the slot that will be changed when this
  * timeline is applied.
  */
 SPINE_C_API int spine_slot_timeline_get_slot_index(spine_slot_timeline self);

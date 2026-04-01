@@ -47,7 +47,7 @@ class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkConstrai
 
 		bones = new Array<BonePose>();
 		for (boneData in data.bones)
-			bones.push(skeleton.bones[boneData.index].constrained);
+			bones.push(skeleton.bones[boneData.index].constrainedPose);
 		target = skeleton.bones[data.target.index];
 	}
 
@@ -59,10 +59,10 @@ class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkConstrai
 
 	/** Applies the constraint to the constrained bones. */
 	public function update(skeleton:Skeleton, physics:Physics):Void {
-		var p = applied;
+		var p = appliedPose;
 		if (p.mix == 0)
 			return;
-		var target = target.applied;
+		var target = target.appliedPose;
 		switch (bones.length) {
 			case 1:
 				apply1(skeleton, bones[0], target.worldX, target.worldY, p.compress, p.stretch, data.uniform, p.mix);
@@ -99,7 +99,7 @@ class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkConstrai
 		if (bone == null)
 			throw new SpineException("bone cannot be null.");
 		bone.modifyLocal(skeleton);
-		var p = bone.bone.parent.applied;
+		var p = bone.bone.parent.appliedPose;
 		var pa = p.a, pb = p.b, pc = p.c, pd = p.d;
 		var rotationIK = -bone.shearX - bone.rotation, tx = 0., ty = 0.;
 
@@ -198,7 +198,7 @@ class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkConstrai
 			cwx = a * child.x + b * child.y + parent.worldX;
 			cwy = c * child.x + d * child.y + parent.worldY;
 		}
-		var pp = parent.bone.parent.applied;
+		var pp = parent.bone.parent.appliedPose;
 		a = pp.a;
 		b = pp.b;
 		c = pp.c;

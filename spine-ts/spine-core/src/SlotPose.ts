@@ -27,18 +27,17 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+import type { DeformTimeline } from "./Animation.js";
 import type { Attachment } from "./attachments/Attachment.js";
 import { VertexAttachment } from "./attachments/Attachment.js";
 import type { Sequence } from "./attachments/Sequence.js";
 import type { Pose } from "./Pose.js";
 import { Color } from "./Utils.js";
 
-/** Stores a slot's pose. Slots organize attachments for {@link Skeleton#drawOrder} purposes and provide a place to store state
- * for an attachment. State cannot be stored in an attachment itself because attachments are stateless and may be shared across
- * multiple skeletons. */
+/** Stores a slot's pose. */
 export class SlotPose implements Pose<SlotPose> {
-	/** The color used to tint the slot's attachment. If {@link darkColor} is set, this is used as the light color for two
-	 * color tinting. */
+	/** The color used to tint the slot's attachment. If {@link darkColor} is set, this is used as the light color for two color
+	 * tinting. */
 	readonly color = new Color(1, 1, 1, 1);
 
 	/** The dark color used to tint the slot's attachment for two color tinting, or null if two color tinting is not used. The dark
@@ -49,13 +48,13 @@ export class SlotPose implements Pose<SlotPose> {
 	attachment: Attachment | null = null; // Not used in setup pose.
 
 	/** The index of the texture region to display when the slot's attachment has a {@link Sequence}. -1 represents the
-	 * {@link Sequence.getSetupIndex()}. */
+	 * {@link Sequence.getSetupIndex}. */
 	sequenceIndex = 0;
 
 	/** Values to deform the slot's attachment. For an unweighted mesh, the entries are local positions for each vertex. For a
 	 * weighted mesh, the entries are an offset for each vertex which will be added to the mesh's local vertex positions.
 	 *
-	 * See {@link VertexAttachment.computeWorldVertices()} and
+	 * See {@link VertexAttachment.computeWorldVertices} and
 	 * {@link DeformTimeline}. */
 	readonly deform = [] as number[];
 
@@ -77,8 +76,8 @@ export class SlotPose implements Pose<SlotPose> {
 		return this.attachment;
 	}
 
-	/** Sets the slot's attachment and, if the attachment changed, resets {@link #sequenceIndex} and clears the {@link #deform}.
-	 * The deform is not cleared if the old attachment has the same {@link VertexAttachment.getTimelineAttachment()} as the
+	/** Sets the slot's attachment and, if the attachment changed, resets {@link sequenceIndex} and clears the {@link deform}.
+	 * The deform is not cleared if the old attachment has the same {@link VertexAttachment.getTimelineAttachment} as the
 	 * specified attachment. */
 	setAttachment (attachment: Attachment | null): void {
 		if (this.attachment === attachment) return;

@@ -96,7 +96,7 @@ export class SkeletonJson {
 				if (parentName) parent = skeletonData.findBone(parentName);
 				const data = new BoneData(skeletonData.bones.length, boneMap.name, parent);
 				data.length = getValue(boneMap, "length", 0) * scale;
-				const setup = data.setup;
+				const setup = data.setupPose;
 				setup.x = getValue(boneMap, "x", 0) * scale;
 				setup.y = getValue(boneMap, "y", 0) * scale;
 				setup.rotation = getValue(boneMap, "rotation", 0);
@@ -125,10 +125,10 @@ export class SkeletonJson {
 				const data = new SlotData(skeletonData.slots.length, slotName, boneData);
 
 				const color: string = getValue(slotMap, "color", null);
-				if (color) data.setup.color.setFromString(color);
+				if (color) data.setupPose.color.setFromString(color);
 
 				const dark: string = getValue(slotMap, "dark", null);
-				if (dark) data.setup.darkColor = Color.fromString(dark);
+				if (dark) data.setupPose.darkColor = Color.fromString(dark);
 
 				data.attachmentName = getValue(slotMap, "attachment", null);
 				data.blendMode = Utils.enumValue(BlendMode, getValue(slotMap, "blend", "normal"));
@@ -159,7 +159,7 @@ export class SkeletonJson {
 						data.target = target;
 
 						data.uniform = getValue(constraintMap, "uniform", false);
-						const setup = data.setup;
+						const setup = data.setupPose;
 						setup.mix = getValue(constraintMap, "mix", 1);
 						setup.softness = getValue(constraintMap, "softness", 0) * scale;
 						setup.bendDirection = getValue(constraintMap, "bendPositive", true) ? 1 : -1;
@@ -250,7 +250,7 @@ export class SkeletonJson {
 						data.offsets[TransformConstraintData.SCALEY] = getValue(constraintMap, "scaleY", 0);
 						data.offsets[TransformConstraintData.SHEARY] = getValue(constraintMap, "shearY", 0);
 
-						const setup = data.setup;
+						const setup = data.setupPose;
 						if (rotate) setup.mixRotate = getValue(constraintMap, "mixRotate", 1);
 						if (x) setup.mixX = getValue(constraintMap, "mixX", 1);
 						if (y) setup.mixY = getValue(constraintMap, "mixY", setup.mixX);
@@ -281,7 +281,7 @@ export class SkeletonJson {
 						data.spacingMode = Utils.enumValue(SpacingMode, getValue(constraintMap, "spacingMode", "Length"));
 						data.rotateMode = Utils.enumValue(RotateMode, getValue(constraintMap, "rotateMode", "Tangent"));
 						data.offsetRotation = getValue(constraintMap, "rotation", 0);
-						const setup = data.setup;
+						const setup = data.setupPose;
 						setup.position = getValue(constraintMap, "position", 0);
 						if (data.positionMode === PositionMode.Fixed) setup.position *= scale;
 						setup.spacing = getValue(constraintMap, "spacing", 0);
@@ -309,7 +309,7 @@ export class SkeletonJson {
 						data.shearX = getValue(constraintMap, "shearX", 0);
 						data.limit = getValue(constraintMap, "limit", 5000) * scale;
 						data.step = 1 / getValue(constraintMap, "fps", 60);
-						const setup = data.setup;
+						const setup = data.setupPose;
 						setup.inertia = getValue(constraintMap, "inertia", 0.5);
 						setup.strength = getValue(constraintMap, "strength", 100);
 						setup.damping = getValue(constraintMap, "damping", 0.85);
@@ -334,8 +334,8 @@ export class SkeletonJson {
 
 						data.additive = getValue(constraintMap, "additive", false);
 						data.loop = getValue(constraintMap, "loop", false);
-						data.setup.time = getValue(constraintMap, "time", 0);
-						data.setup.mix = getValue(constraintMap, "mix", 1);
+						data.setupPose.time = getValue(constraintMap, "time", 0);
+						data.setupPose.mix = getValue(constraintMap, "mix", 1);
 
 						const boneName: string = constraintMap.bone;
 						if (boneName) {
@@ -449,13 +449,14 @@ export class SkeletonJson {
 			for (const eventName in root.events) {
 				const eventMap = root.events[eventName];
 				const data = new EventData(eventName);
-				data.intValue = getValue(eventMap, "int", 0);
-				data.floatValue = getValue(eventMap, "float", 0);
-				data.stringValue = getValue(eventMap, "string", "");
-				data.audioPath = getValue(eventMap, "audio", null);
+				const setup = data.setupPose;
+				setup.intValue = getValue(eventMap, "int", 0);
+				setup.floatValue = getValue(eventMap, "float", 0);
+				setup.stringValue = getValue(eventMap, "string", "");
+				data._audioPath = getValue(eventMap, "audio", null);
 				if (data.audioPath) {
-					data.volume = getValue(eventMap, "volume", 1);
-					data.balance = getValue(eventMap, "balance", 0);
+					setup.volume = getValue(eventMap, "volume", setup.volume);
+					setup.balance = getValue(eventMap, "balance", setup.balance);
 				}
 				skeletonData.events.push(data);
 			}
@@ -1211,15 +1212,16 @@ export class SkeletonJson {
 			let frame = 0;
 			for (let i = 0; i < map.events.length; i++, frame++) {
 				const eventMap = map.events[i];
-				const eventData = skeletonData.findEvent(eventMap.name);
-				if (!eventData) throw new Error(`Event not found: ${eventMap.name}`);
-				const event = new Event(Utils.toSinglePrecision(getValue(eventMap, "time", 0)), eventData);
-				event.intValue = getValue(eventMap, "int", eventData.intValue);
-				event.floatValue = getValue(eventMap, "float", eventData.floatValue);
-				event.stringValue = getValue(eventMap, "string", eventData.stringValue);
+				const data = skeletonData.findEvent(eventMap.name);
+				if (!data) throw new Error(`Event not found: ${eventMap.name}`);
+				const setup = data.setupPose;
+				const event = new Event(Utils.toSinglePrecision(getValue(eventMap, "time", 0)), data);
+				event.intValue = getValue(eventMap, "int", setup.intValue);
+				event.floatValue = getValue(eventMap, "float", setup.floatValue);
+				event.stringValue = getValue(eventMap, "string", setup.stringValue);
 				if (event.data.audioPath) {
-					event.volume = getValue(eventMap, "volume", 1);
-					event.balance = getValue(eventMap, "balance", 0);
+					event.volume = getValue(eventMap, "volume", setup.volume);
+					event.balance = getValue(eventMap, "balance", setup.volume);
 				}
 				timeline.setFrame(frame, event);
 			}

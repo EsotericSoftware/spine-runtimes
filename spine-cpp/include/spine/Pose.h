@@ -33,13 +33,14 @@
 #include <spine/SpineObject.h>
 
 namespace spine {
+	/// An interface for an object representing a pose.
 	template<class P>
 	class SP_API Pose : public SpineObject {
 	public:
 		Pose() {};
 		virtual ~Pose() {};
 
-		/// Sets the pose values.
+		/// Sets this pose to the specified pose.
 		virtual void set(P &pose) = 0;
 	};
 }

@@ -45,8 +45,8 @@ protected:
 	static void _bind_methods();
 
 public:
-	void apply(Ref<SpineSkeleton> skeleton, float last_time, float time, bool loop, Array events, float alpha, SpineConstant::MixBlend blend,
-			   SpineConstant::MixDirection direction, bool appliedPose);
+	void apply(Ref<SpineSkeleton> skeleton, float last_time, float time, bool loop, Array events, float alpha, bool from_setup, bool add, bool out,
+			   bool appliedPose);
 
 	Array get_timelines();
 

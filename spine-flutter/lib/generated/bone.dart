@@ -35,7 +35,6 @@ import '../spine_bindings.dart';
 import 'rtti.dart';
 import 'arrays.dart';
 import 'bone_data.dart';
-import 'bone_local.dart';
 import 'bone_pose.dart';
 import 'physics.dart';
 import 'posed.dart';
@@ -43,13 +42,14 @@ import 'posed_active.dart';
 import 'skeleton.dart';
 import 'update.dart';
 
-/// The current pose for a bone, before constraints are applied.
-///
-/// A bone has a local transform which is used to compute its world transform. A
-/// bone also has an applied transform, which is a local transform that can be
-/// applied to compute the world transform. The local transform and applied
-/// transform may differ if a constraint or application code modifies the world
-/// transform after it was computed from the local transform.
+/// A node in a skeleton's hierarchy with a transform that affects its children
+/// and their attachments. A bone has a number of poses: - getData(): The setup
+/// pose data. - getPose(): The unconstrained local pose. Set by animations and
+/// application code. - getAppliedPose(): The local pose to use for rendering.
+/// Possibly modified by constraints. - World transform: the local pose combined
+/// with the parent world transform. Computed on a pose by
+/// BonePose::updateWorldTransform(Skeleton) and
+/// Skeleton::updateWorldTransform(Physics).
 class Bone extends PosedActive implements Posed, Update {
   final Pointer<spine_bone_wrapper> _ptr;
 
@@ -66,7 +66,7 @@ class Bone extends PosedActive implements Posed, Update {
     return Bone.fromPointer(ptr);
   }
 
-  /// Copy constructor. Does not copy the children bones.
+  /// Copy constructor. Does not copy the child bones.
   factory Bone.from(Bone bone, Bone? parent) {
     final ptr = SpineBindings.bindings
         .spine_bone_create2(bone.nativePtr.cast(), parent?.nativePtr.cast() ?? Pointer.fromAddress(0));
@@ -110,27 +110,36 @@ class Bone extends PosedActive implements Posed, Update {
     SpineBindings.bindings.spine_bone_update(_ptr, skeleton.nativePtr.cast(), physics.value);
   }
 
-  /// The constraint's setup pose data.
+  /// The setup pose data. May be shared with multiple instances.
   BoneData get data {
     final result = SpineBindings.bindings.spine_bone_get_data(_ptr);
     return BoneData.fromPointer(result);
   }
 
-  BoneLocal get pose {
+  /// The unconstrained pose for this object, set by animations and application
+  /// code.
+  BonePose get pose {
     final result = SpineBindings.bindings.spine_bone_get_pose(_ptr);
-    return BoneLocal.fromPointer(result);
+    return BonePose.fromPointer(result);
   }
 
+  /// The pose to use for rendering. If no constraints modify this pose, this is
+  /// the same as getPose(). Otherwise it is a copy of getPose() modified by
+  /// constraints.
   BonePose get appliedPose {
     final result = SpineBindings.bindings.spine_bone_get_applied_pose(_ptr);
     return BonePose.fromPointer(result);
   }
 
+  /// Sets the constrained pose to the unconstrained pose, as a starting point
+  /// for constraints to be applied.
   @override
   void resetConstrained() {
     SpineBindings.bindings.spine_bone_reset_constrained(_ptr);
   }
 
+  /// Sets the applied pose to the constrained pose, in anticipation of the
+  /// applied pose being modified by constraints.
   @override
   void constrained() {
     SpineBindings.bindings.spine_bone_constrained(_ptr);

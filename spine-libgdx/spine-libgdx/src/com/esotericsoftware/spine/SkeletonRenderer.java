@@ -33,6 +33,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.ShortArray;
@@ -77,11 +78,12 @@ public class SkeletonRenderer {
 		float[] vertices = this.vertices.items;
 		Color skeletonColor = skeleton.color;
 		float r = skeletonColor.r, g = skeletonColor.g, b = skeletonColor.b, a = skeletonColor.a;
-		Slot[] drawOrder = skeleton.drawOrder.items;
-		for (int i = 0, n = skeleton.drawOrder.size; i < n; i++) {
-			Slot slot = drawOrder[i];
+		Array<Slot> drawOrder = skeleton.drawOrder.appliedPose;
+		Slot[] slots = drawOrder.items;
+		for (int i = 0, n = drawOrder.size; i < n; i++) {
+			Slot slot = slots[i];
 			if (!slot.bone.active) continue;
-			SlotPose pose = slot.applied;
+			SlotPose pose = slot.appliedPose;
 			Attachment attachment = pose.attachment;
 			if (attachment instanceof RegionAttachment region) {
 				Sequence sequence = region.getSequence();
@@ -146,11 +148,12 @@ public class SkeletonRenderer {
 		short[] triangles = null;
 		Color color = null, skeletonColor = skeleton.color;
 		float r = skeletonColor.r, g = skeletonColor.g, b = skeletonColor.b, a = skeletonColor.a;
-		Slot[] drawOrder = skeleton.drawOrder.items;
-		for (int i = 0, n = skeleton.drawOrder.size; i < n; i++) {
-			Slot slot = drawOrder[i];
+		Array<Slot> drawOrder = skeleton.drawOrder.appliedPose;
+		Slot[] slots = drawOrder.items;
+		for (int i = 0, n = drawOrder.size; i < n; i++) {
+			Slot slot = slots[i];
 			if (slot.bone.active) {
-				SlotPose pose = slot.applied;
+				SlotPose pose = slot.appliedPose;
 				Attachment attachment = pose.attachment;
 				if (attachment != null) {
 					Texture texture = null;
@@ -245,11 +248,12 @@ public class SkeletonRenderer {
 		short[] triangles = null;
 		Color color = null, skeletonColor = skeleton.color;
 		float r = skeletonColor.r, g = skeletonColor.g, b = skeletonColor.b, a = skeletonColor.a;
-		Slot[] drawOrder = skeleton.drawOrder.items;
-		for (int i = 0, n = skeleton.drawOrder.size; i < n; i++) {
-			Slot slot = drawOrder[i];
+		Array<Slot> drawOrder = skeleton.drawOrder.appliedPose;
+		Slot[] slots = drawOrder.items;
+		for (int i = 0, n = drawOrder.size; i < n; i++) {
+			Slot slot = slots[i];
 			if (slot.bone.active) {
-				SlotPose pose = slot.applied;
+				SlotPose pose = slot.appliedPose;
 				Attachment attachment = pose.attachment;
 				if (attachment != null) {
 					Texture texture = null;

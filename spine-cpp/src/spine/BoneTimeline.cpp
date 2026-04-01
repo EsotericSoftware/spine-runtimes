@@ -33,7 +33,7 @@
 #include <spine/Skeleton.h>
 #include <spine/Bone.h>
 #include <spine/BoneData.h>
-#include <spine/BoneLocal.h>
+#include <spine/BonePose.h>
 #include <spine/Property.h>
 
 using namespace spine;
@@ -51,16 +51,17 @@ BoneTimeline1::BoneTimeline1(size_t frameCount, size_t bezierCount, int boneInde
 	: CurveTimeline1(frameCount, bezierCount), BoneTimeline(boneIndex), _boneIndex(boneIndex) {
 	PropertyId ids[] = {((PropertyId) property << 32) | boneIndex};
 	setPropertyIds(ids, 1);
+	_additive = true;
 }
 
-void BoneTimeline1::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend, MixDirection direction,
+void BoneTimeline1::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
 						  bool appliedPose) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(events);
 
 	Bone *bone = skeleton._bones[_boneIndex];
 	if (bone->isActive()) {
-		_apply(appliedPose ? *bone->_applied : bone->_pose, bone->_data._setup, time, alpha, blend, direction);
+		_apply(appliedPose ? *bone->_appliedPose : bone->_pose, bone->_data._setupPose, time, alpha, fromSetup, add, out);
 	}
 }
 
@@ -70,16 +71,17 @@ BoneTimeline2::BoneTimeline2(size_t frameCount, size_t bezierCount, int boneInde
 	: CurveTimeline(frameCount, BoneTimeline2::ENTRIES, bezierCount), BoneTimeline(boneIndex), _boneIndex(boneIndex) {
 	PropertyId ids[] = {((PropertyId) property1 << 32) | boneIndex, ((PropertyId) property2 << 32) | boneIndex};
 	setPropertyIds(ids, 2);
+	_additive = true;
 }
 
-void BoneTimeline2::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend, MixDirection direction,
+void BoneTimeline2::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
 						  bool appliedPose) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(events);
 
 	Bone *bone = skeleton._bones[_boneIndex];
 	if (bone->isActive()) {
-		_apply(appliedPose ? *bone->_applied : bone->_pose, bone->_data._setup, time, alpha, blend, direction);
+		_apply(appliedPose ? *bone->_appliedPose : bone->_pose, bone->_data._setupPose, time, alpha, fromSetup, add, out);
 	}
 }
 

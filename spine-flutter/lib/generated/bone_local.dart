@@ -76,6 +76,7 @@ class BoneLocal {
     SpineBindings.bindings.spine_bone_local_set_y(_ptr, value);
   }
 
+  /// Sets local x and y translation.
   void setPosition(double x, double y) {
     SpineBindings.bindings.spine_bone_local_set_position(_ptr, x, y);
   }
@@ -140,10 +141,12 @@ class BoneLocal {
     SpineBindings.bindings.spine_bone_local_set_inherit(_ptr, value.value);
   }
 
+  /// Sets local scaleX and scaleY.
   void setScale(double scaleX, double scaleY) {
     SpineBindings.bindings.spine_bone_local_set_scale_1(_ptr, scaleX, scaleY);
   }
 
+  /// Sets local scaleX and scaleY to the same value.
   set scale2(double value) {
     SpineBindings.bindings.spine_bone_local_set_scale_2(_ptr, value);
   }

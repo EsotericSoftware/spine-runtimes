@@ -55,6 +55,7 @@
 #include <spine/ArrayUtils.h>
 #include <spine/CurveTimeline.h>
 #include <spine/DeformTimeline.h>
+#include <spine/DrawOrder.h>
 #include <spine/DrawOrderFolderTimeline.h>
 #include <spine/DrawOrderTimeline.h>
 #include <spine/Event.h>
@@ -73,8 +74,6 @@
 #include <spine/LinkedMesh.h>
 #include <spine/MathUtil.h>
 #include <spine/MeshAttachment.h>
-#include <spine/MixBlend.h>
-#include <spine/MixDirection.h>
 #include <spine/PathAttachment.h>
 #include <spine/PathConstraint.h>
 #include <spine/PathConstraintData.h>

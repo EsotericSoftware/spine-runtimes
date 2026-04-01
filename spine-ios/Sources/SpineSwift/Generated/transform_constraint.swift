@@ -32,7 +32,10 @@
 import Foundation
 import SpineC
 
-/// TransformConstraint wrapper
+/// Adjusts the world transform of the constrained bones to match that of the source bone.
+///
+/// See https://esotericsoftware.com/spine-transform-constraints Transform constraints in the Spine
+/// User Guide.
 @objc(SpineTransformConstraint)
 @objcMembers
 public class TransformConstraint: TransformConstraintBase {
@@ -54,7 +57,7 @@ public class TransformConstraint: TransformConstraintBase {
         return ArrayBonePose(fromPointer: result!)
     }
 
-    /// The bone whose world transform will be copied to the constrained bones.
+    /// The bone whose world transform will be matched by the constrained bones.
     public var source: Bone {
         get {
             let result = spine_transform_constraint_get_source(_ptr.assumingMemoryBound(to: spine_transform_constraint_wrapper.self))

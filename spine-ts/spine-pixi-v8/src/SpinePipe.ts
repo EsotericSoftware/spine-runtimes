@@ -87,12 +87,14 @@ export class SpinePipe implements RenderPipe<Spine> {
 		// if the textures have changed, we need to rebuild the batch, but only if the texture is not already in the batch
 		else if (spine.spineTexturesDirty) {
 			// loop through and see if the textures have changed..
-			const drawOrder = spine.skeleton.drawOrder;
+			const drawOrder = spine.skeleton.drawOrder.appliedPose;
 			const gpuSpine = this.gpuSpineData[spine.uid];
+
+			if (!gpuSpine) return false;
 
 			for (let i = 0, n = drawOrder.length; i < n; i++) {
 				const slot = drawOrder[i];
-				const attachment = slot.applied.attachment;
+				const attachment = slot.appliedPose.attachment;
 
 				if (attachment instanceof RegionAttachment || attachment instanceof MeshAttachment) {
 					const cacheData = spine._getCachedData(slot, attachment);
@@ -148,7 +150,7 @@ export class SpinePipe implements RenderPipe<Spine> {
 
 		const batcher = this.renderer.renderPipes.batch;
 
-		const drawOrder = spine.skeleton.drawOrder;
+		const drawOrder = spine.skeleton.drawOrder.appliedPose;
 
 		const roundPixels = (this.renderer._roundPixels | spine._roundPixels) as 0 | 1;
 
@@ -159,7 +161,7 @@ export class SpinePipe implements RenderPipe<Spine> {
 
 		for (let i = 0, n = drawOrder.length; i < n; i++) {
 			const slot = drawOrder[i];
-			const attachment = slot.applied.attachment;
+			const attachment = slot.appliedPose.attachment;
 			const blendMode = spineBlendModeMap[slot.data.blendMode];
 			let skipRender = false;
 
@@ -185,12 +187,10 @@ export class SpinePipe implements RenderPipe<Spine> {
 			if (containerAttachment) {
 				const container = containerAttachment.container;
 
-				if (!skipRender) {
-					container.includeInBuild = true;
-					// See https://github.com/pixijs/pixijs/blob/b4c050a791fe65e979e467c9cba2bda0c01a1c35/src/scene/container/utils/collectAllRenderables.ts#L28
-					// biome-ignore lint/style/noNonNullAssertion: it was in pixi code
-					container.collectRenderables(instructionSet, this.renderer, null!);
-				}
+				container.includeInBuild = true;
+				// See https://github.com/pixijs/pixijs/blob/b4c050a791fe65e979e467c9cba2bda0c01a1c35/src/scene/container/utils/collectAllRenderables.ts#L28
+				// biome-ignore lint/style/noNonNullAssertion: it was in pixi code
+				container.collectRenderables(instructionSet, this.renderer, null!);
 
 				container.includeInBuild = false;
 			}
@@ -200,16 +200,18 @@ export class SpinePipe implements RenderPipe<Spine> {
 	updateRenderable (spine: Spine) {
 		const gpuSpine = this.gpuSpineData[spine.uid];
 
+		if (!gpuSpine) return;
+
 		spine._validateAndTransformAttachments();
 
 		spine.spineAttachmentsDirty = false;
 		spine.spineTexturesDirty = false;
 
-		const drawOrder = spine.skeleton.drawOrder;
+		const drawOrder = spine.skeleton.drawOrder.appliedPose;
 
 		for (let i = 0, n = drawOrder.length; i < n; i++) {
 			const slot = drawOrder[i];
-			const attachment = slot.applied.attachment;
+			const attachment = slot.appliedPose.attachment;
 
 			if (attachment instanceof RegionAttachment || attachment instanceof MeshAttachment) {
 				const cacheData = spine._getCachedData(slot, attachment);

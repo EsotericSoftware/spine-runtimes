@@ -41,6 +41,7 @@
 #define VERSION_PATCH GODOT_VERSION_PATCH
 #endif
 
+#include <godot_cpp/classes/ref.hpp>
 #include <godot_cpp/classes/ref_counted.hpp>
 #include <godot_cpp/variant/string_name.hpp>
 using namespace godot;

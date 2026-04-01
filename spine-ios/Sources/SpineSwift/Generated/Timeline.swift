@@ -32,7 +32,9 @@
 import Foundation
 import SpineC
 
-/// Timeline wrapper
+/// The base class for all timelines.
+///
+/// See Applying Animations in the Spine Runtimes Guide.
 @objc(SpineTimeline)
 @objcMembers
 open class Timeline: NSObject {
@@ -46,6 +48,19 @@ open class Timeline: NSObject {
     public var rtti: Rtti {
         let result = spine_timeline_get_rtti(_ptr.assumingMemoryBound(to: spine_timeline_wrapper.self))
         return Rtti(fromPointer: result!)
+    }
+
+    /// True if this timeline supports additive blending.
+    public var additive: Bool {
+        let result = spine_timeline_get_additive(_ptr.assumingMemoryBound(to: spine_timeline_wrapper.self))
+        return result
+    }
+
+    /// True if this timeline sets values instantaneously and does not support interpolation between
+    /// frames.
+    public var instant: Bool {
+        let result = spine_timeline_get_instant(_ptr.assumingMemoryBound(to: spine_timeline_wrapper.self))
+        return result
     }
 
     public var frameEntries: Int {
@@ -73,24 +88,26 @@ open class Timeline: NSObject {
         return ArrayPropertyId(fromPointer: result!)
     }
 
-    /// Sets the value(s) for the specified time.
+    /// Applies this timeline to the skeleton.
     ///
-    /// - Parameter skeleton: The skeleton the timeline is being applied to. This provides access to the bones, slots, and other skeleton components the timeline may change.
-    /// - Parameter lastTime: lastTime The time this timeline was last applied. Timelines such as EventTimeline trigger only at specific times rather than every frame. In that case, the timeline triggers everything between lastTime (exclusive) and time (inclusive).
-    /// - Parameter time: The time within the animation. Most timelines find the key before and the key after this time so they can interpolate between the keys.
-    /// - Parameter events: If any events are fired, they are added to this array. Can be NULL to ignore firing events or if the timeline does not fire events. May be NULL.
-    /// - Parameter alpha: alpha 0 applies the current or setup pose value (depending on pose parameter). 1 applies the timeline value. Between 0 and 1 applies a value between the current or setup pose and the timeline value. By adjusting alpha over time, an animation can be mixed in or out. alpha can also be useful to apply animations on top of each other (layered).
-    /// - Parameter blend: Controls how mixing is applied when alpha is than 1.
-    /// - Parameter direction: Indicates whether the timeline is mixing in or out. Used by timelines which perform instant transitions such as DrawOrderTimeline and AttachmentTimeline.
-    /// - Parameter appliedPose: True to modify the applied pose.
+    /// See Applying Animations in the Spine Runtimes Guide.
+    ///
+    /// - Parameter skeleton: The skeleton the timeline is applied to. This provides access to the bones, slots, and other skeleton components the timelines may change.
+    /// - Parameter lastTime: The last time in seconds this timeline was applied. Some timelines trigger only at discrete times, in which case all keys are triggered between lastTime (exclusive) and time (inclusive). Pass -1 the first time a timeline is applied to ensure frame 0 is triggered.
+    /// - Parameter time: The time in seconds the skeleton is being posed for. Timelines find the frame before and after this time and interpolate between the frame values.
+    /// - Parameter events: If any events are fired, they are added to this list. Can be NULL to ignore fired events or if no timelines fire events.
+    /// - Parameter alpha: 0 applies setup or current values (depending on fromSetup), 1 uses timeline values, and intermediate values interpolate between them. Adjusting alpha over time can mix a timeline in or out.
+    /// - Parameter fromSetup: If true, alpha transitions between setup and timeline values, setup values are used before the first frame (current values are not used). If false, alpha transitions between current and timeline values, no change is made before the first frame.
+    /// - Parameter add: If true, for timelines that support it, their values are added to the setup or current values (depending on fromSetup).
+    /// - Parameter out: True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant transitions.
+    /// - Parameter appliedPose: True to modify getAppliedPose(), else getPose() is modified.
     public func apply(
-        _ skeleton: Skeleton, _ lastTime: Float, _ time: Float, _ events: ArrayEvent?, _ alpha: Float, _ blend: MixBlend, _ direction: MixDirection,
+        _ skeleton: Skeleton, _ lastTime: Float, _ time: Float, _ events: ArrayEvent?, _ alpha: Float, _ fromSetup: Bool, _ add: Bool, _ out: Bool,
         _ appliedPose: Bool
     ) {
         spine_timeline_apply(
             _ptr.assumingMemoryBound(to: spine_timeline_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self), lastTime,
-            time, events?._ptr.assumingMemoryBound(to: spine_array_event_wrapper.self), alpha, spine_mix_blend(rawValue: UInt32(blend.rawValue)),
-            spine_mix_direction(rawValue: UInt32(direction.rawValue)), appliedPose)
+            time, events?._ptr.assumingMemoryBound(to: spine_array_event_wrapper.self), alpha, fromSetup, add, out, appliedPose)
     }
 
     public static func rttiStatic() -> Rtti {

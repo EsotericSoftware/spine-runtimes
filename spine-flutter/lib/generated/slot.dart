@@ -38,8 +38,9 @@ import 'skeleton.dart';
 import 'slot_data.dart';
 import 'slot_pose.dart';
 
-/// Stores a slot's current pose. Slots organize attachments for Skeleton
-/// drawOrder purposes and provide a place to store state for an attachment.
+/// Organizes attachments for Skeleton drawOrder purposes and provide a place to
+/// store state for an attachment.
+///
 /// State cannot be stored in an attachment itself because attachments are
 /// stateless and may be shared across multiple skeletons.
 class Slot implements Posed {
@@ -70,27 +71,36 @@ class Slot implements Posed {
     SpineBindings.bindings.spine_slot_setup_pose(_ptr);
   }
 
-  /// The constraint's setup pose data.
+  /// The setup pose data. May be shared with multiple instances.
   SlotData get data {
     final result = SpineBindings.bindings.spine_slot_get_data(_ptr);
     return SlotData.fromPointer(result);
   }
 
+  /// The unconstrained pose for this object, set by animations and application
+  /// code.
   SlotPose get pose {
     final result = SpineBindings.bindings.spine_slot_get_pose(_ptr);
     return SlotPose.fromPointer(result);
   }
 
+  /// The pose to use for rendering. If no constraints modify this pose, this is
+  /// the same as getPose(). Otherwise it is a copy of getPose() modified by
+  /// constraints.
   SlotPose get appliedPose {
     final result = SpineBindings.bindings.spine_slot_get_applied_pose(_ptr);
     return SlotPose.fromPointer(result);
   }
 
+  /// Sets the constrained pose to the unconstrained pose, as a starting point
+  /// for constraints to be applied.
   @override
   void resetConstrained() {
     SpineBindings.bindings.spine_slot_reset_constrained(_ptr);
   }
 
+  /// Sets the applied pose to the constrained pose, in anticipation of the
+  /// applied pose being modified by constraints.
   @override
   void constrained() {
     SpineBindings.bindings.spine_slot_constrained(_ptr);

@@ -2,7 +2,7 @@
 	"name": "com.esotericsoftware.spine.spine-csharp",
 	"displayName": "spine-csharp Runtime",
 	"description": "This plugin provides the spine-csharp core runtime. Compatible with skeleton exports from Spine Editor version 4.3.40-beta or later.",
-	"version": "4.3.17",
+	"version": "4.3.18",
 	"unity": "2018.3",
 	"author": {
 		"name": "Esoteric Software",

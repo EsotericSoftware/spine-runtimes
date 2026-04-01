@@ -48,9 +48,9 @@ size_t spine_deform_timeline_get_frame_count(spine_deform_timeline self) {
 }
 
 void spine_deform_timeline_apply(spine_deform_timeline self, spine_skeleton skeleton, float lastTime, float time, /*@null*/ spine_array_event events,
-								 float alpha, spine_mix_blend blend, spine_mix_direction direction, bool appliedPose) {
+								 float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
 	DeformTimeline *_self = (DeformTimeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixBlend) blend, (MixDirection) direction, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
 }
 
 int spine_deform_timeline_get_slot_index(spine_deform_timeline self) {
@@ -81,6 +81,16 @@ float spine_deform_timeline_get_bezier_value(spine_deform_timeline self, float t
 spine_array_float spine_deform_timeline_get_curves(spine_deform_timeline self) {
 	DeformTimeline *_self = (DeformTimeline *) self;
 	return (spine_array_float) &_self->getCurves();
+}
+
+bool spine_deform_timeline_get_additive(spine_deform_timeline self) {
+	DeformTimeline *_self = (DeformTimeline *) self;
+	return _self->getAdditive();
+}
+
+bool spine_deform_timeline_get_instant(spine_deform_timeline self) {
+	DeformTimeline *_self = (DeformTimeline *) self;
+	return _self->getInstant();
 }
 
 size_t spine_deform_timeline_get_frame_entries(spine_deform_timeline self) {

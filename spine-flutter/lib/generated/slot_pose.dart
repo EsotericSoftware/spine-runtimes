@@ -43,7 +43,7 @@ import 'path_attachment.dart';
 import 'point_attachment.dart';
 import 'region_attachment.dart';
 
-/// SlotPose wrapper
+/// Stores a slot's pose.
 class SlotPose {
   final Pointer<spine_slot_pose_wrapper> _ptr;
 
@@ -65,8 +65,8 @@ class SlotPose {
     SpineBindings.bindings.spine_slot_pose_set(_ptr, pose.nativePtr.cast());
   }
 
-  /// The color used to tint the slot's attachment. If getDarkColor() is set,
-  /// this is used as the light color for two color tinting.
+  /// The color used to tint the slot's attachment. If a dark color is set, this
+  /// is used as the light color for two color tinting.
   Color get color {
     final result = SpineBindings.bindings.spine_slot_pose_get_color(_ptr);
     return Color.fromPointer(result);

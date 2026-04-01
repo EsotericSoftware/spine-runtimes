@@ -35,8 +35,6 @@ import spine.Skeleton;
 
 /** The base class for most spine.PhysicsConstraint timelines. */
 abstract class PhysicsConstraintTimeline extends ConstraintTimeline1 {
-	public var additive:Bool = false;
-
 	/**
 	 * @param constraintIndex -1 for all physics constraints in the skeleton.
 	 */
@@ -44,22 +42,23 @@ abstract class PhysicsConstraintTimeline extends ConstraintTimeline1 {
 		super(frameCount, bezierCount, constraintIndex, property);
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, blend:MixBlend, direction:MixDirection,
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
 			appliedPose:Bool) {
-		if (blend == MixBlend.add && !additive) blend = MixBlend.replace;
+		if (add && !this.additive)
+			add = false;
 		if (constraintIndex == -1) {
 			var value:Float = time >= frames[0] ? getCurveValue(time) : 0;
 			for (constraint in skeleton.physics) {
 				if (constraint.active && global(constraint.data)) {
-					var pose = appliedPose ? constraint.applied : constraint.pose;
-					set(pose, getAbsoluteValue2(time, alpha, blend, get(pose), get(constraint.data.setup), value));
+					var pose = appliedPose ? constraint.appliedPose : constraint.pose;
+					set(pose, getAbsoluteValue2(time, alpha, fromSetup, add, get(pose), get(constraint.data.setupPose), value));
 				}
 			}
 		} else {
 			var constraint = cast(skeleton.constraints[constraintIndex], PhysicsConstraint);
 			if (constraint.active) {
-				var pose = appliedPose ? constraint.applied : constraint.pose;
-				set(pose, getAbsoluteValue(time, alpha, blend, get(pose), get(constraint.data.setup)));
+				var pose = appliedPose ? constraint.appliedPose : constraint.pose;
+				set(pose, getAbsoluteValue(time, alpha, fromSetup, add, get(pose), get(constraint.data.setupPose)));
 			}
 		}
 	}

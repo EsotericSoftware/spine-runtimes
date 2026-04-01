@@ -46,18 +46,12 @@ ShearTimeline::ShearTimeline(size_t frameCount, size_t bezierCount, int boneInde
 	: BoneTimeline2(frameCount, bezierCount, boneIndex, Property_ShearX, Property_ShearY) {
 }
 
-void ShearTimeline::_apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, MixBlend blend, MixDirection direction) {
+void ShearTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
+	SP_UNUSED(out);
 	if (time < _frames[0]) {
-		switch (blend) {
-			case MixBlend_Setup:
-				pose._shearX = setup._shearX;
-				pose._shearY = setup._shearY;
-				return;
-			case MixBlend_First:
-				pose._shearX += (setup._shearX - pose._shearX) * alpha;
-				pose._shearY += (setup._shearY - pose._shearY) * alpha;
-			default: {
-			}
+		if (fromSetup) {
+			pose._shearX = setup._shearX;
+			pose._shearY = setup._shearY;
 		}
 		return;
 	}
@@ -86,19 +80,15 @@ void ShearTimeline::_apply(BoneLocal &pose, BoneLocal &setup, float time, float 
 		}
 	}
 
-	switch (blend) {
-		case MixBlend_Setup:
-			pose._shearX = setup._shearX + x * alpha;
-			pose._shearY = setup._shearY + y * alpha;
-			break;
-		case MixBlend_First:
-		case MixBlend_Replace:
-			pose._shearX += (setup._shearX + x - pose._shearX) * alpha;
-			pose._shearY += (setup._shearY + y - pose._shearY) * alpha;
-			break;
-		case MixBlend_Add:
-			pose._shearX += x * alpha;
-			pose._shearY += y * alpha;
+	if (fromSetup) {
+		pose._shearX = setup._shearX + x * alpha;
+		pose._shearY = setup._shearY + y * alpha;
+	} else if (add) {
+		pose._shearX += x * alpha;
+		pose._shearY += y * alpha;
+	} else {
+		pose._shearX += (setup._shearX + x - pose._shearX) * alpha;
+		pose._shearY += (setup._shearY + y - pose._shearY) * alpha;
 	}
 }
 
@@ -108,8 +98,9 @@ ShearXTimeline::ShearXTimeline(size_t frameCount, size_t bezierCount, int boneIn
 	: BoneTimeline1(frameCount, bezierCount, boneIndex, Property_ShearX) {
 }
 
-void ShearXTimeline::_apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, MixBlend blend, MixDirection direction) {
-	pose._shearX = getRelativeValue(time, alpha, blend, pose._shearX, setup._shearX);
+void ShearXTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
+	SP_UNUSED(out);
+	pose._shearX = getRelativeValue(time, alpha, fromSetup, add, pose._shearX, setup._shearX);
 }
 
 RTTI_IMPL(ShearYTimeline, BoneTimeline1)
@@ -118,6 +109,7 @@ ShearYTimeline::ShearYTimeline(size_t frameCount, size_t bezierCount, int boneIn
 	: BoneTimeline1(frameCount, bezierCount, boneIndex, Property_ShearY) {
 }
 
-void ShearYTimeline::_apply(BoneLocal &pose, BoneLocal &setup, float time, float alpha, MixBlend blend, MixDirection direction) {
-	pose._shearY = getRelativeValue(time, alpha, blend, pose._shearY, setup._shearY);
+void ShearYTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
+	SP_UNUSED(out);
+	pose._shearY = getRelativeValue(time, alpha, fromSetup, add, pose._shearY, setup._shearY);
 }

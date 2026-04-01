@@ -29,53 +29,69 @@
 
 package spine;
 
+/** The base class for an object with a number of poses:
+ * - data: The setup pose.
+ * - pose: The unconstrained pose. Set by animations and application code.
+ * - appliedPose: The pose to use for rendering. Possibly modified by constraints.
+ */
 abstract class Posed< //
 	D:PosedData<P>, //
-	P:Pose<Any>, //
-	A:P> {
-	/** The constraint's setup pose data. */
+	P:Pose<Any>> {
+	/** The setup pose data. May be shared with multiple instances. */
 	public final data:D;
 
-	public final pose:A;
-	public final constrained:A;
-	public var applied:A;
+	/** The unconstrained pose for this object, set by animations and application code. */
+	public final pose:P;
 
-	public function new(data:D, pose:A, constrained:A) {
+	public final constrainedPose:P;
+
+	/** The pose to use for rendering. If no constraints modify this pose, this is the same as pose. Otherwise it is a
+	 * copy of pose modified by constraints. */
+	public var appliedPose:P;
+
+	public function new(data:D, pose:P, constrainedPose:P) {
 		if (data == null)
 			throw new SpineException("data cannot be null.");
 		this.data = data;
 		this.pose = pose;
-		this.constrained = constrained;
-		applied = pose;
+		this.constrainedPose = constrainedPose;
+		appliedPose = pose;
 	}
 
-	/** The constraint's setup pose data. */
+	/** The setup pose data. May be shared with multiple instances. */
 	public function getData():D {
 		return data;
 	}
 
+	/** The unconstrained pose for this object, set by animations and application code. */
 	public function getPose():P {
 		return pose;
 	}
 
-	public function getAppliedPose():A {
-		return applied;
+	/** The pose to use for rendering. If no constraints modify this pose, this is the same as pose. Otherwise it is a
+	 * copy of pose modified by constraints. */
+	public function getAppliedPose():P {
+		return appliedPose;
 	}
 
+	/** Sets the unconstrained pose to the setup pose. */
 	public function setupPose():Void {
-		pose.set(data.setup);
+		pose.set(data.setupPose);
 	}
 
-	public function usePose():Void { // Port: usePose - reference runtime: pose()
-		applied = pose;
+	/** Sets the applied pose to the unconstrained pose, for when no constraints will modify the pose. */
+	public function unconstrained():Void {
+		appliedPose = pose;
 	}
 
-	public function useConstrained():Void { // Port: useConstrained - reference runtime: constrained()
-		applied = constrained;
+	/** Sets the applied pose to the constrained pose, in anticipation of the applied pose being modified by constraints. */
+	public function constrained():Void {
+		appliedPose = constrainedPose;
 	}
 
-	public function resetConstrained():Void { // Port: resetConstrained - reference runtime: reset()
-		constrained.set(pose);
+	/** Sets the constrained pose to the unconstrained pose, as a starting point for constraints to be applied. */
+	public function resetConstrained():Void {
+		constrainedPose.set(pose);
 	}
 
 	public function toString():String {

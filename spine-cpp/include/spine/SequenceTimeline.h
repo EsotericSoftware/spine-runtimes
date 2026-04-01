@@ -38,7 +38,7 @@ namespace spine {
 	class Attachment;
 	class HasTextureRegion;
 
-	/// Changes a slot's SlotPose::getSequenceIndex() for an attachment's Sequence.
+	/// Changes the sequence index for an attachment's Sequence.
 	class SP_API SequenceTimeline : public Timeline, public SlotTimeline {
 		friend class SkeletonBinary;
 
@@ -51,14 +51,17 @@ namespace spine {
 
 		virtual ~SequenceTimeline();
 
-		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixBlend blend,
-						   MixDirection direction, bool appliedPose) override;
+		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+						   bool appliedPose) override;
 
 		/// Sets the time, mode, index, and frame time for the specified frame.
 		/// @param frame Between 0 and frameCount, inclusive.
 		/// @param delay Seconds between frames.
 		void setFrame(int frame, float time, SequenceMode mode, int index, float delay);
 
+		/// The attachment for which the sequence index will be set.
+		///
+		/// See Attachment::getTimelineAttachment().
 		Attachment &getAttachment() {
 			return *(Attachment *) _attachment;
 		}

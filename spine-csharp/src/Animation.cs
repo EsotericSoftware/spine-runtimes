@@ -2018,7 +2018,8 @@ namespace Spine {
 
 	/// <summary>Changes a skeleton's <see cref="Skeleton.DrawOrder"/>.</summary>
 	public class DrawOrderTimeline : Timeline {
-		internal static readonly string[] propertyIds = { ((int)Property.DrawOrder).ToString() };
+		internal static readonly string propertyID = ((int)Property.DrawOrder).ToString();
+		internal static readonly string[] propertyIds = { propertyID };
 
 		readonly int[][] drawOrders;
 
@@ -2082,12 +2083,20 @@ namespace Spine {
 		/// <param name="slots"><see cref="Skeleton.Slots"/> indices controlled by this timeline, in setup order.</param>
 		/// <param name="slotCount">The maximum number of slots in the skeleton.</param>
 		public DrawOrderFolderTimeline (int frameCount, int[] slots, int slotCount)
-			: base(frameCount, DrawOrderTimeline.propertyIds) {
+			: base(frameCount, PropertyIdsFromSlots(slots)) {
 			this.slots = slots;
 			drawOrders = new int[frameCount][];
 			inFolder = new bool[slotCount];
 			foreach (int i in slots)
 				inFolder[i] = true;
+		}
+
+		static private string[] PropertyIdsFromSlots (int[] slots) {
+			int n = slots.Length;
+			string[] ids = new string[n];
+			for (int i = 0; i < n; i++)
+				ids[i] = "d" + slots[i];
+			return ids;
 		}
 
 		override public int FrameCount {

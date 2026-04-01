@@ -19,19 +19,14 @@ SPINE_C_API spine_rtti spine_bone_pose_get_rtti(spine_bone_pose self);
  */
 SPINE_C_API void spine_bone_pose_update(spine_bone_pose self, spine_skeleton skeleton, spine_physics physics);
 /**
- * Computes the world transform using the parent bone's applied pose and this
- * pose. Child bones are not updated.
+ * Computes the world transform using the parent bone's world transform and this
+ * applied local pose. Child bones are not updated.
  *
  * See World transforms in the Spine Runtimes Guide.
  */
 SPINE_C_API void spine_bone_pose_update_world_transform(spine_bone_pose self, spine_skeleton skeleton);
 /**
  * Computes the local transform values from the world transform.
- *
- * If the world transform is modified (by a constraint, rotateWorld(), etc) then
- * this method should be called so the local transform matches the world
- * transform. The local transform may be needed by other code (eg to apply
- * another constraint).
  *
  * Some information is ambiguous in the world transform, such as -1,-1 scale
  * versus 180 rotation. The local transform after calling this method is
@@ -40,49 +35,48 @@ SPINE_C_API void spine_bone_pose_update_world_transform(spine_bone_pose self, sp
  */
 SPINE_C_API void spine_bone_pose_update_local_transform(spine_bone_pose self, spine_skeleton skeleton);
 /**
- * If the world transform has been modified and the local transform no longer
- * matches, updateLocalTransform() is called.
+ * If the world transform has been modified by constraints and the local
+ * transform no longer matches, updateLocalTransform() is called. Call this
+ * after Skeleton::updateWorldTransform(Physics) before using the applied local
+ * transform.
  */
 SPINE_C_API void spine_bone_pose_validate_local_transform(spine_bone_pose self, spine_skeleton skeleton);
 SPINE_C_API void spine_bone_pose_modify_local(spine_bone_pose self, spine_skeleton skeleton);
 SPINE_C_API void spine_bone_pose_modify_world(spine_bone_pose self, int update);
 SPINE_C_API void spine_bone_pose_reset_world(spine_bone_pose self, int update);
 /**
- * Part of the world transform matrix for the X axis. If changed,
- * updateLocalTransform() should be called.
+ * The world transform [a b][c d] x-axis x component.
  */
 SPINE_C_API float spine_bone_pose_get_a(spine_bone_pose self);
 SPINE_C_API void spine_bone_pose_set_a(spine_bone_pose self, float a);
 /**
- * Part of the world transform matrix for the Y axis. If changed,
- * updateLocalTransform() should be called.
+ * The world transform [a b][c d] y-axis x component.
  */
 SPINE_C_API float spine_bone_pose_get_b(spine_bone_pose self);
 SPINE_C_API void spine_bone_pose_set_b(spine_bone_pose self, float b);
 /**
- * Part of the world transform matrix for the X axis. If changed,
- * updateLocalTransform() should be called.
+ * The world transform [a b][c d] x-axis y component.
  */
 SPINE_C_API float spine_bone_pose_get_c(spine_bone_pose self);
 SPINE_C_API void spine_bone_pose_set_c(spine_bone_pose self, float c);
 /**
- * Part of the world transform matrix for the Y axis. If changed,
- * updateLocalTransform() should be called.
+ * The world transform [a b][c d] y-axis y component.
  */
 SPINE_C_API float spine_bone_pose_get_d(spine_bone_pose self);
 SPINE_C_API void spine_bone_pose_set_d(spine_bone_pose self, float d);
 /**
- * The world X position. If changed, updateLocalTransform() should be called.
+ * The world X position.
  */
 SPINE_C_API float spine_bone_pose_get_world_x(spine_bone_pose self);
 SPINE_C_API void spine_bone_pose_set_world_x(spine_bone_pose self, float worldX);
 /**
- * The world Y position. If changed, updateLocalTransform() should be called.
+ * The world Y position.
  */
 SPINE_C_API float spine_bone_pose_get_world_y(spine_bone_pose self);
 SPINE_C_API void spine_bone_pose_set_world_y(spine_bone_pose self, float worldY);
 /**
- * The world rotation for the X axis, calculated using a and c.
+ * The world rotation for the X axis, calculated using a and c. This is the
+ * direction the bone is pointing.
  */
 SPINE_C_API float spine_bone_pose_get_world_rotation_x(spine_bone_pose self);
 /**
@@ -126,9 +120,6 @@ SPINE_C_API float spine_bone_pose_world_to_local_rotation(spine_bone_pose self, 
 SPINE_C_API float spine_bone_pose_local_to_world_rotation(spine_bone_pose self, float localRotation);
 /**
  * Rotates the world transform the specified amount.
- *
- * After changes are made to the world transform, updateLocalTransform() should
- * be called on this bone and any child bones, recursively.
  */
 SPINE_C_API void spine_bone_pose_rotate_world(spine_bone_pose self, float degrees);
 SPINE_C_API void spine_bone_pose_set(spine_bone_pose self, spine_bone_local pose);
@@ -142,6 +133,9 @@ SPINE_C_API void spine_bone_pose_set_x(spine_bone_pose self, float x);
  */
 SPINE_C_API float spine_bone_pose_get_y(spine_bone_pose self);
 SPINE_C_API void spine_bone_pose_set_y(spine_bone_pose self, float y);
+/**
+ * Sets local x and y translation.
+ */
 SPINE_C_API void spine_bone_pose_set_position(spine_bone_pose self, float x, float y);
 /**
  * The local rotation in degrees, counter clockwise.
@@ -158,7 +152,13 @@ SPINE_C_API void spine_bone_pose_set_scale_x(spine_bone_pose self, float scaleX)
  */
 SPINE_C_API float spine_bone_pose_get_scale_y(spine_bone_pose self);
 SPINE_C_API void spine_bone_pose_set_scale_y(spine_bone_pose self, float scaleY);
+/**
+ * Sets local scaleX and scaleY.
+ */
 SPINE_C_API void spine_bone_pose_set_scale_1(spine_bone_pose self, float scaleX, float scaleY);
+/**
+ * Sets local scaleX and scaleY to the same value.
+ */
 SPINE_C_API void spine_bone_pose_set_scale_2(spine_bone_pose self, float scale);
 /**
  * The local shearX.

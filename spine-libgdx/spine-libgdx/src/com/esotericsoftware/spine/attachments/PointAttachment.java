@@ -60,6 +60,7 @@ public class PointAttachment extends Attachment {
 		color.set(other.color);
 	}
 
+	/** The local x position. */
 	public float getX () {
 		return x;
 	}
@@ -68,6 +69,7 @@ public class PointAttachment extends Attachment {
 		this.x = x;
 	}
 
+	/** The local y position. */
 	public float getY () {
 		return y;
 	}
@@ -76,6 +78,7 @@ public class PointAttachment extends Attachment {
 		this.y = y;
 	}
 
+	/** The local rotation in degrees, counter clockwise. */
 	public float getRotation () {
 		return rotation;
 	}
@@ -90,12 +93,14 @@ public class PointAttachment extends Attachment {
 		return color;
 	}
 
+	/** Computes the world position from the local position. */
 	public Vector2 computeWorldPosition (BonePose bone, Vector2 point) {
 		point.x = x * bone.getA() + y * bone.getB() + bone.getWorldX();
 		point.y = x * bone.getC() + y * bone.getD() + bone.getWorldY();
 		return point;
 	}
 
+	/** Computes the world rotation from the local rotation. */
 	public float computeWorldRotation (BonePose bone) {
 		float r = rotation * degRad, cos = cos(r), sin = sin(r);
 		float x = cos * bone.getA() + sin * bone.getB();

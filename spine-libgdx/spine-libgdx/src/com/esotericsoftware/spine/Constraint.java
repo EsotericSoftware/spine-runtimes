@@ -5,7 +5,7 @@ abstract public class Constraint< //
 	T extends Constraint<T, D, P>, //
 	D extends ConstraintData<T, P>, //
 	P extends Pose> //
-	extends PosedActive<D, P, P> implements Update {
+	extends PosedActive<D, P> implements Update {
 
 	public Constraint (D data, P pose, P constrained) {
 		super(data, pose, constrained);

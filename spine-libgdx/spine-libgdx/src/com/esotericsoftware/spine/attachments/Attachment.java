@@ -31,7 +31,9 @@ package com.esotericsoftware.spine.attachments;
 
 import com.badlogic.gdx.utils.Null;
 
-/** The base class for all attachments. */
+import com.esotericsoftware.spine.Skeleton;
+
+/** The base class for all attachments. Multiple {@link Skeleton} instances, slots, or skins can use the same attachments. */
 abstract public class Attachment {
 	final String name;
 	@Null Attachment timelineAttachment;

@@ -46,8 +46,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-import com.esotericsoftware.spine.Animation.MixBlend;
-import com.esotericsoftware.spine.Animation.MixDirection;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
 /** Demonstrates rendering an animation to a frame buffer (FBO) and then writing each frame as a PNG. */
@@ -103,7 +101,7 @@ public class PngExportTest extends ApplicationAdapter {
 		float fps = 1 / 15f, time = 0;
 		int frame = 1;
 		while (time < animation.getDuration()) {
-			animation.apply(skeleton, time, time, false, null, 1, MixBlend.first, MixDirection.in, false);
+			animation.apply(skeleton, time, time, false, null, 1, true, false, false, false);
 			skeleton.update(fps);
 			skeleton.updateWorldTransform(Physics.update);
 

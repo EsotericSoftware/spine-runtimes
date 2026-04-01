@@ -43,6 +43,7 @@ public class PhysicsConstraintPose implements Pose<PhysicsConstraintPose> {
 		mix = pose.mix;
 	}
 
+	/** Controls how much bone movement is converted into physics movement. */
 	public float getInertia () {
 		return inertia;
 	}
@@ -51,6 +52,7 @@ public class PhysicsConstraintPose implements Pose<PhysicsConstraintPose> {
 		this.inertia = inertia;
 	}
 
+	/** The amount of force used to return properties to the unconstrained value. */
 	public float getStrength () {
 		return strength;
 	}
@@ -59,6 +61,7 @@ public class PhysicsConstraintPose implements Pose<PhysicsConstraintPose> {
 		this.strength = strength;
 	}
 
+	/** Reduces the speed of physics movements, with more of a reduction at higher speeds. */
 	public float getDamping () {
 		return damping;
 	}
@@ -67,6 +70,7 @@ public class PhysicsConstraintPose implements Pose<PhysicsConstraintPose> {
 		this.damping = damping;
 	}
 
+	/** Determines susceptibility to acceleration. */
 	public float getMassInverse () {
 		return massInverse;
 	}
@@ -75,6 +79,7 @@ public class PhysicsConstraintPose implements Pose<PhysicsConstraintPose> {
 		this.massInverse = massInverse;
 	}
 
+	/** Applies a constant force along the {@link Skeleton#windX}, {@link Skeleton#windY} vector. */
 	public float getWind () {
 		return wind;
 	}
@@ -83,6 +88,7 @@ public class PhysicsConstraintPose implements Pose<PhysicsConstraintPose> {
 		this.wind = wind;
 	}
 
+	/** Applies a constant force along the {@link Skeleton#gravityX}, {@link Skeleton#gravityY} vector. */
 	public float getGravity () {
 		return gravity;
 	}
@@ -91,7 +97,7 @@ public class PhysicsConstraintPose implements Pose<PhysicsConstraintPose> {
 		this.gravity = gravity;
 	}
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained poses. */
+	/** A percentage (0+) that controls the mix between the constrained and unconstrained poses. */
 	public float getMix () {
 		return mix;
 	}

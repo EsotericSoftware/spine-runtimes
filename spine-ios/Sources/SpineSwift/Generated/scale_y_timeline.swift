@@ -32,7 +32,7 @@
 import Foundation
 import SpineC
 
-/// Changes a bone's local BoneLocal::getScaleY().
+/// Changes a bone's local scaleY.
 @objc(SpineScaleYTimeline)
 @objcMembers
 public class ScaleYTimeline: BoneTimeline1 {
