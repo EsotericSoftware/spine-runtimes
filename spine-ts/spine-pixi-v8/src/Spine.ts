@@ -830,6 +830,10 @@ export class Spine extends ViewContainer {
 			container.setFromMatrix(matrix);
 
 			container.alpha = slotAlpha;
+			container.tint = 
+				((255 * this.skeleton.color.r * slot.color.r) << 16) |
+				((255 * this.skeleton.color.g * slot.color.g) << 8) |
+				((255 * this.skeleton.color.b * slot.color.b) << 0);
 		}
 	}
 
