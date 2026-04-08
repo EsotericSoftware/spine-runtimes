@@ -92,10 +92,10 @@ namespace Spine {
 		/// May be null.</summary>
 		public string Hash { get { return hash; } set { hash = value; } }
 
+		/// <summary>The path to the images folder as defined in Spine, or null if nonessential data was not exported.</summary>
 		public string ImagesPath { get { return imagesPath; } set { imagesPath = value; } }
 
-		/// <summary> The path to the audio directory as defined in Spine. Available only when nonessential data was exported.
-		/// May be null.</summary>
+		/// <summary>The path to the audio folder as defined in Spine, or null if nonessential data was not exported.</summary>
 		public string AudioPath { get { return audioPath; } set { audioPath = value; } }
 
 		/// <summary>The dopesheet FPS in Spine, or zero if nonessential data was not exported.</summary>
@@ -177,6 +177,9 @@ namespace Spine {
 		}
 
 		// --- Constraints
+		/// <summary>Finds a constraint of the specified type by comparing each constraint's name. It is more efficient to cache the
+		/// results of this method than to call it multiple times.</summary>
+		/// <returns>May be null.</returns>
 		public T FindConstraint<T> (String constraintName) where T : class, IConstraintData {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
 			IConstraintData[] constraints = this.constraints.Items;

@@ -780,6 +780,7 @@ namespace Spine.Unity.Editor {
 			if (selection == null) return null;
 
 			PropertyInfo animationClipProperty = selection.GetType().GetProperty("animationClip");
+			if (animationClipProperty == null) return null;
 			return animationClipProperty.GetValue(selection, null) as AnimationClip;
 		}
 

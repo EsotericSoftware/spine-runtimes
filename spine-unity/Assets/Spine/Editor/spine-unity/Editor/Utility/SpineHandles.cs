@@ -276,7 +276,7 @@ namespace Spine.Unity.Editor {
 		public static void DrawPaths (Transform transform, Skeleton skeleton) {
 			if (UnityEngine.Event.current.type != EventType.Repaint) return;
 
-			foreach (Slot s in skeleton.DrawOrder) {
+			foreach (Slot s in skeleton.DrawOrder.AppliedPose) {
 				PathAttachment p = s.AppliedPose.Attachment as PathAttachment;
 				if (p != null) SpineHandles.DrawPath(skeleton, s, p, transform, true);
 			}

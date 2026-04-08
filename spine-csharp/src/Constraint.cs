@@ -45,7 +45,7 @@ namespace Spine {
 	/// <para>
 	/// See <a href="http://esotericsoftware.com/spine-ik-constraints">IK constraints</a> in the Spine User Guide.</para>
 	/// </summary>
-	public abstract class Constraint<T, D, P> : PosedActive<D, P, P>, IUpdate, IConstraint
+	public abstract class Constraint<T, D, P> : PosedActive<D, P>, IUpdate, IConstraint
 		where T : Constraint<T, D, P>
 		where D : ConstraintData<T, P>
 		where P : IPose<P> {

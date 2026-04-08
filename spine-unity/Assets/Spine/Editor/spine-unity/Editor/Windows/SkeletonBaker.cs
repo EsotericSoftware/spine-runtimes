@@ -239,8 +239,8 @@ namespace Spine.Unity.Editor {
 						List<Skin.SkinEntry> skinEntries = new List<Skin.SkinEntry>();
 						skin.GetAttachments(s, skinEntries);
 						foreach (Skin.SkinEntry entry in skinEntries) {
-							if (!attachmentNames.Contains(entry.Name))
-								attachmentNames.Add(entry.Name);
+							if (!attachmentNames.Contains(entry.PlaceholderName))
+								attachmentNames.Add(entry.PlaceholderName);
 						}
 					}
 					slotLookup.Add(s, attachmentNames);
@@ -361,7 +361,7 @@ namespace Spine.Unity.Editor {
 
 					for (int a = 0; a < skinEntries.Count; a++) {
 						Attachment attachment = skinEntries[a].Attachment;
-						string attachmentName = skinEntries[a].Name;
+						string attachmentName = skinEntries[a].PlaceholderName;
 						string attachmentMeshName = "[" + slotData.Name + "] " + attachmentName;
 						Vector3 offset = Vector3.zero;
 						float rotation = 0;
@@ -849,7 +849,7 @@ namespace Spine.Unity.Editor {
 		static void BakeBoneConstraints (Skeleton skeleton, Bone bone, Spine.Animation animation, AnimationClip clip) {
 			bool inheritRotation = bone.Pose.Inherit.InheritsRotation();
 
-			animation.Apply(skeleton, 0, 0, false, null, 1f, MixBlend.Setup, MixDirection.In, false);
+			animation.Apply(skeleton, 0, 0, false, null, 1f, true, false, false, false);
 			skeleton.UpdateWorldTransform(Physics.Update);
 			float duration = animation.Duration;
 
@@ -877,7 +877,7 @@ namespace Spine.Unity.Editor {
 				if (i == steps)
 					currentTime = duration;
 
-				animation.Apply(skeleton, 0, currentTime, true, null, 1f, MixBlend.Setup, MixDirection.In, false);
+				animation.Apply(skeleton, 0, currentTime, true, null, 1f, true, false, false, false);
 				skeleton.UpdateWorldTransform(Physics.Update);
 
 				int pIndex = listIndex;
@@ -969,7 +969,7 @@ namespace Spine.Unity.Editor {
 
 					currentTime = time;
 
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In, false);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, true, false, false, false);
 
 					lastTime = time;
 					listIndex++;
@@ -996,7 +996,7 @@ namespace Spine.Unity.Editor {
 
 					currentTime = time;
 
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In, false);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, true, false, false, false);
 
 					lastTime = time;
 					listIndex++;
@@ -1014,7 +1014,7 @@ namespace Spine.Unity.Editor {
 						if (i == steps)
 							currentTime = time;
 
-						timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In, false);
+						timeline.Apply(skeleton, lastTime, currentTime, null, 1, true, false, false, false);
 
 						px = xKeys[listIndex];
 						py = yKeys[listIndex];
@@ -1096,7 +1096,7 @@ namespace Spine.Unity.Editor {
 
 					keys[pIndex] = p;
 					currentTime = time;
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In, false);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, true, false, false, false);
 
 					lastTime = time;
 					listIndex++;
@@ -1112,7 +1112,7 @@ namespace Spine.Unity.Editor {
 
 					keys[pIndex] = p;
 					currentTime = time;
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In, false);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, true, false, false, false);
 
 					lastTime = time;
 					listIndex++;
@@ -1129,7 +1129,7 @@ namespace Spine.Unity.Editor {
 						if (i == steps)
 							currentTime = time;
 
-						timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In, false);
+						timeline.Apply(skeleton, lastTime, currentTime, null, 1, true, false, false, false);
 
 						p = keys[listIndex];
 						float boneOffset = isXTimeline ? bonePose.X : bonePose.Y;
@@ -1208,7 +1208,7 @@ namespace Spine.Unity.Editor {
 
 					currentTime = time;
 
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In, false);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, true, false, false, false);
 
 					lastTime = time;
 					listIndex++;
@@ -1235,7 +1235,7 @@ namespace Spine.Unity.Editor {
 
 					currentTime = time;
 
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In, false);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, true, false, false, false);
 
 					lastTime = time;
 					listIndex++;
@@ -1253,7 +1253,7 @@ namespace Spine.Unity.Editor {
 						if (i == steps)
 							currentTime = time;
 
-						timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In, false);
+						timeline.Apply(skeleton, lastTime, currentTime, null, 1, true, false, false, false);
 
 						px = xKeys[listIndex];
 						py = yKeys[listIndex];
@@ -1330,7 +1330,7 @@ namespace Spine.Unity.Editor {
 
 					keys[pIndex] = p;
 					currentTime = time;
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In, false);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, true, false, false, false);
 
 					lastTime = time;
 					listIndex++;
@@ -1346,7 +1346,7 @@ namespace Spine.Unity.Editor {
 
 					keys[pIndex] = p;
 					currentTime = time;
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In, false);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, true, false, false, false);
 
 					lastTime = time;
 					listIndex++;
@@ -1361,7 +1361,7 @@ namespace Spine.Unity.Editor {
 						if (i == steps)
 							currentTime = time;
 
-						timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In, false);
+						timeline.Apply(skeleton, lastTime, currentTime, null, 1, true, false, false, false);
 
 						p = keys[listIndex];
 
@@ -1438,7 +1438,7 @@ namespace Spine.Unity.Editor {
 
 					currentTime = time;
 
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In, false);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, true, false, false, false);
 
 					lastTime = time;
 					listIndex++;
@@ -1463,7 +1463,7 @@ namespace Spine.Unity.Editor {
 
 					currentTime = time;
 
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In, false);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, true, false, false, false);
 
 					lastTime = time;
 					listIndex++;
@@ -1473,7 +1473,7 @@ namespace Spine.Unity.Editor {
 
 					float time = frames[f];
 
-					timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In, false);
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, true, false, false, false);
 					skeleton.UpdateWorldTransform(Physics.Update);
 
 					rotation = frames[f + 1] + setup.Rotation;
@@ -1487,7 +1487,7 @@ namespace Spine.Unity.Editor {
 						if (i == steps)
 							currentTime = time;
 
-						timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In, false);
+						timeline.Apply(skeleton, lastTime, currentTime, null, 1, true, false, false, false);
 						skeleton.UpdateWorldTransform(Physics.Update);
 						pk = keys[listIndex];
 

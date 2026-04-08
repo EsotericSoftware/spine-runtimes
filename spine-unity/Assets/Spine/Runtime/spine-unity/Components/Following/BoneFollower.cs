@@ -253,7 +253,8 @@ namespace Spine.Unity {
 		}
 
 		float GetAttachmentZPosition () {
-			int boneIndex = skeletonRenderer.Skeleton.DrawOrder.FindIndex(slot => slot.Bone == bone);
+			var drawOrderPose = skeletonRenderer.Skeleton.DrawOrder.Pose;
+			int boneIndex = drawOrderPose.FindIndex(slot => slot.Bone == bone);
 			if (boneIndex < 0) return 0f;
 			return skeletonRenderer.zSpacing * boneIndex;
 		}

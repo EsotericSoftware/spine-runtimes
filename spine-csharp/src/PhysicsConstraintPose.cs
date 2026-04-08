@@ -47,13 +47,19 @@ namespace Spine {
 			mix = pose.mix;
 		}
 
+		/// <summary>Controls how much bone movement is converted into physics movement.</summary>
 		public float Inertia { get { return inertia; } set { inertia = value; } }
+		/// <summary>The amount of force used to return properties to the unconstrained value.</summary>
 		public float Strength { get { return strength; } set { strength = value; } }
+		/// <summary>Reduces the speed of physics movements, with more of a reduction at higher speeds.</summary>
 		public float Damping { get { return damping; } set { damping = value; } }
+		/// <summary>Determines susceptibility to acceleration.</summary>
 		public float MassInverse { get { return massInverse; } set { massInverse = value; } }
+		/// <summary>Applies a constant force along the <see cref="Skeleton.WindX"/>, <see cref="Skeleton.WindY"/> vector.</summary>
 		public float Wind { get { return wind; } set { wind = value; } }
+		/// <summary>Applies a constant force along the <see cref="Skeleton.GravityX"/>, <see cref="Skeleton.GravityY"/> vector.</summary>
 		public float Gravity { get { return gravity; } set { gravity = value; } }
-		/// <summary>A percentage (0-1) that controls the mix between the constrained and unconstrained poses.</summary>
+		/// <summary>A percentage (0+) that controls the mix between the constrained and unconstrained poses.</summary>
 		public float Mix { get { return mix; } set { mix = value; } }
 	}
 }

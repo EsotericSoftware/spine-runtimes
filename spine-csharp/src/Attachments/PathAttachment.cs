@@ -39,8 +39,8 @@ namespace Spine {
 		public float[] Lengths { get { return lengths; } set { lengths = value; } }
 		/// <summary>If true, the start and end knots are connected.</summary>
 		public bool Closed { get { return closed; } set { closed = value; } }
-		/// <summary>If true, additional calculations are performed to make computing positions along the path more accurate and movement along
-		/// the path have a constant speed.</summary>
+		/// <summary>If true, additional calculations are performed to make computing positions along the path more accurate so movement along
+		/// the path has a constant speed.</summary>
 		public bool ConstantSpeed { get { return constantSpeed; } set { constantSpeed = value; } }
 
 		public PathAttachment (String name)

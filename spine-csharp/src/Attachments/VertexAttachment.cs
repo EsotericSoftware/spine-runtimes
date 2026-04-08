@@ -30,7 +30,7 @@
 using System;
 
 namespace Spine {
-	/// <summary>>An attachment with vertices that are transformed by one or more bones and can be deformed by a slot's
+	/// <summary>Base class for an attachment with vertices that are transformed by one or more bones and can be deformed by
 	/// <see cref="SlotPose.Deform"/>.</summary>
 	public abstract class VertexAttachment : Attachment {
 		static int nextID = 0;
@@ -43,7 +43,13 @@ namespace Spine {
 
 		/// <summary>Gets a unique ID for this attachment.</summary>
 		public int Id { get { return id; } }
+		/// <summary>The bones that affect the <see cref="Vertices"/>. The entries are, for each vertex, the number of bones affecting the
+		/// vertex followed by that many bone indices, which is <see cref="Skeleton.Bones"/> index. Null if this attachment has no
+		/// weights.</summary>
 		public int[] Bones { get { return bones; } set { bones = value; } }
+		/// <summary>The vertex positions in the bone's coordinate system. For a non-weighted attachment, the values are <c>x,y</c> pairs
+		/// for each vertex. For a weighted attachment, the values are <c>x,y,weight</c> triplets for each bone affecting each
+		/// vertex.</summary>
 		public float[] Vertices { get { return vertices; } set { vertices = value; } }
 		public int WorldVerticesLength { get { return worldVerticesLength; } set { worldVerticesLength = value; } }
 
@@ -83,7 +89,7 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// Transforms the attachment's local <see cref="Vertices"/> to world coordinates. If the slot's <see cref="SlotPose.Deform"/>
+		/// Transforms the attachment's local <see cref="Vertices"/> to world coordinates. If <see cref="SlotPose.Deform"/>
 		/// is not empty, it is used to deform the vertices.
 		/// <para />
 		/// See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine

@@ -32,11 +32,13 @@ using System;
 namespace Spine {
 
 	/// <summary>
-	/// An AttachmentLoader that configures attachments using texture regions from an Atlas.
+	/// An <see cref="AttachmentLoader"/> that configures attachments using texture regions from an <see cref="Atlas"/>.
 	/// See <a href='http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data'>Loading Skeleton Data</a> in the Spine Runtimes Guide.
 	/// </summary>
 	public class AtlasAttachmentLoader : AttachmentLoader {
 		private Atlas[] atlasArray;
+		/// <summary>If true, <see cref="FindRegion(string, string)"/> may return null. If false, an error is raised if the texture region is not
+		/// found. Default is false.</summary>
 		public bool allowMissingRegions;
 
 		public AtlasAttachmentLoader (params Atlas[] atlasArray)
@@ -49,6 +51,8 @@ namespace Spine {
 			this.allowMissingRegions = allowMissingRegions;
 		}
 
+		/// <summary>Sets each <see cref="Sequence.Regions"/> by calling <see cref="FindRegion(string, string)"/> for each texture region using
+		/// <see cref="Sequence.GetPath(string, int)"/>.</summary>
 		protected void FindRegions (string name, string basePath, Sequence sequence) {
 			TextureRegion[] regions = sequence.Regions;
 			for (int i = 0, n = regions.Length; i < n; i++) {
@@ -56,6 +60,8 @@ namespace Spine {
 			}
 		}
 
+		/// <summary>Looks for the region with the specified path. If not found and <see cref="allowMissingRegions"/> is false, an error is
+		/// raised.</summary>
 		protected AtlasRegion FindRegion (string name, string path) {
 			for (int i = 0; i < atlasArray.Length; i++) {
 				AtlasRegion region = atlasArray[i].FindRegion(path);

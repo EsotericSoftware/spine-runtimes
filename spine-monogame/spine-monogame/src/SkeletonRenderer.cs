@@ -112,8 +112,8 @@ namespace Spine {
 		}
 
 		public void Draw (Skeleton skeleton) {
-			var drawOrder = skeleton.DrawOrder;
-			var drawOrderItems = skeleton.DrawOrder.Items;
+			var drawOrder = skeleton.DrawOrder.AppliedPose;
+			var drawOrderItems = drawOrder.Items;
 			Color32F skeletonColor = skeleton.GetColor();
 
 			if (VertexEffect != null) VertexEffect.Begin(skeleton);

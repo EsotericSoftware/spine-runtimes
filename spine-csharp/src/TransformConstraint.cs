@@ -35,8 +35,7 @@ namespace Spine {
 
 	/// <summary>
 	/// <para>
-	/// Stores the current pose for a transform constraint. A transform constraint adjusts the world transform of the constrained
-	/// bones to match that of the source bone.</para>
+	/// Adjusts the world transform of the constrained bones to match that of the source bone.</para>
 	/// <para>
 	/// See <a href="http://esotericsoftware.com/spine-transform-constraints">Transform constraints</a> in the Spine User Guide.</para>
 	/// </summary>
@@ -50,7 +49,7 @@ namespace Spine {
 
 			bones = new ExposedList<BonePose>(data.bones.Count);
 			foreach (BoneData boneData in data.bones)
-				bones.Add(skeleton.bones.Items[boneData.index].constrained);
+				bones.Add(skeleton.bones.Items[boneData.index].constrainedPose);
 
 			source = skeleton.bones.Items[data.source.index];
 		}
@@ -63,13 +62,13 @@ namespace Spine {
 
 		/// <summary>Applies the constraint to the constrained bones.</summary>
 		override public void Update (Skeleton skeleton, Physics physics) {
-			TransformConstraintPose p = applied;
+			TransformConstraintPose p = appliedPose;
 			if (p.mixRotate == 0 && p.mixX == 0 && p.mixY == 0 && p.mixScaleX == 0 && p.mixScaleY == 0 && p.mixShearY == 0) return;
 
 			TransformConstraintData data = this.data;
 			bool localSource = data.localSource, localTarget = data.localTarget, additive = data.additive, clamp = data.clamp;
 			float[] offsets = data.offsets;
-			BonePose source = this.source.applied;
+			BonePose source = this.source.appliedPose;
 			if (localSource) source.ValidateLocalTransform(skeleton);
 			FromProperty[] fromItems = data.properties.Items;
 			int fn = data.properties.Count, update = skeleton.update;

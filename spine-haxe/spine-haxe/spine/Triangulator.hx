@@ -76,23 +76,20 @@ class Triangulator {
 					var p1x:Float = vertices[p1], p1y:Float = vertices[p1 + 1];
 					var p2x:Float = vertices[p2], p2y:Float = vertices[p2 + 1];
 					var p3x:Float = vertices[p3], p3y:Float = vertices[p3 + 1];
-					var ii:Int = (next + 1) % vertexCount;
+					var ii:Int = next + 1 < vertexCount ? next + 1 : 0;
 					while (ii != previous) {
-						if (!isConcaveArray[ii]) {
-							ii = (ii + 1) % vertexCount;
-							continue;
+						if (isConcaveArray[ii]) {
+							var v:Int = indicesArray[ii] << 1;
+							var vx:Float = vertices[v];
+							var vy:Float = vertices[v + 1];
+							if (positiveArea(p3x, p3y, p1x, p1y, vx, vy)
+								&& positiveArea(p1x, p1y, p2x, p2y, vx, vy)
+								&& positiveArea(p2x, p2y, p3x, p3y, vx, vy))
+								break;
 						}
-						var v:Int = indicesArray[ii] << 1;
-						var vx:Float = vertices[v];
-						var vy:Float = vertices[v + 1];
-						if (positiveArea(p3x, p3y, p1x, p1y, vx, vy)) {
-							if (positiveArea(p1x, p1y, p2x, p2y, vx, vy)) {
-								if (positiveArea(p2x, p2y, p3x, p3y, vx, vy)) {
-									break;
-								}
-							}
-						}
-						ii = (ii + 1) % vertexCount;
+						ii++;
+						if (ii == vertexCount)
+							ii = 0;
 					}
 					break;
 				}
@@ -103,34 +100,36 @@ class Triangulator {
 							break;
 						i--;
 					} while (i > 0);
+					previous = i > 0 ? i - 1 : vertexCount - 1;
+					next = i + 1 < vertexCount ? i + 1 : 0;
 					break;
 				}
 
 				previous = i;
 				i = next;
-				next = (next + 1) % vertexCount;
+				next++;
+				if (next == vertexCount)
+					next = 0;
 			}
 
 			// Cut ear tip.
-			triangles.push(indicesArray[(vertexCount + i - 1) % vertexCount]);
+			triangles.push(indicesArray[previous]);
 			triangles.push(indicesArray[i]);
-			triangles.push(indicesArray[(i + 1) % vertexCount]);
+			triangles.push(indicesArray[next]);
 			indicesArray.splice(i, 1);
 			isConcaveArray.splice(i, 1);
 			vertexCount--;
 
-			var previousIndex:Int = (vertexCount + i - 1) % vertexCount;
-			var nextIndex:Int = i == vertexCount ? 0 : i;
+			var previousIndex:Int = i > 0 ? i - 1 : vertexCount - 1;
+			var nextIndex:Int = i < vertexCount ? i : 0;
 			isConcaveArray[previousIndex] = isConcave(previousIndex, vertexCount, vertices, indicesArray);
 			isConcaveArray[nextIndex] = isConcave(nextIndex, vertexCount, vertices, indicesArray);
 		}
-
 		if (vertexCount == 3) {
 			triangles.push(indicesArray[2]);
 			triangles.push(indicesArray[0]);
 			triangles.push(indicesArray[1]);
 		}
-
 		return triangles;
 	}
 
@@ -160,7 +159,7 @@ class Triangulator {
 		// Merge subsequent triangles if they form a triangle fan.
 		var fanBaseIndex:Int = -1, lastWinding:Int = 0;
 		var x1:Float, y1:Float, x2:Float, y2:Float, x3:Float, y3:Float;
-		var winding1:Int, winding2:Int, o:Int;
+		var o:Int;
 		var i:Int = 0;
 		while (i < triangles.length) {
 			var t1:Int = triangles[i] << 1,
@@ -174,44 +173,38 @@ class Triangulator {
 			y3 = vertices[t3 + 1];
 
 			// If the base of the last triangle is the same as this triangle, check if they form a convex polygon (triangle fan).
-			var merged:Bool = false;
 			if (fanBaseIndex == t1) {
 				o = polygon.length - 4;
-				winding1 = Triangulator.winding(polygon[o], polygon[o + 1], polygon[o + 2], polygon[o + 3], x3, y3);
-				winding2 = Triangulator.winding(x3, y3, polygon[0], polygon[1], polygon[2], polygon[3]);
-				if (winding1 == lastWinding && winding2 == lastWinding) {
+				if (Triangulator.winding(polygon[o], polygon[o + 1], polygon[o + 2], polygon[o + 3], x3, y3) == lastWinding
+					&& Triangulator.winding(x3, y3, polygon[0], polygon[1], polygon[2], polygon[3]) == lastWinding) {
 					polygon.push(x3);
 					polygon.push(y3);
 					polygonIndices.push(t3);
-					merged = true;
+					i += 3;
+					continue;
 				}
 			}
 
 			// Otherwise make this triangle the new base.
-			if (!merged) {
-				if (polygon.length > 0) {
-					convexPolygons.push(polygon);
-					convexPolygonsIndices.push(polygonIndices);
-				} else {
-					polygonPool.free(polygon);
-					polygonIndicesPool.free(polygonIndices);
-				}
+			if (polygon.length > 0) {
+				convexPolygons.push(polygon);
+				convexPolygonsIndices.push(polygonIndices);
 				polygon = polygonPool.obtain();
-				polygon.resize(0);
-				polygon.push(x1);
-				polygon.push(y1);
-				polygon.push(x2);
-				polygon.push(y2);
-				polygon.push(x3);
-				polygon.push(y3);
 				polygonIndices = polygonIndicesPool.obtain();
-				polygonIndices.resize(0);
-				polygonIndices.push(t1);
-				polygonIndices.push(t2);
-				polygonIndices.push(t3);
-				lastWinding = Triangulator.winding(x1, y1, x2, y2, x3, y3);
-				fanBaseIndex = t1;
 			}
+			polygon.resize(0);
+			polygon.push(x1);
+			polygon.push(y1);
+			polygon.push(x2);
+			polygon.push(y2);
+			polygon.push(x3);
+			polygon.push(y3);
+			polygonIndices.resize(0);
+			polygonIndices.push(t1);
+			polygonIndices.push(t2);
+			polygonIndices.push(t3);
+			lastWinding = Triangulator.winding(x1, y1, x2, y2, x3, y3);
+			fanBaseIndex = t1;
 
 			i += 3;
 		}
@@ -221,7 +214,7 @@ class Triangulator {
 			convexPolygonsIndices.push(polygonIndices);
 		}
 
-		// Go through the list of polygons and try to merge the remaining triangles with the found triangle fans.
+		// Merge remaining triangles with the found triangle fans.
 		i = 0;
 		var n:Int = convexPolygons.length;
 		while (i < n) {
@@ -264,19 +257,19 @@ class Triangulator {
 					ii++;
 					continue;
 				}
-				winding1 = Triangulator.winding(prevPrevX, prevPrevY, prevX, prevY, x3, y3);
-				winding2 = Triangulator.winding(x3, y3, firstX, firstY, secondX, secondY);
-				if (winding1 == currWinding && winding2 == currWinding) {
+				if (Triangulator.winding(prevPrevX, prevPrevY, prevX, prevY, x3, y3) == currWinding
+					&& Triangulator.winding(x3, y3, firstX, firstY, secondX, secondY) == currWinding) {
 					otherPoly.resize(0);
 					otherIndices.resize(0);
 					polygon.push(x3);
 					polygon.push(y3);
 					polygonIndices.push(otherLastIndex);
+					lastIndex = otherLastIndex;
 					prevPrevX = prevX;
 					prevPrevY = prevY;
 					prevX = x3;
 					prevY = y3;
-					ii = 0;
+					ii = -1;
 				}
 
 				ii++;
@@ -285,7 +278,7 @@ class Triangulator {
 			i++;
 		}
 
-		// Remove empty polygons that resulted from the merge step above.
+		// Remove empty polygons from the merge step above.
 		i = convexPolygons.length - 1;
 		while (i >= 0) {
 			polygon = convexPolygons[i];
@@ -295,6 +288,9 @@ class Triangulator {
 				polygonIndices = convexPolygonsIndices[i];
 				convexPolygonsIndices.splice(i, 1);
 				this.polygonIndicesPool.free(polygonIndices);
+			} else {
+				polygon.push(polygon[0]);
+				polygon.push(polygon[1]);
 			}
 
 			i--;
@@ -304,9 +300,9 @@ class Triangulator {
 	}
 
 	private static function isConcave(index:Int, vertexCount:Int, vertices:Array<Float>, indices:Array<Int>):Bool {
-		var previous:Int = indices[(vertexCount + index - 1) % vertexCount] << 1;
+		var previous:Int = indices[index > 0 ? index - 1 : vertexCount - 1] << 1;
 		var current:Int = indices[index] << 1;
-		var next:Int = indices[(index + 1) % vertexCount] << 1;
+		var next:Int = indices[index + 1 < vertexCount ? index + 1 : 0] << 1;
 		return !positiveArea(vertices[previous], vertices[previous + 1], vertices[current], vertices[current + 1], vertices[next], vertices[next + 1]);
 	}
 
@@ -315,7 +311,6 @@ class Triangulator {
 	}
 
 	private static function winding(p1x:Float, p1y:Float, p2x:Float, p2y:Float, p3x:Float, p3y:Float):Int {
-		var px:Float = p2x - p1x, py:Float = p2y - p1y;
-		return p3x * py - p3y * px + px * p1y - p1x * py >= 0 ? 1 : -1;
+		return p1x * (p3y - p2y) + p2x * (p1y - p3y) + p3x * (p2y - p1y) >= 0 ? 1 : -1;
 	}
 }

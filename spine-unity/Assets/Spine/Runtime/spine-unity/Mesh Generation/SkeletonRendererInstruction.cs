@@ -104,7 +104,7 @@ namespace Spine.Unity {
 			attachments.Resize(attachmentCount);
 			Attachment[] attachmentsItems = attachments.Items;
 
-			Slot[] drawOrderItems = instructionsItems[0].skeleton.DrawOrder.Items;
+			Slot[] drawOrderItems = instructionsItems[0].skeleton.DrawOrder.AppliedPose.Items;
 			for (int i = 0; i < attachmentCount; i++) {
 				Slot slot = drawOrderItems[startSlot + i];
 				if (!slot.Bone.Active

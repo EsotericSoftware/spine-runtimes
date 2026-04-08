@@ -31,13 +31,13 @@ using System;
 
 namespace Spine {
 	internal interface IPosedInternal {
-		// replaces "object.pose == object.applied" of reference implementation.
+		// replaces "object.pose == object.appliedPose" of reference implementation.
 		bool PoseEqualsApplied { get; }
-		// replaces "object.applied = object.pose" of reference implementation.
-		void UsePose ();
-		// replaces "object.applied = object.constrained" of reference implementation.
-		void UseConstrained ();
-		// replaces "object.applied.Set(object.pose)" of reference implementation.
+		// replaces "object.appliedPose = object.pose" of reference implementation.
+		void Unconstrained ();
+		// replaces "object.appliedPose = object.constrainedPose" of reference implementation.
+		void Constrained ();
+		// replaces "object.appliedPose.Set(object.pose)" of reference implementation.
 		void ResetConstrained ();
 	}
 
@@ -45,50 +45,59 @@ namespace Spine {
 		void SetupPose ();
 	}
 
-	public class Posed<D, P, A> : IPosed, IPosedInternal
+	/// <summary>The base class for an object with a number of poses:
+	/// <list type="bullet">
+	/// <item><see cref="Data"/>: The setup pose.</item>
+	/// <item><see cref="Pose"/>: The unconstrained pose. Set by animations and application code.</item>
+	/// <item><see cref="AppliedPose"/>: The pose to use for rendering. Possibly modified by constraints.</item>
+	/// </list>
+	/// </summary>
+	public class Posed<D, P> : IPosed, IPosedInternal
 		where D : PosedData<P>
-		where P : IPose<P>
-		where A : P {
+		where P : IPose<P> {
 
 		internal readonly D data;
-		internal readonly A pose;
-		internal readonly A constrained;
-		internal A applied;
+		internal readonly P pose, constrainedPose;
+		internal P appliedPose;
 
-		public Posed (D data, A pose, A constrained) {
+		protected Posed (D data, P pose, P constrainedPose) {
 			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
 			this.data = data;
 			this.pose = pose;
-			this.constrained = constrained;
-			applied = pose;
+			this.constrainedPose = constrainedPose;
+			appliedPose = pose;
 		}
 
+		/// <summary>Sets the unconstrained pose to the setup pose.</summary>
 		public virtual void SetupPose () {
-			pose.Set(data.setup);
+			pose.Set(data.setupPose);
 		}
 
 		bool IPosedInternal.PoseEqualsApplied {
-			get { return (object)pose == (object)applied; }
+			get { return (object)pose == (object)appliedPose; }
 		}
 
-		void IPosedInternal.UsePose () {
-			applied = pose;
+		void IPosedInternal.Unconstrained () {
+			appliedPose = pose;
 		}
 
-		void IPosedInternal.UseConstrained () {
-			applied = constrained;
+		void IPosedInternal.Constrained () {
+			appliedPose = constrainedPose;
 		}
 
 		void IPosedInternal.ResetConstrained () {
-			applied.Set(pose);
+			appliedPose.Set(pose);
 		}
 
-		/// <summary>The constraint's setup pose data.</summary>
+		/// <summary>The setup pose data. May be shared with multiple instances.</summary>
 		public D Data { get { return data; } }
 
+		/// <summary>The unconstrained pose for this object, set by animations and application code.</summary>
 		public P Pose { get { return pose; } }
 
-		public A AppliedPose { get { return applied; } }
+		/// <summary>The pose to use for rendering. If no constraints modify this pose, this is the same as <see cref="Pose"/>. Otherwise it is a
+		/// copy of <see cref="Pose"/> modified by constraints.</summary>
+		public P AppliedPose { get { return appliedPose; } }
 
 		override public string ToString () {
 			return data.name;

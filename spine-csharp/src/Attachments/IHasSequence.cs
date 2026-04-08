@@ -36,11 +36,15 @@ namespace Spine {
 	using Color32F = UnityEngine.Color;
 #endif
 
+	/// <summary>Interface for an attachment that gets 1 or more texture regions from a <see cref="Sequence"/>.</summary>
 	public interface IHasSequence {
+		/// <summary>The base path for the attachment's texture region.</summary>
 		string Path { get; set; }
+		/// <summary>The color the attachment is tinted, to be combined with <see cref="SlotPose.Color"/>.</summary>
 		Color32F GetColor ();
 		void SetColor (Color32F color);
 		void SetColor (float r, float g, float b, float a);
+		/// <summary>The sequence that provides texture regions, UVs, and vertex offsets for rendering this attachment.</summary>
 		Sequence Sequence { get; }
 		void UpdateSequence ();
 	}

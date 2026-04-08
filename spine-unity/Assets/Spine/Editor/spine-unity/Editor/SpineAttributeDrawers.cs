@@ -591,17 +591,17 @@ namespace Spine.Unity.Editor {
 					List<Skin.SkinEntry> skinEntries = new List<Skin.SkinEntry>();
 					skin.GetAttachments(i, skinEntries);
 					foreach (Skin.SkinEntry entry in skinEntries) {
-						attachmentNames.Add(entry.Name);
+						attachmentNames.Add(entry.PlaceholderName);
 					}
 
 					if (skin != defaultSkin) {
 						foreach (Skin.SkinEntry entry in skinEntries) {
-							placeholderNames.Add(entry.Name);
+							placeholderNames.Add(entry.PlaceholderName);
 						}
 						skinEntries.Clear();
 						defaultSkin.GetAttachments(i, skinEntries);
 						foreach (Skin.SkinEntry entry in skinEntries) {
-							attachmentNames.Add(entry.Name);
+							attachmentNames.Add(entry.PlaceholderName);
 						}
 					}
 

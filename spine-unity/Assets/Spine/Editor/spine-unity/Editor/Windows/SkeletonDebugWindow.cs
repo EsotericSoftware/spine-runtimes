@@ -520,7 +520,7 @@ namespace Spine.Unity.Editor {
 							const string SeparatorString = "------------- v SEPARATOR v -------------";
 
 							if (Application.isPlaying) {
-								foreach (Slot slot in skeleton.DrawOrder) {
+								foreach (Slot slot in skeleton.DrawOrder.AppliedPose) {
 									if (skeletonRenderer.separatorSlots.Contains(slot)) EditorGUILayout.LabelField(SeparatorString);
 
 									using (new EditorGUI.DisabledScope(!slot.Bone.Active)) {
@@ -528,7 +528,7 @@ namespace Spine.Unity.Editor {
 									}
 								}
 							} else {
-								foreach (Slot slot in skeleton.DrawOrder) {
+								foreach (Slot slot in skeleton.DrawOrder.AppliedPose) {
 									string[] slotNames = SkeletonRendererInspector.GetSeparatorSlotNames(skeletonRenderer);
 									for (int i = 0, n = slotNames.Length; i < n; i++) {
 										if (string.Equals(slotNames[i], slot.Data.Name, System.StringComparison.Ordinal)) {

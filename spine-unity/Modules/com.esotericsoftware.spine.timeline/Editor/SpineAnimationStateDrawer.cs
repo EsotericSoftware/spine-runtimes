@@ -47,7 +47,6 @@ public class SpineAnimationStateDrawer : PropertyDrawer {
 		SerializedProperty customDurationProp = property.FindPropertyRelative("customDuration");
 		SerializedProperty useBlendDurationProp = property.FindPropertyRelative("useBlendDuration");
 		SerializedProperty mixDurationProp = property.FindPropertyRelative("mixDuration");
-		SerializedProperty holdPreviousProp = property.FindPropertyRelative("holdPrevious");
 		SerializedProperty alphaProp = property.FindPropertyRelative("alpha");
 		SerializedProperty dontPauseWithDirectorProp = property.FindPropertyRelative("dontPauseWithDirector");
 		SerializedProperty dontEndWithClip = property.FindPropertyRelative("dontEndWithClip");
@@ -119,9 +118,6 @@ public class SpineAnimationStateDrawer : PropertyDrawer {
 				EditorGUI.PropertyField(singleFieldRect, mixDurationProp);
 			}
 		}
-
-		singleFieldRect.y += lineHeightWithSpacing;
-		EditorGUI.PropertyField(singleFieldRect, holdPreviousProp);
 
 		singleFieldRect.y += lineHeightWithSpacing;
 		EditorGUI.PropertyField(singleFieldRect, eventProp);

@@ -34,25 +34,22 @@ namespace Spine {
 		bool Active { get; set; }
 	}
 
-	public class PosedActive<D, P, A> : Posed<D, P, A>, IPosedActive
+	/// <summary>A posed object that may be active or inactive.</summary>
+	public class PosedActive<D, P> : Posed<D, P>, IPosedActive
 		where D : PosedData<P>
-		where P : IPose<P>
-		where A : P {
+		where P : IPose<P> {
 
 		internal bool active;
 
-		public PosedActive (D data, A pose, A constrained)
+		protected PosedActive (D data, P pose, P constrained)
 			: base(data, pose, constrained) {
 			SetupPose();
 		}
 
 		/// <summary>Returns false when this constraint won't be updated by
 		/// <see cref="Skeleton.UpdateWorldTransform(Physics)"/> because a skin is required and the
-		/// <see cref="Skeleton.Skin">active skin</see> does not contain this item.</summary>
-		/// <seealso cref="Skin.Bones"/>
-		/// <seealso cref="Skin.Constraints"/>
-		/// <seealso cref="PosedData.SkinRequired"/>
-		/// <seealso cref="Skeleton.UpdateCache()"/>
+		/// <see cref="Skeleton.Skin">active skin</see> does not contain this item. See <see cref="Skin.Bones"/>,
+		/// <see cref="Skin.Constraints"/>, <see cref="PosedData{P}.SkinRequired"/>, and <see cref="Skeleton.UpdateCache()"/>.</summary>
 		public bool Active { get { return active; } set { active = value; } }
 	}
 }

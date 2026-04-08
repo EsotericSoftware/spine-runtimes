@@ -32,7 +32,7 @@ using System;
 namespace Spine {
 
 	/// <summary>
-	/// Stores the current pose for a physics constraint. A physics constraint applies physics to bones.
+	/// Applies physics to a bone.
 	/// <para>
 	/// See <a href="http://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide.</para>
 	/// </summary>
@@ -52,7 +52,7 @@ namespace Spine {
 			: base(data, new PhysicsConstraintPose(), new PhysicsConstraintPose()) {
 			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
 
-			bone = skeleton.bones.Items[data.bone.index].constrained;
+			bone = skeleton.bones.Items[data.bone.index].constrainedPose;
 		}
 
 		override public IConstraint Copy (Skeleton skeleton) {
@@ -61,6 +61,8 @@ namespace Spine {
 			return copy;
 		}
 
+		/// <summary>Resets all physics state that was the result of previous movement. Use this after moving a bone to prevent physics
+		/// from reacting to the movement.</summary>
 		public void Reset (Skeleton skeleton) {
 			remaining = 0;
 			lastTime = skeleton.time;
@@ -80,7 +82,7 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// Translates the physics constraint so next <see cref="Update(Skeleton, Physics)"/> forces are applied as if the bone moved an
+		/// Translates the physics constraint so the next <see cref="Update(Skeleton, Physics)"/> forces are applied as if the bone moved an
 		/// additional amount in world space.
 		/// </summary>
 		public void Translate (float x, float y) {
@@ -91,7 +93,7 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// Rotates the physics constraint so next <see cref="Update(Skeleton, Physics)"/> forces are applied as if the bone rotated around
+		/// Rotates the physics constraint so the next <see cref="Update(Skeleton, Physics)"/> forces are applied as if the bone rotated around
 		/// the specified point in world space.
 		/// </summary>
 		public void Rotate (float x, float y, float degrees) {
@@ -102,7 +104,7 @@ namespace Spine {
 
 		/// <summary>Applies the constraint to the constrained bones.</summary>
 		override public void Update (Skeleton skeleton, Physics physics) {
-			PhysicsConstraintPose p = applied;
+			PhysicsConstraintPose p = appliedPose;
 			float mix = p.mix;
 			if (mix == 0) return;
 

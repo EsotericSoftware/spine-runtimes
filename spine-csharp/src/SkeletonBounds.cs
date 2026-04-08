@@ -75,7 +75,7 @@ namespace Spine {
 			for (int i = 0; i < slotCount; i++) {
 				Slot slot = slots[i];
 				if (!slot.bone.active) continue;
-				BoundingBoxAttachment boundingBox = slot.applied.attachment as BoundingBoxAttachment;
+				BoundingBoxAttachment boundingBox = slot.appliedPose.attachment as BoundingBoxAttachment;
 				if (boundingBox == null) continue;
 				boundingBoxes.Add(boundingBox);
 

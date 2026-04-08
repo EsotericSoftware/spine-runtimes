@@ -36,7 +36,7 @@ import type { Color, NumberArrayLike } from "./Utils";
 export class SkeletonRendererCore {
 	private commandPool = new CommandPool();
 	private worldVertices = new Float32Array(12 * 1024);
-	private quadIndices = new Uint32Array([0, 1, 2, 2, 3, 0]);
+	private quadIndices = new Uint16Array([0, 1, 2, 2, 3, 0]);
 	private clipping = new SkeletonClipping();
 	private renderCommands: RenderCommand[] = [];
 
@@ -67,7 +67,7 @@ export class SkeletonRendererCore {
 			let vertices: NumberArrayLike;
 			let verticesCount: number;
 			let uvs: NumberArrayLike;
-			let indices: number[] | Uint32Array;
+			let indices: number[] | Uint16Array;
 			let indicesCount: number;
 			let attachmentColor: Color;
 			// biome-ignore lint/suspicious/noExplicitAny: texture depends on the runtime
@@ -171,7 +171,7 @@ export class SkeletonRendererCore {
 			}
 
 			if (clipper.isClipping()) {
-				clipper.clipTrianglesUnpacked(vertices, indices, indicesCount, uvs, stride);
+				clipper.clipTrianglesUnpacked(vertices, 0, indices, indicesCount, uvs, stride);
 				vertices = clipper.clippedVerticesTyped;
 				verticesCount = clipper.clippedVerticesLength / stride;
 				uvs = clipper.clippedUVsTyped;

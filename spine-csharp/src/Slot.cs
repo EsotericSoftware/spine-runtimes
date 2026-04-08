@@ -38,12 +38,12 @@ namespace Spine {
 	using Color32F = UnityEngine.Color;
 #endif
 
-	/// <summary>
-	/// Stores a slot's current pose. Slots organize attachments for <see cref="Skeleton.DrawOrder"/> purposes and provide a place to store
-	/// state for an attachment.State cannot be stored in an attachment itself because attachments are stateless and may be shared
-	/// across multiple skeletons.
-	/// </summary>
-	public class Slot : Posed<SlotData, SlotPose, SlotPose> {
+	/// <summary>Organizes attachments for <see cref="Skeleton.DrawOrder"/> purposes and provides a place to store state for an
+	/// attachment.
+	/// <para>
+	/// State cannot be stored in an attachment itself because attachments are stateless and may be shared across multiple
+	/// skeletons.</para></summary>
+	public class Slot : Posed<SlotData, SlotPose> {
 		internal readonly Skeleton skeleton;
 		internal readonly Bone bone;
 		internal int attachmentState;
@@ -53,9 +53,9 @@ namespace Spine {
 			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
 			this.skeleton = skeleton;
 			bone = skeleton.bones.Items[data.boneData.index];
-			if (data.setup.GetDarkColor().HasValue) {
+			if (data.setupPose.GetDarkColor().HasValue) {
 				pose.SetDarkColor(new Color32F());
-				constrained.SetDarkColor(new Color32F());
+				constrainedPose.SetDarkColor(new Color32F());
 			}
 			SetupPose();
 		}
@@ -67,9 +67,9 @@ namespace Spine {
 			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
 			this.bone = bone;
 			this.skeleton = skeleton;
-			if (data.setup.GetDarkColor().HasValue) {
+			if (data.setupPose.GetDarkColor().HasValue) {
 				pose.SetDarkColor(new Color32F());
-				constrained.SetDarkColor(new Color32F());
+				constrainedPose.SetDarkColor(new Color32F());
 			}
 			pose.Set(slot.pose);
 		}
@@ -79,9 +79,9 @@ namespace Spine {
 
 		/// <summary>Sets this slot to the setup pose.</summary>
 		override public void SetupPose () {
-			pose.SetColor(data.setup.GetColor());
-			if (pose.GetDarkColor().HasValue) pose.SetDarkColor(data.setup.GetDarkColor());
-			pose.sequenceIndex = data.setup.sequenceIndex;
+			pose.SetColor(data.setupPose.GetColor());
+			if (pose.GetDarkColor().HasValue) pose.SetDarkColor(data.setupPose.GetDarkColor());
+			pose.sequenceIndex = data.setupPose.sequenceIndex;
 			if (data.attachmentName == null)
 				pose.Attachment = null;
 			else {

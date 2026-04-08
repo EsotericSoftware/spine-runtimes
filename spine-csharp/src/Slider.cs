@@ -30,9 +30,9 @@
 using System;
 
 namespace Spine {
-	/// <summary>
-	/// Stores the current pose for a slider. 
-	/// </summary>
+	/// <summary>Applies an animation based on either the slider's <see cref="SliderPose.Time"/> or a bone's transform property.
+	/// <para>
+	/// See <a href="https://esotericsoftware.com/spine-sliders">Sliders</a> in the Spine User Guide.</para></summary>
 	public class Slider : Constraint<Slider, SliderData, SliderPose> {
 		static private readonly float[] offsets = new float[6];
 		internal Bone bone;
@@ -51,15 +51,15 @@ namespace Spine {
 		}
 
 		override public void Update (Skeleton skeleton, Physics physics) {
-			SliderPose p = applied;
+			SliderPose p = appliedPose;
 			if (p.mix == 0) return;
 
 			Animation animation = data.animation;
 			if (bone != null) {
 				if (!bone.active) return;
-				if (data.local) bone.applied.ValidateLocalTransform(skeleton);
+				if (data.local) bone.appliedPose.ValidateLocalTransform(skeleton);
 				p.time = data.offset
-					+ (data.property.Value(skeleton, bone.applied, data.local, offsets) - data.property.offset) * data.scale;
+					+ (data.property.Value(skeleton, bone.appliedPose, data.local, offsets) - data.property.offset) * data.scale;
 				if (data.loop)
 					p.time = animation.duration + (p.time % animation.duration);
 				else
@@ -69,10 +69,9 @@ namespace Spine {
 			Bone[] bones = skeleton.bones.Items;
 			int[] indices = animation.bones.Items;
 			for (int i = 0, n = animation.bones.Count; i < n; i++)
-				bones[indices[i]].applied.ModifyLocal(skeleton);
+				bones[indices[i]].appliedPose.ModifyLocal(skeleton);
 
-			animation.Apply(skeleton, p.time, p.time, data.loop, null, p.mix, data.additive ? MixBlend.Add : MixBlend.Replace,
-				MixDirection.In, true);
+			animation.Apply(skeleton, p.time, p.time, data.loop, null, p.mix, false, data.additive, false, true);
 		}
 
 		override public void Sort (Skeleton skeleton) {
@@ -93,10 +92,12 @@ namespace Spine {
 					bone.sorted = false;
 					skeleton.SortReset(bone.children);
 					skeleton.Constrained(bone);
-				} else if (t as ISlotTimeline != null) {
+				} else if (t is ISlotTimeline) {
 					ISlotTimeline timeline = (ISlotTimeline)t;
 					skeleton.Constrained(slots[timeline.SlotIndex]);
-				} else if (t as PhysicsConstraintTimeline != null) {
+				} else if (t is DrawOrderTimeline || t is DrawOrderFolderTimeline) {
+					skeleton.drawOrder.Constrained();
+				} else if (t is PhysicsConstraintTimeline) {
 					PhysicsConstraintTimeline timeline = (PhysicsConstraintTimeline)t;
 					if (timeline.constraintIndex == -1) {
 						for (int ii = 0; ii < physicsCount; ii++)
@@ -110,6 +111,7 @@ namespace Spine {
 			}
 		}
 
+		/// <summary>When set, the bone's transform property is used to set the slider's <see cref="SliderPose.Time"/>.</summary>
 		public Bone Bone { get { return bone; } set { bone = value; } }
 	}
 }

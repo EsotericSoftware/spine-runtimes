@@ -34,14 +34,14 @@ namespace Spine {
 	/// <summary>
 	/// The setup pose for a bone.
 	/// </summary>
-	public class BoneData : PosedData<BoneLocal> {
+	public class BoneData : PosedData<BonePose> {
 		internal int index;
 		internal BoneData parent;
 		internal float length;
 
 		/// <param name="parent">May be null.</param>
 		public BoneData (int index, string name, BoneData parent)
-			: base(name, new BoneLocal()) {
+			: base(name, new BonePose()) {
 
 			if (index < 0) throw new ArgumentException("index must be >= 0", "index");
 			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
@@ -54,10 +54,10 @@ namespace Spine {
 		public BoneData (BoneData data, BoneData parent)
 			: this(data.index, data.name, parent) {
 			length = data.length;
-			setup.Set(data.setup);
+			setupPose.Set(data.setupPose);
 		}
 
-		/// <summary>The index of the bone in Skeleton.Bones</summary>
+		/// <summary>The <see cref="Skeleton.Bones"/> index.</summary>
 		public int Index { get { return index; } }
 
 		/// <summary>May be null.</summary>

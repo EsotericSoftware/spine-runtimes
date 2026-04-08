@@ -30,7 +30,9 @@
 using System;
 
 namespace Spine {
+	/// <summary>An interface for an object representing a pose.</summary>
 	public interface IPose<P> {
+		/// <summary>Sets this pose to the specified pose.</summary>
 		void Set (P pose);
 	}
 }

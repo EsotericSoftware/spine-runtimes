@@ -206,7 +206,7 @@ namespace Spine.Unity {
 		/// <param name="material">Material to be set at the renderer instruction. When null, the last attachment
 		/// in the draw order list is assigned as the instruction's material.</param>
 		public static void GenerateSingleSubmeshInstruction (SkeletonRendererInstruction instructionOutput, Skeleton skeleton, Material material) {
-			ExposedList<Slot> drawOrder = skeleton.DrawOrder;
+			ExposedList<Slot> drawOrder = skeleton.DrawOrder.AppliedPose;
 			int drawOrderCount = drawOrder.Count;
 
 			// Clear last state of attachments and submeshes
@@ -304,7 +304,7 @@ namespace Spine.Unity {
 
 		public static bool RequiresMultipleSubmeshesByDrawOrder (Skeleton skeleton) {
 
-			ExposedList<Slot> drawOrder = skeleton.DrawOrder;
+			ExposedList<Slot> drawOrder = skeleton.DrawOrder.AppliedPose;
 			int drawOrderCount = drawOrder.Count;
 			Slot[] drawOrderItems = drawOrder.Items;
 
@@ -340,7 +340,7 @@ namespace Spine.Unity {
 			//			if (skeleton == null) throw new ArgumentNullException("skeleton");
 			//			if (instructionOutput == null) throw new ArgumentNullException("instructionOutput");
 
-			ExposedList<Slot> drawOrder = skeleton.DrawOrder;
+			ExposedList<Slot> drawOrder = skeleton.DrawOrder.AppliedPose;
 			int drawOrderCount = drawOrder.Count;
 
 			// Clear last state of attachments and submeshes
@@ -555,7 +555,7 @@ namespace Spine.Unity {
 			submesh.Clear(false);
 
 			Skeleton skeleton = instruction.skeleton;
-			Slot[] drawOrderItems = skeleton.DrawOrder.Items;
+			Slot[] drawOrderItems = skeleton.DrawOrder.AppliedPose.Items;
 
 			Color32 color = default(Color32);
 
@@ -837,7 +837,7 @@ namespace Spine.Unity {
 			for (int si = 0, n = instruction.submeshInstructions.Count; si < n; si++) {
 				SubmeshInstruction submesh = instruction.submeshInstructions.Items[si];
 				Skeleton skeleton = submesh.skeleton;
-				Slot[] drawOrderItems = skeleton.DrawOrder.Items;
+				Slot[] drawOrderItems = skeleton.DrawOrder.AppliedPose.Items;
 				Color skeletonC = skeleton.GetColor();
 
 				int endSlot = submesh.endSlot;
@@ -1108,7 +1108,7 @@ namespace Spine.Unity {
 					int[] tris = currentSubmeshBuffer.Items;
 					int triangleIndex = 0;
 					Skeleton skeleton = submeshInstruction.skeleton;
-					Slot[] drawOrderItems = skeleton.DrawOrder.Items;
+					Slot[] drawOrderItems = skeleton.DrawOrder.AppliedPose.Items;
 					for (int slotIndex = submeshInstruction.startSlot, endSlot = submeshInstruction.endSlot; slotIndex < endSlot; slotIndex++) {
 						Slot slot = drawOrderItems[slotIndex];
 						if (!slot.Bone.Active

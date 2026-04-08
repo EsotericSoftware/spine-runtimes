@@ -33,8 +33,7 @@ namespace Spine {
 
 	/// <summary>
 	/// <para>
-	/// Stores the current pose for a path constraint. A path constraint adjusts the rotation, translation, and scale of the
-	/// constrained bones so they follow a <see cref="PathAttachment"/>.</para>
+	/// Adjusts the rotation, translation, and scale of the constrained bones so they follow a <see cref="PathAttachment"/>.</para>
 	/// <para>
 	/// See <a href="http://esotericsoftware.com/spine-path-constraints">Path constraints</a> in the Spine User Guide.</para>
 	/// </summary>
@@ -55,7 +54,7 @@ namespace Spine {
 
 			bones = new ExposedList<BonePose>(data.Bones.Count);
 			foreach (BoneData boneData in data.bones)
-				bones.Add(skeleton.bones.Items[boneData.index].constrained);
+				bones.Add(skeleton.bones.Items[boneData.index].constrainedPose);
 
 			slot = skeleton.slots.Items[data.slot.index];
 		}
@@ -72,10 +71,10 @@ namespace Spine {
 		}
 
 		override public void Update (Skeleton skeleton, Physics physics) {
-			PathAttachment pathAttachment = slot.applied.Attachment as PathAttachment;
+			PathAttachment pathAttachment = slot.appliedPose.Attachment as PathAttachment;
 			if (pathAttachment == null) return;
 
-			PathConstraintPose p = applied;
+			PathConstraintPose p = appliedPose;
 			float mixRotate = p.mixRotate, mixX = p.mixX, mixY = p.mixY;
 			if (mixRotate == 0 && mixX == 0 && mixY == 0) return;
 
@@ -146,7 +145,7 @@ namespace Spine {
 				tip = data.rotateMode == RotateMode.Chain;
 			} else {
 				tip = false;
-				BonePose bone = slot.bone.applied;
+				BonePose bone = slot.bone.appliedPose;
 				offsetRotation *= bone.a * bone.d - bone.b * bone.c > 0 ? MathUtils.DegRad : -MathUtils.DegRad;
 			}
 			for (int i = 0, ip = 3, u = skeleton.update; i < boneCount; i++, ip += 3) {
@@ -199,7 +198,7 @@ namespace Spine {
 
 		float[] ComputeWorldPositions (Skeleton skeleton, PathAttachment path, int spacesCount, bool tangents) {
 			Slot slot = this.slot;
-			float position = applied.position;
+			float position = appliedPose.position;
 			float[] spaces = this.spaces.Items, output = this.positions.EnsureSize(spacesCount * 3 + 2).Items, world;
 			bool closed = path.Closed;
 			int verticesLength = path.WorldVerticesLength, curveCount = verticesLength / 6, prevCurve = NONE;

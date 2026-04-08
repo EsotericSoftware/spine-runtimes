@@ -831,7 +831,7 @@ namespace Spine.Unity.AttachmentTools {
 			int i = 0;
 			foreach (Skin.SkinEntry originalSkinEntry in skinAttachments) {
 				Attachment newAttachment = inoutAttachments[i++];
-				newSkin.SetAttachment(originalSkinEntry.SlotIndex, originalSkinEntry.Name, newAttachment);
+				newSkin.SetAttachment(originalSkinEntry.SlotIndex, originalSkinEntry.PlaceholderName, newAttachment);
 			}
 			return newSkin;
 		}

@@ -38,6 +38,15 @@ class ClippingAttachment extends VertexAttachment {
 	 * the skeleton's rendering. */
 	public var endSlot:SlotData;
 
+	/** When true the clipping polygon is treated as convex for more efficient clipping. If the polygon deforms to concave then the
+	 * convex hull is used. When false the clipping polygon can be concave and if so has an additional CPU cost. Inverse clipping
+	 * always uses convex. */
+	public var convex = false;
+
+	/** When false, everything inside the clipping polygon is visible. When true, everything outside the clipping polygon is
+	 * visible and clipping is convex. */
+	public var inverse = false;
+
 	/** The color of the clipping attachment as it was in Spine, or a default color if nonessential data was not exported. Clipping
 	 * attachments are not usually rendered at runtime. */
 	public var color:Color = new Color(0.2275, 0.2275, 0.2275, 1);
@@ -50,6 +59,8 @@ class ClippingAttachment extends VertexAttachment {
 		var copy:ClippingAttachment = new ClippingAttachment(name);
 		copyTo(copy);
 		copy.endSlot = endSlot;
+		copy.convex = convex;
+		copy.inverse = inverse;
 		copy.color.setFromColor(color);
 		return copy;
 	}

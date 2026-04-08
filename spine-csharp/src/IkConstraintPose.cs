@@ -31,7 +31,7 @@ using System;
 
 namespace Spine {
 
-	/// <summary>Stores the current pose for an IK constraint.</summary>
+	/// <summary>Stores a pose for an IK constraint.</summary>
 	public class IkConstraintPose : IPose<IkConstraintPose> {
 		internal int bendDirection;
 		internal bool compress, stretch;

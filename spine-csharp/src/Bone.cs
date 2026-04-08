@@ -31,15 +31,17 @@ using System;
 
 namespace Spine {
 
-	/// <summary>
-	/// The current pose for a bone, before constraints are applied.
-	/// <para>
-	/// A bone has a local transform which is used to compute its world transform. A bone also has an applied transform, which is a
-	/// local transform that can be applied to compute the world transform. The local transform and applied transform may differ if a
-	/// constraint or application code modifies the world transform after it was computed from the local transform.
-	/// </para>
+	/// <summary>A node in a skeleton's hierarchy with a transform that affects its children and their attachments. A bone has a
+	/// number of poses:
+	/// <list type="bullet">
+	/// <item><see cref="Data"/>: The setup pose.</item>
+	/// <item><see cref="Pose"/>: The unconstrained local pose. Set by animations and application code.</item>
+	/// <item><see cref="AppliedPose"/>: The local pose to use for rendering. Possibly modified by constraints.</item>
+	/// <item>World transform: the local pose combined with the parent world transform. Computed on a pose by
+	/// <see cref="BonePose.UpdateWorldTransform(Skeleton)"/> and <see cref="Skeleton.UpdateWorldTransform(Physics)"/>.</item>
+	/// </list>
 	/// </summary>
-	public class Bone : PosedActive<BoneData, BoneLocal, BonePose> {
+	public class Bone : PosedActive<BoneData, BonePose> {
 		static public bool yDown;
 
 		internal Bone parent;
@@ -50,8 +52,8 @@ namespace Spine {
 		public Bone (BoneData data, Bone parent)
 			: base(data, new BonePose(), new BonePose()) {
 			this.parent = parent;
-			applied.bone = this;
-			constrained.bone = this;
+			appliedPose.bone = this;
+			constrainedPose.bone = this;
 		}
 
 		/// <summary>

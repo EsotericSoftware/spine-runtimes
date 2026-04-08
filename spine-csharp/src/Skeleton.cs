@@ -37,12 +37,18 @@ namespace Spine {
 #if IS_UNITY
 	using Color32F = UnityEngine.Color;
 #endif
+	/// <summary>Stores bones and slots to be posed by animations and application code. Multiple skeleton instances can share the same
+	/// <see cref="SkeletonData"/>, including animations, attachments, and skins.
+	/// <para>After posing, call <see cref="UpdateWorldTransform(Physics)"/> to apply constraints and compute world transforms for
+	/// rendering.</para>
+	/// <para>See <see href="https://esotericsoftware.com/spine-runtime-architecture#Instance-objects">Instance objects</see> in the
+	/// Spine Runtimes Guide.</para></summary>
 	public class Skeleton {
 		static private readonly int[] quadTriangles = { 0, 1, 2, 2, 3, 0 };
 		internal SkeletonData data;
 		internal ExposedList<Bone> bones;
 		internal ExposedList<Slot> slots;
-		internal ExposedList<Slot> drawOrder;
+		internal readonly DrawOrder drawOrder;
 		internal ExposedList<IConstraint> constraints;
 		internal ExposedList<PhysicsConstraint> physics;
 		internal ExposedList<object> updateCache = new ExposedList<object>();
@@ -77,12 +83,9 @@ namespace Spine {
 			}
 
 			slots = new ExposedList<Slot>(data.slots.Count);
-			drawOrder = new ExposedList<Slot>(data.slots.Count);
-			foreach (SlotData slotData in data.slots) {
-				Slot slot = new Slot(slotData, this);
-				slots.Add(slot);
-				drawOrder.Add(slot);
-			}
+			foreach (SlotData slotData in data.slots)
+				slots.Add(new Slot(slotData, this));
+			drawOrder = new DrawOrder(slots);
 
 			physics = new ExposedList<PhysicsConstraint>(8);
 			constraints = new ExposedList<IConstraint>(data.constraints.Count);
@@ -122,10 +125,10 @@ namespace Spine {
 			foreach (Slot slot in skeleton.slots)
 				slots.Add(new Slot(slot, bonesItems[slot.bone.data.index], this));
 
-			drawOrder = new ExposedList<Slot>(slots.Count);
-			Slot[] slotsItems = slots.Items;
-			foreach (Slot slot in skeleton.drawOrder)
-				drawOrder.Add(slotsItems[slot.data.index]);
+			drawOrder = new DrawOrder(slots);
+			drawOrder.pose.Clear();
+			foreach (Slot slot in skeleton.drawOrder.pose)
+				drawOrder.pose.Add(slots.Items[slot.data.index]);
 
 			physics = new ExposedList<PhysicsConstraint>(skeleton.physics.Count);
 			constraints = new ExposedList<IConstraint>(skeleton.constraints.Count);
@@ -153,9 +156,10 @@ namespace Spine {
 			updateCache.Clear();
 			resetCache.Clear();
 
+			drawOrder.Unconstrained();
 			Slot[] slots = this.slots.Items;
 			for (int i = 0, n = this.slots.Count; i < n; i++) {
-				((IPosedInternal)slots[i]).UsePose();
+				((IPosedInternal)slots[i]).Unconstrained();
 			}
 
 			int boneCount = this.bones.Count;
@@ -164,7 +168,7 @@ namespace Spine {
 				Bone bone = bones[i];
 				bone.sorted = bone.data.skinRequired;
 				bone.active = !bone.sorted;
-				((IPosedInternal)bone).UsePose();
+				((IPosedInternal)bone).Unconstrained();
 			}
 			if (skin != null) {
 				BoneData[] skinBones = skin.bones.Items;
@@ -182,7 +186,7 @@ namespace Spine {
 			{ // scope added to prevent compile error of n already being declared in enclosing scope
 				int n = this.constraints.Count;
 				for (int i = 0; i < n; i++) {
-					((IPosedInternal)constraints[i]).UsePose();
+					((IPosedInternal)constraints[i]).Unconstrained();
 				}
 				for (int i = 0; i < n; i++) {
 					IConstraint constraint = constraints[i];
@@ -198,14 +202,14 @@ namespace Spine {
 				n = this.updateCache.Count;
 				for (int i = 0; i < n; i++) {
 					Bone bone = updateCache[i] as Bone;
-					if (bone != null) updateCache[i] = bone.applied;
+					if (bone != null) updateCache[i] = bone.appliedPose;
 				}
 			}
 		}
 
 		internal void Constrained (IPosedInternal obj) {
-			if (obj.PoseEqualsApplied) { // if (obj.pose == obj.applied) {
-				obj.UseConstrained();
+			if (obj.PoseEqualsApplied) { // if (obj.pose == obj.appliedPose) {
+				obj.Constrained();
 				resetCache.Add(obj);
 			}
 		}
@@ -238,6 +242,7 @@ namespace Spine {
 		public void UpdateWorldTransform (Physics physics) {
 			update++;
 
+			drawOrder.ResetConstrained();
 			IPosedInternal[] resetCache = this.resetCache.Items;
 			for (int i = 0, n = this.resetCache.Count; i < n; i++) {
 				resetCache[i].ResetConstrained();
@@ -267,10 +272,9 @@ namespace Spine {
 
 		/// <summary>Sets the slots and draw order to their setup pose values.</summary>
 		public void SetupPoseSlots () {
+			drawOrder.SetupPose();
 			Slot[] slots = this.slots.Items;
-			int n = this.slots.Count;
-			Array.Copy(slots, 0, drawOrder.Items, 0, n);
-			for (int i = 0; i < n; i++)
+			for (int i = 0, n = this.slots.Count; i < n; i++)
 				slots[i].SetupPose();
 		}
 
@@ -300,7 +304,7 @@ namespace Spine {
 			return null;
 		}
 
-		/// <summary>The skeleton's slots.</summary>
+		/// <summary>The skeleton's slots. To add a slot, also add it to <see cref="DrawOrder.Pose"/>.</summary>
 		public ExposedList<Slot> Slots { get { return slots; } }
 
 		/// <summary>Finds a slot by comparing each slot's name. It is more efficient to cache the results of this method than to call it
@@ -317,14 +321,11 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// The skeleton's slots in the order they should be drawn. The returned array may be modified to change the draw order.
+		/// The skeleton's draw order. Use <see cref="DrawOrder.AppliedPose"/> for rendering and
+		/// <see cref="DrawOrder.Pose"/> for changing the draw order.
 		/// </summary>
-		public ExposedList<Slot> DrawOrder {
+		public DrawOrder DrawOrder {
 			get { return drawOrder; }
-			set {
-				if (value == null) throw new ArgumentNullException("drawOrder ", "drawOrder cannot be null.");
-				this.drawOrder = value;
-			}
 		}
 
 		/// <summary>The skeleton's current skin. May be null. See <see cref="SetSkin(Spine.Skin)"/></summary>
@@ -343,8 +344,8 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// <para>Sets the skin used to look up attachments before looking in the <see cref="SkeletonData.DefaultSkin"/>. If the
-		/// skin is changed, <see cref="UpdateCache()"/> is called.
+		/// <para>Sets the skin used to look up attachments before looking in <see cref="SkeletonData.DefaultSkin"/>. If the skin is
+		/// changed, <see cref="UpdateCache()"/> is called.
 		/// </para>
 		/// <para>Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was no
 		/// old skin, each slot's setup mode attachment is attached from the new skin.
@@ -379,40 +380,40 @@ namespace Spine {
 		/// name.</summary>
 		/// <returns>May be null.</returns>
 		/// <seealso cref="GetAttachment(int, string)"/>
-		public Attachment GetAttachment (string slotName, string attachmentName) {
+		public Attachment GetAttachment (string slotName, string placeholderName) {
 			SlotData slot = data.FindSlot(slotName);
 			if (slot == null) throw new ArgumentException("Slot not found: " + slotName, "slotName");
-			return GetAttachment(slot.index, attachmentName);
+			return GetAttachment(slot.index, placeholderName);
 		}
 
-		/// <summary>Finds an attachment by looking in the skin and skeletonData.defaultSkin using the slot index and
-		/// attachment name. First the skin is checked and if the attachment was not found, the default skin is checked.</summary>
+		/// <summary>Finds an attachment by looking in the skin and skeletonData.defaultSkin using the slot index and skin
+		/// placeholder name. First the skin is checked and if the attachment was not found, the default skin is checked.</summary>
 		/// <para>
 		/// See <a href="http://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide.</para>
 		/// <returns>May be null.</returns>
-		public Attachment GetAttachment (int slotIndex, string attachmentName) {
-			if (attachmentName == null) throw new ArgumentNullException("attachmentName", "attachmentName cannot be null.");
+		public Attachment GetAttachment (int slotIndex, string placeholderName) {
+			if (placeholderName == null) throw new ArgumentNullException("placeholderName", "placeholderName cannot be null.");
 			if (skin != null) {
-				Attachment attachment = skin.GetAttachment(slotIndex, attachmentName);
+				Attachment attachment = skin.GetAttachment(slotIndex, placeholderName);
 				if (attachment != null) return attachment;
 			}
-			if (data.defaultSkin != null) return data.defaultSkin.GetAttachment(slotIndex, attachmentName);
+			if (data.defaultSkin != null) return data.defaultSkin.GetAttachment(slotIndex, placeholderName);
 			return null;
 		}
 
 		/// <summary>A convenience method to set an attachment by finding the slot with <see cref="FindSlot(string)"/>, finding the attachment with
 		/// <see cref="GetAttachment(int, string)"/>, then setting the slot's <see cref="SlotPose.Attachment"/>.</summary>
-		/// <param name="attachmentName">May be null to clear the slot's attachment.</param>
-		public void SetAttachment (string slotName, string attachmentName) {
+		/// <param name="placeholderName">May be null to clear the slot's attachment.</param>
+		public void SetAttachment (string slotName, string placeholderName) {
 			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
 
 			Slot slot = FindSlot(slotName);
 			if (slot == null) throw new ArgumentException("Slot not found: " + slotName, "slotName");
 			Attachment attachment = null;
-			if (attachmentName != null) {
-				attachment = GetAttachment(slot.data.index, attachmentName);
+			if (placeholderName != null) {
+				attachment = GetAttachment(slot.data.index, placeholderName);
 				if (attachment == null)
-					throw new ArgumentException("Attachment not found: " + attachmentName + ", for slot: " + slotName, "attachmentName");
+					throw new ArgumentException("Attachment not found: " + placeholderName + ", for slot: " + slotName, "placeholderName");
 			}
 			slot.pose.Attachment = attachment;
 		}
@@ -422,6 +423,8 @@ namespace Spine {
 		/// <summary>The skeleton's physics constraints.</summary>
 		public ExposedList<PhysicsConstraint> PhysicsConstraints { get { return physics; } }
 
+		/// <summary>Finds a constraint of the specified type by comparing each constraint's name. It is more efficient to cache the
+		/// results of this method than to call it multiple times.</summary>
 		/// <returns>May be null.</returns>
 		public T FindConstraint<T> (string constraintName) where T : class, IConstraint {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
@@ -434,7 +437,7 @@ namespace Spine {
 			return null;
 		}
 
-		/// <summary>Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.</summary>
+		/// <summary>Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the applied pose.</summary>
 		/// <param name="x">The horizontal distance between the skeleton origin and the left side of the AABB.</param>
 		/// <param name="y">The vertical distance between the skeleton origin and the bottom side of the AABB.</param>
 		/// <param name="width">The width of the AABB</param>
@@ -445,21 +448,22 @@ namespace Spine {
 
 			float[] temp = vertexBuffer;
 			temp = temp ?? new float[8];
-			Slot[] drawOrder = this.drawOrder.Items;
+			ExposedList<Slot> drawOrder = this.drawOrder.appliedPose;
+			Slot[] slots = drawOrder.Items;
 			float minX = int.MaxValue, minY = int.MaxValue, maxX = int.MinValue, maxY = int.MinValue;
-			for (int i = 0, n = this.drawOrder.Count; i < n; i++) {
-				Slot slot = drawOrder[i];
+			for (int i = 0, n = drawOrder.Count; i < n; i++) {
+				Slot slot = slots[i];
 				if (!slot.bone.active) continue;
 				int verticesLength = 0;
 				float[] vertices = null;
 				int[] triangles = null;
-				Attachment attachment = slot.pose.attachment;
+				Attachment attachment = slot.appliedPose.attachment;
 				RegionAttachment region = attachment as RegionAttachment;
 				if (region != null) {
 					verticesLength = 8;
 					vertices = temp;
 					if (vertices.Length < 8) vertices = temp = new float[8];
-					region.ComputeWorldVertices(slot, region.GetOffsets(slot.applied), vertices, 0, 2);
+					region.ComputeWorldVertices(slot, region.GetOffsets(slot.appliedPose), vertices, 0, 2);
 					triangles = quadTriangles;
 				} else {
 					MeshAttachment mesh = attachment as MeshAttachment;
@@ -558,9 +562,13 @@ namespace Spine {
 			this.y = y;
 		}
 
+		/// <summary>The x component of a vector that defines the direction <see cref="PhysicsConstraintPose.Wind"/> is applied.</summary>
 		public float WindX { get { return windX; } set { windX = value; } }
+		/// <summary>The y component of a vector that defines the direction <see cref="PhysicsConstraintPose.Wind"/> is applied.</summary>
 		public float WindY { get { return windY; } set { windY = value; } }
+		/// <summary>The x component of a vector that defines the direction <see cref="PhysicsConstraintPose.Gravity"/> is applied.</summary>
 		public float GravityX { get { return gravityX; } set { gravityX = value; } }
+		/// <summary>The y component of a vector that defines the direction <see cref="PhysicsConstraintPose.Gravity"/> is applied.</summary>
 		public float GravityY { get { return gravityY; } set { gravityY = value; } }
 
 		/// <summary>
@@ -581,7 +589,7 @@ namespace Spine {
 				physicsConstraints[i].Rotate(x, y, degrees);
 		}
 
-		/// <summary>Returns the skeleton's time. This is used for time-based manipulations, such as <see cref="PhysicsConstraint"/>.</summary>
+		/// <summary>Returns the skeleton's time, used for time-based manipulations, such as <see cref="PhysicsConstraint"/>.</summary>
 		/// <seealso cref="Update(float)"/>
 		public float Time { get { return time; } set { time = value; } }
 

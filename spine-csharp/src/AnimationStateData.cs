@@ -32,7 +32,7 @@ using System.Collections.Generic;
 
 namespace Spine {
 
-	/// <summary>Stores mix (crossfade) durations to be applied when AnimationState animations are changed.</summary>
+	/// <summary>Stores mix (crossfade) durations to be applied when <see cref="AnimationState"/> animations are changed on the same track.</summary>
 	public class AnimationStateData {
 		internal SkeletonData skeletonData;
 		readonly Dictionary<AnimationPair, float> animationToMixTime = new Dictionary<AnimationPair, float>(AnimationPairComparer.Instance);
@@ -70,8 +70,8 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// The mix duration to use when changing from the specified animation to the other,
-		/// or the DefaultMix if no mix duration has been set.
+		/// Returns the mix duration to use when changing from the specified animation to the other on the same track,
+		/// or the <see cref="DefaultMix"/> if no mix duration has been set.
 		/// </summary>
 		public float GetMix (Animation from, Animation to) {
 			if (from == null) throw new ArgumentNullException("from", "from cannot be null.");

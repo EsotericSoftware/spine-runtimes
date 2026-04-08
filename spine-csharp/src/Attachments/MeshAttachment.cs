@@ -94,8 +94,8 @@ namespace Spine {
 
 		// Nonessential.
 		/// <summary>
-		/// Vertex index pairs describing edges for controlling triangulation, or be null if nonessential data was not exported. Mesh
-		/// triangles never cross edges. Triangulation is not performed at runtime.
+		/// Vertex index pairs describing edges for controlling triangulation, or null if nonessential data was not exported. Mesh
+		/// triangles do not cross edges. Triangulation is not performed at runtime.
 		/// </summary>
 		public int[] Edges { get; set; }
 		public float Width { get; set; }

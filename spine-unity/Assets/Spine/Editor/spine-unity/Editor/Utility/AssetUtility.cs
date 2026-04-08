@@ -67,6 +67,7 @@
 #define USES_ENTITY_ID
 #endif
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -562,7 +563,7 @@ namespace Spine.Unity.Editor {
 
 			foreach (FileInfo f in files) {
 				string localPath = dir + "/" + f.Name;
-				UnityEngine.Object obj = AssetDatabase.LoadAssetAtPath(localPath, typeof(Object));
+				UnityEngine.Object obj = AssetDatabase.LoadAssetAtPath(localPath, typeof(UnityEngine.Object));
 				SkeletonDataAsset skeletonDataAsset = obj as SkeletonDataAsset;
 				if (skeletonDataAsset != null) {
 					if (skeletonDataAsset.skeletonJSON == textAsset) {
@@ -632,7 +633,7 @@ namespace Spine.Unity.Editor {
 			int subLen = Application.dataPath.Length - 6;
 			foreach (FileInfo f in assetInfoArr) {
 				string assetRelativePath = f.FullName.Substring(subLen, f.FullName.Length - subLen).Replace("\\", "/");
-				Object obj = AssetDatabase.LoadAssetAtPath(assetRelativePath, typeof(AtlasAssetBase));
+				UnityEngine.Object obj = AssetDatabase.LoadAssetAtPath(assetRelativePath, typeof(AtlasAssetBase));
 				if (obj != null)
 					arr.Add(obj as AtlasAssetBase);
 			}
@@ -1157,7 +1158,7 @@ namespace Spine.Unity.Editor {
 
 			foreach (FileInfo path in files) {
 				string localPath = dir + "/" + path.Name;
-				UnityEngine.Object obj = AssetDatabase.LoadAssetAtPath(localPath, typeof(Object));
+				UnityEngine.Object obj = AssetDatabase.LoadAssetAtPath(localPath, typeof(UnityEngine.Object));
 				SkeletonDataAsset skeletonDataAsset = obj as SkeletonDataAsset;
 				if (skeletonDataAsset != null && skeletonDataAsset.skeletonJSON == textAsset)
 					return true;
@@ -1179,9 +1180,28 @@ namespace Spine.Unity.Editor {
 			while (!resolved) {
 
 				string filename = Path.GetFileNameWithoutExtension(skeletonPath);
+
+				StringBuilder dialogText = new StringBuilder();
+				dialogText.AppendLine(string.Format("Could not automatically set the AtlasAsset for \"{0}\".", filename));
+				dialogText.AppendLine();
+				if (localAtlases.Count == 0) {
+					dialogText.AppendLine("No AtlasAsset was found.");
+					dialogText.AppendLine("Did you forget to set the extension to `.atlas.txt`?");
+				} else {
+					List<string> missingRegions = GetMissingRegions(requiredPaths, localAtlases);
+					for (int i = 0; i < localAtlases.Count; i++) {
+						if (i > 0) dialogText.Append(", ");
+						dialogText.AppendFormat("\"{0}\"", localAtlases[i].name);
+					}
+					dialogText.AppendLine(localAtlases.Count == 1 ? " has missing regions:" : " have missing regions:");
+					AppendMissingAtlasRegions(dialogText, missingRegions);
+				}
+				dialogText.AppendLine();
+				dialogText.AppendLine("(You may resolve this manually later.)");
+
 				int result = EditorUtility.DisplayDialogComplex(
 					string.Format("AtlasAsset for \"{0}\"", filename),
-					string.Format("Could not automatically set the AtlasAsset for \"{0}\".\n\n (You may resolve this manually later.)", filename),
+					dialogText.ToString(),
 					"Resolve atlases...", "Import without atlases", "Stop importing"
 				);
 
@@ -1202,11 +1222,14 @@ namespace Spine.Unity.Editor {
 				}
 				case 0: { // Resolve AtlasAssets...
 					string pathForwardSlash = Path.GetDirectoryName(skeletonPath).Replace('\\', '/');
-					List<AtlasAssetBase> atlasList = MultiAtlasDialog(requiredPaths, pathForwardSlash,
-						localAtlases, filename);
-					if (atlasList != null)
-						AssetUtility.IngestSpineProject(AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonPath), atlasList.ToArray());
-
+					AtlasAssetBase firstAtlas = BrowseAtlasDialog(pathForwardSlash, localAtlases);
+					if (firstAtlas != null) {
+						List<AtlasAssetBase> initialAtlases = new List<AtlasAssetBase> { firstAtlas };
+						List<AtlasAssetBase> atlasList = MultiAtlasDialog(requiredPaths, pathForwardSlash,
+							localAtlases, filename, initialAtlases);
+						if (atlasList != null)
+							AssetUtility.IngestSpineProject(AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonPath), atlasList.ToArray());
+					}
 					resolved = true;
 					break;
 				}
@@ -1223,16 +1246,43 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
-		public static List<AtlasAssetBase> MultiAtlasDialog (List<string> requiredPaths, string initialDirectory,
-			List<AtlasAssetBase> localAtlases, string filename = "") {
+		static List<string> GetMissingRegions (List<string> requiredPaths, IList<AtlasAssetBase> atlasAssets) {
+			List<string> missingRegions = new List<string>(requiredPaths);
+			foreach (AtlasAssetBase atlasAsset in atlasAssets) {
+				Atlas atlas = atlasAsset.GetAtlas();
+				for (int i = 0; i < missingRegions.Count; i++) {
+					if (atlas.FindRegionIgnoringNumberSuffix(missingRegions[i]) != null) {
+						missingRegions.RemoveAt(i);
+						i--;
+					}
+				}
+			}
+			return missingRegions;
+		}
 
-			List<AtlasAssetBase> atlasAssets = new List<AtlasAssetBase>();
+		static void AppendMissingAtlasRegions (StringBuilder dialogText, List<string> missingRegions) {
+			const int MaxListLength = 15;
+			int missingCount = missingRegions.Count;
+			int max = Math.Min(missingRegions.Count, MaxListLength);
+			for (int i = 0; i < max; i++)
+				dialogText.AppendLine(string.Format("\t {0}", missingRegions[i]));
+			if (missingCount > MaxListLength)
+				dialogText.AppendLine(string.Format("\t... {0} more...", missingCount - MaxListLength));
+		}
+
+		public static List<AtlasAssetBase> MultiAtlasDialog (List<string> requiredPaths, string initialDirectory,
+			List<AtlasAssetBase> localAtlases, string filename = "", List<AtlasAssetBase> initialAtlases = null) {
+
+			List<AtlasAssetBase> atlasAssets = initialAtlases != null ? new List<AtlasAssetBase>(initialAtlases) : new List<AtlasAssetBase>();
 			bool resolved = false;
 			string lastAtlasPath = initialDirectory;
 			while (!resolved) {
 
 				// Build dialog box message.
-				List<string> missingRegions = new List<string>(requiredPaths);
+				List<string> missingRegions = GetMissingRegions(requiredPaths, atlasAssets);
+				if (missingRegions.Count == 0)
+					break;
+
 				StringBuilder dialogText = new StringBuilder();
 				{
 					dialogText.AppendLine(string.Format("SkeletonDataAsset for \"{0}\"", filename));
@@ -1240,35 +1290,12 @@ namespace Spine.Unity.Editor {
 					dialogText.AppendLine();
 					dialogText.AppendLine("Current Atlases:");
 
-					if (atlasAssets.Count == 0)
-						dialogText.AppendLine("\t--none--");
-
 					for (int i = 0; i < atlasAssets.Count; i++)
 						dialogText.AppendLine("\t" + atlasAssets[i].name);
 
 					dialogText.AppendLine();
 					dialogText.AppendLine("Missing Regions:");
-
-					foreach (AtlasAssetBase atlasAsset in atlasAssets) {
-						Atlas atlas = atlasAsset.GetAtlas();
-						for (int i = 0; i < missingRegions.Count; i++) {
-							if (atlas.FindRegionIgnoringNumberSuffix(missingRegions[i]) != null) {
-								missingRegions.RemoveAt(i);
-								i--;
-							}
-						}
-					}
-
-					int n = missingRegions.Count;
-					if (n == 0)
-						break;
-
-					const int MaxListLength = 15;
-					for (int i = 0; (i < n && i < MaxListLength); i++)
-						dialogText.AppendLine(string.Format("\t {0}", missingRegions[i]));
-
-					if (n > MaxListLength)
-						dialogText.AppendLine(string.Format("\t... {0} more...", n - MaxListLength));
+					AppendMissingAtlasRegions(dialogText, missingRegions);
 				}
 
 				// Show dialog box.
@@ -1515,7 +1542,7 @@ namespace Spine.Unity.Editor {
 
 		public static SkeletonMecanim InstantiateSkeletonMecanim (SkeletonDataAsset skeletonDataAsset, Skin skin = null,
 			bool destroyInvalid = true, bool useObjectFactory = true) {
-			
+
 			SkeletonData data = GetSkeletonData(skeletonDataAsset);
 			if (data == null) {
 				Debug.LogWarning("InstantiateSkeletonMecanim tried to instantiate a skeleton from an invalid SkeletonDataAsset.", skeletonDataAsset);

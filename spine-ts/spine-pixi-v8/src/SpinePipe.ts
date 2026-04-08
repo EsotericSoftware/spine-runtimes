@@ -219,7 +219,8 @@ export class SpinePipe implements RenderPipe<Spine> {
 				if (!cacheData.skipRender) {
 					const batchableSpineSlot = gpuSpine.slotBatches[cacheData.id];
 					if (batchableSpineSlot) {
-						batchableSpineSlot.uvs = cacheData.uvs;
+						// biome-ignore lint/style/noNonNullAssertion: if clipped is true, clippedData exists
+						batchableSpineSlot.uvs = cacheData.clipped ? cacheData.clippedData!.uvs : cacheData.uvs;
 						batchableSpineSlot._batcher?.updateElement(batchableSpineSlot);
 					}
 				}

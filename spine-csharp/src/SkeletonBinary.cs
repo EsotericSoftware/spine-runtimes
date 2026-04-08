@@ -197,7 +197,7 @@ namespace Spine {
 					string name = input.ReadString();
 					BoneData parent = i == 0 ? null : bones[input.ReadInt(true)];
 					var data = new BoneData(i, name, parent);
-					BoneLocal setup = data.setup;
+					BonePose setup = data.setupPose;
 					setup.rotation = input.ReadFloat();
 					setup.x = input.ReadFloat() * scale;
 					setup.y = input.ReadFloat() * scale;
@@ -223,10 +223,10 @@ namespace Spine {
 
 					BoneData boneData = bones[input.ReadInt(true)];
 					var slotData = new SlotData(i, slotName, boneData);
-					slotData.setup.SetColor(((uint)input.ReadInt()).RGBA8888ToColor());
+					slotData.setupPose.SetColor(((uint)input.ReadInt()).RGBA8888ToColor());
 					int darkColor = input.ReadInt(); // 0x00rrggbb
 					if (darkColor != -1) {
-						slotData.setup.SetDarkColor(((uint)darkColor).XRGB888ToColor());
+						slotData.setupPose.SetDarkColor(((uint)darkColor).XRGB888ToColor());
 					}
 
 					slotData.attachmentName = input.ReadStringRef();
@@ -254,7 +254,7 @@ namespace Spine {
 						int flags = input.Read();
 						data.skinRequired = (flags & 1) != 0;
 						data.uniform = (flags & 2) != 0;
-						IkConstraintPose setup = data.setup;
+						IkConstraintPose setup = data.setupPose;
 						setup.bendDirection = (flags & 4) != 0 ? -1 : 1;
 						setup.compress = (flags & 8) != 0;
 						setup.stretch = (flags & 16) != 0;
@@ -333,7 +333,7 @@ namespace Spine {
 						if ((flags & 16) != 0) data.offsets[TransformConstraintData.SCALEY] = input.ReadFloat();
 						if ((flags & 32) != 0) data.offsets[TransformConstraintData.SHEARY] = input.ReadFloat();
 						flags = input.Read();
-						TransformConstraintPose setup = data.setup;
+						TransformConstraintPose setup = data.setupPose;
 						if ((flags & 1) != 0) setup.mixRotate = input.ReadFloat();
 						if ((flags & 2) != 0) setup.mixX = input.ReadFloat();
 						if ((flags & 4) != 0) setup.mixY = input.ReadFloat();
@@ -355,7 +355,7 @@ namespace Spine {
 						data.spacingMode = (SpacingMode)Enum.GetValues(typeof(SpacingMode)).GetValue((flags >> 2) & 0x3); // 0b11
 						data.rotateMode = (RotateMode)Enum.GetValues(typeof(RotateMode)).GetValue((flags >> 4) & 0x3); // 0b11
 						if ((flags & 128) != 0) data.offsetRotation = input.ReadFloat();
-						PathConstraintPose setup = data.setup;
+						PathConstraintPose setup = data.setupPose;
 						setup.position = input.ReadFloat();
 						if (data.positionMode == PositionMode.Fixed) setup.position *= scale;
 						setup.spacing = input.ReadFloat();
@@ -378,7 +378,7 @@ namespace Spine {
 						if ((flags & 32) != 0) data.shearX = input.ReadFloat();
 						data.limit = ((flags & 64) != 0 ? input.ReadFloat() : 5000) * scale;
 						data.step = 1f / input.ReadUByte();
-						PhysicsConstraintPose setup = data.setup;
+						PhysicsConstraintPose setup = data.setupPose;
 						setup.inertia = input.ReadFloat();
 						setup.strength = input.ReadFloat();
 						setup.damping = input.ReadFloat();
@@ -403,8 +403,8 @@ namespace Spine {
 						data.skinRequired = (flags & 1) != 0;
 						data.loop = (flags & 2) != 0;
 						data.additive = (flags & 4) != 0;
-						if ((flags & 8) != 0) data.setup.time = input.ReadFloat();
-						if ((flags & 16) != 0) data.setup.mix = (flags & 32) != 0 ? input.ReadFloat() : 1;
+						if ((flags & 8) != 0) data.setupPose.time = input.ReadFloat();
+						if ((flags & 16) != 0) data.setupPose.mix = (flags & 32) != 0 ? input.ReadFloat() : 1;
 						if ((flags & 64) != 0) {
 							data.local = (flags & 128) != 0;
 							data.bone = bones[input.ReadInt(true)];
@@ -469,13 +469,14 @@ namespace Spine {
 				o = skeletonData.events.EnsureSize(n = input.ReadInt(true)).Items;
 				for (int i = 0; i < n; i++) {
 					var data = new EventData(input.ReadString());
-					data.Int = input.ReadInt(false);
-					data.Float = input.ReadFloat();
-					data.String = input.ReadString();
+					Event setup = data.setupPose;
+					setup.intValue = input.ReadInt(false);
+					setup.floatValue = input.ReadFloat();
+					setup.stringValue = input.ReadString();
 					data.AudioPath = input.ReadString();
 					if (data.AudioPath != null) {
-						data.Volume = input.ReadFloat();
-						data.Balance = input.ReadFloat();
+						setup.volume = input.ReadFloat();
+						setup.balance = input.ReadFloat();
 					}
 					o[i] = data;
 				}
@@ -927,8 +928,11 @@ namespace Spine {
 			}
 
 			// Bone timelines.
-			for (int i = 0, n = input.ReadInt(true); i < n; i++) {
+			int boneCount = input.ReadInt(true);
+			var bones = new ExposedList<int>(boneCount);
+			for (int i = 0; i < boneCount; i++) {
 				int boneIndex = input.ReadInt(true);
+				bones.Add(boneIndex);
 				for (int ii = 0, nn = input.ReadInt(true); ii < nn; ii++) {
 					int type = input.ReadUByte(), frameCount = input.ReadInt(true);
 					if (type == BONE_INHERIT) {
@@ -1250,7 +1254,7 @@ namespace Spine {
 					e.intValue = input.ReadInt(false);
 					e.floatValue = input.ReadFloat();
 					e.stringValue = input.ReadString();
-					if (e.stringValue == null) e.stringValue = eventData.String;
+					if (e.stringValue == null) e.stringValue = eventData.setupPose.stringValue;
 					if (e.data.AudioPath != null) {
 						e.volume = input.ReadFloat();
 						e.balance = input.ReadFloat();
@@ -1264,7 +1268,11 @@ namespace Spine {
 			Timeline[] items = timelines.Items;
 			for (int i = 0, n = timelines.Count; i < n; i++)
 				duration = Math.Max(duration, items[i].Duration);
-			return new Animation(name, timelines, duration);
+
+			Animation animation = new Animation(name);
+			animation.SetTimelines(timelines, bones);
+			animation.Duration = duration;
+			return animation;
 		}
 
 		/// <exception cref="IOException">Throws IOException when a read operation fails.</exception>

@@ -37,6 +37,7 @@ import com.esotericsoftware.spine.SlotData;
 /** An attachment with vertices that make up a polygon used for clipping the rendering of other attachments. */
 public class ClippingAttachment extends VertexAttachment {
 	@Null SlotData endSlot;
+	boolean convex, inverse;
 
 	// Nonessential.
 	final Color color = new Color(0.2275f, 0.2275f, 0.8078f, 1); // ce3a3aff
@@ -49,6 +50,8 @@ public class ClippingAttachment extends VertexAttachment {
 	protected ClippingAttachment (ClippingAttachment other) {
 		super(other);
 		endSlot = other.endSlot;
+		convex = other.convex;
+		inverse = other.inverse;
 		color.set(other.color);
 	}
 
@@ -60,6 +63,27 @@ public class ClippingAttachment extends VertexAttachment {
 
 	public void setEndSlot (@Null SlotData endSlot) {
 		this.endSlot = endSlot;
+	}
+
+	/** When true the clipping polygon is treated as convex for more efficient clipping. If the polygon deforms to concave then the
+	 * convex hull is used. When false the clipping polygon can be concave and if so has an additional CPU cost. Inverse clipping
+	 * always uses convex. */
+	public boolean getConvex () {
+		return convex;
+	}
+
+	public void setConvex (boolean convex) {
+		this.convex = convex;
+	}
+
+	/** When false, everything inside the clipping polygon is visible. When true, everything outside the clipping polygon is
+	 * visible and clipping is convex. */
+	public boolean getInverse () {
+		return inverse;
+	}
+
+	public void setInverse (boolean inverse) {
+		this.inverse = inverse;
 	}
 
 	/** The color of the clipping attachment as it was in Spine, or a default color if nonessential data was not exported. Clipping

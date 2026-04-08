@@ -427,7 +427,7 @@ namespace Spine.Unity.Examples {
 					foreach (Skin.SkinEntry entry in skinEntries) {
 						BoundingBoxAttachment bbAttachment = entry.Attachment as BoundingBoxAttachment;
 						if (bbAttachment != null) {
-							if (!entry.Name.ToLower().Contains(AttachmentNameMarker))
+							if (!entry.PlaceholderName.ToLower().Contains(AttachmentNameMarker))
 								continue;
 
 							BoxCollider bbCollider = go.AddComponent<BoxCollider>();

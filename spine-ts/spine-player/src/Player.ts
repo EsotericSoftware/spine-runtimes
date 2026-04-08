@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { type Animation, AnimationState, AnimationStateData, AtlasAttachmentLoader, type Bone, Color, type Disposable, type Downloader, MathUtils, Physics, Skeleton, SkeletonBinary, type SkeletonData, SkeletonJson, type StringMap, type TextureAtlas, TextureFilter, TimeKeeper, type TrackEntry, Vector2 } from "@esotericsoftware/spine-core"
+import { type Animation, AnimationState, AnimationStateData, AtlasAttachmentLoader, type Bone, Color, type Disposable, type Downloader, MathUtils, Physics, Skeleton, SkeletonBinary, type SkeletonData, SkeletonJson, Skin, type StringMap, type TextureAtlas, TextureFilter, TimeKeeper, type TrackEntry, Vector2 } from "@esotericsoftware/spine-core"
 import { AssetManager, type GLTexture, Input, LoadingScreen, ManagedWebGLRenderingContext, ResizeMode, SceneRenderer, Vector3 } from "@esotericsoftware/spine-webgl"
 
 export interface SpinePlayerConfig {
@@ -60,8 +60,8 @@ export interface SpinePlayerConfig {
 	/* Optional: The default mix time used to switch between two animations. Default: 0.25 */
 	defaultMix?: number
 
-	/* Optional: The name of the skin to be set. Default: the default skin */
-	skin?: string
+	/* Optional: The name of the skin or list of skins to be set. Default: the default skin */
+	skin?: string | string[]
 
 	/* Optional: List of skin names from which the user can choose. Default: all skins */
 	skins?: string[]
@@ -209,6 +209,7 @@ export class SpinePlayer implements Disposable {
 	private timelineSlider: Slider | null = null;
 	private playButton: HTMLElement | null = null;
 	private skinButton: HTMLElement | null = null;
+	private pinnedSkins: Set<string> = new Set();
 	private animationButton: HTMLElement | null = null;
 
 	private playTime = 0;
@@ -318,8 +319,15 @@ export class SpinePlayer implements Disposable {
 		}
 		if (config.animations && config.animation && config.animations.indexOf(config.animation) < 0)
 			throw new Error(`Animation '${config.animation}' is not in the config animation list: ${print(config.animations)}`);
-		if (config.skins && config.skin && config.skins.indexOf(config.skin) < 0)
-			throw new Error(`Default skin '${config.skin}' is not in the config skins list: ${print(config.skins)}`);
+		if (config.skin) {
+			if (!Array.isArray(config.skin)) config.skin = [config.skin];
+			if (config.skins) {
+				for (const s of config.skin) {
+					if (config.skins.indexOf(s) < 0)
+						throw new Error(`Default skin '${s}' is not in the config skins list: ${print(config.skins)}`);
+				}
+			}
+		}
 		if (!config.viewport) config.viewport = {} as any;
 		if (!config.viewport!.animations) config.viewport!.animations = {};
 		if (config.viewport!.debugRender === void 0) config.viewport!.debugRender = false;
@@ -506,18 +514,22 @@ export class SpinePlayer implements Disposable {
 		})
 
 		// Setup skin.
-		if (!config.skin && skeletonData.skins.length) config.skin = skeletonData.skins[0].name;
+		if ((!config.skin || !config.skin.length) && skeletonData.skins.length) config.skin = [skeletonData.skins[0].name];
 		if (config.skins && config.skin!.length) {
 			config.skins.forEach(skin => {
 				if (!this.skeleton!.data.findSkin(skin))
 					this.showError(`Error: Skin in config list does not exist in skeleton: ${skin}`);
 			});
 		}
-		if (config.skin) {
-			if (!this.skeleton.data.findSkin(config.skin))
-				this.showError(`Error: Skin does not exist in skeleton: ${config.skin}`);
-			this.skeleton.setSkin(config.skin);
-			this.skeleton.setupPoseSlots();
+		const skinList = config.skin as string[];
+		if (skinList?.length) {
+			for (const s of skinList) {
+				if (!this.skeleton.data.findSkin(s))
+					this.showError(`Error: Skin does not exist in skeleton: ${s}`);
+				if (this.skeleton.data.findSkin(s) !== this.skeleton.data.defaultSkin)
+					this.pinnedSkins.add(s);
+			}
+			this.applyCombinedSkin();
 		}
 
 		// Check if all animations given a viewport exist.
@@ -800,19 +812,21 @@ export class SpinePlayer implements Disposable {
 			this.skeleton!.updateWorldTransform(Physics.update);
 			this.skeleton!.getBounds(offset, size, tempArray, this.sceneRenderer!.skeletonRenderer.getSkeletonClipping());
 
-			if (!Number.isNaN(offset.x) && !Number.isNaN(offset.y) && !Number.isNaN(size.x) && !Number.isNaN(size.y)) {
+			if (Number.isFinite(offset.x) && Number.isFinite(offset.y) && Number.isFinite(size.x) && Number.isFinite(size.y)) {
 				minX = Math.min(offset.x, minX);
 				maxX = Math.max(offset.x + size.x, maxX);
 				minY = Math.min(offset.y, minY);
 				maxY = Math.max(offset.y + size.y, maxY);
-			} else
-				this.showError(`Animation bounds are invalid: ${animation.name}`);
+			}
 		}
 
 		viewport.x = minX;
 		viewport.y = minY;
 		viewport.width = maxX - minX;
 		viewport.height = maxY - minY;
+
+		if (!Number.isFinite(viewport.width) || !Number.isFinite(viewport.height))
+			this.showError(`Animation bounds are invalid: ${animation.name}`);
 	}
 
 	private drawFrame (requestNextFrame = true) {
@@ -1025,31 +1039,67 @@ export class SpinePlayer implements Disposable {
 		popup.show();
 	}
 
+	private applyCombinedSkin () {
+		if (!this.skeleton) return;
+		if (this.pinnedSkins.size === 0) {
+			this.skeleton.setSkin(this.skeleton.data.defaultSkin!);
+		} else if (this.pinnedSkins.size === 1) {
+			this.skeleton.setSkin(this.pinnedSkins.values().next().value!);
+		} else {
+			const combined = new Skin("combined");
+			for (const name of this.pinnedSkins) {
+				const skin = this.skeleton.data.findSkin(name);
+				if (skin) combined.addSkin(skin);
+			}
+			this.skeleton.setSkin(combined);
+		}
+		this.skeleton.setupPoseSlots();
+		this.skeleton.updateWorldTransform(Physics.pose);
+
+		// Recalculate the viewport for the current animation since skin changes affect bounds.
+		const entry = this.animationState?.getCurrent(0);
+		if (entry && entry.animation) this.setViewport(entry.animation);
+	}
+
 	private showSkinsDialog (skinButton: HTMLElement) {
 		const id = "skins";
 		if (this.hidePopup(id)) return;
-		if (!this.skeleton || !this.skeleton.data.animations.length) return;
+		if (!this.skeleton || !this.skeleton.data.skins.length) return;
 
 		const popup = new Popup(id, skinButton, this, this.playerControls!,
 				/*html*/`<div class="spine-player-popup-title">Skins</div><hr><ul class="spine-player-list"></ul>`);
 
 		const rows = findWithClass(popup.dom, "spine-player-list");
 		this.skeleton.data.skins.forEach((skin) => {
+			if (skin === this.skeleton!.data.defaultSkin) return;
 			// Skip skins not whitelisted if a whitelist was given.
 			if (this.config.skins && this.config.skins.indexOf(skin.name) < 0) return;
 
-			const row = createElement(/*html*/`<li class="spine-player-list-item selectable"><div class="selectable-circle"></div><div class="selectable-text"></div></li>`);
-			if (skin.name === this.config.skin) row.classList.add("selected");
-			findWithClass(row, "selectable-text").innerText = skin.name;
+			const row = createElement(/*html*/`<li class="spine-player-list-item selectable"><div class="selectable-pin"></div><div class="selectable-text"></div></li>`);
+			if (this.pinnedSkins.has(skin.name)) row.classList.add("pinned");
+			const pinElement = findWithClass(row, "selectable-pin");
+			const textElement = findWithClass(row, "selectable-text");
+			textElement.innerText = skin.name;
 			rows.appendChild(row);
+			pinElement.onclick = (e) => {
+				e.stopPropagation();
+				if (this.pinnedSkins.has(skin.name)) {
+					this.pinnedSkins.delete(skin.name);
+					row.classList.remove("pinned");
+				} else {
+					this.pinnedSkins.add(skin.name);
+					row.classList.add("pinned");
+				}
+				this.applyCombinedSkin();
+			};
 			row.onclick = () => {
-				removeClass(rows.children, "selected");
-				row.classList.add("selected");
-				this.config.skin = skin.name;
-				this.skeleton!.setSkin(this.config.skin);
-				this.skeleton!.setupPose();
-				this.skeleton!.updateWorldTransform(Physics.pose);
-			}
+				this.pinnedSkins.clear();
+				this.pinnedSkins.add(skin.name);
+				for (let i = 0; i < rows.children.length; i++)
+					rows.children[i].classList.remove("pinned");
+				row.classList.add("pinned");
+				this.applyCombinedSkin();
+			};
 		});
 		popup.show();
 	}
@@ -1099,9 +1149,8 @@ export class SpinePlayer implements Disposable {
 class Popup {
 	public dom: HTMLElement;
 	private className: string;
-	private windowClickListener: any;
 
-	constructor (private id: string, private button: HTMLElement, private player: SpinePlayer, parent: HTMLElement, htmlContent: string) {
+	constructor (private id: string, private button: HTMLElement, private player: SpinePlayer, private parent: HTMLElement, htmlContent: string) {
 		this.dom = createElement(/*html*/`<div class="spine-player-popup spine-player-hidden"></div>`);
 		this.dom.innerHTML = htmlContent;
 		parent.appendChild(this.dom);
@@ -1131,10 +1180,7 @@ class Popup {
 		let dismissed = false;
 		const resize = () => {
 			if (!dismissed) requestAnimationFrame(resize);
-			const playerDom = this.player.dom;
-			const bottomOffset = Math.abs(playerDom.getBoundingClientRect().bottom - playerDom.getBoundingClientRect().bottom);
-			const rightOffset = Math.abs(playerDom.getBoundingClientRect().right - playerDom.getBoundingClientRect().right);
-			this.dom.style.maxHeight = `${playerDom.clientHeight - bottomOffset - rightOffset}px`;
+			this.dom.style.maxHeight = `${this.player.dom.clientHeight - this.parent.getBoundingClientRect().height}px`;
 		}
 		requestAnimationFrame(resize);
 
@@ -1209,24 +1255,36 @@ class Slider {
 		// this.knob = findWithClass(this.slider, "spine-player-slider-knob");
 		this.setValue(0);
 
-		let dragging = false;
-		new Input(this.slider).addListener({
-			down: (x, y) => {
-				dragging = true;
-				this.value?.classList.add("hovering");
-			},
-			up: (x, y) => {
-				dragging = false;
-				if (this.change) this.change(this.setValue(x / this.slider!.clientWidth));
-				this.value?.classList.remove("hovering");
-			},
-			moved: (x, y) => {
-				if (dragging && this.change) this.change(this.setValue(x / this.slider!.clientWidth));
-			},
-			dragged: (x, y) => {
-				if (this.change) this.change(this.setValue(x / this.slider!.clientWidth));
-			}
-		});
+		let rect: DOMRect;
+
+		const update = (ev: MouseEvent | TouchEvent) => {
+			const clientX = ev instanceof MouseEvent ? ev.clientX : ev.changedTouches[0].clientX;
+			if (this.change) this.change(this.setValue((clientX - rect.left) / rect.width));
+		};
+
+		const onEnd = (ev: MouseEvent | TouchEvent) => {
+			update(ev);
+			this.value?.classList.remove("hovering");
+			this.slider?.parentElement?.classList.remove("dragging");
+			document.removeEventListener("mousemove", update, true);
+			document.removeEventListener("mouseup", onEnd, true);
+			document.removeEventListener("touchmove", update, true);
+			document.removeEventListener("touchend", onEnd, true);
+		};
+
+		const onStart = (ev: MouseEvent | TouchEvent) => {
+			rect = this.slider!.getBoundingClientRect();
+			this.value?.classList.add("hovering");
+			this.slider?.parentElement?.classList.add("dragging");
+			update(ev);
+			document.addEventListener("mousemove", update, true);
+			document.addEventListener("mouseup", onEnd, true);
+			document.addEventListener("touchmove", update, true);
+			document.addEventListener("touchend", onEnd, true);
+		};
+
+		this.slider.addEventListener("mousedown", onStart, true);
+		this.slider.addEventListener("touchstart", onStart, true);
 
 		return this.slider;
 	}

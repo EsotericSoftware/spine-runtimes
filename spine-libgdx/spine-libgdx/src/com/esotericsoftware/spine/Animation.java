@@ -813,7 +813,7 @@ public class Animation {
 		final int boneIndex;
 
 		public InheritTimeline (int frameCount, int boneIndex) {
-			super(frameCount, Property.inherit.ordinal() << 53 | boneIndex);
+			super(frameCount, (long)Property.inherit.ordinal() << 53 | boneIndex);
 			this.boneIndex = boneIndex;
 			instant = true;
 		}
@@ -882,8 +882,8 @@ public class Animation {
 
 		public RGBATimeline (int frameCount, int bezierCount, int slotIndex) {
 			super(frameCount, bezierCount, slotIndex, //
-				Property.rgb.ordinal() << 53 | slotIndex, //
-				Property.alpha.ordinal() << 53 | slotIndex);
+				(long)Property.rgb.ordinal() << 53 | slotIndex, //
+				(long)Property.alpha.ordinal() << 53 | slotIndex);
 		}
 
 		public int getFrameEntries () {
@@ -958,7 +958,7 @@ public class Animation {
 		static private final int R = 1, G = 2, B = 3;
 
 		public RGBTimeline (int frameCount, int bezierCount, int slotIndex) {
-			super(frameCount, bezierCount, slotIndex, Property.rgb.ordinal() << 53 | slotIndex);
+			super(frameCount, bezierCount, slotIndex, (long)Property.rgb.ordinal() << 53 | slotIndex);
 		}
 
 		public int getFrameEntries () {
@@ -1037,7 +1037,7 @@ public class Animation {
 		final int slotIndex;
 
 		public AlphaTimeline (int frameCount, int bezierCount, int slotIndex) {
-			super(frameCount, bezierCount, Property.alpha.ordinal() << 53 | slotIndex);
+			super(frameCount, bezierCount, (long)Property.alpha.ordinal() << 53 | slotIndex);
 			this.slotIndex = slotIndex;
 		}
 
@@ -1077,9 +1077,9 @@ public class Animation {
 
 		public RGBA2Timeline (int frameCount, int bezierCount, int slotIndex) {
 			super(frameCount, bezierCount, slotIndex, //
-				Property.rgb.ordinal() << 53 | slotIndex, //
-				Property.alpha.ordinal() << 53 | slotIndex, //
-				Property.rgb2.ordinal() << 53 | slotIndex);
+				(long)Property.rgb.ordinal() << 53 | slotIndex, //
+				(long)Property.alpha.ordinal() << 53 | slotIndex, //
+				(long)Property.rgb2.ordinal() << 53 | slotIndex);
 		}
 
 		public int getFrameEntries () {
@@ -1188,8 +1188,8 @@ public class Animation {
 
 		public RGB2Timeline (int frameCount, int bezierCount, int slotIndex) {
 			super(frameCount, bezierCount, slotIndex, //
-				Property.rgb.ordinal() << 53 | slotIndex, //
-				Property.rgb2.ordinal() << 53 | slotIndex);
+				(long)Property.rgb.ordinal() << 53 | slotIndex, //
+				(long)Property.rgb2.ordinal() << 53 | slotIndex);
 		}
 
 		public int getFrameEntries () {
@@ -1299,7 +1299,7 @@ public class Animation {
 		final String[] attachmentNames;
 
 		public AttachmentTimeline (int frameCount, int slotIndex) {
-			super(frameCount, Property.attachment.ordinal() << 53 | slotIndex);
+			super(frameCount, (long)Property.attachment.ordinal() << 53 | slotIndex);
 			this.slotIndex = slotIndex;
 			attachmentNames = new String[frameCount];
 			instant = true;
@@ -1349,7 +1349,8 @@ public class Animation {
 		private final float[][] vertices;
 
 		public DeformTimeline (int frameCount, int bezierCount, int slotIndex, VertexAttachment attachment) {
-			super(frameCount, bezierCount, slotIndex, Property.deform.ordinal() << 53 | slotIndex << 32 | +attachment.getId());
+			super(frameCount, bezierCount, slotIndex,
+				(long)Property.deform.ordinal() << 53 | (long)slotIndex << 32 | +attachment.getId());
 			this.attachment = attachment;
 			vertices = new float[frameCount][];
 			additive = true;
@@ -1562,7 +1563,8 @@ public class Animation {
 		final HasSequence attachment;
 
 		public SequenceTimeline (int frameCount, int slotIndex, Attachment attachment) {
-			super(frameCount, Property.sequence.ordinal() << 53 | slotIndex << 32 | ((HasSequence)attachment).getSequence().getId());
+			super(frameCount,
+				(long)Property.sequence.ordinal() << 53 | (long)slotIndex << 32 | ((HasSequence)attachment).getSequence().getId());
 			this.slotIndex = slotIndex;
 			this.attachment = (HasSequence)attachment;
 			instant = true;
@@ -1851,7 +1853,7 @@ public class Animation {
 		final int constraintIndex;
 
 		public IkConstraintTimeline (int frameCount, int bezierCount, int constraintIndex) {
-			super(frameCount, bezierCount, Property.ikConstraint.ordinal() << 53 | constraintIndex);
+			super(frameCount, bezierCount, (long)Property.ikConstraint.ordinal() << 53 | constraintIndex);
 			this.constraintIndex = constraintIndex;
 		}
 
@@ -1945,7 +1947,7 @@ public class Animation {
 		final int constraintIndex;
 
 		public TransformConstraintTimeline (int frameCount, int bezierCount, int constraintIndex) {
-			super(frameCount, bezierCount, Property.transformConstraint.ordinal() << 53 | constraintIndex);
+			super(frameCount, bezierCount, (long)Property.transformConstraint.ordinal() << 53 | constraintIndex);
 			this.constraintIndex = constraintIndex;
 			additive = true;
 		}
@@ -2104,7 +2106,7 @@ public class Animation {
 		final int constraintIndex;
 
 		public PathConstraintMixTimeline (int frameCount, int bezierCount, int constraintIndex) {
-			super(frameCount, bezierCount, Property.pathConstraintMix.ordinal() << 53 | constraintIndex);
+			super(frameCount, bezierCount, (long)Property.pathConstraintMix.ordinal() << 53 | constraintIndex);
 			this.constraintIndex = constraintIndex;
 			additive = true;
 		}

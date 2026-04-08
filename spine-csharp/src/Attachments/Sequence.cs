@@ -45,15 +45,23 @@ namespace Spine {
 		internal float[][] uvs, offsets;
 		internal int start, digits, setupIndex;
 
+		/// <summary>The starting number for the numeric <see cref="GetPath(string, int)">path</see> suffix.</summary>
 		public int Start { get { return start; } set { start = value; } }
+		/// <summary>The minimum number of digits in the numeric <see cref="GetPath(string, int)">path</see> suffix, for zero
+		/// padding. 0 for no zero padding.</summary>
 		public int Digits { get { return digits; } set { digits = value; } }
 		/// <summary>The index of the region to show for the setup pose.</summary>
 		public int SetupIndex { get { return setupIndex; } set { setupIndex = value; } }
+		/// <summary>The list of texture regions this sequence will display.</summary>
 		public TextureRegion[] Regions { get { return regions; } }
+		/// <summary>Returns true if the <see cref="GetPath(string, int)">path</see> has a numeric suffix.</summary>
 		public bool HasPathSuffix { get { return pathSuffix; } }
 		/// <summary>Returns a unique ID for this attachment.</summary>
 		public int Id { get { return id; } }
 
+		/// <param name="count">The number of texture regions this sequence will display.</param>
+		/// <param name="pathSuffix">If true, the <see cref="GetPath(string, int)">path</see> has a numeric suffix. If false, all
+		/// regions will use the same path, so <c>count</c> should be 1.</param>
 		public Sequence (int count, bool pathSuffix) {
 			lock (Sequence.nextIdLock) {
 				id = Sequence.nextID++;
@@ -119,6 +127,7 @@ namespace Spine {
 			}
 		}
 
+		/// <summary>Returns the <see cref="Regions"/> index for the <see cref="SlotPose.SequenceIndex"/>.</summary>
 		public int ResolveIndex (SlotPose pose) {
 			int index = pose.SequenceIndex;
 			if (index == -1) index = setupIndex;
@@ -126,10 +135,13 @@ namespace Spine {
 			return index;
 		}
 
+		/// <summary>Returns the texture region from <see cref="Regions"/> for the specified index.</summary>
 		public TextureRegion GetRegion (int index) {
 			return regions[index];
 		}
 
+		/// <summary>Returns the UVs for the specified index. <see cref="Regions">Regions</see> must be populated and
+		/// <see cref="Update(IHasSequence)"/> called before calling this method.</summary>
 		public float[] GetUVs (int index) {
 			return uvs[index];
 		}
@@ -141,6 +153,7 @@ namespace Spine {
 			return offsets[index];
 		}
 
+		/// <summary>Returns the specified base path with an optional numeric suffix for the specified index.</summary>
 		public string GetPath (string basePath, int index) {
 			if (!pathSuffix) return basePath;
 			var buffer = new StringBuilder(basePath.Length + digits);
@@ -153,6 +166,7 @@ namespace Spine {
 		}
 	}
 
+	/// <summary>Controls how <see cref="Sequence.Regions"/> are displayed over time.</summary>
 	public enum SequenceMode {
 		Hold, Once, Loop, Pingpong, OnceReverse, LoopReverse, PingpongReverse
 	}

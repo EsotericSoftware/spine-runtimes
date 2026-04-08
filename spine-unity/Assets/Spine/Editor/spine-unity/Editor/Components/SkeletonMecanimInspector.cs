@@ -41,7 +41,7 @@ namespace Spine.Unity.Editor {
 		public static bool mecanimSettingsFoldout;
 		public static bool enableScenePreview;
 
-		protected SerializedProperty updateTiming, autoReset, useCustomMixMode, layerMixModes, layerBlendModes, threadedAnimation;
+		protected SerializedProperty updateTiming, autoReset, useCustomMixMode, layerMixModes, threadedAnimation;
 
 		readonly GUIContent UpdateTimingLabel = new GUIContent("Animation Update",
 			"Whether to update the animation in normal Update (the default), " +
@@ -62,7 +62,6 @@ namespace Spine.Unity.Editor {
 			autoReset = mecanimTranslator.FindPropertyRelative("autoReset");
 			useCustomMixMode = mecanimTranslator.FindPropertyRelative("useCustomMixMode");
 			layerMixModes = mecanimTranslator.FindPropertyRelative("layerMixModes");
-			layerBlendModes = mecanimTranslator.FindPropertyRelative("layerBlendModes");
 
 			updateTiming = serializedObject.FindProperty("updateTiming");
 			threadedAnimation = serializedObject.FindProperty("threadedAnimation");
@@ -156,7 +155,7 @@ namespace Spine.Unity.Editor {
 				skeleton.SetupPose();
 				if (clip != null) {
 					Spine.Animation animation = skeletonData.FindAnimation(clip.name);
-					animation.Apply(skeleton, 0, time, false, null, 1.0f, MixBlend.First, MixDirection.In, false);
+					animation.Apply(skeleton, 0, time, false, null, 1.0f, true, false, false, false);
 				}
 				skeletonRenderer.LateUpdate();
 			}

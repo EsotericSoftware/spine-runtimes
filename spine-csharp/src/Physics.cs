@@ -34,7 +34,7 @@ namespace Spine {
 		/// <summary>Physics are not updated or applied.</summary>
 		None,
 
-		/// <summary>Physics are reset to the current pose.</summary>
+		/// <summary>Physics are <see cref="PhysicsConstraint.Reset(Skeleton)">reset</see>.</summary>
 		Reset,
 
 		/// <summary>Physics are updated and the pose from physics is applied.</summary>

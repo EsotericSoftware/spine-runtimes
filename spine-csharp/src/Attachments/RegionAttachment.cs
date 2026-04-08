@@ -55,6 +55,7 @@ namespace Spine {
 
 		public float X { get { return x; } set { x = value; } }
 		public float Y { get { return y; } set { y = value; } }
+		/// <summary>The local rotation in degrees, counter clockwise.</summary>
 		public float Rotation { get { return rotation; } set { rotation = value; } }
 		public float ScaleX { get { return scaleX; } set { scaleX = value; } }
 		public float ScaleY { get { return scaleY; } set { scaleY = value; } }

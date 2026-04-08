@@ -51,7 +51,7 @@ namespace Spine {
 			this.boneData = boneData;
 		}
 
-		/// <summary>The index of the slot in <see cref="Skeleton.Slots"/>.</summary>
+		/// <summary>The <see cref="Skeleton.Slots"/> index.</summary>
 		public int Index { get { return index; } }
 
 		/// <summary>The bone this slot belongs to.</summary>

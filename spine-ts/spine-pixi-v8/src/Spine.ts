@@ -733,6 +733,7 @@ export class Spine extends ViewContainer {
 
 		clipper.clipTrianglesUnpacked(
 			cacheData.vertices,
+			0,
 			cacheData.indices,
 			cacheData.indices.length,
 			cacheData.uvs,

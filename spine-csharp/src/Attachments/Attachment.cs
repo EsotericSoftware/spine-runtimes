@@ -31,7 +31,8 @@ using System;
 
 namespace Spine {
 
-	/// <summary>The base class for all attachments.</summary>
+	/// <summary>The base class for all attachments. Multiple <see cref="Skeleton"/> instances, slots, or skins can use the same
+	/// attachments.</summary>
 	abstract public class Attachment {
 		internal Attachment timelineAttachment;
 

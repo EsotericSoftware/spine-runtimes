@@ -38,11 +38,7 @@ namespace Spine {
 	using Color32F = UnityEngine.Color;
 #endif
 
-	/// <summary>
-	/// Stores a slot's pose. Slots organize attachments for <see cref="Skeleton.DrawOrder"/> purposes and provide a place to store state
-	/// for an attachment. State cannot be stored in an attachment itself because attachments are stateless and may be shared across
-	/// multiple skeletons.
-	/// </summary>
+	/// <summary>Stores a slot's pose.</summary>
 	public class SlotPose : IPose<SlotPose> {
 		// Color is a struct, thus set to protected to prevent
 		// Color color = slot.color; color.a = 0.5; modifying just a copy of the struct instead of the original

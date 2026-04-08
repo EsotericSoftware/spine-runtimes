@@ -39,7 +39,9 @@ namespace Spine {
 			mix = pose.mix;
 		}
 
+		/// <summary>The time in the <see cref="SliderData.Animation"/> to apply the animation.</summary>
 		public float Time { get { return time; } set { time = value; } }
+		/// <summary>A percentage that controls the mix between the constrained and unconstrained poses.</summary>
 		public float Mix { get { return mix; } set { mix = value; } }
 	}
 }

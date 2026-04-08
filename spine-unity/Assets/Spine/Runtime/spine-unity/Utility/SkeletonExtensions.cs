@@ -83,7 +83,7 @@ namespace Spine.Unity {
 		}
 
 		/// <summary>Sets the bone's (local) X and Y according to a Vector2</summary>
-		public static void SetLocalPosition (this BoneLocal bonePose, Vector2 position) {
+		public static void SetLocalPosition (this BonePose bonePose, Vector2 position) {
 			bonePose.X = position.x;
 			bonePose.Y = position.y;
 		}
@@ -94,7 +94,7 @@ namespace Spine.Unity {
 		}
 
 		/// <summary>Sets the bone's (local) X and Y according to a Vector3. The z component is ignored.</summary>
-		public static void SetLocalPosition (this BoneLocal bonePose, Vector3 position) {
+		public static void SetLocalPosition (this BonePose bonePose, Vector3 position) {
 			bonePose.X = position.x;
 			bonePose.Y = position.y;
 		}
@@ -105,7 +105,7 @@ namespace Spine.Unity {
 		}
 
 		/// <summary>Gets the bone's local X and Y as a Vector2.</summary>
-		public static Vector2 GetLocalPosition (this BoneLocal bonePose) {
+		public static Vector2 GetLocalPosition (this BonePose bonePose) {
 			return new Vector2(bonePose.X, bonePose.Y);
 		}
 
@@ -174,7 +174,7 @@ namespace Spine.Unity {
 		}
 
 		/// <summary>Gets a bone-local space UnityEngine.Quaternion representation of bone.rotation.</summary>
-		public static Quaternion GetLocalQuaternion (this BoneLocal bonePose) {
+		public static Quaternion GetLocalQuaternion (this BonePose bonePose) {
 			float halfRotation = bonePose.Rotation * Mathf.Deg2Rad * 0.5f;
 			return new Quaternion(0, 0, Mathf.Sin(halfRotation), Mathf.Cos(halfRotation));
 		}

@@ -155,7 +155,7 @@ namespace Spine.Unity {
 			skin.GetAttachments(slotIndex, skinEntries);
 
 			foreach (Skin.SkinEntry entry in skinEntries) {
-				Attachment attachment = skin.GetAttachment(slotIndex, entry.Name);
+				Attachment attachment = skin.GetAttachment(slotIndex, entry.PlaceholderName);
 				BoundingBoxAttachment boundingBoxAttachment = attachment as BoundingBoxAttachment;
 
 				if (BoundingBoxFollowerGraphic.DebugMessages && attachment != null && boundingBoxAttachment == null)
@@ -178,7 +178,7 @@ namespace Spine.Unity {
 						bbCollider.enabled = false;
 						bbCollider.hideFlags = HideFlags.NotEditable;
 						colliderTable.Add(boundingBoxAttachment, bbCollider);
-						nameTable.Add(boundingBoxAttachment, entry.Name);
+						nameTable.Add(boundingBoxAttachment, entry.PlaceholderName);
 					}
 				}
 			}
