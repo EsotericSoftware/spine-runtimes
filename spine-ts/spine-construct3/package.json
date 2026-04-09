@@ -1,5 +1,6 @@
 {
   "name": "@esotericsoftware/spine-construct3",
+  "private": true,
   "version": "4.2.82",
   "description": "The official Spine Runtimes for Construct3",
   "main": "dist/plugin.js",

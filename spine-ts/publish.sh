@@ -30,6 +30,9 @@ packages=(
     "spine-threejs/package.json"
     "spine-webgl/package.json"
     "spine-webcomponents/package.json"
+    "spine-construct3/package.json"
+    "spine-construct3/spine-construct3-lib/package.json"
+    "spine-construct3/src/addon.json"
 )
 
 for package in "${packages[@]}"; do

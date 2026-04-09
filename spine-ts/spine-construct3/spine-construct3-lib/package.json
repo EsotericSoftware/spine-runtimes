@@ -1,5 +1,6 @@
 {
   "name": "@esotericsoftware/spine-construct3-lib",
+  "private": true,
   "version": "4.2.82",
   "description": "The official Spine Runtimes for the web.",
   "main": "dist/index.js",

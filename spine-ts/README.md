@@ -14,6 +14,7 @@ up into multiple modules:
 1. `spine-phaser-v4/`, a [Phaser v4](https://phaser.io/) backend, built on the core classes.
 1. `spine-pixi-v7/`, a [PixiJS v7](https://pixijs.com/) backend, built on the core classes.
 1. `spine-pixi-v8/`, a [PixiJS v8](https://pixijs.com/) backend, built on the core classes.
+1. `spine-construct3/`, the official [Construct 3](https://www.construct.net/) plugin, built on the core classes.
 
 In most cases, the `spine-player` module is best suited for your needs. Please refer to the [Spine Web Player documentation](https://esotericsoftware.com/spine-player) for more information.
 
