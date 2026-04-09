@@ -269,7 +269,7 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 
 			if (errorsString) {
 				const webglText = this.getErrorTextC3(iRenderer, this.layoutView);
-				webglText.SetSize(_inst.GetWidth(), _inst.GetHeight(), this.debugZoomFactor(iDrawParams));
+				webglText.SetSize(_inst.GetWidth(), _inst.GetHeight(), iDrawParams.GetLayoutView().GetZoomFactor());
 				webglText.SetText(errorsString);
 
 				const texture = webglText.GetTexture();
@@ -283,19 +283,6 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 		}
 	}
 
-	private debugZoomFactor (iDrawParams: SDK.Gfx.IDrawParams) {
-		const layoutView = iDrawParams.GetLayoutView();
-		let count = 1000;
-		let zoom = -1;
-		while (zoom === -1 && count-- > 0) {
-			try {
-				zoom = layoutView.GetZoomFactor();
-			} catch (error) {
-				console.log("error ZOOM: ", error);
-			}
-		}
-		return zoom === -1 ? 1 : zoom;
-	}
 
 	private setAnimation () {
 		const propValue = this._inst.GetPropertyValue(PLUGIN_CLASS.PROP_ANIMATION) as string;

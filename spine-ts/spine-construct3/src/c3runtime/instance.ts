@@ -661,7 +661,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			return;
 		}
 
-		track.alpha = spine.MathUtils.clamp(0, 1, alpha);
+		track.alpha = spine.MathUtils.clamp(alpha, 0, 1);
 	}
 
 
@@ -910,6 +910,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	private updateBoneFollowers (matrix: C3Matrix) {
 		if (this.boneFollowers.size === 0) return;
 
+		const staleFollowers: { uid: number, boneName: string }[] = [];
+
 		for (const [boneName, followers] of this.boneFollowers) {
 			const bone = this.skeleton?.findBone(boneName);
 			if (!bone) continue;
@@ -933,7 +935,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			for (const follower of followers) {
 				const instance = this.runtime.getInstanceByUid(follower.uid) as IWorldInstance;
 				if (!instance) {
-					this.detachInstanceFromBoneByUid(follower.uid, boneName);
+					staleFollowers.push({ uid: follower.uid, boneName });
 					continue;
 				}
 
@@ -957,6 +959,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 				);
 			}
 		}
+
+		for (const { uid, boneName } of staleFollowers) this.detachInstanceFromBoneByUid(uid, boneName);
 	}
 
 	private updateBonesOverride () {
@@ -1184,7 +1188,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	public mirror (isMirrored: boolean) {
 		if (isMirrored !== this.isMirrored) {
 			this.isMirrored = isMirrored;
-			this.width = -this.width
+			this.width = -this.width;
 
 			for (const [, followers] of this.boneFollowers) {
 				for (const follower of followers) {

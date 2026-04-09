@@ -106,8 +106,8 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Exps =
 		if (field === "balance") return this.triggeredEventData?.balance ?? 0;
 		if (field === "volume") return this.triggeredEventData?.volume ?? 0;
 		if (field === "audiopath") return this.triggeredEventData?.data.audioPath ?? "";
-		if (field === "event") return this.triggeredEventData?.data.name ?? 0;
-		if (field === "animation") return this.triggeredEventData?.animation ?? 0;
+		if (field === "event") return this.triggeredEventData?.data.name ?? "";
+		if (field === "animation") return this.triggeredEventData?.animation ?? "";
 		if (field === "track") return this.triggeredEventData?.track ?? -1;
 		return "";
 	},
