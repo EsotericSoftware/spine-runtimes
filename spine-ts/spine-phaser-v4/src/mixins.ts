@@ -26,6 +26,8 @@ SOFTWARE.
 
 // biome-ignore-all lint: ignore biome for this file
 
+import * as Phaser from "phaser";
+
 const components = (Phaser.GameObjects.Components as any);
 export const ComputedSize = components.ComputedSize;
 export const Depth = components.Depth;
@@ -35,6 +37,87 @@ export const Transform = components.Transform;
 export const Visible = components.Visible;
 export const Origin = components.Origin;
 export const Alpha = components.Alpha;
+
+function hasGetterOrSetter (definition: Record<string, unknown>) {
+	return typeof definition.get === "function" || typeof definition.set === "function";
+}
+
+function getMixinProperty (definition: Record<string, unknown>, key: string) {
+	let property = Object.getOwnPropertyDescriptor(definition, key);
+
+	if (!property) {
+		return false;
+	}
+
+	if ("value" in property && property.value && typeof property.value === "object") {
+		property = property.value as PropertyDescriptor;
+	}
+
+	if (!property || !hasGetterOrSetter(property as Record<string, unknown>)) {
+		return false;
+	}
+
+	if (typeof property.enumerable === "undefined") {
+		property.enumerable = true;
+	}
+
+	if (typeof property.configurable === "undefined") {
+		property.configurable = true;
+	}
+
+	return property;
+}
+
+function hasNonConfigurable (target: object, key: string) {
+	let property = Object.getOwnPropertyDescriptor(target, key);
+
+	if (!property) {
+		return false;
+	}
+
+	if ("value" in property && property.value && typeof property.value === "object") {
+		property = property.value as PropertyDescriptor;
+	}
+
+	return property.configurable === false;
+}
+
+function extendPrototype (target: { prototype: object }, definition: Record<string, unknown>) {
+	for (const key of Object.keys(definition)) {
+		const property = getMixinProperty(definition, key);
+
+		if (property !== false) {
+			if (hasNonConfigurable(target.prototype, key)) {
+				continue;
+			}
+
+			Object.defineProperty(target.prototype, key, property);
+			continue;
+		}
+
+		(target.prototype as Record<string, unknown>)[key] = definition[key];
+	}
+}
+
+function mixin (target: { prototype: object }, mixins: unknown) {
+	if (!mixins) {
+		return;
+	}
+
+	const mixinList = Array.isArray(mixins) ? mixins : [mixins];
+
+	for (const currentMixin of mixinList) {
+		const definition = typeof currentMixin === "function"
+			? currentMixin.prototype as Record<string, unknown> | undefined
+			: currentMixin as Record<string, unknown> | undefined;
+
+		if (!definition) {
+			continue;
+		}
+
+		extendPrototype(target, definition);
+	}
+}
 
 export interface Type<
 	T,
@@ -56,7 +139,7 @@ export function createMixin<
 	...component: GameObjectComponent[]
 ): Mixin<GameObjectComponent, GameObjectConstraint> {
 	return (BaseGameObject) => {
-		(Phaser as any).Class.mixin(BaseGameObject, component);
+		mixin(BaseGameObject, component);
 		return BaseGameObject as any;
 	};
 }

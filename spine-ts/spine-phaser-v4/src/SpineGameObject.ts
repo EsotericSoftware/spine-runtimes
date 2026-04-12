@@ -27,6 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+import * as Phaser from "phaser";
 import {
 	AnimationState,
 	AnimationStateData,
