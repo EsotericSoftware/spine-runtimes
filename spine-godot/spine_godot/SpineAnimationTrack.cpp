@@ -368,8 +368,22 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 		}
 
 		int found_track_index = -1;
-		auto scene_path = EditorNode::get_singleton()->get_edited_scene()->get_path();
-		auto animation_player_path = scene_path.rel_path_to(animation_player->get_path());
+		auto editing_player = player_editor->get_player();
+		if (!editing_player) {
+			skeleton->setToSetupPose();
+			animation_state->clearTracks();
+			animation_state->setTimeScale(1);
+			return;
+		}
+		auto root_node = editing_player->get_node(editing_player->get_root_node());
+		if (!root_node) {
+			skeleton->setToSetupPose();
+			animation_state->clearTracks();
+			animation_state->setTimeScale(1);
+			return;
+		}
+		auto animation_player_path = root_node->get_path().rel_path_to(animation_player->get_path());
+
 		for (int i = 0; i < edited_animation->get_track_count(); i++) {
 			auto path = edited_animation->track_get_path(i);
 			if (path == animation_player_path) {
