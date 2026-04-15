@@ -375,7 +375,11 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 			animation_state->setTimeScale(1);
 			return;
 		}
+#if VERSION_MAJOR > 3
 		auto root_node = editing_player->get_node(editing_player->get_root_node());
+#else
+		auto root_node = editing_player->get_node(editing_player->get_root());
+#endif
 		if (!root_node) {
 			skeleton->setToSetupPose();
 			animation_state->clearTracks();
