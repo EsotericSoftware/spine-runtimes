@@ -52,6 +52,7 @@ export class SceneRenderer implements Disposable {
 	canvas: HTMLCanvasElement;
 	camera: OrthoCamera;
 	batcher: PolygonBatcher;
+	maxTextureSize: number;
 	private twoColorTint = false;
 	private batcherShader: Shader;
 	private shapes: ShapeRenderer;
@@ -71,6 +72,7 @@ export class SceneRenderer implements Disposable {
 		this.shapes = new ShapeRenderer(this.context);
 		this.skeletonRenderer = new SkeletonRenderer(this.context, twoColorTint);
 		this.skeletonDebugRenderer = new SkeletonDebugRenderer(this.context);
+		this.maxTextureSize = this.context.gl.getParameter(this.context.gl.MAX_TEXTURE_SIZE);
 	}
 
 	dispose () {
@@ -468,6 +470,14 @@ export class SceneRenderer implements Disposable {
 		var dpr = window.devicePixelRatio || 1;
 		var w = Math.round(canvas.clientWidth * dpr);
 		var h = Math.round(canvas.clientHeight * dpr);
+
+		// If the canvas size is larger than the max texture size, scale the canvas size to the max texture size
+        if (this.maxTextureSize && (w > this.maxTextureSize || h > this.maxTextureSize)) {
+            const max = Math.max(w, h);
+            const s = this.maxTextureSize / max;
+            w = Math.round(w * s);
+            h = Math.round(h * s);
+        }
 
 		if (canvas.width != w || canvas.height != h) {
 			canvas.width = w;
