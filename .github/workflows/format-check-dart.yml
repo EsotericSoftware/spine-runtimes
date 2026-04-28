@@ -62,3 +62,4 @@ jobs:
       with:
         name: dart-format-diff
         path: dart-format-diff/
+        retention-days: 1
