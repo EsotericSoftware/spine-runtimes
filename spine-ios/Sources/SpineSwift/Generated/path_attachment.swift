@@ -50,17 +50,19 @@ public class PathAttachment: VertexAttachment {
     public var lengths: ArrayFloat {
         get {
             let result = spine_path_attachment_get_lengths(_ptr.assumingMemoryBound(to: spine_path_attachment_wrapper.self))
-        return ArrayFloat(fromPointer: result!)
+            return ArrayFloat(fromPointer: result!)
         }
         set {
-            spine_path_attachment_set_lengths(_ptr.assumingMemoryBound(to: spine_path_attachment_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self))
+            spine_path_attachment_set_lengths(
+                _ptr.assumingMemoryBound(to: spine_path_attachment_wrapper.self),
+                newValue._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self))
         }
     }
 
     public var closed: Bool {
         get {
             let result = spine_path_attachment_get_closed(_ptr.assumingMemoryBound(to: spine_path_attachment_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_path_attachment_set_closed(_ptr.assumingMemoryBound(to: spine_path_attachment_wrapper.self), newValue)
@@ -72,7 +74,7 @@ public class PathAttachment: VertexAttachment {
     public var constantSpeed: Bool {
         get {
             let result = spine_path_attachment_get_constant_speed(_ptr.assumingMemoryBound(to: spine_path_attachment_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_path_attachment_set_constant_speed(_ptr.assumingMemoryBound(to: spine_path_attachment_wrapper.self), newValue)

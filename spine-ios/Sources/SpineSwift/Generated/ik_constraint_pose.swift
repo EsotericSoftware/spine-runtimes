@@ -55,7 +55,7 @@ public class IkConstraintPose: NSObject {
     public var mix: Float {
         get {
             let result = spine_ik_constraint_pose_get_mix(_ptr.assumingMemoryBound(to: spine_ik_constraint_pose_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_ik_constraint_pose_set_mix(_ptr.assumingMemoryBound(to: spine_ik_constraint_pose_wrapper.self), newValue)
@@ -68,7 +68,7 @@ public class IkConstraintPose: NSObject {
     public var softness: Float {
         get {
             let result = spine_ik_constraint_pose_get_softness(_ptr.assumingMemoryBound(to: spine_ik_constraint_pose_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_ik_constraint_pose_set_softness(_ptr.assumingMemoryBound(to: spine_ik_constraint_pose_wrapper.self), newValue)
@@ -79,7 +79,7 @@ public class IkConstraintPose: NSObject {
     public var bendDirection: Int32 {
         get {
             let result = spine_ik_constraint_pose_get_bend_direction(_ptr.assumingMemoryBound(to: spine_ik_constraint_pose_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_ik_constraint_pose_set_bend_direction(_ptr.assumingMemoryBound(to: spine_ik_constraint_pose_wrapper.self), newValue)
@@ -90,7 +90,7 @@ public class IkConstraintPose: NSObject {
     public var compress: Bool {
         get {
             let result = spine_ik_constraint_pose_get_compress(_ptr.assumingMemoryBound(to: spine_ik_constraint_pose_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_ik_constraint_pose_set_compress(_ptr.assumingMemoryBound(to: spine_ik_constraint_pose_wrapper.self), newValue)
@@ -105,7 +105,7 @@ public class IkConstraintPose: NSObject {
     public var stretch: Bool {
         get {
             let result = spine_ik_constraint_pose_get_stretch(_ptr.assumingMemoryBound(to: spine_ik_constraint_pose_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_ik_constraint_pose_set_stretch(_ptr.assumingMemoryBound(to: spine_ik_constraint_pose_wrapper.self), newValue)
@@ -113,7 +113,9 @@ public class IkConstraintPose: NSObject {
     }
 
     public func set(_ pose: IkConstraintPose) {
-        spine_ik_constraint_pose_set(_ptr.assumingMemoryBound(to: spine_ik_constraint_pose_wrapper.self), pose._ptr.assumingMemoryBound(to: spine_ik_constraint_pose_wrapper.self))
+        spine_ik_constraint_pose_set(
+            _ptr.assumingMemoryBound(to: spine_ik_constraint_pose_wrapper.self),
+            pose._ptr.assumingMemoryBound(to: spine_ik_constraint_pose_wrapper.self))
     }
 
     public func dispose() {

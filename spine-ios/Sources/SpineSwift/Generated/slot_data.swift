@@ -63,7 +63,7 @@ public class SlotData: PosedData {
     public var attachmentName: String {
         get {
             let result = spine_slot_data_get_attachment_name(_ptr.assumingMemoryBound(to: spine_slot_data_wrapper.self))
-        return String(cString: result!)
+            return String(cString: result!)
         }
         set {
             spine_slot_data_set_attachment_name(_ptr.assumingMemoryBound(to: spine_slot_data_wrapper.self), newValue)
@@ -74,10 +74,11 @@ public class SlotData: PosedData {
     public var blendMode: BlendMode {
         get {
             let result = spine_slot_data_get_blend_mode(_ptr.assumingMemoryBound(to: spine_slot_data_wrapper.self))
-        return BlendMode(rawValue: Int32(result.rawValue))!
+            return BlendMode(rawValue: Int32(result.rawValue))!
         }
         set {
-            spine_slot_data_set_blend_mode(_ptr.assumingMemoryBound(to: spine_slot_data_wrapper.self), spine_blend_mode(rawValue: UInt32(newValue.rawValue)))
+            spine_slot_data_set_blend_mode(
+                _ptr.assumingMemoryBound(to: spine_slot_data_wrapper.self), spine_blend_mode(rawValue: UInt32(newValue.rawValue)))
         }
     }
 
@@ -86,7 +87,7 @@ public class SlotData: PosedData {
     public var visible: Bool {
         get {
             let result = spine_slot_data_get_visible(_ptr.assumingMemoryBound(to: spine_slot_data_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_slot_data_set_visible(_ptr.assumingMemoryBound(to: spine_slot_data_wrapper.self), newValue)

@@ -95,6 +95,28 @@ class BoneData extends PosedData {
     SpineBindings.bindings.spine_bone_data_set_icon(_ptr, value.toNativeUtf8().cast<Char>());
   }
 
+  /// The bone icon's display size scale, or 1 if nonessential data was not
+  /// exported.
+  double get iconSize {
+    final result = SpineBindings.bindings.spine_bone_data_get_icon_size(_ptr);
+    return result;
+  }
+
+  set iconSize(double value) {
+    SpineBindings.bindings.spine_bone_data_set_icon_size(_ptr, value);
+  }
+
+  /// The bone icon's display rotation in degrees, or 0 if nonessential data was
+  /// not exported.
+  double get iconRotation {
+    final result = SpineBindings.bindings.spine_bone_data_get_icon_rotation(_ptr);
+    return result;
+  }
+
+  set iconRotation(double value) {
+    SpineBindings.bindings.spine_bone_data_set_icon_rotation(_ptr, value);
+  }
+
   bool get visible {
     final result = SpineBindings.bindings.spine_bone_data_get_visible(_ptr);
     return result;

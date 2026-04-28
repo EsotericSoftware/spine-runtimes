@@ -48,7 +48,8 @@ public class Slot: NSObject, Posed {
     }
 
     public convenience init(_ data: SlotData, _ skeleton: Skeleton) {
-        let ptr = spine_slot_create(data._ptr.assumingMemoryBound(to: spine_slot_data_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
+        let ptr = spine_slot_create(
+            data._ptr.assumingMemoryBound(to: spine_slot_data_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
         self.init(fromPointer: ptr!)
     }
 

@@ -86,6 +86,16 @@ namespace spine {
 
 		void setIcon(const String &icon);
 
+		/// The bone icon's display size scale, or 1 if nonessential data was not exported.
+		float getIconSize();
+
+		void setIconSize(float iconSize);
+
+		/// The bone icon's display rotation in degrees, or 0 if nonessential data was not exported.
+		float getIconRotation();
+
+		void setIconRotation(float iconRotation);
+
 		bool getVisible();
 
 		void setVisible(bool inValue);
@@ -96,6 +106,8 @@ namespace spine {
 		float _length;
 		Color _color;
 		String _icon;
+		float _iconSize;
+		float _iconRotation;
 		bool _visible;
 	};
 }

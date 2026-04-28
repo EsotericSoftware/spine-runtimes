@@ -31,6 +31,7 @@
 #define Spine_Animation_h
 
 #include <spine/Array.h>
+#include <spine/Color.h>
 #include <spine/HashMap.h>
 #include <spine/SpineObject.h>
 #include <spine/SpineString.h>
@@ -161,6 +162,9 @@ namespace spine {
 		/// See setTimelines() and BoneTimeline::getBoneIndex().
 		const Array<int> &getBones();
 
+		/// The color of the animation as it was in Spine, or a default color if nonessential data was not exported.
+		Color &getColor();
+
 		/// @param target After the first and before the last entry.
 		static int search(Array<float> &values, float target);
 
@@ -172,6 +176,7 @@ namespace spine {
 		Array<int> _bones;
 		float _duration;
 		String _name;
+		Color _color;
 	};
 }
 

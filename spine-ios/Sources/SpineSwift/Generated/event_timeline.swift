@@ -56,7 +56,8 @@ public class EventTimeline: Timeline {
     ///
     /// - Parameter frame: Between 0 and frameCount, inclusive.
     public func setFrame(_ frame: Int, _ event: Event) {
-        spine_event_timeline_set_frame(_ptr.assumingMemoryBound(to: spine_event_timeline_wrapper.self), frame, event._ptr.assumingMemoryBound(to: spine_event_wrapper.self))
+        spine_event_timeline_set_frame(
+            _ptr.assumingMemoryBound(to: spine_event_timeline_wrapper.self), frame, event._ptr.assumingMemoryBound(to: spine_event_wrapper.self))
     }
 
     public func dispose() {

@@ -66,7 +66,7 @@ public class Animation: NSObject {
     public var duration: Float {
         get {
             let result = spine_animation_get_duration(_ptr.assumingMemoryBound(to: spine_animation_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_animation_set_duration(_ptr.assumingMemoryBound(to: spine_animation_wrapper.self), newValue)
@@ -87,14 +87,24 @@ public class Animation: NSObject {
         return ArrayInt(fromPointer: result!)
     }
 
+    /// The color of the animation as it was in Spine, or a default color if nonessential data was
+    /// not exported.
+    public var color: Color {
+        let result = spine_animation_get_color(_ptr.assumingMemoryBound(to: spine_animation_wrapper.self))
+        return Color(fromPointer: result!)
+    }
+
     /// Sets the timelines and bone indices.
     public func setTimelines(_ timelines: ArrayTimeline, _ bones: ArrayInt) {
-        spine_animation_set_timelines(_ptr.assumingMemoryBound(to: spine_animation_wrapper.self), timelines._ptr.assumingMemoryBound(to: spine_array_timeline_wrapper.self), bones._ptr.assumingMemoryBound(to: spine_array_int_wrapper.self))
+        spine_animation_set_timelines(
+            _ptr.assumingMemoryBound(to: spine_animation_wrapper.self), timelines._ptr.assumingMemoryBound(to: spine_array_timeline_wrapper.self),
+            bones._ptr.assumingMemoryBound(to: spine_array_int_wrapper.self))
     }
 
     /// Returns true if this animation contains a timeline with any of the specified property IDs.
     public func hasTimeline(_ ids: ArrayPropertyId) -> Bool {
-        let result = spine_animation_has_timeline(_ptr.assumingMemoryBound(to: spine_animation_wrapper.self), ids._ptr.assumingMemoryBound(to: spine_array_property_id_wrapper.self))
+        let result = spine_animation_has_timeline(
+            _ptr.assumingMemoryBound(to: spine_animation_wrapper.self), ids._ptr.assumingMemoryBound(to: spine_array_property_id_wrapper.self))
         return result
     }
 
@@ -112,8 +122,13 @@ public class Animation: NSObject {
     /// - Parameter add: If true, for timelines that support it, their values are added to the setup or current values (depending on fromSetup).
     /// - Parameter out: True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant transitions.
     /// - Parameter appliedPose: True to modify getAppliedPose(), else the unconstrained pose is modified.
-    public func apply(_ skeleton: Skeleton, _ lastTime: Float, _ time: Float, _ loop: Bool, _ events: ArrayEvent?, _ alpha: Float, _ fromSetup: Bool, _ add: Bool, _ out: Bool, _ appliedPose: Bool) {
-        spine_animation_apply(_ptr.assumingMemoryBound(to: spine_animation_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self), lastTime, time, loop, events?._ptr.assumingMemoryBound(to: spine_array_event_wrapper.self), alpha, fromSetup, add, out, appliedPose)
+    public func apply(
+        _ skeleton: Skeleton, _ lastTime: Float, _ time: Float, _ loop: Bool, _ events: ArrayEvent?, _ alpha: Float, _ fromSetup: Bool, _ add: Bool,
+        _ out: Bool, _ appliedPose: Bool
+    ) {
+        spine_animation_apply(
+            _ptr.assumingMemoryBound(to: spine_animation_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self), lastTime,
+            time, loop, events?._ptr.assumingMemoryBound(to: spine_array_event_wrapper.self), alpha, fromSetup, add, out, appliedPose)
     }
 
     /// - Parameter target: After the first and before the last entry.

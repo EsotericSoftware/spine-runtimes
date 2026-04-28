@@ -73,7 +73,9 @@ public class Skin: NSObject {
     /// Adds an attachment to the skin for the specified slot index and placeholder name. If the
     /// placeholder name already exists for the slot, the previous value is replaced.
     public func setAttachment(_ slotIndex: Int, _ placeholderName: String, _ attachment: Attachment?) {
-        spine_skin_set_attachment(_ptr.assumingMemoryBound(to: spine_skin_wrapper.self), slotIndex, placeholderName, attachment?._ptr.assumingMemoryBound(to: spine_attachment_wrapper.self))
+        spine_skin_set_attachment(
+            _ptr.assumingMemoryBound(to: spine_skin_wrapper.self), slotIndex, placeholderName,
+            attachment?._ptr.assumingMemoryBound(to: spine_attachment_wrapper.self))
     }
 
     /// Returns the attachment for the specified slot index and placeholder name, or NULL.
@@ -117,7 +119,9 @@ public class Skin: NSObject {
     /// - Parameter slotIndex: The target slotIndex. To find the slot index, use SkeletonData::findSlot and SlotData::getIndex.
     /// - Parameter attachments: Found Attachments will be added to this array.
     public func findAttachmentsForSlot(_ slotIndex: Int, _ attachments: ArrayAttachment) {
-        spine_skin_find_attachments_for_slot(_ptr.assumingMemoryBound(to: spine_skin_wrapper.self), slotIndex, attachments._ptr.assumingMemoryBound(to: spine_array_attachment_wrapper.self))
+        spine_skin_find_attachments_for_slot(
+            _ptr.assumingMemoryBound(to: spine_skin_wrapper.self), slotIndex,
+            attachments._ptr.assumingMemoryBound(to: spine_array_attachment_wrapper.self))
     }
 
     /// Adds all attachments, bones, and constraints from the specified skin to this skin.

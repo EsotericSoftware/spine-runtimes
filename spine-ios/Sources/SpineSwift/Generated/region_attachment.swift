@@ -49,7 +49,7 @@ public class RegionAttachment: Attachment {
     public var x: Float {
         get {
             let result = spine_region_attachment_get_x(_ptr.assumingMemoryBound(to: spine_region_attachment_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_region_attachment_set_x(_ptr.assumingMemoryBound(to: spine_region_attachment_wrapper.self), newValue)
@@ -59,7 +59,7 @@ public class RegionAttachment: Attachment {
     public var y: Float {
         get {
             let result = spine_region_attachment_get_y(_ptr.assumingMemoryBound(to: spine_region_attachment_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_region_attachment_set_y(_ptr.assumingMemoryBound(to: spine_region_attachment_wrapper.self), newValue)
@@ -69,7 +69,7 @@ public class RegionAttachment: Attachment {
     public var scaleX: Float {
         get {
             let result = spine_region_attachment_get_scale_x(_ptr.assumingMemoryBound(to: spine_region_attachment_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_region_attachment_set_scale_x(_ptr.assumingMemoryBound(to: spine_region_attachment_wrapper.self), newValue)
@@ -79,7 +79,7 @@ public class RegionAttachment: Attachment {
     public var scaleY: Float {
         get {
             let result = spine_region_attachment_get_scale_y(_ptr.assumingMemoryBound(to: spine_region_attachment_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_region_attachment_set_scale_y(_ptr.assumingMemoryBound(to: spine_region_attachment_wrapper.self), newValue)
@@ -90,7 +90,7 @@ public class RegionAttachment: Attachment {
     public var rotation: Float {
         get {
             let result = spine_region_attachment_get_rotation(_ptr.assumingMemoryBound(to: spine_region_attachment_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_region_attachment_set_rotation(_ptr.assumingMemoryBound(to: spine_region_attachment_wrapper.self), newValue)
@@ -100,7 +100,7 @@ public class RegionAttachment: Attachment {
     public var width: Float {
         get {
             let result = spine_region_attachment_get_width(_ptr.assumingMemoryBound(to: spine_region_attachment_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_region_attachment_set_width(_ptr.assumingMemoryBound(to: spine_region_attachment_wrapper.self), newValue)
@@ -110,7 +110,7 @@ public class RegionAttachment: Attachment {
     public var height: Float {
         get {
             let result = spine_region_attachment_get_height(_ptr.assumingMemoryBound(to: spine_region_attachment_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_region_attachment_set_height(_ptr.assumingMemoryBound(to: spine_region_attachment_wrapper.self), newValue)
@@ -125,7 +125,7 @@ public class RegionAttachment: Attachment {
     public var path: String {
         get {
             let result = spine_region_attachment_get_path(_ptr.assumingMemoryBound(to: spine_region_attachment_wrapper.self))
-        return String(cString: result!)
+            return String(cString: result!)
         }
         set {
             spine_region_attachment_set_path(_ptr.assumingMemoryBound(to: spine_region_attachment_wrapper.self), newValue)
@@ -139,7 +139,8 @@ public class RegionAttachment: Attachment {
 
     /// Returns the vertex offsets for the specified slot pose.
     public func getOffsets(_ pose: SlotPose) -> ArrayFloat {
-        let result = spine_region_attachment_get_offsets(_ptr.assumingMemoryBound(to: spine_region_attachment_wrapper.self), pose._ptr.assumingMemoryBound(to: spine_slot_pose_wrapper.self))
+        let result = spine_region_attachment_get_offsets(
+            _ptr.assumingMemoryBound(to: spine_region_attachment_wrapper.self), pose._ptr.assumingMemoryBound(to: spine_slot_pose_wrapper.self))
         return ArrayFloat(fromPointer: result!)
     }
 
@@ -151,12 +152,20 @@ public class RegionAttachment: Attachment {
     ///
     /// - Parameter uvs: Output array for the computed UVs, length of 8.
     /// - Parameter offset: Output array for the computed vertex offsets, length of 8.
-    public static func computeUVs(_ region: TextureRegion?, _ x: Float, _ y: Float, _ scaleX: Float, _ scaleY: Float, _ rotation: Float, _ width: Float, _ height: Float, _ offset: ArrayFloat, _ uvs: ArrayFloat) {
-        spine_region_attachment_compute_u_vs(region?._ptr.assumingMemoryBound(to: spine_texture_region_wrapper.self), x, y, scaleX, scaleY, rotation, width, height, offset._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self), uvs._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self))
+    public static func computeUVs(
+        _ region: TextureRegion?, _ x: Float, _ y: Float, _ scaleX: Float, _ scaleY: Float, _ rotation: Float, _ width: Float, _ height: Float,
+        _ offset: ArrayFloat, _ uvs: ArrayFloat
+    ) {
+        spine_region_attachment_compute_u_vs(
+            region?._ptr.assumingMemoryBound(to: spine_texture_region_wrapper.self), x, y, scaleX, scaleY, rotation, width, height,
+            offset._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self), uvs._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self))
     }
 
     public func computeWorldVertices(_ slot: Slot, _ vertexOffsets: ArrayFloat, _ worldVertices: ArrayFloat, _ offset: Int, _ stride: Int) {
-        spine_region_attachment_compute_world_vertices_2(_ptr.assumingMemoryBound(to: spine_region_attachment_wrapper.self), slot._ptr.assumingMemoryBound(to: spine_slot_wrapper.self), vertexOffsets._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self), worldVertices._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self), offset, stride)
+        spine_region_attachment_compute_world_vertices_2(
+            _ptr.assumingMemoryBound(to: spine_region_attachment_wrapper.self), slot._ptr.assumingMemoryBound(to: spine_slot_wrapper.self),
+            vertexOffsets._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self),
+            worldVertices._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self), offset, stride)
     }
 
     public func dispose() {

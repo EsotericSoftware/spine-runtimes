@@ -49,17 +49,20 @@ public class PhysicsConstraintResetTimeline: Timeline, ConstraintTimeline {
 
     public var constraintIndex: Int32 {
         get {
-            let result = spine_physics_constraint_reset_timeline_get_constraint_index(_ptr.assumingMemoryBound(to: spine_physics_constraint_reset_timeline_wrapper.self))
-        return result
+            let result = spine_physics_constraint_reset_timeline_get_constraint_index(
+                _ptr.assumingMemoryBound(to: spine_physics_constraint_reset_timeline_wrapper.self))
+            return result
         }
         set {
-            spine_physics_constraint_reset_timeline_set_constraint_index(_ptr.assumingMemoryBound(to: spine_physics_constraint_reset_timeline_wrapper.self), newValue)
+            spine_physics_constraint_reset_timeline_set_constraint_index(
+                _ptr.assumingMemoryBound(to: spine_physics_constraint_reset_timeline_wrapper.self), newValue)
         }
     }
 
     /// Sets the time for the specified frame.
     public func setFrame(_ frame: Int32, _ time: Float) {
-        spine_physics_constraint_reset_timeline_set_frame(_ptr.assumingMemoryBound(to: spine_physics_constraint_reset_timeline_wrapper.self), frame, time)
+        spine_physics_constraint_reset_timeline_set_frame(
+            _ptr.assumingMemoryBound(to: spine_physics_constraint_reset_timeline_wrapper.self), frame, time)
     }
 
     public func dispose() {

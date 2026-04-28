@@ -44,37 +44,43 @@ public class EventQueueEntry: NSObject {
     }
 
     public convenience init(_ eventType: EventType, _ trackEntry: TrackEntry?, _ event: Event?) {
-        let ptr = spine_event_queue_entry_create(spine_event_type(rawValue: UInt32(eventType.rawValue)), trackEntry?._ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self), event?._ptr.assumingMemoryBound(to: spine_event_wrapper.self))
+        let ptr = spine_event_queue_entry_create(
+            spine_event_type(rawValue: UInt32(eventType.rawValue)), trackEntry?._ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self),
+            event?._ptr.assumingMemoryBound(to: spine_event_wrapper.self))
         self.init(fromPointer: ptr!)
     }
 
     public var type: EventType {
         get {
             let result = spine_event_queue_entry_get__type(_ptr.assumingMemoryBound(to: spine_event_queue_entry_wrapper.self))
-        return EventType(rawValue: Int32(result.rawValue))!
+            return EventType(rawValue: Int32(result.rawValue))!
         }
         set {
-            spine_event_queue_entry_set__type(_ptr.assumingMemoryBound(to: spine_event_queue_entry_wrapper.self), spine_event_type(rawValue: UInt32(newValue.rawValue)))
+            spine_event_queue_entry_set__type(
+                _ptr.assumingMemoryBound(to: spine_event_queue_entry_wrapper.self), spine_event_type(rawValue: UInt32(newValue.rawValue)))
         }
     }
 
     public var entry: TrackEntry? {
         get {
             let result = spine_event_queue_entry_get__entry(_ptr.assumingMemoryBound(to: spine_event_queue_entry_wrapper.self))
-        return result.map { TrackEntry(fromPointer: $0) }
+            return result.map { TrackEntry(fromPointer: $0) }
         }
         set {
-            spine_event_queue_entry_set__entry(_ptr.assumingMemoryBound(to: spine_event_queue_entry_wrapper.self), newValue?._ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))
+            spine_event_queue_entry_set__entry(
+                _ptr.assumingMemoryBound(to: spine_event_queue_entry_wrapper.self),
+                newValue?._ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))
         }
     }
 
     public var event: Event? {
         get {
             let result = spine_event_queue_entry_get__event(_ptr.assumingMemoryBound(to: spine_event_queue_entry_wrapper.self))
-        return result.map { Event(fromPointer: $0) }
+            return result.map { Event(fromPointer: $0) }
         }
         set {
-            spine_event_queue_entry_set__event(_ptr.assumingMemoryBound(to: spine_event_queue_entry_wrapper.self), newValue?._ptr.assumingMemoryBound(to: spine_event_wrapper.self))
+            spine_event_queue_entry_set__event(
+                _ptr.assumingMemoryBound(to: spine_event_queue_entry_wrapper.self), newValue?._ptr.assumingMemoryBound(to: spine_event_wrapper.self))
         }
     }
 

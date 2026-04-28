@@ -66,7 +66,7 @@ public class SlotPose: NSObject {
     public var hasDarkColor: Bool {
         get {
             let result = spine_slot_pose_has_dark_color(_ptr.assumingMemoryBound(to: spine_slot_pose_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_slot_pose_set_has_dark_color(_ptr.assumingMemoryBound(to: spine_slot_pose_wrapper.self), newValue)
@@ -77,34 +77,35 @@ public class SlotPose: NSObject {
     public var attachment: Attachment? {
         get {
             let result = spine_slot_pose_get_attachment(_ptr.assumingMemoryBound(to: spine_slot_pose_wrapper.self))
-        guard let ptr = result else { return nil }
-        let rtti = spine_attachment_get_rtti(ptr)
-        let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
-        switch rttiClassName {
-        case "BoundingBoxAttachment":
-            let castedPtr = spine_attachment_cast_to_bounding_box_attachment(ptr)
-            return BoundingBoxAttachment(fromPointer: castedPtr!)
-        case "ClippingAttachment":
-            let castedPtr = spine_attachment_cast_to_clipping_attachment(ptr)
-            return ClippingAttachment(fromPointer: castedPtr!)
-        case "MeshAttachment":
-            let castedPtr = spine_attachment_cast_to_mesh_attachment(ptr)
-            return MeshAttachment(fromPointer: castedPtr!)
-        case "PathAttachment":
-            let castedPtr = spine_attachment_cast_to_path_attachment(ptr)
-            return PathAttachment(fromPointer: castedPtr!)
-        case "PointAttachment":
-            let castedPtr = spine_attachment_cast_to_point_attachment(ptr)
-            return PointAttachment(fromPointer: castedPtr!)
-        case "RegionAttachment":
-            let castedPtr = spine_attachment_cast_to_region_attachment(ptr)
-            return RegionAttachment(fromPointer: castedPtr!)
-        default:
-            fatalError("Unknown concrete type: \(rttiClassName) for abstract class Attachment")
-        }
+            guard let ptr = result else { return nil }
+            let rtti = spine_attachment_get_rtti(ptr)
+            let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
+            switch rttiClassName {
+            case "BoundingBoxAttachment":
+                let castedPtr = spine_attachment_cast_to_bounding_box_attachment(ptr)
+                return BoundingBoxAttachment(fromPointer: castedPtr!)
+            case "ClippingAttachment":
+                let castedPtr = spine_attachment_cast_to_clipping_attachment(ptr)
+                return ClippingAttachment(fromPointer: castedPtr!)
+            case "MeshAttachment":
+                let castedPtr = spine_attachment_cast_to_mesh_attachment(ptr)
+                return MeshAttachment(fromPointer: castedPtr!)
+            case "PathAttachment":
+                let castedPtr = spine_attachment_cast_to_path_attachment(ptr)
+                return PathAttachment(fromPointer: castedPtr!)
+            case "PointAttachment":
+                let castedPtr = spine_attachment_cast_to_point_attachment(ptr)
+                return PointAttachment(fromPointer: castedPtr!)
+            case "RegionAttachment":
+                let castedPtr = spine_attachment_cast_to_region_attachment(ptr)
+                return RegionAttachment(fromPointer: castedPtr!)
+            default:
+                fatalError("Unknown concrete type: \(rttiClassName) for abstract class Attachment")
+            }
         }
         set {
-            spine_slot_pose_set_attachment(_ptr.assumingMemoryBound(to: spine_slot_pose_wrapper.self), newValue?._ptr.assumingMemoryBound(to: spine_attachment_wrapper.self))
+            spine_slot_pose_set_attachment(
+                _ptr.assumingMemoryBound(to: spine_slot_pose_wrapper.self), newValue?._ptr.assumingMemoryBound(to: spine_attachment_wrapper.self))
         }
     }
 
@@ -113,7 +114,7 @@ public class SlotPose: NSObject {
     public var sequenceIndex: Int32 {
         get {
             let result = spine_slot_pose_get_sequence_index(_ptr.assumingMemoryBound(to: spine_slot_pose_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_slot_pose_set_sequence_index(_ptr.assumingMemoryBound(to: spine_slot_pose_wrapper.self), newValue)
@@ -131,7 +132,8 @@ public class SlotPose: NSObject {
     }
 
     public func set(_ pose: SlotPose) {
-        spine_slot_pose_set(_ptr.assumingMemoryBound(to: spine_slot_pose_wrapper.self), pose._ptr.assumingMemoryBound(to: spine_slot_pose_wrapper.self))
+        spine_slot_pose_set(
+            _ptr.assumingMemoryBound(to: spine_slot_pose_wrapper.self), pose._ptr.assumingMemoryBound(to: spine_slot_pose_wrapper.self))
     }
 
     public func dispose() {

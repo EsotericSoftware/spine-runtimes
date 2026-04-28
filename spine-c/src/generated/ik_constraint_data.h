@@ -25,12 +25,12 @@ SPINE_C_API spine_array_bone_data spine_ik_constraint_data_get_bones(spine_ik_co
 SPINE_C_API spine_bone_data spine_ik_constraint_data_get_target(spine_ik_constraint_data self);
 SPINE_C_API void spine_ik_constraint_data_set_target(spine_ik_constraint_data self, spine_bone_data inValue);
 /**
- * When true and IkConstraintPose::getCompress() or
- * IkConstraintPose::getStretch() is used, the bone is scaled on both the X and
- * Y axes.
+ * Determines how BonePose::getScaleY() changes when
+ * IkConstraintPose::getCompress() or IkConstraintPose::getStretch() sets
+ * BonePose::getScaleX().
  */
-SPINE_C_API bool spine_ik_constraint_data_get_uniform(spine_ik_constraint_data self);
-SPINE_C_API void spine_ik_constraint_data_set_uniform(spine_ik_constraint_data self, bool uniform);
+SPINE_C_API spine_scale_y spine_ik_constraint_data_get_scale_y(spine_ik_constraint_data self);
+SPINE_C_API void spine_ik_constraint_data_set_scale_y(spine_ik_constraint_data self, spine_scale_y scaleY);
 /**
  * Resolve ambiguity by forwarding to PosedData's implementation
  */

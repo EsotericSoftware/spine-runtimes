@@ -41,7 +41,7 @@
 
 using namespace spine;
 
-Animation::Animation(const String &name) : _timelines(), _timelineIds(), _bones(), _duration(0), _name(name) {
+Animation::Animation(const String &name) : _timelines(), _timelineIds(), _bones(), _duration(0), _name(name), _color(1, 1, 1, 1) {
 }
 
 bool Animation::hasTimeline(Array<PropertyId> &ids) {
@@ -75,6 +75,10 @@ const String &Animation::getName() {
 
 const Array<int> &Animation::getBones() {
 	return _bones;
+}
+
+Color &Animation::getColor() {
+	return _color;
 }
 
 Array<Timeline *> &Animation::getTimelines() {

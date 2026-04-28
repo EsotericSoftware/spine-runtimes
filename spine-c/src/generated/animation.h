@@ -69,6 +69,11 @@ SPINE_C_API const char *spine_animation_get_name(spine_animation self);
  */
 SPINE_C_API spine_array_int spine_animation_get_bones(spine_animation self);
 /**
+ * The color of the animation as it was in Spine, or a default color if
+ * nonessential data was not exported.
+ */
+SPINE_C_API spine_color spine_animation_get_color(spine_animation self);
+/**
  *
  * @param target After the first and before the last entry.
  */

@@ -49,17 +49,18 @@ public class AtlasRegion: TextureRegion {
     public var page: AtlasPage? {
         get {
             let result = spine_atlas_region_get_page(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self))
-        return result.map { AtlasPage(fromPointer: $0) }
+            return result.map { AtlasPage(fromPointer: $0) }
         }
         set {
-            spine_atlas_region_set_page(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self), newValue?._ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self))
+            spine_atlas_region_set_page(
+                _ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self), newValue?._ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self))
         }
     }
 
     public var name: String {
         get {
             let result = spine_atlas_region_get_name(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self))
-        return String(cString: result!)
+            return String(cString: result!)
         }
         set {
             spine_atlas_region_set_name(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self), newValue)
@@ -69,7 +70,7 @@ public class AtlasRegion: TextureRegion {
     public var index: Int32 {
         get {
             let result = spine_atlas_region_get_index(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_atlas_region_set_index(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self), newValue)
@@ -79,7 +80,7 @@ public class AtlasRegion: TextureRegion {
     public var x: Int32 {
         get {
             let result = spine_atlas_region_get_x(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_atlas_region_set_x(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self), newValue)
@@ -89,7 +90,7 @@ public class AtlasRegion: TextureRegion {
     public var y: Int32 {
         get {
             let result = spine_atlas_region_get_y(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_atlas_region_set_y(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self), newValue)
@@ -99,7 +100,7 @@ public class AtlasRegion: TextureRegion {
     public var offsetX: Float {
         get {
             let result = spine_atlas_region_get_offset_x(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_atlas_region_set_offset_x(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self), newValue)
@@ -109,7 +110,7 @@ public class AtlasRegion: TextureRegion {
     public var offsetY: Float {
         get {
             let result = spine_atlas_region_get_offset_y(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_atlas_region_set_offset_y(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self), newValue)
@@ -119,7 +120,7 @@ public class AtlasRegion: TextureRegion {
     public var packedWidth: Int32 {
         get {
             let result = spine_atlas_region_get_packed_width(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_atlas_region_set_packed_width(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self), newValue)
@@ -129,7 +130,7 @@ public class AtlasRegion: TextureRegion {
     public var packedHeight: Int32 {
         get {
             let result = spine_atlas_region_get_packed_height(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_atlas_region_set_packed_height(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self), newValue)
@@ -139,7 +140,7 @@ public class AtlasRegion: TextureRegion {
     public var originalWidth: Int32 {
         get {
             let result = spine_atlas_region_get_original_width(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_atlas_region_set_original_width(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self), newValue)
@@ -149,7 +150,7 @@ public class AtlasRegion: TextureRegion {
     public var originalHeight: Int32 {
         get {
             let result = spine_atlas_region_get_original_height(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_atlas_region_set_original_height(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self), newValue)
@@ -159,7 +160,7 @@ public class AtlasRegion: TextureRegion {
     public var rotate: Bool {
         get {
             let result = spine_atlas_region_get_rotate(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_atlas_region_set_rotate(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self), newValue)
@@ -169,7 +170,7 @@ public class AtlasRegion: TextureRegion {
     public var degrees: Int32 {
         get {
             let result = spine_atlas_region_get_degrees(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_atlas_region_set_degrees(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self), newValue)
@@ -179,30 +180,33 @@ public class AtlasRegion: TextureRegion {
     public var splits: ArrayInt {
         get {
             let result = spine_atlas_region_get_splits(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self))
-        return ArrayInt(fromPointer: result!)
+            return ArrayInt(fromPointer: result!)
         }
         set {
-            spine_atlas_region_set_splits(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_array_int_wrapper.self))
+            spine_atlas_region_set_splits(
+                _ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_array_int_wrapper.self))
         }
     }
 
     public var pads: ArrayInt {
         get {
             let result = spine_atlas_region_get_pads(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self))
-        return ArrayInt(fromPointer: result!)
+            return ArrayInt(fromPointer: result!)
         }
         set {
-            spine_atlas_region_set_pads(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_array_int_wrapper.self))
+            spine_atlas_region_set_pads(
+                _ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_array_int_wrapper.self))
         }
     }
 
     public var values: ArrayFloat {
         get {
             let result = spine_atlas_region_get_values(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self))
-        return ArrayFloat(fromPointer: result!)
+            return ArrayFloat(fromPointer: result!)
         }
         set {
-            spine_atlas_region_set_values(_ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self))
+            spine_atlas_region_set_values(
+                _ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self))
         }
     }
 

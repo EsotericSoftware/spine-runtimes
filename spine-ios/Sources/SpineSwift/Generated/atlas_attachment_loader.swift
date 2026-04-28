@@ -52,32 +52,44 @@ public class AtlasAttachmentLoader: NSObject, AttachmentLoader {
     }
 
     public func newRegionAttachment(_ skin: Skin, _ name: String, _ path: String, _ sequence: Sequence?) -> RegionAttachment? {
-        let result = spine_atlas_attachment_loader_new_region_attachment(_ptr.assumingMemoryBound(to: spine_atlas_attachment_loader_wrapper.self), skin._ptr.assumingMemoryBound(to: spine_skin_wrapper.self), name, path, sequence?._ptr.assumingMemoryBound(to: spine_sequence_wrapper.self))
+        let result = spine_atlas_attachment_loader_new_region_attachment(
+            _ptr.assumingMemoryBound(to: spine_atlas_attachment_loader_wrapper.self), skin._ptr.assumingMemoryBound(to: spine_skin_wrapper.self),
+            name, path, sequence?._ptr.assumingMemoryBound(to: spine_sequence_wrapper.self))
         return result.map { RegionAttachment(fromPointer: $0) }
     }
 
     public func newMeshAttachment(_ skin: Skin, _ name: String, _ path: String, _ sequence: Sequence?) -> MeshAttachment? {
-        let result = spine_atlas_attachment_loader_new_mesh_attachment(_ptr.assumingMemoryBound(to: spine_atlas_attachment_loader_wrapper.self), skin._ptr.assumingMemoryBound(to: spine_skin_wrapper.self), name, path, sequence?._ptr.assumingMemoryBound(to: spine_sequence_wrapper.self))
+        let result = spine_atlas_attachment_loader_new_mesh_attachment(
+            _ptr.assumingMemoryBound(to: spine_atlas_attachment_loader_wrapper.self), skin._ptr.assumingMemoryBound(to: spine_skin_wrapper.self),
+            name, path, sequence?._ptr.assumingMemoryBound(to: spine_sequence_wrapper.self))
         return result.map { MeshAttachment(fromPointer: $0) }
     }
 
     public func newBoundingBoxAttachment(_ skin: Skin, _ name: String) -> BoundingBoxAttachment? {
-        let result = spine_atlas_attachment_loader_new_bounding_box_attachment(_ptr.assumingMemoryBound(to: spine_atlas_attachment_loader_wrapper.self), skin._ptr.assumingMemoryBound(to: spine_skin_wrapper.self), name)
+        let result = spine_atlas_attachment_loader_new_bounding_box_attachment(
+            _ptr.assumingMemoryBound(to: spine_atlas_attachment_loader_wrapper.self), skin._ptr.assumingMemoryBound(to: spine_skin_wrapper.self), name
+        )
         return result.map { BoundingBoxAttachment(fromPointer: $0) }
     }
 
     public func newPathAttachment(_ skin: Skin, _ name: String) -> PathAttachment? {
-        let result = spine_atlas_attachment_loader_new_path_attachment(_ptr.assumingMemoryBound(to: spine_atlas_attachment_loader_wrapper.self), skin._ptr.assumingMemoryBound(to: spine_skin_wrapper.self), name)
+        let result = spine_atlas_attachment_loader_new_path_attachment(
+            _ptr.assumingMemoryBound(to: spine_atlas_attachment_loader_wrapper.self), skin._ptr.assumingMemoryBound(to: spine_skin_wrapper.self), name
+        )
         return result.map { PathAttachment(fromPointer: $0) }
     }
 
     public func newPointAttachment(_ skin: Skin, _ name: String) -> PointAttachment? {
-        let result = spine_atlas_attachment_loader_new_point_attachment(_ptr.assumingMemoryBound(to: spine_atlas_attachment_loader_wrapper.self), skin._ptr.assumingMemoryBound(to: spine_skin_wrapper.self), name)
+        let result = spine_atlas_attachment_loader_new_point_attachment(
+            _ptr.assumingMemoryBound(to: spine_atlas_attachment_loader_wrapper.self), skin._ptr.assumingMemoryBound(to: spine_skin_wrapper.self), name
+        )
         return result.map { PointAttachment(fromPointer: $0) }
     }
 
     public func newClippingAttachment(_ skin: Skin, _ name: String) -> ClippingAttachment? {
-        let result = spine_atlas_attachment_loader_new_clipping_attachment(_ptr.assumingMemoryBound(to: spine_atlas_attachment_loader_wrapper.self), skin._ptr.assumingMemoryBound(to: spine_skin_wrapper.self), name)
+        let result = spine_atlas_attachment_loader_new_clipping_attachment(
+            _ptr.assumingMemoryBound(to: spine_atlas_attachment_loader_wrapper.self), skin._ptr.assumingMemoryBound(to: spine_skin_wrapper.self), name
+        )
         return result.map { ClippingAttachment(fromPointer: $0) }
     }
 

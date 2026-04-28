@@ -48,11 +48,13 @@ public class TransformConstraintTimeline: CurveTimeline, ConstraintTimeline {
 
     public var constraintIndex: Int32 {
         get {
-            let result = spine_transform_constraint_timeline_get_constraint_index(_ptr.assumingMemoryBound(to: spine_transform_constraint_timeline_wrapper.self))
-        return result
+            let result = spine_transform_constraint_timeline_get_constraint_index(
+                _ptr.assumingMemoryBound(to: spine_transform_constraint_timeline_wrapper.self))
+            return result
         }
         set {
-            spine_transform_constraint_timeline_set_constraint_index(_ptr.assumingMemoryBound(to: spine_transform_constraint_timeline_wrapper.self), newValue)
+            spine_transform_constraint_timeline_set_constraint_index(
+                _ptr.assumingMemoryBound(to: spine_transform_constraint_timeline_wrapper.self), newValue)
         }
     }
 
@@ -60,8 +62,12 @@ public class TransformConstraintTimeline: CurveTimeline, ConstraintTimeline {
     ///
     /// - Parameter frame: Between 0 and frameCount, inclusive.
     /// - Parameter time: The frame time in seconds.
-    public func setFrame(_ frame: Int32, _ time: Float, _ mixRotate: Float, _ mixX: Float, _ mixY: Float, _ mixScaleX: Float, _ mixScaleY: Float, _ mixShearY: Float) {
-        spine_transform_constraint_timeline_set_frame(_ptr.assumingMemoryBound(to: spine_transform_constraint_timeline_wrapper.self), frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY)
+    public func setFrame(
+        _ frame: Int32, _ time: Float, _ mixRotate: Float, _ mixX: Float, _ mixY: Float, _ mixScaleX: Float, _ mixScaleY: Float, _ mixShearY: Float
+    ) {
+        spine_transform_constraint_timeline_set_frame(
+            _ptr.assumingMemoryBound(to: spine_transform_constraint_timeline_wrapper.self), frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY,
+            mixShearY)
     }
 
     public func dispose() {

@@ -51,10 +51,12 @@ public class ClippingAttachment: VertexAttachment {
     public var endSlot: SlotData? {
         get {
             let result = spine_clipping_attachment_get_end_slot(_ptr.assumingMemoryBound(to: spine_clipping_attachment_wrapper.self))
-        return result.map { SlotData(fromPointer: $0) }
+            return result.map { SlotData(fromPointer: $0) }
         }
         set {
-            spine_clipping_attachment_set_end_slot(_ptr.assumingMemoryBound(to: spine_clipping_attachment_wrapper.self), newValue?._ptr.assumingMemoryBound(to: spine_slot_data_wrapper.self))
+            spine_clipping_attachment_set_end_slot(
+                _ptr.assumingMemoryBound(to: spine_clipping_attachment_wrapper.self),
+                newValue?._ptr.assumingMemoryBound(to: spine_slot_data_wrapper.self))
         }
     }
 
@@ -64,7 +66,7 @@ public class ClippingAttachment: VertexAttachment {
     public var convex: Bool {
         get {
             let result = spine_clipping_attachment_get_convex(_ptr.assumingMemoryBound(to: spine_clipping_attachment_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_clipping_attachment_set_convex(_ptr.assumingMemoryBound(to: spine_clipping_attachment_wrapper.self), newValue)
@@ -76,7 +78,7 @@ public class ClippingAttachment: VertexAttachment {
     public var inverse: Bool {
         get {
             let result = spine_clipping_attachment_get_inverse(_ptr.assumingMemoryBound(to: spine_clipping_attachment_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_clipping_attachment_set_inverse(_ptr.assumingMemoryBound(to: spine_clipping_attachment_wrapper.self), newValue)

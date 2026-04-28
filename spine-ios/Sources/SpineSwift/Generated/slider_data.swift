@@ -55,10 +55,11 @@ public class SliderData: PosedData, ConstraintData {
     public var animation: Animation {
         get {
             let result = spine_slider_data_get_animation(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self))
-        return Animation(fromPointer: result!)
+            return Animation(fromPointer: result!)
         }
         set {
-            spine_slider_data_set_animation(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_animation_wrapper.self))
+            spine_slider_data_set_animation(
+                _ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_animation_wrapper.self))
         }
     }
 
@@ -67,7 +68,7 @@ public class SliderData: PosedData, ConstraintData {
     public var additive: Bool {
         get {
             let result = spine_slider_data_get_additive(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_slider_data_set_additive(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self), newValue)
@@ -78,7 +79,7 @@ public class SliderData: PosedData, ConstraintData {
     public var loop: Bool {
         get {
             let result = spine_slider_data_get_loop(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_slider_data_set_loop(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self), newValue)
@@ -89,10 +90,11 @@ public class SliderData: PosedData, ConstraintData {
     public var bone: BoneData? {
         get {
             let result = spine_slider_data_get_bone(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self))
-        return result.map { BoneData(fromPointer: $0) }
+            return result.map { BoneData(fromPointer: $0) }
         }
         set {
-            spine_slider_data_set_bone(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self), newValue?._ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self))
+            spine_slider_data_set_bone(
+                _ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self), newValue?._ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self))
         }
     }
 
@@ -101,34 +103,36 @@ public class SliderData: PosedData, ConstraintData {
     public var property: FromProperty? {
         get {
             let result = spine_slider_data_get_property(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self))
-        guard let ptr = result else { return nil }
-        let rtti = spine_from_property_get_rtti(ptr)
-        let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
-        switch rttiClassName {
-        case "FromRotate":
-            let castedPtr = spine_from_property_cast_to_from_rotate(ptr)
-            return FromRotate(fromPointer: castedPtr!)
-        case "FromScaleX":
-            let castedPtr = spine_from_property_cast_to_from_scale_x(ptr)
-            return FromScaleX(fromPointer: castedPtr!)
-        case "FromScaleY":
-            let castedPtr = spine_from_property_cast_to_from_scale_y(ptr)
-            return FromScaleY(fromPointer: castedPtr!)
-        case "FromShearY":
-            let castedPtr = spine_from_property_cast_to_from_shear_y(ptr)
-            return FromShearY(fromPointer: castedPtr!)
-        case "FromX":
-            let castedPtr = spine_from_property_cast_to_from_x(ptr)
-            return FromX(fromPointer: castedPtr!)
-        case "FromY":
-            let castedPtr = spine_from_property_cast_to_from_y(ptr)
-            return FromY(fromPointer: castedPtr!)
-        default:
-            fatalError("Unknown concrete type: \(rttiClassName) for abstract class FromProperty")
-        }
+            guard let ptr = result else { return nil }
+            let rtti = spine_from_property_get_rtti(ptr)
+            let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
+            switch rttiClassName {
+            case "FromRotate":
+                let castedPtr = spine_from_property_cast_to_from_rotate(ptr)
+                return FromRotate(fromPointer: castedPtr!)
+            case "FromScaleX":
+                let castedPtr = spine_from_property_cast_to_from_scale_x(ptr)
+                return FromScaleX(fromPointer: castedPtr!)
+            case "FromScaleY":
+                let castedPtr = spine_from_property_cast_to_from_scale_y(ptr)
+                return FromScaleY(fromPointer: castedPtr!)
+            case "FromShearY":
+                let castedPtr = spine_from_property_cast_to_from_shear_y(ptr)
+                return FromShearY(fromPointer: castedPtr!)
+            case "FromX":
+                let castedPtr = spine_from_property_cast_to_from_x(ptr)
+                return FromX(fromPointer: castedPtr!)
+            case "FromY":
+                let castedPtr = spine_from_property_cast_to_from_y(ptr)
+                return FromY(fromPointer: castedPtr!)
+            default:
+                fatalError("Unknown concrete type: \(rttiClassName) for abstract class FromProperty")
+            }
         }
         set {
-            spine_slider_data_set_property(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self), newValue?._ptr.assumingMemoryBound(to: spine_from_property_wrapper.self))
+            spine_slider_data_set_property(
+                _ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self), newValue?._ptr.assumingMemoryBound(to: spine_from_property_wrapper.self)
+            )
         }
     }
 
@@ -136,7 +140,7 @@ public class SliderData: PosedData, ConstraintData {
     public var scale: Float {
         get {
             let result = spine_slider_data_get_scale(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_slider_data_set_scale(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self), newValue)
@@ -147,7 +151,7 @@ public class SliderData: PosedData, ConstraintData {
     public var offset: Float {
         get {
             let result = spine_slider_data_get_offset(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_slider_data_set_offset(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self), newValue)
@@ -159,7 +163,7 @@ public class SliderData: PosedData, ConstraintData {
     public var local: Bool {
         get {
             let result = spine_slider_data_get_local(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_slider_data_set_local(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self), newValue)
@@ -174,7 +178,8 @@ public class SliderData: PosedData, ConstraintData {
 
     /// Creates a slider instance.
     public func createMethod(_ skeleton: Skeleton) -> Constraint {
-        let result = spine_slider_data_create_method(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
+        let result = spine_slider_data_create_method(
+            _ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
         let rtti = spine_constraint_get_rtti(result!)
         let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
         switch rttiClassName {

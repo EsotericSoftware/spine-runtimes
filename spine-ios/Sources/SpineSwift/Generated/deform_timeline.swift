@@ -42,7 +42,8 @@ public class DeformTimeline: SlotCurveTimeline {
     }
 
     public convenience init(_ frameCount: Int, _ bezierCount: Int, _ slotIndex: Int32, _ attachment: VertexAttachment) {
-        let ptr = spine_deform_timeline_create(frameCount, bezierCount, slotIndex, attachment._ptr.assumingMemoryBound(to: spine_vertex_attachment_wrapper.self))
+        let ptr = spine_deform_timeline_create(
+            frameCount, bezierCount, slotIndex, attachment._ptr.assumingMemoryBound(to: spine_vertex_attachment_wrapper.self))
         self.init(fromPointer: ptr!)
     }
 
@@ -50,33 +51,37 @@ public class DeformTimeline: SlotCurveTimeline {
     public var attachment: VertexAttachment {
         get {
             let result = spine_deform_timeline_get_attachment(_ptr.assumingMemoryBound(to: spine_deform_timeline_wrapper.self))
-        let rtti = spine_vertex_attachment_get_rtti(result!)
-        let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
-        switch rttiClassName {
-        case "BoundingBoxAttachment":
-            let castedPtr = spine_vertex_attachment_cast_to_bounding_box_attachment(result!)
-            return BoundingBoxAttachment(fromPointer: castedPtr!)
-        case "ClippingAttachment":
-            let castedPtr = spine_vertex_attachment_cast_to_clipping_attachment(result!)
-            return ClippingAttachment(fromPointer: castedPtr!)
-        case "MeshAttachment":
-            let castedPtr = spine_vertex_attachment_cast_to_mesh_attachment(result!)
-            return MeshAttachment(fromPointer: castedPtr!)
-        case "PathAttachment":
-            let castedPtr = spine_vertex_attachment_cast_to_path_attachment(result!)
-            return PathAttachment(fromPointer: castedPtr!)
-        default:
-            fatalError("Unknown concrete type: \(rttiClassName) for abstract class VertexAttachment")
-        }
+            let rtti = spine_vertex_attachment_get_rtti(result!)
+            let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
+            switch rttiClassName {
+            case "BoundingBoxAttachment":
+                let castedPtr = spine_vertex_attachment_cast_to_bounding_box_attachment(result!)
+                return BoundingBoxAttachment(fromPointer: castedPtr!)
+            case "ClippingAttachment":
+                let castedPtr = spine_vertex_attachment_cast_to_clipping_attachment(result!)
+                return ClippingAttachment(fromPointer: castedPtr!)
+            case "MeshAttachment":
+                let castedPtr = spine_vertex_attachment_cast_to_mesh_attachment(result!)
+                return MeshAttachment(fromPointer: castedPtr!)
+            case "PathAttachment":
+                let castedPtr = spine_vertex_attachment_cast_to_path_attachment(result!)
+                return PathAttachment(fromPointer: castedPtr!)
+            default:
+                fatalError("Unknown concrete type: \(rttiClassName) for abstract class VertexAttachment")
+            }
         }
         set {
-            spine_deform_timeline_set_attachment(_ptr.assumingMemoryBound(to: spine_deform_timeline_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_vertex_attachment_wrapper.self))
+            spine_deform_timeline_set_attachment(
+                _ptr.assumingMemoryBound(to: spine_deform_timeline_wrapper.self),
+                newValue._ptr.assumingMemoryBound(to: spine_vertex_attachment_wrapper.self))
         }
     }
 
     /// Sets the time and vertices for the specified frame.
     public func setFrame(_ frameIndex: Int32, _ time: Float, _ vertices: ArrayFloat) {
-        spine_deform_timeline_set_frame(_ptr.assumingMemoryBound(to: spine_deform_timeline_wrapper.self), frameIndex, time, vertices._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self))
+        spine_deform_timeline_set_frame(
+            _ptr.assumingMemoryBound(to: spine_deform_timeline_wrapper.self), frameIndex, time,
+            vertices._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self))
     }
 
     public func getCurvePercent(_ time: Float, _ frame: Int32) -> Float {

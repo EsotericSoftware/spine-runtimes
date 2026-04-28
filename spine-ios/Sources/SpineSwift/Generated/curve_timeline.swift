@@ -60,12 +60,17 @@ open class CurveTimeline: Timeline {
         return ArrayFloat(fromPointer: result!)
     }
 
-    public func setBezier(_ bezier: Int, _ frame: Int, _ value: Float, _ time1: Float, _ value1: Float, _ cx1: Float, _ cy1: Float, _ cx2: Float, _ cy2: Float, _ time2: Float, _ value2: Float) {
-        spine_curve_timeline_set_bezier(_ptr.assumingMemoryBound(to: spine_curve_timeline_wrapper.self), bezier, frame, value, time1, value1, cx1, cy1, cx2, cy2, time2, value2)
+    public func setBezier(
+        _ bezier: Int, _ frame: Int, _ value: Float, _ time1: Float, _ value1: Float, _ cx1: Float, _ cy1: Float, _ cx2: Float, _ cy2: Float,
+        _ time2: Float, _ value2: Float
+    ) {
+        spine_curve_timeline_set_bezier(
+            _ptr.assumingMemoryBound(to: spine_curve_timeline_wrapper.self), bezier, frame, value, time1, value1, cx1, cy1, cx2, cy2, time2, value2)
     }
 
     public func getBezierValue(_ time: Float, _ frame: Int, _ valueOffset: Int, _ i: Int) -> Float {
-        let result = spine_curve_timeline_get_bezier_value(_ptr.assumingMemoryBound(to: spine_curve_timeline_wrapper.self), time, frame, valueOffset, i)
+        let result = spine_curve_timeline_get_bezier_value(
+            _ptr.assumingMemoryBound(to: spine_curve_timeline_wrapper.self), time, frame, valueOffset, i)
         return result
     }
 

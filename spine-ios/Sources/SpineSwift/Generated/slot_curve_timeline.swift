@@ -44,7 +44,7 @@ open class SlotCurveTimeline: CurveTimeline, SlotTimeline {
     public var slotIndex: Int32 {
         get {
             let result = spine_slot_curve_timeline_get_slot_index(_ptr.assumingMemoryBound(to: spine_slot_curve_timeline_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_slot_curve_timeline_set_slot_index(_ptr.assumingMemoryBound(to: spine_slot_curve_timeline_wrapper.self), newValue)

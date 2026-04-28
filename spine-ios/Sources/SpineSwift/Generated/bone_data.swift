@@ -61,7 +61,7 @@ public class BoneData: PosedData {
     public var length: Float {
         get {
             let result = spine_bone_data_get_length(_ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_bone_data_set_length(_ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self), newValue)
@@ -77,17 +77,39 @@ public class BoneData: PosedData {
     public var icon: String {
         get {
             let result = spine_bone_data_get_icon(_ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self))
-        return String(cString: result!)
+            return String(cString: result!)
         }
         set {
             spine_bone_data_set_icon(_ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self), newValue)
         }
     }
 
+    /// The bone icon's display size scale, or 1 if nonessential data was not exported.
+    public var iconSize: Float {
+        get {
+            let result = spine_bone_data_get_icon_size(_ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self))
+            return result
+        }
+        set {
+            spine_bone_data_set_icon_size(_ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self), newValue)
+        }
+    }
+
+    /// The bone icon's display rotation in degrees, or 0 if nonessential data was not exported.
+    public var iconRotation: Float {
+        get {
+            let result = spine_bone_data_get_icon_rotation(_ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self))
+            return result
+        }
+        set {
+            spine_bone_data_set_icon_rotation(_ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self), newValue)
+        }
+    }
+
     public var visible: Bool {
         get {
             let result = spine_bone_data_get_visible(_ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_bone_data_set_visible(_ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self), newValue)

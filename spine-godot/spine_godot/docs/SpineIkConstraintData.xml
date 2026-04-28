@@ -54,10 +54,10 @@
 				The bone that is the IK target.
 			</description>
 		</method>
-		<method name="get_uniform">
-			<return type="bool" />
+		<method name="get_scale_y">
+			<return type="int" enum="SpineConstant.ScaleY" />
 			<description>
-				When true and compress or stretch is used, the bone is scaled on both the X and Y axes.
+				Determines how scaleY changes when compress or stretch changes scaleX: none, uniform, or volume.
 			</description>
 		</method>
 		<method name="set_bend_direction">
@@ -96,13 +96,22 @@
 			<description>
 			</description>
 		</method>
-		<method name="set_uniform">
+		<method name="set_scale_y">
 			<return type="void" />
-			<argument index="0" name="v" type="bool" />
+			<argument index="0" name="v" type="int" enum="SpineConstant.ScaleY" />
 			<description>
 			</description>
 		</method>
 	</methods>
 	<constants>
+		<constant name="ScaleY_None" value="0" enum="ScaleY">
+			ScaleY is not changed.
+		</constant>
+		<constant name="ScaleY_Uniform" value="1" enum="ScaleY">
+			ScaleY is multiplied by the scaleX factor, preserving the bone's aspect ratio.
+		</constant>
+		<constant name="ScaleY_Volume" value="2" enum="ScaleY">
+			ScaleY is divided by the scaleX factor, preserving the bone's area.
+		</constant>
 	</constants>
 </class>

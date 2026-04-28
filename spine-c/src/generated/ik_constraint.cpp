@@ -52,14 +52,14 @@ void spine_ik_constraint_set_target(spine_ik_constraint self, spine_bone inValue
 }
 
 void spine_ik_constraint_apply_1(spine_skeleton skeleton, spine_bone_pose bone, float targetX, float targetY, bool compress, bool stretch,
-								 bool uniform, float mix) {
-	IkConstraint::apply(*((Skeleton *) skeleton), *((BonePose *) bone), targetX, targetY, compress, stretch, uniform, mix);
+								 spine_scale_y scaleY, float mix) {
+	IkConstraint::apply(*((Skeleton *) skeleton), *((BonePose *) bone), targetX, targetY, compress, stretch, (ScaleY) scaleY, mix);
 }
 
 void spine_ik_constraint_apply_2(spine_skeleton skeleton, spine_bone_pose parent, spine_bone_pose child, float targetX, float targetY,
-								 int bendDirection, bool stretch, bool uniform, float softness, float mix) {
-	IkConstraint::apply(*((Skeleton *) skeleton), *((BonePose *) parent), *((BonePose *) child), targetX, targetY, bendDirection, stretch, uniform,
-						softness, mix);
+								 int bendDirection, bool stretch, spine_scale_y scaleY, float softness, float mix) {
+	IkConstraint::apply(*((Skeleton *) skeleton), *((BonePose *) parent), *((BonePose *) child), targetX, targetY, bendDirection, stretch,
+						(ScaleY) scaleY, softness, mix);
 }
 
 spine_ik_constraint_data spine_ik_constraint_get_data(spine_ik_constraint self) {

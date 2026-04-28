@@ -56,7 +56,7 @@ public class Color: NSObject {
     public var r: Float {
         get {
             let result = spine_color_get_r(_ptr.assumingMemoryBound(to: spine_color_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_color_set_r(_ptr.assumingMemoryBound(to: spine_color_wrapper.self), newValue)
@@ -66,7 +66,7 @@ public class Color: NSObject {
     public var g: Float {
         get {
             let result = spine_color_get_g(_ptr.assumingMemoryBound(to: spine_color_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_color_set_g(_ptr.assumingMemoryBound(to: spine_color_wrapper.self), newValue)
@@ -76,7 +76,7 @@ public class Color: NSObject {
     public var b: Float {
         get {
             let result = spine_color_get_b(_ptr.assumingMemoryBound(to: spine_color_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_color_set_b(_ptr.assumingMemoryBound(to: spine_color_wrapper.self), newValue)
@@ -86,7 +86,7 @@ public class Color: NSObject {
     public var a: Float {
         get {
             let result = spine_color_get_a(_ptr.assumingMemoryBound(to: spine_color_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_color_set_a(_ptr.assumingMemoryBound(to: spine_color_wrapper.self), newValue)
@@ -124,7 +124,8 @@ public class Color: NSObject {
     }
 
     public func set3(_ other: Color) -> Color {
-        let result = spine_color_set_3(_ptr.assumingMemoryBound(to: spine_color_wrapper.self), other._ptr.assumingMemoryBound(to: spine_color_wrapper.self))
+        let result = spine_color_set_3(
+            _ptr.assumingMemoryBound(to: spine_color_wrapper.self), other._ptr.assumingMemoryBound(to: spine_color_wrapper.self))
         return Color(fromPointer: result!)
     }
 
@@ -139,7 +140,8 @@ public class Color: NSObject {
     }
 
     public func add3(_ other: Color) -> Color {
-        let result = spine_color_add_3(_ptr.assumingMemoryBound(to: spine_color_wrapper.self), other._ptr.assumingMemoryBound(to: spine_color_wrapper.self))
+        let result = spine_color_add_3(
+            _ptr.assumingMemoryBound(to: spine_color_wrapper.self), other._ptr.assumingMemoryBound(to: spine_color_wrapper.self))
         return Color(fromPointer: result!)
     }
 

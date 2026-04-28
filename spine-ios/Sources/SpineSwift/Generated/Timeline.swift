@@ -101,8 +101,13 @@ open class Timeline: NSObject {
     /// - Parameter add: If true, for timelines that support it, their values are added to the setup or current values (depending on fromSetup).
     /// - Parameter out: True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant transitions.
     /// - Parameter appliedPose: True to modify getAppliedPose(), else getPose() is modified.
-    public func apply(_ skeleton: Skeleton, _ lastTime: Float, _ time: Float, _ events: ArrayEvent?, _ alpha: Float, _ fromSetup: Bool, _ add: Bool, _ out: Bool, _ appliedPose: Bool) {
-        spine_timeline_apply(_ptr.assumingMemoryBound(to: spine_timeline_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self), lastTime, time, events?._ptr.assumingMemoryBound(to: spine_array_event_wrapper.self), alpha, fromSetup, add, out, appliedPose)
+    public func apply(
+        _ skeleton: Skeleton, _ lastTime: Float, _ time: Float, _ events: ArrayEvent?, _ alpha: Float, _ fromSetup: Bool, _ add: Bool, _ out: Bool,
+        _ appliedPose: Bool
+    ) {
+        spine_timeline_apply(
+            _ptr.assumingMemoryBound(to: spine_timeline_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self), lastTime,
+            time, events?._ptr.assumingMemoryBound(to: spine_array_event_wrapper.self), alpha, fromSetup, add, out, appliedPose)
     }
 
     public static func rttiStatic() -> Rtti {

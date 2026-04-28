@@ -52,6 +52,11 @@ spine_array_int spine_animation_get_bones(spine_animation self) {
 	return (spine_array_int) &_self->getBones();
 }
 
+spine_color spine_animation_get_color(spine_animation self) {
+	Animation *_self = (Animation *) self;
+	return (spine_color) &_self->getColor();
+}
+
 int spine_animation_search_1(spine_array_float values, float target) {
 	return Animation::search(*((Array<float> *) values), target);
 }

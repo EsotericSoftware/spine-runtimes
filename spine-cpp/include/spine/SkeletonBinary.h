@@ -251,7 +251,7 @@ namespace spine {
 
 		void readUnsignedShortArray(DataInput &input, Array<unsigned short> &array, int n);
 
-		Animation *readAnimation(DataInput &input, const String &name, SkeletonData &skeletonData);
+		Animation *readAnimation(DataInput &input, const String &name, SkeletonData &skeletonData, bool nonessential);
 
 		void readTimeline(DataInput &input, Array<Timeline *> &timelines, CurveTimeline1 &timeline, float scale);
 

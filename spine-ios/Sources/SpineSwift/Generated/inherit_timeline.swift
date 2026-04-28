@@ -49,7 +49,7 @@ public class InheritTimeline: Timeline, BoneTimeline {
     public var boneIndex: Int32 {
         get {
             let result = spine_inherit_timeline_get_bone_index(_ptr.assumingMemoryBound(to: spine_inherit_timeline_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_inherit_timeline_set_bone_index(_ptr.assumingMemoryBound(to: spine_inherit_timeline_wrapper.self), newValue)
@@ -61,7 +61,8 @@ public class InheritTimeline: Timeline, BoneTimeline {
     /// - Parameter frame: Between 0 and frameCount, inclusive.
     /// - Parameter time: The frame time in seconds.
     public func setFrame(_ frame: Int32, _ time: Float, _ inherit: Inherit) {
-        spine_inherit_timeline_set_frame(_ptr.assumingMemoryBound(to: spine_inherit_timeline_wrapper.self), frame, time, spine_inherit(rawValue: UInt32(inherit.rawValue)))
+        spine_inherit_timeline_set_frame(
+            _ptr.assumingMemoryBound(to: spine_inherit_timeline_wrapper.self), frame, time, spine_inherit(rawValue: UInt32(inherit.rawValue)))
     }
 
     public func dispose() {

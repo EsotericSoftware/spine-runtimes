@@ -54,10 +54,12 @@ open class VertexAttachment: Attachment {
     public var bones: ArrayInt {
         get {
             let result = spine_vertex_attachment_get_bones(_ptr.assumingMemoryBound(to: spine_vertex_attachment_wrapper.self))
-        return ArrayInt(fromPointer: result!)
+            return ArrayInt(fromPointer: result!)
         }
         set {
-            spine_vertex_attachment_set_bones(_ptr.assumingMemoryBound(to: spine_vertex_attachment_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_array_int_wrapper.self))
+            spine_vertex_attachment_set_bones(
+                _ptr.assumingMemoryBound(to: spine_vertex_attachment_wrapper.self),
+                newValue._ptr.assumingMemoryBound(to: spine_array_int_wrapper.self))
         }
     }
 
@@ -67,17 +69,19 @@ open class VertexAttachment: Attachment {
     public var vertices: ArrayFloat {
         get {
             let result = spine_vertex_attachment_get_vertices(_ptr.assumingMemoryBound(to: spine_vertex_attachment_wrapper.self))
-        return ArrayFloat(fromPointer: result!)
+            return ArrayFloat(fromPointer: result!)
         }
         set {
-            spine_vertex_attachment_set_vertices(_ptr.assumingMemoryBound(to: spine_vertex_attachment_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self))
+            spine_vertex_attachment_set_vertices(
+                _ptr.assumingMemoryBound(to: spine_vertex_attachment_wrapper.self),
+                newValue._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self))
         }
     }
 
     public var worldVerticesLength: Int {
         get {
             let result = spine_vertex_attachment_get_world_vertices_length(_ptr.assumingMemoryBound(to: spine_vertex_attachment_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_vertex_attachment_set_world_vertices_length(_ptr.assumingMemoryBound(to: spine_vertex_attachment_wrapper.self), newValue)
@@ -85,11 +89,18 @@ open class VertexAttachment: Attachment {
     }
 
     public func copyTo(_ other: VertexAttachment) {
-        spine_vertex_attachment_copy_to(_ptr.assumingMemoryBound(to: spine_vertex_attachment_wrapper.self), other._ptr.assumingMemoryBound(to: spine_vertex_attachment_wrapper.self))
+        spine_vertex_attachment_copy_to(
+            _ptr.assumingMemoryBound(to: spine_vertex_attachment_wrapper.self),
+            other._ptr.assumingMemoryBound(to: spine_vertex_attachment_wrapper.self))
     }
 
-    public func computeWorldVertices(_ skeleton: Skeleton, _ slot: Slot, _ start: Int, _ count: Int, _ worldVertices: ArrayFloat, _ offset: Int, _ stride: Int) {
-        spine_vertex_attachment_compute_world_vertices_2(_ptr.assumingMemoryBound(to: spine_vertex_attachment_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self), slot._ptr.assumingMemoryBound(to: spine_slot_wrapper.self), start, count, worldVertices._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self), offset, stride)
+    public func computeWorldVertices(
+        _ skeleton: Skeleton, _ slot: Slot, _ start: Int, _ count: Int, _ worldVertices: ArrayFloat, _ offset: Int, _ stride: Int
+    ) {
+        spine_vertex_attachment_compute_world_vertices_2(
+            _ptr.assumingMemoryBound(to: spine_vertex_attachment_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self),
+            slot._ptr.assumingMemoryBound(to: spine_slot_wrapper.self), start, count,
+            worldVertices._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self), offset, stride)
     }
 
 }

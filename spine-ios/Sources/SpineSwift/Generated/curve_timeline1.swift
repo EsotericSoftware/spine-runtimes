@@ -56,22 +56,28 @@ open class CurveTimeline1: CurveTimeline {
     }
 
     public func getRelativeValue(_ time: Float, _ alpha: Float, _ fromSetup: Bool, _ add: Bool, _ current: Float, _ setup: Float) -> Float {
-        let result = spine_curve_timeline1_get_relative_value(_ptr.assumingMemoryBound(to: spine_curve_timeline1_wrapper.self), time, alpha, fromSetup, add, current, setup)
+        let result = spine_curve_timeline1_get_relative_value(
+            _ptr.assumingMemoryBound(to: spine_curve_timeline1_wrapper.self), time, alpha, fromSetup, add, current, setup)
         return result
     }
 
     public func getScaleValue(_ time: Float, _ alpha: Float, _ fromSetup: Bool, _ add: Bool, _ out: Bool, _ current: Float, _ setup: Float) -> Float {
-        let result = spine_curve_timeline1_get_scale_value(_ptr.assumingMemoryBound(to: spine_curve_timeline1_wrapper.self), time, alpha, fromSetup, add, out, current, setup)
+        let result = spine_curve_timeline1_get_scale_value(
+            _ptr.assumingMemoryBound(to: spine_curve_timeline1_wrapper.self), time, alpha, fromSetup, add, out, current, setup)
         return result
     }
 
     public func getAbsoluteValue(_ time: Float, _ alpha: Float, _ fromSetup: Bool, _ add: Bool, _ current: Float, _ setup: Float) -> Float {
-        let result = spine_curve_timeline1_get_absolute_value_1(_ptr.assumingMemoryBound(to: spine_curve_timeline1_wrapper.self), time, alpha, fromSetup, add, current, setup)
+        let result = spine_curve_timeline1_get_absolute_value_1(
+            _ptr.assumingMemoryBound(to: spine_curve_timeline1_wrapper.self), time, alpha, fromSetup, add, current, setup)
         return result
     }
 
-    public func getAbsoluteValue2(_ time: Float, _ alpha: Float, _ fromSetup: Bool, _ add: Bool, _ current: Float, _ setup: Float, _ value: Float) -> Float {
-        let result = spine_curve_timeline1_get_absolute_value_2(_ptr.assumingMemoryBound(to: spine_curve_timeline1_wrapper.self), time, alpha, fromSetup, add, current, setup, value)
+    public func getAbsoluteValue2(
+        _ time: Float, _ alpha: Float, _ fromSetup: Bool, _ add: Bool, _ current: Float, _ setup: Float, _ value: Float
+    ) -> Float {
+        let result = spine_curve_timeline1_get_absolute_value_2(
+            _ptr.assumingMemoryBound(to: spine_curve_timeline1_wrapper.self), time, alpha, fromSetup, add, current, setup, value)
         return result
     }
 

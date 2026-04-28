@@ -61,22 +61,25 @@ public class IkConstraintData: PosedData, ConstraintData {
     public var target: BoneData {
         get {
             let result = spine_ik_constraint_data_get_target(_ptr.assumingMemoryBound(to: spine_ik_constraint_data_wrapper.self))
-        return BoneData(fromPointer: result!)
+            return BoneData(fromPointer: result!)
         }
         set {
-            spine_ik_constraint_data_set_target(_ptr.assumingMemoryBound(to: spine_ik_constraint_data_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self))
+            spine_ik_constraint_data_set_target(
+                _ptr.assumingMemoryBound(to: spine_ik_constraint_data_wrapper.self),
+                newValue._ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self))
         }
     }
 
-    /// When true and IkConstraintPose::getCompress() or IkConstraintPose::getStretch() is used, the
-    /// bone is scaled on both the X and Y axes.
-    public var uniform: Bool {
+    /// Determines how BonePose::getScaleY() changes when IkConstraintPose::getCompress() or
+    /// IkConstraintPose::getStretch() sets BonePose::getScaleX().
+    public var scaleY: ScaleY {
         get {
-            let result = spine_ik_constraint_data_get_uniform(_ptr.assumingMemoryBound(to: spine_ik_constraint_data_wrapper.self))
-        return result
+            let result = spine_ik_constraint_data_get_scale_y(_ptr.assumingMemoryBound(to: spine_ik_constraint_data_wrapper.self))
+            return ScaleY(rawValue: Int32(result.rawValue))!
         }
         set {
-            spine_ik_constraint_data_set_uniform(_ptr.assumingMemoryBound(to: spine_ik_constraint_data_wrapper.self), newValue)
+            spine_ik_constraint_data_set_scale_y(
+                _ptr.assumingMemoryBound(to: spine_ik_constraint_data_wrapper.self), spine_scale_y(rawValue: UInt32(newValue.rawValue)))
         }
     }
 
@@ -87,7 +90,8 @@ public class IkConstraintData: PosedData, ConstraintData {
     }
 
     public func createMethod(_ skeleton: Skeleton) -> Constraint {
-        let result = spine_ik_constraint_data_create_method(_ptr.assumingMemoryBound(to: spine_ik_constraint_data_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
+        let result = spine_ik_constraint_data_create_method(
+            _ptr.assumingMemoryBound(to: spine_ik_constraint_data_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
         let rtti = spine_constraint_get_rtti(result!)
         let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
         switch rttiClassName {

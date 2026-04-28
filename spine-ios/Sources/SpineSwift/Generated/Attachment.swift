@@ -57,44 +57,46 @@ open class Attachment: NSObject {
     public var timelineAttachment: Attachment? {
         get {
             let result = spine_attachment_get_timeline_attachment(_ptr.assumingMemoryBound(to: spine_attachment_wrapper.self))
-        guard let ptr = result else { return nil }
-        let rtti = spine_attachment_get_rtti(ptr)
-        let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
-        switch rttiClassName {
-        case "BoundingBoxAttachment":
-            let castedPtr = spine_attachment_cast_to_bounding_box_attachment(ptr)
-            return BoundingBoxAttachment(fromPointer: castedPtr!)
-        case "ClippingAttachment":
-            let castedPtr = spine_attachment_cast_to_clipping_attachment(ptr)
-            return ClippingAttachment(fromPointer: castedPtr!)
-        case "MeshAttachment":
-            let castedPtr = spine_attachment_cast_to_mesh_attachment(ptr)
-            return MeshAttachment(fromPointer: castedPtr!)
-        case "PathAttachment":
-            let castedPtr = spine_attachment_cast_to_path_attachment(ptr)
-            return PathAttachment(fromPointer: castedPtr!)
-        case "PointAttachment":
-            let castedPtr = spine_attachment_cast_to_point_attachment(ptr)
-            return PointAttachment(fromPointer: castedPtr!)
-        case "RegionAttachment":
-            let castedPtr = spine_attachment_cast_to_region_attachment(ptr)
-            return RegionAttachment(fromPointer: castedPtr!)
-        default:
-            fatalError("Unknown concrete type: \(rttiClassName) for abstract class Attachment")
-        }
+            guard let ptr = result else { return nil }
+            let rtti = spine_attachment_get_rtti(ptr)
+            let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
+            switch rttiClassName {
+            case "BoundingBoxAttachment":
+                let castedPtr = spine_attachment_cast_to_bounding_box_attachment(ptr)
+                return BoundingBoxAttachment(fromPointer: castedPtr!)
+            case "ClippingAttachment":
+                let castedPtr = spine_attachment_cast_to_clipping_attachment(ptr)
+                return ClippingAttachment(fromPointer: castedPtr!)
+            case "MeshAttachment":
+                let castedPtr = spine_attachment_cast_to_mesh_attachment(ptr)
+                return MeshAttachment(fromPointer: castedPtr!)
+            case "PathAttachment":
+                let castedPtr = spine_attachment_cast_to_path_attachment(ptr)
+                return PathAttachment(fromPointer: castedPtr!)
+            case "PointAttachment":
+                let castedPtr = spine_attachment_cast_to_point_attachment(ptr)
+                return PointAttachment(fromPointer: castedPtr!)
+            case "RegionAttachment":
+                let castedPtr = spine_attachment_cast_to_region_attachment(ptr)
+                return RegionAttachment(fromPointer: castedPtr!)
+            default:
+                fatalError("Unknown concrete type: \(rttiClassName) for abstract class Attachment")
+            }
         }
         set {
-            spine_attachment_set_timeline_attachment(_ptr.assumingMemoryBound(to: spine_attachment_wrapper.self), newValue?._ptr.assumingMemoryBound(to: spine_attachment_wrapper.self))
+            spine_attachment_set_timeline_attachment(
+                _ptr.assumingMemoryBound(to: spine_attachment_wrapper.self), newValue?._ptr.assumingMemoryBound(to: spine_attachment_wrapper.self))
         }
     }
 
     public var timelineSlots: ArrayInt {
         get {
             let result = spine_attachment_get_timeline_slots(_ptr.assumingMemoryBound(to: spine_attachment_wrapper.self))
-        return ArrayInt(fromPointer: result!)
+            return ArrayInt(fromPointer: result!)
         }
         set {
-            spine_attachment_set_timeline_slots(_ptr.assumingMemoryBound(to: spine_attachment_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_array_int_wrapper.self))
+            spine_attachment_set_timeline_slots(
+                _ptr.assumingMemoryBound(to: spine_attachment_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_array_int_wrapper.self))
         }
     }
 
@@ -132,7 +134,9 @@ open class Attachment: NSObject {
     }
 
     public func isTimelineActive(_ slots: ArraySlot, _ slotIndex: Int32, _ appliedPose: Bool) -> Bool {
-        let result = spine_attachment_is_timeline_active(_ptr.assumingMemoryBound(to: spine_attachment_wrapper.self), slots._ptr.assumingMemoryBound(to: spine_array_slot_wrapper.self), slotIndex, appliedPose)
+        let result = spine_attachment_is_timeline_active(
+            _ptr.assumingMemoryBound(to: spine_attachment_wrapper.self), slots._ptr.assumingMemoryBound(to: spine_array_slot_wrapper.self), slotIndex,
+            appliedPose)
         return result
     }
 

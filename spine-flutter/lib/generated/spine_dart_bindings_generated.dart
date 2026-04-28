@@ -15885,6 +15885,21 @@ class SpineDartBindings {
   late final _spine_animation_get_bones =
       _spine_animation_get_bonesPtr.asFunction<spine_array_int Function(spine_animation)>();
 
+  /// The color of the animation as it was in Spine, or a default color if
+  /// nonessential data was not exported.
+  spine_color spine_animation_get_color(
+    spine_animation self,
+  ) {
+    return _spine_animation_get_color(
+      self,
+    );
+  }
+
+  late final _spine_animation_get_colorPtr =
+      _lookup<ffi.NativeFunction<spine_color Function(spine_animation)>>('spine_animation_get_color');
+  late final _spine_animation_get_color =
+      _spine_animation_get_colorPtr.asFunction<spine_color Function(spine_animation)>();
+
   /// @param target After the first and before the last entry.
   int spine_animation_search_1(
     spine_array_float values,
@@ -18689,6 +18704,66 @@ class SpineDartBindings {
           'spine_bone_data_set_icon');
   late final _spine_bone_data_set_icon =
       _spine_bone_data_set_iconPtr.asFunction<void Function(spine_bone_data, ffi.Pointer<ffi.Char>)>();
+
+  /// The bone icon's display size scale, or 1 if nonessential data was not
+  /// exported.
+  double spine_bone_data_get_icon_size(
+    spine_bone_data self,
+  ) {
+    return _spine_bone_data_get_icon_size(
+      self,
+    );
+  }
+
+  late final _spine_bone_data_get_icon_sizePtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_bone_data)>>('spine_bone_data_get_icon_size');
+  late final _spine_bone_data_get_icon_size =
+      _spine_bone_data_get_icon_sizePtr.asFunction<double Function(spine_bone_data)>();
+
+  void spine_bone_data_set_icon_size(
+    spine_bone_data self,
+    double iconSize,
+  ) {
+    return _spine_bone_data_set_icon_size(
+      self,
+      iconSize,
+    );
+  }
+
+  late final _spine_bone_data_set_icon_sizePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_bone_data, ffi.Float)>>('spine_bone_data_set_icon_size');
+  late final _spine_bone_data_set_icon_size =
+      _spine_bone_data_set_icon_sizePtr.asFunction<void Function(spine_bone_data, double)>();
+
+  /// The bone icon's display rotation in degrees, or 0 if nonessential data was
+  /// not exported.
+  double spine_bone_data_get_icon_rotation(
+    spine_bone_data self,
+  ) {
+    return _spine_bone_data_get_icon_rotation(
+      self,
+    );
+  }
+
+  late final _spine_bone_data_get_icon_rotationPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_bone_data)>>('spine_bone_data_get_icon_rotation');
+  late final _spine_bone_data_get_icon_rotation =
+      _spine_bone_data_get_icon_rotationPtr.asFunction<double Function(spine_bone_data)>();
+
+  void spine_bone_data_set_icon_rotation(
+    spine_bone_data self,
+    double iconRotation,
+  ) {
+    return _spine_bone_data_set_icon_rotation(
+      self,
+      iconRotation,
+    );
+  }
+
+  late final _spine_bone_data_set_icon_rotationPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_bone_data, ffi.Float)>>('spine_bone_data_set_icon_rotation');
+  late final _spine_bone_data_set_icon_rotation =
+      _spine_bone_data_set_icon_rotationPtr.asFunction<void Function(spine_bone_data, double)>();
 
   bool spine_bone_data_get_visible(
     spine_bone_data self,
@@ -24749,7 +24824,7 @@ class SpineDartBindings {
     double targetY,
     bool compress,
     bool stretch,
-    bool uniform,
+    int scaleY,
     double mix,
   ) {
     return _spine_ik_constraint_apply_1(
@@ -24759,17 +24834,17 @@ class SpineDartBindings {
       targetY,
       compress,
       stretch,
-      uniform,
+      scaleY,
       mix,
     );
   }
 
   late final _spine_ik_constraint_apply_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Void Function(spine_skeleton, spine_bone_pose, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool,
+          ffi.Void Function(spine_skeleton, spine_bone_pose, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Int32,
               ffi.Float)>>('spine_ik_constraint_apply_1');
   late final _spine_ik_constraint_apply_1 = _spine_ik_constraint_apply_1Ptr
-      .asFunction<void Function(spine_skeleton, spine_bone_pose, double, double, bool, bool, bool, double)>();
+      .asFunction<void Function(spine_skeleton, spine_bone_pose, double, double, bool, bool, int, double)>();
 
   /// Adjusts the parent and child bone rotations so the tip of the child is as
   /// close to the target position as possible. The target is specified in the
@@ -24784,7 +24859,7 @@ class SpineDartBindings {
     double targetY,
     int bendDirection,
     bool stretch,
-    bool uniform,
+    int scaleY,
     double softness,
     double mix,
   ) {
@@ -24796,7 +24871,7 @@ class SpineDartBindings {
       targetY,
       bendDirection,
       stretch,
-      uniform,
+      scaleY,
       softness,
       mix,
     );
@@ -24805,10 +24880,10 @@ class SpineDartBindings {
   late final _spine_ik_constraint_apply_2Ptr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_skeleton, spine_bone_pose, spine_bone_pose, ffi.Float, ffi.Float, ffi.Int, ffi.Bool,
-              ffi.Bool, ffi.Float, ffi.Float)>>('spine_ik_constraint_apply_2');
+              ffi.Int32, ffi.Float, ffi.Float)>>('spine_ik_constraint_apply_2');
   late final _spine_ik_constraint_apply_2 = _spine_ik_constraint_apply_2Ptr.asFunction<
       void Function(
-          spine_skeleton, spine_bone_pose, spine_bone_pose, double, double, int, bool, bool, double, double)>();
+          spine_skeleton, spine_bone_pose, spine_bone_pose, double, double, int, bool, int, double, double)>();
 
   spine_ik_constraint_data spine_ik_constraint_get_data(
     spine_ik_constraint self,
@@ -25253,37 +25328,37 @@ class SpineDartBindings {
   late final _spine_ik_constraint_data_set_target =
       _spine_ik_constraint_data_set_targetPtr.asFunction<void Function(spine_ik_constraint_data, spine_bone_data)>();
 
-  /// When true and IkConstraintPose::getCompress() or
-  /// IkConstraintPose::getStretch() is used, the bone is scaled on both the X and
-  /// Y axes.
-  bool spine_ik_constraint_data_get_uniform(
+  /// Determines how BonePose::getScaleY() changes when
+  /// IkConstraintPose::getCompress() or IkConstraintPose::getStretch() sets
+  /// BonePose::getScaleX().
+  int spine_ik_constraint_data_get_scale_y(
     spine_ik_constraint_data self,
   ) {
-    return _spine_ik_constraint_data_get_uniform(
+    return _spine_ik_constraint_data_get_scale_y(
       self,
     );
   }
 
-  late final _spine_ik_constraint_data_get_uniformPtr =
-      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_ik_constraint_data)>>('spine_ik_constraint_data_get_uniform');
-  late final _spine_ik_constraint_data_get_uniform =
-      _spine_ik_constraint_data_get_uniformPtr.asFunction<bool Function(spine_ik_constraint_data)>();
+  late final _spine_ik_constraint_data_get_scale_yPtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_ik_constraint_data)>>('spine_ik_constraint_data_get_scale_y');
+  late final _spine_ik_constraint_data_get_scale_y =
+      _spine_ik_constraint_data_get_scale_yPtr.asFunction<int Function(spine_ik_constraint_data)>();
 
-  void spine_ik_constraint_data_set_uniform(
+  void spine_ik_constraint_data_set_scale_y(
     spine_ik_constraint_data self,
-    bool uniform,
+    int scaleY,
   ) {
-    return _spine_ik_constraint_data_set_uniform(
+    return _spine_ik_constraint_data_set_scale_y(
       self,
-      uniform,
+      scaleY,
     );
   }
 
-  late final _spine_ik_constraint_data_set_uniformPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(spine_ik_constraint_data, ffi.Bool)>>(
-          'spine_ik_constraint_data_set_uniform');
-  late final _spine_ik_constraint_data_set_uniform =
-      _spine_ik_constraint_data_set_uniformPtr.asFunction<void Function(spine_ik_constraint_data, bool)>();
+  late final _spine_ik_constraint_data_set_scale_yPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_ik_constraint_data, ffi.Int32)>>(
+          'spine_ik_constraint_data_set_scale_y');
+  late final _spine_ik_constraint_data_set_scale_y =
+      _spine_ik_constraint_data_set_scale_yPtr.asFunction<void Function(spine_ik_constraint_data, int)>();
 
   /// Resolve ambiguity by forwarding to PosedData's implementation
   ffi.Pointer<ffi.Char> spine_ik_constraint_data_get_name(
@@ -45134,8 +45209,8 @@ class SpineDartBindings {
   late final _spine_slider_pose_set_time =
       _spine_slider_pose_set_timePtr.asFunction<void Function(spine_slider_pose, double)>();
 
-  /// A percentage that controls the mix between the constrained and unconstrained
-  /// poses.
+  /// A percentage (unbounded) that controls the mix between the constrained and
+  /// unconstrained poses.
   double spine_slider_pose_get_mix(
     spine_slider_pose self,
   ) {
@@ -49552,8 +49627,8 @@ class SpineDartBindings {
   late final _spine_transform_constraint_pose_set = _spine_transform_constraint_pose_setPtr
       .asFunction<void Function(spine_transform_constraint_pose, spine_transform_constraint_pose)>();
 
-  /// A percentage that controls the mix between the constrained and unconstrained
-  /// rotation.
+  /// A percentage (unbounded) that controls the mix between the constrained and
+  /// unconstrained rotation.
   double spine_transform_constraint_pose_get_mix_rotate(
     spine_transform_constraint_pose self,
   ) {
@@ -49584,8 +49659,8 @@ class SpineDartBindings {
   late final _spine_transform_constraint_pose_set_mix_rotate = _spine_transform_constraint_pose_set_mix_rotatePtr
       .asFunction<void Function(spine_transform_constraint_pose, double)>();
 
-  /// A percentage that controls the mix between the constrained and unconstrained
-  /// translation X.
+  /// A percentage (unbounded) that controls the mix between the constrained and
+  /// unconstrained translation X.
   double spine_transform_constraint_pose_get_mix_x(
     spine_transform_constraint_pose self,
   ) {
@@ -49616,8 +49691,8 @@ class SpineDartBindings {
   late final _spine_transform_constraint_pose_set_mix_x = _spine_transform_constraint_pose_set_mix_xPtr
       .asFunction<void Function(spine_transform_constraint_pose, double)>();
 
-  /// A percentage that controls the mix between the constrained and unconstrained
-  /// translation Y.
+  /// A percentage (unbounded) that controls the mix between the constrained and
+  /// unconstrained translation Y.
   double spine_transform_constraint_pose_get_mix_y(
     spine_transform_constraint_pose self,
   ) {
@@ -49648,8 +49723,8 @@ class SpineDartBindings {
   late final _spine_transform_constraint_pose_set_mix_y = _spine_transform_constraint_pose_set_mix_yPtr
       .asFunction<void Function(spine_transform_constraint_pose, double)>();
 
-  /// A percentage that controls the mix between the constrained and unconstrained
-  /// scale X.
+  /// A percentage (unbounded) that controls the mix between the constrained and
+  /// unconstrained scale X.
   double spine_transform_constraint_pose_get_mix_scale_x(
     spine_transform_constraint_pose self,
   ) {
@@ -49680,8 +49755,8 @@ class SpineDartBindings {
   late final _spine_transform_constraint_pose_set_mix_scale_x = _spine_transform_constraint_pose_set_mix_scale_xPtr
       .asFunction<void Function(spine_transform_constraint_pose, double)>();
 
-  /// A percentage that controls the mix between the constrained and unconstrained
-  /// scale Y.
+  /// A percentage (unbounded) that controls the mix between the constrained and
+  /// unconstrained scale Y.
   double spine_transform_constraint_pose_get_mix_scale_y(
     spine_transform_constraint_pose self,
   ) {
@@ -49712,8 +49787,8 @@ class SpineDartBindings {
   late final _spine_transform_constraint_pose_set_mix_scale_y = _spine_transform_constraint_pose_set_mix_scale_yPtr
       .asFunction<void Function(spine_transform_constraint_pose, double)>();
 
-  /// A percentage that controls the mix between the constrained and unconstrained
-  /// shear Y.
+  /// A percentage (unbounded) that controls the mix between the constrained and
+  /// unconstrained shear Y.
   double spine_transform_constraint_pose_get_mix_shear_y(
     spine_transform_constraint_pose self,
   ) {
@@ -52225,6 +52300,12 @@ abstract class spine_rotate_mode {
   static const int SPINE_ROTATE_MODE_CHAIN_SCALE = 2;
 }
 
+abstract class spine_scale_y {
+  static const int SPINE_SCALE_Y_NONE = 0;
+  static const int SPINE_SCALE_Y_UNIFORM = 1;
+  static const int SPINE_SCALE_Y_VOLUME = 2;
+}
+
 abstract class spine_sequence_mode {
   static const int SPINE_SEQUENCE_MODE_HOLD = 0;
   static const int SPINE_SEQUENCE_MODE_ONCE = 1;
@@ -52718,10 +52799,10 @@ typedef spine_translate_x_timeline = ffi.Pointer<spine_translate_x_timeline_wrap
 typedef spine_translate_y_timeline = ffi.Pointer<spine_translate_y_timeline_wrapper>;
 
 /// Forward declarations for all non-enum types
-typedef spine_sequence = ffi.Pointer<spine_sequence_wrapper>;
+typedef spine_color = ffi.Pointer<spine_color_wrapper>;
 
 /// Forward declarations for all non-enum types
-typedef spine_color = ffi.Pointer<spine_color_wrapper>;
+typedef spine_sequence = ffi.Pointer<spine_sequence_wrapper>;
 
 /// Forward declarations for all non-enum types
 typedef spine_draw_order = ffi.Pointer<spine_draw_order_wrapper>;

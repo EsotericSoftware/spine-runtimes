@@ -30,37 +30,14 @@
 // AUTO GENERATED FILE, DO NOT EDIT.
 
 import Foundation
-import SpineC
 
-/// Rtti wrapper
-@objc(SpineRtti)
-@objcMembers
-public class Rtti: NSObject {
-    public let _ptr: UnsafeMutableRawPointer
+/// ScaleY enum
+public enum ScaleY: Int32, CaseIterable {
+    case none = 0
+    case uniform = 1
+    case volume = 2
 
-    public init(fromPointer ptr: spine_rtti) {
-        self._ptr = UnsafeMutableRawPointer(ptr)
-        super.init()
-    }
-
-    public var rttiClassName: String? {
-        let result = spine_rtti_get_class_name(_ptr.assumingMemoryBound(to: spine_rtti_wrapper.self))
-        return result.map { String(cString: $0) }
-    }
-
-    public func isExactly(_ rtti: Rtti) -> Bool {
-        let result = spine_rtti_is_exactly(
-            _ptr.assumingMemoryBound(to: spine_rtti_wrapper.self), rtti._ptr.assumingMemoryBound(to: spine_rtti_wrapper.self))
-        return result
-    }
-
-    public func instanceOf(_ rtti: Rtti) -> Bool {
-        let result = spine_rtti_instance_of(
-            _ptr.assumingMemoryBound(to: spine_rtti_wrapper.self), rtti._ptr.assumingMemoryBound(to: spine_rtti_wrapper.self))
-        return result
-    }
-
-    public func dispose() {
-        spine_rtti_dispose(_ptr.assumingMemoryBound(to: spine_rtti_wrapper.self))
+    public static func fromValue(_ value: Int32) -> ScaleY? {
+        return ScaleY(rawValue: value)
     }
 }

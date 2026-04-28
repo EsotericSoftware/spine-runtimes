@@ -42,7 +42,9 @@ public class PathConstraint: PathConstraintBase {
     }
 
     public convenience init(_ data: PathConstraintData, _ skeleton: Skeleton) {
-        let ptr = spine_path_constraint_create(data._ptr.assumingMemoryBound(to: spine_path_constraint_data_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
+        let ptr = spine_path_constraint_create(
+            data._ptr.assumingMemoryBound(to: spine_path_constraint_data_wrapper.self),
+            skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
         self.init(fromPointer: ptr!)
     }
 
@@ -56,15 +58,17 @@ public class PathConstraint: PathConstraintBase {
     public var slot: Slot {
         get {
             let result = spine_path_constraint_get_slot(_ptr.assumingMemoryBound(to: spine_path_constraint_wrapper.self))
-        return Slot(fromPointer: result!)
+            return Slot(fromPointer: result!)
         }
         set {
-            spine_path_constraint_set_slot(_ptr.assumingMemoryBound(to: spine_path_constraint_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_slot_wrapper.self))
+            spine_path_constraint_set_slot(
+                _ptr.assumingMemoryBound(to: spine_path_constraint_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_slot_wrapper.self))
         }
     }
 
     public func copyAttachment(_ skeleton: Skeleton) -> PathConstraint {
-        let result = spine_path_constraint_copy(_ptr.assumingMemoryBound(to: spine_path_constraint_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
+        let result = spine_path_constraint_copy(
+            _ptr.assumingMemoryBound(to: spine_path_constraint_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
         return PathConstraint(fromPointer: result!)
     }
 

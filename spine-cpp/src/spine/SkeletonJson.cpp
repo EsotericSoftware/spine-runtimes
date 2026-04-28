@@ -230,6 +230,8 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 			if (color) Color::valueOf(color, data->getColor());
 
 			data->_icon = Json::getString(boneMap, "icon", "");
+			data->_iconSize = Json::getFloat(boneMap, "iconSize", 1);
+			data->_iconRotation = Json::getFloat(boneMap, "iconRotation", 0);
 			data->_visible = Json::getBoolean(boneMap, "visible", true);
 
 			skeletonData->_bones[bonesCount] = data;
@@ -288,7 +290,8 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 				data->_target = skeletonData->findBone(targetName);
 				if (!data->_target) SKELETON_JSON_ERROR(root, "IK target bone not found: ", targetName);
 
-				data->_uniform = Json::getBoolean(constraintMap, "uniform", false);
+				const char *scaleY = Json::getString(constraintMap, "scaleY", NULL);
+				if (scaleY) data->_scaleY = ScaleY_valueOf(scaleY);
 				IkConstraintPose &setup = data->_setupPose;
 				setup._mix = Json::getFloat(constraintMap, "mix", 1);
 				setup._softness = Json::getFloat(constraintMap, "softness", 0) * _scale;
@@ -1434,6 +1437,8 @@ Animation *SkeletonJson::readAnimation(Json *map, SkeletonData *skeletonData) {
 	Animation *animation = new (__FILE__, __LINE__) Animation(String(map->_name));
 	animation->setTimelines(timelines, bones);
 	animation->setDuration(duration);
+	const char *color = Json::getString(map, "color", NULL);
+	if (color) Color::valueOf(color, animation->getColor());
 	return animation;
 }
 

@@ -8,6 +8,7 @@
   - Regenerated C bindings for the updated clipping runtime, including convex and inverse clipping support.
   - Regenerated linked mesh APIs so source meshes can be resolved from different slots, matching spine-cpp.
   - Added generated attachment timeline slot APIs, including `spine_attachment_get_timeline_slots()`, `spine_attachment_set_timeline_slots()`, and `spine_attachment_is_timeline_active()`.
+  - Added generated animation color and bone icon size/rotation APIs.
 
 - **Breaking changes**
   - `spine_animation_state_get_current()` renamed to `spine_animation_state_get_track()`.
@@ -22,6 +23,7 @@
   - Added new pose system with `spine_bone_local`, `spine_bone_pose`, and related types
   - Added `spine_pose`, `spine_posed`, and `spine_posed_active` base types
   - Regenerated the C API for the sequence attachment refactor in spine-cpp. `spine_region_attachment` and `spine_mesh_attachment` now mirror the new non-null `Sequence` model exposed by the C++ runtime.
+  - IK constraint data now uses `spine_scale_y` instead of the old `uniform` boolean, matching spine-cpp.
 
 - **Breaking changes**
   - **IMPORTANT**: The C runtime has been completely rewritten as an auto-generated wrapper around the C++ runtime. This is a major breaking change. Users must update their code to use the new API. See https://esotericsoftware.com/spine-c
@@ -104,6 +106,7 @@
   - Ported the sequence attachment refactor from spine-libgdx. `Sequence` now precomputes per-frame regions, UVs, and region offsets, and `RegionAttachment` / `MeshAttachment` now mirror the libgdx implementation.
   - Ported the latest clipping runtime changes from spine-libgdx, including convex and inverse clipping support and the inverse clipping crash fix.
   - Added `ClippingAttachment::getConvex()` / `setConvex()` and `getInverse()` / `setInverse()`.
+  - Added `Animation::getColor()` and `BoneData` icon size/rotation accessors for nonessential editor data.
 
 - **Breaking changes**
   - `AnimationState::getCurrent()` renamed to `AnimationState::getTrack()`.
@@ -118,6 +121,7 @@
   - `Skin::AttachmentMap::Entry::_name` renamed to `_placeholderName`. All `Skin` methods use `placeholderName` parameter names instead of `name`/`attachmentName`.
   - `AnimationState` hold constants changed: `HoldSubsequent` and `HoldMix` removed, replaced with bitmask system (`Subsequent=0, First=1, Hold=2, HoldFirst=3`).
   - `Bone` now extends `PosedActive` with separate pose, constrained, and applied states
+  - `IkConstraintData::getUniform()` / `setUniform()` replaced by `getScaleY()` / `setScaleY()` and `ScaleY` (`none`, `uniform`, `volume`).
   - `BoneData::getSetupPose()` and `Bone::getPose()` now use `BonePose` instead of `BoneLocal`. Bone timelines and parser setup pose data were updated to match the spine-libgdx `BoneLocal` removal.
   - Renamed timeline constraint index methods to use unified `getConstraintIndex()`
   - Changed timeline class hierarchy with new base classes `BoneTimeline`, `SlotCurveTimeline`, and `ConstraintTimeline`
@@ -492,6 +496,7 @@
   - `AnimationState.getCurrent(_:)` renamed to `AnimationState.getTrack(_:)` in SpineSwift.
   - SpineSwift mesh attachment APIs now use `sourceMesh` naming instead of `parentMesh` to match spine-cpp.
   - SpineSwift attachments now expose `timelineSlots` and `isTimelineActive(...)` to match spine-cpp.
+  - SpineSwift IK constraint data now uses `scaleY` instead of the old `uniform` boolean.
 
 ## Dart
 
@@ -534,6 +539,7 @@
   - Generated Flutter bindings now use `BonePose` for bone setup and unconstrained pose accessors to match spine-cpp.
   - Generated Flutter bindings now expose event setup payloads via `EventData.setupPose` instead of directly on `EventData`.
   - Generated Flutter bindings now construct `Animation` with only a name, and setting timelines also requires the animation's bone indices.
+  - Generated Flutter IK constraint data now uses `scaleY` instead of the old `uniform` boolean.
 
 ## Haxe
 

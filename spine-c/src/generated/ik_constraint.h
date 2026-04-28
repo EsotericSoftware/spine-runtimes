@@ -27,7 +27,7 @@ SPINE_C_API void spine_ik_constraint_set_target(spine_ik_constraint self, spine_
  * world coordinate system.
  */
 SPINE_C_API void spine_ik_constraint_apply_1(spine_skeleton skeleton, spine_bone_pose bone, float targetX, float targetY, bool compress, bool stretch,
-											 bool uniform, float mix);
+											 spine_scale_y scaleY, float mix);
 /**
  * Adjusts the parent and child bone rotations so the tip of the child is as
  * close to the target position as possible. The target is specified in the
@@ -36,7 +36,7 @@ SPINE_C_API void spine_ik_constraint_apply_1(spine_skeleton skeleton, spine_bone
  * @param child A direct descendant of the parent bone.
  */
 SPINE_C_API void spine_ik_constraint_apply_2(spine_skeleton skeleton, spine_bone_pose parent, spine_bone_pose child, float targetX, float targetY,
-											 int bendDirection, bool stretch, bool uniform, float softness, float mix);
+											 int bendDirection, bool stretch, spine_scale_y scaleY, float softness, float mix);
 SPINE_C_API spine_ik_constraint_data spine_ik_constraint_get_data(spine_ik_constraint self);
 /**
  * The unconstrained pose for this object, set by animations and application

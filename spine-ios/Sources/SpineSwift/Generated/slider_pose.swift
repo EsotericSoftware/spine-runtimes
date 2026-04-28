@@ -52,18 +52,19 @@ public class SliderPose: NSObject {
     public var time: Float {
         get {
             let result = spine_slider_pose_get_time(_ptr.assumingMemoryBound(to: spine_slider_pose_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_slider_pose_set_time(_ptr.assumingMemoryBound(to: spine_slider_pose_wrapper.self), newValue)
         }
     }
 
-    /// A percentage that controls the mix between the constrained and unconstrained poses.
+    /// A percentage (unbounded) that controls the mix between the constrained and unconstrained
+    /// poses.
     public var mix: Float {
         get {
             let result = spine_slider_pose_get_mix(_ptr.assumingMemoryBound(to: spine_slider_pose_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_slider_pose_set_mix(_ptr.assumingMemoryBound(to: spine_slider_pose_wrapper.self), newValue)
@@ -71,7 +72,8 @@ public class SliderPose: NSObject {
     }
 
     public func set(_ pose: SliderPose) {
-        spine_slider_pose_set(_ptr.assumingMemoryBound(to: spine_slider_pose_wrapper.self), pose._ptr.assumingMemoryBound(to: spine_slider_pose_wrapper.self))
+        spine_slider_pose_set(
+            _ptr.assumingMemoryBound(to: spine_slider_pose_wrapper.self), pose._ptr.assumingMemoryBound(to: spine_slider_pose_wrapper.self))
     }
 
     public func dispose() {

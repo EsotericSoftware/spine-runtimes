@@ -179,6 +179,7 @@ SPINE_OPAQUE_TYPE(spine_vertex_attachment)
 #include "position_mode.h"
 #include "property.h"
 #include "rotate_mode.h"
+#include "scale_y.h"
 #include "sequence_mode.h"
 #include "spacing_mode.h"
 #include "texture_filter.h"

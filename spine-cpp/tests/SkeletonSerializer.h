@@ -75,6 +75,9 @@ namespace spine {
 			_json.writeName("duration");
 			_json.writeValue(obj->getDuration());
 
+			_json.writeName("color");
+			writeColor(&obj->getColor());
+
 			_json.writeName("bones");
 			writeIntArray(obj->getBones());
 
@@ -2012,6 +2015,12 @@ namespace spine {
 			_json.writeName("icon");
 			_json.writeValue(obj->getIcon());
 
+			_json.writeName("iconSize");
+			_json.writeValue(obj->getIconSize());
+
+			_json.writeName("iconRotation");
+			_json.writeValue(obj->getIconRotation());
+
 			_json.writeName("visible");
 			_json.writeValue(obj->getVisible());
 
@@ -2499,8 +2508,8 @@ namespace spine {
 			_json.writeName("target");
 			writeBoneData(obj->getTarget());
 
-			_json.writeName("uniform");
-			_json.writeValue(obj->getUniform());
+			_json.writeName("scaleY");
+			_json.writeValue(ScaleY_toString(obj->getScaleY()));
 
 			_json.writeName("name");
 			_json.writeValue(obj->getName());

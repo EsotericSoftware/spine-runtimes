@@ -51,7 +51,7 @@ open class ToProperty: NSObject {
     public var offset: Float {
         get {
             let result = spine_to_property_get__offset(_ptr.assumingMemoryBound(to: spine_to_property_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_to_property_set__offset(_ptr.assumingMemoryBound(to: spine_to_property_wrapper.self), newValue)
@@ -61,7 +61,7 @@ open class ToProperty: NSObject {
     public var max: Float {
         get {
             let result = spine_to_property_get__max(_ptr.assumingMemoryBound(to: spine_to_property_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_to_property_set__max(_ptr.assumingMemoryBound(to: spine_to_property_wrapper.self), newValue)
@@ -71,7 +71,7 @@ open class ToProperty: NSObject {
     public var scale: Float {
         get {
             let result = spine_to_property_get__scale(_ptr.assumingMemoryBound(to: spine_to_property_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_to_property_set__scale(_ptr.assumingMemoryBound(to: spine_to_property_wrapper.self), newValue)
@@ -80,13 +80,18 @@ open class ToProperty: NSObject {
 
     /// Reads the mix for this property from the specified pose.
     public func mix(_ pose: TransformConstraintPose) -> Float {
-        let result = spine_to_property_mix(_ptr.assumingMemoryBound(to: spine_to_property_wrapper.self), pose._ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self))
+        let result = spine_to_property_mix(
+            _ptr.assumingMemoryBound(to: spine_to_property_wrapper.self),
+            pose._ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self))
         return result
     }
 
     /// Applies the value to this property.
     public func apply(_ skeleton: Skeleton, _ pose: TransformConstraintPose, _ bone: BonePose, _ value: Float, _ local: Bool, _ additive: Bool) {
-        spine_to_property_apply(_ptr.assumingMemoryBound(to: spine_to_property_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self), pose._ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self), bone._ptr.assumingMemoryBound(to: spine_bone_pose_wrapper.self), value, local, additive)
+        spine_to_property_apply(
+            _ptr.assumingMemoryBound(to: spine_to_property_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self),
+            pose._ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self),
+            bone._ptr.assumingMemoryBound(to: spine_bone_pose_wrapper.self), value, local, additive)
     }
 
     public static func rttiStatic() -> Rtti {

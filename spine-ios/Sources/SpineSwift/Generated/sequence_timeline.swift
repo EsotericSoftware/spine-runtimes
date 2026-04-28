@@ -80,7 +80,7 @@ public class SequenceTimeline: Timeline, SlotTimeline {
     public var slotIndex: Int32 {
         get {
             let result = spine_sequence_timeline_get_slot_index(_ptr.assumingMemoryBound(to: spine_sequence_timeline_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_sequence_timeline_set_slot_index(_ptr.assumingMemoryBound(to: spine_sequence_timeline_wrapper.self), newValue)
@@ -92,7 +92,9 @@ public class SequenceTimeline: Timeline, SlotTimeline {
     /// - Parameter frame: Between 0 and frameCount, inclusive.
     /// - Parameter delay: Seconds between frames.
     public func setFrame(_ frame: Int32, _ time: Float, _ mode: SequenceMode, _ index: Int32, _ delay: Float) {
-        spine_sequence_timeline_set_frame(_ptr.assumingMemoryBound(to: spine_sequence_timeline_wrapper.self), frame, time, spine_sequence_mode(rawValue: UInt32(mode.rawValue)), index, delay)
+        spine_sequence_timeline_set_frame(
+            _ptr.assumingMemoryBound(to: spine_sequence_timeline_wrapper.self), frame, time, spine_sequence_mode(rawValue: UInt32(mode.rawValue)),
+            index, delay)
     }
 
     public func dispose() {

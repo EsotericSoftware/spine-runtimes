@@ -34,6 +34,7 @@ import 'package:universal_ffi/ffi_utils.dart';
 import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
 import 'arrays.dart';
+import 'color.dart';
 import 'skeleton.dart';
 
 /// Stores a list of timelines to animate a skeleton's pose over time.
@@ -124,6 +125,13 @@ class Animation {
   ArrayInt get bones {
     final result = SpineBindings.bindings.spine_animation_get_bones(_ptr);
     return ArrayInt.fromPointer(result);
+  }
+
+  /// The color of the animation as it was in Spine, or a default color if
+  /// nonessential data was not exported.
+  Color get color {
+    final result = SpineBindings.bindings.spine_animation_get_color(_ptr);
+    return Color.fromPointer(result);
   }
 
   /// [target] After the first and before the last entry.

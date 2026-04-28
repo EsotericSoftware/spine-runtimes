@@ -73,6 +73,10 @@ void SpineConstant::_bind_methods() {
 	BIND_ENUM_CONSTANT(BlendMode_Multiply)
 	BIND_ENUM_CONSTANT(BlendMode_Screen)
 
+	BIND_ENUM_CONSTANT(ScaleY_None)
+	BIND_ENUM_CONSTANT(ScaleY_Uniform)
+	BIND_ENUM_CONSTANT(ScaleY_Volume)
+
 	BIND_ENUM_CONSTANT(UpdateMode_Process)
 	BIND_ENUM_CONSTANT(UpdateMode_Physics)
 	BIND_ENUM_CONSTANT(UpdateMode_Manual)

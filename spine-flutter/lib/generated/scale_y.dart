@@ -29,38 +29,19 @@
 
 // AUTO GENERATED FILE, DO NOT EDIT.
 
-import Foundation
-import SpineC
+/// ScaleY enum
+enum ScaleY {
+  none(0),
+  uniform(1),
+  volume(2);
 
-/// Rtti wrapper
-@objc(SpineRtti)
-@objcMembers
-public class Rtti: NSObject {
-    public let _ptr: UnsafeMutableRawPointer
+  const ScaleY(this.value);
+  final int value;
 
-    public init(fromPointer ptr: spine_rtti) {
-        self._ptr = UnsafeMutableRawPointer(ptr)
-        super.init()
-    }
-
-    public var rttiClassName: String? {
-        let result = spine_rtti_get_class_name(_ptr.assumingMemoryBound(to: spine_rtti_wrapper.self))
-        return result.map { String(cString: $0) }
-    }
-
-    public func isExactly(_ rtti: Rtti) -> Bool {
-        let result = spine_rtti_is_exactly(
-            _ptr.assumingMemoryBound(to: spine_rtti_wrapper.self), rtti._ptr.assumingMemoryBound(to: spine_rtti_wrapper.self))
-        return result
-    }
-
-    public func instanceOf(_ rtti: Rtti) -> Bool {
-        let result = spine_rtti_instance_of(
-            _ptr.assumingMemoryBound(to: spine_rtti_wrapper.self), rtti._ptr.assumingMemoryBound(to: spine_rtti_wrapper.self))
-        return result
-    }
-
-    public func dispose() {
-        spine_rtti_dispose(_ptr.assumingMemoryBound(to: spine_rtti_wrapper.self))
-    }
+  static ScaleY fromValue(int value) {
+    return values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw ArgumentError('Invalid ScaleY value: $value'),
+    );
+  }
 }

@@ -60,7 +60,8 @@ open class TransformConstraintBase: PosedActive, Posed, Constraint {
     }
 
     public var isPoseEqualToApplied: Bool {
-        let result = spine_transform_constraint_base_is_pose_equal_to_applied(_ptr.assumingMemoryBound(to: spine_transform_constraint_base_wrapper.self))
+        let result = spine_transform_constraint_base_is_pose_equal_to_applied(
+            _ptr.assumingMemoryBound(to: spine_transform_constraint_base_wrapper.self))
         return result
     }
 
@@ -87,12 +88,16 @@ open class TransformConstraintBase: PosedActive, Posed, Constraint {
     }
 
     public func sort(_ skeleton: Skeleton) {
-        spine_transform_constraint_base_sort(_ptr.assumingMemoryBound(to: spine_transform_constraint_base_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
+        spine_transform_constraint_base_sort(
+            _ptr.assumingMemoryBound(to: spine_transform_constraint_base_wrapper.self),
+            skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
     }
 
     /// Inherited from Update
     public func update(_ skeleton: Skeleton, _ physics: Physics) {
-        spine_transform_constraint_base_update(_ptr.assumingMemoryBound(to: spine_transform_constraint_base_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self), spine_physics(rawValue: UInt32(physics.rawValue)))
+        spine_transform_constraint_base_update(
+            _ptr.assumingMemoryBound(to: spine_transform_constraint_base_wrapper.self),
+            skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self), spine_physics(rawValue: UInt32(physics.rawValue)))
     }
 
     public static func rttiStatic() -> Rtti {

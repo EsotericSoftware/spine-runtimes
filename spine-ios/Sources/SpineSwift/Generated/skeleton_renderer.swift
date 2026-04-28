@@ -49,7 +49,8 @@ public class SkeletonRenderer: NSObject {
     }
 
     public func render(_ skeleton: Skeleton) -> RenderCommand? {
-        let result = spine_skeleton_renderer_render(_ptr.assumingMemoryBound(to: spine_skeleton_renderer_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
+        let result = spine_skeleton_renderer_render(
+            _ptr.assumingMemoryBound(to: spine_skeleton_renderer_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
         return result.map { RenderCommand(fromPointer: $0) }
     }
 

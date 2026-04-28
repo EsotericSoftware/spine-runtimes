@@ -60,7 +60,7 @@ public class PosedData: NSObject {
     public var skinRequired: Bool {
         get {
             let result = spine_posed_data_get_skin_required(_ptr.assumingMemoryBound(to: spine_posed_data_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_posed_data_set_skin_required(_ptr.assumingMemoryBound(to: spine_posed_data_wrapper.self), newValue)

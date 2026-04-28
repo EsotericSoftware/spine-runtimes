@@ -48,66 +48,72 @@ public class TransformConstraintPose: NSObject {
         self.init(fromPointer: ptr!)
     }
 
-    /// A percentage that controls the mix between the constrained and unconstrained rotation.
+    /// A percentage (unbounded) that controls the mix between the constrained and unconstrained
+    /// rotation.
     public var mixRotate: Float {
         get {
             let result = spine_transform_constraint_pose_get_mix_rotate(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_transform_constraint_pose_set_mix_rotate(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self), newValue)
         }
     }
 
-    /// A percentage that controls the mix between the constrained and unconstrained translation X.
+    /// A percentage (unbounded) that controls the mix between the constrained and unconstrained
+    /// translation X.
     public var mixX: Float {
         get {
             let result = spine_transform_constraint_pose_get_mix_x(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_transform_constraint_pose_set_mix_x(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self), newValue)
         }
     }
 
-    /// A percentage that controls the mix between the constrained and unconstrained translation Y.
+    /// A percentage (unbounded) that controls the mix between the constrained and unconstrained
+    /// translation Y.
     public var mixY: Float {
         get {
             let result = spine_transform_constraint_pose_get_mix_y(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_transform_constraint_pose_set_mix_y(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self), newValue)
         }
     }
 
-    /// A percentage that controls the mix between the constrained and unconstrained scale X.
+    /// A percentage (unbounded) that controls the mix between the constrained and unconstrained
+    /// scale X.
     public var mixScaleX: Float {
         get {
             let result = spine_transform_constraint_pose_get_mix_scale_x(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_transform_constraint_pose_set_mix_scale_x(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self), newValue)
         }
     }
 
-    /// A percentage that controls the mix between the constrained and unconstrained scale Y.
+    /// A percentage (unbounded) that controls the mix between the constrained and unconstrained
+    /// scale Y.
     public var mixScaleY: Float {
         get {
             let result = spine_transform_constraint_pose_get_mix_scale_y(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_transform_constraint_pose_set_mix_scale_y(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self), newValue)
         }
     }
 
-    /// A percentage that controls the mix between the constrained and unconstrained shear Y.
+    /// A percentage (unbounded) that controls the mix between the constrained and unconstrained
+    /// shear Y.
     public var mixShearY: Float {
         get {
             let result = spine_transform_constraint_pose_get_mix_shear_y(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self))
-        return result
+            return result
         }
         set {
             spine_transform_constraint_pose_set_mix_shear_y(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self), newValue)
@@ -115,7 +121,9 @@ public class TransformConstraintPose: NSObject {
     }
 
     public func set(_ pose: TransformConstraintPose) {
-        spine_transform_constraint_pose_set(_ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self), pose._ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self))
+        spine_transform_constraint_pose_set(
+            _ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self),
+            pose._ptr.assumingMemoryBound(to: spine_transform_constraint_pose_wrapper.self))
     }
 
     public func dispose() {

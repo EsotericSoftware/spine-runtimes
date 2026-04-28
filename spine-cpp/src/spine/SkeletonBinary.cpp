@@ -196,6 +196,8 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 			if (nonessential) {
 				Color::rgba8888ToColor(data->getColor(), input.readInt());
 				data->_icon.own(input.readString());
+				data->_iconSize = input.readFloat();
+				data->_iconRotation = input.readFloat();
 				data->_visible = input.readBoolean();
 			}
 			bones[i] = data;
@@ -235,7 +237,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 					data->_target = bones[input.readInt(true)];
 					int flags = input.read();
 					data->_skinRequired = (flags & 1) != 0;
-					data->_uniform = (flags & 2) != 0;
+					if ((flags & 2) != 0) data->_scaleY = static_cast<ScaleY>(input.read());
 					IkConstraintPose &setup = data->_setupPose;
 					setup._bendDirection = (flags & 4) != 0 ? -1 : 1;
 					setup._compress = (flags & 8) != 0;
@@ -503,7 +505,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 		int animationsCount = input.readInt(true);
 		Array<Animation *> &animations = skeletonData->_animations.setSize(animationsCount, NULL);
 		for (int i = 0; i < animationsCount; ++i) {
-			Animation *animation = readAnimation(input, String(input.readString(), true), *skeletonData);
+			Animation *animation = readAnimation(input, String(input.readString(), true), *skeletonData, nonessential);
 			if (!animation) {
 				delete skeletonData;
 				setError("Error reading animation: ", input.readString());
@@ -801,7 +803,7 @@ void SkeletonBinary::readUnsignedShortArray(DataInput &input, Array<unsigned sho
 	}
 }
 
-Animation *SkeletonBinary::readAnimation(DataInput &input, const String &name, SkeletonData &skeletonData) {
+Animation *SkeletonBinary::readAnimation(DataInput &input, const String &name, SkeletonData &skeletonData, bool nonessential) {
 	Array<Timeline *> timelines;
 	Array<int> bones;
 	timelines.ensureCapacity(input.readInt(true));
@@ -1380,6 +1382,7 @@ Animation *SkeletonBinary::readAnimation(DataInput &input, const String &name, S
 	Animation *animation = new (__FILE__, __LINE__) Animation(String(name));
 	animation->setTimelines(timelines, bones);
 	animation->setDuration(duration);
+	if (nonessential) Color::rgba8888ToColor(animation->getColor(), input.readInt());
 	return animation;
 }
 
