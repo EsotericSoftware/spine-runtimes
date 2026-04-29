@@ -155,9 +155,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	}
 
 	_tick (): void {
-		const { renderer } = this;
-
-		if (!renderer) return;
+		this.renderer ||= this.runtime.renderer;
+		if (!this.renderer) return;
 
 		if (!this.atlasLoaded) {
 			this.loadAtlas();
@@ -465,10 +464,11 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	*/
 
 	private async loadAtlas () {
-		if (this.atlasLoading || !this.renderer) return;
+		const { renderer } = this;
+		if (this.atlasLoading || !renderer) return;
 		this.atlasLoading = true;
 
-		const textureAtlas = await this.assetLoader.loadAtlasRuntime(this.propAtlas, this.plugin.runtime, this.renderer);
+		const textureAtlas = await this.assetLoader.loadAtlasRuntime(this.propAtlas, this.plugin.runtime, renderer);
 		if (!textureAtlas) return;
 
 		this.textureAtlas = textureAtlas;
