@@ -181,6 +181,18 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 		this.removeDragHandle(type, name);
 	},
 
+	SetCollisionBoundingBox (this: SDKInstanceClass, slotName: string, attachmentName: string) {
+		this.setCollisionBoundingBox(slotName, attachmentName);
+	},
+
+	ClearCollisionBoundingBox (this: SDKInstanceClass) {
+		this.clearCollisionBoundingBox();
+	},
+
+	SetCollisionBoundingBoxDebug (this: SDKInstanceClass, enabled: boolean) {
+		this.setCollisionBoundingBoxDebug(enabled);
+	},
+
 	SetBounds (this: SDKInstanceClass, x: number, y: number, width: number, height: number) {
 		this.setBounds(x, y, width, height);
 	},

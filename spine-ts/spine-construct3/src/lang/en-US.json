@@ -754,6 +754,37 @@
               }
             }
           },
+          "set-collision-bounding-box": {
+            "list-name": "Set collision bounding box",
+            "display-text": "Set collision body to bounding box {1} on slot {0}",
+            "description": "Use a Spine bounding box attachment to update the internal Sprite collision body mesh each tick. The attachment is applied once when this action is called."
+            "params": {
+              "slot-name": {
+                "name": "Slot name",
+                "desc": "Name of the slot containing the bounding box attachment"
+              },
+              "attachment-name": {
+                "name": "Attachment name",
+                "desc": "Name of the bounding box attachment to use for the collision body"
+              }
+            }
+          },
+          "clear-collision-bounding-box": {
+            "list-name": "Clear collision bounding box",
+            "display-text": "Clear collision bounding box",
+            "description": "Stop using a Spine bounding box attachment for the collision body and return to the object's rectangular collision body."
+          },
+          "set-collision-bounding-box-debug": {
+            "list-name": "Set collision bounding box debug",
+            "display-text": "Set collision bounding box debug to {0}",
+            "description": "Draw the active collision bounding box mesh outline for debugging.",
+            "params": {
+              "enabled": {
+                "name": "Enabled",
+                "desc": "Whether to draw the collision bounding box mesh outline"
+              }
+            }
+          },
           "set-bounds": {
             "list-name": "Set bounds",
             "display-text": "Set bounds to ({0}, {1}, {2}, {3})",

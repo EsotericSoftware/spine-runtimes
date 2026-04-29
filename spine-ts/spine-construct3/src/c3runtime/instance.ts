@@ -65,6 +65,13 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	isFlipped = false;
 	collisionSpriteInstance?: IWorldInstance;
 	collisionSpriteClassName = "";
+	private collisionBoundingBoxSlotName = "";
+	private collisionBoundingBoxAttachmentName = "";
+	private collisionBoundingBoxSlot?: Slot;
+	private collisionBoundingBoxVertices = spine.Utils.newFloatArray(128);
+	private collisionBoundingBoxGamePoints: number[] = [];
+	private collisionBoundingBoxDebug = false;
+	private collisionBoundingBoxMeshSize: [number, number] = [0, 0];
 	isPlaying = true;
 	physicsMode = spine.Physics.update;
 	customSkins: Record<string, Skin> = {};
@@ -196,6 +203,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 		skeleton.updateWorldTransform(physicsMode);
 
+		this.updateCollisionSprite();
 		this.updateBoneFollowers(matrix);
 
 		this.runtime.sdk.updateRender();
@@ -216,7 +224,24 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		this.requestRedraw = false;
 
 		if (this.propDebugSkeleton) this.skeletonRenderer.drawDebug(skeleton, this.x, this.y, this.getBoundingQuad(false));
+		this.renderCollisionBoundingBoxDebug(renderer);
 		this.renderDragHandles();
+	}
+
+	private renderCollisionBoundingBoxDebug (renderer: IRenderer) {
+		const points = this.collisionBoundingBoxGamePoints;
+		if (!this.collisionBoundingBoxDebug || points.length < 6 || !this.collisionSpriteInstance?.isCollisionEnabled) return;
+
+		renderer.setColorFillMode();
+		renderer.setColorRgba(1, 0, 0, 1);
+		renderer.pushLineWidth(2);
+		for (let i = 0; i < points.length; i += 2) {
+			const next = (i + 2) % points.length;
+			renderer.line(points[i], points[i + 1], points[next], points[next + 1]);
+		}
+		renderer.popLineWidth();
+		renderer.setTextureFillMode();
+		renderer.setColorRgba(1, 1, 1, 1);
 	}
 
 	private renderDragHandles () {
@@ -526,12 +551,116 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	private updateCollisionSprite () {
 		if (!this.collisionSpriteInstance) return;
 
-		this.collisionSpriteInstance.x = this.x;
-		this.collisionSpriteInstance.y = this.y;
-		this.collisionSpriteInstance.width = this.width;
-		this.collisionSpriteInstance.height = this.height;
+		if (this.collisionBoundingBoxSlotName && this.collisionBoundingBoxAttachmentName) {
+			this.updateCollisionBoundingBoxSprite();
+			return;
+		}
+
+		if (this.collisionBoundingBoxMeshSize[0] !== 0) {
+			this.collisionSpriteInstance.releaseMesh();
+			this.collisionBoundingBoxMeshSize = [0, 0];
+		}
+
+		this.collisionSpriteInstance.isCollisionEnabled = true;
+		this.collisionSpriteInstance.setPosition(this.x, this.y);
+		this.collisionSpriteInstance.setSize(this.width, this.height);
 		this.collisionSpriteInstance.angleDegrees = this.angleDegrees;
 		this.collisionSpriteInstance.setOrigin(this.originX, this.originY);
+	}
+
+	private updateCollisionBoundingBoxSprite () {
+		const { skeleton, collisionSpriteInstance } = this;
+		if (!skeleton || !collisionSpriteInstance) return;
+
+		const slot = this.collisionBoundingBoxSlot ?? skeleton.findSlot(this.collisionBoundingBoxSlotName) ?? undefined;
+		this.collisionBoundingBoxSlot = slot;
+		if (!slot || !slot.bone.active) {
+			collisionSpriteInstance.isCollisionEnabled = false;
+			return;
+		}
+
+		const attachment = slot.appliedPose.attachment;
+		if (!(attachment instanceof spine.BoundingBoxAttachment) || attachment.name !== this.collisionBoundingBoxAttachmentName) {
+			collisionSpriteInstance.isCollisionEnabled = false;
+			return;
+		}
+
+		const vertexCount = attachment.worldVerticesLength >> 1;
+		if (vertexCount < 3) {
+			collisionSpriteInstance.isCollisionEnabled = false;
+			return;
+		}
+
+		if (this.collisionBoundingBoxVertices.length < attachment.worldVerticesLength)
+			this.collisionBoundingBoxVertices = spine.Utils.newFloatArray(attachment.worldVerticesLength);
+
+		attachment.computeWorldVertices(skeleton, slot, 0, attachment.worldVerticesLength, this.collisionBoundingBoxVertices, 0, 2);
+
+		let minX = Number.POSITIVE_INFINITY;
+		let minY = Number.POSITIVE_INFINITY;
+		let maxX = Number.NEGATIVE_INFINITY;
+		let maxY = Number.NEGATIVE_INFINITY;
+		const gamePoints = this.collisionBoundingBoxGamePoints;
+		gamePoints.length = 0;
+		for (let i = 0; i < attachment.worldVerticesLength; i += 2) {
+			const point = this.matrix.skeletonToGame(this.collisionBoundingBoxVertices[i], this.collisionBoundingBoxVertices[i + 1]);
+			const x = point.x;
+			const y = point.y;
+			gamePoints.push(x, y);
+			minX = Math.min(minX, x);
+			minY = Math.min(minY, y);
+			maxX = Math.max(maxX, x);
+			maxY = Math.max(maxY, y);
+		}
+
+		const width = Math.max(maxX - minX, 1);
+		const height = Math.max(maxY - minY, 1);
+		const meshWidth = Math.max(2, Math.ceil(vertexCount / 2));
+		const meshHeight = 2;
+		if (this.collisionBoundingBoxMeshSize[0] !== meshWidth || this.collisionBoundingBoxMeshSize[1] !== meshHeight) {
+			collisionSpriteInstance.createMesh(meshWidth, meshHeight);
+			this.collisionBoundingBoxMeshSize = [meshWidth, meshHeight];
+		}
+
+		collisionSpriteInstance.isCollisionEnabled = true;
+		collisionSpriteInstance.setPosition(minX, minY);
+		collisionSpriteInstance.setSize(width, height);
+		collisionSpriteInstance.angle = 0;
+		collisionSpriteInstance.setOrigin(0, 0);
+
+		const perimeterPointCount = meshWidth * 2;
+		for (let i = 0; i < perimeterPointCount; i++) {
+			const sourceIndex = Math.min(i, vertexCount - 1) * 2;
+			const meshX = (gamePoints[sourceIndex] - minX) / width;
+			const meshY = (gamePoints[sourceIndex + 1] - minY) / height;
+			if (i < meshWidth) {
+				collisionSpriteInstance.setMeshPoint(i, 0, { mode: "absolute", x: meshX, y: meshY });
+			} else {
+				collisionSpriteInstance.setMeshPoint(perimeterPointCount - 1 - i, 1, { mode: "absolute", x: meshX, y: meshY });
+			}
+		}
+	}
+
+	public setCollisionBoundingBox (slotName: string, attachmentName: string) {
+		this.collisionBoundingBoxSlotName = slotName;
+		this.collisionBoundingBoxAttachmentName = attachmentName;
+		this.collisionBoundingBoxSlot = this.skeleton?.findSlot(slotName) ?? undefined;
+		if (slotName && attachmentName) this.skeleton?.setAttachment(slotName, attachmentName);
+		this.updateCollisionSprite();
+	}
+
+	public clearCollisionBoundingBox () {
+		this.collisionBoundingBoxSlotName = "";
+		this.collisionBoundingBoxAttachmentName = "";
+		this.collisionBoundingBoxSlot = undefined;
+		this.collisionBoundingBoxGamePoints.length = 0;
+		this.updateCollisionSprite();
+	}
+
+	public setCollisionBoundingBoxDebug (enabled: boolean) {
+		this.collisionBoundingBoxDebug = enabled;
+		this.requestRedraw = true;
+		this.runtime.sdk.updateRender();
 	}
 
 	private calculateBounds () {
