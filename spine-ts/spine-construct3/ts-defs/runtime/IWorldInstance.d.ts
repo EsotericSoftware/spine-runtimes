@@ -88,6 +88,7 @@ declare class IWorldInstance extends IInstance
 	angleDegrees: number;
 
 	getBoundingBox(ignoreMesh?: boolean): DOMRect;
+	getBoundingBox3d(ignoreMesh?: boolean): IAABB3D;
 	getBoundingQuad(ignoreMesh?: boolean): DOMQuad;
 	isOnScreen(): boolean;
 
@@ -96,7 +97,7 @@ declare class IWorldInstance extends IInstance
 	colorRgb: Vec3Arr;
 	blendMode: BlendModeParameter;
 	sampling: SamplingModeOrAutoType;
-    activeSampling: SamplingModeType;
+    readonly activeSampling: SamplingModeType;
 	effects: IEffectInstance[];
 
 	moveToTop(): void;

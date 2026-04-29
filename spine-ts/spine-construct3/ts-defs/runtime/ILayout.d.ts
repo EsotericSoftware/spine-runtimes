@@ -35,7 +35,7 @@ declare class ILayout extends ConstructEventTarget<LayoutEventMap>
     readonly isUnboundedScrolling: boolean;
 
     sampling: SamplingModeOrAutoType;
-    activeSampling: SamplingModeType;
+    readonly activeSampling: SamplingModeType;
 
     getLayer(nameOrIndex: LayerParameter): IAnyProjectLayer | null;
     getAllLayers(): IAnyProjectLayer[];

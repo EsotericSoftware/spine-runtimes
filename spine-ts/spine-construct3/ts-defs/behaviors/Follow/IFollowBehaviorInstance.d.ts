@@ -1,7 +1,7 @@
 ﻿
 type FollowBehaviorMode = "time" | "distance";
 type FollowBehaviorInterpolationType = "step" | "linear" | "angular";
-type FollowBehaviorPropertyType = "x" | "y" | "z-elevation" | "width" | "height" | "angle" | "opacity" | "visibility" | "destroyed";
+type FollowBehaviorPropertyType = "x" | "y" | "z" | "width" | "height" | "angle" | "opacity" | "visibility" | "destroyed";
 
 /** Represents the Follow behavior.
  * @see {@link https://www.construct.net/make-games/manuals/construct-3/scripting/scripting-reference/behavior-interfaces/follow | IFollowBehaviorInstance documentation } */

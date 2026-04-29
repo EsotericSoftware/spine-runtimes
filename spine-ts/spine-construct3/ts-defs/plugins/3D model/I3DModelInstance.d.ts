@@ -12,7 +12,8 @@ declare class I3DModelInstance extends IWorldInstance
 	onError(): void;
 
 	modelName: string;
-	meshName: string;
+	// meshName: string; // deprecated
+	meshNames: Array<string>;
 	animationName: string;
 	animationProgress: number;
 	isPlaying: boolean;
@@ -37,6 +38,14 @@ declare class I3DModelInstance extends IWorldInstance
 	animationDuration(animation: string): number;
 	getAllMeshes(): Array<string>;
 	getAllAnimations(): Array<string>;
+
+	setMeshEnabled(mesh: string, enable: boolean);
+	setAllMeshesEnabled(enable: boolean);
+
+	isMeshEnabled(mesh: string);
+	areAllMeshesEnabled();
+
+	meshExists(mesh: string);
 
 	play(animationName?: string, progress?: number): void;
 	stop(): void;
