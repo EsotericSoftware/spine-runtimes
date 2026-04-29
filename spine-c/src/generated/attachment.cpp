@@ -32,6 +32,21 @@ void spine_attachment_set_timeline_attachment(spine_attachment self, /*@null*/ s
 	_self->setTimelineAttachment((Attachment *) attachment);
 }
 
+spine_array_int spine_attachment_get_timeline_slots(spine_attachment self) {
+	Attachment *_self = (Attachment *) self;
+	return (spine_array_int) &_self->getTimelineSlots();
+}
+
+void spine_attachment_set_timeline_slots(spine_attachment self, spine_array_int timelineSlots) {
+	Attachment *_self = (Attachment *) self;
+	_self->setTimelineSlots(*((Array<int> *) timelineSlots));
+}
+
+bool spine_attachment_is_timeline_active(spine_attachment self, spine_array_slot slots, int slotIndex, bool appliedPose) {
+	Attachment *_self = (Attachment *) self;
+	return _self->isTimelineActive(*((Array<Slot *> *) slots), slotIndex, appliedPose);
+}
+
 int spine_attachment_get_ref_count(spine_attachment self) {
 	Attachment *_self = (Attachment *) self;
 	return _self->getRefCount();

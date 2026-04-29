@@ -83,14 +83,14 @@ spine_color spine_mesh_attachment_get_color(spine_mesh_attachment self) {
 	return (spine_color) &_self->getColor();
 }
 
-/*@null*/ spine_mesh_attachment spine_mesh_attachment_get_parent_mesh(spine_mesh_attachment self) {
+/*@null*/ spine_mesh_attachment spine_mesh_attachment_get_source_mesh(spine_mesh_attachment self) {
 	MeshAttachment *_self = (MeshAttachment *) self;
-	return (spine_mesh_attachment) _self->getParentMesh();
+	return (spine_mesh_attachment) _self->getSourceMesh();
 }
 
-void spine_mesh_attachment_set_parent_mesh(spine_mesh_attachment self, /*@null*/ spine_mesh_attachment inValue) {
+void spine_mesh_attachment_set_source_mesh(spine_mesh_attachment self, /*@null*/ spine_mesh_attachment inValue) {
 	MeshAttachment *_self = (MeshAttachment *) self;
-	_self->setParentMesh((MeshAttachment *) inValue);
+	_self->setSourceMesh((MeshAttachment *) inValue);
 }
 
 spine_array_unsigned_short spine_mesh_attachment_get_edges(spine_mesh_attachment self) {
@@ -190,6 +190,21 @@ void spine_mesh_attachment_copy_to(spine_mesh_attachment self, spine_vertex_atta
 const char *spine_mesh_attachment_get_name(spine_mesh_attachment self) {
 	MeshAttachment *_self = (MeshAttachment *) self;
 	return _self->getName().buffer();
+}
+
+spine_array_int spine_mesh_attachment_get_timeline_slots(spine_mesh_attachment self) {
+	MeshAttachment *_self = (MeshAttachment *) self;
+	return (spine_array_int) &_self->getTimelineSlots();
+}
+
+void spine_mesh_attachment_set_timeline_slots(spine_mesh_attachment self, spine_array_int timelineSlots) {
+	MeshAttachment *_self = (MeshAttachment *) self;
+	_self->setTimelineSlots(*((Array<int> *) timelineSlots));
+}
+
+bool spine_mesh_attachment_is_timeline_active(spine_mesh_attachment self, spine_array_slot slots, int slotIndex, bool appliedPose) {
+	MeshAttachment *_self = (MeshAttachment *) self;
+	return _self->isTimelineActive(*((Array<Slot *> *) slots), slotIndex, appliedPose);
 }
 
 int spine_mesh_attachment_get_ref_count(spine_mesh_attachment self) {

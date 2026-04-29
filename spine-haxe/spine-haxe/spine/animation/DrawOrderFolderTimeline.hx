@@ -52,6 +52,7 @@ class DrawOrderFolderTimeline extends Timeline {
 			inFolder[i] = false;
 		for (i in slots)
 			inFolder[i] = true;
+		this.instant = true;
 	}
 
 	private static function getPropertyIds(slots:Array<Int>):Array<String> {

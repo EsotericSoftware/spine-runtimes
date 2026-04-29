@@ -53,7 +53,7 @@ namespace spine {
 		Pool<Array<float>> _polygonPool;
 		Pool<Array<int>> _polygonIndicesPool;
 
-		static bool isConcave(int index, int vertexCount, Array<float> &vertices, Array<int> &indices);
+		static bool isConcave(int index, int vertexCount, const float *vertices, const int *indices);
 
 		static bool positiveArea(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y);
 

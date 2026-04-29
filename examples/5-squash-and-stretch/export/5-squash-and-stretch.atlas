@@ -1,69 +1,63 @@
 5-squash-and-stretch.png
-	size: 1024, 512
+	size: 2048, 512
 	filter: Linear, Linear
 	scale: 0.5
 ball
 	bounds: 874, 375, 38, 38
 belt-ends
-	bounds: 807, 300, 23, 28
-	rotate: 90
+	bounds: 773, 299, 23, 28
 course
 	bounds: 2, 2, 769, 411
 hair-1
-	bounds: 815, 325, 41, 20
+	bounds: 773, 329, 41, 20
 hair-2
-	bounds: 988, 341, 37, 22
-	rotate: 90
+	bounds: 816, 323, 37, 22
 head
 	bounds: 773, 351, 58, 62
 hood-end1a
-	bounds: 956, 265, 12, 42
+	bounds: 945, 269, 12, 42
 hood-end1b
-	bounds: 906, 303, 14, 40
+	bounds: 898, 295, 14, 40
 hood-end1c
-	bounds: 922, 279, 16, 35
+	bounds: 815, 286, 16, 35
 hood-end1d
-	bounds: 996, 298, 15, 41
+	bounds: 1002, 398, 15, 41
+	rotate: 90
 hood-end1e
-	bounds: 858, 306, 18, 39
+	bounds: 855, 306, 18, 39
 hood-end1f
-	bounds: 953, 309, 20, 36
+	bounds: 1000, 328, 20, 36
 hood-end2a
-	bounds: 837, 285, 15, 38
+	bounds: 798, 289, 15, 38
 hood-end2b
-	bounds: 975, 303, 19, 36
+	bounds: 973, 304, 19, 36
 hood-end2c
-	bounds: 773, 304, 21, 32
-	rotate: 90
+	bounds: 875, 303, 21, 32
 hood-end2d
-	bounds: 854, 266, 12, 38
+	bounds: 914, 272, 12, 38
 hood-end2e
-	bounds: 940, 270, 14, 37
+	bounds: 833, 284, 14, 37
 hood-end2f
-	bounds: 878, 279, 16, 35
+	bounds: 994, 291, 16, 35
 left-foot
-	bounds: 938, 373, 40, 24
-	rotate: 90
+	bounds: 960, 389, 40, 24
 left-foot-bent01
-	bounds: 914, 369, 44, 22
-	rotate: 90
+	bounds: 914, 391, 44, 22
 left-foot-bent02
-	bounds: 880, 345, 41, 22
+	bounds: 915, 343, 41, 22
 left-foot-side
-	bounds: 938, 347, 45, 21
-left-hand
-	bounds: 878, 316, 26, 27
-right-foot
-	bounds: 988, 380, 33, 28
-	rotate: 90
-right-foot-bent01
-	bounds: 964, 370, 43, 22
-	rotate: 90
-right-foot-bent02
-	bounds: 773, 327, 40, 22
-right-foot-side
 	bounds: 833, 347, 45, 21
+left-hand
+	bounds: 945, 313, 26, 27
+right-foot
+	bounds: 880, 337, 33, 28
+right-foot-bent01
+	bounds: 914, 367, 43, 22
+right-foot-bent02
+	bounds: 958, 342, 40, 22
+right-foot-side
+	bounds: 959, 366, 45, 21
 right-hand
-	bounds: 923, 316, 28, 29
+	bounds: 915, 312, 28, 29
 torso
 	bounds: 833, 370, 39, 43

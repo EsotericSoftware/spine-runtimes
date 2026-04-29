@@ -29,7 +29,7 @@
 
 /** biome-ignore-all lint/style/noNonNullAssertion: reference runtime expects some nullable to not be null */
 
-import { Animation, AttachmentTimeline, DrawOrderFolderTimeline, DrawOrderTimeline, RotateTimeline, Timeline } from "./Animation.js";
+import { Animation, AttachmentTimeline, DrawOrderFolderTimeline, DrawOrderTimeline, EventTimeline, RotateTimeline, Timeline } from "./Animation.js";
 import type { AnimationStateData } from "./AnimationStateData.js";
 import type { Event } from "./Event.js";
 import type { Skeleton } from "./Skeleton.js";
@@ -97,7 +97,7 @@ export class AnimationState {
 					next.delay = 0;
 					next.trackTime += current.timeScale === 0 ? 0 : (nextTime / current.timeScale + delta) * next.timeScale;
 					current.trackTime += currentDelta;
-					this.setCurrent(i, next, true);
+					this.setTrack(i, next, true);
 					while (next.mixingFrom) {
 						next.mixTime += delta;
 						next = next.mixingFrom;
@@ -222,6 +222,7 @@ export class AnimationState {
 					}
 				}
 			}
+			if (current.reverse) this.eventsReverse(current, animationLast, animationTime);
 			this.queueEvents(current, animationTime);
 			events.length = 0;
 			current.nextAnimationLast = animationTime;
@@ -298,6 +299,7 @@ export class AnimationState {
 			}
 		}
 
+		if (from.reverse && mix < from.eventThreshold) this.eventsReverse(from, animationLast, animationTime);
 		if (to.mixDuration > 0) this.queueEvents(from, animationTime);
 		this.events.length = 0;
 
@@ -386,18 +388,18 @@ export class AnimationState {
 	}
 
 	queueEvents (entry: TrackEntry, animationTime: number) {
-		const animationStart = entry.animationStart, animationEnd = entry.animationEnd;
-		const duration = animationEnd - animationStart;
-		const trackLastWrapped = entry.trackLast % duration;
+		const animationStart = entry.animationStart, animationEnd = entry.animationEnd, duration = animationEnd - animationStart;
+		const reverse = entry.reverse;
+		let split = entry.trackLast % duration;
+		if (reverse) split = duration - split;
 
 		// Queue events before complete.
 		const events = this.events;
 		let i = 0, n = events.length;
 		for (; i < n; i++) {
 			const event = events[i];
-			if (event.time < trackLastWrapped) break;
-			if (event.time > animationEnd) continue; // Discard events outside animation start/end.
-			this.queue.event(entry, event);
+			if ((event.time < split) !== reverse) break; // java: if (event.time < split ^ reverse) break;
+			if (event.time >= animationStart && event.time <= animationEnd) this.queue.event(entry, event);
 		}
 
 		// Queue complete if completed a loop iteration or the animation.
@@ -416,8 +418,36 @@ export class AnimationState {
 		// Queue events after complete.
 		for (; i < n; i++) {
 			const event = events[i];
-			if (event.time < animationStart) continue; // Discard events outside animation start/end.
-			this.queue.event(entry, event);
+			if (event.time >= animationStart && event.time <= animationEnd) this.queue.event(entry, event);
+		}
+	}
+
+	private eventsReverse (entry: TrackEntry, animationLast: number, animationTime: number) {
+		const duration = entry.animation!.duration, from = duration - animationLast, to = duration - animationTime;
+		const timelines = entry.animation!.timelines;
+		for (let i = 0, n = entry.animation!.timelines.length; i < n; i++) {
+			const eventTimeline = timelines[i];
+			if (!(eventTimeline instanceof EventTimeline)) continue;
+			const timelineEvents = eventTimeline.events;
+			const frames = eventTimeline.frames;
+			const frameCount = frames.length;
+			if (from >= to) { // from -> to
+				for (let ii = 0; ii < frameCount; ii++) {
+					if (frames[ii] < to) continue;
+					if (frames[ii] >= from) break;
+					this.events.push(timelineEvents[ii]);
+				}
+			} else {
+				for (let ii = 0; ii < frameCount; ii++) { // from -> 0
+					if (frames[ii] >= from) break;
+					this.events.push(timelineEvents[ii]);
+				}
+				let ii = 0; // end -> to
+				for (; ii < frameCount; ii++)
+					if (frames[ii] >= to) break;
+				for (; ii < frameCount; ii++)
+					this.events.push(timelineEvents[ii]);
+			}
 		}
 	}
 
@@ -463,7 +493,7 @@ export class AnimationState {
 		this.queue.drain();
 	}
 
-	setCurrent (index: number, current: TrackEntry, interrupt: boolean) {
+	setTrack (index: number, current: TrackEntry, interrupt: boolean) {
 		const from = this.expandToIndex(index);
 		this.tracks[index] = current;
 		current.previous = null;
@@ -533,7 +563,7 @@ export class AnimationState {
 				this.clearNext(current);
 		}
 		const entry = this.trackEntry(trackIndex, animation, loop, current);
-		this.setCurrent(trackIndex, entry, interrupt);
+		this.setTrack(trackIndex, entry, interrupt);
 		this.queue.drain();
 		return entry;
 	}
@@ -577,7 +607,7 @@ export class AnimationState {
 		const entry = this.trackEntry(trackIndex, animation, loop, last);
 
 		if (!last) {
-			this.setCurrent(trackIndex, entry, true);
+			this.setTrack(trackIndex, entry, true);
 			this.queue.drain();
 			if (delay < 0) delay = 0;
 		} else {
@@ -772,9 +802,16 @@ export class AnimationState {
 	}
 
 	/** Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing. */
-	getCurrent (trackIndex: number) {
+	getTrack (trackIndex: number) {
+		if (trackIndex < 0) throw new Error("trackIndex must be >= 0.");
 		if (trackIndex >= this.tracks.length) return null;
 		return this.tracks[trackIndex];
+	}
+
+	/** Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing.
+	 * @deprecated Use {@link getTrack}. */
+	getCurrent (trackIndex: number) {
+		return this.getTrack(trackIndex);
 	}
 
 	/** Adds a listener to receive events for all track entries. */
@@ -830,7 +867,7 @@ export class TrackEntry {
 
 	/** The index of the track where this track entry is either current or queued.
 	 *
-	 * See {@link AnimationState.getCurrent}. */
+	 * See {@link AnimationState.getTrack}. */
 	trackIndex = 0;
 
 	/** If true, the animation will repeat. If false it will not, instead its last frame is applied if played beyond its
@@ -842,7 +879,7 @@ export class TrackEntry {
 	 * is next called. */
 	additive = false;
 
-	/** If true, the animation will be applied in reverse and events will not be fired. */
+	/** If true, the animation will be applied in reverse. */
 	reverse = false;
 
 	/** If true, mixing rotation between tracks always uses the shortest rotation direction. If the rotation is animated, the
@@ -876,21 +913,21 @@ export class TrackEntry {
 	 * applied while this animation is being mixed out. */
 	mixDrawOrderThreshold = 0;
 
-	/** Seconds when this animation starts, both initially and after looping. Defaults to 0.
+	/** The time in seconds for the first frame of this animation, both initially and after looping. Defaults to 0.
 	 *
-	 * When changing the `animationStart` time, it often makes sense to set {@link animationLast} to the same value
-	 * to prevent timeline keys before the start time from triggering. */
+	 * When setting `animationStart` time, {@link animationLast} can be set to the same value to avoid firing events
+	 * from the start of the animation. */
 	animationStart = 0;
 
-	/** Seconds for the last frame of this animation. Non-looping animations won't play past this time. Looping animations will
-	 * loop back to {@link animationStart} at this time. Defaults to the animation {@link Animation.duration}. */
+	/** The time in seconds for the last frame of this animation. Past this time, non-looping animations hold the pose at this
+	 * time while looping animations will loop back to {@link animationStart}. Defaults to the {@link Animation.duration}. */
 	animationEnd = 0;
 
 
-	/** The time in seconds this animation was last applied. Some timelines use this for one-time triggers. Eg, when this
-	 * animation is applied, event timelines will fire all events between the `animationLast` time (exclusive) and
-	 * `animationTime` (inclusive). Defaults to -1 to ensure triggers on frame 0 happen the first time this animation
-	 * is applied. */
+	/** The time in seconds this animation was last applied. Some timelines use this for one-time triggers. For example, when
+	 * this animation is applied, event timelines will fire all events between the `animationLast` time (exclusive)
+	 * and `animationTime` (inclusive). Defaults to -1 to ensure triggers on frame 0 happen the first time this
+	 * animation is applied. */
 	animationLast = 0;
 
 	nextAnimationLast = 0;
@@ -907,9 +944,13 @@ export class TrackEntry {
 	 * afterward, use {@link setMixDuration} so this `delay` is adjusted. */
 	delay = 0;
 
-	/** Current time in seconds this track entry has been the current track entry. The track time determines
-	 * {@link animationTime}. The track time can be set to start the animation at a time other than 0, without affecting
-	 * looping. */
+	/** The time in seconds this track entry has been the current track entry, starting at 0 and increasing forever. Compare to
+	 * {@link getAnimationTime}, which is always between {@link animationStart} and {@link animationEnd}.
+	 *
+	 * The track time can be set to start the animation at a time other than 0, without affecting looping. When doing so,
+	 * {@link animationLast} can be set to the same value to avoid firing events from the start of the animation.
+	 *
+	 * To set the time an animation starts and loops, use {@link animationStart} and {@link animationEnd}. */
 	trackTime = 0;
 
 	trackLast = 0; nextTrackLast = 0;
@@ -1014,19 +1055,14 @@ export class TrackEntry {
 		this.timelinesRotation.length = 0;
 	}
 
-	/** Uses {@link trackTime} to compute the `animationTime`. When the `trackTime` is 0, the
-	 * `animationTime` is equal to the `animationStart` time.
-	 *
-	 * The `animationTime` is between {@link animationStart} and {@link animationEnd}, except if this track entry
-	 * is non-looping and {@link animationEnd} is >= to the {@link Animation.duration}, then `animationTime`
-	 * continues to increase past {@link animationEnd}. */
+	/** Uses {@link trackTime} to compute the `animationTime`, which is always between {@link animationStart} and
+	 * {@link animationEnd}. When `trackTime` is 0, `animationTime` is equal to the
+	 * `animationStart` time. */
 	getAnimationTime () {
-		if (this.loop) {
-			const duration = this.animationEnd - this.animationStart;
-			if (duration === 0) return this.animationStart;
-			return (this.trackTime % duration) + this.animationStart;
-		}
-		return Math.min(this.trackTime + this.animationStart, this.animationEnd);
+		if (!this.loop) return Math.min(this.trackTime + this.animationStart, this.animationEnd);
+		const duration = this.animationEnd - this.animationStart;
+		if (duration === 0) return this.animationStart;
+		return (this.trackTime % duration) + this.animationStart;
 	}
 
 	setAnimationLast (animationLast: number) {

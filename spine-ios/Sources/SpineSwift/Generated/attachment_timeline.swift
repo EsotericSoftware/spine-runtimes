@@ -49,7 +49,7 @@ public class AttachmentTimeline: Timeline, SlotTimeline {
     public var slotIndex: Int32 {
         get {
             let result = spine_attachment_timeline_get_slot_index(_ptr.assumingMemoryBound(to: spine_attachment_timeline_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_attachment_timeline_set_slot_index(_ptr.assumingMemoryBound(to: spine_attachment_timeline_wrapper.self), newValue)

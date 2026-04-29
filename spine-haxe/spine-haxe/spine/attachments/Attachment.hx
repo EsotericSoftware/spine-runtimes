@@ -29,13 +29,20 @@
 
 package spine.attachments;
 
+import spine.Slot;
+
 /** The base class for all attachments. */
 class Attachment {
+	private static final empty:Array<Int> = new Array<Int>();
+
 	private var _name:String;
 
 	/** Timelines for the timeline attachment are also applied to this attachment.
 	 * May be null if no attachment-specific timelines should be applied. */
 	public var timelineAttachment:Attachment;
+
+	/** Slots that can have attachments whose timelineAttachment is this attachment. */
+	public var timelineSlots:Array<Int> = empty;
 
 	public function new(name:String) {
 		if (name == null) {
@@ -43,6 +50,28 @@ class Attachment {
 		}
 		_name = name;
 		timelineAttachment = this;
+	}
+
+	/** Returns true if the `slotIndex` or any timelineSlots have an attachment whose timelineAttachment is
+	 * this attachment.
+	 * @param slots The Skeleton.slots.
+	 * @param slotIndex The timeline's primary slot index. */
+	public function isTimelineActive(slots:Array<Slot>, slotIndex:Int, appliedPose:Bool):Bool {
+		var slot = slots[slotIndex];
+		if (slot.bone.active) {
+			var other = (appliedPose ? slot.appliedPose : slot.pose).attachment;
+			if (other != null && other.timelineAttachment == this)
+				return true;
+		}
+		for (i in 0...timelineSlots.length) {
+			slot = slots[timelineSlots[i]];
+			if (!slot.bone.active)
+				continue;
+			var other = (appliedPose ? slot.appliedPose : slot.pose).attachment;
+			if (other != null && other.timelineAttachment == this)
+				return true;
+		}
+		return false;
 	}
 
 	/** The attachment's name. */

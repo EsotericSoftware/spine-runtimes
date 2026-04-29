@@ -27,10 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#if !SPINE_DISABLE_THREADING
-#define USE_THREADED_ANIMATION_UPDATE
-#endif
-
 using Spine.Unity;
 using System.Collections;
 using UnityEngine;
@@ -62,11 +58,7 @@ namespace Spine.Unity.Examples {
 			model.ShootEvent += PlayShoot;
 			model.StartAimEvent += StartPlayingAim;
 			model.StopAimEvent += StopPlayingAim;
-#if USE_THREADED_ANIMATION_UPDATE
-			skeletonAnimation.MainThreadEvent += HandleEvent;
-#else
 			skeletonAnimation.AnimationState.Event += HandleEvent;
-#endif
 		}
 
 		void HandleEvent (Spine.TrackEntry trackEntry, Spine.Event e) {

@@ -55,7 +55,7 @@ public class SkeletonData: NSObject {
     public var name: String {
         get {
             let result = spine_skeleton_data_get_name(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self))
-            return String(cString: result!)
+        return String(cString: result!)
         }
         set {
             spine_skeleton_data_set_name(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self), newValue)
@@ -87,11 +87,10 @@ public class SkeletonData: NSObject {
     public var defaultSkin: Skin? {
         get {
             let result = spine_skeleton_data_get_default_skin(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self))
-            return result.map { Skin(fromPointer: $0) }
+        return result.map { Skin(fromPointer: $0) }
         }
         set {
-            spine_skeleton_data_set_default_skin(
-                _ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self), newValue?._ptr.assumingMemoryBound(to: spine_skin_wrapper.self))
+            spine_skeleton_data_set_default_skin(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self), newValue?._ptr.assumingMemoryBound(to: spine_skin_wrapper.self))
         }
     }
 
@@ -117,7 +116,7 @@ public class SkeletonData: NSObject {
     public var x: Float {
         get {
             let result = spine_skeleton_data_get_x(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_skeleton_data_set_x(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self), newValue)
@@ -128,7 +127,7 @@ public class SkeletonData: NSObject {
     public var y: Float {
         get {
             let result = spine_skeleton_data_get_y(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_skeleton_data_set_y(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self), newValue)
@@ -139,7 +138,7 @@ public class SkeletonData: NSObject {
     public var width: Float {
         get {
             let result = spine_skeleton_data_get_width(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_skeleton_data_set_width(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self), newValue)
@@ -150,7 +149,7 @@ public class SkeletonData: NSObject {
     public var height: Float {
         get {
             let result = spine_skeleton_data_get_height(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_skeleton_data_set_height(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self), newValue)
@@ -162,7 +161,7 @@ public class SkeletonData: NSObject {
     public var referenceScale: Float {
         get {
             let result = spine_skeleton_data_get_reference_scale(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_skeleton_data_set_reference_scale(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self), newValue)
@@ -173,7 +172,7 @@ public class SkeletonData: NSObject {
     public var version: String {
         get {
             let result = spine_skeleton_data_get_version(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self))
-            return String(cString: result!)
+        return String(cString: result!)
         }
         set {
             spine_skeleton_data_set_version(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self), newValue)
@@ -184,7 +183,7 @@ public class SkeletonData: NSObject {
     public var hashString: String {
         get {
             let result = spine_skeleton_data_get_hash(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self))
-            return String(cString: result!)
+        return String(cString: result!)
         }
         set {
             spine_skeleton_data_set_hash(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self), newValue)
@@ -196,7 +195,7 @@ public class SkeletonData: NSObject {
     public var imagesPath: String {
         get {
             let result = spine_skeleton_data_get_images_path(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self))
-            return String(cString: result!)
+        return String(cString: result!)
         }
         set {
             spine_skeleton_data_set_images_path(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self), newValue)
@@ -208,7 +207,7 @@ public class SkeletonData: NSObject {
     public var audioPath: String {
         get {
             let result = spine_skeleton_data_get_audio_path(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self))
-            return String(cString: result!)
+        return String(cString: result!)
         }
         set {
             spine_skeleton_data_set_audio_path(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self), newValue)
@@ -219,7 +218,7 @@ public class SkeletonData: NSObject {
     public var fps: Float {
         get {
             let result = spine_skeleton_data_get_fps(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_skeleton_data_set_fps(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self), newValue)
@@ -261,9 +260,7 @@ public class SkeletonData: NSObject {
 
     /// Collects animations used by slider constraints.
     public func findSliderAnimations(_ animations: ArrayAnimation) -> ArrayAnimation {
-        let result = spine_skeleton_data_find_slider_animations(
-            _ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self),
-            animations._ptr.assumingMemoryBound(to: spine_array_animation_wrapper.self))
+        let result = spine_skeleton_data_find_slider_animations(_ptr.assumingMemoryBound(to: spine_skeleton_data_wrapper.self), animations._ptr.assumingMemoryBound(to: spine_array_animation_wrapper.self))
         return ArrayAnimation(fromPointer: result!)
     }
 

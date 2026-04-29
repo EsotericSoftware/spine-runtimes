@@ -72,6 +72,9 @@ SPINE_C_API /*@null*/ spine_attachment spine_path_attachment_get_timeline_attach
 SPINE_C_API void spine_path_attachment_set_timeline_attachment(spine_path_attachment self, /*@null*/ spine_attachment attachment);
 SPINE_C_API void spine_path_attachment_copy_to(spine_path_attachment self, spine_vertex_attachment other);
 SPINE_C_API const char *spine_path_attachment_get_name(spine_path_attachment self);
+SPINE_C_API spine_array_int spine_path_attachment_get_timeline_slots(spine_path_attachment self);
+SPINE_C_API void spine_path_attachment_set_timeline_slots(spine_path_attachment self, spine_array_int timelineSlots);
+SPINE_C_API bool spine_path_attachment_is_timeline_active(spine_path_attachment self, spine_array_slot slots, int slotIndex, bool appliedPose);
 SPINE_C_API int spine_path_attachment_get_ref_count(spine_path_attachment self);
 SPINE_C_API void spine_path_attachment_reference(spine_path_attachment self);
 SPINE_C_API void spine_path_attachment_dereference(spine_path_attachment self);

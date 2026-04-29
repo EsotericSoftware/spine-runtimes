@@ -64,12 +64,10 @@ public class PathConstraintData: PosedData, ConstraintData {
     public var slot: SlotData {
         get {
             let result = spine_path_constraint_data_get_slot(_ptr.assumingMemoryBound(to: spine_path_constraint_data_wrapper.self))
-            return SlotData(fromPointer: result!)
+        return SlotData(fromPointer: result!)
         }
         set {
-            spine_path_constraint_data_set_slot(
-                _ptr.assumingMemoryBound(to: spine_path_constraint_data_wrapper.self),
-                newValue._ptr.assumingMemoryBound(to: spine_slot_data_wrapper.self))
+            spine_path_constraint_data_set_slot(_ptr.assumingMemoryBound(to: spine_path_constraint_data_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_slot_data_wrapper.self))
         }
     }
 
@@ -77,11 +75,10 @@ public class PathConstraintData: PosedData, ConstraintData {
     public var positionMode: PositionMode {
         get {
             let result = spine_path_constraint_data_get_position_mode(_ptr.assumingMemoryBound(to: spine_path_constraint_data_wrapper.self))
-            return PositionMode(rawValue: Int32(result.rawValue))!
+        return PositionMode(rawValue: Int32(result.rawValue))!
         }
         set {
-            spine_path_constraint_data_set_position_mode(
-                _ptr.assumingMemoryBound(to: spine_path_constraint_data_wrapper.self), spine_position_mode(rawValue: UInt32(newValue.rawValue)))
+            spine_path_constraint_data_set_position_mode(_ptr.assumingMemoryBound(to: spine_path_constraint_data_wrapper.self), spine_position_mode(rawValue: UInt32(newValue.rawValue)))
         }
     }
 
@@ -89,11 +86,10 @@ public class PathConstraintData: PosedData, ConstraintData {
     public var spacingMode: SpacingMode {
         get {
             let result = spine_path_constraint_data_get_spacing_mode(_ptr.assumingMemoryBound(to: spine_path_constraint_data_wrapper.self))
-            return SpacingMode(rawValue: Int32(result.rawValue))!
+        return SpacingMode(rawValue: Int32(result.rawValue))!
         }
         set {
-            spine_path_constraint_data_set_spacing_mode(
-                _ptr.assumingMemoryBound(to: spine_path_constraint_data_wrapper.self), spine_spacing_mode(rawValue: UInt32(newValue.rawValue)))
+            spine_path_constraint_data_set_spacing_mode(_ptr.assumingMemoryBound(to: spine_path_constraint_data_wrapper.self), spine_spacing_mode(rawValue: UInt32(newValue.rawValue)))
         }
     }
 
@@ -101,11 +97,10 @@ public class PathConstraintData: PosedData, ConstraintData {
     public var rotateMode: RotateMode {
         get {
             let result = spine_path_constraint_data_get_rotate_mode(_ptr.assumingMemoryBound(to: spine_path_constraint_data_wrapper.self))
-            return RotateMode(rawValue: Int32(result.rawValue))!
+        return RotateMode(rawValue: Int32(result.rawValue))!
         }
         set {
-            spine_path_constraint_data_set_rotate_mode(
-                _ptr.assumingMemoryBound(to: spine_path_constraint_data_wrapper.self), spine_rotate_mode(rawValue: UInt32(newValue.rawValue)))
+            spine_path_constraint_data_set_rotate_mode(_ptr.assumingMemoryBound(to: spine_path_constraint_data_wrapper.self), spine_rotate_mode(rawValue: UInt32(newValue.rawValue)))
         }
     }
 
@@ -113,7 +108,7 @@ public class PathConstraintData: PosedData, ConstraintData {
     public var offsetRotation: Float {
         get {
             let result = spine_path_constraint_data_get_offset_rotation(_ptr.assumingMemoryBound(to: spine_path_constraint_data_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_path_constraint_data_set_offset_rotation(_ptr.assumingMemoryBound(to: spine_path_constraint_data_wrapper.self), newValue)
@@ -127,8 +122,7 @@ public class PathConstraintData: PosedData, ConstraintData {
     }
 
     public func createMethod(_ skeleton: Skeleton) -> Constraint {
-        let result = spine_path_constraint_data_create_method(
-            _ptr.assumingMemoryBound(to: spine_path_constraint_data_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
+        let result = spine_path_constraint_data_create_method(_ptr.assumingMemoryBound(to: spine_path_constraint_data_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
         let rtti = spine_constraint_get_rtti(result!)
         let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
         switch rttiClassName {

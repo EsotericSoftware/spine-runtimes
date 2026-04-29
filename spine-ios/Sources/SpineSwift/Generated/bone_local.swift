@@ -52,7 +52,7 @@ public class BoneLocal: NSObject {
     public var x: Float {
         get {
             let result = spine_bone_local_get_x(_ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_bone_local_set_x(_ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self), newValue)
@@ -63,7 +63,7 @@ public class BoneLocal: NSObject {
     public var y: Float {
         get {
             let result = spine_bone_local_get_y(_ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_bone_local_set_y(_ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self), newValue)
@@ -74,7 +74,7 @@ public class BoneLocal: NSObject {
     public var rotation: Float {
         get {
             let result = spine_bone_local_get_rotation(_ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_bone_local_set_rotation(_ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self), newValue)
@@ -85,7 +85,7 @@ public class BoneLocal: NSObject {
     public var scaleX: Float {
         get {
             let result = spine_bone_local_get_scale_x(_ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_bone_local_set_scale_x(_ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self), newValue)
@@ -96,7 +96,7 @@ public class BoneLocal: NSObject {
     public var scaleY: Float {
         get {
             let result = spine_bone_local_get_scale_y(_ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_bone_local_set_scale_y(_ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self), newValue)
@@ -107,7 +107,7 @@ public class BoneLocal: NSObject {
     public var shearX: Float {
         get {
             let result = spine_bone_local_get_shear_x(_ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_bone_local_set_shear_x(_ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self), newValue)
@@ -118,7 +118,7 @@ public class BoneLocal: NSObject {
     public var shearY: Float {
         get {
             let result = spine_bone_local_get_shear_y(_ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_bone_local_set_shear_y(_ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self), newValue)
@@ -129,11 +129,10 @@ public class BoneLocal: NSObject {
     public var inherit: Inherit {
         get {
             let result = spine_bone_local_get_inherit(_ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self))
-            return Inherit(rawValue: Int32(result.rawValue))!
+        return Inherit(rawValue: Int32(result.rawValue))!
         }
         set {
-            spine_bone_local_set_inherit(
-                _ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self), spine_inherit(rawValue: UInt32(newValue.rawValue)))
+            spine_bone_local_set_inherit(_ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self), spine_inherit(rawValue: UInt32(newValue.rawValue)))
         }
     }
 
@@ -146,8 +145,7 @@ public class BoneLocal: NSObject {
     }
 
     public func set(_ pose: BoneLocal) {
-        spine_bone_local_set(
-            _ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self), pose._ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self))
+        spine_bone_local_set(_ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self), pose._ptr.assumingMemoryBound(to: spine_bone_local_wrapper.self))
     }
 
     /// Sets local x and y translation.

@@ -110,18 +110,18 @@ class MeshAttachment extends VertexAttachment {
     return Color.fromPointer(result);
   }
 
-  /// The parent mesh if this is a linked mesh, else NULL. A linked mesh shares
+  /// The source mesh if this is a linked mesh, else NULL. A linked mesh shares
   /// the bones, vertices, regionUVs, triangles, hullLength, edges, width, and
-  /// height with the parent mesh, but may have a different name or path, and
+  /// height with the source mesh, but may have a different name or path, and
   /// therefore a different texture region.
-  MeshAttachment? get parentMesh {
-    final result = SpineBindings.bindings.spine_mesh_attachment_get_parent_mesh(_ptr);
+  MeshAttachment? get sourceMesh {
+    final result = SpineBindings.bindings.spine_mesh_attachment_get_source_mesh(_ptr);
     return result.address == 0 ? null : MeshAttachment.fromPointer(result);
   }
 
-  set parentMesh(MeshAttachment? value) {
+  set sourceMesh(MeshAttachment? value) {
     SpineBindings.bindings
-        .spine_mesh_attachment_set_parent_mesh(_ptr, value?.nativePtr.cast() ?? Pointer.fromAddress(0));
+        .spine_mesh_attachment_set_source_mesh(_ptr, value?.nativePtr.cast() ?? Pointer.fromAddress(0));
   }
 
   /// Vertex index pairs describing edges for controlling triangulation, or

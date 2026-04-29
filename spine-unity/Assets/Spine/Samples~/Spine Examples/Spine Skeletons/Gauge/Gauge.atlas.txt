@@ -1,9 +1,10 @@
 Gauge.png
-	size: 1024, 64
+	size: 1024, 256
 	filter: Linear, Linear
 Background
-	bounds: 480, 30, 224, 32
+	bounds: 287, 194, 224, 32
 Bar
-	bounds: 254, 30, 224, 32
+	bounds: 253, 2, 224, 32
+	rotate: 90
 Border
-	bounds: 2, 2, 250, 60
+	bounds: 2, 166, 250, 60

@@ -46,7 +46,6 @@ SliderTimeline::SliderTimeline(size_t frameCount, size_t bezierCount, int slider
 	: ConstraintTimeline1(frameCount, bezierCount, sliderIndex, Property_SliderTime) {
 	PropertyId ids[] = {((PropertyId) Property_SliderTime << 32) | sliderIndex};
 	setPropertyIds(ids, 1);
-	_additive = true;
 }
 
 SliderTimeline::~SliderTimeline() {

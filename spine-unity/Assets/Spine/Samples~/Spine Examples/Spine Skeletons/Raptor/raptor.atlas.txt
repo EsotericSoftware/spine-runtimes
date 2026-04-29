@@ -2,83 +2,72 @@ raptor.png
 	size: 1024, 1024
 	filter: Linear, Linear
 back_arm
-	bounds: 407, 496, 46, 29
+	bounds: 665, 544, 46, 29
 back_bracer
-	bounds: 493, 497, 39, 28
+	bounds: 713, 545, 39, 28
 back_hand
-	bounds: 455, 491, 36, 34
+	bounds: 978, 865, 36, 34
 back_knee
-	bounds: 338, 524, 49, 67
-	rotate: 90
+	bounds: 972, 738, 49, 67
 back_thigh
-	bounds: 534, 501, 39, 24
+	bounds: 978, 808, 39, 24
 eyes_open
-	bounds: 849, 508, 47, 45
+	bounds: 972, 591, 47, 45
 front_arm
-	bounds: 957, 512, 48, 30
+	bounds: 969, 559, 48, 30
 front_bracer
-	bounds: 978, 811, 41, 29
+	bounds: 978, 834, 41, 29
 front_hand
-	bounds: 978, 937, 41, 38
+	bounds: 978, 938, 41, 38
 front_open_hand
-	bounds: 978, 977, 43, 44
+	bounds: 978, 978, 43, 44
 front_thigh
-	bounds: 898, 513, 57, 29
+	bounds: 606, 544, 57, 29
 gun
-	bounds: 492, 631, 107, 103
+	bounds: 479, 632, 107, 103
 gun_nohand
-	bounds: 486, 527, 105, 102
+	bounds: 779, 513, 105, 102
 head
-	bounds: 157, 598, 136, 149
-	rotate: 90
+	bounds: 157, 586, 136, 149
 lower_leg
-	bounds: 697, 524, 73, 98
-	rotate: 90
+	bounds: 2, 492, 73, 98
 mouth_smile
-	bounds: 978, 842, 47, 30
-	rotate: 90
+	bounds: 420, 544, 47, 30
 neck
-	bounds: 997, 788, 18, 21
+	bounds: 779, 742, 18, 21
 raptor_arm_back
-	bounds: 157, 514, 82, 86
-	rotate: 90
+	bounds: 77, 498, 82, 86
 raptor_body
-	bounds: 2, 736, 610, 285
+	bounds: 2, 737, 610, 285
 raptor_front_arm
-	bounds: 593, 516, 81, 102
-	rotate: 90
+	bounds: 886, 513, 81, 102
 raptor_front_leg
-	bounds: 614, 764, 191, 257
+	bounds: 614, 765, 191, 257
 raptor_hindleg_back
-	bounds: 807, 806, 169, 215
+	bounds: 807, 807, 169, 215
 raptor_horn
-	bounds: 308, 654, 182, 80
+	bounds: 295, 655, 182, 80
 raptor_horn_back
-	bounds: 308, 575, 176, 77
+	bounds: 295, 576, 176, 77
 raptor_jaw
-	bounds: 2, 591, 153, 143
+	bounds: 2, 592, 153, 143
 raptor_saddle_noshadow
-	bounds: 614, 599, 163, 188
-	rotate: 90
+	bounds: 614, 575, 163, 188
 raptor_saddle_strap_front
-	bounds: 937, 544, 57, 95
+	bounds: 249, 479, 57, 95
 raptor_saddle_strap_rear
-	bounds: 90, 515, 54, 74
+	bounds: 364, 500, 54, 74
 raptor_saddle_w_shadow
-	bounds: 807, 641, 163, 188
-	rotate: 90
+	bounds: 807, 617, 163, 188
 raptor_tongue
-	bounds: 2, 525, 86, 64
+	bounds: 161, 520, 86, 64
 stirrup_back
-	bounds: 978, 891, 44, 35
-	rotate: 90
+	bounds: 978, 901, 44, 35
 stirrup_front
-	bounds: 797, 508, 45, 50
-	rotate: 90
+	bounds: 972, 638, 45, 50
 stirrup_strap
-	bounds: 407, 527, 49, 46
+	bounds: 972, 690, 49, 46
 torso
-	bounds: 245, 519, 54, 91
-	rotate: 90
+	bounds: 308, 483, 54, 91
 visor
-	bounds: 804, 555, 131, 84
+	bounds: 473, 546, 131, 84

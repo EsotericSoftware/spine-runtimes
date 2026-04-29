@@ -58,7 +58,8 @@ namespace Spine.Unity.Editor {
 		protected SerializedProperty threadedMeshGeneration;
 		// Vertex Data parameters
 		protected SerializedProperty tintBlack, canvasGroupCompatible, pmaVertexColors, addNormals, calculateTangents;
-		protected SerializedProperty physicsPositionInheritanceFactor, physicsRotationInheritanceFactor, physicsMovementRelativeTo;
+		protected SerializedProperty physicsPositionInheritanceFactor, physicsRotationInheritanceFactor,
+			physicsPositionInheritanceLimit, physicsRotationInheritanceLimit, physicsMovementRelativeTo;
 
 		protected bool isInspectingPrefab;
 		protected bool forceReloadQueued = false;
@@ -115,6 +116,12 @@ namespace Spine.Unity.Editor {
 			"\n1 to apply movement normally, " +
 			"\n2 to apply movement with double intensity, or " +
 			"\n0 to not apply any Transform rotation movement at all.");
+		readonly GUIContent PhysicsPositionInheritanceLimitLabel = new GUIContent("Limit",
+			"Limits Transform position movement in X and Y direction that is applied to skeleton PhysicsConstraints, " +
+			"after it has been multiplied by Position inheritance above.");
+		readonly GUIContent PhysicsRotationInheritanceLimitLabel = new GUIContent("Limit",
+			"Limits Transform rotation that is applied to skeleton PhysicsConstraints, " +
+			"after it has been multiplied by Rotation inheritance above.");
 		readonly GUIContent PhysicsMovementRelativeToLabel = new GUIContent("Movement relative to",
 			"Reference transform relative to which physics movement will be calculated, or null to use world location.");
 
@@ -180,6 +187,8 @@ namespace Spine.Unity.Editor {
 
 			physicsPositionInheritanceFactor = serializedObject.FindProperty("physicsPositionInheritanceFactor");
 			physicsRotationInheritanceFactor = serializedObject.FindProperty("physicsRotationInheritanceFactor");
+			physicsPositionInheritanceLimit = serializedObject.FindProperty("physicsPositionInheritanceLimit");
+			physicsRotationInheritanceLimit = serializedObject.FindProperty("physicsRotationInheritanceLimit");
 			physicsMovementRelativeTo = serializedObject.FindProperty("physicsMovementRelativeTo");
 		}
 
@@ -247,8 +256,69 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.PropertyField(physicsPositionInheritanceFactor, GUIContent.none, GUILayout.MinWidth(60));
 				EditorGUI.indentLevel = savedIndentLevel;
 			}
+			DrawOptionalLimitVector2(physicsPositionInheritanceLimit, PhysicsPositionInheritanceLimitLabel, new Vector2(10f, 10f),
+				EditorGUI.indentLevel + 1);
+
 			EditorGUILayout.PropertyField(physicsRotationInheritanceFactor, PhysicsRotationInheritanceFactorLabel);
+			DrawOptionalLimitFloat(physicsRotationInheritanceLimit, PhysicsRotationInheritanceLimitLabel, 10f,
+				EditorGUI.indentLevel + 1);
 			EditorGUILayout.PropertyField(physicsMovementRelativeTo, PhysicsMovementRelativeToLabel);
+		}
+
+		static readonly GUIContent UnlimitedLabel = new GUIContent("Unlimited");
+		static readonly GUIContent LimitToggleLabel = new GUIContent("",
+			"Enable to set a maximum value. When disabled, no limit is applied.");
+
+		static void DrawOptionalLimitVector2 (SerializedProperty prop, GUIContent label, Vector2 enableDefault, int labelIndentLevel) {
+			using (new GUILayout.HorizontalScope()) {
+				int savedIndentLevel = EditorGUI.indentLevel;
+				EditorGUI.indentLevel = labelIndentLevel;
+				EditorGUILayout.LabelField(label, GUILayout.Width(EditorGUIUtility.labelWidth));
+				EditorGUI.indentLevel = 0;
+				Vector2 currentValue = prop.vector2Value;
+				bool isLimited = !(float.IsPositiveInfinity(currentValue.x) && float.IsPositiveInfinity(currentValue.y));
+				EditorGUI.showMixedValue = prop.hasMultipleDifferentValues;
+				EditorGUI.BeginChangeCheck();
+				bool newIsLimited = EditorGUILayout.Toggle(LimitToggleLabel, isLimited, GUILayout.Width(15));
+				EditorGUI.showMixedValue = false;
+				if (EditorGUI.EndChangeCheck()) {
+					prop.vector2Value = newIsLimited ? enableDefault : Vector2.positiveInfinity;
+					isLimited = newIsLimited;
+				}
+				if (isLimited) {
+					EditorGUILayout.PropertyField(prop, GUIContent.none, GUILayout.MinWidth(60));
+				} else {
+					using (new EditorGUI.DisabledScope(true))
+						EditorGUILayout.LabelField(UnlimitedLabel);
+				}
+				EditorGUI.indentLevel = savedIndentLevel;
+			}
+		}
+
+		static void DrawOptionalLimitFloat (SerializedProperty prop, GUIContent label, float enableDefault, int labelIndentLevel) {
+			using (new GUILayout.HorizontalScope()) {
+				int savedIndentLevel = EditorGUI.indentLevel;
+				EditorGUI.indentLevel = labelIndentLevel;
+				EditorGUILayout.LabelField(label, GUILayout.Width(EditorGUIUtility.labelWidth));
+				EditorGUI.indentLevel = 0;
+				float currentValue = prop.floatValue;
+				bool isLimited = currentValue < float.MaxValue && !float.IsPositiveInfinity(currentValue);
+				EditorGUI.showMixedValue = prop.hasMultipleDifferentValues;
+				EditorGUI.BeginChangeCheck();
+				bool newIsLimited = EditorGUILayout.Toggle(LimitToggleLabel, isLimited, GUILayout.Width(15));
+				EditorGUI.showMixedValue = false;
+				if (EditorGUI.EndChangeCheck()) {
+					prop.floatValue = newIsLimited ? enableDefault : float.MaxValue;
+					isLimited = newIsLimited;
+				}
+				if (isLimited) {
+					EditorGUILayout.PropertyField(prop, GUIContent.none, GUILayout.MinWidth(60));
+				} else {
+					using (new EditorGUI.DisabledScope(true))
+						EditorGUILayout.LabelField(UnlimitedLabel);
+				}
+				EditorGUI.indentLevel = savedIndentLevel;
+			}
 		}
 
 		protected virtual void AdvancedPropertyFields () {

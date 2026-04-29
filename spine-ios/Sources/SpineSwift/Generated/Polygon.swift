@@ -51,18 +51,17 @@ public class Polygon: NSObject {
     public var vertices: ArrayFloat {
         get {
             let result = spine_polygon_get__vertices(_ptr.assumingMemoryBound(to: spine_polygon_wrapper.self))
-            return ArrayFloat(fromPointer: result!)
+        return ArrayFloat(fromPointer: result!)
         }
         set {
-            spine_polygon_set__vertices(
-                _ptr.assumingMemoryBound(to: spine_polygon_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self))
+            spine_polygon_set__vertices(_ptr.assumingMemoryBound(to: spine_polygon_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self))
         }
     }
 
     public var count: Int32 {
         get {
             let result = spine_polygon_get__count(_ptr.assumingMemoryBound(to: spine_polygon_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_polygon_set__count(_ptr.assumingMemoryBound(to: spine_polygon_wrapper.self), newValue)

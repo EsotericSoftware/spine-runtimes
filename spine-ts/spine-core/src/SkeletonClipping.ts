@@ -716,7 +716,8 @@ export class SkeletonClipping {
 
 		for (let i = 0; ; i += 2) {
 			const edgeX = v[i], edgeY = v[i + 1], ex = edgeX - v[i + 2], ey = edgeY - v[i + 3];
-			const outputStart = output.length, fragmentStart = this.inverseVertices.length++;
+			const outputStart = output.length, fragmentStart = this.inverseVertices.length;
+			this.inverseVertices.push(0);
 			iv = input;
 			for (let ii = 0, nn = input.length - 2; ii < nn;) {
 				x1 = iv[ii];

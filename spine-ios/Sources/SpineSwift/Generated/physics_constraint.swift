@@ -42,9 +42,7 @@ public class PhysicsConstraint: PhysicsConstraintBase {
     }
 
     public convenience init(_ data: PhysicsConstraintData, _ skeleton: Skeleton) {
-        let ptr = spine_physics_constraint_create(
-            data._ptr.assumingMemoryBound(to: spine_physics_constraint_data_wrapper.self),
-            skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
+        let ptr = spine_physics_constraint_create(data._ptr.assumingMemoryBound(to: spine_physics_constraint_data_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
         self.init(fromPointer: ptr!)
     }
 
@@ -52,26 +50,22 @@ public class PhysicsConstraint: PhysicsConstraintBase {
     public var bone: BonePose {
         get {
             let result = spine_physics_constraint_get_bone(_ptr.assumingMemoryBound(to: spine_physics_constraint_wrapper.self))
-            return BonePose(fromPointer: result!)
+        return BonePose(fromPointer: result!)
         }
         set {
-            spine_physics_constraint_set_bone(
-                _ptr.assumingMemoryBound(to: spine_physics_constraint_wrapper.self),
-                newValue._ptr.assumingMemoryBound(to: spine_bone_pose_wrapper.self))
+            spine_physics_constraint_set_bone(_ptr.assumingMemoryBound(to: spine_physics_constraint_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_bone_pose_wrapper.self))
         }
     }
 
     public func copyAttachment(_ skeleton: Skeleton) -> PhysicsConstraint {
-        let result = spine_physics_constraint_copy(
-            _ptr.assumingMemoryBound(to: spine_physics_constraint_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
+        let result = spine_physics_constraint_copy(_ptr.assumingMemoryBound(to: spine_physics_constraint_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
         return PhysicsConstraint(fromPointer: result!)
     }
 
     /// Resets all physics state that was the result of previous movement. Use this after moving a
     /// bone to prevent physics from reacting to the movement.
     public func reset(_ skeleton: Skeleton) {
-        spine_physics_constraint_reset(
-            _ptr.assumingMemoryBound(to: spine_physics_constraint_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
+        spine_physics_constraint_reset(_ptr.assumingMemoryBound(to: spine_physics_constraint_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
     }
 
     /// Translates the physics constraint so the next update() forces are applied as if the bone

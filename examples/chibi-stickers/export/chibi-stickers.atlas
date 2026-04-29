@@ -3,386 +3,345 @@ chibi-stickers.png
 	filter: Linear, Linear
 	scale: 0.5
 common/angry-mark
-	bounds: 464, 63, 42, 41
-	rotate: 90
+	bounds: 431, 67, 42, 41
 common/big-purple-fear
-	bounds: 40, 33, 134, 72
+	bounds: 40, 36, 134, 72
 common/big-tear
-	bounds: 340, 72, 33, 82
-	rotate: 90
+	bounds: 340, 26, 33, 82
 common/eye-3
-	bounds: 131, 16, 15, 26
-	rotate: 90
+	bounds: 129, 8, 15, 26
 common/eye-closed-happy
-	bounds: 335, 9, 25, 9
+	bounds: 323, 15, 25, 9
 common/eye-dafault
-	bounds: 288, 17, 22, 21
+	bounds: 421, 21, 22, 21
 common/eye-equal
-	bounds: 428, 9, 25, 15
+	bounds: 168, 14, 25, 15
 common/eye-fire
-	bounds: 2, 37, 26, 28
+	bounds: 2, 42, 26, 28
 common/eye-half-open
-	bounds: 75, 15, 26, 16
+	bounds: 47, 18, 26, 16
 common/eye-heart
-	bounds: 371, 24, 26, 23
+	bounds: 481, 31, 26, 23
 common/eye-reverse-v
-	bounds: 203, 16, 26, 16
-	rotate: 90
+	bounds: 19, 18, 26, 16
 common/eye-sideway-v
-	bounds: 482, 19, 21, 23
-	rotate: 90
+	bounds: 398, 19, 21, 23
 common/eye-slant-close
-	bounds: 455, 8, 23, 16
+	bounds: 195, 13, 23, 16
 common/eye-small-dot
-	bounds: 178, 3, 15, 15
+	bounds: 350, 9, 15, 15
 common/eye-sparkle
-	bounds: 2, 67, 30, 29
+	bounds: 475, 79, 30, 29
 common/eye-star
-	bounds: 340, 43, 29, 27
+	bounds: 2, 72, 29, 27
 common/eye-twirl
-	bounds: 340, 20, 21, 23
-	rotate: 90
+	bounds: 375, 24, 21, 23
 common/eye-u
-	bounds: 261, 20, 24, 17
+	bounds: 75, 17, 24, 17
 common/eye-x
-	bounds: 176, 20, 25, 22
+	bounds: 226, 29, 25, 22
 common/lamp
-	bounds: 291, 40, 47, 65
+	bounds: 291, 43, 47, 65
 common/mouth-3
-	bounds: 45, 16, 15, 28
-	rotate: 90
+	bounds: 2, 12, 15, 28
 common/mouth-bracket
-	bounds: 2, 7, 34, 11
+	bounds: 474, 18, 34, 11
 common/mouth-doubt
-	bounds: 103, 16, 26, 15
+	bounds: 101, 19, 26, 15
 common/mouth-fangs
-	bounds: 441, 26, 39, 14
+	bounds: 176, 31, 39, 14
 common/mouth-line
-	bounds: 2, 98, 36, 7
+	bounds: 2, 101, 36, 7
 common/mouth-neutral
-	bounds: 365, 10, 27, 12
+	bounds: 276, 16, 27, 12
 common/mouth-o-tall
-	bounds: 264, 39, 22, 33
+	bounds: 264, 42, 22, 33
 common/mouth-open-smile
-	bounds: 226, 50, 36, 22
+	bounds: 226, 53, 36, 22
 common/mouth-rectangle
-	bounds: 371, 49, 35, 21
+	bounds: 475, 56, 35, 21
 common/mouth-reverse-v
-	bounds: 243, 8, 27, 10
+	bounds: 220, 17, 27, 10
 common/mouth-s
-	bounds: 2, 20, 41, 11
+	bounds: 288, 30, 41, 11
 common/mouth-smile-little
-	bounds: 226, 29, 33, 19
+	bounds: 446, 35, 33, 19
 common/mouth-toungue-sticking-out
-	bounds: 408, 28, 31, 21
+	bounds: 413, 44, 31, 21
 common/mouth-u
-	bounds: 464, 42, 36, 19
+	bounds: 375, 49, 36, 19
 common/mouth-v
-	bounds: 399, 12, 27, 14
+	bounds: 445, 19, 27, 14
 common/mouth-x
-	bounds: 312, 18, 21, 20
+	bounds: 253, 20, 21, 20
 common/purple-fear-lines
-	bounds: 176, 44, 48, 28
+	bounds: 176, 47, 48, 28
 common/shadow
-	bounds: 176, 74, 113, 31
+	bounds: 176, 77, 113, 31
 common/small-dash
-	bounds: 480, 8, 9, 20
-	rotate: 90
+	bounds: 367, 2, 9, 20
 common/small-drop-line
-	bounds: 159, 2, 16, 17
-	rotate: 90
+	bounds: 305, 11, 16, 17
 common/small-purple-fear
-	bounds: 424, 51, 54, 38
-	rotate: 90
+	bounds: 375, 70, 54, 38
 common/tear
-	bounds: 221, 8, 20, 19
+	bounds: 146, 15, 20, 19
 
 chibi-stickers_2.png
 	size: 256, 256
 	filter: Linear, Linear
 	scale: 0.5
 davide/arm
-	bounds: 102, 14, 28, 90
-	rotate: 90
+	bounds: 200, 29, 28, 90
 davide/body
-	bounds: 2, 2, 70, 98
-	rotate: 90
+	bounds: 170, 121, 70, 98
 davide/body-decoration
-	bounds: 2, 187, 6, 28
+	bounds: 2, 191, 6, 28
 davide/eyebrow
-	bounds: 219, 162, 35, 15
+	bounds: 31, 61, 35, 15
 davide/hair-back
-	bounds: 10, 74, 158, 141
+	bounds: 10, 78, 158, 141
 davide/hair-front
-	bounds: 170, 74, 141, 74
-	rotate: 90
+	bounds: 2, 2, 141, 74
 davide/leg
-	bounds: 102, 44, 28, 101
-	rotate: 90
+	bounds: 170, 18, 28, 101
 
 chibi-stickers_3.png
-	size: 1024, 256
+	size: 1024, 512
 	filter: Linear, Linear
 	scale: 0.5
 erikari/arm
-	bounds: 146, 53, 28, 90
-	rotate: 90
+	bounds: 95, 17, 28, 90
 erikari/arm-shoulder-decoration
-	bounds: 656, 45, 32, 43
-	rotate: 90
+	bounds: 445, 53, 32, 43
 erikari/back-hair
-	bounds: 513, 64, 158, 141
-	rotate: 90
+	bounds: 2, 236, 158, 141
 erikari/back-hair-long
-	bounds: 257, 2, 220, 254
+	bounds: 257, 198, 220, 254
 	rotate: 90
 erikari/blush
-	bounds: 985, 70, 29, 18
-erikari/body
-	bounds: 164, 83, 70, 98
-erikari/bracelet
-	bounds: 739, 66, 33, 11
-erikari/collar
-	bounds: 886, 28, 61, 62
-erikari/ear
-	bounds: 949, 46, 34, 42
-erikari/eyebrow
-	bounds: 998, 202, 20, 12
+	bounds: 229, 348, 29, 18
 	rotate: 90
+erikari/body
+	bounds: 412, 98, 70, 98
+erikari/bracelet
+	bounds: 288, 65, 33, 11
+erikari/collar
+	bounds: 2, 45, 61, 62
+erikari/ear
+	bounds: 409, 54, 34, 42
+erikari/eyebrow
+	bounds: 229, 334, 20, 12
 erikari/hair-front
-	bounds: 886, 92, 130, 65
+	bounds: 162, 247, 130, 65
 	rotate: 90
 erikari/hair-side
-	bounds: 953, 90, 43, 132
+	bounds: 364, 2, 43, 132
 erikari/hat-border
-	bounds: 2, 183, 254, 39
+	bounds: 2, 379, 254, 39
 erikari/hat-top
-	bounds: 2, 121, 160, 60
+	bounds: 250, 136, 160, 60
 erikari/head-base
-	bounds: 656, 79, 143, 125
-	rotate: 90
+	bounds: 2, 109, 143, 125
 erikari/leg
-	bounds: 116, 18, 28, 101
+	bounds: 65, 6, 28, 101
 erikari/leg-decoration
-	bounds: 701, 64, 36, 13
+	bounds: 250, 63, 36, 13
 erikari/skirt
-	bounds: 783, 58, 164, 101
+	bounds: 147, 70, 164, 101
 	rotate: 90
 erikari/strawberries-decoration
-	bounds: 2, 63, 112, 56
+	bounds: 250, 78, 112, 56
 
 chibi-stickers_4.png
 	size: 256, 512
 	filter: Linear, Linear
 	scale: 0.5
 harri/arm
-	bounds: 117, 3, 28, 90
-	rotate: 90
+	bounds: 219, 187, 28, 90
 harri/back-hair
-	bounds: 2, 234, 158, 141
+	bounds: 2, 305, 158, 141
 harri/back-hair-long
-	bounds: 141, 33, 40, 80
-	rotate: 90
+	bounds: 147, 197, 40, 80
 harri/beard
-	bounds: 147, 221, 10, 11
+	bounds: 234, 435, 10, 11
 harri/blush
-	bounds: 209, 7, 29, 18
+	bounds: 189, 123, 29, 18
 harri/body
-	bounds: 147, 118, 70, 98
-	rotate: 90
+	bounds: 162, 348, 70, 98
 harri/body-decoration
-	bounds: 2, 38, 70, 67
+	bounds: 162, 279, 70, 67
 harri/ear
-	bounds: 2, 2, 34, 42
-	rotate: 90
+	bounds: 219, 143, 34, 42
 harri/eyebrow
-	bounds: 217, 104, 22, 12
+	bounds: 147, 183, 22, 12
 harri/hair-front
-	bounds: 104, 26, 143, 90
-	rotate: 180
+	bounds: 2, 2, 143, 90
 harri/head-base
-	bounds: 2, 107, 143, 125
+	bounds: 2, 178, 143, 125
 harri/leg
-	bounds: 74, 4, 28, 101
+	bounds: 189, 176, 28, 101
 harri/sword
-	bounds: 162, 190, 185, 82
-	rotate: 90
+	bounds: 2, 94, 185, 82
 
 chibi-stickers_5.png
-	size: 1024, 256
+	size: 2048, 256
 	filter: Linear, Linear
 	scale: 0.5
 luke/arm
-	bounds: 873, 24, 28, 90
+	bounds: 954, 125, 28, 90
 	rotate: 90
 luke/arm-shoulder-decoration
-	bounds: 975, 124, 31, 27
-	rotate: 90
+	bounds: 972, 96, 31, 27
 luke/back-hair
-	bounds: 2, 14, 158, 141
+	bounds: 2, 42, 158, 141
 luke/blush
-	bounds: 975, 93, 29, 18
-	rotate: 90
+	bounds: 681, 82, 29, 18
 luke/body
-	bounds: 873, 57, 70, 98
+	bounds: 609, 2, 70, 98
 luke/eyebrow
-	bounds: 162, 143, 27, 12
+	bounds: 162, 171, 27, 12
 luke/face-cover
-	bounds: 162, 2, 169, 153
+	bounds: 162, 30, 169, 153
 luke/glasses-shadow
-	bounds: 568, 8, 147, 81
-	rotate: 90
+	bounds: 609, 102, 147, 81
 luke/hair-decoration
-	bounds: 459, 25, 130, 107
-	rotate: 90
+	bounds: 477, 76, 130, 107
 luke/hair-front
-	bounds: 814, 33, 122, 57
-	rotate: 90
+	bounds: 848, 53, 122, 57
 luke/head-base
-	bounds: 332, 12, 143, 125
-	rotate: 90
+	bounds: 332, 58, 143, 125
 luke/leg
-	bounds: 945, 54, 28, 101
-luke/shield
-	bounds: 651, 51, 88, 104
-luke/skirt
-	bounds: 651, 18, 81, 31
-luke/sword
-	bounds: 741, 51, 104, 71
+	bounds: 954, 155, 28, 101
 	rotate: 90
+luke/shield
+	bounds: 758, 79, 88, 104
+luke/skirt
+	bounds: 681, 46, 81, 31
+luke/sword
+	bounds: 848, 112, 104, 71
 
 chibi-stickers_6.png
 	size: 256, 512
 	filter: Linear, Linear
 	scale: 0.5
 mario/arm
-	bounds: 203, 34, 28, 90
+	bounds: 177, 107, 28, 90
 mario/back-hair
-	bounds: 2, 244, 168, 148
+	bounds: 2, 292, 168, 148
 mario/back-hair-long
-	bounds: 147, 151, 86, 91
+	bounds: 147, 199, 86, 91
 mario/beard
-	bounds: 141, 2, 147, 93
-	rotate: 270
+	bounds: 2, 2, 147, 93
+	rotate: 180
 mario/blush
-	bounds: 208, 255, 29, 18
+	bounds: 208, 303, 29, 18
 mario/body
-	bounds: 172, 294, 70, 98
+	bounds: 172, 342, 70, 98
 mario/ear
-	bounds: 172, 250, 34, 42
+	bounds: 172, 298, 34, 42
 mario/eyebrow
-	bounds: 208, 275, 32, 17
+	bounds: 208, 323, 32, 17
 mario/hair-front
-	bounds: 2, 49, 137, 66
+	bounds: 2, 97, 137, 66
 mario/head-base
-	bounds: 2, 117, 143, 125
+	bounds: 2, 165, 143, 125
 mario/leg
-	bounds: 2, 19, 28, 101
-	rotate: 90
+	bounds: 147, 96, 28, 101
 
 chibi-stickers_7.png
 	size: 1024, 256
 	filter: Linear, Linear
 	scale: 0.5
 misaki/arm
-	bounds: 915, 102, 28, 90
+	bounds: 32, 65, 28, 90
 misaki/back-hair
-	bounds: 341, 34, 158, 141
-	rotate: 90
+	bounds: 341, 51, 158, 141
 misaki/back-hair-long
 	bounds: 144, 2, 190, 195
 	rotate: 90
 misaki/belt
-	bounds: 945, 116, 76, 26
-	rotate: 90
+	bounds: 62, 129, 76, 26
 misaki/blush
-	bounds: 2, 137, 29, 18
+	bounds: 792, 113, 29, 18
 misaki/body
-	bounds: 764, 94, 70, 98
+	bounds: 898, 94, 70, 98
 misaki/ear
-	bounds: 973, 150, 34, 42
+	bounds: 756, 89, 34, 42
 misaki/eyebrow
-	bounds: 33, 143, 30, 12
+	bounds: 823, 119, 30, 12
 misaki/glasses
 	bounds: 2, 157, 141, 35
 misaki/glasses-side
-	bounds: 65, 147, 8, 23
-	rotate: 90
+	bounds: 855, 108, 8, 23
 misaki/hair-front
-	bounds: 703, 52, 140, 59
-	rotate: 90
+	bounds: 756, 133, 140, 59
 misaki/hair-side
-	bounds: 836, 52, 47, 140
+	bounds: 970, 52, 47, 140
 misaki/head-base
-	bounds: 484, 49, 143, 125
-	rotate: 90
+	bounds: 501, 67, 143, 125
 misaki/leg
-	bounds: 885, 91, 28, 101
+	bounds: 2, 54, 28, 101
 misaki/skirt
-	bounds: 611, 84, 108, 90
-	rotate: 90
+	bounds: 646, 102, 108, 90
 
 chibi-stickers_8.png
 	size: 256, 512
 	filter: Linear, Linear
 	scale: 0.5
 nate/arm
-	bounds: 214, 201, 28, 90
+	bounds: 192, 266, 28, 90
 nate/back-hair
-	bounds: 2, 199, 158, 141
-	rotate: 90
+	bounds: 2, 278, 158, 141
 nate/beard
 	bounds: 2, 2, 147, 68
-	rotate: 180
+	rotate: 90
 nate/blush
-	bounds: 183, 232, 29, 18
+	bounds: 222, 338, 29, 18
 nate/body
-	bounds: 145, 296, 70, 98
+	bounds: 162, 358, 70, 98
 nate/ear
-	bounds: 147, 117, 34, 42
-	rotate: 90
+	bounds: 192, 222, 34, 42
 nate/eyebrow
-	bounds: 179, 218, 27, 12
+	bounds: 222, 324, 27, 12
 nate/glasses
-	bounds: 2, 359, 141, 35
+	bounds: 2, 421, 141, 35
 nate/glasses-side
-	bounds: 196, 256, 8, 16
-	rotate: 90
+	bounds: 145, 440, 8, 16
 nate/hair-front
-	bounds: 147, 152, 142, 65
-	rotate: 90
+	bounds: 72, 84, 142, 65
 nate/head-base
-	bounds: 2, 72, 143, 125
+	bounds: 2, 151, 143, 125
 nate/leg
-	bounds: 217, 293, 28, 101
+	bounds: 162, 255, 28, 101
 
 chibi-stickers_9.png
 	size: 256, 512
 	filter: Linear, Linear
 	scale: 0.5
 sinisa/arm
-	bounds: 209, 71, 28, 90
+	bounds: 192, 314, 28, 90
 sinisa/back-hair
-	bounds: 2, 223, 158, 141
+	bounds: 2, 363, 158, 141
 sinisa/beard
-	bounds: 162, 125, 139, 45
+	bounds: 2, 2, 139, 45
 	rotate: 90
 sinisa/blush
-	bounds: 78, 76, 29, 18
+	bounds: 222, 357, 29, 18
 sinisa/body
-	bounds: 162, 266, 70, 98
+	bounds: 162, 406, 70, 98
 sinisa/body-decoration
-	bounds: 49, 67, 27, 27
+	bounds: 222, 377, 27, 27
 sinisa/ear
-	bounds: 147, 82, 34, 42
+	bounds: 192, 270, 34, 42
 sinisa/eyebrow
-	bounds: 147, 61, 38, 19
+	bounds: 147, 282, 38, 19
 sinisa/hair-front
-	bounds: 2, 2, 143, 92
+	bounds: 2, 142, 143, 92
 sinisa/head-base
-	bounds: 2, 96, 143, 125
+	bounds: 2, 236, 143, 125
 sinisa/leg
-	bounds: 209, 163, 28, 101
+	bounds: 162, 303, 28, 101
 
 chibi-stickers_10.png
 	size: 256, 512
@@ -395,14 +354,13 @@ soeren/back-hair
 soeren/beard
 	bounds: 2, 2, 145, 68
 soeren/blush
-	bounds: 214, 375, 29, 18
+	bounds: 214, 331, 29, 18
 soeren/body
 	bounds: 156, 395, 70, 98
 soeren/ear
-	bounds: 147, 212, 34, 42
-	rotate: 90
+	bounds: 214, 351, 34, 42
 soeren/eyebrow
-	bounds: 214, 361, 27, 12
+	bounds: 214, 317, 27, 12
 soeren/glasses
 	bounds: 2, 456, 152, 37
 soeren/glasses-side
@@ -417,35 +375,32 @@ soeren/leg
 	bounds: 154, 292, 28, 101
 
 chibi-stickers_11.png
-	size: 256, 512
+	size: 512, 256
 	filter: Linear, Linear
 	scale: 0.5
 spineboy/arm
-	bounds: 214, 152, 28, 90
+	bounds: 74, 10, 28, 90
 spineboy/arm-decoration
-	bounds: 148, 93, 32, 29
+	bounds: 104, 27, 32, 29
 spineboy/arm-shoulder-decoration
-	bounds: 147, 219, 23, 23
+	bounds: 484, 129, 23, 23
 spineboy/back-hair
-	bounds: 2, 342, 158, 141
+	bounds: 2, 102, 158, 141
 spineboy/blush
-	bounds: 182, 85, 29, 18
+	bounds: 422, 33, 29, 18
 spineboy/body
-	bounds: 162, 244, 70, 98
+	bounds: 2, 2, 70, 98
 spineboy/ear
-	bounds: 183, 105, 34, 42
-	rotate: 90
+	bounds: 104, 58, 34, 42
 spineboy/eyebrow
-	bounds: 234, 315, 27, 12
-	rotate: 90
+	bounds: 453, 37, 27, 12
 spineboy/glasses
-	bounds: 2, 124, 179, 89
+	bounds: 307, 154, 179, 89
 spineboy/glasses-shadow
-	bounds: 162, 344, 139, 82
-	rotate: 90
+	bounds: 162, 34, 139, 82
 spineboy/hair-front
-	bounds: 2, 2, 145, 120
+	bounds: 307, 32, 145, 120
 spineboy/head-base
-	bounds: 2, 215, 143, 125
+	bounds: 162, 118, 143, 125
 spineboy/leg
-	bounds: 183, 141, 29, 101
+	bounds: 453, 51, 29, 101

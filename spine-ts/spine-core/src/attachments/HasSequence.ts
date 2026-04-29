@@ -31,10 +31,6 @@ import type { SlotPose } from "../SlotPose.js";
 import type { Color } from "../Utils.js"
 import type { Sequence } from "./Sequence.js"
 
-export function isHasSequence (obj: unknown): obj is HasSequence {
-	return !!obj && typeof obj === "object" && "sequence" in obj && "updateSequence" in obj;
-}
-
 /** Interface for an attachment that gets 1 or more texture regions from a {@link Sequence}. */
 export interface HasSequence {
 	/** The base path for the attachment's texture region. */

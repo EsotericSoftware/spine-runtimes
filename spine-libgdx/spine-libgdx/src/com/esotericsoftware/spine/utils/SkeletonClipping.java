@@ -573,7 +573,8 @@ public class SkeletonClipping {
 
 		for (int i = 0;; i += 2) {
 			float edgeX = v[i], edgeY = v[i + 1], ex = edgeX - v[i + 2], ey = edgeY - v[i + 3];
-			int outputStart = output.size, fragmentStart = inverseVertices.size++;
+			int outputStart = output.size, fragmentStart = inverseVertices.size;
+			inverseVertices.add(0);
 			iv = input.items;
 			for (int ii = 0, nn = input.size - 2; ii < nn;) {
 				x1 = iv[ii];

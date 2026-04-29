@@ -28,7 +28,7 @@ class AnimationStateEvents extends StatelessWidget {
             );
           }
         });
-        print("Current: ${controller.animationState.getCurrent(0)?.animation.name}");
+        print("Current: ${controller.animationState.getTrack(0)?.animation.name}");
       },
     );
 

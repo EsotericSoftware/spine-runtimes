@@ -37,7 +37,7 @@ import com.badlogic.gdx.utils.Array;
 public class IkConstraintData extends ConstraintData<IkConstraint, IkConstraintPose> {
 	final Array<BoneData> bones = new Array(true, 2, BoneData[]::new);
 	BoneData target;
-	boolean uniform;
+	ScaleY scaleY = ScaleY.none;
 
 	public IkConstraintData (String name) {
 		super(name, new IkConstraintPose());
@@ -62,13 +62,27 @@ public class IkConstraintData extends ConstraintData<IkConstraint, IkConstraintP
 		this.target = target;
 	}
 
-	/** When true and {@link IkConstraintPose#compress} or {@link IkConstraintPose#stretch} is used, the bone is scaled on both the
-	 * X and Y axes. */
-	public boolean getUniform () {
-		return uniform;
+	/** Determines how the {@link BonePose#scaleY} changes when {@link IkConstraintPose#compress} or
+	 * {@link IkConstraintPose#stretch} set {@link BonePose#scaleX}. */
+	public ScaleY getScaleY () {
+		return scaleY;
 	}
 
-	public void setUniform (boolean uniform) {
-		this.uniform = uniform;
+	public void setScaleY (ScaleY scaleY) {
+		if (scaleY == null) throw new IllegalArgumentException("scaleY cannot be null.");
+		this.scaleY = scaleY;
+	}
+
+	/** Determines how the {@link BonePose#scaleY} changes when {@link IkConstraintPose#compress} or
+	 * {@link IkConstraintPose#stretch} set {@link BonePose#scaleX}. */
+	static public enum ScaleY {
+		/** scaleY is not changed. */
+		none,
+		/** scaleY is multiplied by the scaleX factor, preserving the bone's aspect ratio. */
+		uniform,
+		/** scaleY is divided by the scaleX factor, preserving the bone's area. */
+		volume;
+
+		static public final ScaleY[] values = ScaleY.values();
 	}
 }

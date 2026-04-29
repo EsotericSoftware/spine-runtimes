@@ -472,7 +472,7 @@ namespace Spine {
 		public float GetAbsoluteValue (float time, float alpha, bool fromSetup, bool add, float current, float setup) {
 			if (time < frames[0]) return fromSetup ? setup : current;
 			float value = GetCurveValue(time);
-			return fromSetup ? setup + (value - setup) * alpha : current + (add ? value : value - current) * alpha;
+			return fromSetup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
 		}
 
 		/// <summary>Returns the interpolated value for properties set as absolute values, using the specified timeline value rather than
@@ -484,7 +484,7 @@ namespace Spine {
 		public float GetAbsoluteValue (float time, float alpha, bool fromSetup, bool add, float current, float setup,
 			float value) {
 			if (time < frames[0]) return fromSetup ? setup : current;
-			return fromSetup ? setup + (value - setup) * alpha : current + (add ? value : value - current) * alpha;
+			return fromSetup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
 		}
 
 		/// <summary>Returns the interpolated value for scale properties. The timeline and setup values are multiplied and sign adjusted.</summary>
@@ -1437,13 +1437,15 @@ namespace Spine {
 	}
 
 	/// <summary>Changes <see cref="SlotPose.Deform"/> to deform a <see cref="VertexAttachment"/>.</summary>
-	public class DeformTimeline : SlotCurveTimeline {
+	public class DeformTimeline : CurveTimeline, ISlotTimeline {
+		internal readonly int slotIndex;
 		readonly VertexAttachment attachment;
 		internal float[][] vertices;
 
 		public DeformTimeline (int frameCount, int bezierCount, int slotIndex, VertexAttachment attachment)
-			: base(frameCount, bezierCount, slotIndex,
+			: base(frameCount, bezierCount,
 				  (ulong)Property.Deform << 53 | (ulong)(uint)slotIndex << 32 | (uint)attachment.Id) {
+			this.slotIndex = slotIndex;
 			this.attachment = attachment;
 			vertices = new float[frameCount][];
 			additive = true;
@@ -1451,6 +1453,10 @@ namespace Spine {
 
 		override public int FrameCount {
 			get { return frames.Length; }
+		}
+
+		public int SlotIndex {
+			get { return slotIndex; }
 		}
 
 		/// <summary>The attachment that will be deformed.</summary>
@@ -1531,127 +1537,149 @@ namespace Spine {
 			}
 		}
 
-		override protected void Apply (Slot slot, SlotPose pose, float time, float alpha, bool fromSetup, bool add) {
-			VertexAttachment vertexAttachment = pose.attachment as VertexAttachment;
-			if (vertexAttachment == null || vertexAttachment.TimelineAttachment != attachment) return;
-
-			ExposedList<float> deformArray = pose.deform;
-			if (deformArray.Count == 0) fromSetup = true;
-
-			float[][] vertices = this.vertices;
-			int vertexCount = vertices[0].Length;
-
-			float[] deform;
+		public override void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, bool fromSetup,
+			bool add, bool mixOut, bool appliedPose) {
+			Slot[] slots = skeleton.slots.Items;
+			if (!attachment.IsTimelineActive(slots, slotIndex, appliedPose)) return;
+			int[] timelineSlots = attachment.TimelineSlots;
 
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				if (fromSetup) deformArray.Clear();
+				ApplyBeforeFirst(slots[slotIndex], appliedPose, fromSetup);
+				foreach (int slotIndex in timelineSlots)
+					ApplyBeforeFirst(slots[slotIndex], appliedPose, fromSetup);
 				return;
 			}
 
-			// Ensure size and preemptively set count.
-			if (deformArray.Capacity < vertexCount) deformArray.Capacity = vertexCount;
-			deformArray.Count = vertexCount;
-			deform = deformArray.Items;
+			float[] v1, v2;
+			float percent;
+			if (time >= frames[frames.Length - 1]) {
+				percent = 0;
+				v1 = vertices[frames.Length - 1];
+				v2 = null;
+			} else {
+				int frame = Search(frames, time);
+				percent = GetCurvePercent(time, frame);
+				v1 = vertices[frame];
+				v2 = vertices[frame + 1];
+			}
 
-			if (time >= frames[frames.Length - 1]) { // Time is after last frame.
-				float[] lastVertices = vertices[frames.Length - 1];
+			int vertexCount = vertices[0].Length;
+			ApplyToSlot(slots[slotIndex], appliedPose, v1, v2, percent, vertexCount, alpha, fromSetup, add);
+			foreach (int slotIndex in timelineSlots)
+				ApplyToSlot(slots[slotIndex], appliedPose, v1, v2, percent, vertexCount, alpha, fromSetup, add);
+		}
+
+		private void ApplyBeforeFirst (Slot slot, bool appliedPose, bool fromSetup) {
+			if (!slot.bone.active) return;
+			SlotPose pose = appliedPose ? slot.appliedPose : slot.pose;
+			if (pose.attachment == null || pose.attachment.TimelineAttachment != attachment) return;
+			if (pose.deform.Count == 0) fromSetup = true;
+			if (fromSetup) pose.deform.Clear();
+		}
+
+		private void ApplyToSlot (Slot slot, bool appliedPose, float[] v1, float[] v2, float percent, int vertexCount,
+			float alpha, bool fromSetup, bool add) {
+			if (!slot.bone.active) return;
+			SlotPose pose = appliedPose ? slot.appliedPose : slot.pose;
+			if (pose.attachment == null || pose.attachment.TimelineAttachment != attachment) return;
+
+			var vertexAttachment = (VertexAttachment)pose.attachment;
+			ExposedList<float> deformArray = pose.deform;
+			if (deformArray.Count == 0) fromSetup = true;
+			float[] deform = deformArray.EnsureSize(vertexCount).Items;
+
+			if (v2 == null) { // Time is after last frame.
 				if (alpha == 1) {
 					if (add && !fromSetup) {
-						if (vertexAttachment.bones == null) { // Unweighted vertex positions, no alpha.
-							float[] setupVertices = vertexAttachment.vertices;
+						if (vertexAttachment.Bones == null) { // Unweighted vertex positions, no alpha.
+							float[] setupVertices = vertexAttachment.Vertices;
 							for (int i = 0; i < vertexCount; i++)
-								deform[i] += lastVertices[i] - setupVertices[i];
+								deform[i] += v1[i] - setupVertices[i];
 						} else { // Weighted deform offsets, no alpha.
 							for (int i = 0; i < vertexCount; i++)
-								deform[i] += lastVertices[i];
+								deform[i] += v1[i];
 						}
 					} else // Vertex positions or deform offsets, no alpha.
-						Array.Copy(lastVertices, 0, deform, 0, vertexCount);
+						Array.Copy(v1, 0, deform, 0, vertexCount);
 				} else if (fromSetup) {
-					if (vertexAttachment.bones == null) { // Unweighted vertex positions, with alpha.
-						float[] setupVertices = vertexAttachment.vertices;
+					if (vertexAttachment.Bones == null) { // Unweighted vertex positions, with alpha.
+						float[] setupVertices = vertexAttachment.Vertices;
 						for (int i = 0; i < vertexCount; i++) {
 							float setup = setupVertices[i];
-							deform[i] = setup + (lastVertices[i] - setup) * alpha;
+							deform[i] = setup + (v1[i] - setup) * alpha;
 						}
-					} else { // Weighted deform offsets, alpha.
+					} else { // Weighted deform offsets, with alpha.
 						for (int i = 0; i < vertexCount; i++)
-							deform[i] = lastVertices[i] * alpha;
+							deform[i] = v1[i] * alpha;
 					}
 				} else if (add) {
-					if (vertexAttachment.bones == null) { // Unweighted vertex positions, no alpha.
-						float[] setupVertices = vertexAttachment.vertices;
+					if (vertexAttachment.Bones == null) { // Unweighted vertex positions, with alpha.
+						float[] setupVertices = vertexAttachment.Vertices;
 						for (int i = 0; i < vertexCount; i++)
-							deform[i] += (lastVertices[i] - setupVertices[i]) * alpha;
-					} else { // Weighted deform offsets, alpha.
+							deform[i] += (v1[i] - setupVertices[i]) * alpha;
+					} else { // Weighted deform offsets, with alpha.
 						for (int i = 0; i < vertexCount; i++)
-							deform[i] += lastVertices[i] * alpha;
+							deform[i] += v1[i] * alpha;
 					}
 				} else { // Vertex positions or deform offsets, with alpha.
 					for (int i = 0; i < vertexCount; i++)
-						deform[i] += (lastVertices[i] - deform[i]) * alpha;
+						deform[i] += (v1[i] - deform[i]) * alpha;
 				}
-				return;
-			}
-
-			int frame = Search(frames, time);
-			float percent = GetCurvePercent(time, frame);
-			float[] prevVertices = vertices[frame];
-			float[] nextVertices = vertices[frame + 1];
-
-			if (alpha == 1) {
-				if (add && !fromSetup) {
-					if (vertexAttachment.bones == null) { // Unweighted vertex positions, no alpha.
-						float[] setupVertices = vertexAttachment.vertices;
-						for (int i = 0; i < vertexCount; i++) {
-							float prev = prevVertices[i];
-							deform[i] += prev + (nextVertices[i] - prev) * percent - setupVertices[i];
+			} else { // Between frames.
+				if (alpha == 1) {
+					if (add && !fromSetup) {
+						if (vertexAttachment.Bones == null) { // Unweighted vertex positions, no alpha.
+							float[] setupVertices = vertexAttachment.Vertices;
+							for (int i = 0; i < vertexCount; i++) {
+								float prev = v1[i];
+								deform[i] += prev + (v2[i] - prev) * percent - setupVertices[i];
+							}
+						} else { // Weighted deform offsets, no alpha.
+							for (int i = 0; i < vertexCount; i++) {
+								float prev = v1[i];
+								deform[i] += prev + (v2[i] - prev) * percent;
+							}
 						}
-					} else { // Weighted deform offsets, no alpha.
+					} else if (percent == 0)
+						Array.Copy(v1, 0, deform, 0, vertexCount);
+					else { // Vertex positions or deform offsets, no alpha.
 						for (int i = 0; i < vertexCount; i++) {
-							float prev = prevVertices[i];
-							deform[i] += prev + (nextVertices[i] - prev) * percent;
+							float prev = v1[i];
+							deform[i] = prev + (v2[i] - prev) * percent;
 						}
 					}
-				} else if (percent == 0) {
-					Array.Copy(prevVertices, 0, deform, 0, vertexCount);
-				} else { // Vertex positions or deform offsets, no alpha.
-					for (int i = 0; i < vertexCount; i++) {
-						float prev = prevVertices[i];
-						deform[i] = prev + (nextVertices[i] - prev) * percent;
+				} else if (fromSetup) {
+					if (vertexAttachment.Bones == null) { // Unweighted vertex positions, with alpha.
+						float[] setupVertices = vertexAttachment.Vertices;
+						for (int i = 0; i < vertexCount; i++) {
+							float prev = v1[i], setup = setupVertices[i];
+							deform[i] = setup + (prev + (v2[i] - prev) * percent - setup) * alpha;
+						}
+					} else { // Weighted deform offsets, with alpha.
+						for (int i = 0; i < vertexCount; i++) {
+							float prev = v1[i];
+							deform[i] = (prev + (v2[i] - prev) * percent) * alpha;
+						}
 					}
-				}
-			} else if (fromSetup) {
-				if (vertexAttachment.bones == null) { // Unweighted vertex positions, with alpha.
-					float[] setupVertices = vertexAttachment.vertices;
-					for (int i = 0; i < vertexCount; i++) {
-						float prev = prevVertices[i], setup = setupVertices[i];
-						deform[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
+				} else if (add) {
+					if (vertexAttachment.Bones == null) { // Unweighted vertex positions, with alpha.
+						float[] setupVertices = vertexAttachment.Vertices;
+						for (int i = 0; i < vertexCount; i++) {
+							float prev = v1[i];
+							deform[i] += (prev + (v2[i] - prev) * percent - setupVertices[i]) * alpha;
+						}
+					} else { // Weighted deform offsets, with alpha.
+						for (int i = 0; i < vertexCount; i++) {
+							float prev = v1[i];
+							deform[i] += (prev + (v2[i] - prev) * percent) * alpha;
+						}
 					}
-				} else { // Weighted deform offsets, with alpha.
+				} else { // Vertex positions or deform offsets, with alpha.
 					for (int i = 0; i < vertexCount; i++) {
-						float prev = prevVertices[i];
-						deform[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
+						float prev = v1[i];
+						deform[i] += (prev + (v2[i] - prev) * percent - deform[i]) * alpha;
 					}
-				}
-			} else if (add) {
-				if (vertexAttachment.bones == null) { // Unweighted vertex positions, with alpha.
-					float[] setupVertices = vertexAttachment.vertices;
-					for (int i = 0; i < vertexCount; i++) {
-						float prev = prevVertices[i];
-						deform[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
-					}
-				} else { // Weighted deform offsets, with alpha.
-					for (int i = 0; i < vertexCount; i++) {
-						float prev = prevVertices[i];
-						deform[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
-					}
-				}
-			} else { // Vertex positions or deform offsets, with alpha.
-				for (int i = 0; i < vertexCount; i++) {
-					float prev = prevVertices[i];
-					deform[i] += (prev + (nextVertices[i] - prev) * percent - deform[i]) * alpha;
 				}
 			}
 		}
@@ -1663,13 +1691,13 @@ namespace Spine {
 		private const int MODE = 1, DELAY = 2;
 
 		readonly int slotIndex;
-		readonly IHasSequence attachment;
+		readonly Attachment attachment;
 
 		public SequenceTimeline (int frameCount, int slotIndex, Attachment attachment)
 			: base(frameCount, (ulong)Property.Sequence << 53 | (ulong)(uint)slotIndex << 32
 				  | (uint)((IHasSequence)attachment).Sequence.Id) {
 			this.slotIndex = slotIndex;
-			this.attachment = (IHasSequence)attachment;
+			this.attachment = attachment;
 			instant = true;
 		}
 
@@ -1687,7 +1715,7 @@ namespace Spine {
 		/// <seealso cref="Attachment.TimelineAttachment"/>.
 		public Attachment Attachment {
 			get {
-				return (Attachment)attachment;
+				return attachment;
 			}
 		}
 
@@ -1704,22 +1732,17 @@ namespace Spine {
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, bool fromSetup,
 			bool add, bool mixOut, bool appliedPose) {
 
-			Slot slot = skeleton.slots.Items[slotIndex];
-			if (!slot.bone.active) return;
-			SlotPose pose = appliedPose ? slot.appliedPose : slot.pose;
-
-			Attachment slotAttachment = pose.attachment;
-			IHasSequence hasSequence = slotAttachment as IHasSequence;
-			if ((hasSequence == null) || slotAttachment.TimelineAttachment != attachment) return;
-
-			if (mixOut) {
-				if (fromSetup) pose.SequenceIndex = -1;
-				return;
-			}
+			Slot[] slots = skeleton.slots.Items;
+			if (!attachment.IsTimelineActive(slots, slotIndex, appliedPose)) return;
+			int[] timelineSlots = attachment.TimelineSlots;
 
 			float[] frames = this.frames;
-			if (time < frames[0]) {
-				if (fromSetup) pose.SequenceIndex = -1;
+			if (mixOut || time < frames[0]) {
+				if (fromSetup) {
+					SetupPose(slots[slotIndex], appliedPose);
+					foreach (int slotIndex in timelineSlots)
+						SetupPose(slots[slotIndex], appliedPose);
+				}
 				return;
 			}
 
@@ -1728,7 +1751,24 @@ namespace Spine {
 			int modeAndIndex = (int)frames[i + MODE];
 			float delay = frames[i + DELAY];
 
-			int index = modeAndIndex >> 4, count = hasSequence.Sequence.Regions.Length;
+			ApplyToSlot(slots[slotIndex], appliedPose, time, before, modeAndIndex, delay);
+			foreach (int slotIndex in timelineSlots)
+				ApplyToSlot(slots[slotIndex], appliedPose, time, before, modeAndIndex, delay);
+		}
+
+		private void SetupPose (Slot slot, bool appliedPose) {
+			if (!slot.bone.active) return;
+			SlotPose pose = appliedPose ? slot.appliedPose : slot.pose;
+			if (pose.attachment == null || pose.attachment.TimelineAttachment != attachment) return;
+			pose.SequenceIndex = -1;
+		}
+
+		private void ApplyToSlot (Slot slot, bool appliedPose, float time, float before, int modeAndIndex, float delay) {
+			if (!slot.bone.active) return;
+			SlotPose pose = appliedPose ? slot.appliedPose : slot.pose;
+			if (pose.attachment == null || pose.attachment.TimelineAttachment != attachment) return;
+
+			int index = modeAndIndex >> 4, count = ((IHasSequence)pose.attachment).Sequence.Regions.Length;
 			SequenceMode mode = (SequenceMode)(modeAndIndex & 0xf);
 			if (mode != SequenceMode.Hold) {
 				index += (int)((time - before) / delay + 0.0001f);
@@ -2263,7 +2303,6 @@ namespace Spine {
 		public PathConstraintMixTimeline (int frameCount, int bezierCount, int constraintIndex)
 			: base(frameCount, bezierCount, (ulong)Property.PathConstraintMix << 53 | (uint)constraintIndex) {
 			this.constraintIndex = constraintIndex;
-			additive = true;
 		}
 
 		public override int FrameEntries {
@@ -2585,7 +2624,6 @@ namespace Spine {
 	public class SliderTimeline : ConstraintTimeline1 {
 		public SliderTimeline (int frameCount, int bezierCount, int constraintIndex)
 			: base(frameCount, bezierCount, constraintIndex, Property.SliderTime) {
-			additive = true;
 		}
 
 		/// <param name="events">May be null.</param>

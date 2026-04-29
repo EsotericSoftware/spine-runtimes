@@ -69,6 +69,30 @@ class ClippingAttachment extends VertexAttachment {
         .spine_clipping_attachment_set_end_slot(_ptr, value?.nativePtr.cast() ?? Pointer.fromAddress(0));
   }
 
+  /// When true the clipping polygon is treated as convex for more efficient
+  /// clipping. If the polygon deforms to concave then the convex hull is used.
+  /// When false the clipping polygon can be concave and if so has an additional
+  /// CPU cost. Inverse clipping always uses convex.
+  bool get convex {
+    final result = SpineBindings.bindings.spine_clipping_attachment_get_convex(_ptr);
+    return result;
+  }
+
+  set convex(bool value) {
+    SpineBindings.bindings.spine_clipping_attachment_set_convex(_ptr, value);
+  }
+
+  /// When false, everything inside the clipping polygon is visible. When true,
+  /// everything outside the clipping polygon is visible and clipping is convex.
+  bool get inverse {
+    final result = SpineBindings.bindings.spine_clipping_attachment_get_inverse(_ptr);
+    return result;
+  }
+
+  set inverse(bool value) {
+    SpineBindings.bindings.spine_clipping_attachment_set_inverse(_ptr, value);
+  }
+
   Color get color {
     final result = SpineBindings.bindings.spine_clipping_attachment_get_color(_ptr);
     return Color.fromPointer(result);

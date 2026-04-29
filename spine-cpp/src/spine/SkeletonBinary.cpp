@@ -469,14 +469,14 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 		for (int i = 0; i < n; i++) {
 			LinkedMesh *linkedMesh = items[i];
 			Skin *skin = skeletonData->_skins[linkedMesh->_skinIndex];
-			Attachment *parent = skin->getAttachment(linkedMesh->_slotIndex, linkedMesh->_parent);
-			if (parent == NULL) {
+			Attachment *source = skin->getAttachment(linkedMesh->_sourceIndex, linkedMesh->_source);
+			if (source == NULL) {
 				delete skeletonData;
-				setError("Parent mesh not found: ", linkedMesh->_parent.buffer());
+				setError("Source mesh not found: ", linkedMesh->_source.buffer());
 				return NULL;
 			}
-			linkedMesh->_mesh->setTimelineAttachment(linkedMesh->_inheritTimelines ? static_cast<VertexAttachment *>(parent) : linkedMesh->_mesh);
-			linkedMesh->_mesh->setParentMesh(static_cast<MeshAttachment *>(parent));
+			linkedMesh->_mesh->setTimelineAttachment(linkedMesh->_inheritTimelines ? source : linkedMesh->_mesh);
+			linkedMesh->_mesh->setSourceMesh(static_cast<MeshAttachment *>(source));
 			linkedMesh->_mesh->updateSequence();
 		}
 		ArrayUtils::deleteElements(_linkedMeshes);
@@ -634,6 +634,10 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 			Array<unsigned short> triangles;
 			readUnsignedShortArray(input, triangles, (verticesLength - hullLength - 2) * 3);
 
+			Array<int> timelineSlots;
+			timelineSlots.setSize(input.readInt(true), 0);
+			for (size_t i = 0; i < timelineSlots.size(); ++i) timelineSlots[i] = input.readInt(true);
+
 			Array<unsigned short> edges;
 			float width = 0, height = 0;
 			if (nonessential) {
@@ -652,6 +656,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 			mesh->setWorldVerticesLength(verticesLength);
 			mesh->setRegionUVs(uvs);
 			mesh->setTriangles(triangles);
+			if (timelineSlots.size() > 0) mesh->setTimelineSlots(timelineSlots);
 			if (nonessential) {
 				mesh->setEdges(edges);
 				mesh->setWidth(width * scale);
@@ -665,8 +670,9 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 			int color = (flags & 32) != 0 ? input.readInt() : 0xffffffff;
 			Sequence *sequence = readSequence(input, (flags & 64) != 0);
 			bool inheritTimelines = (flags & 128) != 0;
+			int sourceIndex = input.readInt(true);
 			int skinIndex = input.readInt(true);
-			String parent = input.readStringRef();
+			String source = input.readStringRef();
 			float width = 0, height = 0;
 			if (nonessential) {
 				width = input.readFloat();
@@ -681,7 +687,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 				mesh->setWidth(width * scale);
 				mesh->setHeight(height * scale);
 			}
-			_linkedMeshes.add(new (__FILE__, __LINE__) LinkedMesh(*mesh, skinIndex, slotIndex, parent, inheritTimelines));
+			_linkedMeshes.add(new (__FILE__, __LINE__) LinkedMesh(*mesh, skinIndex, slotIndex, sourceIndex, source, inheritTimelines));
 			return mesh;
 		}
 		case AttachmentType_Path: {
@@ -691,8 +697,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 			Array<int> bones;
 			int verticesLength = readVertices(input, vertices, bones, (flags & 64) != 0);
 			Array<float> lengths;
-			lengths.setSize(verticesLength / 6, 0);
-			for (int i = 0, n = (int) lengths.size(); i < n; i++) lengths[i] = input.readFloat() * scale;
+			readFloatArray(input, verticesLength / 6, scale, lengths);
 			int color = nonessential ? input.readInt() : 0;
 
 			PathAttachment *path = _attachmentLoader->newPathAttachment(skin, name);
@@ -730,6 +735,8 @@ Attachment *SkeletonBinary::readAttachment(DataInput &input, Skin &skin, int slo
 			ClippingAttachment *clip = _attachmentLoader->newClippingAttachment(skin, name);
 			if (!clip) return NULL;
 			clip->setEndSlot(skeletonData._slots[endSlotIndex]);
+			clip->setConvex((flags & 32) != 0);
+			clip->setInverse((flags & 64) != 0);
 			clip->setWorldVerticesLength(verticesLength);
 			clip->setVertices(vertices);
 			clip->setBones(bones);

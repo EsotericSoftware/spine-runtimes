@@ -1,223 +1,209 @@
 food-app.png
-	size: 1024, 1024
+	size: 2048, 2048
 	filter: Linear, Linear
 	scale: 0.4
 cooking/blob-cooking
-	bounds: 457, 369, 408, 338
+	bounds: 386, 388, 408, 338
 cooking/flame-orange-1
-	bounds: 979, 711, 9, 9
+	bounds: 311, 188, 9, 9
 cooking/flame-orange-2
-	bounds: 26, 936, 13, 13
+	bounds: 311, 199, 13, 13
 cooking/flame-orange-3
-	bounds: 26, 951, 12, 16
+	bounds: 311, 214, 12, 16
 cooking/flame-orange-4
-	bounds: 1009, 268, 10, 12
+	bounds: 502, 258, 10, 12
 cooking/flame-orange-5
-	bounds: 968, 710, 9, 10
+	bounds: 483, 175, 9, 10
 cooking/flame-red-1
-	bounds: 292, 28, 20, 22
+	bounds: 990, 610, 20, 22
 cooking/flame-red-2
-	bounds: 441, 10, 32, 34
+	bounds: 2, 701, 32, 34
 cooking/flame-red-3
-	bounds: 922, 10, 31, 36
+	bounds: 2, 737, 31, 36
 cooking/flame-red-4
-	bounds: 123, 219, 25, 30
+	bounds: 2, 636, 25, 30
 cooking/flame-red-5
-	bounds: 468, 150, 24, 28
+	bounds: 210, 20, 24, 28
 cooking/food-piece-1
-	bounds: 556, 23, 18, 18
+	bounds: 108, 20, 18, 18
 cooking/food-piece-2
-	bounds: 123, 189, 26, 28
+	bounds: 182, 20, 26, 28
 cooking/food-piece-3
-	bounds: 532, 23, 22, 18
+	bounds: 84, 20, 22, 18
 cooking/food-piece-4
-	bounds: 576, 26, 18, 15
+	bounds: 1003, 833, 18, 15
 cooking/food-piece-5
-	bounds: 719, 30, 37, 34
+	bounds: 982, 160, 37, 34
 cooking/food-piece-6
-	bounds: 790, 190, 29, 31
+	bounds: 2, 668, 29, 31
 cooking/food-piece-7
-	bounds: 1009, 282, 11, 11
+	bounds: 945, 949, 11, 11
 cooking/pan-front
-	bounds: 570, 284, 170, 83
+	bounds: 330, 187, 170, 83
 cooking/pan-handle
-	bounds: 361, 74, 98, 46
+	bounds: 99, 40, 98, 46
+	rotate: 90
 cooking/pan-handle-knot
-	bounds: 659, 79, 18, 18
+	bounds: 366, 400, 18, 18
 cooking/pan-inside
-	bounds: 399, 281, 169, 86
+	bounds: 671, 200, 169, 86
 delivery/blob-delivery
-	bounds: 457, 709, 449, 310
+	bounds: 386, 728, 449, 310
 delivery/box
-	bounds: 826, 187, 106, 106
+	bounds: 837, 932, 106, 106
 delivery/building
-	bounds: 570, 192, 120, 90
+	bounds: 837, 840, 120, 90
 delivery/building2
-	bounds: 2, 169, 119, 80
+	bounds: 652, 118, 119, 80
 delivery/bush
-	bounds: 190, 71, 89, 56
-	rotate: 90
+	bounds: 906, 493, 89, 56
 delivery/bush-small
-	bounds: 379, 30, 60, 42
+	bounds: 922, 196, 60, 42
 delivery/cloud
-	bounds: 960, 88, 89, 56
-	rotate: 90
+	bounds: 308, 31, 89, 56
 delivery/house-distant
-	bounds: 888, 48, 66, 51
+	bounds: 399, 18, 66, 51
 delivery/house-front
-	bounds: 596, 99, 82, 91
+	bounds: 906, 551, 82, 91
 delivery/lamp-post
-	bounds: 2, 926, 22, 93
+	bounds: 2, 945, 22, 93
 delivery/tree-top
-	bounds: 399, 372, 54, 86
+	bounds: 546, 72, 54, 86
 delivery/tree-trunk
-	bounds: 35, 973, 9, 46
+	bounds: 26, 940, 9, 46
 delivery/wing-back
-	bounds: 532, 43, 55, 50
+	bounds: 535, 20, 55, 50
 delivery/wing-front
-	bounds: 692, 224, 58, 46
-	rotate: 90
+	bounds: 922, 240, 58, 46
 ready/blob-ready
-	bounds: 2, 343, 395, 326
+	bounds: 2, 232, 395, 326
+	rotate: 90
 ready/bottle-base
-	bounds: 311, 205, 78, 136
+	bounds: 842, 150, 78, 136
 ready/bottle-cork
-	bounds: 876, 11, 44, 35
+	bounds: 942, 645, 44, 35
 ready/bottle-liquid-base
-	bounds: 934, 179, 73, 114
+	bounds: 408, 71, 73, 114
 ready/bottle-liquid-top
-	bounds: 475, 25, 55, 16
+	bounds: 959, 850, 55, 16
 ready/bottle-reflection-middle
-	bounds: 942, 711, 12, 9
+	bounds: 366, 389, 12, 9
 ready/bottle-reflection-top
-	bounds: 990, 712, 10, 8
+	bounds: 871, 729, 10, 8
 ready/bottle-top-open
-	bounds: 908, 712, 32, 8
+	bounds: 837, 729, 32, 8
 ready/bottle-wrap
-	bounds: 967, 391, 79, 53
-	rotate: 90
+	bounds: 906, 438, 79, 53
 ready/bread-bottom
-	bounds: 742, 223, 144, 82
-	rotate: 90
+	bounds: 796, 644, 144, 82
 ready/bread-top
-	bounds: 2, 251, 149, 90
+	bounds: 2, 140, 149, 90
 ready/bubble-big
-	bounds: 956, 710, 10, 10
+	bounds: 945, 937, 10, 10
 ready/bubble-small
-	bounds: 1002, 712, 8, 8
+	bounds: 883, 729, 8, 8
 ready/burger-case-base
-	bounds: 908, 836, 183, 114
-	rotate: 90
+	bounds: 330, 272, 183, 114
 ready/burger-case-front
-	bounds: 867, 389, 184, 98
-	rotate: 90
+	bounds: 671, 288, 184, 98
 ready/cheese
-	bounds: 867, 295, 148, 92
+	bounds: 502, 160, 148, 92
 ready/fries-1
-	bounds: 461, 46, 47, 69
-	rotate: 90
+	bounds: 886, 79, 47, 69
 ready/fries-10
-	bounds: 399, 566, 55, 103
+	bounds: 942, 682, 55, 103
+	rotate: 90
 ready/fries-11
-	bounds: 967, 472, 50, 101
+	bounds: 330, 526, 50, 101
 ready/fries-12
-	bounds: 2, 827, 39, 97
+	bounds: 773, 101, 39, 97
 ready/fries-13
-	bounds: 62, 20, 29, 80
-	rotate: 90
+	bounds: 2, 775, 29, 80
 ready/fries-2
-	bounds: 2, 734, 36, 91
+	bounds: 848, 57, 36, 91
 ready/fries-3
-	bounds: 159, 38, 31, 81
-	rotate: 90
+	bounds: 2, 857, 31, 81
 ready/fries-4
-	bounds: 498, 195, 61, 84
+	bounds: 483, 74, 61, 84
 ready/fries-5
-	bounds: 361, 122, 56, 105
-	rotate: 90
+	bounds: 250, 41, 56, 105
 ready/fries-6
-	bounds: 399, 460, 45, 104
+	bounds: 330, 420, 45, 104
 ready/fries-7
-	bounds: 96, 103, 57, 92
-	rotate: 90
+	bounds: 959, 868, 57, 92
 ready/fries-8
-	bounds: 680, 66, 58, 80
-	rotate: 90
+	bounds: 602, 36, 58, 80
 ready/fries-9
-	bounds: 2, 110, 57, 92
-	rotate: 90
+	bounds: 944, 746, 57, 92
 ready/fries-case-back
-	bounds: 908, 722, 108, 112
+	bounds: 796, 388, 108, 112
 ready/fries-case-front
-	bounds: 391, 180, 105, 99
+	bounds: 837, 739, 105, 99
 ready/fries-case-side
-	bounds: 2, 54, 54, 83
-	rotate: 90
+	bounds: 662, 33, 54, 83
 ready/mushroom-1
-	bounds: 762, 41, 66, 47
+	bounds: 886, 30, 66, 47
 ready/mushroom-2
-	bounds: 315, 31, 62, 41
+	bounds: 796, 504, 62, 41
 ready/mushroom-3
-	bounds: 956, 37, 62, 49
+	bounds: 906, 387, 62, 49
 ready/mushroom-4
-	bounds: 87, 51, 70, 50
+	bounds: 483, 2, 70, 50
+	rotate: 90
 ready/olive
-	bounds: 361, 181, 27, 22
+	bounds: 2, 18, 27, 22
 ready/olive-pick
-	bounds: 26, 969, 7, 50
+	bounds: 26, 988, 7, 50
 ready/salad
-	bounds: 153, 259, 156, 82
+	bounds: 153, 148, 156, 82
 ready/sparkle-1
-	bounds: 826, 329, 36, 38
+	bounds: 602, 120, 36, 38
 ready/sparkle-2
-	bounds: 263, 217, 40, 40
+	bounds: 860, 505, 40, 40
 ready/tomato-1
-	bounds: 2, 10, 58, 42
+	bounds: 935, 108, 58, 42
 ready/tomato-2
-	bounds: 2, 10, 58, 42
+	bounds: 935, 108, 58, 42
 ready/tomato-3
-	bounds: 659, 22, 58, 42
+	bounds: 922, 152, 58, 42
 search/blob-list
-	bounds: 46, 671, 409, 348
+	bounds: 36, 629, 409, 348
+	rotate: 90
 search/bread
-	bounds: 248, 52, 65, 54
+	bounds: 718, 45, 65, 54
 search/bubble-base-b
-	bounds: 790, 90, 95, 96
-	rotate: 90
+	bounds: 2, 42, 95, 96
 search/bubble-base-c
-	bounds: 498, 95, 95, 96
-	rotate: 90
+	bounds: 153, 50, 95, 96
 search/bubble-base-m
-	bounds: 263, 108, 95, 96
-	rotate: 90
+	bounds: 311, 89, 95, 96
 search/bubble-base-t
-	bounds: 692, 126, 95, 96
-	rotate: 90
+	bounds: 857, 288, 95, 96
 search/bubble-tail-b
-	bounds: 762, 102, 23, 22
+	bounds: 59, 18, 23, 22
 search/bubble-tail-c
-	bounds: 468, 101, 22, 22
+	bounds: 988, 658, 22, 22
 search/bubble-tail-m
-	bounds: 159, 79, 21, 22
+	bounds: 990, 634, 21, 22
 search/bubble-tail-t
-	bounds: 468, 125, 22, 23
+	bounds: 987, 468, 22, 23
 search/carrot-body
-	bounds: 2, 682, 40, 50
+	bounds: 982, 274, 40, 50
 search/carrot-green
-	bounds: 826, 299, 34, 28
+	bounds: 330, 390, 34, 28
 search/list-base
-	bounds: 867, 575, 154, 132
+	bounds: 515, 254, 154, 132
 search/list-writing
-	bounds: 153, 162, 108, 95
+	bounds: 796, 547, 108, 95
 search/magnifier-holder
-	bounds: 830, 29, 44, 59
+	bounds: 954, 326, 44, 59
 search/magnifier-reflection
-	bounds: 123, 165, 26, 22
+	bounds: 31, 18, 26, 22
 search/magnifier-round
-	bounds: 888, 101, 70, 76
+	bounds: 945, 962, 70, 76
 search/mushroom
-	bounds: 242, 2, 48, 48
+	bounds: 970, 388, 48, 48
 search/tomato-body
-	bounds: 596, 43, 61, 54
+	bounds: 785, 45, 61, 54
 search/tomato-green
-	bounds: 315, 80, 33, 26
+	bounds: 147, 22, 33, 26

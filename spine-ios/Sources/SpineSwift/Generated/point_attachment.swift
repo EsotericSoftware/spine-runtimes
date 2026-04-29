@@ -54,7 +54,7 @@ public class PointAttachment: Attachment {
     public var x: Float {
         get {
             let result = spine_point_attachment_get_x(_ptr.assumingMemoryBound(to: spine_point_attachment_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_point_attachment_set_x(_ptr.assumingMemoryBound(to: spine_point_attachment_wrapper.self), newValue)
@@ -65,7 +65,7 @@ public class PointAttachment: Attachment {
     public var y: Float {
         get {
             let result = spine_point_attachment_get_y(_ptr.assumingMemoryBound(to: spine_point_attachment_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_point_attachment_set_y(_ptr.assumingMemoryBound(to: spine_point_attachment_wrapper.self), newValue)
@@ -76,7 +76,7 @@ public class PointAttachment: Attachment {
     public var rotation: Float {
         get {
             let result = spine_point_attachment_get_rotation(_ptr.assumingMemoryBound(to: spine_point_attachment_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_point_attachment_set_rotation(_ptr.assumingMemoryBound(to: spine_point_attachment_wrapper.self), newValue)
@@ -90,8 +90,7 @@ public class PointAttachment: Attachment {
 
     /// Computes the world rotation from the local rotation.
     public func computeWorldRotation(_ bone: BonePose) -> Float {
-        let result = spine_point_attachment_compute_world_rotation(
-            _ptr.assumingMemoryBound(to: spine_point_attachment_wrapper.self), bone._ptr.assumingMemoryBound(to: spine_bone_pose_wrapper.self))
+        let result = spine_point_attachment_compute_world_rotation(_ptr.assumingMemoryBound(to: spine_point_attachment_wrapper.self), bone._ptr.assumingMemoryBound(to: spine_bone_pose_wrapper.self))
         return result
     }
 

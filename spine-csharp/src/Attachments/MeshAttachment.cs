@@ -50,7 +50,7 @@ namespace Spine {
 		// modifying just a copy of the struct instead of the original
 		// object as in reference implementation.
 		protected Color32F color = new Color32F(1, 1, 1, 1);
-		private MeshAttachment parentMesh;
+		private MeshAttachment sourceMesh;
 
 		public int HullLength { get { return hullLength; } set { hullLength = value; } }
 
@@ -74,10 +74,17 @@ namespace Spine {
 		public string Path { get { return path; } set { path = value; } }
 		public Sequence Sequence { get { return sequence; } }
 
-		public MeshAttachment ParentMesh {
-			get { return parentMesh; }
+		/// <summary>
+		/// The source mesh if this is a linked mesh, else null. A linked mesh shares the
+		/// <see cref="VertexAttachment.Bones">Bones</see>, <see cref="VertexAttachment.Vertices">Vertices</see>,
+		/// <see cref="RegionUVs"/>, <see cref="Triangles"/>, <see cref="HullLength"/>, <see cref="Edges"/>,
+		/// <see cref="Width"/>, <see cref="Height"/> with the
+		/// source mesh, but may have a different <see cref="name"/> or <see cref="path"/>, and therefore a different texture region.
+		/// </summary>
+		public MeshAttachment SourceMesh {
+			get { return sourceMesh; }
 			set {
-				parentMesh = value;
+				sourceMesh = value;
 				if (value != null) {
 					bones = value.bones;
 					vertices = value.vertices;
@@ -111,7 +118,7 @@ namespace Spine {
 		protected MeshAttachment (MeshAttachment other)
 			: base(other) {
 
-			if (parentMesh != null) throw new ArgumentException("Use newLinkedMesh to copy a linked mesh.");
+			if (sourceMesh != null) throw new ArgumentException("Use newLinkedMesh to copy a linked mesh.");
 
 			path = other.path;
 			color = other.color;
@@ -138,20 +145,22 @@ namespace Spine {
 			sequence.Update(this);
 		}
 
-		/// <summary>Returns a new mesh with this mesh set as the <see cref="ParentMesh"/>.
+		/// <summary>
+		/// Returns a new mesh with the <see cref="SourceMesh"/> set to this mesh's source mesh, if any, else to this mesh.
+		/// </summary>
 		public MeshAttachment NewLinkedMesh () {
 			var mesh = new MeshAttachment(Name, new Sequence(sequence));
 
 			mesh.timelineAttachment = timelineAttachment;
 			mesh.path = path;
 			mesh.color = color;
-			mesh.ParentMesh = parentMesh != null ? parentMesh : this;
+			mesh.SourceMesh = sourceMesh != null ? sourceMesh : this;
 			mesh.UpdateSequence();
 			return mesh;
 		}
 
 		public override Attachment Copy () {
-			return parentMesh != null ? NewLinkedMesh() : new MeshAttachment(this);
+			return sourceMesh != null ? NewLinkedMesh() : new MeshAttachment(this);
 		}
 
 		/// <summary>

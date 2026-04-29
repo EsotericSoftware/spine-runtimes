@@ -43,13 +43,11 @@ open class PhysicsConstraintTimeline: CurveTimeline1, ConstraintTimeline {
 
     public var constraintIndex: Int32 {
         get {
-            let result = spine_physics_constraint_timeline_get_constraint_index(
-                _ptr.assumingMemoryBound(to: spine_physics_constraint_timeline_wrapper.self))
-            return result
+            let result = spine_physics_constraint_timeline_get_constraint_index(_ptr.assumingMemoryBound(to: spine_physics_constraint_timeline_wrapper.self))
+        return result
         }
         set {
-            spine_physics_constraint_timeline_set_constraint_index(
-                _ptr.assumingMemoryBound(to: spine_physics_constraint_timeline_wrapper.self), newValue)
+            spine_physics_constraint_timeline_set_constraint_index(_ptr.assumingMemoryBound(to: spine_physics_constraint_timeline_wrapper.self), newValue)
         }
     }
 

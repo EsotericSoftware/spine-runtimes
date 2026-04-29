@@ -1,32 +1,32 @@
 1-weight-and-mass-pma.png
-	size: 1024, 512
+	size: 1024, 1024
 	filter: Linear, Linear
 	pma: true
 	scale: 0.5
 beach-ball
-	bounds: 678, 55, 286, 286
+	bounds: 248, 342, 286, 286
 blue-rubber-ball
-	bounds: 534, 39, 103, 103
+	bounds: 641, 450, 103, 103
 cast-shadow-beach
-	bounds: 2, 69, 286, 73
+	bounds: 536, 555, 286, 73
 cast-shadow-blue
-	bounds: 175, 18, 110, 49
+	bounds: 675, 379, 110, 49
 cast-shadow-iron
-	bounds: 175, 18, 110, 49
+	bounds: 675, 379, 110, 49
 cast-shadow-red
-	bounds: 639, 2, 137, 51
+	bounds: 536, 397, 137, 51
 ground-bg
-	bounds: 50, 144, 626, 197
-ground-cover
-	bounds: 2, 8, 171, 59
-red-rubber-ball
-	bounds: 290, 5, 137, 137
-rock
-	bounds: 966, 297, 44, 38
+	bounds: 49, 2, 626, 197
 	rotate: 90
+ground-cover
+	bounds: 746, 430, 171, 59
+red-rubber-ball
+	bounds: 824, 491, 137, 137
+rock
+	bounds: 963, 590, 44, 38
 steel-ball
-	bounds: 429, 39, 103, 103
+	bounds: 536, 450, 103, 103
 stick
-	bounds: 26, 207, 22, 134
+	bounds: 26, 494, 22, 134
 sword
-	bounds: 2, 203, 22, 138
+	bounds: 2, 490, 22, 138

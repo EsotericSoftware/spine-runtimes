@@ -202,7 +202,8 @@ namespace spine {
 		/// @return May be NULL.
 		Bone *findBone(const String &boneName);
 
-		/// The skeleton's slots. To add a slot, also add it to DrawOrder::getPose().
+		/// The skeleton's slots in setup pose order. To change the order use DrawOrder::getPose(). For rendering use
+		/// DrawOrder::getAppliedPose().
 		Array<Slot *> &getSlots();
 
 		/// @return May be NULL.

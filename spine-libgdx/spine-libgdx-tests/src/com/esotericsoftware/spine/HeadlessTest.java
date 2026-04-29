@@ -41,6 +41,80 @@ import com.esotericsoftware.spine.utils.SkeletonSerializer;
 
 public class HeadlessTest implements ApplicationListener {
 	private String skeletonPath;
+
+	private static String quote (String value) {
+		return value == null ? "null" : "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
+	}
+
+	private static void appendBonePoseJson (StringBuilder sb, BonePose pose) {
+		sb.append('{');
+		sb.append("\"x\":").append(pose.x).append(',');
+		sb.append("\"y\":").append(pose.y).append(',');
+		sb.append("\"rotation\":").append(pose.rotation).append(',');
+		sb.append("\"scaleX\":").append(pose.scaleX).append(',');
+		sb.append("\"scaleY\":").append(pose.scaleY).append(',');
+		sb.append("\"shearX\":").append(pose.shearX).append(',');
+		sb.append("\"shearY\":").append(pose.shearY).append(',');
+		sb.append("\"a\":").append(pose.a).append(',');
+		sb.append("\"b\":").append(pose.b).append(',');
+		sb.append("\"c\":").append(pose.c).append(',');
+		sb.append("\"d\":").append(pose.d).append(',');
+		sb.append("\"worldX\":").append(pose.worldX).append(',');
+		sb.append("\"worldY\":").append(pose.worldY).append(',');
+		sb.append("\"worldRotationX\":").append(pose.getWorldRotationX()).append(',');
+		sb.append("\"worldRotationY\":").append(pose.getWorldRotationY()).append(',');
+		sb.append("\"worldScaleX\":").append(pose.getWorldScaleX()).append(',');
+		sb.append("\"worldScaleY\":").append(pose.getWorldScaleY());
+		sb.append('}');
+	}
+
+	private static void appendSlotPoseJson (StringBuilder sb, SlotPose pose) {
+		sb.append('{');
+		sb.append("\"attachment\":").append(quote(pose.attachment == null ? null : pose.attachment.getName())).append(',');
+		sb.append("\"sequenceIndex\":").append(pose.sequenceIndex).append(',');
+		sb.append("\"color\":{");
+		sb.append("\"r\":").append(pose.color.r).append(',');
+		sb.append("\"g\":").append(pose.color.g).append(',');
+		sb.append("\"b\":").append(pose.color.b).append(',');
+		sb.append("\"a\":").append(pose.color.a).append("}");
+		sb.append('}');
+	}
+
+	private static String serializeSkeletonFrame (Skeleton skeleton, int frame) {
+		StringBuilder sb = new StringBuilder();
+		sb.append('{');
+		sb.append("\"frame\":").append(frame).append(',');
+		sb.append("\"time\":").append(skeleton.time).append(',');
+		sb.append("\"bones\":[");
+		for (int i = 0; i < skeleton.bones.size; i++) {
+			if (i > 0) sb.append(',');
+			Bone bone = skeleton.bones.get(i);
+			sb.append('{');
+			sb.append("\"name\":").append(quote(bone.data.name)).append(',');
+			sb.append("\"pose\":");
+			appendBonePoseJson(sb, bone.pose);
+			sb.append(',');
+			sb.append("\"appliedPose\":");
+			appendBonePoseJson(sb, bone.appliedPose);
+			sb.append('}');
+		}
+		sb.append("],\"slots\":[");
+		for (int i = 0; i < skeleton.slots.size; i++) {
+			if (i > 0) sb.append(',');
+			Slot slot = skeleton.slots.get(i);
+			sb.append('{');
+			sb.append("\"name\":").append(quote(slot.data.name)).append(',');
+			sb.append("\"pose\":");
+			appendSlotPoseJson(sb, slot.pose);
+			sb.append(',');
+			sb.append("\"appliedPose\":");
+			appendSlotPoseJson(sb, slot.appliedPose);
+			sb.append('}');
+		}
+		sb.append("]}");
+		return sb.toString();
+	}
+
 	private String atlasPath;
 	private String animationName;
 	private String animationName2;
@@ -169,6 +243,33 @@ public class HeadlessTest implements ApplicationListener {
 			if (state != null) {
 				System.out.println("\n=== ANIMATION STATE ===");
 				System.out.println(serializer.serializeAnimationState(state));
+			}
+
+			// Full animation sampling: if a single animation is provided, sample skeleton state for every
+			// frame across the full non-looping animation duration at 60 FPS.
+			if (state != null && animationName2 == null) {
+				Animation animation = skeletonData.findAnimation(animationName);
+				if (animation == null) {
+					System.err.println("Animation not found: " + animationName);
+					System.exit(1);
+				}
+
+				skeleton.setupPose();
+				state.clearTracks();
+				state.setAnimation(0, animation, false);
+				state.apply(skeleton);
+				skeleton.updateWorldTransform(Physics.update);
+
+				int frameCount = (int)Math.ceil(animation.getDuration() * 60f);
+				for (int i = 0; i <= frameCount; i++) {
+					if (i > 0) {
+						state.update(1 / 60f);
+						state.apply(skeleton);
+						skeleton.updateWorldTransform(Physics.update);
+					}
+					System.out.println("\n=== ANIMATION FRAME " + i + " ===");
+					System.out.println(serializeSkeletonFrame(skeleton, i));
+				}
 			}
 
 			// Transition test: if a second animation is provided, play A for 10 frames, transition to B,

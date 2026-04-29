@@ -58,10 +58,10 @@ class MeshAttachment extends VertexAttachment implements HasSequence {
 	/** The color to tint the mesh. */
 	public var color:Color = new Color(1, 1, 1, 1);
 
-	/** The parent mesh if this is a linked mesh, else null. A linked mesh shares the #bones, #vertices,
+	/** The source mesh if this is a linked mesh, else null. A linked mesh shares the #bones, #vertices,
 	 * #regionUVs, #triangles, #hullLength, #edges, #width, and #height with the
-	 * parent mesh, but may have a different #name or #path (and therefore a different texture). */
-	private var _parentMesh:MeshAttachment;
+	 * source mesh, but may have a different #name or #path (and therefore a different texture). */
+	private var _sourceMesh:MeshAttachment;
 
 	/** Vertex index pairs describing edges for controlling triangulation, or null if nonessential data was not exported. Mesh
 	 * triangles never cross edges. Triangulation is not performed at runtime. */
@@ -81,7 +81,7 @@ class MeshAttachment extends VertexAttachment implements HasSequence {
 	}
 
 	override public function copy():Attachment {
-		if (_parentMesh != null)
+		if (_sourceMesh != null)
 			return newLinkedMesh();
 
 		var copy = new MeshAttachment(name, sequence.copy());
@@ -108,36 +108,36 @@ class MeshAttachment extends VertexAttachment implements HasSequence {
 		sequence.update(this);
 	}
 
-	public var parentMesh(get, set):MeshAttachment;
+	public var sourceMesh(get, set):MeshAttachment;
 
-	private function get_parentMesh():MeshAttachment {
-		return _parentMesh;
+	private function get_sourceMesh():MeshAttachment {
+		return _sourceMesh;
 	}
 
-	private function set_parentMesh(parentMesh:MeshAttachment):MeshAttachment {
-		_parentMesh = parentMesh;
-		if (parentMesh != null) {
-			bones = parentMesh.bones;
-			vertices = parentMesh.vertices;
-			worldVerticesLength = parentMesh.worldVerticesLength;
-			regionUVs = parentMesh.regionUVs;
-			triangles = parentMesh.triangles;
-			hullLength = parentMesh.hullLength;
-			edges = parentMesh.edges;
-			width = parentMesh.width;
-			height = parentMesh.height;
+	private function set_sourceMesh(sourceMesh:MeshAttachment):MeshAttachment {
+		_sourceMesh = sourceMesh;
+		if (sourceMesh != null) {
+			bones = sourceMesh.bones;
+			vertices = sourceMesh.vertices;
+			worldVerticesLength = sourceMesh.worldVerticesLength;
+			regionUVs = sourceMesh.regionUVs;
+			triangles = sourceMesh.triangles;
+			hullLength = sourceMesh.hullLength;
+			edges = sourceMesh.edges;
+			width = sourceMesh.width;
+			height = sourceMesh.height;
 		}
-		return _parentMesh;
+		return _sourceMesh;
 	}
 
-	/** Returns a new mesh with the parentMesh set to this mesh's parent mesh, if any, else to this mesh. */
+	/** Returns a new mesh with the sourceMesh set to this mesh's source mesh, if any, else to this mesh. */
 	public function newLinkedMesh():MeshAttachment {
 		var copy = new MeshAttachment(name, sequence.copy());
 		copy.rendererObject = rendererObject;
 		copy.timelineAttachment = timelineAttachment;
 		copy.path = path;
 		copy.color.setFromColor(color);
-		copy.parentMesh = _parentMesh != null ? _parentMesh : this;
+		copy.sourceMesh = _sourceMesh != null ? _sourceMesh : this;
 		copy.updateSequence();
 		return copy;
 	}

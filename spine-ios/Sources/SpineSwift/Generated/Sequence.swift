@@ -67,7 +67,7 @@ public class Sequence: NSObject {
     public var start: Int32 {
         get {
             let result = spine_sequence_get_start(_ptr.assumingMemoryBound(to: spine_sequence_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_sequence_set_start(_ptr.assumingMemoryBound(to: spine_sequence_wrapper.self), newValue)
@@ -79,7 +79,7 @@ public class Sequence: NSObject {
     public var digits: Int32 {
         get {
             let result = spine_sequence_get_digits(_ptr.assumingMemoryBound(to: spine_sequence_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_sequence_set_digits(_ptr.assumingMemoryBound(to: spine_sequence_wrapper.self), newValue)
@@ -90,7 +90,7 @@ public class Sequence: NSObject {
     public var setupIndex: Int32 {
         get {
             let result = spine_sequence_get_setup_index(_ptr.assumingMemoryBound(to: spine_sequence_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_sequence_set_setup_index(_ptr.assumingMemoryBound(to: spine_sequence_wrapper.self), newValue)
@@ -111,8 +111,7 @@ public class Sequence: NSObject {
 
     /// Returns the getRegions() index for SlotPose::getSequenceIndex().
     public func resolveIndex(_ pose: SlotPose) -> Int32 {
-        let result = spine_sequence_resolve_index(
-            _ptr.assumingMemoryBound(to: spine_sequence_wrapper.self), pose._ptr.assumingMemoryBound(to: spine_slot_pose_wrapper.self))
+        let result = spine_sequence_resolve_index(_ptr.assumingMemoryBound(to: spine_sequence_wrapper.self), pose._ptr.assumingMemoryBound(to: spine_slot_pose_wrapper.self))
         return result
     }
 
@@ -145,13 +144,11 @@ public class Sequence: NSObject {
     /// Computes UVs and offsets for the specified attachment. Must be called if the regions or
     /// attachment properties are changed.
     public func update(_ attachment: RegionAttachment) {
-        spine_sequence_update_1(
-            _ptr.assumingMemoryBound(to: spine_sequence_wrapper.self), attachment._ptr.assumingMemoryBound(to: spine_region_attachment_wrapper.self))
+        spine_sequence_update_1(_ptr.assumingMemoryBound(to: spine_sequence_wrapper.self), attachment._ptr.assumingMemoryBound(to: spine_region_attachment_wrapper.self))
     }
 
     public func update2(_ attachment: MeshAttachment) {
-        spine_sequence_update_2(
-            _ptr.assumingMemoryBound(to: spine_sequence_wrapper.self), attachment._ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self))
+        spine_sequence_update_2(_ptr.assumingMemoryBound(to: spine_sequence_wrapper.self), attachment._ptr.assumingMemoryBound(to: spine_mesh_attachment_wrapper.self))
     }
 
     public func dispose() {

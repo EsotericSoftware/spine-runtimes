@@ -40,7 +40,7 @@
 #endif
 
 #if UNITY_6000_3_OR_NEWER
-#define GET_ASSET_PATH_USES_ENTITY_ID
+#define USES_ENTITY_ID
 #endif
 
 using UnityEditor;
@@ -108,7 +108,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static bool IsSkeletonTexturePMA (Texture texture, string skeletonName, out bool detectionSucceeded) {
-#if GET_ASSET_PATH_USES_ENTITY_ID
+#if USES_ENTITY_ID
 			string texturePath = AssetDatabase.GetAssetPath(texture.GetEntityId());
 #else
 			string texturePath = AssetDatabase.GetAssetPath(texture.GetInstanceID());

@@ -44,6 +44,7 @@ class DrawOrderTimeline extends Timeline {
 		super(frameCount, Property.drawOrder);
 		drawOrders = new Array<Array<Int>>();
 		drawOrders.resize(frameCount);
+		this.instant = true;
 	}
 
 	public var frameCount(get, never):Int;

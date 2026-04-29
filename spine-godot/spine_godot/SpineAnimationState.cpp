@@ -43,7 +43,7 @@ void SpineAnimationState::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_empty_animation", "track_id", "mix_duration"), &SpineAnimationState::set_empty_animation);
 	ClassDB::bind_method(D_METHOD("add_empty_animation", "track_id", "mix_duration", "delay"), &SpineAnimationState::add_empty_animation);
 	ClassDB::bind_method(D_METHOD("set_empty_animations", "mix_duration"), &SpineAnimationState::set_empty_animations);
-	ClassDB::bind_method(D_METHOD("get_current", "track_id"), &SpineAnimationState::get_current);
+	ClassDB::bind_method(D_METHOD("get_track", "track_id"), &SpineAnimationState::get_track);
 	ClassDB::bind_method(D_METHOD("get_time_scale"), &SpineAnimationState::get_time_scale);
 	ClassDB::bind_method(D_METHOD("set_time_scale", "time_scale"), &SpineAnimationState::set_time_scale);
 	ClassDB::bind_method(D_METHOD("disable_queue"), &SpineAnimationState::disable_queue);
@@ -143,9 +143,9 @@ void SpineAnimationState::set_empty_animations(float mix_duration) {
 	animation_state->setEmptyAnimations(mix_duration);
 }
 
-Ref<SpineTrackEntry> SpineAnimationState::get_current(int track_index) {
+Ref<SpineTrackEntry> SpineAnimationState::get_track(int track_index) {
 	SPINE_CHECK(animation_state, nullptr)
-	auto track_entry = animation_state->getCurrent(track_index);
+	auto track_entry = animation_state->getTrack(track_index);
 	if (!track_entry) return nullptr;
 	Ref<SpineTrackEntry> track_entry_ref(memnew(SpineTrackEntry));
 	track_entry_ref->set_spine_object(sprite, track_entry);

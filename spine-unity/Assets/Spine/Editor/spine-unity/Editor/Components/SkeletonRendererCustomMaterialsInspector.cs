@@ -86,7 +86,7 @@ namespace Spine.Unity.Editor {
 				Type cm = typeof(SkeletonRendererCustomMaterials);
 				componentCustomMaterialOverrides = cm.GetField("customMaterialOverrides", PrivateInstance).GetValue(component) as List<SkeletonRendererCustomMaterials.AtlasMaterialOverride>;
 				componentCustomSlotMaterials = cm.GetField("customSlotMaterials", PrivateInstance).GetValue(component) as List<SkeletonRendererCustomMaterials.SlotMaterialOverride>;
-				if (componentCustomMaterialOverrides == null) {
+				if (componentCustomMaterialOverrides == null || componentCustomSlotMaterials == null) {
 					Debug.Log("Reflection failed.");
 					return;
 				}

@@ -48,15 +48,13 @@ public class Bone: PosedActive, Posed, Update {
 
     /// - Parameter parent: May be NULL.
     public convenience init(_ data: BoneData, _ parent: Bone?) {
-        let ptr = spine_bone_create(
-            data._ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self), parent?._ptr.assumingMemoryBound(to: spine_bone_wrapper.self))
+        let ptr = spine_bone_create(data._ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self), parent?._ptr.assumingMemoryBound(to: spine_bone_wrapper.self))
         self.init(fromPointer: ptr!)
     }
 
     /// Copy constructor. Does not copy the child bones.
     public static func from(_ bone: Bone, _ parent: Bone?) -> Bone {
-        let ptr = spine_bone_create2(
-            bone._ptr.assumingMemoryBound(to: spine_bone_wrapper.self), parent?._ptr.assumingMemoryBound(to: spine_bone_wrapper.self))
+        let ptr = spine_bone_create2(bone._ptr.assumingMemoryBound(to: spine_bone_wrapper.self), parent?._ptr.assumingMemoryBound(to: spine_bone_wrapper.self))
         return Bone(fromPointer: ptr!)
     }
 
@@ -111,9 +109,7 @@ public class Bone: PosedActive, Posed, Update {
     }
 
     public func update(_ skeleton: Skeleton, _ physics: Physics) {
-        spine_bone_update(
-            _ptr.assumingMemoryBound(to: spine_bone_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self),
-            spine_physics(rawValue: UInt32(physics.rawValue)))
+        spine_bone_update(_ptr.assumingMemoryBound(to: spine_bone_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self), spine_physics(rawValue: UInt32(physics.rawValue)))
     }
 
     /// Sets the constrained pose to the unconstrained pose, as a starting point for constraints to

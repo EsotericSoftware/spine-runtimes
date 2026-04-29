@@ -163,4 +163,5 @@ void VertexAttachment::copyTo(VertexAttachment &other) {
 	other._vertices.clearAndAddAll(this->_vertices);
 	other._worldVerticesLength = this->_worldVerticesLength;
 	other.setTimelineAttachment(this->getTimelineAttachment());
+	other.setTimelineSlots(this->getTimelineSlots());
 }

@@ -58,7 +58,7 @@ public class EventData: NSObject {
     public var audioPath: String {
         get {
             let result = spine_event_data_get_audio_path(_ptr.assumingMemoryBound(to: spine_event_data_wrapper.self))
-            return String(cString: result!)
+        return String(cString: result!)
         }
         set {
             spine_event_data_set_audio_path(_ptr.assumingMemoryBound(to: spine_event_data_wrapper.self), newValue)

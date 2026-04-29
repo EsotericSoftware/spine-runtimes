@@ -31,22 +31,22 @@ import type { Pose } from "./Pose"
 
 /** Stores a pose for a transform constraint. */
 export class TransformConstraintPose implements Pose<TransformConstraintPose> {
-	/** A percentage that controls the mix between the constrained and unconstrained rotation. */
+	/** A percentage (unbounded) that controls the mix between the constrained and unconstrained rotation. */
 	mixRotate = 0;
 
-	/** A percentage that controls the mix between the constrained and unconstrained translation X. */
+	/** A percentage (unbounded) that controls the mix between the constrained and unconstrained translation X. */
 	mixX = 0;
 
-	/** A percentage that controls the mix between the constrained and unconstrained translation Y. */
+	/** A percentage (unbounded) that controls the mix between the constrained and unconstrained translation Y. */
 	mixY = 0;
 
-	/** A percentage that controls the mix between the constrained and unconstrained scale X. */
+	/** A percentage (unbounded) that controls the mix between the constrained and unconstrained scale X. */
 	mixScaleX = 0;
 
-	/** A percentage that controls the mix between the constrained and unconstrained scale X. */
+	/** A percentage (unbounded) that controls the mix between the constrained and unconstrained scale Y. */
 	mixScaleY = 0;
 
-	/** A percentage that controls the mix between the constrained and unconstrained shear Y. */
+	/** A percentage (unbounded) that controls the mix between the constrained and unconstrained shear Y. */
 	mixShearY = 0;
 
 	public set (pose: TransformConstraintPose) {

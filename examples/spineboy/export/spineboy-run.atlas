@@ -1,48 +1,44 @@
 spineboy-run.png
-	size: 1765, 546
+	size: 1826, 634
 	filter: Linear, Linear
 	pma: true
 spineboy-pro-run
 	index: 8
-	bounds: 2, 230, 302, 314
+	bounds: 914, 2, 302, 314
 	offsets: 12, 22, 316, 341
 spineboy-pro-run
-	index: 9
-	bounds: 306, 219, 278, 325
-	offsets: 30, 2, 316, 341
+	index: 8
+	bounds: 914, 2, 302, 314
+	offsets: 12, 22, 316, 341
 spineboy-pro-run
-	index: 0
-	bounds: 610, 224, 245, 320
-	offsets: 67, 1, 316, 341
+	index: 8
+	bounds: 914, 2, 302, 314
+	offsets: 12, 22, 316, 341
 spineboy-pro-run
-	index: 3
-	bounds: 914, 225, 242, 319
-	offsets: 12, 21, 316, 341
+	index: 8
+	bounds: 914, 2, 302, 314
+	offsets: 12, 22, 316, 341
 spineboy-pro-run
-	index: 4
-	bounds: 1218, 225, 240, 319
-	offsets: 3, 5, 316, 341
+	index: 8
+	bounds: 914, 2, 302, 314
+	offsets: 12, 22, 316, 341
 spineboy-pro-run
-	index: 5
-	bounds: 1522, 228, 241, 316
-	offsets: 8, 3, 316, 341
+	index: 8
+	bounds: 914, 2, 302, 314
+	offsets: 12, 22, 316, 341
 spineboy-pro-run
-	index: 2
-	bounds: 2, 2, 226, 306
-	offsets: 34, 26, 316, 341
-	rotate: 90
+	index: 8
+	bounds: 914, 2, 302, 314
+	offsets: 12, 22, 316, 341
 spineboy-pro-run
-	index: 7
-	bounds: 310, 2, 226, 296
-	offsets: 37, 33, 316, 341
-	rotate: 90
+	index: 8
+	bounds: 914, 2, 302, 314
+	offsets: 12, 22, 316, 341
 spineboy-pro-run
-	index: 6
-	bounds: 618, 34, 194, 315
-	offsets: 68, 5, 316, 341
-	rotate: 90
+	index: 8
+	bounds: 914, 2, 302, 314
+	offsets: 12, 22, 316, 341
 spineboy-pro-run
-	index: 1
-	bounds: 926, 36, 192, 318
-	offsets: 69, 3, 316, 341
-	rotate: 90
+	index: 8
+	bounds: 914, 2, 302, 314
+	offsets: 12, 22, 316, 341

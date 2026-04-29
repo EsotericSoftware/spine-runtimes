@@ -61,12 +61,10 @@ public class IkConstraintData: PosedData, ConstraintData {
     public var target: BoneData {
         get {
             let result = spine_ik_constraint_data_get_target(_ptr.assumingMemoryBound(to: spine_ik_constraint_data_wrapper.self))
-            return BoneData(fromPointer: result!)
+        return BoneData(fromPointer: result!)
         }
         set {
-            spine_ik_constraint_data_set_target(
-                _ptr.assumingMemoryBound(to: spine_ik_constraint_data_wrapper.self),
-                newValue._ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self))
+            spine_ik_constraint_data_set_target(_ptr.assumingMemoryBound(to: spine_ik_constraint_data_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self))
         }
     }
 
@@ -75,7 +73,7 @@ public class IkConstraintData: PosedData, ConstraintData {
     public var uniform: Bool {
         get {
             let result = spine_ik_constraint_data_get_uniform(_ptr.assumingMemoryBound(to: spine_ik_constraint_data_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_ik_constraint_data_set_uniform(_ptr.assumingMemoryBound(to: spine_ik_constraint_data_wrapper.self), newValue)
@@ -89,8 +87,7 @@ public class IkConstraintData: PosedData, ConstraintData {
     }
 
     public func createMethod(_ skeleton: Skeleton) -> Constraint {
-        let result = spine_ik_constraint_data_create_method(
-            _ptr.assumingMemoryBound(to: spine_ik_constraint_data_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
+        let result = spine_ik_constraint_data_create_method(_ptr.assumingMemoryBound(to: spine_ik_constraint_data_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
         let rtti = spine_constraint_get_rtti(result!)
         let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
         switch rttiClassName {

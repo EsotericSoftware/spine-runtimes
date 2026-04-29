@@ -32,10 +32,24 @@ using System;
 namespace Spine {
 	public class ClippingAttachment : VertexAttachment {
 		internal SlotData endSlot;
+		internal bool convex, inverse;
 
 		/// <summary>Clipping is performed between the clipping attachment's slot and the end slot. If null, clipping is done until the end of
 		/// the skeleton's rendering.</summary>
 		public SlotData EndSlot { get { return endSlot; } set { endSlot = value; } }
+
+		/// <summary>
+		/// When true the clipping polygon is treated as convex for more efficient clipping. If the polygon deforms to concave then the
+		/// convex hull is used.When false the clipping polygon can be concave and if so has an additional CPU cost.Inverse clipping
+		/// always uses convex.
+		/// </summary>
+		public bool Convex { get { return convex; } set { convex = value; } }
+
+		/// <summary>
+		/// When false, everything inside the clipping polygon is visible. When true, everything outside the clipping polygon is
+		/// visible and clipping is convex.
+		/// </summary>
+		public bool Inverse { get { return inverse; } set { inverse = value; } }
 
 		public ClippingAttachment (string name) : base(name) {
 		}
@@ -44,6 +58,8 @@ namespace Spine {
 		protected ClippingAttachment (ClippingAttachment other)
 			: base(other) {
 			endSlot = other.endSlot;
+			convex = other.convex;
+			inverse = other.inverse;
 		}
 
 		public override Attachment Copy () {

@@ -65,19 +65,25 @@ namespace spine {
 	private:
 		Triangulator _triangulator;
 		Array<float> _clippingPolygon;
+		Array<Array<float> *> _clippingPolygons;
 		Array<float> _clipOutput;
 		Array<float> _clippedVertices;
 		Array<unsigned short> _clippedTriangles;
 		Array<float> _clippedUVs;
+		Array<float> _inverseVertices;
 		Array<float> _scratch;
 		ClippingAttachment *_clipAttachment;
-		Array<Array<float> *> *_clippingPolygons;
+		bool _inverse;
 
 		/** Clips the input triangle against the convex, clockwise clipping area. If the triangle lies entirely within the clipping
 		  * area, false is returned. The clipping area must duplicate the first vertex at the end of the vertices list. */
-		bool clip(float x1, float y1, float x2, float y2, float x3, float y3, Array<float> *clippingArea, Array<float> *output);
+		bool clip(float x1, float y1, float x2, float y2, float x3, float y3, Array<float> *polygon);
 
-		static void makeClockwise(Array<float> &polygon);
+		void clipInverse(float x1, float y1, float x2, float y2, float x3, float y3, Array<float> *polygon);
+
+		static bool makeClockwise(Array<float> &polygon);
+
+		void makeConvex(Array<float> &polygon);
 	};
 }
 

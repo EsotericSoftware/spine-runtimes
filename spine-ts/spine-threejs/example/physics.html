@@ -18,6 +18,20 @@
         width: 100%;
         height: 100%;
       }
+
+      #instructions {
+        position: absolute;
+        left: 12px;
+        top: 12px;
+        z-index: 1;
+        padding: 8px 10px;
+        color: white;
+        background: rgba(0, 0, 0, 0.55);
+        font-family: sans-serif;
+        font-size: 13px;
+        line-height: 1.4;
+        pointer-events: none;
+      }
     </style>
 
     <script type="importmap">
@@ -32,6 +46,11 @@
   </head>
 
   <body>
+    <div id="instructions">
+      Mouse: orbit camera<br />
+      Arrow keys / WASD: move Celeste<br />
+      Shift: move faster
+    </div>
     <script type="module">
       import * as THREE from "three";
       import * as spine from "spine-threejs";
@@ -43,6 +62,8 @@
       let canvas;
       let controls;
       let lastFrameTime = Date.now() / 1000;
+      let pressedKeys = Object.create(null);
+      const moveSpeed = 500;
 
       let baseUrl = "/assets/";
       let skeletonFile = "celestial-circus-pro.json";
@@ -62,7 +83,16 @@
         canvas = renderer.domElement;
         controls = new OrbitControls(camera, renderer.domElement);
 
-        // load the assets required to display the Raptor model
+        window.addEventListener("keydown", (event) => {
+          pressedKeys[event.code] = true;
+          if (event.code.startsWith("Arrow")) event.preventDefault();
+        });
+        window.addEventListener("keyup", (event) => {
+          pressedKeys[event.code] = false;
+          if (event.code.startsWith("Arrow")) event.preventDefault();
+        });
+
+        // load the assets required to display the Celeste model
         assetManager = new spine.AssetManager(baseUrl);
         assetManager.loadText(skeletonFile);
         assetManager.loadTextureAtlas(atlasFile);
@@ -72,7 +102,6 @@
 
       function load(name, scale) {
         if (assetManager.isLoadingComplete()) {
-          // Add a box to the scene to which we attach the skeleton mesh
           geometry = new THREE.BoxGeometry(200, 200, 200);
           material = new THREE.MeshBasicMaterial({
             color: 0xff0000,
@@ -112,7 +141,6 @@
               },
               twoColorTint: false,
             });
-            skeletonMesh.state.setAnimation(0, "swing", true);
             skeletonMesh.state.setAnimation(1, "eyeblink-long", true);
             mesh.add(skeletonMesh);
 
@@ -135,6 +163,8 @@
         // Update orbital controls
         controls.update();
 
+        updateKeyboardMovement(delta);
+
         // update the animation
         skeletonMesh.update(delta);
 
@@ -142,6 +172,18 @@
         renderer.render(scene, camera);
 
         requestAnimationFrame(render);
+      }
+
+      function updateKeyboardMovement(delta) {
+        if (!mesh) return;
+
+        const speed = moveSpeed * (pressedKeys.ShiftLeft || pressedKeys.ShiftRight ? 3 : 1);
+        const distance = speed * delta;
+
+        if (pressedKeys.ArrowLeft || pressedKeys.KeyA) mesh.position.x -= distance;
+        if (pressedKeys.ArrowRight || pressedKeys.KeyD) mesh.position.x += distance;
+        if (pressedKeys.ArrowUp || pressedKeys.KeyW) mesh.position.y += distance;
+        if (pressedKeys.ArrowDown || pressedKeys.KeyS) mesh.position.y -= distance;
       }
 
       function resize() {

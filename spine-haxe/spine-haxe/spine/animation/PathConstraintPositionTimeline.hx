@@ -33,6 +33,7 @@ package spine.animation;
 class PathConstraintPositionTimeline extends ConstraintTimeline1 {
 	public function new(frameCount:Int, bezierCount:Int, constraintIndex:Int) {
 		super(frameCount, bezierCount, constraintIndex, Property.pathConstraintPosition);
+		this.additive = true;
 	}
 
 	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,

@@ -32,6 +32,7 @@ package spine;
 import spine.animation.SliderMixTimeline;
 import spine.animation.SliderTimeline;
 import spine.TransformConstraintData;
+import spine.IkConstraintData.ScaleY;
 import haxe.io.Bytes;
 import StringTools;
 import spine.animation.AlphaTimeline;
@@ -204,6 +205,8 @@ class SkeletonBinary {
 			if (nonessential) {
 				data.color.setFromRgba8888(input.readInt32());
 				data.icon = input.readString();
+				data.iconSize = input.readFloat();
+				data.iconRotation = input.readFloat();
 				data.visible = input.readBoolean();
 			}
 			bones.push(data);
@@ -246,7 +249,8 @@ class SkeletonBinary {
 					data.target = bones[input.readInt(true)];
 					var flags = input.readByte();
 					data.skinRequired = (flags & 1) != 0;
-					data.uniform = (flags & 2) != 0;
+					if ((flags & 2) != 0)
+						data.scaleY = ScaleY.values[input.readUnsignedByte()];
 					var setup = data.setupPose;
 					setup.bendDirection = (flags & 4) != 0 ? -1 : 1;
 					setup.compress = (flags & 8) != 0;
@@ -463,11 +467,11 @@ class SkeletonBinary {
 		// Linked meshes.
 		for (linkedMesh in linkedMeshes) {
 			var skin:Skin = skeletonData.skins[linkedMesh.skinIndex];
-			var parent:Attachment = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
-			if (parent == null)
-				throw new SpineException("Parent mesh not found: " + linkedMesh.parent);
-			linkedMesh.mesh.timelineAttachment = linkedMesh.inheritTimeline ? cast(parent, VertexAttachment) : linkedMesh.mesh;
-			linkedMesh.mesh.parentMesh = cast(parent, MeshAttachment);
+			var source:Attachment = skin.getAttachment(linkedMesh.sourceIndex, linkedMesh.source);
+			if (source == null)
+				throw new SpineException("Source mesh not found: " + linkedMesh.source);
+			linkedMesh.mesh.timelineAttachment = linkedMesh.inheritTimelines ? source : linkedMesh.mesh;
+			linkedMesh.mesh.sourceMesh = cast(source, MeshAttachment);
 			linkedMesh.mesh.updateSequence();
 		}
 		linkedMeshes.resize(0);
@@ -492,7 +496,7 @@ class SkeletonBinary {
 		var animations = skeletonData.animations;
 		n = input.readInt(true);
 		for (i in 0...n)
-			animations[i] = readAnimation(input, input.readString(), skeletonData);
+			animations[i] = readAnimation(input, input.readString(), skeletonData, nonessential);
 
 		for (i in 0...constraintCount)
 			if (Std.isOfType(constraints[i], SliderData)) {
@@ -624,6 +628,16 @@ class SkeletonBinary {
 				vertices = readVertices(input, (flags & 128) != 0);
 				var uvs:Array<Float> = readFloatArray(input, vertices.length, 1);
 				var triangles:Array<Int> = readShortArray(input, (vertices.length - hullLength - 2) * 3);
+
+				var slotCount:Int = input.readInt(true);
+				var timelineSlots:Array<Int> = null;
+				if (slotCount > 0) {
+					timelineSlots = new Array<Int>();
+					timelineSlots.resize(slotCount);
+					for (i in 0...slotCount)
+						timelineSlots[i] = input.readInt(true);
+				}
+
 				var edges:Array<Int> = null;
 				if (nonessential) {
 					edges = readShortArray(input, input.readInt(true));
@@ -645,6 +659,8 @@ class SkeletonBinary {
 				mesh.worldVerticesLength = vertices.length;
 				mesh.regionUVs = uvs;
 				mesh.triangles = triangles;
+				if (timelineSlots != null)
+					mesh.timelineSlots = timelineSlots;
 				if (nonessential) {
 					mesh.edges = edges;
 					mesh.width = width * scale;
@@ -659,8 +675,9 @@ class SkeletonBinary {
 				color = (flags & 32) != 0 ? input.readInt32() : 0xffffffff;
 				var sequence = readSequence(input, (flags & 64) != 0);
 				var inheritTimelines:Bool = (flags & 128) != 0;
+				var sourceIndex = input.readInt(true);
 				var skinIndex = input.readInt(true);
-				var parent:String = input.readStringRef();
+				var source:String = input.readStringRef();
 				if (nonessential) {
 					width = input.readFloat();
 					height = input.readFloat();
@@ -675,17 +692,13 @@ class SkeletonBinary {
 					mesh.width = width * scale;
 					mesh.height = height * scale;
 				}
-				this.linkedMeshes.push(new LinkedMeshBinary(mesh, skinIndex, slotIndex, parent, inheritTimelines));
+				this.linkedMeshes.push(new LinkedMeshBinary(mesh, skinIndex, slotIndex, sourceIndex, source, inheritTimelines));
 				return mesh;
 			case AttachmentType.path:
 				var closed:Bool = (flags & 16) != 0;
 				var constantSpeed:Bool = (flags & 32) != 0;
 				vertices = readVertices(input, (flags & 64) != 0);
-				var lengths:Array<Float> = new Array<Float>();
-				lengths.resize(Std.int(vertices.length / 6));
-				for (i in 0...lengths.length) {
-					lengths[i] = input.readFloat() * scale;
-				}
+				var lengths:Array<Float> = readFloatArray(input, Std.int(vertices.length / 6), scale);
 				color = nonessential ? input.readInt32() : 0;
 
 				var pathAttachment:PathAttachment = attachmentLoader.newPathAttachment(skin, name);
@@ -725,6 +738,8 @@ class SkeletonBinary {
 				if (clip == null)
 					return null;
 				clip.endSlot = skeletonData.slots[endSlotIndex];
+				clip.convex = (flags & 32) != 0;
+				clip.inverse = (flags & 64) != 0;
 				clip.worldVerticesLength = vertices.length;
 				clip.vertices = vertices.vertices;
 				if (vertices.bones.length > 0)
@@ -814,7 +829,7 @@ class SkeletonBinary {
 		return array;
 	}
 
-	private function readAnimation(input:BinaryInput, name:String, skeletonData:SkeletonData):Animation {
+	private function readAnimation(input:BinaryInput, name:String, skeletonData:SkeletonData, nonessential:Bool):Animation {
 		input.readInt(true); // Count of timelines.
 		var timelines:Array<Timeline> = new Array<Timeline>();
 		var i:Int = 0, n:Int = 0, ii:Int = 0, nn:Int = 0;
@@ -1366,7 +1381,7 @@ class SkeletonBinary {
 							}
 							timelines.push(deformTimeline);
 						case ATTACHMENT_SEQUENCE:
-							var timeline = new SequenceTimeline(frameCount, slotIndex, cast(attachment, HasSequence));
+							var timeline = new SequenceTimeline(frameCount, slotIndex, attachment);
 							for (frame in 0...frameCount) {
 								var time = input.readFloat();
 								var modeAndIndex = input.readInt32();
@@ -1429,7 +1444,10 @@ class SkeletonBinary {
 		var duration:Float = 0;
 		for (i in 0...timelines.length)
 			duration = Math.max(duration, timelines[i].getDuration());
-		return new Animation(name, timelines, duration);
+		var animation = new Animation(name, timelines, duration);
+		if (nonessential)
+			animation.color.setFromRgba8888(input.readInt32());
+		return animation;
 	}
 
 	static private function readTimeline(input:BinaryInput, timelines:Array<Timeline>, timeline:CurveTimeline1, scale:Float) {
@@ -1504,17 +1522,19 @@ class Vertices {
 }
 
 class LinkedMeshBinary {
-	public var parent(default, null):String;
+	public var source(default, null):String;
 	public var skinIndex(default, null):Int;
 	public var slotIndex(default, null):Int;
+	public var sourceIndex(default, null):Int;
 	public var mesh(default, null):MeshAttachment;
-	public var inheritTimeline(default, null):Bool;
+	public var inheritTimelines(default, null):Bool;
 
-	public function new(mesh:MeshAttachment, skinIndex:Int, slotIndex:Int, parent:String, inheritTimeline:Bool) {
+	public function new(mesh:MeshAttachment, skinIndex:Int, slotIndex:Int, sourceIndex:Int, source:String, inheritTimelines:Bool) {
 		this.mesh = mesh;
 		this.skinIndex = skinIndex;
 		this.slotIndex = slotIndex;
-		this.parent = parent;
-		this.inheritTimeline = inheritTimeline;
+		this.sourceIndex = sourceIndex;
+		this.source = source;
+		this.inheritTimelines = inheritTimelines;
 	}
 }

@@ -42,8 +42,7 @@ public class Slider: SliderBase {
     }
 
     public convenience init(_ data: SliderData, _ skeleton: Skeleton) {
-        let ptr = spine_slider_create(
-            data._ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
+        let ptr = spine_slider_create(data._ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
         self.init(fromPointer: ptr!)
     }
 
@@ -51,17 +50,15 @@ public class Slider: SliderBase {
     public var bone: Bone {
         get {
             let result = spine_slider_get_bone(_ptr.assumingMemoryBound(to: spine_slider_wrapper.self))
-            return Bone(fromPointer: result!)
+        return Bone(fromPointer: result!)
         }
         set {
-            spine_slider_set_bone(
-                _ptr.assumingMemoryBound(to: spine_slider_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_bone_wrapper.self))
+            spine_slider_set_bone(_ptr.assumingMemoryBound(to: spine_slider_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_bone_wrapper.self))
         }
     }
 
     public func copyAttachment(_ skeleton: Skeleton) -> Slider {
-        let result = spine_slider_copy(
-            _ptr.assumingMemoryBound(to: spine_slider_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
+        let result = spine_slider_copy(_ptr.assumingMemoryBound(to: spine_slider_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
         return Slider(fromPointer: result!)
     }
 

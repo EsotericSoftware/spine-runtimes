@@ -95,13 +95,14 @@ int main() {
 		skeleton.setScaleY(0.3);
 		skeleton.setupPose();
 
-		// Create an AnimationState to drive animations on the skeleton. Set the "portal" animation
-		// on track with index 0.
+		// Create an AnimationState to drive animations on the skeleton. Start directly with the
+		// non-looping "death" animation so its playback can be inspected in isolation, then loop
+		// "run" afterwards.
 		AnimationStateData animationStateData(*skeletonData);
 		animationStateData.setDefaultMix(0.2f);
 		AnimationState animationState(animationStateData);
 		globalAnimationState = &animationState;
-		animationState.setAnimation(0, "portal", true);
+		animationState.setAnimation(0, "death", false);
 		animationState.addAnimation(0, "run", true, 0)
 			.setListener([](AnimationState *state, EventType type, TrackEntry *entry, Event *event, void *userData) {
 				SP_UNUSED(state);

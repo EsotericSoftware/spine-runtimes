@@ -207,7 +207,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 		if (ui.animationList.getSelected() == null) return;
 		int track = ui.trackButtons.getCheckedIndex();
 		TrackEntry entry;
-		if (!first && state.getCurrent(track) == null) {
+		if (!first && state.getTrack(track) == null) {
 			state.setEmptyAnimation(track, 0);
 			entry = state.addAnimation(track, ui.animationList.getSelected(), ui.loopCheckbox.isChecked(), 0);
 			entry.setMixDuration(ui.mixSlider.getValue());
@@ -320,7 +320,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		// Draw indicator lines for animation and mix times.
 		if (state != null) {
-			TrackEntry entry = state.getCurrent(0);
+			TrackEntry entry = state.getTrack(0);
 			if (entry != null) {
 				shapes.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 				shapes.updateMatrices();

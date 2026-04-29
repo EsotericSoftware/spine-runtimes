@@ -60,7 +60,6 @@
             let mousePosition = new spine.Vector2(e.data.global.x, e.data.global.y);
             girl.x += mousePosition.x - lastX;
             girl.y += mousePosition.y - lastY;
-            girl.skeleton.physicsTranslate(mousePosition.x - lastX, mousePosition.y - lastY);
             lastX = mousePosition.x;
             lastY = mousePosition.y;
           }

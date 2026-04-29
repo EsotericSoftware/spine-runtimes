@@ -211,6 +211,8 @@ namespace Spine {
 					if (nonessential) { // discard non-essential data
 						input.ReadInt(); // Color.rgba8888ToColor(data.color, input.readInt());
 						input.ReadString(); // data.icon = input.readString();
+						input.ReadFloat(); // data.iconSize = input.readFloat();
+						input.ReadFloat(); // data.iconRotation = input.readFloat();
 						input.ReadBoolean(); // data.visible = input.readBoolean();
 					}
 					bones[i] = data;
@@ -253,7 +255,7 @@ namespace Spine {
 						data.target = bones[input.ReadInt(true)];
 						int flags = input.Read();
 						data.skinRequired = (flags & 1) != 0;
-						data.uniform = (flags & 2) != 0;
+						if ((flags & 2) != 0) data.scaleY = (IkConstraintData.ScaleYMode)input.Read();
 						IkConstraintPose setup = data.setupPose;
 						setup.bendDirection = (flags & 4) != 0 ? -1 : 1;
 						setup.compress = (flags & 8) != 0;
@@ -457,10 +459,10 @@ namespace Spine {
 				for (int i = 0; i < n; i++) {
 					LinkedMesh linkedMesh = linkedMeshes[i];
 					Skin skin = skeletonData.skins.Items[linkedMesh.skinIndex];
-					Attachment parent = skin.GetAttachment(linkedMesh.slotIndex, linkedMesh.parent);
-					if (parent == null) throw new Exception("Parent mesh not found: " + linkedMesh.parent);
-					linkedMesh.mesh.TimelineAttachment = linkedMesh.inheritTimelines ? (VertexAttachment)parent : linkedMesh.mesh;
-					linkedMesh.mesh.ParentMesh = (MeshAttachment)parent;
+					Attachment source = skin.GetAttachment(linkedMesh.sourceIndex, linkedMesh.source);
+					if (source == null) throw new Exception("Source mesh not found: " + linkedMesh.source);
+					linkedMesh.mesh.TimelineAttachment = linkedMesh.inheritTimelines ? source : linkedMesh.mesh;
+					linkedMesh.mesh.SourceMesh = (MeshAttachment)source;
 					linkedMesh.mesh.UpdateSequence();
 				}
 				linkedMeshes.Clear();
@@ -484,7 +486,7 @@ namespace Spine {
 				// Animations.
 				Animation[] animations = skeletonData.animations.EnsureSize(n = input.ReadInt(true)).Items;
 				for (int i = 0; i < n; i++)
-					animations[i] = ReadAnimation(input, input.ReadString(), skeletonData);
+					animations[i] = ReadAnimation(input, input.ReadString(), skeletonData, nonessential);
 
 				for (int i = 0; i < constraintCount; i++) {
 					SliderData data = constraints[i] as SliderData;
@@ -592,6 +594,14 @@ namespace Spine {
 				float[] uvs = ReadFloatArray(input, vertices.length, 1);
 				int[] triangles = ReadShortArray(input, (vertices.length - hullLength - 2) * 3);
 
+				int slotCount = input.ReadInt(true);
+				int[] timelineSlots = null;
+				if (slotCount > 0) {
+					timelineSlots = new int[slotCount];
+					for (int i = 0; i < slotCount; i++)
+						timelineSlots[i] = input.ReadInt(true);
+				}
+
 				int[] edges = null;
 				float width = 0, height = 0;
 				if (nonessential) {
@@ -610,6 +620,7 @@ namespace Spine {
 				mesh.WorldVerticesLength = vertices.length;
 				mesh.regionUVs = uvs;
 				mesh.triangles = triangles;
+				if (timelineSlots != null) mesh.TimelineSlots = timelineSlots;
 				if (nonessential) {
 					mesh.Edges = edges;
 					mesh.Width = width * scale;
@@ -623,8 +634,9 @@ namespace Spine {
 				uint color = (flags & 32) != 0 ? (uint)input.ReadInt() : 0xffffffff;
 				Sequence sequence = ReadSequence(input, (flags & 64) != 0);
 				bool inheritTimelines = (flags & 128) != 0;
+				int sourceIndex = input.ReadInt(true);
 				int skinIndex = input.ReadInt(true);
-				string parent = input.ReadStringRef();
+				string source = input.ReadStringRef();
 				float width = 0, height = 0;
 				if (nonessential) {
 					width = input.ReadFloat();
@@ -639,16 +651,14 @@ namespace Spine {
 					mesh.Width = width * scale;
 					mesh.Height = height * scale;
 				}
-				linkedMeshes.Add(new LinkedMesh(mesh, skinIndex, slotIndex, parent, inheritTimelines));
+				linkedMeshes.Add(new LinkedMesh(mesh, skinIndex, slotIndex, sourceIndex, source, inheritTimelines));
 				return mesh;
 			}
 			case AttachmentType.Path: {
 				bool closed = (flags & 16) != 0;
 				bool constantSpeed = (flags & 32) != 0;
 				Vertices vertices = ReadVertices(input, (flags & 64) != 0);
-				var lengths = new float[vertices.length / 6];
-				for (int i = 0, n = lengths.Length; i < n; i++)
-					lengths[i] = input.ReadFloat() * scale;
+				float[] lengths = ReadFloatArray(input, vertices.length / 6, scale);
 				if (nonessential) input.ReadInt(); // discard, int color = nonessential ? input.ReadInt() : 0;
 
 				PathAttachment path = attachmentLoader.NewPathAttachment(skin, name);
@@ -684,6 +694,8 @@ namespace Spine {
 				ClippingAttachment clip = attachmentLoader.NewClippingAttachment(skin, name);
 				if (clip == null) return null;
 				clip.EndSlot = skeletonData.slots.Items[endSlotIndex];
+				clip.Convex = (flags & 32) != 0;
+				clip.Inverse = (flags & 64) != 0;
 				clip.worldVerticesLength = vertices.length;
 				clip.vertices = vertices.vertices;
 				clip.bones = vertices.bones;
@@ -752,7 +764,7 @@ namespace Spine {
 
 		/// <exception cref="SerializationException">SerializationException will be thrown when a Vertex attachment is not found.</exception>
 		/// <exception cref="IOException">Throws IOException when a read operation fails.</exception>
-		private Animation ReadAnimation (SkeletonInput input, string name, SkeletonData skeletonData) {
+		private Animation ReadAnimation (SkeletonInput input, string name, SkeletonData skeletonData, bool nonessential) {
 			var timelines = new ExposedList<Timeline>(input.ReadInt(true));
 			float scale = this.scale;
 
@@ -1272,6 +1284,7 @@ namespace Spine {
 			Animation animation = new Animation(name);
 			animation.SetTimelines(timelines, bones);
 			animation.Duration = duration;
+			if (nonessential) input.ReadInt(); // discard non-essential, Color.rgba8888ToColor(animation.color, input.readInt());
 			return animation;
 		}
 
@@ -1510,16 +1523,18 @@ namespace Spine {
 		}
 
 		private class LinkedMesh {
-			internal string parent;
-			internal int skinIndex, slotIndex;
+			internal string source;
+			internal int skinIndex, slotIndex, sourceIndex;
 			internal MeshAttachment mesh;
 			internal bool inheritTimelines;
 
-			public LinkedMesh (MeshAttachment mesh, int skinIndex, int slotIndex, string parent, bool inheritTimelines) {
+			public LinkedMesh (MeshAttachment mesh, int skinIndex, int slotIndex, int sourceIndex, string source,
+				bool inheritTimelines) {
 				this.mesh = mesh;
 				this.skinIndex = skinIndex;
 				this.slotIndex = slotIndex;
-				this.parent = parent;
+				this.sourceIndex = sourceIndex;
+				this.source = source;
 				this.inheritTimelines = inheritTimelines;
 			}
 		}

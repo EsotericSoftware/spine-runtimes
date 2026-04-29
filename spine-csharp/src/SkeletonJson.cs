@@ -212,7 +212,8 @@ namespace Spine {
 							data.target = skeletonData.FindBone(targetName);
 							if (data.target == null) throw new Exception("IK target bone not found: " + targetName);
 
-							data.uniform = GetBoolean(constraintMap, "uniform", false);
+							string scaleY = GetString(constraintMap, "scaleY", null);
+							if (scaleY != null) data.scaleY = (IkConstraintData.ScaleYMode)Enum.Parse(typeof(IkConstraintData.ScaleYMode), scaleY, true);
 							IkConstraintPose setup = data.setupPose;
 							setup.mix = GetFloat(constraintMap, "mix", 1);
 							setup.softness = GetFloat(constraintMap, "softness", 0) * scale;
@@ -492,11 +493,23 @@ namespace Spine {
 					LinkedMesh linkedMesh = linkedMeshes[i];
 					Skin skin = linkedMesh.skin == null ? skeletonData.defaultSkin : skeletonData.FindSkin(linkedMesh.skin);
 					if (skin == null) throw new Exception("Slot not found: " + linkedMesh.skin);
-					Attachment parent = skin.GetAttachment(linkedMesh.slotIndex, linkedMesh.parent);
-					if (parent == null) throw new Exception("Parent mesh not found: " + linkedMesh.parent);
-					linkedMesh.mesh.TimelineAttachment = linkedMesh.inheritTimelines ? (VertexAttachment)parent : linkedMesh.mesh;
-					linkedMesh.mesh.ParentMesh = (MeshAttachment)parent;
+					Attachment source = skin.GetAttachment(linkedMesh.sourceIndex, linkedMesh.source);
+					if (source == null) throw new Exception("Source mesh not found: " + linkedMesh.source);
+					linkedMesh.mesh.TimelineAttachment = linkedMesh.inheritTimelines ? source : linkedMesh.mesh;
+					linkedMesh.mesh.SourceMesh = (MeshAttachment)source;
 					linkedMesh.mesh.UpdateSequence();
+
+					//outer:
+					if (linkedMesh.inheritTimelines && linkedMesh.slotIndex != linkedMesh.sourceIndex) {
+						int[] slots = source.TimelineSlots;
+						foreach (int existing in slots)
+							if (existing == linkedMesh.slotIndex) { goto goto_outer; }
+						int[] newSlots = new int[slots.Length + 1];
+						Array.Copy(slots, newSlots, slots.Length);
+						newSlots[slots.Length] = linkedMesh.slotIndex;
+						source.TimelineSlots = newSlots;
+					}
+					goto_outer:;
 				}
 				linkedMeshes.Clear();
 
@@ -631,9 +644,17 @@ namespace Spine {
 				mesh.Width = GetFloat(map, "width", 0) * scale;
 				mesh.Height = GetFloat(map, "height", 0) * scale;
 
-				string parent = GetString(map, "parent", null);
-				if (parent != null) {
-					linkedMeshes.Add(new LinkedMesh(mesh, GetString(map, "skin", null), slotIndex, parent, GetBoolean(map, "timelines", true)));
+				string source = GetString(map, "source", null);
+				if (source != null) {
+					int sourceIndex = slotIndex;
+					String slot = GetString(map, "slot", null);
+					if (slot != null) {
+						SlotData sourceSlot = skeletonData.FindSlot(slot);
+						if (sourceSlot == null) throw new SerializationException("Source mesh slot not found: " + slot);
+						sourceIndex = sourceSlot.index;
+					}
+					linkedMeshes.Add(new LinkedMesh(mesh, GetString(map, "skin", null), slotIndex, sourceIndex, source,
+						GetBoolean(map, "timelines", true)));
 					return mesh;
 				}
 
@@ -681,6 +702,9 @@ namespace Spine {
 					if (slot == null) throw new Exception("Clipping end slot not found: " + end);
 					clip.EndSlot = slot;
 				}
+
+				clip.Convex = GetBoolean(map, "convex", false);
+				clip.Inverse = GetBoolean(map, "inverse", false);
 
 				ReadVertices(map, clip, GetInt(map, "vertexCount", 0) << 1);
 
@@ -1631,16 +1655,18 @@ namespace Spine {
 		}
 
 		private class LinkedMesh {
-			internal string parent, skin;
-			internal int slotIndex;
+			internal string source, skin;
+			internal int slotIndex, sourceIndex;
 			internal MeshAttachment mesh;
 			internal bool inheritTimelines;
 
-			public LinkedMesh (MeshAttachment mesh, string skin, int slotIndex, string parent, bool inheritTimelines) {
+			public LinkedMesh (MeshAttachment mesh, string skin, int slotIndex, int sourceIndex, string source,
+				bool inheritTimelines) {
 				this.mesh = mesh;
 				this.skin = skin;
 				this.slotIndex = slotIndex;
-				this.parent = parent;
+				this.sourceIndex = sourceIndex;
+				this.source = source;
 				this.inheritTimelines = inheritTimelines;
 			}
 		}

@@ -84,6 +84,21 @@ spine_attachment spine_vertex_attachment_copy(spine_vertex_attachment self) {
 	return (spine_attachment) &_self->copy();
 }
 
+spine_array_int spine_vertex_attachment_get_timeline_slots(spine_vertex_attachment self) {
+	VertexAttachment *_self = (VertexAttachment *) self;
+	return (spine_array_int) &_self->getTimelineSlots();
+}
+
+void spine_vertex_attachment_set_timeline_slots(spine_vertex_attachment self, spine_array_int timelineSlots) {
+	VertexAttachment *_self = (VertexAttachment *) self;
+	_self->setTimelineSlots(*((Array<int> *) timelineSlots));
+}
+
+bool spine_vertex_attachment_is_timeline_active(spine_vertex_attachment self, spine_array_slot slots, int slotIndex, bool appliedPose) {
+	VertexAttachment *_self = (VertexAttachment *) self;
+	return _self->isTimelineActive(*((Array<Slot *> *) slots), slotIndex, appliedPose);
+}
+
 int spine_vertex_attachment_get_ref_count(spine_vertex_attachment self) {
 	VertexAttachment *_self = (VertexAttachment *) self;
 	return _self->getRefCount();

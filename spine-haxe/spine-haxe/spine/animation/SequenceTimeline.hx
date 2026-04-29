@@ -38,12 +38,17 @@ class SequenceTimeline extends Timeline implements SlotTimeline {
 	static var DELAY = 2;
 
 	var slotIndex:Int;
-	var attachment:HasSequence;
+	var attachment:Attachment;
 
-	public function new(frameCount:Int, slotIndex:Int, attachment:HasSequence) {
-		super(frameCount, Std.string(Property.sequence) + "|" + Std.string(slotIndex) + "|" + Std.string(attachment.sequence.id));
+	public function new(frameCount:Int, slotIndex:Int, attachment:Attachment) {
+		super(frameCount, Std.string(Property.sequence)
+			+ "|"
+			+ Std.string(slotIndex)
+			+ "|"
+			+ Std.string(cast(attachment, HasSequence).sequence.id));
 		this.slotIndex = slotIndex;
 		this.attachment = attachment;
+		this.instant = true;
 	}
 
 	public override function getFrameEntries():Int {
@@ -57,7 +62,7 @@ class SequenceTimeline extends Timeline implements SlotTimeline {
 	/** The attachment for which the sequenceIndex will be set.
 	 * See VertexAttachment.timelineAttachment. */
 	public function getAttachment():Attachment {
-		return cast(attachment, Attachment);
+		return attachment;
 	}
 
 	/** Sets the time, mode, index, and frame time for the specified frame.
@@ -72,26 +77,17 @@ class SequenceTimeline extends Timeline implements SlotTimeline {
 
 	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
 			appliedPose:Bool) {
-		var slot = skeleton.slots[this.slotIndex];
-		if (!slot.bone.active)
+		var slots = skeleton.slots;
+		if (!attachment.isTimelineActive(slots, slotIndex, appliedPose))
 			return;
-		var pose = appliedPose ? slot.appliedPose : slot.pose;
+		var timelineSlots = attachment.timelineSlots;
 
-		var slotAttachment:Attachment = cast(pose.attachment, Attachment);
-		var attachmentRef:Attachment = cast(this.attachment, Attachment);
-
-		if (!Std.isOfType(slotAttachment, HasSequence) || slotAttachment.timelineAttachment != attachmentRef)
-			return;
-
-		if (out) {
-			if (fromSetup)
-				pose.sequenceIndex = -1;
-			return;
-		}
-
-		if (time < frames[0]) {
-			if (fromSetup)
-				pose.sequenceIndex = -1;
+		if (out || time < frames[0]) {
+			if (fromSetup) {
+				setupPose(slots[slotIndex], appliedPose);
+				for (i in 0...timelineSlots.length)
+					setupPose(slots[timelineSlots[i]], appliedPose);
+			}
 			return;
 		}
 
@@ -100,8 +96,29 @@ class SequenceTimeline extends Timeline implements SlotTimeline {
 		var modeAndIndex = Std.int(frames[i + SequenceTimeline.MODE]);
 		var delay = frames[i + SequenceTimeline.DELAY];
 
-		var hasSeq:HasSequence = cast(slotAttachment, HasSequence);
-		var index = modeAndIndex >> 4, count = hasSeq.sequence.regions.length;
+		applyToSlot(slots[slotIndex], appliedPose, time, before, modeAndIndex, delay);
+		for (j in 0...timelineSlots.length)
+			applyToSlot(slots[timelineSlots[j]], appliedPose, time, before, modeAndIndex, delay);
+	}
+
+	private function setupPose(slot:Slot, appliedPose:Bool):Void {
+		if (!slot.bone.active)
+			return;
+		var pose = appliedPose ? slot.appliedPose : slot.pose;
+		if (pose.attachment == null || pose.attachment.timelineAttachment != attachment)
+			return;
+		pose.sequenceIndex = -1;
+	}
+
+	private function applyToSlot(slot:Slot, appliedPose:Bool, time:Float, before:Float, modeAndIndex:Int, delay:Float):Void {
+		if (!slot.bone.active)
+			return;
+		var pose = appliedPose ? slot.appliedPose : slot.pose;
+		if (pose.attachment == null || pose.attachment.timelineAttachment != attachment)
+			return;
+
+		var index = modeAndIndex >> 4,
+			count = cast(pose.attachment, HasSequence).sequence.regions.length;
 		var mode = SequenceMode.values[modeAndIndex & 0xf];
 		if (mode != SequenceMode.hold) {
 			index += Std.int(((time - before) / delay + 0.00001));

@@ -1,64 +1,59 @@
 windmill-pma.png
-	size: 1024, 512
+	size: 1024, 1024
 	filter: Linear, Linear
 	pma: true
 	scale: 0.5
 bush1
-	bounds: 898, 265, 56, 38
+	bounds: 810, 416, 56, 38
 bush2
-	bounds: 955, 412, 67, 45
-	rotate: 90
+	bounds: 867, 511, 67, 45
 flower-leaf-back
-	bounds: 999, 323, 16, 11
+	bounds: 977, 394, 16, 11
 flower-leaf-front
-	bounds: 1002, 421, 16, 11
+	bounds: 959, 394, 16, 11
 flower-shadow
-	bounds: 1002, 434, 23, 9
-	rotate: 90
+	bounds: 888, 401, 23, 9
 flower-stem
-	bounds: 547, 474, 5, 27
-	rotate: 90
+	bounds: 290, 529, 5, 27
 flower1
-	bounds: 999, 336, 22, 19
+	bounds: 988, 510, 22, 19
 flower2
-	bounds: 1002, 459, 20, 17
-	rotate: 90
+	bounds: 849, 393, 20, 17
 flower3
-	bounds: 558, 456, 15, 16
+	bounds: 871, 394, 15, 16
 heat
-	bounds: 899, 330, 48, 52
+	bounds: 918, 449, 48, 52
 rooster
-	bounds: 983, 232, 27, 25
-	rotate: 90
+	bounds: 988, 531, 27, 25
 tree1-leaves1
-	bounds: 848, 341, 49, 53
+	bounds: 867, 456, 49, 53
 tree1-leaves2
-	bounds: 848, 289, 48, 50
+	bounds: 760, 421, 48, 50
 tree1-leaves3
-	bounds: 938, 217, 43, 42
+	bounds: 760, 377, 43, 42
 tree1-leaves4
-	bounds: 893, 221, 43, 42
+	bounds: 914, 405, 43, 42
 tree1-trunk
-	bounds: 848, 396, 64, 83
+	bounds: 760, 473, 64, 83
 tree2-leaves1
-	bounds: 955, 357, 50, 53
+	bounds: 936, 503, 50, 53
 tree2-leaves2
-	bounds: 949, 305, 48, 50
+	bounds: 968, 451, 48, 50
 tree2-leaves3
-	bounds: 956, 261, 44, 42
+	bounds: 868, 412, 44, 42
 tree2-leaves4
-	bounds: 848, 245, 43, 42
+	bounds: 968, 407, 43, 42
 tree2-leaves5
-	bounds: 848, 201, 42, 42
+	bounds: 805, 372, 42, 42
 tree2-trunk
-	bounds: 914, 384, 39, 95
+	bounds: 826, 461, 39, 95
 windmill-base
-	bounds: 2, 2, 554, 462
+	bounds: 296, 2, 554, 462
+	rotate: 90
 windmill-blades
-	bounds: 576, 208, 271, 270
+	bounds: 2, 270, 271, 270
 	rotate: 90
 windmill-blades-wood-h
-	bounds: 2, 466, 271, 13
+	bounds: 2, 543, 271, 13
 windmill-blades-wood-v
-	bounds: 275, 466, 13, 270
-	rotate: 90
+	bounds: 275, 286, 13, 270

@@ -61,7 +61,7 @@ public class BoneData: PosedData {
     public var length: Float {
         get {
             let result = spine_bone_data_get_length(_ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_bone_data_set_length(_ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self), newValue)
@@ -77,7 +77,7 @@ public class BoneData: PosedData {
     public var icon: String {
         get {
             let result = spine_bone_data_get_icon(_ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self))
-            return String(cString: result!)
+        return String(cString: result!)
         }
         set {
             spine_bone_data_set_icon(_ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self), newValue)
@@ -87,7 +87,7 @@ public class BoneData: PosedData {
     public var visible: Bool {
         get {
             let result = spine_bone_data_get_visible(_ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_bone_data_set_visible(_ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self), newValue)

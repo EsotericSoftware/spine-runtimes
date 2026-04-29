@@ -150,8 +150,8 @@ class AnimationState {
   }
 
   /// Returns The track entry for the animation currently playing on the track, or NULL if no animation is currently playing.
-  TrackEntry? getCurrent(int trackIndex) {
-    final result = SpineBindings.bindings.spine_animation_state_get_current(_ptr, trackIndex);
+  TrackEntry? getTrack(int trackIndex) {
+    final result = SpineBindings.bindings.spine_animation_state_get_track(_ptr, trackIndex);
     return result.address == 0 ? null : TrackEntry.fromPointer(result);
   }
 

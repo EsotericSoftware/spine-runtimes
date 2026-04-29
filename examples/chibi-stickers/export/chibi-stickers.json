@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "dhTc606xLC8",
-	"spine": "4.3.44-beta",
+	"hash": "332sNAu1s4k",
+	"spine": "4.3.75-beta",
 	"x": -179.99997,
 	"y": -37.5,
 	"width": 360,
@@ -290,16 +290,16 @@
 		"bones": [ "hair-front" ],
 		"attachments": {
 			"arm-l": {
-				"arm": { "name": "davide/arm", "type": "linkedmesh", "skin": "spineboy", "parent": "arm", "width": 55.0, "height": 179.0 }
+				"arm": { "name": "davide/arm", "type": "linkedmesh", "skin": "spineboy", "source": "arm", "width": 55.0, "height": 179.0 }
 			},
 			"arm-r": {
-				"arm": { "name": "davide/arm", "type": "linkedmesh", "skin": "spineboy", "parent": "arm", "width": 55.0, "height": 179.0 }
+				"arm": { "name": "davide/arm", "type": "linkedmesh", "skin": "spineboy", "source": "arm", "width": 55.0, "height": 179.0 }
 			},
 			"back-hair": {
-				"back-hair": { "name": "davide/hair-back", "type": "linkedmesh", "parent": "spineboy/back-hair", "timelines": false, "width": 315.0, "height": 282.0 }
+				"back-hair": { "name": "davide/hair-back", "type": "linkedmesh", "source": "spineboy/back-hair", "timelines": false, "width": 315.0, "height": 282.0 }
 			},
 			"body": {
-				"body": { "name": "davide/body", "type": "linkedmesh", "skin": "spineboy", "parent": "body", "width": 140.0, "height": 195.0 }
+				"body": { "name": "davide/body", "type": "linkedmesh", "skin": "spineboy", "source": "body", "width": 140.0, "height": 195.0 }
 			},
 			"body-decoration": {
 				"body-decoration": { "name": "davide/body-decoration", "x": 73.24773, "y": 13.900006, "rotation": -90, "width": 11, "height": 56 }
@@ -316,10 +316,10 @@
 				}
 			},
 			"ear-l": {
-				"ear": { "name": "spineboy/ear", "type": "linkedmesh", "skin": "spineboy", "parent": "ear", "width": 68.0, "height": 83.0 }
+				"ear": { "name": "spineboy/ear", "type": "linkedmesh", "skin": "spineboy", "source": "ear", "width": 68.0, "height": 83.0 }
 			},
 			"ear-r": {
-				"ear": { "name": "spineboy/ear", "type": "linkedmesh", "skin": "spineboy", "parent": "ear", "width": 68.0, "height": 83.0 }
+				"ear": { "name": "spineboy/ear", "type": "linkedmesh", "skin": "spineboy", "source": "ear", "width": 68.0, "height": 83.0 }
 			},
 			"eye-l": {
 				"eye-3": { "name": "common/eye-3", "x": 1.0117798, "y": -1.9814606, "rotation": -90, "width": 29, "height": 51 },
@@ -384,10 +384,10 @@
 				"head-base": { "name": "spineboy/head-base", "x": 122.13795, "rotation": -90, "width": 286, "height": 249 }
 			},
 			"leg-l": {
-				"leg": { "name": "davide/leg", "type": "linkedmesh", "skin": "spineboy", "parent": "leg", "width": 56.0, "height": 201.0 }
+				"leg": { "name": "davide/leg", "type": "linkedmesh", "skin": "spineboy", "source": "leg", "width": 56.0, "height": 201.0 }
 			},
 			"leg-r": {
-				"leg": { "name": "davide/leg", "type": "linkedmesh", "skin": "spineboy", "parent": "leg", "width": 56.0, "height": 201.0 }
+				"leg": { "name": "davide/leg", "type": "linkedmesh", "skin": "spineboy", "source": "leg", "width": 56.0, "height": 201.0 }
 			},
 			"mouth": {
 				"mouth-3": { "name": "common/mouth-3", "x": 9.500011, "y": 1.414247, "width": 29, "height": 55 },
@@ -414,10 +414,10 @@
 		"bones": [ "hair-back-long-middle", "hair-back-long-middle-down", "skirt-middle", "skirt-side-l", "skirt-side-r", "skirt-side-rotator-l", "skirt-side-rotator-r" ],
 		"attachments": {
 			"arm-l": {
-				"arm": { "name": "erikari/arm", "type": "linkedmesh", "skin": "spineboy", "parent": "arm", "width": 55.0, "height": 179.0 }
+				"arm": { "name": "erikari/arm", "type": "linkedmesh", "skin": "spineboy", "source": "arm", "width": 55.0, "height": 179.0 }
 			},
 			"arm-r": {
-				"arm": { "name": "erikari/arm", "type": "linkedmesh", "skin": "spineboy", "parent": "arm", "width": 55.0, "height": 179.0 }
+				"arm": { "name": "erikari/arm", "type": "linkedmesh", "skin": "spineboy", "source": "arm", "width": 55.0, "height": 179.0 }
 			},
 			"arm-shoulder-decoration-l": {
 				"arm-shoulder-decoration": { "name": "erikari/arm-shoulder-decoration", "x": 15.805313, "y": 0.918686, "rotation": 89.99997, "width": 64, "height": 85 }
@@ -426,7 +426,7 @@
 				"arm-shoulder-decoration": { "name": "erikari/arm-shoulder-decoration", "x": 15.805328, "y": 0.9186897, "rotation": 90, "width": 64, "height": 85 }
 			},
 			"back-hair": {
-				"back-hair": { "name": "erikari/back-hair", "type": "linkedmesh", "skin": "spineboy", "parent": "back-hair", "width": 315.0, "height": 282.0 }
+				"back-hair": { "name": "erikari/back-hair", "type": "linkedmesh", "skin": "spineboy", "source": "back-hair", "width": 315.0, "height": 282.0 }
 			},
 			"back-hair-long": {
 				"back-hair-long": {
@@ -448,7 +448,7 @@
 				"blush": { "name": "erikari/blush", "x": 0.8085327, "y": -1.4510117, "rotation": -89.99995, "width": 57, "height": 36 }
 			},
 			"body": {
-				"body": { "name": "erikari/body", "type": "linkedmesh", "skin": "spineboy", "parent": "body", "width": 140.0, "height": 195.0 }
+				"body": { "name": "erikari/body", "type": "linkedmesh", "skin": "spineboy", "source": "body", "width": 140.0, "height": 195.0 }
 			},
 			"bracelet-l": {
 				"bracelet": {
@@ -480,10 +480,10 @@
 				"collar": { "name": "erikari/collar", "x": 104.91772, "rotation": -90, "width": 121, "height": 123 }
 			},
 			"ear-l": {
-				"ear": { "name": "erikari/ear", "type": "linkedmesh", "skin": "spineboy", "parent": "ear", "width": 68.0, "height": 83.0 }
+				"ear": { "name": "erikari/ear", "type": "linkedmesh", "skin": "spineboy", "source": "ear", "width": 68.0, "height": 83.0 }
 			},
 			"ear-r": {
-				"ear": { "name": "erikari/ear", "type": "linkedmesh", "skin": "spineboy", "parent": "ear", "width": 68.0, "height": 83.0 }
+				"ear": { "name": "erikari/ear", "type": "linkedmesh", "skin": "spineboy", "source": "ear", "width": 68.0, "height": 83.0 }
 			},
 			"eye-l": {
 				"eye-3": { "name": "common/eye-3", "x": 1.0117798, "y": -1.9814606, "rotation": -90, "width": 29, "height": 51 },
@@ -619,10 +619,10 @@
 				"leg-decoration": { "name": "erikari/leg-decoration", "x": 51.55666, "y": 0.9329033, "rotation": 90, "width": 71, "height": 25 }
 			},
 			"leg-l": {
-				"leg": { "name": "erikari/leg", "type": "linkedmesh", "skin": "spineboy", "parent": "leg", "width": 56.0, "height": 201.0 }
+				"leg": { "name": "erikari/leg", "type": "linkedmesh", "skin": "spineboy", "source": "leg", "width": 56.0, "height": 201.0 }
 			},
 			"leg-r": {
-				"leg": { "name": "erikari/leg", "type": "linkedmesh", "skin": "spineboy", "parent": "leg", "width": 56.0, "height": 201.0 }
+				"leg": { "name": "erikari/leg", "type": "linkedmesh", "skin": "spineboy", "source": "leg", "width": 56.0, "height": 201.0 }
 			},
 			"mouth": {
 				"mouth-3": { "name": "common/mouth-3", "x": 9.500011, "y": 1.414247, "width": 29, "height": 55 },
@@ -675,13 +675,13 @@
 		"bones": [ "hair-back-long-middle" ],
 		"attachments": {
 			"arm-l": {
-				"arm": { "name": "harri/arm", "type": "linkedmesh", "skin": "spineboy", "parent": "arm", "width": 55.0, "height": 179.0 }
+				"arm": { "name": "harri/arm", "type": "linkedmesh", "skin": "spineboy", "source": "arm", "width": 55.0, "height": 179.0 }
 			},
 			"arm-r": {
-				"arm": { "name": "harri/arm", "type": "linkedmesh", "skin": "spineboy", "parent": "arm", "width": 55.0, "height": 179.0 }
+				"arm": { "name": "harri/arm", "type": "linkedmesh", "skin": "spineboy", "source": "arm", "width": 55.0, "height": 179.0 }
 			},
 			"back-hair": {
-				"back-hair": { "name": "harri/back-hair", "type": "linkedmesh", "skin": "spineboy", "parent": "back-hair", "width": 315.0, "height": 282.0 }
+				"back-hair": { "name": "harri/back-hair", "type": "linkedmesh", "skin": "spineboy", "source": "back-hair", "width": 315.0, "height": 282.0 }
 			},
 			"back-hair-long": {
 				"back-hair-long": {
@@ -724,16 +724,16 @@
 				}
 			},
 			"body": {
-				"body": { "name": "harri/body", "type": "linkedmesh", "skin": "spineboy", "parent": "body", "width": 140.0, "height": 195.0 }
+				"body": { "name": "harri/body", "type": "linkedmesh", "skin": "spineboy", "source": "body", "width": 140.0, "height": 195.0 }
 			},
 			"body-decoration": {
 				"body-decoration": { "name": "harri/body-decoration", "x": 60.91772, "y": 12, "rotation": -90, "width": 140, "height": 133 }
 			},
 			"ear-l": {
-				"ear": { "name": "harri/ear", "type": "linkedmesh", "skin": "spineboy", "parent": "ear", "width": 68.0, "height": 83.0 }
+				"ear": { "name": "harri/ear", "type": "linkedmesh", "skin": "spineboy", "source": "ear", "width": 68.0, "height": 83.0 }
 			},
 			"ear-r": {
-				"ear": { "name": "harri/ear", "type": "linkedmesh", "skin": "spineboy", "parent": "ear", "width": 68.0, "height": 83.0 }
+				"ear": { "name": "harri/ear", "type": "linkedmesh", "skin": "spineboy", "source": "ear", "width": 68.0, "height": 83.0 }
 			},
 			"eye-l": {
 				"eye-3": { "name": "common/eye-3", "x": 1.0117798, "y": -1.9814606, "rotation": -90, "width": 29, "height": 51 },
@@ -798,10 +798,10 @@
 				"head-base": { "name": "harri/head-base", "x": 122.13795, "rotation": -90, "width": 286, "height": 249 }
 			},
 			"leg-l": {
-				"leg": { "name": "harri/leg", "type": "linkedmesh", "skin": "spineboy", "parent": "leg", "width": 56.0, "height": 201.0 }
+				"leg": { "name": "harri/leg", "type": "linkedmesh", "skin": "spineboy", "source": "leg", "width": 56.0, "height": 201.0 }
 			},
 			"leg-r": {
-				"leg": { "name": "harri/leg", "type": "linkedmesh", "skin": "spineboy", "parent": "leg", "width": 56.0, "height": 201.0 }
+				"leg": { "name": "harri/leg", "type": "linkedmesh", "skin": "spineboy", "source": "leg", "width": 56.0, "height": 201.0 }
 			},
 			"mouth": {
 				"mouth-3": { "name": "common/mouth-3", "x": 9.500011, "y": 1.414247, "width": 29, "height": 55 },
@@ -830,10 +830,10 @@
 		"name": "luke",
 		"attachments": {
 			"arm-l": {
-				"arm": { "name": "luke/arm", "type": "linkedmesh", "skin": "spineboy", "parent": "arm", "width": 55.0, "height": 179.0 }
+				"arm": { "name": "luke/arm", "type": "linkedmesh", "skin": "spineboy", "source": "arm", "width": 55.0, "height": 179.0 }
 			},
 			"arm-r": {
-				"arm": { "name": "luke/arm", "type": "linkedmesh", "skin": "spineboy", "parent": "arm", "width": 55.0, "height": 179.0 }
+				"arm": { "name": "luke/arm", "type": "linkedmesh", "skin": "spineboy", "source": "arm", "width": 55.0, "height": 179.0 }
 			},
 			"arm-shoulder-decoration-l": {
 				"arm-shoulder-decoration": { "name": "luke/arm-shoulder-decoration", "x": 0.15081787, "y": 0.918686, "rotation": 89.99997, "width": 61, "height": 53 }
@@ -842,7 +842,7 @@
 				"arm-shoulder-decoration": { "name": "luke/arm-shoulder-decoration", "x": 0.15081787, "y": 0.918686, "rotation": 90, "width": 61, "height": 53 }
 			},
 			"back-hair": {
-				"back-hair": { "name": "luke/back-hair", "type": "linkedmesh", "skin": "spineboy", "parent": "back-hair", "width": 315.0, "height": 282.0 }
+				"back-hair": { "name": "luke/back-hair", "type": "linkedmesh", "skin": "spineboy", "source": "back-hair", "width": 315.0, "height": 282.0 }
 			},
 			"blush-l": {
 				"blush": { "name": "luke/blush", "x": 0.8085327, "y": -1.451004, "rotation": -90, "width": 57, "height": 36 }
@@ -859,7 +859,7 @@
 				}
 			},
 			"body": {
-				"body": { "name": "luke/body", "type": "linkedmesh", "skin": "spineboy", "parent": "body", "width": 140.0, "height": 195.0 }
+				"body": { "name": "luke/body", "type": "linkedmesh", "skin": "spineboy", "source": "body", "width": 140.0, "height": 195.0 }
 			},
 			"eye-l": {
 				"eye-3": { "name": "common/eye-3", "x": 1.0117798, "y": -1.9814606, "rotation": -90, "width": 29, "height": 51 },
@@ -963,10 +963,10 @@
 				"head-base": { "name": "luke/head-base", "x": 122.13795, "rotation": -90, "width": 286, "height": 249 }
 			},
 			"leg-l": {
-				"leg": { "name": "luke/leg", "type": "linkedmesh", "skin": "spineboy", "parent": "leg", "width": 56.0, "height": 201.0 }
+				"leg": { "name": "luke/leg", "type": "linkedmesh", "skin": "spineboy", "source": "leg", "width": 56.0, "height": 201.0 }
 			},
 			"leg-r": {
-				"leg": { "name": "luke/leg", "type": "linkedmesh", "skin": "spineboy", "parent": "leg", "width": 56.0, "height": 201.0 }
+				"leg": { "name": "luke/leg", "type": "linkedmesh", "skin": "spineboy", "source": "leg", "width": 56.0, "height": 201.0 }
 			},
 			"mouth": {
 				"mouth-3": { "name": "common/mouth-3", "x": 9.500011, "y": 1.414247, "width": 29, "height": 55 },
@@ -1002,13 +1002,13 @@
 		"bones": [ "hair-front" ],
 		"attachments": {
 			"arm-l": {
-				"arm": { "name": "mario/arm", "type": "linkedmesh", "skin": "spineboy", "parent": "arm", "width": 55.0, "height": 179.0 }
+				"arm": { "name": "mario/arm", "type": "linkedmesh", "skin": "spineboy", "source": "arm", "width": 55.0, "height": 179.0 }
 			},
 			"arm-r": {
-				"arm": { "name": "mario/arm", "type": "linkedmesh", "skin": "spineboy", "parent": "arm", "width": 55.0, "height": 179.0 }
+				"arm": { "name": "mario/arm", "type": "linkedmesh", "skin": "spineboy", "source": "arm", "width": 55.0, "height": 179.0 }
 			},
 			"back-hair": {
-				"back-hair": { "name": "mario/back-hair", "type": "linkedmesh", "skin": "spineboy", "parent": "back-hair", "width": 335.0, "height": 295.0 }
+				"back-hair": { "name": "mario/back-hair", "type": "linkedmesh", "skin": "spineboy", "source": "back-hair", "width": 335.0, "height": 295.0 }
 			},
 			"back-hair-long": {
 				"back-hair-long": {
@@ -1043,13 +1043,13 @@
 				"blush": { "name": "mario/blush", "x": 0.8085327, "y": -1.4510117, "rotation": -89.99995, "width": 57, "height": 36 }
 			},
 			"body": {
-				"body": { "name": "mario/body", "type": "linkedmesh", "skin": "spineboy", "parent": "body", "width": 140.0, "height": 195.0 }
+				"body": { "name": "mario/body", "type": "linkedmesh", "skin": "spineboy", "source": "body", "width": 140.0, "height": 195.0 }
 			},
 			"ear-l": {
-				"ear": { "name": "mario/ear", "type": "linkedmesh", "skin": "spineboy", "parent": "ear", "width": 68.0, "height": 83.0 }
+				"ear": { "name": "mario/ear", "type": "linkedmesh", "skin": "spineboy", "source": "ear", "width": 68.0, "height": 83.0 }
 			},
 			"ear-r": {
-				"ear": { "name": "mario/ear", "type": "linkedmesh", "skin": "spineboy", "parent": "ear", "width": 68.0, "height": 83.0 }
+				"ear": { "name": "mario/ear", "type": "linkedmesh", "skin": "spineboy", "source": "ear", "width": 68.0, "height": 83.0 }
 			},
 			"eye-l": {
 				"eye-3": { "name": "common/eye-3", "x": 1.0117798, "y": -1.9814606, "rotation": -90, "width": 29, "height": 51 },
@@ -1114,10 +1114,10 @@
 				"head-base": { "name": "mario/head-base", "x": 122.13795, "rotation": -90, "width": 286, "height": 249 }
 			},
 			"leg-l": {
-				"leg": { "name": "mario/leg", "type": "linkedmesh", "skin": "spineboy", "parent": "leg", "width": 56.0, "height": 201.0 }
+				"leg": { "name": "mario/leg", "type": "linkedmesh", "skin": "spineboy", "source": "leg", "width": 56.0, "height": 201.0 }
 			},
 			"leg-r": {
-				"leg": { "name": "mario/leg", "type": "linkedmesh", "skin": "spineboy", "parent": "leg", "width": 56.0, "height": 201.0 }
+				"leg": { "name": "mario/leg", "type": "linkedmesh", "skin": "spineboy", "source": "leg", "width": 56.0, "height": 201.0 }
 			},
 			"mouth": {
 				"mouth-3": { "name": "common/mouth-3", "x": 9.500011, "y": 1.414247, "width": 29, "height": 55 },
@@ -1144,13 +1144,13 @@
 		"bones": [ "hair-back-long-middle", "hair-back-long-middle-down", "skirt-middle", "skirt-side-l", "skirt-side-r", "skirt-side-rotator-l", "skirt-side-rotator-r" ],
 		"attachments": {
 			"arm-l": {
-				"arm": { "name": "misaki/arm", "type": "linkedmesh", "skin": "spineboy", "parent": "arm", "width": 55.0, "height": 179.0 }
+				"arm": { "name": "misaki/arm", "type": "linkedmesh", "skin": "spineboy", "source": "arm", "width": 55.0, "height": 179.0 }
 			},
 			"arm-r": {
-				"arm": { "name": "misaki/arm", "type": "linkedmesh", "skin": "spineboy", "parent": "arm", "width": 55.0, "height": 179.0 }
+				"arm": { "name": "misaki/arm", "type": "linkedmesh", "skin": "spineboy", "source": "arm", "width": 55.0, "height": 179.0 }
 			},
 			"back-hair": {
-				"back-hair": { "name": "misaki/back-hair", "type": "linkedmesh", "skin": "spineboy", "parent": "back-hair", "width": 315.0, "height": 282.0 }
+				"back-hair": { "name": "misaki/back-hair", "type": "linkedmesh", "skin": "spineboy", "source": "back-hair", "width": 315.0, "height": 282.0 }
 			},
 			"back-hair-long": {
 				"back-hair-long": {
@@ -1183,13 +1183,13 @@
 				}
 			},
 			"body": {
-				"body": { "name": "misaki/body", "type": "linkedmesh", "skin": "spineboy", "parent": "body", "width": 140.0, "height": 195.0 }
+				"body": { "name": "misaki/body", "type": "linkedmesh", "skin": "spineboy", "source": "body", "width": 140.0, "height": 195.0 }
 			},
 			"ear-l": {
-				"ear": { "name": "misaki/ear", "type": "linkedmesh", "skin": "spineboy", "parent": "ear", "width": 68.0, "height": 83.0 }
+				"ear": { "name": "misaki/ear", "type": "linkedmesh", "skin": "spineboy", "source": "ear", "width": 68.0, "height": 83.0 }
 			},
 			"ear-r": {
-				"ear": { "name": "misaki/ear", "type": "linkedmesh", "skin": "spineboy", "parent": "ear", "width": 68.0, "height": 83.0 }
+				"ear": { "name": "misaki/ear", "type": "linkedmesh", "skin": "spineboy", "source": "ear", "width": 68.0, "height": 83.0 }
 			},
 			"eye-l": {
 				"eye-3": { "name": "common/eye-3", "x": 1.0117798, "y": -1.9814606, "rotation": -90, "width": 29, "height": 51 },
@@ -1283,10 +1283,10 @@
 				"head-base": { "name": "misaki/head-base", "x": 122.13795, "rotation": -90, "width": 286, "height": 249 }
 			},
 			"leg-l": {
-				"leg": { "name": "misaki/leg", "type": "linkedmesh", "skin": "spineboy", "parent": "leg", "width": 56.0, "height": 201.0 }
+				"leg": { "name": "misaki/leg", "type": "linkedmesh", "skin": "spineboy", "source": "leg", "width": 56.0, "height": 201.0 }
 			},
 			"leg-r": {
-				"leg": { "name": "misaki/leg", "type": "linkedmesh", "skin": "spineboy", "parent": "leg", "width": 56.0, "height": 201.0 }
+				"leg": { "name": "misaki/leg", "type": "linkedmesh", "skin": "spineboy", "source": "leg", "width": 56.0, "height": 201.0 }
 			},
 			"mouth": {
 				"mouth-3": { "name": "common/mouth-3", "x": 9.500011, "y": 1.414247, "width": 29, "height": 55 },
@@ -1325,13 +1325,13 @@
 		"name": "nate",
 		"attachments": {
 			"arm-l": {
-				"arm": { "name": "nate/arm", "type": "linkedmesh", "skin": "spineboy", "parent": "arm", "width": 55.0, "height": 179.0 }
+				"arm": { "name": "nate/arm", "type": "linkedmesh", "skin": "spineboy", "source": "arm", "width": 55.0, "height": 179.0 }
 			},
 			"arm-r": {
-				"arm": { "name": "nate/arm", "type": "linkedmesh", "skin": "spineboy", "parent": "arm", "width": 55.0, "height": 179.0 }
+				"arm": { "name": "nate/arm", "type": "linkedmesh", "skin": "spineboy", "source": "arm", "width": 55.0, "height": 179.0 }
 			},
 			"back-hair": {
-				"back-hair": { "name": "nate/back-hair", "type": "linkedmesh", "skin": "spineboy", "parent": "back-hair", "width": 315.0, "height": 282.0 }
+				"back-hair": { "name": "nate/back-hair", "type": "linkedmesh", "skin": "spineboy", "source": "back-hair", "width": 315.0, "height": 282.0 }
 			},
 			"beard": {
 				"beard": {
@@ -1361,13 +1361,13 @@
 				}
 			},
 			"body": {
-				"body": { "name": "nate/body", "type": "linkedmesh", "skin": "spineboy", "parent": "body", "width": 140.0, "height": 195.0 }
+				"body": { "name": "nate/body", "type": "linkedmesh", "skin": "spineboy", "source": "body", "width": 140.0, "height": 195.0 }
 			},
 			"ear-l": {
-				"ear": { "name": "nate/ear", "type": "linkedmesh", "skin": "spineboy", "parent": "ear", "width": 68.0, "height": 83.0 }
+				"ear": { "name": "nate/ear", "type": "linkedmesh", "skin": "spineboy", "source": "ear", "width": 68.0, "height": 83.0 }
 			},
 			"ear-r": {
-				"ear": { "name": "nate/ear", "type": "linkedmesh", "skin": "spineboy", "parent": "ear", "width": 68.0, "height": 83.0 }
+				"ear": { "name": "nate/ear", "type": "linkedmesh", "skin": "spineboy", "source": "ear", "width": 68.0, "height": 83.0 }
 			},
 			"eye-l": {
 				"eye-3": { "name": "common/eye-3", "x": 1.0117798, "y": -1.9814606, "rotation": -90, "width": 29, "height": 51 },
@@ -1461,10 +1461,10 @@
 				"head-base": { "name": "nate/head-base", "x": 122.13795, "rotation": -90, "width": 286, "height": 249 }
 			},
 			"leg-l": {
-				"leg": { "name": "nate/leg", "type": "linkedmesh", "skin": "spineboy", "parent": "leg", "width": 56.0, "height": 201.0 }
+				"leg": { "name": "nate/leg", "type": "linkedmesh", "skin": "spineboy", "source": "leg", "width": 56.0, "height": 201.0 }
 			},
 			"leg-r": {
-				"leg": { "name": "nate/leg", "type": "linkedmesh", "skin": "spineboy", "parent": "leg", "width": 56.0, "height": 201.0 }
+				"leg": { "name": "nate/leg", "type": "linkedmesh", "skin": "spineboy", "source": "leg", "width": 56.0, "height": 201.0 }
 			},
 			"mouth": {
 				"mouth-3": { "name": "common/mouth-3", "x": 9.500011, "y": 1.414247, "width": 29, "height": 55 },
@@ -1491,13 +1491,13 @@
 		"bones": [ "hair-front" ],
 		"attachments": {
 			"arm-l": {
-				"arm": { "name": "sinisa/arm", "type": "linkedmesh", "skin": "spineboy", "parent": "arm", "width": 55.0, "height": 179.0 }
+				"arm": { "name": "sinisa/arm", "type": "linkedmesh", "skin": "spineboy", "source": "arm", "width": 55.0, "height": 179.0 }
 			},
 			"arm-r": {
-				"arm": { "name": "sinisa/arm", "type": "linkedmesh", "skin": "spineboy", "parent": "arm", "width": 55.0, "height": 179.0 }
+				"arm": { "name": "sinisa/arm", "type": "linkedmesh", "skin": "spineboy", "source": "arm", "width": 55.0, "height": 179.0 }
 			},
 			"back-hair": {
-				"back-hair": { "name": "sinisa/back-hair", "type": "linkedmesh", "skin": "spineboy", "parent": "back-hair", "width": 315.0, "height": 282.0 }
+				"back-hair": { "name": "sinisa/back-hair", "type": "linkedmesh", "skin": "spineboy", "source": "back-hair", "width": 315.0, "height": 282.0 }
 			},
 			"beard": {
 				"beard": {
@@ -1527,16 +1527,16 @@
 				}
 			},
 			"body": {
-				"body": { "name": "sinisa/body", "type": "linkedmesh", "skin": "spineboy", "parent": "body", "width": 140.0, "height": 195.0 }
+				"body": { "name": "sinisa/body", "type": "linkedmesh", "skin": "spineboy", "source": "body", "width": 140.0, "height": 195.0 }
 			},
 			"body-decoration": {
 				"body-decoration": { "name": "sinisa/body-decoration", "x": 77.41772, "y": -26.5, "rotation": -90, "width": 53, "height": 54 }
 			},
 			"ear-l": {
-				"ear": { "name": "sinisa/ear", "type": "linkedmesh", "skin": "spineboy", "parent": "ear", "width": 68.0, "height": 83.0 }
+				"ear": { "name": "sinisa/ear", "type": "linkedmesh", "skin": "spineboy", "source": "ear", "width": 68.0, "height": 83.0 }
 			},
 			"ear-r": {
-				"ear": { "name": "sinisa/ear", "type": "linkedmesh", "skin": "spineboy", "parent": "ear", "width": 68.0, "height": 83.0 }
+				"ear": { "name": "sinisa/ear", "type": "linkedmesh", "skin": "spineboy", "source": "ear", "width": 68.0, "height": 83.0 }
 			},
 			"eye-l": {
 				"eye-3": { "name": "common/eye-3", "x": 1.0117798, "y": -1.9814606, "rotation": -90, "width": 29, "height": 51 },
@@ -1601,10 +1601,10 @@
 				"head-base": { "name": "sinisa/head-base", "x": 122.13795, "rotation": -90, "width": 286, "height": 249 }
 			},
 			"leg-l": {
-				"leg": { "name": "sinisa/leg", "type": "linkedmesh", "skin": "spineboy", "parent": "leg", "width": 56.0, "height": 201.0 }
+				"leg": { "name": "sinisa/leg", "type": "linkedmesh", "skin": "spineboy", "source": "leg", "width": 56.0, "height": 201.0 }
 			},
 			"leg-r": {
-				"leg": { "name": "sinisa/leg", "type": "linkedmesh", "skin": "spineboy", "parent": "leg", "width": 56.0, "height": 201.0 }
+				"leg": { "name": "sinisa/leg", "type": "linkedmesh", "skin": "spineboy", "source": "leg", "width": 56.0, "height": 201.0 }
 			},
 			"mouth": {
 				"mouth-3": { "name": "common/mouth-3", "x": 9.500011, "y": 1.414247, "width": 29, "height": 55 },
@@ -1631,10 +1631,10 @@
 		"bones": [ "hair-front" ],
 		"attachments": {
 			"arm-l": {
-				"arm": { "name": "soeren/arm", "type": "linkedmesh", "skin": "spineboy", "parent": "arm", "width": 55.0, "height": 179.0 }
+				"arm": { "name": "soeren/arm", "type": "linkedmesh", "skin": "spineboy", "source": "arm", "width": 55.0, "height": 179.0 }
 			},
 			"arm-r": {
-				"arm": { "name": "soeren/arm", "type": "linkedmesh", "skin": "spineboy", "parent": "arm", "width": 55.0, "height": 179.0 }
+				"arm": { "name": "soeren/arm", "type": "linkedmesh", "skin": "spineboy", "source": "arm", "width": 55.0, "height": 179.0 }
 			},
 			"back-hair": {
 				"back-hair": {
@@ -1677,13 +1677,13 @@
 				}
 			},
 			"body": {
-				"body": { "name": "soeren/body", "type": "linkedmesh", "skin": "spineboy", "parent": "body", "width": 140.0, "height": 195.0 }
+				"body": { "name": "soeren/body", "type": "linkedmesh", "skin": "spineboy", "source": "body", "width": 140.0, "height": 195.0 }
 			},
 			"ear-l": {
-				"ear": { "name": "soeren/ear", "type": "linkedmesh", "skin": "spineboy", "parent": "ear", "width": 68.0, "height": 83.0 }
+				"ear": { "name": "soeren/ear", "type": "linkedmesh", "skin": "spineboy", "source": "ear", "width": 68.0, "height": 83.0 }
 			},
 			"ear-r": {
-				"ear": { "name": "soeren/ear", "type": "linkedmesh", "skin": "spineboy", "parent": "ear", "width": 68.0, "height": 83.0 }
+				"ear": { "name": "soeren/ear", "type": "linkedmesh", "skin": "spineboy", "source": "ear", "width": 68.0, "height": 83.0 }
 			},
 			"eye-l": {
 				"eye-3": { "name": "common/eye-3", "x": 1.0117798, "y": -1.9814606, "rotation": -90, "width": 29, "height": 51 },
@@ -1793,10 +1793,10 @@
 				"head-base": { "name": "soeren/head-base", "x": 122.13795, "rotation": -90, "width": 286, "height": 249 }
 			},
 			"leg-l": {
-				"leg": { "name": "soeren/leg", "type": "linkedmesh", "skin": "spineboy", "parent": "leg", "width": 56.0, "height": 201.0 }
+				"leg": { "name": "soeren/leg", "type": "linkedmesh", "skin": "spineboy", "source": "leg", "width": 56.0, "height": 201.0 }
 			},
 			"leg-r": {
-				"leg": { "name": "soeren/leg", "type": "linkedmesh", "skin": "spineboy", "parent": "leg", "width": 56.0, "height": 201.0 }
+				"leg": { "name": "soeren/leg", "type": "linkedmesh", "skin": "spineboy", "source": "leg", "width": 56.0, "height": 201.0 }
 			},
 			"mouth": {
 				"mouth-3": { "name": "common/mouth-3", "x": 9.500011, "y": 1.414247, "width": 29, "height": 55 },

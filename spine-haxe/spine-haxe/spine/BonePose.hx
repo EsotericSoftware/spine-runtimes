@@ -262,8 +262,8 @@ class BonePose implements Pose<BonePose> implements Update {
 					ib = pb * pid;
 				case Inherit.noScale, Inherit.noScaleOrReflection:
 					var r = rotation * MathUtils.degRad,
-						cos = Math.cos(rotation),
-						sin = Math.sin(rotation);
+						cos = Math.cos(r),
+						sin = Math.sin(r);
 					pa = (pa * cos + pb * sin) / skeleton.scaleX;
 					pc = (pc * cos + pd * sin) / skeleton.scaleY;
 					var s = Math.sqrt(pa * pa + pc * pc);
@@ -405,7 +405,7 @@ class BonePose implements Pose<BonePose> implements Update {
 
 	/** Transforms a local rotation to a world rotation. */
 	public function localToWorldRotation(localRotation:Float):Float {
-		localRotation -= rotation - shearX;
+		localRotation -= rotation + shearX;
 		var sin:Float = MathUtils.sinDeg(localRotation),
 			cos:Float = MathUtils.cosDeg(localRotation);
 		return Math.atan2(cos * c + sin * d, cos * a + sin * b) * MathUtils.radDeg;

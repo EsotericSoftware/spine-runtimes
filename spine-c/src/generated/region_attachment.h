@@ -65,6 +65,9 @@ SPINE_C_API void spine_region_attachment_compute_u_vs(/*@null*/ spine_texture_re
 SPINE_C_API const char *spine_region_attachment_get_name(spine_region_attachment self);
 SPINE_C_API /*@null*/ spine_attachment spine_region_attachment_get_timeline_attachment(spine_region_attachment self);
 SPINE_C_API void spine_region_attachment_set_timeline_attachment(spine_region_attachment self, /*@null*/ spine_attachment attachment);
+SPINE_C_API spine_array_int spine_region_attachment_get_timeline_slots(spine_region_attachment self);
+SPINE_C_API void spine_region_attachment_set_timeline_slots(spine_region_attachment self, spine_array_int timelineSlots);
+SPINE_C_API bool spine_region_attachment_is_timeline_active(spine_region_attachment self, spine_array_slot slots, int slotIndex, bool appliedPose);
 SPINE_C_API int spine_region_attachment_get_ref_count(spine_region_attachment self);
 SPINE_C_API void spine_region_attachment_reference(spine_region_attachment self);
 SPINE_C_API void spine_region_attachment_dereference(spine_region_attachment self);

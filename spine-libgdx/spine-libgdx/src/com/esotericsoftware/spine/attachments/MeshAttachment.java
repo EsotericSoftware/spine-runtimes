@@ -47,7 +47,7 @@ public class MeshAttachment extends VertexAttachment implements HasSequence {
 	private int hullLength;
 	private String path;
 	private final Color color = new Color(1, 1, 1, 1);
-	private @Null MeshAttachment parentMesh;
+	private @Null MeshAttachment sourceMesh;
 
 	// Nonessential.
 	private @Null short[] edges;
@@ -63,7 +63,7 @@ public class MeshAttachment extends VertexAttachment implements HasSequence {
 	protected MeshAttachment (MeshAttachment other) {
 		super(other);
 
-		if (parentMesh != null) throw new IllegalArgumentException("Use newLinkedMesh to copy a linked mesh.");
+		if (sourceMesh != null) throw new IllegalArgumentException("Use newLinkedMesh to copy a linked mesh.");
 
 		path = other.path;
 		color.set(other.color);
@@ -162,41 +162,41 @@ public class MeshAttachment extends VertexAttachment implements HasSequence {
 		this.height = height;
 	}
 
-	/** The parent mesh if this is a linked mesh, else null. A linked mesh shares the {@link #bones}, {@link #vertices},
+	/** The source mesh if this is a linked mesh, else null. A linked mesh shares the {@link #bones}, {@link #vertices},
 	 * {@link #regionUVs}, {@link #triangles}, {@link #hullLength}, {@link #edges}, {@link #width}, and {@link #height} with the
-	 * parent mesh, but may have a different {@link #name} or {@link #path}, and therefore a different texture region. */
-	public @Null MeshAttachment getParentMesh () {
-		return parentMesh;
+	 * source mesh, but may have a different {@link #name} or {@link #path}, and therefore a different texture region. */
+	public @Null MeshAttachment getSourceMesh () {
+		return sourceMesh;
 	}
 
-	public void setParentMesh (@Null MeshAttachment parentMesh) {
-		this.parentMesh = parentMesh;
-		if (parentMesh != null) {
-			bones = parentMesh.bones;
-			vertices = parentMesh.vertices;
-			regionUVs = parentMesh.regionUVs;
-			triangles = parentMesh.triangles;
-			hullLength = parentMesh.hullLength;
-			worldVerticesLength = parentMesh.worldVerticesLength;
-			edges = parentMesh.edges;
-			width = parentMesh.width;
-			height = parentMesh.height;
+	public void setSourceMesh (@Null MeshAttachment sourceMesh) {
+		this.sourceMesh = sourceMesh;
+		if (sourceMesh != null) {
+			bones = sourceMesh.bones;
+			vertices = sourceMesh.vertices;
+			regionUVs = sourceMesh.regionUVs;
+			triangles = sourceMesh.triangles;
+			hullLength = sourceMesh.hullLength;
+			worldVerticesLength = sourceMesh.worldVerticesLength;
+			edges = sourceMesh.edges;
+			width = sourceMesh.width;
+			height = sourceMesh.height;
 		}
 	}
 
-	/** Returns a new mesh with the {@link #parentMesh} set to this mesh's parent mesh, if any, else to this mesh. */
+	/** Returns a new mesh with the {@link #sourceMesh} set to this mesh's source mesh, if any, else to this mesh. */
 	public MeshAttachment newLinkedMesh () {
 		var mesh = new MeshAttachment(name, new Sequence(sequence));
 		mesh.timelineAttachment = timelineAttachment;
 		mesh.path = path;
 		mesh.color.set(color);
-		mesh.setParentMesh(parentMesh != null ? parentMesh : this);
+		mesh.setSourceMesh(sourceMesh != null ? sourceMesh : this);
 		mesh.updateSequence();
 		return mesh;
 	}
 
 	public MeshAttachment copy () {
-		return parentMesh != null ? newLinkedMesh() : new MeshAttachment(this);
+		return sourceMesh != null ? newLinkedMesh() : new MeshAttachment(this);
 	}
 
 	/** Computes {@link Sequence#getUVs(int) UVs} for a mesh attachment.

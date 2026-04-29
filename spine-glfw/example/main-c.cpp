@@ -125,11 +125,13 @@ int main() {
 		spine_skeleton_set_scale(skeleton, 0.3f, 0.3f);
 
 		// Create an AnimationState to drive animations on the skeleton. Set the "portal" animation
-		// on track with index 0.
+		// on track with index 0, then queue "death" and finally loop "run" so the transition after
+		// portal can be observed more easily.
 		spine_animation_state animation_state = spine_skeleton_drawable_get_animation_state(drawable);
 		spine_animation_state_data animation_state_data = spine_animation_state_get_data(animation_state);
 		spine_animation_state_data_set_default_mix(animation_state_data, 0.2f);
-		spine_animation_state_set_animation_1(animation_state, 0, "portal", true);
+		spine_animation_state_set_animation_1(animation_state, 0, "portal", false);
+		spine_animation_state_add_animation_1(animation_state, 0, "death", false, 0);
 		spine_track_entry entry = spine_animation_state_add_animation_1(animation_state, 0, "run", true, 0);
 		spine_track_entry_set_listener(entry, track_listener, NULL);
 

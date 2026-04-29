@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "MSvXUku8u+I",
-	"spine": "4.3.44-beta",
+	"hash": "qGaDaRzUa3A",
+	"spine": "4.3.75-beta",
 	"x": -134.11865,
 	"y": -3.2799225,
 	"width": 266.9363,
@@ -503,7 +503,7 @@
 				"left-arm": { "name": "goblingirl/left-arm", "x": 19.64079, "y": -2.427963, "rotation": 33.05112, "width": 37, "height": 35 }
 			},
 			"left-foot": {
-				"left-foot": { "name": "goblingirl/left-foot", "type": "linkedmesh", "skin": "goblin", "parent": "left-foot", "width": 65.0, "height": 31.0 }
+				"left-foot": { "name": "goblingirl/left-foot", "type": "linkedmesh", "skin": "goblin", "source": "left-foot", "width": 65.0, "height": 31.0 }
 			},
 			"left-hand": {
 				"left-hand": {
@@ -536,7 +536,7 @@
 				"right-arm": { "name": "goblingirl/right-arm", "x": 16.851105, "y": -0.6603317, "rotation": 93.52624, "width": 28, "height": 50 }
 			},
 			"right-foot": {
-				"right-foot": { "name": "goblingirl/right-foot", "type": "linkedmesh", "skin": "goblin", "parent": "right-foot", "width": 63.0, "height": 33.0 }
+				"right-foot": { "name": "goblingirl/right-foot", "type": "linkedmesh", "skin": "goblin", "source": "right-foot", "width": 63.0, "height": 33.0 }
 			},
 			"right-hand": {
 				"right-hand": { "name": "goblingirl/right-hand", "x": 7.217323, "y": 3.437336, "rotation": 91.16736, "width": 36, "height": 37 }

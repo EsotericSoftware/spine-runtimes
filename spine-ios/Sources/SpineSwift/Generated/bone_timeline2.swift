@@ -44,7 +44,7 @@ open class BoneTimeline2: CurveTimeline, BoneTimeline {
     public var boneIndex: Int32 {
         get {
             let result = spine_bone_timeline2_get_bone_index(_ptr.assumingMemoryBound(to: spine_bone_timeline2_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_bone_timeline2_set_bone_index(_ptr.assumingMemoryBound(to: spine_bone_timeline2_wrapper.self), newValue)

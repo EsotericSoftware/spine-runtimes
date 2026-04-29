@@ -58,8 +58,7 @@ namespace Spine.Unity.Editor {
 					"Alternatively you can re-export your atlas from Spine with straight alpha instead.", atlasName),
 					"Switch to Gamma", "Export Instructions", "Don't show again");
 				if (result == 0) { // Switch to Gamma
-					PlayerSettings.colorSpace = ColorSpace.Gamma;
-					Debug.Log("Switched Unity project to Gamma color space to support PMA atlas textures. To change it back go to 'Project Settings - Player - Other Settings - Color Space'.");
+					AssetUtility.DelayedSwitchToGamma();
 				} else if (result == 1) { // Export Instructions
 					Application.OpenURL(REEXPORT_INSTRUCTIONS_URL);
 				} else { // Don't show again
@@ -212,8 +211,7 @@ namespace Spine.Unity.Editor {
 			GUILayout.FlexibleSpace();
 			if (GUILayout.Button("Switch to Gamma", GUILayout.Width(120), GUILayout.Height(24))) {
 				dialogResult = DialogResult.Switch;
-				PlayerSettings.colorSpace = ColorSpace.Gamma;
-				Debug.Log("Switched Unity project to Gamma color space to support PMA atlas textures. To change it back go to 'Project Settings - Player - Other Settings - Color Space'.");
+				AssetUtility.DelayedSwitchToGamma();
 				currentWindow = null;
 				Close();
 			}

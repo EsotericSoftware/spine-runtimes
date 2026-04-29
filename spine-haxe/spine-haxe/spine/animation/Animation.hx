@@ -31,6 +31,7 @@ package spine.animation;
 
 import haxe.ds.IntMap;
 import haxe.ds.StringMap;
+import spine.Color;
 import spine.Event;
 import spine.Skeleton;
 
@@ -46,6 +47,11 @@ class Animation {
 	public var timelines:Array<Timeline>;
 	public final timelineIds:StringMap<Bool> = new StringMap<Bool>();
 	public final bones:Array<Int>;
+
+	// Nonessential.
+
+	/** The color of the animation as it was in Spine, or a default color if nonessential data was not exported. */
+	public final color:Color = new Color(1, 1, 1, 1);
 
 	public function new(name:String, timelines:Array<Timeline>, duration:Float) {
 		if (name == null)

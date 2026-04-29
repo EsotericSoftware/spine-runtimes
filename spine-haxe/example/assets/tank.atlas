@@ -3,53 +3,52 @@ tank.png
 	filter: Linear, Linear
 	scale: 0.5
 antenna
-	bounds: 804, 452, 11, 152
+	bounds: 941, 507, 11, 152
 cannon
-	bounds: 2, 322, 466, 29
+	bounds: 2, 377, 466, 29
 cannon-connector
-	bounds: 647, 423, 56, 68
+	bounds: 951, 511, 56, 68
 ground
-	bounds: 817, 92, 512, 177
-	rotate: 90
+	bounds: 2, 25, 512, 177
 guntower
-	bounds: 2, 2, 365, 145
-machinegun
-	bounds: 773, 438, 166, 29
+	bounds: 649, 2, 365, 145
 	rotate: 90
+machinegun
+	bounds: 773, 630, 166, 29
 machinegun-mount
-	bounds: 773, 388, 36, 48
+	bounds: 647, 498, 36, 48
 rock
-	bounds: 707, 314, 290, 64
+	bounds: 707, 369, 290, 64
 	rotate: 90
 smoke-glow
-	bounds: 647, 372, 50, 50
+	bounds: 871, 508, 50, 50
 smoke-puff01-bg
-	bounds: 557, 57, 92, 62
+	bounds: 773, 373, 92, 62
 smoke-puff01-fg
-	bounds: 651, 60, 88, 59
+	bounds: 867, 319, 88, 59
 smoke-puff02-fg
-	bounds: 463, 85, 92, 62
+	bounds: 868, 380, 92, 62
 smoke-puff03-fg
-	bounds: 369, 85, 92, 62
+	bounds: 868, 444, 92, 62
 smoke-puff04-fg
-	bounds: 815, 42, 78, 48
+	bounds: 796, 269, 78, 48
 tank-bottom
-	bounds: 2, 353, 643, 138
+	bounds: 2, 408, 643, 138
 tank-bottom-shadow
-	bounds: 2, 149, 646, 171
+	bounds: 2, 204, 646, 171
 tank-top
-	bounds: 2, 493, 704, 111
+	bounds: 2, 548, 704, 111
 tread
-	bounds: 647, 355, 48, 15
+	bounds: 647, 481, 48, 15
 tread-inside
-	bounds: 996, 590, 13, 14
+	bounds: 994, 565, 13, 14
 wheel-big
-	bounds: 650, 216, 96, 96
+	bounds: 773, 532, 96, 96
 wheel-big-overlay
-	bounds: 650, 121, 93, 93
+	bounds: 773, 437, 93, 93
 wheel-mid
-	bounds: 745, 146, 68, 68
+	bounds: 952, 581, 68, 68
 wheel-mid-overlay
-	bounds: 745, 76, 68, 68
+	bounds: 871, 560, 68, 68
 wheel-small
-	bounds: 773, 350, 36, 36
+	bounds: 986, 474, 36, 36

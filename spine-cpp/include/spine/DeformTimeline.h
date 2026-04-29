@@ -46,6 +46,9 @@ namespace spine {
 	public:
 		explicit DeformTimeline(size_t frameCount, size_t bezierCount, int slotIndex, VertexAttachment &attachment);
 
+		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+						   bool appliedPose) override;
+
 		/// Sets the time and vertices for the specified frame.
 		void setFrame(int frameIndex, float time, Array<float> &vertices);
 
@@ -70,6 +73,12 @@ namespace spine {
 		void _apply(Slot &slot, SlotPose &pose, float time, float alpha, bool fromSetup, bool add) override;
 
 	private:
+		void applyBeforeFirst(Slot &slot, bool appliedPose, bool fromSetup);
+		void applyToPose(SlotPose &pose, Array<float> &v1, Array<float> *v2, float percent, size_t vertexCount, float alpha, bool fromSetup,
+						 bool add);
+		void applyToSlot(Slot &slot, bool appliedPose, Array<float> &v1, Array<float> *v2, float percent, size_t vertexCount, float alpha,
+						 bool fromSetup, bool add);
+
 		Array<Array<float>> _vertices;
 
 		VertexAttachment *_attachment;

@@ -37,7 +37,9 @@ import spine.Skeleton;
 import spine.Slot;
 
 /** Changes a slot's spine.Slot.deform to deform a spine.attachments.VertexAttachment. */
-class DeformTimeline extends SlotCurveTimeline {
+class DeformTimeline extends CurveTimeline implements SlotTimeline {
+	public final slotIndex:Int;
+
 	/** The attachment that will be deformed.
 	 *
 	 * @see spine.attachments.VertexAttachment.getTimelineAttachment() */
@@ -47,11 +49,16 @@ class DeformTimeline extends SlotCurveTimeline {
 	public final vertices:Array<Array<Float>>;
 
 	public function new(frameCount:Int, bezierCount:Int, slotIndex:Int, attachment:VertexAttachment) {
-		super(frameCount, bezierCount, slotIndex, Property.deform + "|" + slotIndex + "|" + attachment.id);
+		super(frameCount, bezierCount, Property.deform + "|" + slotIndex + "|" + attachment.id);
 		this.slotIndex = slotIndex;
 		this.attachment = attachment;
 		vertices = new Array<Array<Float>>();
 		vertices.resize(frameCount);
+		this.additive = true;
+	}
+
+	public function getSlotIndex():Int {
+		return slotIndex;
 	}
 
 	public override function getFrameCount():Int {
@@ -139,128 +146,159 @@ class DeformTimeline extends SlotCurveTimeline {
 		return y + (1 - y) * (time - x) / (frames[frame + getFrameEntries()] - x);
 	}
 
-	public function apply1(slot:Slot, pose:SlotPose, time:Float, alpha:Float, fromSetup:Bool, add:Bool) {
-		if (!Std.isOfType(pose.attachment, VertexAttachment))
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
+			appliedPose:Bool):Void {
+		var slots = skeleton.slots;
+		if (!attachment.isTimelineActive(slots, slotIndex, appliedPose))
 			return;
-		var vertexAttachment = cast(pose.attachment, VertexAttachment);
-		if (vertexAttachment.timelineAttachment != attachment)
+		var timelineSlots = attachment.timelineSlots;
+
+		if (time < frames[0]) {
+			applyBeforeFirst(slots[slotIndex], appliedPose, fromSetup);
+			for (i in 0...timelineSlots.length)
+				applyBeforeFirst(slots[timelineSlots[i]], appliedPose, fromSetup);
+			return;
+		}
+
+		var v1:Array<Float>, v2:Array<Float>;
+		var percent:Float;
+		if (time >= frames[frames.length - 1]) {
+			percent = 0;
+			v1 = vertices[frames.length - 1];
+			v2 = null;
+		} else {
+			var frame = Timeline.search1(frames, time);
+			percent = getCurvePercent(time, frame);
+			v1 = vertices[frame];
+			v2 = vertices[frame + 1];
+		}
+
+		var vertexCount = vertices[0].length;
+		applyToSlot(slots[slotIndex], appliedPose, v1, v2, percent, vertexCount, alpha, fromSetup, add);
+		for (i in 0...timelineSlots.length)
+			applyToSlot(slots[timelineSlots[i]], appliedPose, v1, v2, percent, vertexCount, alpha, fromSetup, add);
+	}
+
+	private function applyBeforeFirst(slot:Slot, appliedPose:Bool, fromSetup:Bool):Void {
+		if (!slot.bone.active)
+			return;
+		var pose = appliedPose ? slot.appliedPose : slot.pose;
+		if (pose.attachment == null || pose.attachment.timelineAttachment != attachment)
+			return;
+		if (pose.deform.length == 0)
+			fromSetup = true;
+		if (fromSetup)
+			pose.deform.resize(0);
+	}
+
+	private function applyToSlot(slot:Slot, appliedPose:Bool, v1:Array<Float>, v2:Array<Float>, percent:Float, vertexCount:Int, alpha:Float, fromSetup:Bool,
+			add:Bool):Void {
+		if (!slot.bone.active)
+			return;
+		var pose = appliedPose ? slot.appliedPose : slot.pose;
+		if (pose.attachment == null || pose.attachment.timelineAttachment != attachment)
 			return;
 
+		var vertexAttachment = cast(pose.attachment, VertexAttachment);
 		var deform = pose.deform;
 		if (deform.length == 0)
 			fromSetup = true;
-
-		var vertexCount = vertices[0].length;
-
-		if (time < frames[0]) {
-			if (fromSetup)
-				deform.resize(0);
-			return;
-		}
-
 		ArrayUtils.resize(deform, vertexCount, 0);
 
-		if (time >= frames[frames.length - 1]) { // Time is after last frame.
-			var lastVertices:Array<Float> = vertices[frames.length - 1];
+		if (v2 == null) { // Time is after last frame.
 			if (alpha == 1) {
 				if (add && !fromSetup) {
-					if (vertexAttachment.bones == null) {
+					if (vertexAttachment.bones == null) { // Unweighted vertex positions, no alpha.
 						var setupVertices = vertexAttachment.vertices;
 						for (i in 0...vertexCount)
-							deform[i] += lastVertices[i] - setupVertices[i];
-					} else {
+							deform[i] += v1[i] - setupVertices[i];
+					} else { // Weighted deform offsets, no alpha.
 						for (i in 0...vertexCount)
-							deform[i] += lastVertices[i];
+							deform[i] += v1[i];
 					}
-				} else
+				} else { // Vertex positions or deform offsets, no alpha.
 					for (i in 0...vertexCount)
-						deform[i] = lastVertices[i];
+						deform[i] = v1[i];
+				}
 			} else if (fromSetup) {
-				if (vertexAttachment.bones == null) {
+				if (vertexAttachment.bones == null) { // Unweighted vertex positions, with alpha.
 					var setupVertices = vertexAttachment.vertices;
 					for (i in 0...vertexCount) {
 						var setup = setupVertices[i];
-						deform[i] = setup + (lastVertices[i] - setup) * alpha;
+						deform[i] = setup + (v1[i] - setup) * alpha;
 					}
-				} else {
+				} else { // Weighted deform offsets, with alpha.
 					for (i in 0...vertexCount)
-						deform[i] = lastVertices[i] * alpha;
+						deform[i] = v1[i] * alpha;
 				}
 			} else if (add) {
-				if (vertexAttachment.bones == null) {
+				if (vertexAttachment.bones == null) { // Unweighted vertex positions, with alpha.
 					var setupVertices = vertexAttachment.vertices;
 					for (i in 0...vertexCount)
-						deform[i] += (lastVertices[i] - setupVertices[i]) * alpha;
-				} else {
+						deform[i] += (v1[i] - setupVertices[i]) * alpha;
+				} else { // Weighted deform offsets, with alpha.
 					for (i in 0...vertexCount)
-						deform[i] += lastVertices[i] * alpha;
+						deform[i] += v1[i] * alpha;
 				}
-			} else {
+			} else { // Vertex positions or deform offsets, with alpha.
 				for (i in 0...vertexCount)
-					deform[i] += (lastVertices[i] - deform[i]) * alpha;
+					deform[i] += (v1[i] - deform[i]) * alpha;
 			}
-			return;
-		}
-
-		// Interpolate between the previous frame and the current frame.
-		var frame:Int = Timeline.search1(frames, time);
-		var percent:Float = getCurvePercent(time, frame);
-		var prevVertices:Array<Float> = vertices[frame];
-		var nextVertices:Array<Float> = vertices[frame + 1];
-
-		if (alpha == 1) {
-			if (add && !fromSetup) {
-				if (vertexAttachment.bones == null) {
+		} else { // Between frames.
+			if (alpha == 1) {
+				if (add && !fromSetup) {
+					if (vertexAttachment.bones == null) { // Unweighted vertex positions, no alpha.
+						var setupVertices = vertexAttachment.vertices;
+						for (i in 0...vertexCount) {
+							var prev = v1[i];
+							deform[i] += prev + (v2[i] - prev) * percent - setupVertices[i];
+						}
+					} else { // Weighted deform offsets, no alpha.
+						for (i in 0...vertexCount) {
+							var prev = v1[i];
+							deform[i] += prev + (v2[i] - prev) * percent;
+						}
+					}
+				} else if (percent == 0) {
+					for (i in 0...vertexCount)
+						deform[i] = v1[i];
+				} else { // Vertex positions or deform offsets, no alpha.
+					for (i in 0...vertexCount) {
+						var prev = v1[i];
+						deform[i] = prev + (v2[i] - prev) * percent;
+					}
+				}
+			} else if (fromSetup) {
+				if (vertexAttachment.bones == null) { // Unweighted vertex positions, with alpha.
 					var setupVertices = vertexAttachment.vertices;
 					for (i in 0...vertexCount) {
-						var prev = prevVertices[i];
-						deform[i] += prev + (nextVertices[i] - prev) * percent - setupVertices[i];
+						var prev = v1[i], setup = setupVertices[i];
+						deform[i] = setup + (prev + (v2[i] - prev) * percent - setup) * alpha;
 					}
-				} else {
+				} else { // Weighted deform offsets, with alpha.
 					for (i in 0...vertexCount) {
-						var prev = prevVertices[i];
-						deform[i] += prev + (nextVertices[i] - prev) * percent;
+						var prev = v1[i];
+						deform[i] = (prev + (v2[i] - prev) * percent) * alpha;
 					}
 				}
-			} else if (percent == 0) {
-				for (i in 0...vertexCount)
-					deform[i] = prevVertices[i];
-			} else {
-				for (i in 0...vertexCount) {
-					var prev = prevVertices[i];
-					deform[i] = prev + (nextVertices[i] - prev) * percent;
+			} else if (add) {
+				if (vertexAttachment.bones == null) { // Unweighted vertex positions, with alpha.
+					var setupVertices = vertexAttachment.vertices;
+					for (i in 0...vertexCount) {
+						var prev = v1[i];
+						deform[i] += (prev + (v2[i] - prev) * percent - setupVertices[i]) * alpha;
+					}
+				} else { // Weighted deform offsets, with alpha.
+					for (i in 0...vertexCount) {
+						var prev = v1[i];
+						deform[i] += (prev + (v2[i] - prev) * percent) * alpha;
+					}
 				}
-			}
-		} else if (fromSetup) {
-			if (vertexAttachment.bones == null) {
-				var setupVertices = vertexAttachment.vertices;
+			} else { // Vertex positions or deform offsets, with alpha.
 				for (i in 0...vertexCount) {
-					var prev = prevVertices[i], setup = setupVertices[i];
-					deform[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
+					var prev = v1[i];
+					deform[i] += (prev + (v2[i] - prev) * percent - deform[i]) * alpha;
 				}
-			} else {
-				for (i in 0...vertexCount) {
-					var prev = prevVertices[i];
-					deform[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
-				}
-			}
-		} else if (add) {
-			if (vertexAttachment.bones == null) {
-				var setupVertices = vertexAttachment.vertices;
-				for (i in 0...vertexCount) {
-					var prev = prevVertices[i];
-					deform[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
-				}
-			} else {
-				for (i in 0...vertexCount) {
-					var prev = prevVertices[i];
-					deform[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
-				}
-			}
-		} else {
-			for (i in 0...vertexCount) {
-				var prev = prevVertices[i];
-				deform[i] += (prev + (nextVertices[i] - prev) * percent - deform[i]) * alpha;
 			}
 		}
 	}

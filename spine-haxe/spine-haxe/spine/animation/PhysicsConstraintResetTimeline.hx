@@ -41,6 +41,7 @@ class PhysicsConstraintResetTimeline extends Timeline implements ConstraintTimel
 	public function new(frameCount:Int, constraintIndex:Int) {
 		super(frameCount, Property.physicsConstraintReset);
 		this.constraintIndex = constraintIndex;
+		this.instant = true;
 	}
 
 	public function getConstraintIndex() {

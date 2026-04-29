@@ -49,7 +49,7 @@ public class AlphaTimeline: CurveTimeline1, SlotTimeline {
     public var slotIndex: Int32 {
         get {
             let result = spine_alpha_timeline_get_slot_index(_ptr.assumingMemoryBound(to: spine_alpha_timeline_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_alpha_timeline_set_slot_index(_ptr.assumingMemoryBound(to: spine_alpha_timeline_wrapper.self), newValue)

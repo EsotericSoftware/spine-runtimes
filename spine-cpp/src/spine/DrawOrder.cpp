@@ -52,7 +52,7 @@ Array<Slot *> &DrawOrder::getAppliedPose() {
 	return *_appliedPose;
 }
 
-void DrawOrder::pose() {
+void DrawOrder::unconstrained() {
 	_appliedPose = &_pose;
 }
 

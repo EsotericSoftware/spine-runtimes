@@ -109,6 +109,58 @@ export class SkeletonMesh extends THREE.Object3D {
 
 	private _castShadow = false;
 	private _receiveShadow = false;
+	private _physicsPositionInheritanceFactorX = 1;
+	private _physicsPositionInheritanceFactorY = 1;
+	private _physicsRotationInheritanceFactor = 1;
+	private hasLastPhysicsTransform = false;
+	private lastPhysicsX = 0;
+	private lastPhysicsY = 0;
+	private lastPhysicsRotation = 0;
+	private readonly currentPhysicsPosition = new THREE.Vector3();
+	private readonly lastPhysicsPosition = new THREE.Vector3();
+	private readonly physicsWorldPosition = new THREE.Vector3();
+	private readonly physicsWorldQuaternion = new THREE.Quaternion();
+	private readonly physicsWorldScale = new THREE.Vector3();
+	private readonly physicsEuler = new THREE.Euler();
+
+	/** Scales how much horizontal translation of this Three.js object is inherited by skeleton physics constraints. */
+	public get physicsPositionInheritanceFactorX (): number {
+		return this._physicsPositionInheritanceFactorX;
+	}
+
+	/** Scales how much vertical translation of this Three.js object is inherited by skeleton physics constraints. */
+	public get physicsPositionInheritanceFactorY (): number {
+		return this._physicsPositionInheritanceFactorY;
+	}
+
+	/**
+	 * Sets how much translation of this Three.js object is inherited by skeleton physics constraints.
+	 * The default is (1, 1), which applies object translation normally. Use (0, 0)
+	 * to prevent object translation from affecting physics constraints.
+	 */
+	public setPhysicsPositionInheritanceFactor (x: number, y: number): void {
+		const wasDisabled = this._physicsPositionInheritanceFactorX === 0 && this._physicsPositionInheritanceFactorY === 0;
+		const isEnabled = x !== 0 || y !== 0;
+
+		this._physicsPositionInheritanceFactorX = x;
+		this._physicsPositionInheritanceFactorY = y;
+		if (wasDisabled && isEnabled) this.resetPhysicsPosition();
+	}
+
+	/**
+	 * Scales how much rotation of this Three.js object is inherited by skeleton physics constraints.
+	 * The default is `1`, which applies object rotation normally. Use `0` to prevent object rotation
+	 * from affecting physics constraints.
+	 */
+	public get physicsRotationInheritanceFactor (): number {
+		return this._physicsRotationInheritanceFactor;
+	}
+
+	public set physicsRotationInheritanceFactor (value: number) {
+		const wasDisabled = this._physicsRotationInheritanceFactor === 0;
+		this._physicsRotationInheritanceFactor = value;
+		if (wasDisabled && value !== 0) this.resetPhysicsRotation();
+	}
 
 	/**
 	 * Create an Object3D containing meshes representing your Spine animation.
@@ -183,10 +235,94 @@ export class SkeletonMesh extends THREE.Object3D {
 
 		state.update(deltaTime);
 		state.apply(skeleton);
+		this.applyTransformMovementToPhysics();
 		skeleton.update(deltaTime);
 		skeleton.updateWorldTransform(Physics.update);
 
 		this.updateGeometry();
+	}
+
+	/** Resets the position used for calculating inherited physics translation. */
+	public resetPhysicsPosition (): void {
+		this.getWorldPosition(this.physicsWorldPosition);
+		this.lastPhysicsX = this.physicsWorldPosition.x;
+		this.lastPhysicsY = this.physicsWorldPosition.y;
+		if (!this.hasLastPhysicsTransform) this.lastPhysicsRotation = this.getPhysicsRotation();
+		this.hasLastPhysicsTransform = true;
+	}
+
+	/** Resets the rotation used for calculating inherited physics rotation. */
+	public resetPhysicsRotation (): void {
+		this.getWorldPosition(this.physicsWorldPosition);
+		this.lastPhysicsRotation = this.getPhysicsRotation();
+		if (!this.hasLastPhysicsTransform) {
+			this.lastPhysicsX = this.physicsWorldPosition.x;
+			this.lastPhysicsY = this.physicsWorldPosition.y;
+		}
+		this.hasLastPhysicsTransform = true;
+	}
+
+	/** Resets the transform used for calculating inherited physics translation and rotation. */
+	public resetPhysicsTransform (): void {
+		this.resetPhysicsPosition();
+		this.resetPhysicsRotation();
+	}
+
+	private applyTransformMovementToPhysics (): void {
+		this.getWorldPosition(this.physicsWorldPosition);
+		const { x, y } = this.physicsWorldPosition;
+		const currentRotation = this.getPhysicsRotation();
+
+		if (this.hasLastPhysicsTransform) {
+			this.applyPositionMovementToPhysics(x, y);
+			this.applyRotationMovementToPhysics(currentRotation);
+		}
+
+		this.setLastPhysicsTransform(x, y, currentRotation);
+	}
+
+	private applyPositionMovementToPhysics (currentX: number, currentY: number): void {
+		if (this._physicsPositionInheritanceFactorX === 0 && this._physicsPositionInheritanceFactorY === 0) return;
+
+		const currentPosition = this.currentPhysicsPosition;
+		currentPosition.set(currentX, currentY, 0);
+		this.worldToLocal(currentPosition);
+
+		const lastPosition = this.lastPhysicsPosition;
+		lastPosition.set(this.lastPhysicsX, this.lastPhysicsY, 0);
+		this.worldToLocal(lastPosition);
+
+		this.skeleton.physicsTranslate(
+			(currentPosition.x - lastPosition.x) * this._physicsPositionInheritanceFactorX,
+			(currentPosition.y - lastPosition.y) * this._physicsPositionInheritanceFactorY
+		);
+	}
+
+	private applyRotationMovementToPhysics (currentRotation: number): void {
+		const rotationFactor = this._physicsRotationInheritanceFactor;
+		if (rotationFactor === 0) return;
+
+		this.skeleton.physicsRotate(0, 0, this.getRotationDelta(currentRotation, this.lastPhysicsRotation) * rotationFactor);
+	}
+
+	private setLastPhysicsTransform (x: number, y: number, rotation: number): void {
+		this.lastPhysicsX = x;
+		this.lastPhysicsY = y;
+		this.lastPhysicsRotation = rotation;
+		this.hasLastPhysicsTransform = true;
+	}
+
+	private getPhysicsRotation (): number {
+		this.updateWorldMatrix(true, false);
+		this.matrixWorld.decompose(this.physicsWorldPosition, this.physicsWorldQuaternion, this.physicsWorldScale);
+		this.physicsEuler.setFromQuaternion(this.physicsWorldQuaternion, 'XYZ');
+		return this.physicsEuler.z * 180 / Math.PI;
+	}
+
+	private getRotationDelta (current: number, previous: number): number {
+		let delta = current - previous;
+		delta = (delta + 180) % 360 - 180;
+		return delta < -180 ? delta + 360 : delta;
 	}
 
 	dispose () {

@@ -48,6 +48,7 @@ class TransformConstraintTimeline extends CurveTimeline implements ConstraintTim
 	public function new(frameCount:Int, bezierCount:Int, constraintIndex:Int) {
 		super(frameCount, bezierCount, Property.transformConstraint + "|" + constraintIndex);
 		this.constraintIndex = constraintIndex;
+		this.additive = true;
 	}
 
 	public override function getFrameEntries():Int {
@@ -128,11 +129,20 @@ class TransformConstraintTimeline extends CurveTimeline implements ConstraintTim
 		}
 
 		var base = fromSetup ? constraint.data.setupPose : pose;
-		pose.mixRotate = base.mixRotate + (rotate - base.mixRotate) * alpha;
-		pose.mixX = base.mixX + (x - base.mixX) * alpha;
-		pose.mixY = base.mixY + (y - base.mixY) * alpha;
-		pose.mixScaleX = base.mixScaleX + (scaleX - base.mixScaleX) * alpha;
-		pose.mixScaleY = base.mixScaleY + (scaleY - base.mixScaleY) * alpha;
-		pose.mixShearY = base.mixShearY + (shearY - base.mixShearY) * alpha;
+		if (add) {
+			pose.mixRotate = base.mixRotate + rotate * alpha;
+			pose.mixX = base.mixX + x * alpha;
+			pose.mixY = base.mixY + y * alpha;
+			pose.mixScaleX = base.mixScaleX + scaleX * alpha;
+			pose.mixScaleY = base.mixScaleY + scaleY * alpha;
+			pose.mixShearY = base.mixShearY + shearY * alpha;
+		} else {
+			pose.mixRotate = base.mixRotate + (rotate - base.mixRotate) * alpha;
+			pose.mixX = base.mixX + (x - base.mixX) * alpha;
+			pose.mixY = base.mixY + (y - base.mixY) * alpha;
+			pose.mixScaleX = base.mixScaleX + (scaleX - base.mixScaleX) * alpha;
+			pose.mixScaleY = base.mixScaleY + (scaleY - base.mixScaleY) * alpha;
+			pose.mixShearY = base.mixShearY + (shearY - base.mixShearY) * alpha;
+		}
 	}
 }

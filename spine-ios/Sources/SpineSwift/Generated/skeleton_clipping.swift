@@ -69,15 +69,12 @@ public class SkeletonClipping: NSObject {
     }
 
     public func clipStart(_ skeleton: Skeleton, _ slot: Slot, _ clip: ClippingAttachment?) -> Int {
-        let result = spine_skeleton_clipping_clip_start(
-            _ptr.assumingMemoryBound(to: spine_skeleton_clipping_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self),
-            slot._ptr.assumingMemoryBound(to: spine_slot_wrapper.self), clip?._ptr.assumingMemoryBound(to: spine_clipping_attachment_wrapper.self))
+        let result = spine_skeleton_clipping_clip_start(_ptr.assumingMemoryBound(to: spine_skeleton_clipping_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self), slot._ptr.assumingMemoryBound(to: spine_slot_wrapper.self), clip?._ptr.assumingMemoryBound(to: spine_clipping_attachment_wrapper.self))
         return result
     }
 
     public func clipEnd(_ slot: Slot) {
-        spine_skeleton_clipping_clip_end_1(
-            _ptr.assumingMemoryBound(to: spine_skeleton_clipping_wrapper.self), slot._ptr.assumingMemoryBound(to: spine_slot_wrapper.self))
+        spine_skeleton_clipping_clip_end_1(_ptr.assumingMemoryBound(to: spine_skeleton_clipping_wrapper.self), slot._ptr.assumingMemoryBound(to: spine_slot_wrapper.self))
     }
 
     public func clipEnd2() {
@@ -85,10 +82,7 @@ public class SkeletonClipping: NSObject {
     }
 
     public func clipTriangles(_ vertices: ArrayFloat, _ triangles: ArrayUnsignedShort, _ uvs: ArrayFloat, _ stride: Int) -> Bool {
-        let result = spine_skeleton_clipping_clip_triangles_3(
-            _ptr.assumingMemoryBound(to: spine_skeleton_clipping_wrapper.self), vertices._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self),
-            triangles._ptr.assumingMemoryBound(to: spine_array_unsigned_short_wrapper.self),
-            uvs._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self), stride)
+        let result = spine_skeleton_clipping_clip_triangles_3(_ptr.assumingMemoryBound(to: spine_skeleton_clipping_wrapper.self), vertices._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self), triangles._ptr.assumingMemoryBound(to: spine_array_unsigned_short_wrapper.self), uvs._ptr.assumingMemoryBound(to: spine_array_float_wrapper.self), stride)
         return result
     }
 

@@ -110,8 +110,14 @@ class PathConstraintMixTimeline extends CurveTimeline implements ConstraintTimel
 		}
 
 		var base = fromSetup ? constraint.data.setupPose : pose;
-		pose.mixRotate = base.mixRotate + (rotate - base.mixRotate) * alpha;
-		pose.mixX = base.mixX + (x - base.mixX) * alpha;
-		pose.mixY = base.mixY + (y - base.mixY) * alpha;
+		if (add) {
+			pose.mixRotate = base.mixRotate + rotate * alpha;
+			pose.mixX = base.mixX + x * alpha;
+			pose.mixY = base.mixY + y * alpha;
+		} else {
+			pose.mixRotate = base.mixRotate + (rotate - base.mixRotate) * alpha;
+			pose.mixX = base.mixX + (x - base.mixX) * alpha;
+			pose.mixY = base.mixY + (y - base.mixY) * alpha;
+		}
 	}
 }

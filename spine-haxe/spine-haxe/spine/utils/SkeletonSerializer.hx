@@ -3814,6 +3814,16 @@ class SkeletonSerializer {
 			"isNullable": true
 		});
 
+		json.writeName("timelineSlots");
+		writeProperty(obj, "getTimelineSlots()", {
+			"kind": "array",
+			"name": "timelineSlots",
+			"getter": "getTimelineSlots()",
+			"elementType": "int",
+			"elementKind": "primitive",
+			"isNullable": false
+		});
+
 		json.writeName("id");
 		writeProperty(obj, "getId()", {
 			"kind": "primitive",
@@ -3908,6 +3918,16 @@ class SkeletonSerializer {
 			"valueType": "Attachment",
 			"writeMethodCall": "writeAttachment",
 			"isNullable": true
+		});
+
+		json.writeName("timelineSlots");
+		writeProperty(obj, "getTimelineSlots()", {
+			"kind": "array",
+			"name": "timelineSlots",
+			"getter": "getTimelineSlots()",
+			"elementType": "int",
+			"elementKind": "primitive",
+			"isNullable": false
 		});
 
 		json.writeName("id");
@@ -4233,12 +4253,12 @@ class SkeletonSerializer {
 			"isNullable": false
 		});
 
-		json.writeName("uniform");
-		writeProperty(obj, "getUniform()", {
+		json.writeName("scaleY");
+		writeProperty(obj, "getScaleY().name()", {
 			"kind": "primitive",
-			"name": "uniform",
-			"getter": "getUniform()",
-			"valueType": "boolean",
+			"name": "scaleY",
+			"getter": "getScaleY().name()",
+			"valueType": "String",
 			"isNullable": false
 		});
 
@@ -4458,11 +4478,11 @@ class SkeletonSerializer {
 			"isNullable": true
 		});
 
-		json.writeName("parentMesh");
-		writeProperty(obj, "getParentMesh()", {
+		json.writeName("sourceMesh");
+		writeProperty(obj, "getSourceMesh()", {
 			"kind": "object",
-			"name": "parentMesh",
-			"getter": "getParentMesh()",
+			"name": "sourceMesh",
+			"getter": "getSourceMesh()",
 			"valueType": "MeshAttachment",
 			"writeMethodCall": "writeMeshAttachment",
 			"isNullable": true
@@ -4505,6 +4525,16 @@ class SkeletonSerializer {
 			"valueType": "Attachment",
 			"writeMethodCall": "writeAttachment",
 			"isNullable": true
+		});
+
+		json.writeName("timelineSlots");
+		writeProperty(obj, "getTimelineSlots()", {
+			"kind": "array",
+			"name": "timelineSlots",
+			"getter": "getTimelineSlots()",
+			"elementType": "int",
+			"elementKind": "primitive",
+			"isNullable": false
 		});
 
 		json.writeName("id");
@@ -4619,6 +4649,16 @@ class SkeletonSerializer {
 			"valueType": "Attachment",
 			"writeMethodCall": "writeAttachment",
 			"isNullable": true
+		});
+
+		json.writeName("timelineSlots");
+		writeProperty(obj, "getTimelineSlots()", {
+			"kind": "array",
+			"name": "timelineSlots",
+			"getter": "getTimelineSlots()",
+			"elementType": "int",
+			"elementKind": "primitive",
+			"isNullable": false
 		});
 
 		json.writeName("id");

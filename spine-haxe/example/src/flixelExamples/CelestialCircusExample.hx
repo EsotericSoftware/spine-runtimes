@@ -91,7 +91,6 @@ class CelestialCircusExample extends FlxState {
 		if (dragging) {
 			skeletonSprite.x += mousePosition.x - lastX;
 			skeletonSprite.y += mousePosition.y - lastY;
-			skeletonSprite.skeleton.physicsTranslate(mousePosition.x - lastX, mousePosition.y - lastY,);
 			lastX = mousePosition.x;
 			lastY = mousePosition.y;
 		}

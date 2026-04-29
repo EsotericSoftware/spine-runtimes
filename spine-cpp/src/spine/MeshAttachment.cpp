@@ -37,7 +37,7 @@ using namespace spine;
 RTTI_IMPL(MeshAttachment, VertexAttachment)
 
 MeshAttachment::MeshAttachment(const String &name, Sequence *sequence)
-	: VertexAttachment(name), _sequence(sequence), _regionUVs(), _triangles(), _hullLength(0), _path(), _color(1, 1, 1, 1), _parentMesh(NULL),
+	: VertexAttachment(name), _sequence(sequence), _regionUVs(), _triangles(), _hullLength(0), _path(), _color(1, 1, 1, 1), _sourceMesh(NULL),
 	  _edges(), _width(0), _height(0) {
 	assert(sequence);
 }
@@ -95,12 +95,12 @@ Color &MeshAttachment::getColor() {
 	return _color;
 }
 
-MeshAttachment *MeshAttachment::getParentMesh() {
-	return _parentMesh;
+MeshAttachment *MeshAttachment::getSourceMesh() {
+	return _sourceMesh;
 }
 
-void MeshAttachment::setParentMesh(MeshAttachment *inValue) {
-	_parentMesh = inValue;
+void MeshAttachment::setSourceMesh(MeshAttachment *inValue) {
+	_sourceMesh = inValue;
 	if (inValue != NULL) {
 		_bones.clearAndAddAll(inValue->_bones);
 		_vertices.clearAndAddAll(inValue->_vertices);
@@ -139,7 +139,7 @@ void MeshAttachment::setHeight(float inValue) {
 }
 
 Attachment &MeshAttachment::copy() {
-	if (_parentMesh) return newLinkedMesh();
+	if (_sourceMesh) return newLinkedMesh();
 
 	MeshAttachment *copy = new (__FILE__, __LINE__) MeshAttachment(getName(), new (__FILE__, __LINE__) Sequence(*_sequence));
 	copy->_path = _path;
@@ -159,7 +159,7 @@ MeshAttachment &MeshAttachment::newLinkedMesh() {
 	copy->setTimelineAttachment(getTimelineAttachment());
 	copy->_path = _path;
 	copy->_color.set(_color);
-	copy->setParentMesh(_parentMesh != NULL ? _parentMesh : this);
+	copy->setSourceMesh(_sourceMesh != NULL ? _sourceMesh : this);
 	copy->updateSequence();
 	return *copy;
 }

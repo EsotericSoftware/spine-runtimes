@@ -38,6 +38,8 @@ import {
 	Skin,
 	type Vector2,
 } from "@esotericsoftware/spine-core";
+import type { SceneRenderer } from "@esotericsoftware/spine-webgl";
+import * as Phaser from "phaser";
 import { SPINE_GAME_OBJECT_TYPE } from "./keys.js";
 import {
 	AlphaMixin,
@@ -228,6 +230,54 @@ export class SpineGameObject extends DepthMixin(
 	afterUpdateWorldTransforms: (object: SpineGameObject) => void = () => { };
 	private offsetX = 0;
 	private offsetY = 0;
+	private _physicsPositionInheritanceFactorX = 1;
+	private _physicsPositionInheritanceFactorY = 1;
+	private _physicsRotationInheritanceFactor = 1;
+	private hasLastPhysicsTransform = false;
+	private lastPhysicsX = 0;
+	private lastPhysicsY = 0;
+	private lastPhysicsRotation = 0;
+	private readonly currentPhysicsPosition = { x: 0, y: 0 };
+	private readonly lastPhysicsPosition = { x: 0, y: 0 };
+
+	/** Scales how much horizontal translation of this Phaser game object is inherited by skeleton physics constraints. */
+	public get physicsPositionInheritanceFactorX (): number {
+		return this._physicsPositionInheritanceFactorX;
+	}
+
+	/** Scales how much vertical translation of this Phaser game object is inherited by skeleton physics constraints. */
+	public get physicsPositionInheritanceFactorY (): number {
+		return this._physicsPositionInheritanceFactorY;
+	}
+
+	/**
+	 * Sets how much translation of this Phaser game object is inherited by skeleton physics constraints.
+	 * The default is (1, 1), which applies game object translation normally. Use (0, 0)
+	 * to prevent game object translation from affecting physics constraints.
+	 */
+	public setPhysicsPositionInheritanceFactor (x: number, y: number): void {
+		const wasDisabled = this._physicsPositionInheritanceFactorX === 0 && this._physicsPositionInheritanceFactorY === 0;
+		const isEnabled = x !== 0 || y !== 0;
+
+		this._physicsPositionInheritanceFactorX = x;
+		this._physicsPositionInheritanceFactorY = y;
+		if (wasDisabled && isEnabled) this.resetPhysicsPosition();
+	}
+
+	/**
+	 * Scales how much rotation of this Phaser game object is inherited by skeleton physics constraints.
+	 * The default is `1`, which applies game object rotation normally. Use `0` to prevent game object
+	 * rotation from affecting physics constraints.
+	 */
+	public get physicsRotationInheritanceFactor (): number {
+		return this._physicsRotationInheritanceFactor;
+	}
+
+	public set physicsRotationInheritanceFactor (value: number) {
+		const wasDisabled = this._physicsRotationInheritanceFactor === 0;
+		this._physicsRotationInheritanceFactor = value;
+		if (wasDisabled && value !== 0) this.resetPhysicsRotation();
+	}
 
 	constructor (
 		scene: Phaser.Scene,
@@ -307,10 +357,94 @@ export class SpineGameObject extends DepthMixin(
 	updatePose (delta: number) {
 		this.animationState.update(delta / 1000);
 		this.animationState.apply(this.skeleton);
+		this.applyTransformMovementToPhysics();
 		this.beforeUpdateWorldTransforms(this);
 		this.skeleton.update(delta / 1000);
 		this.skeleton.updateWorldTransform(Physics.update);
 		this.afterUpdateWorldTransforms(this);
+	}
+
+	/** Resets the position used for calculating inherited physics translation. */
+	public resetPhysicsPosition (): void {
+		const transform = this.getWorldTransformMatrix();
+		this.lastPhysicsX = transform.tx;
+		this.lastPhysicsY = transform.ty;
+		if (!this.hasLastPhysicsTransform) this.lastPhysicsRotation = this.getPhysicsRotation();
+		this.hasLastPhysicsTransform = true;
+	}
+
+	/** Resets the rotation used for calculating inherited physics rotation. */
+	public resetPhysicsRotation (): void {
+		const transform = this.getWorldTransformMatrix();
+		this.lastPhysicsRotation = this.getPhysicsRotation();
+		if (!this.hasLastPhysicsTransform) {
+			this.lastPhysicsX = transform.tx;
+			this.lastPhysicsY = transform.ty;
+		}
+		this.hasLastPhysicsTransform = true;
+	}
+
+	/** Resets the transform used for calculating inherited physics translation and rotation. */
+	public resetPhysicsTransform (): void {
+		this.resetPhysicsPosition();
+		this.resetPhysicsRotation();
+	}
+
+	private applyTransformMovementToPhysics (): void {
+		const transform = this.getWorldTransformMatrix();
+		const { tx, ty } = transform;
+		const currentRotation = this.getPhysicsRotation();
+
+		if (this.hasLastPhysicsTransform) {
+			this.applyPositionMovementToPhysics(tx, ty);
+			this.applyRotationMovementToPhysics(currentRotation);
+		}
+
+		this.setLastPhysicsTransform(tx, ty, currentRotation);
+	}
+
+	private applyPositionMovementToPhysics (currentX: number, currentY: number): void {
+		if (this._physicsPositionInheritanceFactorX === 0 && this._physicsPositionInheritanceFactorY === 0) return;
+
+		const currentPosition = this.currentPhysicsPosition;
+		currentPosition.x = currentX;
+		currentPosition.y = currentY;
+		this.phaserWorldCoordinatesToSkeleton(currentPosition);
+
+		const lastPosition = this.lastPhysicsPosition;
+		lastPosition.x = this.lastPhysicsX;
+		lastPosition.y = this.lastPhysicsY;
+		this.phaserWorldCoordinatesToSkeleton(lastPosition);
+
+		this.skeleton.physicsTranslate(
+			(currentPosition.x - lastPosition.x) * this._physicsPositionInheritanceFactorX,
+			(currentPosition.y - lastPosition.y) * this._physicsPositionInheritanceFactorY
+		);
+	}
+
+	private applyRotationMovementToPhysics (currentRotation: number): void {
+		const rotationFactor = this._physicsRotationInheritanceFactor;
+		if (rotationFactor === 0) return;
+
+		this.skeleton.physicsRotate(0, 0, this.getRotationDelta(currentRotation, this.lastPhysicsRotation) * rotationFactor);
+	}
+
+	private setLastPhysicsTransform (x: number, y: number, rotation: number): void {
+		this.lastPhysicsX = x;
+		this.lastPhysicsY = y;
+		this.lastPhysicsRotation = rotation;
+		this.hasLastPhysicsTransform = true;
+	}
+
+	private getPhysicsRotation (): number {
+		const transform = this.getWorldTransformMatrix();
+		return -Math.atan2(transform.b, transform.a) * 180 / Math.PI;
+	}
+
+	private getRotationDelta (current: number, previous: number): number {
+		let delta = current - previous;
+		delta = (delta + 180) % 360 - 180;
+		return delta < -180 ? delta + 360 : delta;
 	}
 
 	preUpdate (time: number, delta: number) {
@@ -339,6 +473,20 @@ export class SpineGameObject extends DepthMixin(
 		return result;
 	}
 
+	private syncRendererCameraToDrawingContext (sceneRenderer: SceneRenderer, drawingContext: Phaser.Renderer.WebGL.DrawingContext) {
+		const viewportWidth = drawingContext.width;
+		const viewportHeight = drawingContext.height;
+		if (sceneRenderer.camera.viewportWidth === viewportWidth && sceneRenderer.camera.viewportHeight === viewportHeight &&
+			sceneRenderer.camera.position.x === viewportWidth / 2 && sceneRenderer.camera.position.y === viewportHeight / 2) {
+			return;
+		}
+
+		sceneRenderer.camera.position.x = viewportWidth / 2;
+		sceneRenderer.camera.position.y = viewportHeight / 2;
+		sceneRenderer.camera.setViewport(viewportWidth, viewportHeight);
+		sceneRenderer.camera.update();
+	}
+
 	renderWebGL (
 		renderer: Phaser.Renderer.WebGL.WebGLRenderer,
 		src: SpineGameObject,
@@ -359,12 +507,17 @@ export class SpineGameObject extends DepthMixin(
 		const nextGameObject = displayList[displayListIndex + 1];
 		const newType = !previousGameObject || previousGameObject.type !== src.type;
 		const nextTypeMatch = nextGameObject && nextGameObject.type === src.type;
-		if (newType) {
-			// Ensure framebuffer is properly set up.
-			if (drawingContext.renderer.renderNodes.currentBatchDrawingContext !== drawingContext) {
+		const drawingContextChanged = drawingContext.renderer.renderNodes.currentBatchDrawingContext !== drawingContext;
+		if (newType || drawingContextChanged) {
+			if (drawingContextChanged) {
+				if (sceneRenderer.batcher.isDrawing) {
+					sceneRenderer.end();
+				}
 				drawingContext.renderer.renderNodes.finishBatch();
 				drawingContext.beginDraw();
 			}
+
+			src.syncRendererCameraToDrawingContext(sceneRenderer, drawingContext);
 
 			// Yield Phaser context.
 			renderer.renderNodes.getNode('YieldContext')?.run(drawingContext);

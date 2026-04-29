@@ -51,7 +51,7 @@ namespace Spine.Unity.Editor {
 	public class SkeletonGraphicInspector : ISkeletonRendererInspector {
 
 		protected SerializedProperty material, color;
-		protected SerializedProperty additiveMaterial, multiplyMaterial, screenMaterial;
+		protected SerializedProperty additiveMaterial, multiplyMaterial, screenMaterial, forceAdditiveMaterial;
 		protected SerializedProperty freeze;
 		protected SerializedProperty allowMultipleCanvasRenderers,
 			updateSeparatorPartLocation, updateSeparatorPartScale;
@@ -91,6 +91,7 @@ namespace Spine.Unity.Editor {
 			additiveMaterial = serializedObject.FindProperty("additiveMaterial");
 			multiplyMaterial = serializedObject.FindProperty("multiplyMaterial");
 			screenMaterial = serializedObject.FindProperty("screenMaterial");
+			forceAdditiveMaterial = serializedObject.FindProperty("forceAdditiveMaterial");
 			freeze = serializedObject.FindProperty("freeze");
 			allowMultipleCanvasRenderers = serializedObject.FindProperty("allowMultipleCanvasRenderers");
 			updateSeparatorPartLocation = serializedObject.FindProperty("updateSeparatorPartLocation");
@@ -267,16 +268,22 @@ namespace Spine.Unity.Editor {
 
 					bool usesAdditiveMaterial = blendModeMaterials.applyAdditiveMaterial;
 					bool pmaVertexColors = thisSkeletonGraphic.MeshSettings.pmaVertexColors;
-					if (pmaVertexColors)
-						using (new EditorGUI.DisabledGroupScope(true)) {
-							EditorGUILayout.LabelField("Additive Material - Unused with PMA Vertex Colors", EditorStyles.label);
-						}
-					else if (usesAdditiveMaterial)
+					bool forceAdditiveEnabled = thisSkeletonGraphic.forceAdditiveMaterial;
+					if (pmaVertexColors) {
+						EditorGUILayout.PropertyField(forceAdditiveMaterial, SpineInspectorUtility.TempContent("Force Additive Material", null, "Still use 'Additive' material regardless of enabled 'PMA Vertex Colors'."));
+						if (forceAdditiveEnabled)
+							EditorGUILayout.PropertyField(additiveMaterial, SpineInspectorUtility.TempContent("Additive Material", null, "SkeletonGraphic Material for 'Additive' blend mode slots. Unused when 'PMA Vertex Colors' is enabled."));
+						else
+							using (new EditorGUI.DisabledGroupScope(true)) {
+								EditorGUILayout.LabelField("Additive Material - Unused with PMA Vertex Colors", EditorStyles.label);
+							}
+					} else if (usesAdditiveMaterial) {
 						EditorGUILayout.PropertyField(additiveMaterial, SpineInspectorUtility.TempContent("Additive Material", null, "SkeletonGraphic Material for 'Additive' blend mode slots. Unused when 'PMA Vertex Colors' is enabled."));
-					else
+					} else {
 						using (new EditorGUI.DisabledGroupScope(true)) {
 							EditorGUILayout.LabelField("No Additive Mat - 'Apply Additive Material' disabled at SkeletonDataAsset", EditorStyles.label);
 						}
+					}
 					EditorGUILayout.PropertyField(multiplyMaterial, SpineInspectorUtility.TempContent("Multiply Material", null, "SkeletonGraphic Material for 'Multiply' blend mode slots."));
 					EditorGUILayout.PropertyField(screenMaterial, SpineInspectorUtility.TempContent("Screen Material", null, "SkeletonGraphic Material for 'Screen' blend mode slots."));
 				}

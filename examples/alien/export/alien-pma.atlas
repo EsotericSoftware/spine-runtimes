@@ -4,62 +4,56 @@ alien-pma.png
 	pma: true
 	scale: 0.5
 back-foot
-	bounds: 1008, 425, 8, 6
+	bounds: 1003, 482, 8, 6
 back-shin
-	bounds: 998, 477, 21, 24
+	bounds: 1000, 447, 21, 24
 back-thigh
-	bounds: 998, 503, 24, 24
+	bounds: 998, 418, 24, 24
 backarmor
-	bounds: 434, 42, 81, 91
-	rotate: 90
+	bounds: 2, 32, 81, 91
 blown-up-neck
-	bounds: 941, 119, 77, 52
+	bounds: 458, 60, 77, 52
 body
-	bounds: 649, 15, 98, 118
+	bounds: 800, 20, 98, 118
 burst01
-	bounds: 2, 2, 143, 155
-	rotate: 90
+	bounds: 160, 17, 143, 155
 burst02
-	bounds: 649, 135, 156, 181
+	bounds: 2, 125, 156, 181
 burst03-bg
-	bounds: 371, 125, 276, 227
+	bounds: 371, 114, 276, 227
 burst03-fg
-	bounds: 371, 354, 339, 221
+	bounds: 371, 343, 339, 221
 eye
-	bounds: 941, 241, 75, 75
+	bounds: 305, 37, 75, 75
 eye-highlight
-	bounds: 996, 453, 22, 22
+	bounds: 998, 394, 22, 22
 eye-pupil
-	bounds: 996, 433, 18, 18
+	bounds: 1003, 498, 18, 18
 eye-stalk
-	bounds: 941, 173, 74, 66
+	bounds: 382, 46, 74, 66
 front-foot
-	bounds: 996, 425, 10, 6
+	bounds: 1003, 490, 10, 6
 front-lower-arm
-	bounds: 527, 68, 55, 63
-	rotate: 90
+	bounds: 85, 60, 55, 63
 front-shin
-	bounds: 966, 428, 25, 28
-	rotate: 90
+	bounds: 971, 414, 25, 28
 front-thigh
-	bounds: 966, 455, 27, 27
+	bounds: 971, 444, 27, 27
 front-upper-arm
-	bounds: 649, 324, 57, 28
+	bounds: 649, 313, 57, 28
 head
-	bounds: 159, 9, 149, 136
+	bounds: 649, 2, 149, 136
 lower-back-arm
-	bounds: 966, 529, 51, 46
+	bounds: 971, 518, 51, 46
 metaljaw
-	bounds: 310, 37, 122, 86
+	bounds: 900, 52, 122, 86
 splat01
-	bounds: 712, 318, 257, 252
-	rotate: 90
+	bounds: 712, 312, 257, 252
 splat01-fg
-	bounds: 807, 113, 203, 132
-	rotate: 90
+	bounds: 160, 174, 203, 132
 splat02
-	bounds: 2, 319, 367, 256
+	bounds: 2, 308, 367, 256
 splat03
-	bounds: 2, 147, 362, 170
+	bounds: 649, 140, 362, 170
 upper-back-arm
-	bounds: 966, 484, 30, 43
+	bounds: 971, 473, 30, 43

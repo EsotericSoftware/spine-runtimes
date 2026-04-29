@@ -184,13 +184,10 @@ void TrackEntry::setAnimationLast(float inValue) {
 }
 
 float TrackEntry::getAnimationTime() {
-	if (_loop) {
-		float duration = _animationEnd - _animationStart;
-		if (duration == 0) return _animationStart;
-		return MathUtil::fmod(_trackTime, duration) + _animationStart;
-	}
-	float animationTime = _trackTime + _animationStart;
-	return _animationEnd >= _animation->getDuration() ? animationTime : MathUtil::min(animationTime, _animationEnd);
+	if (!_loop) return MathUtil::min(_trackTime + _animationStart, _animationEnd);
+	float duration = _animationEnd - _animationStart;
+	if (duration == 0) return _animationStart;
+	return MathUtil::fmod(_trackTime, duration) + _animationStart;
 }
 
 float TrackEntry::getTimeScale() {
@@ -507,7 +504,7 @@ void AnimationState::update(float delta) {
 				next->_delay = 0;
 				next->_trackTime += current._timeScale == 0 ? 0 : (nextTime / current._timeScale + delta) * next->_timeScale;
 				current._trackTime += currentDelta;
-				setCurrent(i, next, true);
+				setTrack(i, next, true);
 				while (next->_mixingFrom != NULL) {
 					next->_mixTime += delta;
 					next = next->_mixingFrom;
@@ -606,6 +603,7 @@ bool AnimationState::apply(Skeleton &skeleton) {
 			}
 		}
 
+		if (current._reverse) eventsReverse(currentP, animationLast, animationTime);
 		queueEvents(currentP, animationTime);
 		_events.clear();
 		current._nextAnimationLast = animationTime;
@@ -686,7 +684,7 @@ TrackEntry &AnimationState::setAnimation(size_t trackIndex, Animation &animation
 	}
 
 	TrackEntry *entry = newTrackEntry(trackIndex, &animation, loop, current);
-	setCurrent(trackIndex, entry, interrupt);
+	setTrack(trackIndex, entry, interrupt);
 	_queue->drain();
 
 	return *entry;
@@ -707,7 +705,7 @@ TrackEntry &AnimationState::addAnimation(size_t trackIndex, Animation &animation
 	TrackEntry *entry = newTrackEntry(trackIndex, &animation, loop, last);
 
 	if (last == NULL) {
-		setCurrent(trackIndex, entry, true);
+		setTrack(trackIndex, entry, true);
 		_queue->drain();
 		if (delay < 0) delay = 0;
 	} else {
@@ -748,7 +746,7 @@ void AnimationState::setEmptyAnimations(float mixDuration) {
 	_queue->drain();
 }
 
-TrackEntry *AnimationState::getCurrent(size_t trackIndex) {
+TrackEntry *AnimationState::getTrack(size_t trackIndex) {
 	return trackIndex >= _tracks.size() ? NULL : _tracks[trackIndex];
 }
 
@@ -976,6 +974,7 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton) {
 		}
 	}
 
+	if (from->_reverse && mix < from->_eventThreshold) eventsReverse(from, animationLast, animationTime);
 	if (to->_mixDuration > 0) {
 		queueEvents(from, animationTime);
 	}
@@ -993,17 +992,17 @@ void AnimationState::setAttachment(Skeleton &skeleton, Slot &slot, const String 
 }
 
 void AnimationState::queueEvents(TrackEntry *entry, float animationTime) {
-	float animationStart = entry->_animationStart, animationEnd = entry->_animationEnd;
-	float duration = animationEnd - animationStart;
-	float trackLastWrapped = duration != 0 ? MathUtil::fmod(entry->_trackLast, duration) : MathUtil::quietNan();
+	float animationStart = entry->_animationStart, animationEnd = entry->_animationEnd, duration = animationEnd - animationStart;
+	bool reverse = entry->_reverse;
+	float split = duration != 0 ? MathUtil::fmod(entry->_trackLast, duration) : 0;
+	if (reverse) split = duration - split;
 
 	// Queue events before complete.
 	size_t i = 0, n = _events.size();
 	for (; i < n; ++i) {
 		Event *e = _events[i];
-		if (e->_time < trackLastWrapped) break;
-		if (e->_time > animationEnd) continue;// Discard events outside animation start/end.
-		_queue->event(entry, e);
+		if ((e->_time < split) != reverse) break;
+		if (e->_time >= animationStart && e->_time <= animationEnd) _queue->event(entry, e);
 	}
 
 	// Queue complete if completed a loop iteration or the animation.
@@ -1023,12 +1022,39 @@ void AnimationState::queueEvents(TrackEntry *entry, float animationTime) {
 	// Queue events after complete.
 	for (; i < n; ++i) {
 		Event *e = _events[i];
-		if (e->_time < animationStart) continue;// Discard events outside animation start/end.
-		_queue->event(entry, e);
+		if (e->_time >= animationStart && e->_time <= animationEnd) _queue->event(entry, e);
 	}
 }
 
-void AnimationState::setCurrent(size_t index, TrackEntry *current, bool interrupt) {
+void AnimationState::eventsReverse(TrackEntry *entry, float animationLast, float animationTime) {
+	float duration = entry->_animation->getDuration(), from = duration - animationLast, to = duration - animationTime;
+	Array<Timeline *> &timelines = entry->_animation->_timelines;
+	for (size_t i = 0, n = timelines.size(); i < n; i++) {
+		if (!timelines[i]->getRTTI().isExactly(EventTimeline::rtti)) continue;
+		EventTimeline *eventTimeline = static_cast<EventTimeline *>(timelines[i]);
+		Array<Event *> &timelineEvents = eventTimeline->getEvents();
+		Array<float> &frames = eventTimeline->getFrames();
+		int frameCount = (int) frames.size();
+		if (from >= to) {
+			for (int ii = 0; ii < frameCount; ii++) {
+				if (frames[ii] < to) continue;
+				if (frames[ii] >= from) break;
+				_events.add(timelineEvents[ii]);
+			}
+		} else {
+			for (int ii = 0; ii < frameCount; ii++) {
+				if (frames[ii] >= from) break;
+				_events.add(timelineEvents[ii]);
+			}
+			int ii = 0;
+			for (; ii < frameCount; ii++)
+				if (frames[ii] >= to) break;
+			for (; ii < frameCount; ii++) _events.add(timelineEvents[ii]);
+		}
+	}
+}
+
+void AnimationState::setTrack(size_t index, TrackEntry *current, bool interrupt) {
 	TrackEntry *from = expandToIndex(index);
 	_tracks[index] = current;
 	current->_previous = NULL;

@@ -558,11 +558,22 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 		LinkedMesh *linkedMesh = _linkedMeshes[i];
 		Skin *skin = linkedMesh->_skin.length() == 0 ? skeletonData->getDefaultSkin() : skeletonData->findSkin(linkedMesh->_skin);
 		if (skin == NULL) SKELETON_JSON_ERROR(root, "Skin not found: ", linkedMesh->_skin.buffer());
-		Attachment *parent = skin->getAttachment(linkedMesh->_slotIndex, linkedMesh->_parent);
-		if (parent == NULL) SKELETON_JSON_ERROR(root, "Parent mesh not found: ", linkedMesh->_parent.buffer());
-		linkedMesh->_mesh->setTimelineAttachment(linkedMesh->_inheritTimelines ? static_cast<VertexAttachment *>(parent) : linkedMesh->_mesh);
-		linkedMesh->_mesh->setParentMesh(static_cast<MeshAttachment *>(parent));
+		Attachment *source = skin->getAttachment(linkedMesh->_sourceIndex, linkedMesh->_source);
+		if (source == NULL) SKELETON_JSON_ERROR(root, "Source mesh not found: ", linkedMesh->_source.buffer());
+		linkedMesh->_mesh->setTimelineAttachment(linkedMesh->_inheritTimelines ? source : linkedMesh->_mesh);
+		linkedMesh->_mesh->setSourceMesh(static_cast<MeshAttachment *>(source));
 		linkedMesh->_mesh->updateSequence();
+		if (linkedMesh->_inheritTimelines && linkedMesh->_slotIndex != linkedMesh->_sourceIndex) {
+			Array<int> &timelineSlots = source->getTimelineSlots();
+			bool found = false;
+			for (size_t ii = 0; ii < timelineSlots.size(); ++ii) {
+				if ((size_t) timelineSlots[ii] == linkedMesh->_slotIndex) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) timelineSlots.add((int) linkedMesh->_slotIndex);
+		}
 	}
 	ArrayUtils::deleteElements(_linkedMeshes);
 	_linkedMeshes.clear();
@@ -671,10 +682,20 @@ Attachment *SkeletonJson::readAttachment(Json *map, Skin *skin, int slotIndex, c
 			mesh->setWidth(Json::getFloat(map, "width", 0) * scale);
 			mesh->setHeight(Json::getFloat(map, "height", 0) * scale);
 
-			const char *parent = Json::getString(map, "parent", NULL);
-			if (parent) {
+			const char *source = Json::getString(map, "source", NULL);
+			if (source) {
+				int sourceIndex = slotIndex;
+				const char *slot = Json::getString(map, "slot", NULL);
+				if (slot != NULL) {
+					SlotData *sourceSlot = skeletonData->findSlot(slot);
+					if (!sourceSlot) {
+						setError(NULL, "Source mesh slot not found: ", slot);
+						return NULL;
+					}
+					sourceIndex = sourceSlot->getIndex();
+				}
 				LinkedMesh *linkedMesh = new (__FILE__, __LINE__)
-					LinkedMesh(*mesh, Json::getString(map, "skin", NULL), slotIndex, parent, Json::getBoolean(map, "timelines", true));
+					LinkedMesh(*mesh, Json::getString(map, "skin", NULL), slotIndex, sourceIndex, source, Json::getBoolean(map, "timelines", true));
 				_linkedMeshes.add(linkedMesh);
 				return mesh;
 			}
@@ -732,6 +753,9 @@ Attachment *SkeletonJson::readAttachment(Json *map, Skin *skin, int slotIndex, c
 				if (!slot) return NULL;
 				clip->setEndSlot(slot);
 			}
+
+			clip->setConvex(Json::getBoolean(map, "convex", false));
+			clip->setInverse(Json::getBoolean(map, "inverse", false));
 
 			readVertices(map, clip, Json::getInt(map, "vertexCount", 0) << 1);
 

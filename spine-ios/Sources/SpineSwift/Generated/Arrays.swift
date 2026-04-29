@@ -381,8 +381,7 @@ public class ArrayAnimation: NSObject {
 
     /// Adds a value to the end of this array
     public func add(_ value: Animation?) {
-        spine_array_animation_add(
-            _ptr.assumingMemoryBound(to: spine_array_animation_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_animation_wrapper.self))
+        spine_array_animation_add(_ptr.assumingMemoryBound(to: spine_array_animation_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_animation_wrapper.self))
     }
 
     /// Removes all elements from this array
@@ -460,8 +459,7 @@ public class ArrayAtlasPage: NSObject {
 
     /// Adds a value to the end of this array
     public func add(_ value: AtlasPage?) {
-        spine_array_atlas_page_add(
-            _ptr.assumingMemoryBound(to: spine_array_atlas_page_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self))
+        spine_array_atlas_page_add(_ptr.assumingMemoryBound(to: spine_array_atlas_page_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self))
     }
 
     /// Removes all elements from this array
@@ -539,8 +537,7 @@ public class ArrayAtlasRegion: NSObject {
 
     /// Adds a value to the end of this array
     public func add(_ value: AtlasRegion?) {
-        spine_array_atlas_region_add(
-            _ptr.assumingMemoryBound(to: spine_array_atlas_region_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self))
+        spine_array_atlas_region_add(_ptr.assumingMemoryBound(to: spine_array_atlas_region_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_atlas_region_wrapper.self))
     }
 
     /// Removes all elements from this array
@@ -614,36 +611,35 @@ public class ArrayAttachment: NSObject {
             let elementPtr = buffer[Int(index)]
             guard let ptr = elementPtr else { return nil }
             let rtti = spine_attachment_get_rtti(ptr)
-            let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
-            switch rttiClassName {
-            case "BoundingBoxAttachment":
-                let castedPtr = spine_attachment_cast_to_bounding_box_attachment(ptr)
-                return BoundingBoxAttachment(fromPointer: castedPtr!)
-            case "ClippingAttachment":
-                let castedPtr = spine_attachment_cast_to_clipping_attachment(ptr)
-                return ClippingAttachment(fromPointer: castedPtr!)
-            case "MeshAttachment":
-                let castedPtr = spine_attachment_cast_to_mesh_attachment(ptr)
-                return MeshAttachment(fromPointer: castedPtr!)
-            case "PathAttachment":
-                let castedPtr = spine_attachment_cast_to_path_attachment(ptr)
-                return PathAttachment(fromPointer: castedPtr!)
-            case "PointAttachment":
-                let castedPtr = spine_attachment_cast_to_point_attachment(ptr)
-                return PointAttachment(fromPointer: castedPtr!)
-            case "RegionAttachment":
-                let castedPtr = spine_attachment_cast_to_region_attachment(ptr)
-                return RegionAttachment(fromPointer: castedPtr!)
-            default:
-                fatalError("Unknown concrete type: \(rttiClassName) for abstract class Attachment")
-            }
+        let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
+        switch rttiClassName {
+        case "BoundingBoxAttachment":
+            let castedPtr = spine_attachment_cast_to_bounding_box_attachment(ptr)
+            return BoundingBoxAttachment(fromPointer: castedPtr!)
+        case "ClippingAttachment":
+            let castedPtr = spine_attachment_cast_to_clipping_attachment(ptr)
+            return ClippingAttachment(fromPointer: castedPtr!)
+        case "MeshAttachment":
+            let castedPtr = spine_attachment_cast_to_mesh_attachment(ptr)
+            return MeshAttachment(fromPointer: castedPtr!)
+        case "PathAttachment":
+            let castedPtr = spine_attachment_cast_to_path_attachment(ptr)
+            return PathAttachment(fromPointer: castedPtr!)
+        case "PointAttachment":
+            let castedPtr = spine_attachment_cast_to_point_attachment(ptr)
+            return PointAttachment(fromPointer: castedPtr!)
+        case "RegionAttachment":
+            let castedPtr = spine_attachment_cast_to_region_attachment(ptr)
+            return RegionAttachment(fromPointer: castedPtr!)
+        default:
+            fatalError("Unknown concrete type: \(rttiClassName) for abstract class Attachment")
+        }
         }
     }
 
     /// Adds a value to the end of this array
     public func add(_ value: Attachment?) {
-        spine_array_attachment_add(
-            _ptr.assumingMemoryBound(to: spine_array_attachment_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_attachment_wrapper.self))
+        spine_array_attachment_add(_ptr.assumingMemoryBound(to: spine_array_attachment_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_attachment_wrapper.self))
     }
 
     /// Removes all elements from this array
@@ -721,8 +717,7 @@ public class ArrayBone: NSObject {
 
     /// Adds a value to the end of this array
     public func add(_ value: Bone?) {
-        spine_array_bone_add(
-            _ptr.assumingMemoryBound(to: spine_array_bone_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_bone_wrapper.self))
+        spine_array_bone_add(_ptr.assumingMemoryBound(to: spine_array_bone_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_bone_wrapper.self))
     }
 
     /// Removes all elements from this array
@@ -800,8 +795,7 @@ public class ArrayBoneData: NSObject {
 
     /// Adds a value to the end of this array
     public func add(_ value: BoneData?) {
-        spine_array_bone_data_add(
-            _ptr.assumingMemoryBound(to: spine_array_bone_data_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self))
+        spine_array_bone_data_add(_ptr.assumingMemoryBound(to: spine_array_bone_data_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_bone_data_wrapper.self))
     }
 
     /// Removes all elements from this array
@@ -879,8 +873,7 @@ public class ArrayBonePose: NSObject {
 
     /// Adds a value to the end of this array
     public func add(_ value: BonePose?) {
-        spine_array_bone_pose_add(
-            _ptr.assumingMemoryBound(to: spine_array_bone_pose_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_bone_pose_wrapper.self))
+        spine_array_bone_pose_add(_ptr.assumingMemoryBound(to: spine_array_bone_pose_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_bone_pose_wrapper.self))
     }
 
     /// Removes all elements from this array
@@ -958,9 +951,7 @@ public class ArrayBoundingBoxAttachment: NSObject {
 
     /// Adds a value to the end of this array
     public func add(_ value: BoundingBoxAttachment?) {
-        spine_array_bounding_box_attachment_add(
-            _ptr.assumingMemoryBound(to: spine_array_bounding_box_attachment_wrapper.self),
-            value?._ptr.assumingMemoryBound(to: spine_bounding_box_attachment_wrapper.self))
+        spine_array_bounding_box_attachment_add(_ptr.assumingMemoryBound(to: spine_array_bounding_box_attachment_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_bounding_box_attachment_wrapper.self))
     }
 
     /// Removes all elements from this array
@@ -981,8 +972,7 @@ public class ArrayBoundingBoxAttachment: NSObject {
     public var length: Int {
         get { count }
         set {
-            spine_array_bounding_box_attachment_set_size(
-                _ptr.assumingMemoryBound(to: spine_array_bounding_box_attachment_wrapper.self), newValue, nil)
+            spine_array_bounding_box_attachment_set_size(_ptr.assumingMemoryBound(to: spine_array_bounding_box_attachment_wrapper.self), newValue, nil)
         }
     }
 
@@ -1035,33 +1025,32 @@ public class ArrayConstraint: NSObject {
             let elementPtr = buffer[Int(index)]
             guard let ptr = elementPtr else { return nil }
             let rtti = spine_constraint_get_rtti(ptr)
-            let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
-            switch rttiClassName {
-            case "IkConstraint":
-                let castedPtr = spine_constraint_cast_to_ik_constraint(ptr)
-                return IkConstraint(fromPointer: castedPtr!)
-            case "PathConstraint":
-                let castedPtr = spine_constraint_cast_to_path_constraint(ptr)
-                return PathConstraint(fromPointer: castedPtr!)
-            case "PhysicsConstraint":
-                let castedPtr = spine_constraint_cast_to_physics_constraint(ptr)
-                return PhysicsConstraint(fromPointer: castedPtr!)
-            case "Slider":
-                let castedPtr = spine_constraint_cast_to_slider(ptr)
-                return Slider(fromPointer: castedPtr!)
-            case "TransformConstraint":
-                let castedPtr = spine_constraint_cast_to_transform_constraint(ptr)
-                return TransformConstraint(fromPointer: castedPtr!)
-            default:
-                fatalError("Unknown concrete type: \(rttiClassName) for abstract class Constraint")
-            }
+        let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
+        switch rttiClassName {
+        case "IkConstraint":
+            let castedPtr = spine_constraint_cast_to_ik_constraint(ptr)
+            return IkConstraint(fromPointer: castedPtr!)
+        case "PathConstraint":
+            let castedPtr = spine_constraint_cast_to_path_constraint(ptr)
+            return PathConstraint(fromPointer: castedPtr!)
+        case "PhysicsConstraint":
+            let castedPtr = spine_constraint_cast_to_physics_constraint(ptr)
+            return PhysicsConstraint(fromPointer: castedPtr!)
+        case "Slider":
+            let castedPtr = spine_constraint_cast_to_slider(ptr)
+            return Slider(fromPointer: castedPtr!)
+        case "TransformConstraint":
+            let castedPtr = spine_constraint_cast_to_transform_constraint(ptr)
+            return TransformConstraint(fromPointer: castedPtr!)
+        default:
+            fatalError("Unknown concrete type: \(rttiClassName) for abstract class Constraint")
+        }
         }
     }
 
     /// Adds a value to the end of this array
     public func add(_ value: Constraint?) {
-        spine_array_constraint_add(
-            _ptr.assumingMemoryBound(to: spine_array_constraint_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_constraint_wrapper.self))
+        spine_array_constraint_add(_ptr.assumingMemoryBound(to: spine_array_constraint_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_constraint_wrapper.self))
     }
 
     /// Removes all elements from this array
@@ -1135,34 +1124,32 @@ public class ArrayConstraintData: NSObject {
             let elementPtr = buffer[Int(index)]
             guard let ptr = elementPtr else { return nil }
             let rtti = spine_constraint_data_get_rtti(ptr)
-            let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
-            switch rttiClassName {
-            case "IkConstraintData":
-                let castedPtr = spine_constraint_data_cast_to_ik_constraint_data(ptr)
-                return IkConstraintData(fromPointer: castedPtr!)
-            case "PathConstraintData":
-                let castedPtr = spine_constraint_data_cast_to_path_constraint_data(ptr)
-                return PathConstraintData(fromPointer: castedPtr!)
-            case "PhysicsConstraintData":
-                let castedPtr = spine_constraint_data_cast_to_physics_constraint_data(ptr)
-                return PhysicsConstraintData(fromPointer: castedPtr!)
-            case "SliderData":
-                let castedPtr = spine_constraint_data_cast_to_slider_data(ptr)
-                return SliderData(fromPointer: castedPtr!)
-            case "TransformConstraintData":
-                let castedPtr = spine_constraint_data_cast_to_transform_constraint_data(ptr)
-                return TransformConstraintData(fromPointer: castedPtr!)
-            default:
-                fatalError("Unknown concrete type: \(rttiClassName) for abstract class ConstraintData")
-            }
+        let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
+        switch rttiClassName {
+        case "IkConstraintData":
+            let castedPtr = spine_constraint_data_cast_to_ik_constraint_data(ptr)
+            return IkConstraintData(fromPointer: castedPtr!)
+        case "PathConstraintData":
+            let castedPtr = spine_constraint_data_cast_to_path_constraint_data(ptr)
+            return PathConstraintData(fromPointer: castedPtr!)
+        case "PhysicsConstraintData":
+            let castedPtr = spine_constraint_data_cast_to_physics_constraint_data(ptr)
+            return PhysicsConstraintData(fromPointer: castedPtr!)
+        case "SliderData":
+            let castedPtr = spine_constraint_data_cast_to_slider_data(ptr)
+            return SliderData(fromPointer: castedPtr!)
+        case "TransformConstraintData":
+            let castedPtr = spine_constraint_data_cast_to_transform_constraint_data(ptr)
+            return TransformConstraintData(fromPointer: castedPtr!)
+        default:
+            fatalError("Unknown concrete type: \(rttiClassName) for abstract class ConstraintData")
+        }
         }
     }
 
     /// Adds a value to the end of this array
     public func add(_ value: ConstraintData?) {
-        spine_array_constraint_data_add(
-            _ptr.assumingMemoryBound(to: spine_array_constraint_data_wrapper.self),
-            value?._ptr.assumingMemoryBound(to: spine_constraint_data_wrapper.self))
+        spine_array_constraint_data_add(_ptr.assumingMemoryBound(to: spine_array_constraint_data_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_constraint_data_wrapper.self))
     }
 
     /// Removes all elements from this array
@@ -1240,8 +1227,7 @@ public class ArrayEvent: NSObject {
 
     /// Adds a value to the end of this array
     public func add(_ value: Event?) {
-        spine_array_event_add(
-            _ptr.assumingMemoryBound(to: spine_array_event_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_event_wrapper.self))
+        spine_array_event_add(_ptr.assumingMemoryBound(to: spine_array_event_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_event_wrapper.self))
     }
 
     /// Removes all elements from this array
@@ -1319,8 +1305,7 @@ public class ArrayEventData: NSObject {
 
     /// Adds a value to the end of this array
     public func add(_ value: EventData?) {
-        spine_array_event_data_add(
-            _ptr.assumingMemoryBound(to: spine_array_event_data_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_event_data_wrapper.self))
+        spine_array_event_data_add(_ptr.assumingMemoryBound(to: spine_array_event_data_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_event_data_wrapper.self))
     }
 
     /// Removes all elements from this array
@@ -1394,37 +1379,35 @@ public class ArrayFromProperty: NSObject {
             let elementPtr = buffer[Int(index)]
             guard let ptr = elementPtr else { return nil }
             let rtti = spine_from_property_get_rtti(ptr)
-            let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
-            switch rttiClassName {
-            case "FromRotate":
-                let castedPtr = spine_from_property_cast_to_from_rotate(ptr)
-                return FromRotate(fromPointer: castedPtr!)
-            case "FromScaleX":
-                let castedPtr = spine_from_property_cast_to_from_scale_x(ptr)
-                return FromScaleX(fromPointer: castedPtr!)
-            case "FromScaleY":
-                let castedPtr = spine_from_property_cast_to_from_scale_y(ptr)
-                return FromScaleY(fromPointer: castedPtr!)
-            case "FromShearY":
-                let castedPtr = spine_from_property_cast_to_from_shear_y(ptr)
-                return FromShearY(fromPointer: castedPtr!)
-            case "FromX":
-                let castedPtr = spine_from_property_cast_to_from_x(ptr)
-                return FromX(fromPointer: castedPtr!)
-            case "FromY":
-                let castedPtr = spine_from_property_cast_to_from_y(ptr)
-                return FromY(fromPointer: castedPtr!)
-            default:
-                fatalError("Unknown concrete type: \(rttiClassName) for abstract class FromProperty")
-            }
+        let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
+        switch rttiClassName {
+        case "FromRotate":
+            let castedPtr = spine_from_property_cast_to_from_rotate(ptr)
+            return FromRotate(fromPointer: castedPtr!)
+        case "FromScaleX":
+            let castedPtr = spine_from_property_cast_to_from_scale_x(ptr)
+            return FromScaleX(fromPointer: castedPtr!)
+        case "FromScaleY":
+            let castedPtr = spine_from_property_cast_to_from_scale_y(ptr)
+            return FromScaleY(fromPointer: castedPtr!)
+        case "FromShearY":
+            let castedPtr = spine_from_property_cast_to_from_shear_y(ptr)
+            return FromShearY(fromPointer: castedPtr!)
+        case "FromX":
+            let castedPtr = spine_from_property_cast_to_from_x(ptr)
+            return FromX(fromPointer: castedPtr!)
+        case "FromY":
+            let castedPtr = spine_from_property_cast_to_from_y(ptr)
+            return FromY(fromPointer: castedPtr!)
+        default:
+            fatalError("Unknown concrete type: \(rttiClassName) for abstract class FromProperty")
+        }
         }
     }
 
     /// Adds a value to the end of this array
     public func add(_ value: FromProperty?) {
-        spine_array_from_property_add(
-            _ptr.assumingMemoryBound(to: spine_array_from_property_wrapper.self),
-            value?._ptr.assumingMemoryBound(to: spine_from_property_wrapper.self))
+        spine_array_from_property_add(_ptr.assumingMemoryBound(to: spine_array_from_property_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_from_property_wrapper.self))
     }
 
     /// Removes all elements from this array
@@ -1502,9 +1485,7 @@ public class ArrayPhysicsConstraint: NSObject {
 
     /// Adds a value to the end of this array
     public func add(_ value: PhysicsConstraint?) {
-        spine_array_physics_constraint_add(
-            _ptr.assumingMemoryBound(to: spine_array_physics_constraint_wrapper.self),
-            value?._ptr.assumingMemoryBound(to: spine_physics_constraint_wrapper.self))
+        spine_array_physics_constraint_add(_ptr.assumingMemoryBound(to: spine_array_physics_constraint_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_physics_constraint_wrapper.self))
     }
 
     /// Removes all elements from this array
@@ -1582,8 +1563,7 @@ public class ArrayPolygon: NSObject {
 
     /// Adds a value to the end of this array
     public func add(_ value: Polygon?) {
-        spine_array_polygon_add(
-            _ptr.assumingMemoryBound(to: spine_array_polygon_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_polygon_wrapper.self))
+        spine_array_polygon_add(_ptr.assumingMemoryBound(to: spine_array_polygon_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_polygon_wrapper.self))
     }
 
     /// Removes all elements from this array
@@ -1661,8 +1641,7 @@ public class ArraySkin: NSObject {
 
     /// Adds a value to the end of this array
     public func add(_ value: Skin?) {
-        spine_array_skin_add(
-            _ptr.assumingMemoryBound(to: spine_array_skin_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_skin_wrapper.self))
+        spine_array_skin_add(_ptr.assumingMemoryBound(to: spine_array_skin_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_skin_wrapper.self))
     }
 
     /// Removes all elements from this array
@@ -1740,8 +1719,7 @@ public class ArraySlot: NSObject {
 
     /// Adds a value to the end of this array
     public func add(_ value: Slot?) {
-        spine_array_slot_add(
-            _ptr.assumingMemoryBound(to: spine_array_slot_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_slot_wrapper.self))
+        spine_array_slot_add(_ptr.assumingMemoryBound(to: spine_array_slot_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_slot_wrapper.self))
     }
 
     /// Removes all elements from this array
@@ -1819,8 +1797,7 @@ public class ArraySlotData: NSObject {
 
     /// Adds a value to the end of this array
     public func add(_ value: SlotData?) {
-        spine_array_slot_data_add(
-            _ptr.assumingMemoryBound(to: spine_array_slot_data_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_slot_data_wrapper.self))
+        spine_array_slot_data_add(_ptr.assumingMemoryBound(to: spine_array_slot_data_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_slot_data_wrapper.self))
     }
 
     /// Removes all elements from this array
@@ -1898,9 +1875,7 @@ public class ArrayTextureRegion: NSObject {
 
     /// Adds a value to the end of this array
     public func add(_ value: TextureRegion?) {
-        spine_array_texture_region_add(
-            _ptr.assumingMemoryBound(to: spine_array_texture_region_wrapper.self),
-            value?._ptr.assumingMemoryBound(to: spine_texture_region_wrapper.self))
+        spine_array_texture_region_add(_ptr.assumingMemoryBound(to: spine_array_texture_region_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_texture_region_wrapper.self))
     }
 
     /// Removes all elements from this array
@@ -1974,129 +1949,128 @@ public class ArrayTimeline: NSObject {
             let elementPtr = buffer[Int(index)]
             guard let ptr = elementPtr else { return nil }
             let rtti = spine_timeline_get_rtti(ptr)
-            let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
-            switch rttiClassName {
-            case "AlphaTimeline":
-                let castedPtr = spine_timeline_cast_to_alpha_timeline(ptr)
-                return AlphaTimeline(fromPointer: castedPtr!)
-            case "AttachmentTimeline":
-                let castedPtr = spine_timeline_cast_to_attachment_timeline(ptr)
-                return AttachmentTimeline(fromPointer: castedPtr!)
-            case "DeformTimeline":
-                let castedPtr = spine_timeline_cast_to_deform_timeline(ptr)
-                return DeformTimeline(fromPointer: castedPtr!)
-            case "DrawOrderFolderTimeline":
-                let castedPtr = spine_timeline_cast_to_draw_order_folder_timeline(ptr)
-                return DrawOrderFolderTimeline(fromPointer: castedPtr!)
-            case "DrawOrderTimeline":
-                let castedPtr = spine_timeline_cast_to_draw_order_timeline(ptr)
-                return DrawOrderTimeline(fromPointer: castedPtr!)
-            case "EventTimeline":
-                let castedPtr = spine_timeline_cast_to_event_timeline(ptr)
-                return EventTimeline(fromPointer: castedPtr!)
-            case "IkConstraintTimeline":
-                let castedPtr = spine_timeline_cast_to_ik_constraint_timeline(ptr)
-                return IkConstraintTimeline(fromPointer: castedPtr!)
-            case "InheritTimeline":
-                let castedPtr = spine_timeline_cast_to_inherit_timeline(ptr)
-                return InheritTimeline(fromPointer: castedPtr!)
-            case "PathConstraintMixTimeline":
-                let castedPtr = spine_timeline_cast_to_path_constraint_mix_timeline(ptr)
-                return PathConstraintMixTimeline(fromPointer: castedPtr!)
-            case "PathConstraintPositionTimeline":
-                let castedPtr = spine_timeline_cast_to_path_constraint_position_timeline(ptr)
-                return PathConstraintPositionTimeline(fromPointer: castedPtr!)
-            case "PathConstraintSpacingTimeline":
-                let castedPtr = spine_timeline_cast_to_path_constraint_spacing_timeline(ptr)
-                return PathConstraintSpacingTimeline(fromPointer: castedPtr!)
-            case "PhysicsConstraintDampingTimeline":
-                let castedPtr = spine_timeline_cast_to_physics_constraint_damping_timeline(ptr)
-                return PhysicsConstraintDampingTimeline(fromPointer: castedPtr!)
-            case "PhysicsConstraintGravityTimeline":
-                let castedPtr = spine_timeline_cast_to_physics_constraint_gravity_timeline(ptr)
-                return PhysicsConstraintGravityTimeline(fromPointer: castedPtr!)
-            case "PhysicsConstraintInertiaTimeline":
-                let castedPtr = spine_timeline_cast_to_physics_constraint_inertia_timeline(ptr)
-                return PhysicsConstraintInertiaTimeline(fromPointer: castedPtr!)
-            case "PhysicsConstraintMassTimeline":
-                let castedPtr = spine_timeline_cast_to_physics_constraint_mass_timeline(ptr)
-                return PhysicsConstraintMassTimeline(fromPointer: castedPtr!)
-            case "PhysicsConstraintMixTimeline":
-                let castedPtr = spine_timeline_cast_to_physics_constraint_mix_timeline(ptr)
-                return PhysicsConstraintMixTimeline(fromPointer: castedPtr!)
-            case "PhysicsConstraintResetTimeline":
-                let castedPtr = spine_timeline_cast_to_physics_constraint_reset_timeline(ptr)
-                return PhysicsConstraintResetTimeline(fromPointer: castedPtr!)
-            case "PhysicsConstraintStrengthTimeline":
-                let castedPtr = spine_timeline_cast_to_physics_constraint_strength_timeline(ptr)
-                return PhysicsConstraintStrengthTimeline(fromPointer: castedPtr!)
-            case "PhysicsConstraintWindTimeline":
-                let castedPtr = spine_timeline_cast_to_physics_constraint_wind_timeline(ptr)
-                return PhysicsConstraintWindTimeline(fromPointer: castedPtr!)
-            case "Rgb2Timeline":
-                let castedPtr = spine_timeline_cast_to_rgb2_timeline(ptr)
-                return Rgb2Timeline(fromPointer: castedPtr!)
-            case "Rgba2Timeline":
-                let castedPtr = spine_timeline_cast_to_rgba2_timeline(ptr)
-                return Rgba2Timeline(fromPointer: castedPtr!)
-            case "RgbaTimeline":
-                let castedPtr = spine_timeline_cast_to_rgba_timeline(ptr)
-                return RgbaTimeline(fromPointer: castedPtr!)
-            case "RgbTimeline":
-                let castedPtr = spine_timeline_cast_to_rgb_timeline(ptr)
-                return RgbTimeline(fromPointer: castedPtr!)
-            case "RotateTimeline":
-                let castedPtr = spine_timeline_cast_to_rotate_timeline(ptr)
-                return RotateTimeline(fromPointer: castedPtr!)
-            case "ScaleTimeline":
-                let castedPtr = spine_timeline_cast_to_scale_timeline(ptr)
-                return ScaleTimeline(fromPointer: castedPtr!)
-            case "ScaleXTimeline":
-                let castedPtr = spine_timeline_cast_to_scale_x_timeline(ptr)
-                return ScaleXTimeline(fromPointer: castedPtr!)
-            case "ScaleYTimeline":
-                let castedPtr = spine_timeline_cast_to_scale_y_timeline(ptr)
-                return ScaleYTimeline(fromPointer: castedPtr!)
-            case "SequenceTimeline":
-                let castedPtr = spine_timeline_cast_to_sequence_timeline(ptr)
-                return SequenceTimeline(fromPointer: castedPtr!)
-            case "ShearTimeline":
-                let castedPtr = spine_timeline_cast_to_shear_timeline(ptr)
-                return ShearTimeline(fromPointer: castedPtr!)
-            case "ShearXTimeline":
-                let castedPtr = spine_timeline_cast_to_shear_x_timeline(ptr)
-                return ShearXTimeline(fromPointer: castedPtr!)
-            case "ShearYTimeline":
-                let castedPtr = spine_timeline_cast_to_shear_y_timeline(ptr)
-                return ShearYTimeline(fromPointer: castedPtr!)
-            case "SliderMixTimeline":
-                let castedPtr = spine_timeline_cast_to_slider_mix_timeline(ptr)
-                return SliderMixTimeline(fromPointer: castedPtr!)
-            case "SliderTimeline":
-                let castedPtr = spine_timeline_cast_to_slider_timeline(ptr)
-                return SliderTimeline(fromPointer: castedPtr!)
-            case "TransformConstraintTimeline":
-                let castedPtr = spine_timeline_cast_to_transform_constraint_timeline(ptr)
-                return TransformConstraintTimeline(fromPointer: castedPtr!)
-            case "TranslateTimeline":
-                let castedPtr = spine_timeline_cast_to_translate_timeline(ptr)
-                return TranslateTimeline(fromPointer: castedPtr!)
-            case "TranslateXTimeline":
-                let castedPtr = spine_timeline_cast_to_translate_x_timeline(ptr)
-                return TranslateXTimeline(fromPointer: castedPtr!)
-            case "TranslateYTimeline":
-                let castedPtr = spine_timeline_cast_to_translate_y_timeline(ptr)
-                return TranslateYTimeline(fromPointer: castedPtr!)
-            default:
-                fatalError("Unknown concrete type: \(rttiClassName) for abstract class Timeline")
-            }
+        let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
+        switch rttiClassName {
+        case "AlphaTimeline":
+            let castedPtr = spine_timeline_cast_to_alpha_timeline(ptr)
+            return AlphaTimeline(fromPointer: castedPtr!)
+        case "AttachmentTimeline":
+            let castedPtr = spine_timeline_cast_to_attachment_timeline(ptr)
+            return AttachmentTimeline(fromPointer: castedPtr!)
+        case "DeformTimeline":
+            let castedPtr = spine_timeline_cast_to_deform_timeline(ptr)
+            return DeformTimeline(fromPointer: castedPtr!)
+        case "DrawOrderFolderTimeline":
+            let castedPtr = spine_timeline_cast_to_draw_order_folder_timeline(ptr)
+            return DrawOrderFolderTimeline(fromPointer: castedPtr!)
+        case "DrawOrderTimeline":
+            let castedPtr = spine_timeline_cast_to_draw_order_timeline(ptr)
+            return DrawOrderTimeline(fromPointer: castedPtr!)
+        case "EventTimeline":
+            let castedPtr = spine_timeline_cast_to_event_timeline(ptr)
+            return EventTimeline(fromPointer: castedPtr!)
+        case "IkConstraintTimeline":
+            let castedPtr = spine_timeline_cast_to_ik_constraint_timeline(ptr)
+            return IkConstraintTimeline(fromPointer: castedPtr!)
+        case "InheritTimeline":
+            let castedPtr = spine_timeline_cast_to_inherit_timeline(ptr)
+            return InheritTimeline(fromPointer: castedPtr!)
+        case "PathConstraintMixTimeline":
+            let castedPtr = spine_timeline_cast_to_path_constraint_mix_timeline(ptr)
+            return PathConstraintMixTimeline(fromPointer: castedPtr!)
+        case "PathConstraintPositionTimeline":
+            let castedPtr = spine_timeline_cast_to_path_constraint_position_timeline(ptr)
+            return PathConstraintPositionTimeline(fromPointer: castedPtr!)
+        case "PathConstraintSpacingTimeline":
+            let castedPtr = spine_timeline_cast_to_path_constraint_spacing_timeline(ptr)
+            return PathConstraintSpacingTimeline(fromPointer: castedPtr!)
+        case "PhysicsConstraintDampingTimeline":
+            let castedPtr = spine_timeline_cast_to_physics_constraint_damping_timeline(ptr)
+            return PhysicsConstraintDampingTimeline(fromPointer: castedPtr!)
+        case "PhysicsConstraintGravityTimeline":
+            let castedPtr = spine_timeline_cast_to_physics_constraint_gravity_timeline(ptr)
+            return PhysicsConstraintGravityTimeline(fromPointer: castedPtr!)
+        case "PhysicsConstraintInertiaTimeline":
+            let castedPtr = spine_timeline_cast_to_physics_constraint_inertia_timeline(ptr)
+            return PhysicsConstraintInertiaTimeline(fromPointer: castedPtr!)
+        case "PhysicsConstraintMassTimeline":
+            let castedPtr = spine_timeline_cast_to_physics_constraint_mass_timeline(ptr)
+            return PhysicsConstraintMassTimeline(fromPointer: castedPtr!)
+        case "PhysicsConstraintMixTimeline":
+            let castedPtr = spine_timeline_cast_to_physics_constraint_mix_timeline(ptr)
+            return PhysicsConstraintMixTimeline(fromPointer: castedPtr!)
+        case "PhysicsConstraintResetTimeline":
+            let castedPtr = spine_timeline_cast_to_physics_constraint_reset_timeline(ptr)
+            return PhysicsConstraintResetTimeline(fromPointer: castedPtr!)
+        case "PhysicsConstraintStrengthTimeline":
+            let castedPtr = spine_timeline_cast_to_physics_constraint_strength_timeline(ptr)
+            return PhysicsConstraintStrengthTimeline(fromPointer: castedPtr!)
+        case "PhysicsConstraintWindTimeline":
+            let castedPtr = spine_timeline_cast_to_physics_constraint_wind_timeline(ptr)
+            return PhysicsConstraintWindTimeline(fromPointer: castedPtr!)
+        case "Rgb2Timeline":
+            let castedPtr = spine_timeline_cast_to_rgb2_timeline(ptr)
+            return Rgb2Timeline(fromPointer: castedPtr!)
+        case "Rgba2Timeline":
+            let castedPtr = spine_timeline_cast_to_rgba2_timeline(ptr)
+            return Rgba2Timeline(fromPointer: castedPtr!)
+        case "RgbaTimeline":
+            let castedPtr = spine_timeline_cast_to_rgba_timeline(ptr)
+            return RgbaTimeline(fromPointer: castedPtr!)
+        case "RgbTimeline":
+            let castedPtr = spine_timeline_cast_to_rgb_timeline(ptr)
+            return RgbTimeline(fromPointer: castedPtr!)
+        case "RotateTimeline":
+            let castedPtr = spine_timeline_cast_to_rotate_timeline(ptr)
+            return RotateTimeline(fromPointer: castedPtr!)
+        case "ScaleTimeline":
+            let castedPtr = spine_timeline_cast_to_scale_timeline(ptr)
+            return ScaleTimeline(fromPointer: castedPtr!)
+        case "ScaleXTimeline":
+            let castedPtr = spine_timeline_cast_to_scale_x_timeline(ptr)
+            return ScaleXTimeline(fromPointer: castedPtr!)
+        case "ScaleYTimeline":
+            let castedPtr = spine_timeline_cast_to_scale_y_timeline(ptr)
+            return ScaleYTimeline(fromPointer: castedPtr!)
+        case "SequenceTimeline":
+            let castedPtr = spine_timeline_cast_to_sequence_timeline(ptr)
+            return SequenceTimeline(fromPointer: castedPtr!)
+        case "ShearTimeline":
+            let castedPtr = spine_timeline_cast_to_shear_timeline(ptr)
+            return ShearTimeline(fromPointer: castedPtr!)
+        case "ShearXTimeline":
+            let castedPtr = spine_timeline_cast_to_shear_x_timeline(ptr)
+            return ShearXTimeline(fromPointer: castedPtr!)
+        case "ShearYTimeline":
+            let castedPtr = spine_timeline_cast_to_shear_y_timeline(ptr)
+            return ShearYTimeline(fromPointer: castedPtr!)
+        case "SliderMixTimeline":
+            let castedPtr = spine_timeline_cast_to_slider_mix_timeline(ptr)
+            return SliderMixTimeline(fromPointer: castedPtr!)
+        case "SliderTimeline":
+            let castedPtr = spine_timeline_cast_to_slider_timeline(ptr)
+            return SliderTimeline(fromPointer: castedPtr!)
+        case "TransformConstraintTimeline":
+            let castedPtr = spine_timeline_cast_to_transform_constraint_timeline(ptr)
+            return TransformConstraintTimeline(fromPointer: castedPtr!)
+        case "TranslateTimeline":
+            let castedPtr = spine_timeline_cast_to_translate_timeline(ptr)
+            return TranslateTimeline(fromPointer: castedPtr!)
+        case "TranslateXTimeline":
+            let castedPtr = spine_timeline_cast_to_translate_x_timeline(ptr)
+            return TranslateXTimeline(fromPointer: castedPtr!)
+        case "TranslateYTimeline":
+            let castedPtr = spine_timeline_cast_to_translate_y_timeline(ptr)
+            return TranslateYTimeline(fromPointer: castedPtr!)
+        default:
+            fatalError("Unknown concrete type: \(rttiClassName) for abstract class Timeline")
+        }
         }
     }
 
     /// Adds a value to the end of this array
     public func add(_ value: Timeline?) {
-        spine_array_timeline_add(
-            _ptr.assumingMemoryBound(to: spine_array_timeline_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_timeline_wrapper.self))
+        spine_array_timeline_add(_ptr.assumingMemoryBound(to: spine_array_timeline_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_timeline_wrapper.self))
     }
 
     /// Removes all elements from this array
@@ -2170,36 +2144,35 @@ public class ArrayToProperty: NSObject {
             let elementPtr = buffer[Int(index)]
             guard let ptr = elementPtr else { return nil }
             let rtti = spine_to_property_get_rtti(ptr)
-            let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
-            switch rttiClassName {
-            case "ToRotate":
-                let castedPtr = spine_to_property_cast_to_to_rotate(ptr)
-                return ToRotate(fromPointer: castedPtr!)
-            case "ToScaleX":
-                let castedPtr = spine_to_property_cast_to_to_scale_x(ptr)
-                return ToScaleX(fromPointer: castedPtr!)
-            case "ToScaleY":
-                let castedPtr = spine_to_property_cast_to_to_scale_y(ptr)
-                return ToScaleY(fromPointer: castedPtr!)
-            case "ToShearY":
-                let castedPtr = spine_to_property_cast_to_to_shear_y(ptr)
-                return ToShearY(fromPointer: castedPtr!)
-            case "ToX":
-                let castedPtr = spine_to_property_cast_to_to_x(ptr)
-                return ToX(fromPointer: castedPtr!)
-            case "ToY":
-                let castedPtr = spine_to_property_cast_to_to_y(ptr)
-                return ToY(fromPointer: castedPtr!)
-            default:
-                fatalError("Unknown concrete type: \(rttiClassName) for abstract class ToProperty")
-            }
+        let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
+        switch rttiClassName {
+        case "ToRotate":
+            let castedPtr = spine_to_property_cast_to_to_rotate(ptr)
+            return ToRotate(fromPointer: castedPtr!)
+        case "ToScaleX":
+            let castedPtr = spine_to_property_cast_to_to_scale_x(ptr)
+            return ToScaleX(fromPointer: castedPtr!)
+        case "ToScaleY":
+            let castedPtr = spine_to_property_cast_to_to_scale_y(ptr)
+            return ToScaleY(fromPointer: castedPtr!)
+        case "ToShearY":
+            let castedPtr = spine_to_property_cast_to_to_shear_y(ptr)
+            return ToShearY(fromPointer: castedPtr!)
+        case "ToX":
+            let castedPtr = spine_to_property_cast_to_to_x(ptr)
+            return ToX(fromPointer: castedPtr!)
+        case "ToY":
+            let castedPtr = spine_to_property_cast_to_to_y(ptr)
+            return ToY(fromPointer: castedPtr!)
+        default:
+            fatalError("Unknown concrete type: \(rttiClassName) for abstract class ToProperty")
+        }
         }
     }
 
     /// Adds a value to the end of this array
     public func add(_ value: ToProperty?) {
-        spine_array_to_property_add(
-            _ptr.assumingMemoryBound(to: spine_array_to_property_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_to_property_wrapper.self))
+        spine_array_to_property_add(_ptr.assumingMemoryBound(to: spine_array_to_property_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_to_property_wrapper.self))
     }
 
     /// Removes all elements from this array
@@ -2277,8 +2250,7 @@ public class ArrayTrackEntry: NSObject {
 
     /// Adds a value to the end of this array
     public func add(_ value: TrackEntry?) {
-        spine_array_track_entry_add(
-            _ptr.assumingMemoryBound(to: spine_array_track_entry_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))
+        spine_array_track_entry_add(_ptr.assumingMemoryBound(to: spine_array_track_entry_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))
     }
 
     /// Removes all elements from this array
@@ -2352,39 +2324,38 @@ public class ArrayUpdate: NSObject {
             let elementPtr = buffer[Int(index)]
             guard let ptr = elementPtr else { return nil }
             let rtti = spine_update_get_rtti(ptr)
-            let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
-            switch rttiClassName {
-            case "Bone":
-                let castedPtr = spine_update_cast_to_bone(ptr)
-                return Bone(fromPointer: castedPtr!)
-            case "BonePose":
-                let castedPtr = spine_update_cast_to_bone_pose(ptr)
-                return BonePose(fromPointer: castedPtr!)
-            case "IkConstraint":
-                let castedPtr = spine_update_cast_to_ik_constraint(ptr)
-                return IkConstraint(fromPointer: castedPtr!)
-            case "PathConstraint":
-                let castedPtr = spine_update_cast_to_path_constraint(ptr)
-                return PathConstraint(fromPointer: castedPtr!)
-            case "PhysicsConstraint":
-                let castedPtr = spine_update_cast_to_physics_constraint(ptr)
-                return PhysicsConstraint(fromPointer: castedPtr!)
-            case "Slider":
-                let castedPtr = spine_update_cast_to_slider(ptr)
-                return Slider(fromPointer: castedPtr!)
-            case "TransformConstraint":
-                let castedPtr = spine_update_cast_to_transform_constraint(ptr)
-                return TransformConstraint(fromPointer: castedPtr!)
-            default:
-                fatalError("Unknown concrete type: \(rttiClassName) for abstract class Update")
-            }
+        let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
+        switch rttiClassName {
+        case "Bone":
+            let castedPtr = spine_update_cast_to_bone(ptr)
+            return Bone(fromPointer: castedPtr!)
+        case "BonePose":
+            let castedPtr = spine_update_cast_to_bone_pose(ptr)
+            return BonePose(fromPointer: castedPtr!)
+        case "IkConstraint":
+            let castedPtr = spine_update_cast_to_ik_constraint(ptr)
+            return IkConstraint(fromPointer: castedPtr!)
+        case "PathConstraint":
+            let castedPtr = spine_update_cast_to_path_constraint(ptr)
+            return PathConstraint(fromPointer: castedPtr!)
+        case "PhysicsConstraint":
+            let castedPtr = spine_update_cast_to_physics_constraint(ptr)
+            return PhysicsConstraint(fromPointer: castedPtr!)
+        case "Slider":
+            let castedPtr = spine_update_cast_to_slider(ptr)
+            return Slider(fromPointer: castedPtr!)
+        case "TransformConstraint":
+            let castedPtr = spine_update_cast_to_transform_constraint(ptr)
+            return TransformConstraint(fromPointer: castedPtr!)
+        default:
+            fatalError("Unknown concrete type: \(rttiClassName) for abstract class Update")
+        }
         }
     }
 
     /// Adds a value to the end of this array
     public func add(_ value: Update?) {
-        spine_array_update_add(
-            _ptr.assumingMemoryBound(to: spine_array_update_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_update_wrapper.self))
+        spine_array_update_add(_ptr.assumingMemoryBound(to: spine_array_update_wrapper.self), value?._ptr.assumingMemoryBound(to: spine_update_wrapper.self))
     }
 
     /// Removes all elements from this array

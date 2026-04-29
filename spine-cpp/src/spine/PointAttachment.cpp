@@ -82,6 +82,8 @@ float PointAttachment::computeWorldRotation(BonePose &bone) {
 
 Attachment &PointAttachment::copy() {
 	PointAttachment *copy = new (__FILE__, __LINE__) PointAttachment(getName());
+	copy->setTimelineAttachment(getTimelineAttachment());
+	copy->setTimelineSlots(getTimelineSlots());
 	copy->_x = _x;
 	copy->_y = _y;
 	copy->_rotation = _rotation;

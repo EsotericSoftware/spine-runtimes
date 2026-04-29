@@ -48,7 +48,6 @@ PathConstraintMixTimeline::PathConstraintMixTimeline(size_t frameCount, size_t b
 	: CurveTimeline(frameCount, PathConstraintMixTimeline::ENTRIES, bezierCount), ConstraintTimeline(), _constraintIndex(constraintIndex) {
 	PropertyId ids[] = {((PropertyId) Property_PathConstraintMix << 32) | constraintIndex};
 	setPropertyIds(ids, 1);
-	_additive = true;
 }
 
 PathConstraintMixTimeline::~PathConstraintMixTimeline() {

@@ -37,6 +37,7 @@
 namespace spine {
 	class Attachment;
 	class HasTextureRegion;
+	class Slot;
 
 	/// Changes the sequence index for an attachment's Sequence.
 	class SP_API SequenceTimeline : public Timeline, public SlotTimeline {
@@ -72,7 +73,10 @@ namespace spine {
 
 	protected:
 		int _slotIndex;
-		HasTextureRegion *_attachment;
+		Attachment *_attachment;
+
+		void setupPose(Slot &slot, bool appliedPose);
+		void applyToSlot(Slot &slot, bool appliedPose, Sequence &sequence, float time, float before, int modeAndIndex, float delay);
 
 		static const int ENTRIES = 3;
 		static const int MODE = 1;

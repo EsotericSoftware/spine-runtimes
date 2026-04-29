@@ -27,8 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { type Attachment, VertexAttachment } from "./attachments/Attachment.js";
-import { type HasSequence, isHasSequence } from "./attachments/HasSequence.js";
+import type { Attachment, VertexAttachment } from "./attachments/Attachment.js";
+import type { HasSequence } from "./attachments/HasSequence.js";
 import { SequenceMode, SequenceModeValues } from "./attachments/Sequence.js";
 import type { Bone } from "./Bone.js";
 import type { Inherit } from "./BoneData.js";
@@ -50,7 +50,7 @@ import type { Slot } from "./Slot.js";
 import type { SlotPose } from "./SlotPose.js";
 import type { TransformConstraint } from "./TransformConstraint.js";
 import type { TransformConstraintPose } from "./TransformConstraintPose.js";
-import { type NumberArrayLike, StringSet, Utils } from "./Utils.js";
+import { Color, type NumberArrayLike, StringSet, Utils } from "./Utils.js";
 
 /** Stores a list of timelines to animate a skeleton's pose over time.
  *
@@ -72,6 +72,10 @@ export class Animation {
 	 *
 	 * See {@link BoneTimeline.bones}. */
 	readonly bones: Array<number>;
+
+	// Nonessential.
+	/** The color of the animation as it was in Spine, or a default color if nonessential data was not exported. */
+	readonly color = new Color(1, 1, 1, 1);
 
 	/** The duration of the animation in seconds, which is usually the highest time of all frames in the timeline. The duration is
 	 * used to know when it has completed and when it should loop back to the start. */
@@ -444,12 +448,12 @@ export abstract class CurveTimeline1 extends CurveTimeline {
 	private getAbsoluteValue1 (time: number, alpha: number, fromSetup: boolean, add: boolean, current: number, setup: number) {
 		if (time < this.frames[0]) return fromSetup ? setup : current;
 		const value = this.getCurveValue(time);
-		return fromSetup ? setup + (value - setup) * alpha : current + (add ? value : value - current) * alpha;
+		return fromSetup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
 	}
 
 	private getAbsoluteValue2 (time: number, alpha: number, fromSetup: boolean, add: boolean, current: number, setup: number, value: number) {
 		if (time < this.frames[0]) return fromSetup ? setup : current;
-		return fromSetup ? setup + (value - setup) * alpha : current + (add ? value : value - current) * alpha;
+		return fromSetup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
 	}
 
 	/** Returns the interpolated value for scale properties. The timeline and setup values are multiplied and sign adjusted.
@@ -1299,7 +1303,9 @@ export class AttachmentTimeline extends Timeline implements SlotTimeline {
 }
 
 /** Changes {@link SlotPose.deform} to deform a {@link VertexAttachment}. */
-export class DeformTimeline extends SlotCurveTimeline {
+export class DeformTimeline extends CurveTimeline implements SlotTimeline {
+	readonly slotIndex: number;
+
 	/** The attachment that will be deformed.
 	 *
 	 * See {@link VertexAttachment.getTimelineAttachment}. */
@@ -1309,7 +1315,8 @@ export class DeformTimeline extends SlotCurveTimeline {
 	vertices: Array<NumberArrayLike>;
 
 	constructor (frameCount: number, bezierCount: number, slotIndex: number, attachment: VertexAttachment) {
-		super(frameCount, bezierCount, slotIndex, `${Property.deform}|${slotIndex}|${attachment.id}`);
+		super(frameCount, bezierCount, `${Property.deform}|${slotIndex}|${attachment.id}`);
+		this.slotIndex = slotIndex;
 		this.attachment = attachment;
 		this.vertices = new Array<NumberArrayLike>(frameCount);
 		this.additive = true;
@@ -1379,124 +1386,151 @@ export class DeformTimeline extends SlotCurveTimeline {
 		return y + (1 - y) * (time - x) / (this.frames[frame + this.getFrameEntries()] - x);
 	}
 
-	protected apply1 (slot: Slot, pose: SlotPose, time: number, alpha: number, fromSetup: boolean, add: boolean) {
-		if (!(pose.attachment instanceof VertexAttachment)) return;
-		const vertexAttachment = pose.attachment;
-		if (vertexAttachment.timelineAttachment !== this.attachment) return;
-
-		const deform = pose.deform;
-		if (deform.length === 0) fromSetup = true;
-
-		const vertices = this.vertices;
-		const vertexCount = vertices[0].length;
+	apply (skeleton: Skeleton, lastTime: number, time: number, events: Event[] | null, alpha: number, fromSetup: boolean,
+		add: boolean, out: boolean, appliedPose: boolean) {
+		const slots = skeleton.slots;
+		if (!this.attachment.isTimelineActive(slots, this.slotIndex, appliedPose)) return;
+		const timelineSlots = this.attachment.timelineSlots;
 
 		const frames = this.frames;
 		if (time < frames[0]) {
-			if (fromSetup) deform.length = 0;
+			this.applyBeforeFirst(slots[this.slotIndex], appliedPose, fromSetup);
+			for (const slotIndex of timelineSlots)
+				this.applyBeforeFirst(slots[slotIndex], appliedPose, fromSetup);
 			return;
 		}
 
+		let v1: NumberArrayLike, v2: NumberArrayLike | null;
+		let percent: number;
+		if (time >= frames[frames.length - 1]) {
+			percent = 0;
+			v1 = this.vertices[frames.length - 1];
+			v2 = null;
+		} else {
+			const frame = Timeline.search(frames, time);
+			percent = this.getCurvePercent(time, frame);
+			v1 = this.vertices[frame];
+			v2 = this.vertices[frame + 1];
+		}
+
+		const vertexCount = this.vertices[0].length;
+		this.applyToSlot(slots[this.slotIndex], appliedPose, v1, v2, percent, vertexCount, alpha, fromSetup, add);
+		for (const slotIndex of timelineSlots)
+			this.applyToSlot(slots[slotIndex], appliedPose, v1, v2, percent, vertexCount, alpha, fromSetup, add);
+	}
+
+	private applyToSlot (slot: Slot, appliedPose: boolean, v1: NumberArrayLike, v2: NumberArrayLike | null, percent: number, vertexCount: number,
+		alpha: number, fromSetup: boolean, add: boolean) {
+		if (!slot.bone.active) return;
+		const pose = appliedPose ? slot.appliedPose : slot.pose;
+		if (pose.attachment === null || pose.attachment.timelineAttachment !== this.attachment) return;
+
+		const vertexAttachment = pose.attachment as VertexAttachment;
+		const deform = pose.deform;
+		if (deform.length === 0) fromSetup = true;
 		deform.length = vertexCount;
-		if (time >= frames[frames.length - 1]) { // Time is after last frame.
-			const lastVertices = vertices[frames.length - 1];
+
+		if (v2 === null) { // Time is after last frame.
 			if (alpha === 1) {
 				if (add && !fromSetup) {
 					if (!vertexAttachment.bones) { // Unweighted vertex positions, no alpha.
 						const setupVertices = vertexAttachment.vertices;
 						for (let i = 0; i < vertexCount; i++)
-							deform[i] += lastVertices[i] - setupVertices[i];
+							deform[i] += v1[i] - setupVertices[i];
 					} else { // Weighted deform offsets, no alpha.
 						for (let i = 0; i < vertexCount; i++)
-							deform[i] += lastVertices[i];
+							deform[i] += v1[i];
 					}
 				} else // Vertex positions or deform offsets, no alpha.
-					Utils.arrayCopy(lastVertices, 0, deform, 0, vertexCount);
+					Utils.arrayCopy(v1, 0, deform, 0, vertexCount);
 			} else if (fromSetup) {
 				if (!vertexAttachment.bones) { // Unweighted vertex positions, with alpha.
 					const setupVertices = vertexAttachment.vertices;
 					for (let i = 0; i < vertexCount; i++) {
 						const setup = setupVertices[i];
-						deform[i] = setup + (lastVertices[i] - setup) * alpha;
+						deform[i] = setup + (v1[i] - setup) * alpha;
 					}
 				} else { // Weighted deform offsets, with alpha.
 					for (let i = 0; i < vertexCount; i++)
-						deform[i] = lastVertices[i] * alpha;
+						deform[i] = v1[i] * alpha;
 				}
 			} else if (add) {
 				if (!vertexAttachment.bones) { // Unweighted vertex positions, no alpha.
 					const setupVertices = vertexAttachment.vertices;
 					for (let i = 0; i < vertexCount; i++)
-						deform[i] += (lastVertices[i] - setupVertices[i]) * alpha;
+						deform[i] += (v1[i] - setupVertices[i]) * alpha;
 				} else { // Weighted deform offsets, alpha.
 					for (let i = 0; i < vertexCount; i++)
-						deform[i] += lastVertices[i] * alpha;
+						deform[i] += v1[i] * alpha;
 				}
 			} else { // Vertex positions or deform offsets, with alpha.
 				for (let i = 0; i < vertexCount; i++)
-					deform[i] += (lastVertices[i] - deform[i]) * alpha;
+					deform[i] += (v1[i] - deform[i]) * alpha;
 			}
-			return;
-		}
-
-		const frame = Timeline.search(frames, time);
-		const percent = this.getCurvePercent(time, frame);
-		const prevVertices = vertices[frame];
-		const nextVertices = vertices[frame + 1];
-
-		if (alpha === 1) {
-			if (add && !fromSetup) {
-				if (!vertexAttachment.bones) { // Unweighted vertex positions, no alpha.
+		} else { // Between frames.
+			if (alpha === 1) {
+				if (add && !fromSetup) {
+					if (!vertexAttachment.bones) { // Unweighted vertex positions, no alpha.
+						const setupVertices = vertexAttachment.vertices;
+						for (let i = 0; i < vertexCount; i++) {
+							const prev = v1[i];
+							deform[i] += prev + (v2[i] - prev) * percent - setupVertices[i];
+						}
+					} else { // Weighted deform offsets, no alpha.
+						for (let i = 0; i < vertexCount; i++) {
+							const prev = v1[i];
+							deform[i] += prev + (v2[i] - prev) * percent;
+						}
+					}
+				} else if (percent === 0)
+					Utils.arrayCopy(v1, 0, deform, 0, vertexCount)
+				else { // Vertex positions or deform offsets, no alpha.
+					for (let i = 0; i < vertexCount; i++) {
+						const prev = v1[i];
+						deform[i] = prev + (v2[i] - prev) * percent;
+					}
+				}
+			} else if (fromSetup) {
+				if (!vertexAttachment.bones) { // Unweighted vertex positions, with alpha.
 					const setupVertices = vertexAttachment.vertices;
 					for (let i = 0; i < vertexCount; i++) {
-						const prev = prevVertices[i];
-						deform[i] += prev + (nextVertices[i] - prev) * percent - setupVertices[i];
+						const prev = v1[i], setup = setupVertices[i];
+						deform[i] = setup + (prev + (v2[i] - prev) * percent - setup) * alpha;
 					}
-				} else { // Weighted deform offsets, no alpha.
+				} else { // Weighted deform offsets, with alpha.
 					for (let i = 0; i < vertexCount; i++) {
-						const prev = prevVertices[i];
-						deform[i] += prev + (nextVertices[i] - prev) * percent;
+						const prev = v1[i];
+						deform[i] = (prev + (v2[i] - prev) * percent) * alpha;
 					}
 				}
-			} else if (percent === 0)
-				Utils.arrayCopy(prevVertices, 0, deform, 0, vertexCount)
-			else { // Vertex positions or deform offsets, no alpha.
-				for (let i = 0; i < vertexCount; i++) {
-					const prev = prevVertices[i];
-					deform[i] = prev + (nextVertices[i] - prev) * percent;
+			} else if (add) {
+				if (!vertexAttachment.bones) { // Unweighted vertex positions, with alpha.
+					const setupVertices = vertexAttachment.vertices;
+					for (let i = 0; i < vertexCount; i++) {
+						const prev = v1[i];
+						deform[i] += (prev + (v2[i] - prev) * percent - setupVertices[i]) * alpha;
+					}
+				} else { // Weighted deform offsets, with alpha.
+					for (let i = 0; i < vertexCount; i++) {
+						const prev = v1[i];
+						deform[i] += (prev + (v2[i] - prev) * percent) * alpha;
+					}
 				}
-			}
-		} else if (fromSetup) {
-			if (!vertexAttachment.bones) { // Unweighted vertex positions, with alpha.
-				const setupVertices = vertexAttachment.vertices;
+			} else {
 				for (let i = 0; i < vertexCount; i++) {
-					const prev = prevVertices[i], setup = setupVertices[i];
-					deform[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
+					const prev = v1[i];
+					deform[i] += (prev + (v2[i] - prev) * percent - deform[i]) * alpha;
 				}
-			} else { // Weighted deform offsets, with alpha.
-				for (let i = 0; i < vertexCount; i++) {
-					const prev = prevVertices[i];
-					deform[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
-				}
-			}
-		} else if (add) {
-			if (!vertexAttachment.bones) { // Unweighted vertex positions, with alpha.
-				const setupVertices = vertexAttachment.vertices;
-				for (let i = 0; i < vertexCount; i++) {
-					const prev = prevVertices[i];
-					deform[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
-				}
-			} else { // Weighted deform offsets, with alpha.
-				for (let i = 0; i < vertexCount; i++) {
-					const prev = prevVertices[i];
-					deform[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
-				}
-			}
-		} else {
-			for (let i = 0; i < vertexCount; i++) {
-				const prev = prevVertices[i];
-				deform[i] += (prev + (nextVertices[i] - prev) * percent - deform[i]) * alpha;
 			}
 		}
+	}
+
+	private applyBeforeFirst (slot: Slot, appliedPose: boolean, fromSetup: boolean) {
+		if (!slot.bone.active) return;
+		const pose = appliedPose ? slot.appliedPose : slot.pose;
+		if (pose.attachment == null || pose.attachment.timelineAttachment !== this.attachment) return;
+		if (pose.deform.length === 0) fromSetup = true;
+		if (fromSetup) pose.deform.length = 0;
 	}
 }
 
@@ -1507,11 +1541,10 @@ export class SequenceTimeline extends Timeline implements SlotTimeline {
 	static DELAY = 2;
 
 	readonly slotIndex: number;
-	readonly attachment: HasSequence;
+	readonly attachment: Attachment;
 
-	constructor (frameCount: number, slotIndex: number, attachment: HasSequence) {
-		// biome-ignore lint/style/noNonNullAssertion: reference runtime
-		super(frameCount, `${Property.sequence}|${slotIndex}|${attachment.sequence!.id}`);
+	constructor (frameCount: number, slotIndex: number, attachment: Attachment) {
+		super(frameCount, `${Property.sequence}|${slotIndex}|${(attachment as unknown as HasSequence).sequence.id}`);
 		this.slotIndex = slotIndex;
 		this.attachment = attachment;
 		this.instant = true;
@@ -1525,11 +1558,11 @@ export class SequenceTimeline extends Timeline implements SlotTimeline {
 		return this.slotIndex;
 	}
 
-	/** The attachment for which the {@link SlotPose.getSequenceIndex} will be set.
+	/** The attachment for which the {@link SlotPose.sequenceIndex} will be set.
 	 *
 	 * See {@link VertexAttachment.timelineAttachment}. */
 	getAttachment () {
-		return this.attachment as unknown as Attachment;
+		return this.attachment;
 	}
 
 	/** Sets the time, mode, index, and frame time for the specified frame.
@@ -1545,24 +1578,17 @@ export class SequenceTimeline extends Timeline implements SlotTimeline {
 
 	apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, fromSetup: boolean,
 		add: boolean, out: boolean, appliedPose: boolean) {
-
-		const slot = skeleton.slots[this.slotIndex];
-		if (!slot.bone.active) return;
-		const pose = appliedPose ? slot.appliedPose : slot.pose;
-
-		const slotAttachment = pose.attachment as Attachment;
-		const attachment = this.attachment as unknown as Attachment;
-
-		if (!(isHasSequence(slotAttachment)) || slotAttachment.timelineAttachment !== attachment) return;
-
-		if (out) {
-			if (fromSetup) pose.sequenceIndex = -1;
-			return;
-		}
+		const slots = skeleton.slots;
+		if (!this.attachment.isTimelineActive(slots, this.slotIndex, appliedPose)) return;
+		const timelineSlots = this.attachment.timelineSlots;
 
 		const frames = this.frames;
-		if (time < frames[0]) {
-			if (fromSetup) pose.sequenceIndex = -1;
+		if (out || time < frames[0]) {
+			if (fromSetup) {
+				this.setupPose(slots[this.slotIndex], appliedPose);
+				for (const slotIndex of timelineSlots)
+					this.setupPose(slots[slotIndex], appliedPose)
+			}
 			return;
 		}
 
@@ -1571,7 +1597,24 @@ export class SequenceTimeline extends Timeline implements SlotTimeline {
 		const modeAndIndex = frames[i + SequenceTimeline.MODE];
 		const delay = frames[i + SequenceTimeline.DELAY];
 
-		let index = modeAndIndex >> 4, count = slotAttachment.sequence.regions.length;
+		this.applyToSlot(slots[this.slotIndex], appliedPose, time, before, modeAndIndex, delay);
+		for (const slotIndex of timelineSlots)
+			this.applyToSlot(slots[slotIndex], appliedPose, time, before, modeAndIndex, delay);
+	}
+
+	private setupPose (slot: Slot, appliedPose: boolean) {
+		if (!slot.bone.active) return;
+		const pose = appliedPose ? slot.appliedPose : slot.pose;
+		if (pose.attachment === null || pose.attachment.timelineAttachment !== this.attachment) return;
+		pose.sequenceIndex = -1;
+	}
+
+	private applyToSlot (slot: Slot, appliedPose: boolean, time: number, before: number, modeAndIndex: number, delay: number) {
+		if (!slot.bone.active) return;
+		const pose = appliedPose ? slot.appliedPose : slot.pose;
+		if (pose.attachment === null || pose.attachment.timelineAttachment !== this.attachment) return;
+
+		let index = modeAndIndex >> 4, count = (pose.attachment as unknown as HasSequence).sequence.regions.length;
 		const mode = SequenceModeValues[modeAndIndex & 0xf];
 		if (mode !== SequenceMode.hold) {
 			index += (((time - before) / delay + 0.00001) | 0);
@@ -2043,7 +2086,6 @@ export class PathConstraintMixTimeline extends CurveTimeline implements Constrai
 	constructor (frameCount: number, bezierCount: number, constraintIndex: number) {
 		super(frameCount, bezierCount, `${Property.pathConstraintMix}|${constraintIndex}`);
 		this.constraintIndex = constraintIndex;
-		this.additive = true;
 	}
 
 	getFrameEntries () {
@@ -2349,7 +2391,6 @@ export class PhysicsConstraintResetTimeline extends Timeline implements Constrai
 export class SliderTimeline extends ConstraintTimeline1 {
 	constructor (frameCount: number, bezierCount: number, constraintIndex: number) {
 		super(frameCount, bezierCount, constraintIndex, Property.sliderTime);
-		this.additive = true;
 	}
 
 	apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, fromSetup: boolean,

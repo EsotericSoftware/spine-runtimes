@@ -123,6 +123,21 @@ const char *spine_path_attachment_get_name(spine_path_attachment self) {
 	return _self->getName().buffer();
 }
 
+spine_array_int spine_path_attachment_get_timeline_slots(spine_path_attachment self) {
+	PathAttachment *_self = (PathAttachment *) self;
+	return (spine_array_int) &_self->getTimelineSlots();
+}
+
+void spine_path_attachment_set_timeline_slots(spine_path_attachment self, spine_array_int timelineSlots) {
+	PathAttachment *_self = (PathAttachment *) self;
+	_self->setTimelineSlots(*((Array<int> *) timelineSlots));
+}
+
+bool spine_path_attachment_is_timeline_active(spine_path_attachment self, spine_array_slot slots, int slotIndex, bool appliedPose) {
+	PathAttachment *_self = (PathAttachment *) self;
+	return _self->isTimelineActive(*((Array<Slot *> *) slots), slotIndex, appliedPose);
+}
+
 int spine_path_attachment_get_ref_count(spine_path_attachment self) {
 	PathAttachment *_self = (PathAttachment *) self;
 	return _self->getRefCount();

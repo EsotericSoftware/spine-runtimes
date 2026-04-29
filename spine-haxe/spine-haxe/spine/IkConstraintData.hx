@@ -39,9 +39,8 @@ class IkConstraintData extends ConstraintData<IkConstraint, IkConstraintPose> {
 	/** The bone that is the IK target. */
 	public var target(default, set):BoneData;
 
-	/** When true and IkConstraintPose.compress or IkConstraintPose.stretch is used, the bone is scaled
-	 * on both the X and Y axes. */
-	public var uniform = false;
+	/** Determines how BonePose.scaleY changes when IkConstraintPose.compress or IkConstraintPose.stretch set BonePose.scaleX. */
+	public var scaleY:ScaleY = ScaleY.none;
 
 	public function new(name:String) {
 		super(name, new IkConstraintPose());
@@ -56,5 +55,38 @@ class IkConstraintData extends ConstraintData<IkConstraint, IkConstraintPose> {
 			throw new SpineException("target cannot be null.");
 		this.target = target;
 		return target;
+	}
+}
+
+/** Determines how BonePose.scaleY changes when IkConstraintPose.compress or IkConstraintPose.stretch set BonePose.scaleX. */
+class ScaleY {
+	/** scaleY is not changed. */
+	public static var none(default, never):ScaleY = new ScaleY(0, "none");
+
+	/** scaleY is multiplied by the scaleX factor, preserving the bone's aspect ratio. */
+	public static var uniform(default, never):ScaleY = new ScaleY(1, "uniform");
+
+	/** scaleY is divided by the scaleX factor, preserving the bone's area. */
+	public static var volume(default, never):ScaleY = new ScaleY(2, "volume");
+
+	public static var values:Array<ScaleY> = [none, uniform, volume];
+
+	public final ordinal:Int;
+	public final name:String;
+
+	private function new(ordinal:Int, name:String) {
+		this.ordinal = ordinal;
+		this.name = name;
+	}
+
+	public function toString():String {
+		return name;
+	}
+
+	public static function fromName(name:String):ScaleY {
+		for (scaleY in values)
+			if (scaleY.name == name)
+				return scaleY;
+		return none;
 	}
 }

@@ -49,7 +49,7 @@ public class IkConstraintTimeline: CurveTimeline, ConstraintTimeline {
     public var constraintIndex: Int32 {
         get {
             let result = spine_ik_constraint_timeline_get_constraint_index(_ptr.assumingMemoryBound(to: spine_ik_constraint_timeline_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_ik_constraint_timeline_set_constraint_index(_ptr.assumingMemoryBound(to: spine_ik_constraint_timeline_wrapper.self), newValue)
@@ -62,8 +62,7 @@ public class IkConstraintTimeline: CurveTimeline, ConstraintTimeline {
     /// - Parameter time: The frame time in seconds.
     /// - Parameter bendDirection: 1 or -1.
     public func setFrame(_ frame: Int32, _ time: Float, _ mix: Float, _ softness: Float, _ bendDirection: Int32, _ compress: Bool, _ stretch: Bool) {
-        spine_ik_constraint_timeline_set_frame(
-            _ptr.assumingMemoryBound(to: spine_ik_constraint_timeline_wrapper.self), frame, time, mix, softness, bendDirection, compress, stretch)
+        spine_ik_constraint_timeline_set_frame(_ptr.assumingMemoryBound(to: spine_ik_constraint_timeline_wrapper.self), frame, time, mix, softness, bendDirection, compress, stretch)
     }
 
     public func dispose() {

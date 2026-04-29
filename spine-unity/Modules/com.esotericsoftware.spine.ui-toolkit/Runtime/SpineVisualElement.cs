@@ -328,7 +328,7 @@ namespace Spine.Unity {
 			skeleton.UpdateWorldTransform(Physics.Update);
 		}
 
-		void Initialize (bool overwrite) {
+		public void Initialize (bool overwrite) {
 			if (this.IsValid && !overwrite) return;
 
 			if (this.SkeletonDataAsset == null) return;

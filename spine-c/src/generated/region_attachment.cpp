@@ -154,6 +154,21 @@ void spine_region_attachment_set_timeline_attachment(spine_region_attachment sel
 	_self->setTimelineAttachment((Attachment *) attachment);
 }
 
+spine_array_int spine_region_attachment_get_timeline_slots(spine_region_attachment self) {
+	RegionAttachment *_self = (RegionAttachment *) self;
+	return (spine_array_int) &_self->getTimelineSlots();
+}
+
+void spine_region_attachment_set_timeline_slots(spine_region_attachment self, spine_array_int timelineSlots) {
+	RegionAttachment *_self = (RegionAttachment *) self;
+	_self->setTimelineSlots(*((Array<int> *) timelineSlots));
+}
+
+bool spine_region_attachment_is_timeline_active(spine_region_attachment self, spine_array_slot slots, int slotIndex, bool appliedPose) {
+	RegionAttachment *_self = (RegionAttachment *) self;
+	return _self->isTimelineActive(*((Array<Slot *> *) slots), slotIndex, appliedPose);
+}
+
 int spine_region_attachment_get_ref_count(spine_region_attachment self) {
 	RegionAttachment *_self = (RegionAttachment *) self;
 	return _self->getRefCount();

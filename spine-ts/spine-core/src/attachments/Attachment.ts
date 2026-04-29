@@ -34,11 +34,16 @@ import { type NumberArrayLike, Utils } from "../Utils.js";
 
 /** The base class for all attachments. Multiple {@link Skeleton} instances, slots, or skins can use the same attachments. */
 export abstract class Attachment {
+	private static readonly empty: number[] = [];
+
 	name: string;
 
 	/** Timelines for the timeline attachment are also applied to this attachment.
 	 * @return May be null if no attachment-specific timelines should be applied. */
 	timelineAttachment?: Attachment;
+
+	/** Slots that can have attachments whose {@link timelineAttachment} is this attachment. */
+	timelineSlots: number[] = Attachment.empty;
 
 	constructor (name: string) {
 		if (!name) throw new Error("name cannot be null.");
@@ -47,6 +52,25 @@ export abstract class Attachment {
 	}
 
 	abstract copy (): Attachment;
+
+	/** Returns true if the {@code slotIndex} or any {@link timelineSlots} have an attachment whose {@link timelineAttachment} is
+	 * this attachment.
+	 * @param slots The {@link Skeleton.slots}.
+	 * @param slotIndex The timeline's primary slot index. */
+	public isTimelineActive (slots: Slot[], slotIndex: number, appliedPose: boolean): boolean {
+		let slot = slots[slotIndex];
+		if (slot.bone.isActive()) {
+			const other = (appliedPose ? slot.getAppliedPose() : slot.getPose()).getAttachment();
+			if (other != null && other.timelineAttachment === this) return true;
+		}
+		for (let i = 0, n = this.timelineSlots.length; i < n; i++) {
+			slot = slots[this.timelineSlots[i]];
+			if (!slot.bone.isActive()) continue;
+			const other = (appliedPose ? slot.getAppliedPose() : slot.getPose()).getAttachment();
+			if (other != null && other.timelineAttachment === this) return true;
+		}
+		return false;
+	}
 }
 
 /** Base class for an attachment with vertices that are transformed by one or more bones and can be deformed by
@@ -159,5 +183,6 @@ export abstract class VertexAttachment extends Attachment {
 
 		attachment.worldVerticesLength = this.worldVerticesLength;
 		attachment.timelineAttachment = this.timelineAttachment;
+		attachment.timelineSlots = this.timelineSlots;
 	}
 }

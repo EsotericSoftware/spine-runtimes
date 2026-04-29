@@ -50,9 +50,6 @@
           gameObject.phaserWorldCoordinatesToSkeleton(pointBefore);
           gameObject.phaserWorldCoordinatesToSkeleton(pointAfter);
 
-          // transfer drag effect on physics contraints using physicsTranslate (we won't move the skeleton)
-          gameObject.skeleton.physicsTranslate(pointAfter.x - pointBefore.x, pointAfter.y - pointBefore.y);
-
           lastX = dragX;
           lastY = dragY;
         })

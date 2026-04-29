@@ -52,7 +52,7 @@ public class PhysicsConstraintPose: NSObject {
     public var inertia: Float {
         get {
             let result = spine_physics_constraint_pose_get_inertia(_ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_physics_constraint_pose_set_inertia(_ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self), newValue)
@@ -63,7 +63,7 @@ public class PhysicsConstraintPose: NSObject {
     public var strength: Float {
         get {
             let result = spine_physics_constraint_pose_get_strength(_ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_physics_constraint_pose_set_strength(_ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self), newValue)
@@ -74,7 +74,7 @@ public class PhysicsConstraintPose: NSObject {
     public var damping: Float {
         get {
             let result = spine_physics_constraint_pose_get_damping(_ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_physics_constraint_pose_set_damping(_ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self), newValue)
@@ -85,7 +85,7 @@ public class PhysicsConstraintPose: NSObject {
     public var massInverse: Float {
         get {
             let result = spine_physics_constraint_pose_get_mass_inverse(_ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_physics_constraint_pose_set_mass_inverse(_ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self), newValue)
@@ -96,7 +96,7 @@ public class PhysicsConstraintPose: NSObject {
     public var wind: Float {
         get {
             let result = spine_physics_constraint_pose_get_wind(_ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_physics_constraint_pose_set_wind(_ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self), newValue)
@@ -107,7 +107,7 @@ public class PhysicsConstraintPose: NSObject {
     public var gravity: Float {
         get {
             let result = spine_physics_constraint_pose_get_gravity(_ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_physics_constraint_pose_set_gravity(_ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self), newValue)
@@ -118,7 +118,7 @@ public class PhysicsConstraintPose: NSObject {
     public var mix: Float {
         get {
             let result = spine_physics_constraint_pose_get_mix(_ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_physics_constraint_pose_set_mix(_ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self), newValue)
@@ -126,9 +126,7 @@ public class PhysicsConstraintPose: NSObject {
     }
 
     public func set(_ pose: PhysicsConstraintPose) {
-        spine_physics_constraint_pose_set(
-            _ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self),
-            pose._ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self))
+        spine_physics_constraint_pose_set(_ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self), pose._ptr.assumingMemoryBound(to: spine_physics_constraint_pose_wrapper.self))
     }
 
     public func dispose() {

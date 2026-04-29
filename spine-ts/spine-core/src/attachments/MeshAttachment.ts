@@ -30,7 +30,7 @@
 import type { TextureRegion } from "../Texture.js";
 import { TextureAtlasRegion } from "../TextureAtlas.js";
 import { Color, type NumberArrayLike, Utils } from "../Utils.js";
-import { type Attachment, VertexAttachment } from "./Attachment.js";
+import { VertexAttachment } from "./Attachment.js";
 import type { HasSequence } from "./HasSequence.js";
 import type { Sequence } from "./Sequence.js";
 
@@ -56,7 +56,7 @@ export class MeshAttachment extends VertexAttachment implements HasSequence {
 	/** The color to tint the mesh. */
 	color = new Color(1, 1, 1, 1);
 
-	private parentMesh: MeshAttachment | null = null;
+	private sourceMesh: MeshAttachment | null = null;
 
 	/** Vertex index pairs describing edges for controlling triangulation, or null if nonessential data was not exported. Mesh
 	 * triangles do not never cross edges. Triangulation is not performed at runtime. */
@@ -75,8 +75,8 @@ export class MeshAttachment extends VertexAttachment implements HasSequence {
 		this.sequence = sequence;
 	}
 
-	copy (): Attachment {
-		if (this.parentMesh) return this.newLinkedMesh();
+	copy (): MeshAttachment {
+		if (this.sourceMesh) return this.newLinkedMesh();
 
 		const copy = new MeshAttachment(this.name, this.sequence.copy());
 		copy.path = this.path;
@@ -104,34 +104,36 @@ export class MeshAttachment extends VertexAttachment implements HasSequence {
 		this.sequence.update(this);
 	}
 
-	/** The parent mesh if this is a linked mesh, else null. A linked mesh shares the {@link bones}, {@link vertices},
+	/** The source mesh if this is a linked mesh, else null. A linked mesh shares the {@link bones}, {@link vertices},
 	 * {@link regionUVs}, {@link triangles}, {@link hullLength}, {@link edges}, {@link width}, and {@link height} with the
-	 * parent mesh, but may have a different {@link name} or {@link path}, and therefore a different texture region. */
-	getParentMesh () {
-		return this.parentMesh;
+	 * source mesh, but may have a different {@link name} or {@link path}, and therefore a different texture region. */
+	getSourceMesh () {
+		return this.sourceMesh;
 	}
 
-	/** @param parentMesh May be null. */
-	setParentMesh (parentMesh: MeshAttachment) {
-		this.parentMesh = parentMesh;
-		if (parentMesh) {
-			this.bones = parentMesh.bones;
-			this.vertices = parentMesh.vertices;
-			this.worldVerticesLength = parentMesh.worldVerticesLength;
-			this.regionUVs = parentMesh.regionUVs;
-			this.triangles = parentMesh.triangles;
-			this.hullLength = parentMesh.hullLength;
-			this.worldVerticesLength = parentMesh.worldVerticesLength
+	setSourceMesh (sourceMesh: MeshAttachment | null) {
+		this.sourceMesh = sourceMesh;
+		if (sourceMesh) {
+			this.bones = sourceMesh.bones;
+			this.vertices = sourceMesh.vertices;
+			this.worldVerticesLength = sourceMesh.worldVerticesLength;
+			this.regionUVs = sourceMesh.regionUVs;
+			this.triangles = sourceMesh.triangles;
+			this.hullLength = sourceMesh.hullLength;
+			this.worldVerticesLength = sourceMesh.worldVerticesLength
+			this.edges = sourceMesh.edges;
+			this.width = sourceMesh.width;
+			this.height = sourceMesh.height;
 		}
 	}
 
-	/** Returns a new mesh with the {@link parentMesh} set to this mesh's parent mesh, if any, else to this mesh. **/
+	/** Returns a new mesh with the {@link sourceMesh} set to this mesh's source mesh, if any, else to this mesh. **/
 	newLinkedMesh (): MeshAttachment {
 		const copy = new MeshAttachment(this.name, this.sequence.copy());
 		copy.timelineAttachment = this.timelineAttachment;
 		copy.path = this.path;
 		copy.color.setFromColor(this.color);
-		copy.setParentMesh(this.parentMesh ? this.parentMesh : this);
+		copy.setSourceMesh(this.sourceMesh ? this.sourceMesh : this);
 		copy.updateSequence();
 		return copy;
 	}

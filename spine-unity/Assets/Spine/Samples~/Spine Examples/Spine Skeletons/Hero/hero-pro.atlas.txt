@@ -2,55 +2,50 @@ hero-pro.png
 	size: 1024, 256
 	filter: Linear, Linear
 body
-	bounds: 742, 77, 97, 95
-	rotate: 90
+	bounds: 741, 80, 97, 95
 cape
-	bounds: 376, 15, 146, 159
+	bounds: 375, 16, 146, 159
 chain-ball
-	bounds: 896, 106, 64, 68
+	bounds: 2, 91, 64, 68
 chain-flat
-	bounds: 715, 98, 16, 5
+	bounds: 1000, 103, 16, 5
 chain-round
-	bounds: 937, 90, 17, 14
+	bounds: 1000, 110, 17, 14
 eyes
-	bounds: 524, 72, 82, 31
+	bounds: 523, 73, 82, 31
 fingers
-	bounds: 715, 42, 31, 33
+	bounds: 2, 56, 31, 33
 foot1
-	bounds: 608, 61, 50, 42
+	bounds: 648, 62, 50, 42
 foot2
-	bounds: 660, 65, 53, 38
+	bounds: 127, 57, 53, 38
 forearm1
-	bounds: 132, 52, 41, 49
+	bounds: 978, 126, 41, 49
 forearm2
-	bounds: 748, 43, 31, 32
+	bounds: 739, 46, 31, 32
 hand1
-	bounds: 67, 51, 37, 48
+	bounds: 700, 56, 37, 48
 hand2
-	bounds: 2, 59, 31, 37
+	bounds: 68, 56, 31, 37
 handle
-	bounds: 2, 160, 134, 14
+	bounds: 2, 161, 134, 14
 head
 	bounds: 201, 2, 172, 173
-	rotate: 90
 mantles
-	bounds: 839, 38, 136, 55
-	rotate: 90
+	bounds: 840, 120, 136, 55
 mouth
-	bounds: 138, 161, 61, 13
+	bounds: 138, 162, 61, 13
 shin1
-	bounds: 962, 117, 53, 57
+	bounds: 840, 61, 53, 57
 shin2
-	bounds: 962, 61, 51, 54
+	bounds: 947, 64, 51, 54
 sword
-	bounds: 524, 105, 216, 69
+	bounds: 523, 106, 216, 69
 thigh1
-	bounds: 2, 98, 60, 63
-	rotate: 90
+	bounds: 138, 97, 60, 63
 thigh2
-	bounds: 67, 101, 57, 64
-	rotate: 90
+	bounds: 68, 95, 57, 64
 upper-arm1
-	bounds: 138, 103, 50, 56
+	bounds: 895, 62, 50, 56
 upper-arm2
-	bounds: 896, 45, 39, 59
+	bounds: 607, 45, 39, 59

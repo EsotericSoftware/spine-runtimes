@@ -29,6 +29,7 @@
 
 package spine.animation;
 
+import spine.ArrayUtils;
 import spine.Event;
 import spine.Skeleton;
 
@@ -48,8 +49,7 @@ abstract class Timeline {
 	 */
 	public function new(frameCount:Int, propertyIds:...String) {
 		this.propertyIds = propertyIds;
-		frames = new Array<Float>();
-		frames.resize(frameCount * getFrameEntries());
+		frames = ArrayUtils.resize(new Array<Float>(), frameCount * getFrameEntries(), 0);
 	}
 
 	/** The number of entries stored per frame. */

@@ -76,204 +76,24 @@ namespace Spine.Unity {
 		public bool unscaledTime;
 		#endregion
 
-		#region Animation State Callbacks on Main Thread
+		public override void MainThreadBeforeUpdateInternal () {
+			base.MainThreadBeforeUpdateInternal();
 #if USE_THREADED_ANIMATION_UPDATE
-		public event AnimationState.TrackEntryDelegate mainThreadStart, mainThreadInterrupt, mainThreadEnd, mainThreadDispose, mainThreadComplete;
-		public event AnimationState.TrackEntryEventDelegate mainThreadEvent;
-
-		protected struct EventQueueEntry {
-			public EventType type;
-			public TrackEntry entry;
-			public Event e;
-
-			public EventQueueEntry (EventType eventType, TrackEntry trackEntry, Event e = null) {
-				this.type = eventType;
-				this.entry = trackEntry;
-				this.e = e;
+			if (isUpdatedExternally) {
+				if (state != null) state.DelayListenerNotifications();
 			}
-		}
-		protected enum EventType {
-			Start, Interrupt, End, Dispose, Complete, Event
-		}
-		protected List<EventQueueEntry> mainThreadEventQueue = null;
-
-		protected void DrainThreadedEventQueue () {
-			for (int i = 0; i < mainThreadEventQueue.Count; i++) {
-				EventQueueEntry queueEntry = mainThreadEventQueue[i];
-				TrackEntry trackEntry = queueEntry.entry;
-
-				switch (queueEntry.type) {
-				case EventType.Start:
-					if (mainThreadStart != null) mainThreadStart(trackEntry);
-					break;
-				case EventType.Interrupt:
-					if (mainThreadInterrupt != null) mainThreadInterrupt(trackEntry);
-					break;
-				case EventType.End:
-					if (mainThreadEnd != null) mainThreadEnd(trackEntry);
-					break;
-				case EventType.Dispose:
-					if (mainThreadDispose != null) mainThreadDispose(trackEntry);
-					break;
-				case EventType.Complete:
-					if (mainThreadComplete != null) mainThreadComplete(trackEntry);
-					break;
-				case EventType.Event:
-					if (mainThreadEvent != null) mainThreadEvent(trackEntry, queueEntry.e);
-					break;
-				}
-			}
-			mainThreadEventQueue.Clear();
-		}
-
-		private void ThreadedStart (TrackEntry entry) {
-			if (!UsesThreadedAnimation) {
-				if (mainThreadStart != null) mainThreadStart(entry);
-				return;
-			}
-			mainThreadEventQueue.Add(new EventQueueEntry(EventType.Start, entry));
-		}
-		private void ThreadedInterrupt (TrackEntry entry) {
-			if (!UsesThreadedAnimation) {
-				if (mainThreadInterrupt != null) mainThreadInterrupt(entry);
-				return;
-			}
-			mainThreadEventQueue.Add(new EventQueueEntry(EventType.Interrupt, entry));
-		}
-		private void ThreadedEnd (TrackEntry entry) {
-			if (!UsesThreadedAnimation) {
-				if (mainThreadEnd != null) mainThreadEnd(entry);
-				return;
-			}
-			mainThreadEventQueue.Add(new EventQueueEntry(EventType.End, entry));
-		}
-		private void ThreadedDispose (TrackEntry entry) {
-			if (!UsesThreadedAnimation) {
-				if (mainThreadDispose != null) mainThreadDispose(entry);
-				return;
-			}
-			mainThreadEventQueue.Add(new EventQueueEntry(EventType.Dispose, entry));
-		}
-		private void ThreadedComplete (TrackEntry entry) {
-			if (!UsesThreadedAnimation) {
-				if (mainThreadComplete != null) mainThreadComplete(entry);
-				return;
-			}
-			mainThreadEventQueue.Add(new EventQueueEntry(EventType.Complete, entry));
-		}
-		private void ThreadedEvent (TrackEntry entry, Event e) {
-			if (!UsesThreadedAnimation) {
-				if (mainThreadEvent != null) mainThreadEvent(entry, e);
-				return;
-			}
-			mainThreadEventQueue.Add(new EventQueueEntry(EventType.Event, entry, e));
-		}
-
-		public event AnimationState.TrackEntryDelegate MainThreadStart {
-			add {
-				if (mainThreadEventQueue == null) mainThreadEventQueue = new List<EventQueueEntry>();
-				mainThreadStart += value;
-				this.AnimationState.Start -= ThreadedStart;
-				this.AnimationState.Start += ThreadedStart;
-			}
-			remove {
-				mainThreadStart -= value;
-				this.AnimationState.Start -= ThreadedStart;
-			}
-		}
-		public event AnimationState.TrackEntryDelegate MainThreadInterrupt {
-			add {
-				if (mainThreadEventQueue == null) mainThreadEventQueue = new List<EventQueueEntry>();
-				mainThreadInterrupt += value;
-				this.AnimationState.Interrupt -= ThreadedInterrupt;
-				this.AnimationState.Interrupt += ThreadedInterrupt;
-			}
-			remove {
-				mainThreadInterrupt -= value;
-				this.AnimationState.Interrupt -= ThreadedInterrupt;
-			}
-		}
-		public event AnimationState.TrackEntryDelegate MainThreadEnd {
-			add {
-				if (mainThreadEventQueue == null) mainThreadEventQueue = new List<EventQueueEntry>();
-				mainThreadEnd += value;
-				this.AnimationState.End -= ThreadedEnd;
-				this.AnimationState.End += ThreadedEnd;
-			}
-			remove {
-				mainThreadEnd -= value;
-				this.AnimationState.End -= ThreadedEnd;
-			}
-		}
-		public event AnimationState.TrackEntryDelegate MainThreadDispose {
-			add {
-				if (mainThreadEventQueue == null) mainThreadEventQueue = new List<EventQueueEntry>();
-				mainThreadDispose += value;
-				this.AnimationState.Dispose -= ThreadedDispose;
-				this.AnimationState.Dispose += ThreadedDispose;
-			}
-			remove {
-				mainThreadDispose -= value;
-				this.AnimationState.Dispose -= ThreadedDispose;
-			}
-		}
-		public event AnimationState.TrackEntryDelegate MainThreadComplete {
-			add {
-				if (mainThreadEventQueue == null) mainThreadEventQueue = new List<EventQueueEntry>();
-				mainThreadComplete += value;
-				this.AnimationState.Complete -= ThreadedComplete;
-				this.AnimationState.Complete += ThreadedComplete;
-			}
-			remove {
-				mainThreadComplete -= value;
-				this.AnimationState.Complete -= ThreadedComplete;
-			}
-		}
-		public event AnimationState.TrackEntryEventDelegate MainThreadEvent {
-			add {
-				if (mainThreadEventQueue == null) mainThreadEventQueue = new List<EventQueueEntry>();
-				mainThreadEvent += value;
-				this.AnimationState.Event -= ThreadedEvent;
-				this.AnimationState.Event += ThreadedEvent;
-			}
-			remove {
-				mainThreadEvent -= value;
-				this.AnimationState.Event -= ThreadedEvent;
-			}
+#endif
 		}
 
 		public override void MainThreadAfterUpdateInternal () {
-			if (mainThreadEventQueue != null)
-				DrainThreadedEventQueue();
 			base.MainThreadAfterUpdateInternal();
+
+#if USE_THREADED_ANIMATION_UPDATE
+			if (isUpdatedExternally) {
+				if (state != null) state.IssueDelayedListenerNotifications();
+			}
+#endif
 		}
-#else // USE_THREADED_ANIMATION_UPDATE
-		public event AnimationState.TrackEntryDelegate MainThreadStart {
-			add { this.AnimationState.Start += value; }
-			remove { this.AnimationState.Start -= value; }
-		}
-		public event AnimationState.TrackEntryDelegate MainThreadInterrupt {
-			add { this.AnimationState.Interrupt += value; }
-			remove { this.AnimationState.Interrupt -= value; }
-		}
-		public event AnimationState.TrackEntryDelegate MainThreadEnd {
-			add { this.AnimationState.End += value; }
-			remove { this.AnimationState.End -= value; }
-		}
-		public event AnimationState.TrackEntryDelegate MainThreadDispose {
-			add { this.AnimationState.Dispose += value; }
-			remove { this.AnimationState.Dispose -= value; }
-		}
-		public event AnimationState.TrackEntryDelegate MainThreadComplete {
-			add { this.AnimationState.Complete += value; }
-			remove { this.AnimationState.Complete -= value; }
-		}
-		public event AnimationState.TrackEntryEventDelegate MainThreadEvent {
-			add { this.AnimationState.Event += value; }
-			remove { this.AnimationState.Event -= value; }
-		}
-#endif // USE_THREADED_ANIMATION_UPDATE
-		#endregion
 
 		protected Spine.AnimationState state;
 

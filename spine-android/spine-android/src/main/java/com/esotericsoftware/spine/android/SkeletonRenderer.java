@@ -100,9 +100,10 @@ public class SkeletonRenderer {
 		commandList.add(command);
 		int vertexStart = 0;
 
-		Object[] drawOrder = skeleton.getDrawOrder().items;
-		for (int i = 0, n = skeleton.getDrawOrder().size; i < n; i++) {
-			Slot slot = (Slot)drawOrder[i];
+		Array<Slot> drawOrder = skeleton.getDrawOrder().getAppliedPose();
+		Slot[] drawOrderItems = drawOrder.items;
+		for (int i = 0, n = drawOrder.size; i < n; i++) {
+			Slot slot = drawOrderItems[i];
 			if (!slot.getBone().isActive()) {
 				clipper.clipEnd(slot);
 				continue;

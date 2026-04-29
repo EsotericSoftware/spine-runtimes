@@ -139,12 +139,12 @@ float CurveTimeline1::getRelativeValue(float time, float alpha, bool fromSetup, 
 float CurveTimeline1::getAbsoluteValue(float time, float alpha, bool fromSetup, bool add, float current, float setup) {
 	if (time < _frames[0]) return fromSetup ? setup : current;
 	float value = getCurveValue(time);
-	return fromSetup ? setup + (value - setup) * alpha : current + (add ? value : value - current) * alpha;
+	return fromSetup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
 }
 
 float CurveTimeline1::getAbsoluteValue(float time, float alpha, bool fromSetup, bool add, float current, float setup, float value) {
 	if (time < _frames[0]) return fromSetup ? setup : current;
-	return fromSetup ? setup + (value - setup) * alpha : current + (add ? value : value - current) * alpha;
+	return fromSetup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
 }
 
 float CurveTimeline1::getScaleValue(float time, float alpha, bool fromSetup, bool add, bool out, float current, float setup) {

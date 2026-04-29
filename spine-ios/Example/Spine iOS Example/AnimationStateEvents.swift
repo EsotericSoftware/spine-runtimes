@@ -56,7 +56,7 @@ struct AnimationStateEvents: View {
                     )
                 }
             }
-            let current = controller.animationState.getCurrent(0)?.animation.name ?? "--"
+            let current = controller.animationState.getTrack(0)?.animation.name ?? "--"
             print("Current: \(current)")
         }
     )

@@ -3,86 +3,83 @@ raptor.png
 	filter: Linear, Linear
 	scale: 0.5
 back-arm
-	bounds: 130, 32, 46, 25
+	bounds: 206, 49, 46, 25
 back-bracer
-	bounds: 215, 11, 39, 28
+	bounds: 498, 42, 39, 28
 back-hand
-	bounds: 847, 25, 36, 34
+	bounds: 400, 55, 36, 34
 back-knee
-	bounds: 2, 8, 49, 67
+	bounds: 498, 72, 49, 67
 back-thigh
-	bounds: 327, 8, 39, 24
+	bounds: 254, 40, 39, 24
 eyes-open
-	bounds: 232, 309, 47, 45
+	bounds: 232, 328, 47, 45
 front-arm
-	bounds: 421, 99, 48, 26
+	bounds: 350, 63, 48, 26
 front-bracer
-	bounds: 885, 30, 41, 29
+	bounds: 163, 56, 41, 29
 front-hand
-	bounds: 784, 184, 41, 38
+	bounds: 956, 231, 41, 38
 front-open-hand
-	bounds: 771, 310, 43, 44
+	bounds: 770, 329, 43, 44
 front-thigh
-	bounds: 635, 192, 57, 29
+	bounds: 897, 240, 57, 29
 gun
-	bounds: 636, 83, 107, 103
+	bounds: 915, 106, 107, 103
 gun-nohand
-	bounds: 174, 83, 105, 102
+	bounds: 916, 271, 105, 102
 head
-	bounds: 291, 71, 136, 149
-	rotate: 270
+	bounds: 626, 81, 136, 149
 lower-leg
-	bounds: 930, 123, 73, 98
+	bounds: 551, 42, 73, 98
 mouth-grind
-	bounds: 798, 29, 47, 30
+	bounds: 2, 64, 47, 30
 mouth-smile
-	bounds: 749, 29, 47, 30
+	bounds: 841, 127, 47, 30
 neck
-	bounds: 281, 333, 18, 21
+	bounds: 281, 352, 18, 21
 raptor-back-arm
-	bounds: 470, 11, 82, 86
-	rotate: 180
+	bounds: 80, 11, 82, 86
 raptor-body
-	bounds: 2, 121, 632, 233
+	bounds: 2, 140, 632, 233
 raptor-front-arm
-	bounds: 415, 18, 81, 102
+	bounds: 911, 2, 81, 102
 raptor-front-leg
-	bounds: 525, 163, 191, 257
+	bounds: 524, 182, 191, 257
 	rotate: 90
 raptor-hindleg-back
-	bounds: 746, 139, 169, 215
+	bounds: 745, 158, 169, 215
 	rotate: 180
 raptor-horn
-	bounds: 2, 274, 182, 80
+	bounds: 2, 293, 182, 80
 raptor-horn-back
-	bounds: 752, 61, 176, 77
+	bounds: 174, 123, 176, 77
 raptor-jaw
-	bounds: 553, 2, 126, 138
+	bounds: 772, 35, 126, 138
 	rotate: 270
 raptor-jaw-tooth
-	bounds: 687, 223, 37, 48
+	bounds: 686, 242, 37, 48
 raptor-mouth-inside
-	bounds: 178, 12, 36, 41
+	bounds: 755, 39, 36, 41
 raptor-saddle-strap-back
-	bounds: 693, 7, 54, 74
+	bounds: 626, 26, 54, 74
 raptor-saddle-strap-front
-	bounds: 2, 77, 57, 95
+	bounds: 2, 96, 57, 95
 raptor-saddle-w-shadow
-	bounds: 2, 69, 162, 171
+	bounds: 2, 88, 162, 171
 	rotate: 90
 raptor-tail-shadow
-	bounds: 150, 25, 189, 63
+	bounds: 159, 58, 189, 63
 raptor-tongue
-	bounds: 63, 13, 86, 64
+	bounds: 685, 33, 86, 64
 stirrup-back
-	bounds: 341, 34, 44, 35
+	bounds: 783, 204, 44, 35
 stirrup-front
-	bounds: 185, 304, 45, 50
+	bounds: 185, 323, 45, 50
 stirrup-strap
-	bounds: 533, 221, 49, 46
-	rotate: 90
+	bounds: 636, 217, 49, 46
 torso
-	bounds: 930, 30, 54, 91
+	bounds: 442, 48, 54, 91
 visor
-	bounds: 917, 223, 131, 84
+	bounds: 356, 91, 131, 84
 	rotate: 90

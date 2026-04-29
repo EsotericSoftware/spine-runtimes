@@ -51,6 +51,12 @@ export class BoneData extends PosedData<BonePose> {
 	/** The bone icon name as it was in Spine, or null if nonessential data was not exported. */
 	icon?: string;
 
+	/** The bone icon's display size scale, or 1 if nonessential data was not exported. */
+	iconSize = 1;
+
+	/** The bone icon's display rotation in degrees, or 0 if nonessential data was not exported. */
+	iconRotation = 0;
+
 	/** False if the bone was hidden in Spine and nonessential data was exported. Does not affect runtime rendering. */
 	visible = false;
 

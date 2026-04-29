@@ -41,6 +41,7 @@ public class BoneData extends PosedData<BonePose> {
 	// Nonessential.
 	final Color color = new Color(0.61f, 0.61f, 0.61f, 1); // 9b9b9bff
 	@Null String icon;
+	float iconSize = 1, iconRotation;
 	boolean visible;
 
 	public BoneData (int index, String name, @Null BoneData parent) {
@@ -97,6 +98,24 @@ public class BoneData extends PosedData<BonePose> {
 
 	public void setIcon (@Null String icon) {
 		this.icon = icon;
+	}
+
+	/** The bone icon's display size scale, or 1 if nonessential data was not exported. */
+	public float getIconSize () {
+		return iconSize;
+	}
+
+	public void setIconSize (float iconSize) {
+		this.iconSize = iconSize;
+	}
+
+	/** The bone icon's display rotation in degrees, or 0 if nonessential data was not exported. */
+	public float getIconRotation () {
+		return iconRotation;
+	}
+
+	public void setIconRotation (float iconRotation) {
+		this.iconRotation = iconRotation;
 	}
 
 	/** False if the bone was hidden in Spine and nonessential data was exported. Does not affect runtime rendering. */

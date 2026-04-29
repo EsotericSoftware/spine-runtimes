@@ -57,145 +57,183 @@ DeformTimeline::DeformTimeline(size_t frameCount, size_t bezierCount, int slotIn
 }
 
 
-void DeformTimeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, bool fromSetup, bool add) {
-	SP_UNUSED(slot);
-	Attachment *slotAttachment = pose._attachment;
-	if (slotAttachment == NULL || !slotAttachment->getRTTI().instanceOf(VertexAttachment::rtti)) {
-		return;
-	}
+void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+						   bool appliedPose) {
+	SP_UNUSED(lastTime);
+	SP_UNUSED(events);
+	SP_UNUSED(out);
 
-	VertexAttachment *vertexAttachment = static_cast<VertexAttachment *>(slotAttachment);
-	if (vertexAttachment->getTimelineAttachment() != _attachment) {
-		return;
-	}
-
-	Array<float> &deformArray = pose._deform;
-	if (deformArray.size() == 0) fromSetup = true;
-
-	Array<Array<float>> &vertices = _vertices;
-	size_t vertexCount = vertices[0].size();
+	Array<Slot *> &slots = skeleton.getSlots();
+	if (!_attachment->isTimelineActive(slots, getSlotIndex(), appliedPose)) return;
+	Array<int> &timelineSlots = _attachment->getTimelineSlots();
 
 	Array<float> &frames = _frames;
 	if (time < frames[0]) {
-		if (fromSetup) deformArray.clear();
+		applyBeforeFirst(*slots[getSlotIndex()], appliedPose, fromSetup);
+		for (size_t i = 0; i < timelineSlots.size(); ++i) applyBeforeFirst(*slots[timelineSlots[i]], appliedPose, fromSetup);
 		return;
 	}
 
+	Array<float> *v1 = NULL;
+	Array<float> *v2 = NULL;
+	float percent = 0;
+	if (time >= frames[frames.size() - 1]) {
+		v1 = &_vertices[frames.size() - 1];
+	} else {
+		int frame = Animation::search(frames, time);
+		percent = getCurvePercent(time, frame);
+		v1 = &_vertices[frame];
+		v2 = &_vertices[frame + 1];
+	}
+
+	size_t vertexCount = _vertices[0].size();
+	applyToSlot(*slots[getSlotIndex()], appliedPose, *v1, v2, percent, vertexCount, alpha, fromSetup, add);
+	for (size_t i = 0; i < timelineSlots.size(); ++i)
+		applyToSlot(*slots[timelineSlots[i]], appliedPose, *v1, v2, percent, vertexCount, alpha, fromSetup, add);
+}
+
+void DeformTimeline::applyBeforeFirst(Slot &slot, bool appliedPose, bool fromSetup) {
+	if (!slot.getBone().isActive()) return;
+	SlotPose &pose = appliedPose ? slot.getAppliedPose() : slot.getPose();
+	Attachment *attachment = pose.getAttachment();
+	if (attachment == NULL || attachment->getTimelineAttachment() != _attachment) return;
+	if (pose.getDeform().size() == 0) fromSetup = true;
+	if (fromSetup) pose.getDeform().clear();
+}
+
+void DeformTimeline::applyToPose(SlotPose &pose, Array<float> &v1, Array<float> *v2, float percent, size_t vertexCount, float alpha, bool fromSetup,
+								 bool add) {
+	Attachment *slotAttachment = pose.getAttachment();
+	if (slotAttachment == NULL || !slotAttachment->getRTTI().instanceOf(VertexAttachment::rtti)) return;
+
+	VertexAttachment *vertexAttachment = static_cast<VertexAttachment *>(slotAttachment);
+	if (vertexAttachment->getTimelineAttachment() != _attachment) return;
+
+	Array<float> &deformArray = pose.getDeform();
+	if (deformArray.size() == 0) fromSetup = true;
 	deformArray.setSize(vertexCount, 0);
 	Array<float> &deform = deformArray;
 
-	if (time >= frames[frames.size() - 1]) {// Time is after last frame.
-		Array<float> &lastVertices = vertices[frames.size() - 1];
+	if (v2 == NULL) {
 		if (alpha == 1) {
 			if (add && !fromSetup) {
 				if (vertexAttachment->getBones().size() == 0) {
-					// Unweighted vertex positions, no alpha.
 					Array<float> &setupVertices = vertexAttachment->getVertices();
-					for (size_t i = 0; i < vertexCount; i++) deform[i] += lastVertices[i] - setupVertices[i];
+					for (size_t i = 0; i < vertexCount; i++) deform[i] += v1[i] - setupVertices[i];
 				} else {
-					// Weighted deform offsets, no alpha.
-					for (size_t i = 0; i < vertexCount; i++) deform[i] += lastVertices[i];
+					for (size_t i = 0; i < vertexCount; i++) deform[i] += v1[i];
 				}
 			} else {
-				// Vertex positions or deform offsets, no alpha.
-				memcpy(deform.buffer(), lastVertices.buffer(), vertexCount * sizeof(float));
+				memcpy(deform.buffer(), v1.buffer(), vertexCount * sizeof(float));
 			}
 		} else if (fromSetup) {
 			if (vertexAttachment->getBones().size() == 0) {
-				// Unweighted vertex positions, with alpha.
 				Array<float> &setupVertices = vertexAttachment->getVertices();
 				for (size_t i = 0; i < vertexCount; i++) {
 					float setup = setupVertices[i];
-					deform[i] = setup + (lastVertices[i] - setup) * alpha;
+					deform[i] = setup + (v1[i] - setup) * alpha;
 				}
 			} else {
-				// Weighted deform offsets, with alpha.
-				for (size_t i = 0; i < vertexCount; i++) deform[i] = lastVertices[i] * alpha;
+				for (size_t i = 0; i < vertexCount; i++) deform[i] = v1[i] * alpha;
 			}
 		} else if (add) {
 			if (vertexAttachment->getBones().size() == 0) {
-				// Unweighted vertex positions, with alpha.
 				Array<float> &setupVertices = vertexAttachment->getVertices();
-				for (size_t i = 0; i < vertexCount; i++) deform[i] += (lastVertices[i] - setupVertices[i]) * alpha;
+				for (size_t i = 0; i < vertexCount; i++) deform[i] += (v1[i] - setupVertices[i]) * alpha;
 			} else {
-				// Weighted deform offsets, with alpha.
-				for (size_t i = 0; i < vertexCount; i++) deform[i] += lastVertices[i] * alpha;
+				for (size_t i = 0; i < vertexCount; i++) deform[i] += v1[i] * alpha;
 			}
 		} else {
-			// Vertex positions or deform offsets, with alpha.
-			for (size_t i = 0; i < vertexCount; i++) deform[i] += (lastVertices[i] - deform[i]) * alpha;
+			for (size_t i = 0; i < vertexCount; i++) deform[i] += (v1[i] - deform[i]) * alpha;
 		}
 		return;
 	}
-
-	// Interpolate between the previous frame and the current frame.
-	int frame = Animation::search(frames, time);
-	float percent = getCurvePercent(time, frame);
-	Array<float> &prevVertices = vertices[frame];
-	Array<float> &nextVertices = vertices[frame + 1];
 
 	if (alpha == 1) {
 		if (add && !fromSetup) {
 			if (vertexAttachment->getBones().size() == 0) {
-				// Unweighted vertex positions, no alpha.
 				Array<float> &setupVertices = vertexAttachment->getVertices();
 				for (size_t i = 0; i < vertexCount; i++) {
-					float prev = prevVertices[i];
-					deform[i] += prev + (nextVertices[i] - prev) * percent - setupVertices[i];
+					float prev = v1[i];
+					deform[i] += prev + ((*v2)[i] - prev) * percent - setupVertices[i];
 				}
 			} else {
-				// Weighted deform offsets, no alpha.
 				for (size_t i = 0; i < vertexCount; i++) {
-					float prev = prevVertices[i];
-					deform[i] += prev + (nextVertices[i] - prev) * percent;
+					float prev = v1[i];
+					deform[i] += prev + ((*v2)[i] - prev) * percent;
 				}
 			}
 		} else if (percent == 0) {
-			memcpy(deform.buffer(), prevVertices.buffer(), vertexCount * sizeof(float));
+			memcpy(deform.buffer(), v1.buffer(), vertexCount * sizeof(float));
 		} else {
-			// Vertex positions or deform offsets, no alpha.
 			for (size_t i = 0; i < vertexCount; i++) {
-				float prev = prevVertices[i];
-				deform[i] = prev + (nextVertices[i] - prev) * percent;
+				float prev = v1[i];
+				deform[i] = prev + ((*v2)[i] - prev) * percent;
 			}
 		}
 	} else if (fromSetup) {
 		if (vertexAttachment->getBones().size() == 0) {
-			// Unweighted vertex positions, with alpha.
 			Array<float> &setupVertices = vertexAttachment->getVertices();
 			for (size_t i = 0; i < vertexCount; i++) {
-				float prev = prevVertices[i], setup = setupVertices[i];
-				deform[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
+				float prev = v1[i], setup = setupVertices[i];
+				deform[i] = setup + (prev + ((*v2)[i] - prev) * percent - setup) * alpha;
 			}
 		} else {
-			// Weighted deform offsets, with alpha.
 			for (size_t i = 0; i < vertexCount; i++) {
-				float prev = prevVertices[i];
-				deform[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
+				float prev = v1[i];
+				deform[i] = (prev + ((*v2)[i] - prev) * percent) * alpha;
 			}
 		}
 	} else if (add) {
 		if (vertexAttachment->getBones().size() == 0) {
-			// Unweighted vertex positions, with alpha.
 			Array<float> &setupVertices = vertexAttachment->getVertices();
 			for (size_t i = 0; i < vertexCount; i++) {
-				float prev = prevVertices[i];
-				deform[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
+				float prev = v1[i];
+				deform[i] += (prev + ((*v2)[i] - prev) * percent - setupVertices[i]) * alpha;
 			}
 		} else {
-			// Weighted deform offsets, with alpha.
 			for (size_t i = 0; i < vertexCount; i++) {
-				float prev = prevVertices[i];
-				deform[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
+				float prev = v1[i];
+				deform[i] += (prev + ((*v2)[i] - prev) * percent) * alpha;
 			}
 		}
 	} else {
-		// Vertex positions or deform offsets, with alpha.
 		for (size_t i = 0; i < vertexCount; i++) {
-			float prev = prevVertices[i];
-			deform[i] += (prev + (nextVertices[i] - prev) * percent - deform[i]) * alpha;
+			float prev = v1[i];
+			deform[i] += (prev + ((*v2)[i] - prev) * percent - deform[i]) * alpha;
 		}
 	}
+}
+
+void DeformTimeline::applyToSlot(Slot &slot, bool appliedPose, Array<float> &v1, Array<float> *v2, float percent, size_t vertexCount, float alpha,
+								 bool fromSetup, bool add) {
+	if (!slot.getBone().isActive()) return;
+	SlotPose &pose = appliedPose ? slot.getAppliedPose() : slot.getPose();
+	Attachment *attachment = pose.getAttachment();
+	if (attachment == NULL || attachment->getTimelineAttachment() != _attachment) return;
+	applyToPose(pose, v1, v2, percent, vertexCount, alpha, fromSetup, add);
+}
+
+void DeformTimeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, bool fromSetup, bool add) {
+	Array<float> &frames = _frames;
+	if (time < frames[0]) {
+		if (fromSetup) pose.getDeform().clear();
+		return;
+	}
+
+	Array<float> *v1 = NULL;
+	Array<float> *v2 = NULL;
+	float percent = 0;
+	if (time >= frames[frames.size() - 1]) {
+		v1 = &_vertices[frames.size() - 1];
+	} else {
+		int frame = Animation::search(frames, time);
+		percent = getCurvePercent(time, frame);
+		v1 = &_vertices[frame];
+		v2 = &_vertices[frame + 1];
+	}
+
+	applyToPose(pose, *v1, v2, percent, _vertices[0].size(), alpha, fromSetup, add);
 }
 
 void DeformTimeline::setBezier(size_t bezier, size_t frame, float value, float time1, float value1, float cx1, float cy1, float cx2, float cy2,

@@ -81,6 +81,21 @@ void spine_point_attachment_set_timeline_attachment(spine_point_attachment self,
 	_self->setTimelineAttachment((Attachment *) attachment);
 }
 
+spine_array_int spine_point_attachment_get_timeline_slots(spine_point_attachment self) {
+	PointAttachment *_self = (PointAttachment *) self;
+	return (spine_array_int) &_self->getTimelineSlots();
+}
+
+void spine_point_attachment_set_timeline_slots(spine_point_attachment self, spine_array_int timelineSlots) {
+	PointAttachment *_self = (PointAttachment *) self;
+	_self->setTimelineSlots(*((Array<int> *) timelineSlots));
+}
+
+bool spine_point_attachment_is_timeline_active(spine_point_attachment self, spine_array_slot slots, int slotIndex, bool appliedPose) {
+	PointAttachment *_self = (PointAttachment *) self;
+	return _self->isTimelineActive(*((Array<Slot *> *) slots), slotIndex, appliedPose);
+}
+
 int spine_point_attachment_get_ref_count(spine_point_attachment self) {
 	PointAttachment *_self = (PointAttachment *) self;
 	return _self->getRefCount();

@@ -44,7 +44,7 @@ open class ConstraintTimeline1: CurveTimeline1, ConstraintTimeline {
     public var constraintIndex: Int32 {
         get {
             let result = spine_constraint_timeline1_get_constraint_index(_ptr.assumingMemoryBound(to: spine_constraint_timeline1_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_constraint_timeline1_set_constraint_index(_ptr.assumingMemoryBound(to: spine_constraint_timeline1_wrapper.self), newValue)

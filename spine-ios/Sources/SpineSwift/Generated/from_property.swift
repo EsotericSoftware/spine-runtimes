@@ -51,7 +51,7 @@ open class FromProperty: NSObject {
     public var offset: Float {
         get {
             let result = spine_from_property_get__offset(_ptr.assumingMemoryBound(to: spine_from_property_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_from_property_set__offset(_ptr.assumingMemoryBound(to: spine_from_property_wrapper.self), newValue)
@@ -61,12 +61,10 @@ open class FromProperty: NSObject {
     public var to: ArrayToProperty? {
         get {
             let result = spine_from_property_get__to(_ptr.assumingMemoryBound(to: spine_from_property_wrapper.self))
-            return result.map { ArrayToProperty(fromPointer: $0) }
+        return result.map { ArrayToProperty(fromPointer: $0) }
         }
         set {
-            spine_from_property_set__to(
-                _ptr.assumingMemoryBound(to: spine_from_property_wrapper.self),
-                newValue?._ptr.assumingMemoryBound(to: spine_array_to_property_wrapper.self))
+            spine_from_property_set__to(_ptr.assumingMemoryBound(to: spine_from_property_wrapper.self), newValue?._ptr.assumingMemoryBound(to: spine_array_to_property_wrapper.self))
         }
     }
 

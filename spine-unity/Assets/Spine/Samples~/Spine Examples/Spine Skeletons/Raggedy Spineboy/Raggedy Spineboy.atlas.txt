@@ -1,11 +1,12 @@
 Raggedy Spineboy.png
-	size: 256, 256
+	size: 512, 256
 	filter: Linear, Linear
 arm
 	bounds: 140, 17, 71, 75
 head
 	bounds: 2, 2, 136, 187
 leg
-	bounds: 213, 90, 36, 99
+	bounds: 204, 153, 36, 99
+	rotate: 90
 torso
 	bounds: 140, 94, 62, 95

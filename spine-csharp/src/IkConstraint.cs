@@ -30,6 +30,7 @@
 using System;
 
 namespace Spine {
+	using ScaleYMode = IkConstraintData.ScaleYMode;
 
 	/// <summary>
 	/// <para>
@@ -67,10 +68,10 @@ namespace Spine {
 			BonePose[] bones = this.bones.Items;
 			switch (this.bones.Count) {
 			case 1:
-				Apply(skeleton, bones[0], target.worldX, target.worldY, p.compress, p.stretch, data.uniform, p.mix);
+				Apply(skeleton, bones[0], target.worldX, target.worldY, p.compress, p.stretch, data.scaleY, p.mix);
 				break;
 			case 2:
-				Apply(skeleton, bones[0], bones[1], target.worldX, target.worldY, p.bendDirection, p.stretch, data.uniform,
+				Apply(skeleton, bones[0], bones[1], target.worldX, target.worldY, p.bendDirection, p.stretch, data.scaleY,
 					p.softness, p.mix);
 				break;
 			}
@@ -102,7 +103,7 @@ namespace Spine {
 
 		/// <summary>Applies 1 bone IK. The target is specified in the world coordinate system.</summary>
 		static public void Apply (Skeleton skeleton, BonePose bone, float targetX, float targetY, bool compress, bool stretch,
-			bool uniform, float mix) {
+			ScaleYMode scaleY, float mix) {
 			if (bone == null) throw new ArgumentNullException("bone", "bone cannot be null.");
 			bone.ModifyLocal(skeleton);
 			BonePose p = bone.bone.parent.appliedPose;
@@ -158,7 +159,14 @@ namespace Spine {
 					if ((compress && dd < b * b) || (stretch && dd > b * b)) {
 						float s = ((float)Math.Sqrt(dd) / b - 1) * mix + 1;
 						bone.scaleX *= s;
-						if (uniform) bone.scaleY *= s;
+						switch (scaleY) {
+						case ScaleYMode.Uniform:
+							bone.scaleY *= s;
+							break;
+						case ScaleYMode.Volume:
+							bone.scaleY /= s;
+							break;
+						}
 					}
 				}
 			}
@@ -167,7 +175,7 @@ namespace Spine {
 		/// <summary>Applies 2 bone IK. The target is specified in the world coordinate system.</summary>
 		/// <param name="child">A direct descendant of the parent bone.</param>
 		static public void Apply (Skeleton skeleton, BonePose parent, BonePose child, float targetX, float targetY, int bendDir,
-			bool stretch, bool uniform, float softness, float mix) {
+			bool stretch, ScaleYMode scaleY, float softness, float mix) {
 			if (parent == null) throw new ArgumentNullException("parent", "parent cannot be null.");
 			if (child == null) throw new ArgumentNullException("child", "child cannot be null.");
 			if (parent.inherit != Inherit.Normal || child.inherit != Inherit.Normal) return;
@@ -212,7 +220,7 @@ namespace Spine {
 			float dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
 			float l1 = (float)Math.Sqrt(dx * dx + dy * dy), l2 = child.bone.data.length * csx, a1, a2;
 			if (l1 < 0.0001f) {
-				Apply(skeleton, parent, targetX, targetY, false, stretch, false, mix);
+				Apply(skeleton, parent, targetX, targetY, false, stretch, ScaleYMode.None, mix);
 				child.rotation = 0;
 				return;
 			}
@@ -243,7 +251,14 @@ namespace Spine {
 					if (stretch) {
 						a = ((float)Math.Sqrt(dd) / (l1 + l2) - 1) * mix + 1;
 						parent.scaleX *= a;
-						if (uniform) parent.scaleY *= a;
+						switch (scaleY) {
+						case ScaleYMode.Uniform:
+							parent.scaleY *= a;
+							break;
+						case ScaleYMode.Volume:
+							parent.scaleY /= a;
+							break;
+						}
 					}
 				} else
 					a2 = (float)Math.Acos(cos) * bendDir;

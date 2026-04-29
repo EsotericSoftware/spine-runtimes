@@ -457,12 +457,12 @@ namespace Spine.Unity {
 #endif
 					}
 				} else {
-					Material material;
+					Material material = null;
 					if (isCustomSlotMaterialsPopulated) {
 						if (!customSlotMaterials.TryGetValue(slot, out material))
-							material = (Material)((AtlasRegion)region).page.rendererObject;
+							if (region != null) material = (Material)((AtlasRegion)region).page.rendererObject;
 					} else {
-						material = (Material)((AtlasRegion)region).page.rendererObject;
+						if (region != null) material = (Material)((AtlasRegion)region).page.rendererObject;
 					}
 
 #if !SPINE_TRIANGLECHECK

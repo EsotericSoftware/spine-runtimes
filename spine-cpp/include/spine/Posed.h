@@ -50,7 +50,7 @@ namespace spine {
 	protected:
 		virtual void setupPose() = 0;
 
-		virtual void pose() = 0;
+		virtual void unconstrained() = 0;
 	};
 
 	/// The base class for an object with a number of poses:
@@ -129,7 +129,7 @@ namespace spine {
 
 	protected:
 		/// Sets the applied pose to the unconstrained pose, for when no constraints will modify the pose.
-		virtual void pose() override {
+		virtual void unconstrained() override {
 			_appliedPose = &_pose;
 		}
 		/// Sets the unconstrained pose to the setup pose.

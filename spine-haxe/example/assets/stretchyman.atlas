@@ -1,20 +1,18 @@
 stretchyman.png
-	size: 512, 256
+	size: 512, 512
 	filter: Linear, Linear
 back-arm
-	bounds: 2, 10, 70, 199
+	bounds: 184, 137, 70, 199
 	offsets: 1, 2, 72, 202
 	rotate: 90
 back-leg
-	bounds: 2, 50, 100, 316
+	bounds: 50, 351, 100, 316
 	offsets: 0, 1, 100, 318
 	rotate: 90
 body
-	bounds: 2, 104, 139, 448
+	bounds: 2, 2, 139, 449
 	offsets: 0, 0, 141, 452
-	rotate: 90
 front-arm
-	bounds: 280, 2, 145, 221
-	rotate: 270
+	bounds: 75, 150, 145, 221
 head
-	bounds: 319, 70, 87, 102
+	bounds: 167, 270, 87, 102

@@ -65,14 +65,14 @@ class TrackEntry implements Poolable {
 
 	/** The index of the track where this track entry is either current or queued.
 	 *
-	 * See spine.animation.AnimationState.getCurrent(int). */
+	 * See spine.animation.AnimationState.getTrack(int). */
 	public var trackIndex:Int = 0;
 
 	/** If true, the animation will repeat. If false it will not, instead its last frame is applied if played beyond its
 	 * duration. */
 	public var loop:Bool = false;
 
-	/** If true, the animation will be applied in reverse. Events are not fired when an animation is applied in reverse. */
+	/** If true, the animation will be applied in reverse. */
 	public var reverse:Bool = false;
 
 	/** When true, timelines in this animation that support additive have their values added to the setup or current pose values
@@ -100,20 +100,20 @@ class TrackEntry implements Poolable {
 	 * 0, so draw order timelines are not applied while this animation is being mixed out. */
 	public var mixDrawOrderThreshold:Float = 0;
 
-	/** Seconds when this animation starts, both initially and after looping. Defaults to 0.
+	/** The time in seconds for the first frame of this animation, both initially and after looping. Defaults to 0.
 	 *
-	 * When changing the animationStart time, it often makes sense to set TrackEntry.getAnimationLast() to the same
-	 * value to prevent timeline keys before the start time from triggering. */
+	 * When setting animationStart time, TrackEntry.getAnimationLast() can be set to the same value to avoid firing events
+	 * from the start of the animation. */
 	public var animationStart:Float = 0;
 
-	/** Seconds for the last frame of this animation. Non-looping animations won't play past this time. Looping animations will
-	 * loop back to TrackEntry.getAnimationStart() at this time. Defaults to the animation spine.animation.Animation.duration. */
+	/** The time in seconds for the last frame of this animation. Past this time, non-looping animations hold the pose at this
+	 * time while looping animations will loop back to TrackEntry.getAnimationStart(). Defaults to the spine.animation.Animation.duration. */
 	public var animationEnd:Float = 0;
 
-	/** The time in seconds this animation was last applied. Some timelines use this for one-time triggers. Eg, when this
-	 * animation is applied, event timelines will fire all events between the animationLast time (exclusive) and
-	 * animationTime (inclusive). Defaults to -1 to ensure triggers on frame 0 happen the first time this animation
-	 * is applied. */
+	/** The time in seconds this animation was last applied. Some timelines use this for one-time triggers. For example, when
+	 * this animation is applied, event timelines will fire all events between the animationLast time (exclusive)
+	 * and animationTime (inclusive). Defaults to -1 to ensure triggers on frame 0 happen the first time this
+	 * animation is applied. */
 	public var animationLast:Float = 0;
 
 	public var nextAnimationLast:Float = 0;
@@ -131,9 +131,13 @@ class TrackEntry implements Poolable {
 	 * afterward, use TrackEntry.setMixDuration(float, float) so this delay is adjusted. */
 	public var delay(default, set):Float = 0;
 
-	/** Current time in seconds this track entry has been the current track entry. The track time determines
-	 * TrackEntry.getAnimationTime(). The track time can be set to start the animation at a time other than 0, without affecting
-	 * looping. */
+	/** The time in seconds this track entry has been the current track entry, starting at 0 and increasing forever. Compare to
+	 * TrackEntry.getAnimationTime(), which is always between animationStart and animationEnd.
+	 *
+	 * The track time can be set to start the animation at a time other than 0, without affecting looping. When doing so,
+	 * animationLast can be set to the same value to avoid firing events from the start of the animation.
+	 *
+	 * To set the time an animation starts and loops, use animationStart and animationEnd. */
 	public var trackTime:Float = 0;
 
 	public var trackLast:Float = 0;
@@ -214,20 +218,16 @@ class TrackEntry implements Poolable {
 
 	public function new() {}
 
-	/** Uses TrackEntry.getTrackTime() to compute the animationTime. When the trackTime is 0, the
-	 * animationTime is equal to the animationStart time.
-	 *
-	 * The animationTime is between TrackEntry.getAnimationStart() and TrackEntry.getAnimationEnd(), except if this
-	 * track entry is non-looping and TrackEntry.getAnimationEnd() is >= to the animation spine.animation.Animation.duration, then
-	 * animationTime continues to increase past TrackEntry.getAnimationEnd(). */
+	/** Uses TrackEntry.getTrackTime() to compute the animationTime, which is always between TrackEntry.getAnimationStart() and
+	 * TrackEntry.getAnimationEnd(). When trackTime is 0, animationTime is equal to the
+	 * animationStart time. */
 	public function getAnimationTime():Float {
-		if (loop) {
-			var duration:Float = animationEnd - animationStart;
-			if (duration == 0)
-				return animationStart;
-			return (trackTime % duration) + animationStart;
-		}
-		return Math.min(trackTime + animationStart, animationEnd);
+		if (!loop)
+			return Math.min(trackTime + animationStart, animationEnd);
+		var duration:Float = animationEnd - animationStart;
+		if (duration == 0)
+			return animationStart;
+		return (trackTime % duration) + animationStart;
 	}
 
 	/** If this track entry is non-looping, the track time in seconds when TrackEntry.getAnimationEnd() is reached, or the current

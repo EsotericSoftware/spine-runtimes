@@ -58,9 +58,7 @@ public class DrawOrderFolderTimeline: Timeline {
     /// - Parameter time: The frame time in seconds.
     /// - Parameter drawOrder: Ordered getSlots() indices, or null to use setup pose order.
     public func setFrame(_ frame: Int, _ time: Float, _ drawOrder: ArrayInt?) {
-        spine_draw_order_folder_timeline_set_frame(
-            _ptr.assumingMemoryBound(to: spine_draw_order_folder_timeline_wrapper.self), frame, time,
-            drawOrder?._ptr.assumingMemoryBound(to: spine_array_int_wrapper.self))
+        spine_draw_order_folder_timeline_set_frame(_ptr.assumingMemoryBound(to: spine_draw_order_folder_timeline_wrapper.self), frame, time, drawOrder?._ptr.assumingMemoryBound(to: spine_array_int_wrapper.self))
     }
 
     public func dispose() {

@@ -139,9 +139,13 @@ class TrackEntry {
     SpineBindings.bindings.spine_track_entry_set_delay(_ptr, value);
   }
 
-  /// Current time in seconds this track entry has been the current track entry.
-  /// The track time determines getAnimationTime(). The track time can be set to
-  /// start the animation at a time other than 0, without affecting looping.
+  /// The time in seconds this track entry has been the current track entry,
+  /// starting at 0 and increasing forever. Compare to getAnimationTime(), which
+  /// is always between animationStart and animationEnd.
+  ///
+  /// The track time can be set to start the animation at a time other than 0,
+  /// without affecting looping. When doing so, animationLast can be set to the
+  /// same value to avoid firing events from the start of the animation.
   double get trackTime {
     final result = SpineBindings.bindings.spine_track_entry_get_track_time(_ptr);
     return result;
@@ -170,12 +174,11 @@ class TrackEntry {
     SpineBindings.bindings.spine_track_entry_set_track_end(_ptr, value);
   }
 
-  /// Seconds when this animation starts, both initially and after looping.
-  /// Defaults to 0.
+  /// The time in seconds for the first frame of this animation, both initially
+  /// and after looping. Defaults to 0.
   ///
-  /// When changing the animation start time, it often makes sense to set
-  /// TrackEntry.AnimationLast to the same value to prevent timeline keys before
-  /// the start time from triggering.
+  /// When setting the animation start time, animationLast can be set to the
+  /// same value to avoid firing events from the start of the animation.
   double get animationStart {
     final result = SpineBindings.bindings.spine_track_entry_get_animation_start(_ptr);
     return result;
@@ -185,10 +188,9 @@ class TrackEntry {
     SpineBindings.bindings.spine_track_entry_set_animation_start(_ptr, value);
   }
 
-  /// Seconds for the last frame of this animation. Non-looping animations won't
-  /// play past this time. Looping animations will loop back to
-  /// TrackEntry.AnimationStart at this time. Defaults to the animation
-  /// duration.
+  /// The time in seconds for the last frame of this animation. Past this time,
+  /// non-looping animations hold the pose at this time while looping animations
+  /// will loop back to animationStart. Defaults to the animation duration.
   double get animationEnd {
     final result = SpineBindings.bindings.spine_track_entry_get_animation_end(_ptr);
     return result;
@@ -212,12 +214,9 @@ class TrackEntry {
     SpineBindings.bindings.spine_track_entry_set_animation_last(_ptr, value);
   }
 
-  /// Uses the track time to compute animationTime. When trackTime is 0,
-  /// animationTime is equal to animationStart.
-  ///
-  /// animationTime is between animationStart and animationEnd, except if this
-  /// track entry is non-looping and animationEnd is >= the animation duration,
-  /// then animationTime continues to increase past animationEnd.
+  /// Uses the track time to compute animationTime, which is always between
+  /// animationStart and animationEnd. When trackTime is 0, animationTime is
+  /// equal to animationStart.
   double get animationTime {
     final result = SpineBindings.bindings.spine_track_entry_get_animation_time(_ptr);
     return result;

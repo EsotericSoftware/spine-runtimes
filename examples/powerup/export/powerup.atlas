@@ -2,10 +2,8 @@ powerup.png
 	size: 512, 256
 	filter: Linear, Linear
 star
-	bounds: 265, 76, 76, 72
-	rotate: 90
+	bounds: 266, 80, 76, 72
 token
-	bounds: 141, 29, 123, 122
-	rotate: 90
+	bounds: 141, 30, 123, 122
 wing
 	bounds: 2, 2, 137, 150

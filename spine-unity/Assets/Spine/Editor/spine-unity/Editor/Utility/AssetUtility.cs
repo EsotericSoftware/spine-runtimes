@@ -107,6 +107,24 @@ namespace Spine.Unity.Editor {
 		public static HashSet<string> assetsImportedInWrongState = new HashSet<string>();
 		public static bool isFirstPMAWorkflowMismatch = true;
 
+		// Set when DelayedSwitchToGamma issues a deferred call to switch project settings to gamma space after import.
+		static bool pendingSwitchToGamma = false;
+
+		public static ColorSpace ActiveColorSpace {
+			get { return pendingSwitchToGamma ? ColorSpace.Gamma : QualitySettings.activeColorSpace; }
+		}
+
+		public static void DelayedSwitchToGamma () {
+			if (pendingSwitchToGamma) return;
+			pendingSwitchToGamma = true;
+			// Defer to avoid hanging the editor by changing PlayerSettings.colorSpace inside OnPostprocessAllAssets.
+			EditorApplication.delayCall += () => {
+				PlayerSettings.colorSpace = ColorSpace.Gamma;
+				pendingSwitchToGamma = false;
+				Debug.Log("Switched Unity project to Gamma color space to support PMA atlas textures. To change it back go to 'Project Settings - Player - Other Settings - Color Space'.");
+			};
+		}
+
 		public static void HandleOnPostprocessAllAssets (string[] imported, List<string> texturesWithoutMetaFile) {
 			// In case user used "Assets -> Reimport All", during the import process,
 			// asset database is not initialized until some point. During that period,
@@ -487,7 +505,11 @@ namespace Spine.Unity.Editor {
 			foreach (SkeletonGraphic skeletonGraphic in skeletonGraphicObjects) {
 
 				if (skeletonGraphic.skeletonDataAsset == null) {
-					int skeletonGraphicID = skeletonGraphic.GetInstanceID();
+#if USES_ENTITY_ID
+					var skeletonGraphicID = skeletonGraphic.GetEntityId();
+#else
+					var skeletonGraphicID = skeletonGraphic.GetInstanceID();
+#endif
 					if (SpineEditorUtilities.DataReloadHandler.savedSkeletonDataAssetAtSKeletonGraphicID.ContainsKey(skeletonGraphicID)) {
 						string assetPath = SpineEditorUtilities.DataReloadHandler.savedSkeletonDataAssetAtSKeletonGraphicID[skeletonGraphicID];
 						skeletonGraphic.skeletonDataAsset = (SkeletonDataAsset)AssetDatabase.LoadAssetAtPath<SkeletonDataAsset>(assetPath);
@@ -590,7 +612,11 @@ namespace Spine.Unity.Editor {
 							for (int i = 0; i < skeletonDataAtlasAssets.Length; i++) {
 								if (!ReferenceEquals(null, skeletonDataAtlasAssets[i]) &&
 									skeletonDataAtlasAssets[i].Equals(null) &&
+#if USES_ENTITY_ID
+									skeletonDataAtlasAssets[i].GetEntityId().IsValid()
+#else
 									skeletonDataAtlasAssets[i].GetInstanceID() != 0
+#endif
 								) {
 #if USES_ENTITY_ID
 									skeletonDataAtlasAssets[i] = EditorUtility.EntityIdToObject(skeletonDataAtlasAssets[i].GetEntityId()) as AtlasAssetBase;
@@ -779,7 +805,7 @@ namespace Spine.Unity.Editor {
 
 		static void IssueAtlasWorkflowWarnings (bool isNewAtlas, Atlas atlas, SpineAtlasAsset atlasAsset) {
 			bool isPMA = atlas.Pages.Count > 0 && atlas.Pages[0].pma;
-			if (QualitySettings.activeColorSpace == ColorSpace.Linear && isPMA) {
+			if (ActiveColorSpace == ColorSpace.Linear && isPMA) {
 				bool wasFixed = false;
 				if (SpineEditorUtilities.Preferences.ShowWorkflowMismatchDialog)
 					wasFixed = ShowWorkflowMismatchDialog(atlasAsset, isLinearPMAMismatch: true, atlasIsPMA: isPMA);

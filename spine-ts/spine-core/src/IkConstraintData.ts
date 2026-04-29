@@ -28,6 +28,7 @@
  *****************************************************************************/
 
 import type { BoneData } from "./BoneData.js";
+import type { BonePose } from "./BonePose.js";
 import { ConstraintData } from "./ConstraintData.js";
 import { IkConstraint } from "./IkConstraint.js";
 import { IkConstraintPose } from "./IkConstraintPose.js";
@@ -45,12 +46,17 @@ export class IkConstraintData extends ConstraintData<IkConstraint, IkConstraintP
 	public set target (boneData: BoneData) { this._target = boneData; }
 	public get target () {
 		if (!this._target) throw new Error("target cannot be null.")
-		else return this._target;
+		return this._target;
 	}
 
-	/** When true and {@link IkConstraintPose.compress} or {@link IkConstraintPose.stretch} is used, the bone is scaled on both the
-	 * X and Y axes. */
-	uniform = false;
+	/** Determines how the {@link BonePose.scaleY} changes when {@link IkConstraintPose.compress} or
+	  * {@link IkConstraintPose.stretch} set {@link BonePose.scaleX}. */
+	_scaleY = ScaleY.None;
+	public set scaleY (scaleY: ScaleY) { this._scaleY = scaleY; }
+	public get scaleY () {
+		if (this._scaleY == null) throw new Error("scaleY cannot be null.")
+		return this._scaleY;
+	}
 
 	constructor (name: string) {
 		super(name, new IkConstraintPose());
@@ -59,4 +65,15 @@ export class IkConstraintData extends ConstraintData<IkConstraint, IkConstraintP
 	public create (skeleton: Skeleton) {
 		return new IkConstraint(this, skeleton);
 	}
+}
+
+/** Determines how the {@link BonePose.scaleY} changes when {@link IkConstraintPose.compress} or
+ * {@link IkConstraintPose.stretch} set {@link BonePose.scaleX}. */
+export enum ScaleY {
+	/** scaleY is not changed. */
+	None,
+	/** scaleY is multiplied by the scaleX factor, preserving the bone's aspect ratio. */
+	Uniform,
+	/** scaleY is divided by the scaleX factor, preserving the bone's area. */
+	Volume
 }

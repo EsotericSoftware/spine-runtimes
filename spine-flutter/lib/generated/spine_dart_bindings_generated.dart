@@ -16223,21 +16223,21 @@ class SpineDartBindings {
   late final _spine_animation_state_set_empty_animations =
       _spine_animation_state_set_empty_animationsPtr.asFunction<void Function(spine_animation_state, double)>();
 
-  spine_track_entry spine_animation_state_get_current(
+  spine_track_entry spine_animation_state_get_track(
     spine_animation_state self,
     int trackIndex,
   ) {
-    return _spine_animation_state_get_current(
+    return _spine_animation_state_get_track(
       self,
       trackIndex,
     );
   }
 
-  late final _spine_animation_state_get_currentPtr =
+  late final _spine_animation_state_get_trackPtr =
       _lookup<ffi.NativeFunction<spine_track_entry Function(spine_animation_state, ffi.Size)>>(
-          'spine_animation_state_get_current');
-  late final _spine_animation_state_get_current =
-      _spine_animation_state_get_currentPtr.asFunction<spine_track_entry Function(spine_animation_state, int)>();
+          'spine_animation_state_get_track');
+  late final _spine_animation_state_get_track =
+      _spine_animation_state_get_trackPtr.asFunction<spine_track_entry Function(spine_animation_state, int)>();
 
   /// The AnimationStateData to look up mix durations.
   spine_animation_state_data spine_animation_state_get_data(
@@ -17854,6 +17854,55 @@ class SpineDartBindings {
           'spine_attachment_set_timeline_attachment');
   late final _spine_attachment_set_timeline_attachment =
       _spine_attachment_set_timeline_attachmentPtr.asFunction<void Function(spine_attachment, spine_attachment)>();
+
+  spine_array_int spine_attachment_get_timeline_slots(
+    spine_attachment self,
+  ) {
+    return _spine_attachment_get_timeline_slots(
+      self,
+    );
+  }
+
+  late final _spine_attachment_get_timeline_slotsPtr =
+      _lookup<ffi.NativeFunction<spine_array_int Function(spine_attachment)>>('spine_attachment_get_timeline_slots');
+  late final _spine_attachment_get_timeline_slots =
+      _spine_attachment_get_timeline_slotsPtr.asFunction<spine_array_int Function(spine_attachment)>();
+
+  void spine_attachment_set_timeline_slots(
+    spine_attachment self,
+    spine_array_int timelineSlots,
+  ) {
+    return _spine_attachment_set_timeline_slots(
+      self,
+      timelineSlots,
+    );
+  }
+
+  late final _spine_attachment_set_timeline_slotsPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_attachment, spine_array_int)>>(
+          'spine_attachment_set_timeline_slots');
+  late final _spine_attachment_set_timeline_slots =
+      _spine_attachment_set_timeline_slotsPtr.asFunction<void Function(spine_attachment, spine_array_int)>();
+
+  bool spine_attachment_is_timeline_active(
+    spine_attachment self,
+    spine_array_slot slots,
+    int slotIndex,
+    bool appliedPose,
+  ) {
+    return _spine_attachment_is_timeline_active(
+      self,
+      slots,
+      slotIndex,
+      appliedPose,
+    );
+  }
+
+  late final _spine_attachment_is_timeline_activePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_attachment, spine_array_slot, ffi.Int, ffi.Bool)>>(
+          'spine_attachment_is_timeline_active');
+  late final _spine_attachment_is_timeline_active = _spine_attachment_is_timeline_activePtr
+      .asFunction<bool Function(spine_attachment, spine_array_slot, int, bool)>();
 
   int spine_attachment_get_ref_count(
     spine_attachment self,
@@ -20196,6 +20245,56 @@ class SpineDartBindings {
   late final _spine_bounding_box_attachment_get_name = _spine_bounding_box_attachment_get_namePtr
       .asFunction<ffi.Pointer<ffi.Char> Function(spine_bounding_box_attachment)>();
 
+  spine_array_int spine_bounding_box_attachment_get_timeline_slots(
+    spine_bounding_box_attachment self,
+  ) {
+    return _spine_bounding_box_attachment_get_timeline_slots(
+      self,
+    );
+  }
+
+  late final _spine_bounding_box_attachment_get_timeline_slotsPtr =
+      _lookup<ffi.NativeFunction<spine_array_int Function(spine_bounding_box_attachment)>>(
+          'spine_bounding_box_attachment_get_timeline_slots');
+  late final _spine_bounding_box_attachment_get_timeline_slots = _spine_bounding_box_attachment_get_timeline_slotsPtr
+      .asFunction<spine_array_int Function(spine_bounding_box_attachment)>();
+
+  void spine_bounding_box_attachment_set_timeline_slots(
+    spine_bounding_box_attachment self,
+    spine_array_int timelineSlots,
+  ) {
+    return _spine_bounding_box_attachment_set_timeline_slots(
+      self,
+      timelineSlots,
+    );
+  }
+
+  late final _spine_bounding_box_attachment_set_timeline_slotsPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_bounding_box_attachment, spine_array_int)>>(
+          'spine_bounding_box_attachment_set_timeline_slots');
+  late final _spine_bounding_box_attachment_set_timeline_slots = _spine_bounding_box_attachment_set_timeline_slotsPtr
+      .asFunction<void Function(spine_bounding_box_attachment, spine_array_int)>();
+
+  bool spine_bounding_box_attachment_is_timeline_active(
+    spine_bounding_box_attachment self,
+    spine_array_slot slots,
+    int slotIndex,
+    bool appliedPose,
+  ) {
+    return _spine_bounding_box_attachment_is_timeline_active(
+      self,
+      slots,
+      slotIndex,
+      appliedPose,
+    );
+  }
+
+  late final _spine_bounding_box_attachment_is_timeline_activePtr = _lookup<
+          ffi.NativeFunction<ffi.Bool Function(spine_bounding_box_attachment, spine_array_slot, ffi.Int, ffi.Bool)>>(
+      'spine_bounding_box_attachment_is_timeline_active');
+  late final _spine_bounding_box_attachment_is_timeline_active = _spine_bounding_box_attachment_is_timeline_activePtr
+      .asFunction<bool Function(spine_bounding_box_attachment, spine_array_slot, int, bool)>();
+
   int spine_bounding_box_attachment_get_ref_count(
     spine_bounding_box_attachment self,
   ) {
@@ -20316,6 +20415,71 @@ class SpineDartBindings {
           'spine_clipping_attachment_set_end_slot');
   late final _spine_clipping_attachment_set_end_slot = _spine_clipping_attachment_set_end_slotPtr
       .asFunction<void Function(spine_clipping_attachment, spine_slot_data)>();
+
+  /// When true the clipping polygon is treated as convex for more efficient
+  /// clipping. If the polygon deforms to concave then the convex hull is used.
+  /// When false the clipping polygon can be concave and if so has an additional
+  /// CPU cost. Inverse clipping always uses convex.
+  bool spine_clipping_attachment_get_convex(
+    spine_clipping_attachment self,
+  ) {
+    return _spine_clipping_attachment_get_convex(
+      self,
+    );
+  }
+
+  late final _spine_clipping_attachment_get_convexPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_clipping_attachment)>>('spine_clipping_attachment_get_convex');
+  late final _spine_clipping_attachment_get_convex =
+      _spine_clipping_attachment_get_convexPtr.asFunction<bool Function(spine_clipping_attachment)>();
+
+  void spine_clipping_attachment_set_convex(
+    spine_clipping_attachment self,
+    bool convex,
+  ) {
+    return _spine_clipping_attachment_set_convex(
+      self,
+      convex,
+    );
+  }
+
+  late final _spine_clipping_attachment_set_convexPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_clipping_attachment, ffi.Bool)>>(
+          'spine_clipping_attachment_set_convex');
+  late final _spine_clipping_attachment_set_convex =
+      _spine_clipping_attachment_set_convexPtr.asFunction<void Function(spine_clipping_attachment, bool)>();
+
+  /// When false, everything inside the clipping polygon is visible. When true,
+  /// everything outside the clipping polygon is visible and clipping is convex.
+  bool spine_clipping_attachment_get_inverse(
+    spine_clipping_attachment self,
+  ) {
+    return _spine_clipping_attachment_get_inverse(
+      self,
+    );
+  }
+
+  late final _spine_clipping_attachment_get_inversePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_clipping_attachment)>>(
+          'spine_clipping_attachment_get_inverse');
+  late final _spine_clipping_attachment_get_inverse =
+      _spine_clipping_attachment_get_inversePtr.asFunction<bool Function(spine_clipping_attachment)>();
+
+  void spine_clipping_attachment_set_inverse(
+    spine_clipping_attachment self,
+    bool inverse,
+  ) {
+    return _spine_clipping_attachment_set_inverse(
+      self,
+      inverse,
+    );
+  }
+
+  late final _spine_clipping_attachment_set_inversePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_clipping_attachment, ffi.Bool)>>(
+          'spine_clipping_attachment_set_inverse');
+  late final _spine_clipping_attachment_set_inverse =
+      _spine_clipping_attachment_set_inversePtr.asFunction<void Function(spine_clipping_attachment, bool)>();
 
   spine_color spine_clipping_attachment_get_color(
     spine_clipping_attachment self,
@@ -20589,6 +20753,56 @@ class SpineDartBindings {
           'spine_clipping_attachment_get_name');
   late final _spine_clipping_attachment_get_name =
       _spine_clipping_attachment_get_namePtr.asFunction<ffi.Pointer<ffi.Char> Function(spine_clipping_attachment)>();
+
+  spine_array_int spine_clipping_attachment_get_timeline_slots(
+    spine_clipping_attachment self,
+  ) {
+    return _spine_clipping_attachment_get_timeline_slots(
+      self,
+    );
+  }
+
+  late final _spine_clipping_attachment_get_timeline_slotsPtr =
+      _lookup<ffi.NativeFunction<spine_array_int Function(spine_clipping_attachment)>>(
+          'spine_clipping_attachment_get_timeline_slots');
+  late final _spine_clipping_attachment_get_timeline_slots = _spine_clipping_attachment_get_timeline_slotsPtr
+      .asFunction<spine_array_int Function(spine_clipping_attachment)>();
+
+  void spine_clipping_attachment_set_timeline_slots(
+    spine_clipping_attachment self,
+    spine_array_int timelineSlots,
+  ) {
+    return _spine_clipping_attachment_set_timeline_slots(
+      self,
+      timelineSlots,
+    );
+  }
+
+  late final _spine_clipping_attachment_set_timeline_slotsPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_clipping_attachment, spine_array_int)>>(
+          'spine_clipping_attachment_set_timeline_slots');
+  late final _spine_clipping_attachment_set_timeline_slots = _spine_clipping_attachment_set_timeline_slotsPtr
+      .asFunction<void Function(spine_clipping_attachment, spine_array_int)>();
+
+  bool spine_clipping_attachment_is_timeline_active(
+    spine_clipping_attachment self,
+    spine_array_slot slots,
+    int slotIndex,
+    bool appliedPose,
+  ) {
+    return _spine_clipping_attachment_is_timeline_active(
+      self,
+      slots,
+      slotIndex,
+      appliedPose,
+    );
+  }
+
+  late final _spine_clipping_attachment_is_timeline_activePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_clipping_attachment, spine_array_slot, ffi.Int, ffi.Bool)>>(
+          'spine_clipping_attachment_is_timeline_active');
+  late final _spine_clipping_attachment_is_timeline_active = _spine_clipping_attachment_is_timeline_activePtr
+      .asFunction<bool Function(spine_clipping_attachment, spine_array_slot, int, bool)>();
 
   int spine_clipping_attachment_get_ref_count(
     spine_clipping_attachment self,
@@ -22418,6 +22632,40 @@ class SpineDartBindings {
   late final _spine_deform_timeline_get_rtti =
       _spine_deform_timeline_get_rttiPtr.asFunction<spine_rtti Function(spine_deform_timeline)>();
 
+  void spine_deform_timeline_apply(
+    spine_deform_timeline self,
+    spine_skeleton skeleton,
+    double lastTime,
+    double time,
+    spine_array_event events,
+    double alpha,
+    bool fromSetup,
+    bool add,
+    bool out,
+    bool appliedPose,
+  ) {
+    return _spine_deform_timeline_apply(
+      self,
+      skeleton,
+      lastTime,
+      time,
+      events,
+      alpha,
+      fromSetup,
+      add,
+      out,
+      appliedPose,
+    );
+  }
+
+  late final _spine_deform_timeline_applyPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(spine_deform_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event, ffi.Float,
+              ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_deform_timeline_apply');
+  late final _spine_deform_timeline_apply = _spine_deform_timeline_applyPtr.asFunction<
+      void Function(
+          spine_deform_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool, bool, bool)>();
+
   /// Sets the time and vertices for the specified frame.
   void spine_deform_timeline_set_frame(
     spine_deform_timeline self,
@@ -22538,40 +22786,6 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<ffi.Size Function(spine_deform_timeline)>>('spine_deform_timeline_get_frame_count');
   late final _spine_deform_timeline_get_frame_count =
       _spine_deform_timeline_get_frame_countPtr.asFunction<int Function(spine_deform_timeline)>();
-
-  void spine_deform_timeline_apply(
-    spine_deform_timeline self,
-    spine_skeleton skeleton,
-    double lastTime,
-    double time,
-    spine_array_event events,
-    double alpha,
-    bool fromSetup,
-    bool add,
-    bool out,
-    bool appliedPose,
-  ) {
-    return _spine_deform_timeline_apply(
-      self,
-      skeleton,
-      lastTime,
-      time,
-      events,
-      alpha,
-      fromSetup,
-      add,
-      out,
-      appliedPose,
-    );
-  }
-
-  late final _spine_deform_timeline_applyPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(spine_deform_timeline, spine_skeleton, ffi.Float, ffi.Float, spine_array_event, ffi.Float,
-              ffi.Bool, ffi.Bool, ffi.Bool, ffi.Bool)>>('spine_deform_timeline_apply');
-  late final _spine_deform_timeline_apply = _spine_deform_timeline_applyPtr.asFunction<
-      void Function(
-          spine_deform_timeline, spine_skeleton, double, double, spine_array_event, double, bool, bool, bool, bool)>();
 
   int spine_deform_timeline_get_slot_index(
     spine_deform_timeline self,
@@ -25951,47 +26165,52 @@ class SpineDartBindings {
     spine_mesh_attachment mesh,
     int skinIndex,
     int slotIndex,
-    ffi.Pointer<ffi.Char> parent,
+    int sourceIndex,
+    ffi.Pointer<ffi.Char> source,
     bool inheritTimelines,
   ) {
     return _spine_linked_mesh_create(
       mesh,
       skinIndex,
       slotIndex,
-      parent,
+      sourceIndex,
+      source,
       inheritTimelines,
     );
   }
 
   late final _spine_linked_mesh_createPtr = _lookup<
       ffi.NativeFunction<
-          spine_linked_mesh Function(
-              spine_mesh_attachment, ffi.Int, ffi.Size, ffi.Pointer<ffi.Char>, ffi.Bool)>>('spine_linked_mesh_create');
+          spine_linked_mesh Function(spine_mesh_attachment, ffi.Int, ffi.Size, ffi.Size, ffi.Pointer<ffi.Char>,
+              ffi.Bool)>>('spine_linked_mesh_create');
   late final _spine_linked_mesh_create = _spine_linked_mesh_createPtr
-      .asFunction<spine_linked_mesh Function(spine_mesh_attachment, int, int, ffi.Pointer<ffi.Char>, bool)>();
+      .asFunction<spine_linked_mesh Function(spine_mesh_attachment, int, int, int, ffi.Pointer<ffi.Char>, bool)>();
 
   spine_linked_mesh spine_linked_mesh_create2(
     spine_mesh_attachment mesh,
     ffi.Pointer<ffi.Char> skin,
     int slotIndex,
-    ffi.Pointer<ffi.Char> parent,
+    int sourceIndex,
+    ffi.Pointer<ffi.Char> source,
     bool inheritTimelines,
   ) {
     return _spine_linked_mesh_create2(
       mesh,
       skin,
       slotIndex,
-      parent,
+      sourceIndex,
+      source,
       inheritTimelines,
     );
   }
 
   late final _spine_linked_mesh_create2Ptr = _lookup<
       ffi.NativeFunction<
-          spine_linked_mesh Function(spine_mesh_attachment, ffi.Pointer<ffi.Char>, ffi.Size, ffi.Pointer<ffi.Char>,
-              ffi.Bool)>>('spine_linked_mesh_create2');
+          spine_linked_mesh Function(spine_mesh_attachment, ffi.Pointer<ffi.Char>, ffi.Size, ffi.Size,
+              ffi.Pointer<ffi.Char>, ffi.Bool)>>('spine_linked_mesh_create2');
   late final _spine_linked_mesh_create2 = _spine_linked_mesh_create2Ptr.asFunction<
-      spine_linked_mesh Function(spine_mesh_attachment, ffi.Pointer<ffi.Char>, int, ffi.Pointer<ffi.Char>, bool)>();
+      spine_linked_mesh Function(
+          spine_mesh_attachment, ffi.Pointer<ffi.Char>, int, int, ffi.Pointer<ffi.Char>, bool)>();
 
   void spine_linked_mesh_dispose(
     spine_linked_mesh self,
@@ -26266,34 +26485,34 @@ class SpineDartBindings {
   late final _spine_mesh_attachment_get_color =
       _spine_mesh_attachment_get_colorPtr.asFunction<spine_color Function(spine_mesh_attachment)>();
 
-  spine_mesh_attachment spine_mesh_attachment_get_parent_mesh(
+  spine_mesh_attachment spine_mesh_attachment_get_source_mesh(
     spine_mesh_attachment self,
   ) {
-    return _spine_mesh_attachment_get_parent_mesh(
+    return _spine_mesh_attachment_get_source_mesh(
       self,
     );
   }
 
-  late final _spine_mesh_attachment_get_parent_meshPtr =
+  late final _spine_mesh_attachment_get_source_meshPtr =
       _lookup<ffi.NativeFunction<spine_mesh_attachment Function(spine_mesh_attachment)>>(
-          'spine_mesh_attachment_get_parent_mesh');
-  late final _spine_mesh_attachment_get_parent_mesh =
-      _spine_mesh_attachment_get_parent_meshPtr.asFunction<spine_mesh_attachment Function(spine_mesh_attachment)>();
+          'spine_mesh_attachment_get_source_mesh');
+  late final _spine_mesh_attachment_get_source_mesh =
+      _spine_mesh_attachment_get_source_meshPtr.asFunction<spine_mesh_attachment Function(spine_mesh_attachment)>();
 
-  void spine_mesh_attachment_set_parent_mesh(
+  void spine_mesh_attachment_set_source_mesh(
     spine_mesh_attachment self,
     spine_mesh_attachment inValue,
   ) {
-    return _spine_mesh_attachment_set_parent_mesh(
+    return _spine_mesh_attachment_set_source_mesh(
       self,
       inValue,
     );
   }
 
-  late final _spine_mesh_attachment_set_parent_meshPtr =
+  late final _spine_mesh_attachment_set_source_meshPtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(spine_mesh_attachment, spine_mesh_attachment)>>(
-          'spine_mesh_attachment_set_parent_mesh');
-  late final _spine_mesh_attachment_set_parent_mesh = _spine_mesh_attachment_set_parent_meshPtr
+          'spine_mesh_attachment_set_source_mesh');
+  late final _spine_mesh_attachment_set_source_mesh = _spine_mesh_attachment_set_source_meshPtr
       .asFunction<void Function(spine_mesh_attachment, spine_mesh_attachment)>();
 
   /// Vertex index pairs describing edges for controlling triangulation, or empty
@@ -26604,6 +26823,56 @@ class SpineDartBindings {
           'spine_mesh_attachment_get_name');
   late final _spine_mesh_attachment_get_name =
       _spine_mesh_attachment_get_namePtr.asFunction<ffi.Pointer<ffi.Char> Function(spine_mesh_attachment)>();
+
+  spine_array_int spine_mesh_attachment_get_timeline_slots(
+    spine_mesh_attachment self,
+  ) {
+    return _spine_mesh_attachment_get_timeline_slots(
+      self,
+    );
+  }
+
+  late final _spine_mesh_attachment_get_timeline_slotsPtr =
+      _lookup<ffi.NativeFunction<spine_array_int Function(spine_mesh_attachment)>>(
+          'spine_mesh_attachment_get_timeline_slots');
+  late final _spine_mesh_attachment_get_timeline_slots =
+      _spine_mesh_attachment_get_timeline_slotsPtr.asFunction<spine_array_int Function(spine_mesh_attachment)>();
+
+  void spine_mesh_attachment_set_timeline_slots(
+    spine_mesh_attachment self,
+    spine_array_int timelineSlots,
+  ) {
+    return _spine_mesh_attachment_set_timeline_slots(
+      self,
+      timelineSlots,
+    );
+  }
+
+  late final _spine_mesh_attachment_set_timeline_slotsPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_mesh_attachment, spine_array_int)>>(
+          'spine_mesh_attachment_set_timeline_slots');
+  late final _spine_mesh_attachment_set_timeline_slots =
+      _spine_mesh_attachment_set_timeline_slotsPtr.asFunction<void Function(spine_mesh_attachment, spine_array_int)>();
+
+  bool spine_mesh_attachment_is_timeline_active(
+    spine_mesh_attachment self,
+    spine_array_slot slots,
+    int slotIndex,
+    bool appliedPose,
+  ) {
+    return _spine_mesh_attachment_is_timeline_active(
+      self,
+      slots,
+      slotIndex,
+      appliedPose,
+    );
+  }
+
+  late final _spine_mesh_attachment_is_timeline_activePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_mesh_attachment, spine_array_slot, ffi.Int, ffi.Bool)>>(
+          'spine_mesh_attachment_is_timeline_active');
+  late final _spine_mesh_attachment_is_timeline_active = _spine_mesh_attachment_is_timeline_activePtr
+      .asFunction<bool Function(spine_mesh_attachment, spine_array_slot, int, bool)>();
 
   int spine_mesh_attachment_get_ref_count(
     spine_mesh_attachment self,
@@ -27051,6 +27320,56 @@ class SpineDartBindings {
           'spine_path_attachment_get_name');
   late final _spine_path_attachment_get_name =
       _spine_path_attachment_get_namePtr.asFunction<ffi.Pointer<ffi.Char> Function(spine_path_attachment)>();
+
+  spine_array_int spine_path_attachment_get_timeline_slots(
+    spine_path_attachment self,
+  ) {
+    return _spine_path_attachment_get_timeline_slots(
+      self,
+    );
+  }
+
+  late final _spine_path_attachment_get_timeline_slotsPtr =
+      _lookup<ffi.NativeFunction<spine_array_int Function(spine_path_attachment)>>(
+          'spine_path_attachment_get_timeline_slots');
+  late final _spine_path_attachment_get_timeline_slots =
+      _spine_path_attachment_get_timeline_slotsPtr.asFunction<spine_array_int Function(spine_path_attachment)>();
+
+  void spine_path_attachment_set_timeline_slots(
+    spine_path_attachment self,
+    spine_array_int timelineSlots,
+  ) {
+    return _spine_path_attachment_set_timeline_slots(
+      self,
+      timelineSlots,
+    );
+  }
+
+  late final _spine_path_attachment_set_timeline_slotsPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_path_attachment, spine_array_int)>>(
+          'spine_path_attachment_set_timeline_slots');
+  late final _spine_path_attachment_set_timeline_slots =
+      _spine_path_attachment_set_timeline_slotsPtr.asFunction<void Function(spine_path_attachment, spine_array_int)>();
+
+  bool spine_path_attachment_is_timeline_active(
+    spine_path_attachment self,
+    spine_array_slot slots,
+    int slotIndex,
+    bool appliedPose,
+  ) {
+    return _spine_path_attachment_is_timeline_active(
+      self,
+      slots,
+      slotIndex,
+      appliedPose,
+    );
+  }
+
+  late final _spine_path_attachment_is_timeline_activePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_path_attachment, spine_array_slot, ffi.Int, ffi.Bool)>>(
+          'spine_path_attachment_is_timeline_active');
+  late final _spine_path_attachment_is_timeline_active = _spine_path_attachment_is_timeline_activePtr
+      .asFunction<bool Function(spine_path_attachment, spine_array_slot, int, bool)>();
 
   int spine_path_attachment_get_ref_count(
     spine_path_attachment self,
@@ -35532,6 +35851,56 @@ class SpineDartBindings {
   late final _spine_point_attachment_set_timeline_attachment = _spine_point_attachment_set_timeline_attachmentPtr
       .asFunction<void Function(spine_point_attachment, spine_attachment)>();
 
+  spine_array_int spine_point_attachment_get_timeline_slots(
+    spine_point_attachment self,
+  ) {
+    return _spine_point_attachment_get_timeline_slots(
+      self,
+    );
+  }
+
+  late final _spine_point_attachment_get_timeline_slotsPtr =
+      _lookup<ffi.NativeFunction<spine_array_int Function(spine_point_attachment)>>(
+          'spine_point_attachment_get_timeline_slots');
+  late final _spine_point_attachment_get_timeline_slots =
+      _spine_point_attachment_get_timeline_slotsPtr.asFunction<spine_array_int Function(spine_point_attachment)>();
+
+  void spine_point_attachment_set_timeline_slots(
+    spine_point_attachment self,
+    spine_array_int timelineSlots,
+  ) {
+    return _spine_point_attachment_set_timeline_slots(
+      self,
+      timelineSlots,
+    );
+  }
+
+  late final _spine_point_attachment_set_timeline_slotsPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_point_attachment, spine_array_int)>>(
+          'spine_point_attachment_set_timeline_slots');
+  late final _spine_point_attachment_set_timeline_slots = _spine_point_attachment_set_timeline_slotsPtr
+      .asFunction<void Function(spine_point_attachment, spine_array_int)>();
+
+  bool spine_point_attachment_is_timeline_active(
+    spine_point_attachment self,
+    spine_array_slot slots,
+    int slotIndex,
+    bool appliedPose,
+  ) {
+    return _spine_point_attachment_is_timeline_active(
+      self,
+      slots,
+      slotIndex,
+      appliedPose,
+    );
+  }
+
+  late final _spine_point_attachment_is_timeline_activePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_point_attachment, spine_array_slot, ffi.Int, ffi.Bool)>>(
+          'spine_point_attachment_is_timeline_active');
+  late final _spine_point_attachment_is_timeline_active = _spine_point_attachment_is_timeline_activePtr
+      .asFunction<bool Function(spine_point_attachment, spine_array_slot, int, bool)>();
+
   int spine_point_attachment_get_ref_count(
     spine_point_attachment self,
   ) {
@@ -36305,6 +36674,56 @@ class SpineDartBindings {
           'spine_region_attachment_set_timeline_attachment');
   late final _spine_region_attachment_set_timeline_attachment = _spine_region_attachment_set_timeline_attachmentPtr
       .asFunction<void Function(spine_region_attachment, spine_attachment)>();
+
+  spine_array_int spine_region_attachment_get_timeline_slots(
+    spine_region_attachment self,
+  ) {
+    return _spine_region_attachment_get_timeline_slots(
+      self,
+    );
+  }
+
+  late final _spine_region_attachment_get_timeline_slotsPtr =
+      _lookup<ffi.NativeFunction<spine_array_int Function(spine_region_attachment)>>(
+          'spine_region_attachment_get_timeline_slots');
+  late final _spine_region_attachment_get_timeline_slots =
+      _spine_region_attachment_get_timeline_slotsPtr.asFunction<spine_array_int Function(spine_region_attachment)>();
+
+  void spine_region_attachment_set_timeline_slots(
+    spine_region_attachment self,
+    spine_array_int timelineSlots,
+  ) {
+    return _spine_region_attachment_set_timeline_slots(
+      self,
+      timelineSlots,
+    );
+  }
+
+  late final _spine_region_attachment_set_timeline_slotsPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_region_attachment, spine_array_int)>>(
+          'spine_region_attachment_set_timeline_slots');
+  late final _spine_region_attachment_set_timeline_slots = _spine_region_attachment_set_timeline_slotsPtr
+      .asFunction<void Function(spine_region_attachment, spine_array_int)>();
+
+  bool spine_region_attachment_is_timeline_active(
+    spine_region_attachment self,
+    spine_array_slot slots,
+    int slotIndex,
+    bool appliedPose,
+  ) {
+    return _spine_region_attachment_is_timeline_active(
+      self,
+      slots,
+      slotIndex,
+      appliedPose,
+    );
+  }
+
+  late final _spine_region_attachment_is_timeline_activePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_region_attachment, spine_array_slot, ffi.Int, ffi.Bool)>>(
+          'spine_region_attachment_is_timeline_active');
+  late final _spine_region_attachment_is_timeline_active = _spine_region_attachment_is_timeline_activePtr
+      .asFunction<bool Function(spine_region_attachment, spine_array_slot, int, bool)>();
 
   int spine_region_attachment_get_ref_count(
     spine_region_attachment self,
@@ -41732,7 +42151,8 @@ class SpineDartBindings {
   late final _spine_skeleton_find_bone =
       _spine_skeleton_find_bonePtr.asFunction<spine_bone Function(spine_skeleton, ffi.Pointer<ffi.Char>)>();
 
-  /// The skeleton's slots. To add a slot, also add it to DrawOrder::getPose().
+  /// The skeleton's slots in setup pose order. To change the order use
+  /// DrawOrder::getPose(). For rendering use DrawOrder::getAppliedPose().
   spine_array_slot spine_skeleton_get_slots(
     spine_skeleton self,
   ) {
@@ -47412,9 +47832,13 @@ class SpineDartBindings {
   late final _spine_track_entry_set_delay =
       _spine_track_entry_set_delayPtr.asFunction<void Function(spine_track_entry, double)>();
 
-  /// Current time in seconds this track entry has been the current track entry.
-  /// The track time determines getAnimationTime(). The track time can be set to
-  /// start the animation at a time other than 0, without affecting looping.
+  /// The time in seconds this track entry has been the current track entry,
+  /// starting at 0 and increasing forever. Compare to getAnimationTime(), which is
+  /// always between animationStart and animationEnd.
+  ///
+  /// The track time can be set to start the animation at a time other than 0,
+  /// without affecting looping. When doing so, animationLast can be set to the
+  /// same value to avoid firing events from the start of the animation.
   double spine_track_entry_get_track_time(
     spine_track_entry self,
   ) {
@@ -47480,12 +47904,11 @@ class SpineDartBindings {
   late final _spine_track_entry_set_track_end =
       _spine_track_entry_set_track_endPtr.asFunction<void Function(spine_track_entry, double)>();
 
-  /// Seconds when this animation starts, both initially and after looping.
-  /// Defaults to 0.
+  /// The time in seconds for the first frame of this animation, both initially and
+  /// after looping. Defaults to 0.
   ///
-  /// When changing the animation start time, it often makes sense to set
-  /// TrackEntry.AnimationLast to the same value to prevent timeline keys before
-  /// the start time from triggering.
+  /// When setting the animation start time, animationLast can be set to the same
+  /// value to avoid firing events from the start of the animation.
   double spine_track_entry_get_animation_start(
     spine_track_entry self,
   ) {
@@ -47515,9 +47938,9 @@ class SpineDartBindings {
   late final _spine_track_entry_set_animation_start =
       _spine_track_entry_set_animation_startPtr.asFunction<void Function(spine_track_entry, double)>();
 
-  /// Seconds for the last frame of this animation. Non-looping animations won't
-  /// play past this time. Looping animations will loop back to
-  /// TrackEntry.AnimationStart at this time. Defaults to the animation duration.
+  /// The time in seconds for the last frame of this animation. Past this time,
+  /// non-looping animations hold the pose at this time while looping animations
+  /// will loop back to animationStart. Defaults to the animation duration.
   double spine_track_entry_get_animation_end(
     spine_track_entry self,
   ) {
@@ -47581,12 +48004,9 @@ class SpineDartBindings {
   late final _spine_track_entry_set_animation_last =
       _spine_track_entry_set_animation_lastPtr.asFunction<void Function(spine_track_entry, double)>();
 
-  /// Uses the track time to compute animationTime. When trackTime is 0,
-  /// animationTime is equal to animationStart.
-  ///
-  /// animationTime is between animationStart and animationEnd, except if this
-  /// track entry is non-looping and animationEnd is >= the animation duration,
-  /// then animationTime continues to increase past animationEnd.
+  /// Uses the track time to compute animationTime, which is always between
+  /// animationStart and animationEnd. When trackTime is 0, animationTime is equal
+  /// to animationStart.
   double spine_track_entry_get_animation_time(
     spine_track_entry self,
   ) {
@@ -51343,6 +51763,56 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<spine_attachment Function(spine_vertex_attachment)>>('spine_vertex_attachment_copy');
   late final _spine_vertex_attachment_copy =
       _spine_vertex_attachment_copyPtr.asFunction<spine_attachment Function(spine_vertex_attachment)>();
+
+  spine_array_int spine_vertex_attachment_get_timeline_slots(
+    spine_vertex_attachment self,
+  ) {
+    return _spine_vertex_attachment_get_timeline_slots(
+      self,
+    );
+  }
+
+  late final _spine_vertex_attachment_get_timeline_slotsPtr =
+      _lookup<ffi.NativeFunction<spine_array_int Function(spine_vertex_attachment)>>(
+          'spine_vertex_attachment_get_timeline_slots');
+  late final _spine_vertex_attachment_get_timeline_slots =
+      _spine_vertex_attachment_get_timeline_slotsPtr.asFunction<spine_array_int Function(spine_vertex_attachment)>();
+
+  void spine_vertex_attachment_set_timeline_slots(
+    spine_vertex_attachment self,
+    spine_array_int timelineSlots,
+  ) {
+    return _spine_vertex_attachment_set_timeline_slots(
+      self,
+      timelineSlots,
+    );
+  }
+
+  late final _spine_vertex_attachment_set_timeline_slotsPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_vertex_attachment, spine_array_int)>>(
+          'spine_vertex_attachment_set_timeline_slots');
+  late final _spine_vertex_attachment_set_timeline_slots = _spine_vertex_attachment_set_timeline_slotsPtr
+      .asFunction<void Function(spine_vertex_attachment, spine_array_int)>();
+
+  bool spine_vertex_attachment_is_timeline_active(
+    spine_vertex_attachment self,
+    spine_array_slot slots,
+    int slotIndex,
+    bool appliedPose,
+  ) {
+    return _spine_vertex_attachment_is_timeline_active(
+      self,
+      slots,
+      slotIndex,
+      appliedPose,
+    );
+  }
+
+  late final _spine_vertex_attachment_is_timeline_activePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_vertex_attachment, spine_array_slot, ffi.Int, ffi.Bool)>>(
+          'spine_vertex_attachment_is_timeline_active');
+  late final _spine_vertex_attachment_is_timeline_active = _spine_vertex_attachment_is_timeline_activePtr
+      .asFunction<bool Function(spine_vertex_attachment, spine_array_slot, int, bool)>();
 
   int spine_vertex_attachment_get_ref_count(
     spine_vertex_attachment self,

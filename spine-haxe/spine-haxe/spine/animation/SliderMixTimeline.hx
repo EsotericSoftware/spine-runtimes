@@ -35,6 +35,7 @@ import haxe.macro.Type.VarAccess;
 class SliderMixTimeline extends ConstraintTimeline1 {
 	public function new(frameCount:Int, bezierCount:Int, constraintIndex:Int) {
 		super(frameCount, bezierCount, constraintIndex, Property.sliderMix);
+		this.additive = true;
 	}
 
 	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,

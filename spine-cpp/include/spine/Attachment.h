@@ -30,11 +30,14 @@
 #ifndef Spine_Attachment_h
 #define Spine_Attachment_h
 
+#include <spine/Array.h>
 #include <spine/RTTI.h>
 #include <spine/SpineObject.h>
 #include <spine/SpineString.h>
 
 namespace spine {
+	class Slot;
+
 	/// The base class for all attachments. Multiple Skeleton instances, slots, or skins can use the same attachments.
 	class SP_API Attachment : public SpineObject {
 		RTTI_DECL_NOPARENT
@@ -52,6 +55,12 @@ namespace spine {
 
 		void setTimelineAttachment(Attachment *attachment);
 
+		Array<int> &getTimelineSlots();
+
+		void setTimelineSlots(Array<int> &timelineSlots);
+
+		bool isTimelineActive(Array<Slot *> &slots, int slotIndex, bool appliedPose);
+
 		int getRefCount();
 
 		void reference();
@@ -61,6 +70,7 @@ namespace spine {
 	private:
 		const String _name;
 		Attachment *_timelineAttachment;
+		Array<int> _timelineSlots;
 		int _refCount;
 	};
 }

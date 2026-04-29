@@ -42,6 +42,7 @@ class EventTimeline extends Timeline {
 		super(frameCount, Property.event);
 		events = new Array<Event>();
 		events.resize(frameCount);
+		this.instant = true;
 	}
 
 	public override function getFrameCount():Int {

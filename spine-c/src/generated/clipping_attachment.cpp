@@ -26,6 +26,26 @@ void spine_clipping_attachment_set_end_slot(spine_clipping_attachment self, /*@n
 	_self->setEndSlot((SlotData *) inValue);
 }
 
+bool spine_clipping_attachment_get_convex(spine_clipping_attachment self) {
+	ClippingAttachment *_self = (ClippingAttachment *) self;
+	return _self->getConvex();
+}
+
+void spine_clipping_attachment_set_convex(spine_clipping_attachment self, bool convex) {
+	ClippingAttachment *_self = (ClippingAttachment *) self;
+	_self->setConvex(convex);
+}
+
+bool spine_clipping_attachment_get_inverse(spine_clipping_attachment self) {
+	ClippingAttachment *_self = (ClippingAttachment *) self;
+	return _self->getInverse();
+}
+
+void spine_clipping_attachment_set_inverse(spine_clipping_attachment self, bool inverse) {
+	ClippingAttachment *_self = (ClippingAttachment *) self;
+	_self->setInverse(inverse);
+}
+
 spine_color spine_clipping_attachment_get_color(spine_clipping_attachment self) {
 	ClippingAttachment *_self = (ClippingAttachment *) self;
 	return (spine_color) &_self->getColor();
@@ -101,6 +121,21 @@ void spine_clipping_attachment_copy_to(spine_clipping_attachment self, spine_ver
 const char *spine_clipping_attachment_get_name(spine_clipping_attachment self) {
 	ClippingAttachment *_self = (ClippingAttachment *) self;
 	return _self->getName().buffer();
+}
+
+spine_array_int spine_clipping_attachment_get_timeline_slots(spine_clipping_attachment self) {
+	ClippingAttachment *_self = (ClippingAttachment *) self;
+	return (spine_array_int) &_self->getTimelineSlots();
+}
+
+void spine_clipping_attachment_set_timeline_slots(spine_clipping_attachment self, spine_array_int timelineSlots) {
+	ClippingAttachment *_self = (ClippingAttachment *) self;
+	_self->setTimelineSlots(*((Array<int> *) timelineSlots));
+}
+
+bool spine_clipping_attachment_is_timeline_active(spine_clipping_attachment self, spine_array_slot slots, int slotIndex, bool appliedPose) {
+	ClippingAttachment *_self = (ClippingAttachment *) self;
+	return _self->isTimelineActive(*((Array<Slot *> *) slots), slotIndex, appliedPose);
 }
 
 int spine_clipping_attachment_get_ref_count(spine_clipping_attachment self) {

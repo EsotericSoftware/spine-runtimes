@@ -298,7 +298,7 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 				animation_state->setTimeScale(1);
 				return;
 			}
-			auto current_entry = animation_state->getCurrent(track_index);
+			auto current_entry = animation_state->getTrack(track_index);
 			bool should_set_mix = mix_duration >= 0;
 			String other_name;
 #if (VERSION_MAJOR >= 4 && VERSION_MINOR >= 5)
@@ -437,7 +437,7 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 #endif
 	} else {
 		if (animation_player->is_playing()) {
-			auto current_entry = animation_state->getCurrent(track_index);
+			auto current_entry = animation_state->getTrack(track_index);
 			bool should_set_mix = mix_duration >= 0;
 			String other_name;
 #if (VERSION_MAJOR >= 4 && VERSION_MINOR >= 5)

@@ -32,11 +32,15 @@ package com.esotericsoftware.spine.attachments;
 import com.badlogic.gdx.utils.Null;
 
 import com.esotericsoftware.spine.Skeleton;
+import com.esotericsoftware.spine.Slot;
 
 /** The base class for all attachments. Multiple {@link Skeleton} instances, slots, or skins can use the same attachments. */
 abstract public class Attachment {
+	static private final int[] empty = new int[0];
+
 	final String name;
 	@Null Attachment timelineAttachment;
+	int[] timelineSlots = empty;
 
 	public Attachment (String name) {
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
@@ -48,6 +52,7 @@ abstract public class Attachment {
 	protected Attachment (Attachment other) {
 		name = other.name;
 		timelineAttachment = other.timelineAttachment;
+		timelineSlots = other.timelineSlots;
 	}
 
 	/** Timelines for the timeline attachment are also applied to this attachment.
@@ -59,6 +64,34 @@ abstract public class Attachment {
 	/** @param timelineAttachment May be null if no attachment-specific timelines should be applied. */
 	public void setTimelineAttachment (@Null Attachment timelineAttachment) {
 		this.timelineAttachment = timelineAttachment;
+	}
+
+	/** Slots that can have attachments whose {@link #timelineAttachment} is this attachment. */
+	public int[] getTimelineSlots () {
+		return timelineSlots;
+	}
+
+	public void setTimelineSlots (int[] timelineSlots) {
+		this.timelineSlots = timelineSlots;
+	}
+
+	/** Returns true if the {@code slotIndex} or any {@link #timelineSlots} have an attachment whose {@link #timelineAttachment} is
+	 * this attachment.
+	 * @param slots The {@link Skeleton#getSlots()}.
+	 * @param slotIndex The timeline's primary slot index. */
+	public boolean isTimelineActive (Slot[] slots, int slotIndex, boolean appliedPose) {
+		Slot slot = slots[slotIndex];
+		if (slot.getBone().isActive()) {
+			Attachment other = (appliedPose ? slot.getAppliedPose() : slot.getPose()).getAttachment();
+			if (other != null && other.timelineAttachment == this) return true;
+		}
+		for (int i = 0, n = timelineSlots.length; i < n; i++) {
+			slot = slots[timelineSlots[i]];
+			if (!slot.getBone().isActive()) continue;
+			Attachment other = (appliedPose ? slot.getAppliedPose() : slot.getPose()).getAttachment();
+			if (other != null && other.timelineAttachment == this) return true;
+		}
+		return false;
 	}
 
 	/** The attachment's name. */

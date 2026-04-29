@@ -45,9 +45,7 @@ public class TransformConstraint: TransformConstraintBase {
     }
 
     public convenience init(_ data: TransformConstraintData, _ skeleton: Skeleton) {
-        let ptr = spine_transform_constraint_create(
-            data._ptr.assumingMemoryBound(to: spine_transform_constraint_data_wrapper.self),
-            skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
+        let ptr = spine_transform_constraint_create(data._ptr.assumingMemoryBound(to: spine_transform_constraint_data_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
         self.init(fromPointer: ptr!)
     }
 
@@ -61,17 +59,15 @@ public class TransformConstraint: TransformConstraintBase {
     public var source: Bone {
         get {
             let result = spine_transform_constraint_get_source(_ptr.assumingMemoryBound(to: spine_transform_constraint_wrapper.self))
-            return Bone(fromPointer: result!)
+        return Bone(fromPointer: result!)
         }
         set {
-            spine_transform_constraint_set_source(
-                _ptr.assumingMemoryBound(to: spine_transform_constraint_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_bone_wrapper.self))
+            spine_transform_constraint_set_source(_ptr.assumingMemoryBound(to: spine_transform_constraint_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_bone_wrapper.self))
         }
     }
 
     public func copyAttachment(_ skeleton: Skeleton) -> TransformConstraint {
-        let result = spine_transform_constraint_copy(
-            _ptr.assumingMemoryBound(to: spine_transform_constraint_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
+        let result = spine_transform_constraint_copy(_ptr.assumingMemoryBound(to: spine_transform_constraint_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
         return TransformConstraint(fromPointer: result!)
     }
 

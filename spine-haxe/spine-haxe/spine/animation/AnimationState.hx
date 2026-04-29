@@ -30,6 +30,7 @@
 package spine.animation;
 
 import haxe.ds.StringMap;
+import spine.animation.EventTimeline;
 import spine.animation.Listeners.EventListeners;
 import spine.Event;
 import spine.Pool;
@@ -115,11 +116,11 @@ class AnimationState {
 				var nextTime:Float = current.trackLast - next.delay;
 				if (nextTime >= 0) {
 					next.delay = 0;
-					next.trackTime = current.timeScale == 0 ? 0 : (nextTime / current.timeScale + delta) * next.timeScale;
+					next.trackTime += current.timeScale == 0 ? 0 : (nextTime / current.timeScale + delta) * next.timeScale;
 					current.trackTime += currentDelta;
-					setCurrent(i, next, true);
+					setTrack(i, next, true);
 					while (next.mixingFrom != null) {
-						next.mixTime += currentDelta;
+						next.mixTime += delta;
 						next = next.mixingFrom;
 					}
 					continue;
@@ -253,6 +254,8 @@ class AnimationState {
 					}
 				}
 			}
+			if (current.reverse)
+				eventsReverse(current, animationLast, animationTime);
 			queueEvents(current, animationTime);
 			events.resize(0);
 			current.nextAnimationLast = animationTime;
@@ -334,6 +337,8 @@ class AnimationState {
 			}
 		}
 
+		if (from.reverse && mix < from.eventThreshold)
+			eventsReverse(from, animationLast, animationTime);
 		if (to.mixDuration > 0)
 			queueEvents(from, animationTime);
 		events.resize(0);
@@ -436,7 +441,10 @@ class AnimationState {
 		var animationStart:Float = entry.animationStart,
 			animationEnd:Float = entry.animationEnd;
 		var duration:Float = animationEnd - animationStart;
-		var trackLastWrapped:Float = entry.trackLast % duration;
+		var reverse:Bool = entry.reverse;
+		var split:Float = entry.trackLast % duration;
+		if (reverse)
+			split = duration - split;
 
 		// Queue events before complete.
 		var event:Event;
@@ -446,11 +454,10 @@ class AnimationState {
 			event = events[i++];
 			if (event == null)
 				continue;
-			if (event.time < trackLastWrapped)
+			if ((event.time < split) != reverse)
 				break;
-			if (event.time > animationEnd)
-				continue; // Discard events outside animation start/end.
-			queue.event(entry, event);
+			if (event.time >= animationStart && event.time <= animationEnd)
+				queue.event(entry, event);
 		}
 
 		// Queue complete if completed a loop iteration or the animation.
@@ -472,9 +479,51 @@ class AnimationState {
 			event = events[i++];
 			if (event == null)
 				continue;
-			if (event.time < animationStart)
-				continue; // Discard events outside animation start/end.
-			queue.event(entry, event);
+			if (event.time >= animationStart && event.time <= animationEnd)
+				queue.event(entry, event);
+		}
+	}
+
+	private function eventsReverse(entry:TrackEntry, animationLast:Float, animationTime:Float):Void {
+		var duration:Float = entry.animation.duration,
+			from:Float = duration - animationLast,
+			to:Float = duration - animationTime;
+		var timelines:Array<Timeline> = entry.animation.timelines;
+		for (i in 0...entry.animation.timelines.length) {
+			var timeline:Timeline = timelines[i];
+			if (!Std.isOfType(timeline, EventTimeline))
+				continue;
+			var eventTimeline:EventTimeline = cast(timeline, EventTimeline);
+			var timelineEvents:Array<Event> = eventTimeline.events;
+			var frames = eventTimeline.frames;
+			var frameCount:Int = frames.length;
+			if (from >= to) { // from -> to
+				for (ii in 0...frameCount) {
+					if (frames[ii] < to)
+						continue;
+					if (frames[ii] >= from)
+						break;
+					events.push(timelineEvents[ii]);
+				}
+			} else {
+				var ii:Int = 0;
+				while (ii < frameCount) { // from -> 0
+					if (frames[ii] >= from)
+						break;
+					events.push(timelineEvents[ii]);
+					ii++;
+				}
+				ii = 0; // end -> to
+				while (ii < frameCount) {
+					if (frames[ii] >= to)
+						break;
+					ii++;
+				}
+				while (ii < frameCount) {
+					events.push(timelineEvents[ii]);
+					ii++;
+				}
+			}
 		}
 	}
 
@@ -527,9 +576,10 @@ class AnimationState {
 		queue.drain();
 	}
 
-	private function setCurrent(index:Int, current:TrackEntry, interrupt:Bool):Void {
+	private function setTrack(index:Int, current:TrackEntry, interrupt:Bool):Void {
 		var from:TrackEntry = expandToIndex(index);
 		tracks[index] = current;
+		current.previous = null;
 
 		if (from != null) {
 			if (interrupt)
@@ -583,7 +633,7 @@ class AnimationState {
 			}
 		}
 		var entry:TrackEntry = trackEntry(trackIndex, animation, loop, current);
-		setCurrent(trackIndex, entry, interrupt);
+		setTrack(trackIndex, entry, interrupt);
 		queue.drain();
 		return entry;
 	}
@@ -623,7 +673,7 @@ class AnimationState {
 		var entry:TrackEntry = trackEntry(trackIndex, animation, loop, last);
 
 		if (last == null) {
-			setCurrent(trackIndex, entry, true);
+			setTrack(trackIndex, entry, true);
 			queue.drain();
 			if (delay < 0)
 				delay = 0;
@@ -836,10 +886,18 @@ class AnimationState {
 	/**
 	 * Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing.
 	 */
-	public function getCurrent(trackIndex:Int):TrackEntry {
+	public function getTrack(trackIndex:Int):TrackEntry {
+		if (trackIndex < 0)
+			throw new SpineException("trackIndex must be >= 0.");
 		if (trackIndex >= tracks.length)
 			return null;
 		return tracks[trackIndex];
+	}
+
+	/** Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing. */
+	@:deprecated("Use getTrack()")
+	public function getCurrent(trackIndex:Int):TrackEntry {
+		return getTrack(trackIndex);
 	}
 
 	public var fHasEndListener(get, never):Bool;

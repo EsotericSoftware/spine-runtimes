@@ -56,7 +56,7 @@ public class TextureRegion: NSObject {
     public var u: Float {
         get {
             let result = spine_texture_region_get_u(_ptr.assumingMemoryBound(to: spine_texture_region_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_texture_region_set_u(_ptr.assumingMemoryBound(to: spine_texture_region_wrapper.self), newValue)
@@ -66,7 +66,7 @@ public class TextureRegion: NSObject {
     public var v: Float {
         get {
             let result = spine_texture_region_get_v(_ptr.assumingMemoryBound(to: spine_texture_region_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_texture_region_set_v(_ptr.assumingMemoryBound(to: spine_texture_region_wrapper.self), newValue)
@@ -76,7 +76,7 @@ public class TextureRegion: NSObject {
     public var u2: Float {
         get {
             let result = spine_texture_region_get_u2(_ptr.assumingMemoryBound(to: spine_texture_region_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_texture_region_set_u2(_ptr.assumingMemoryBound(to: spine_texture_region_wrapper.self), newValue)
@@ -86,7 +86,7 @@ public class TextureRegion: NSObject {
     public var v2: Float {
         get {
             let result = spine_texture_region_get_v2(_ptr.assumingMemoryBound(to: spine_texture_region_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_texture_region_set_v2(_ptr.assumingMemoryBound(to: spine_texture_region_wrapper.self), newValue)
@@ -96,7 +96,7 @@ public class TextureRegion: NSObject {
     public var regionWidth: Int32 {
         get {
             let result = spine_texture_region_get_region_width(_ptr.assumingMemoryBound(to: spine_texture_region_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_texture_region_set_region_width(_ptr.assumingMemoryBound(to: spine_texture_region_wrapper.self), newValue)
@@ -106,7 +106,7 @@ public class TextureRegion: NSObject {
     public var regionHeight: Int32 {
         get {
             let result = spine_texture_region_get_region_height(_ptr.assumingMemoryBound(to: spine_texture_region_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_texture_region_set_region_height(_ptr.assumingMemoryBound(to: spine_texture_region_wrapper.self), newValue)

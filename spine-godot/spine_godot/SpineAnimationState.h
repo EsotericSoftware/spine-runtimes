@@ -74,7 +74,7 @@ public:
 
 	void set_empty_animations(float mix_duration);
 
-	Ref<SpineTrackEntry> get_current(int track_index);
+	Ref<SpineTrackEntry> get_track(int track_index);
 
 	float get_time_scale();
 

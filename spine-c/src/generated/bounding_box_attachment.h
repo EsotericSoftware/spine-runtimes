@@ -60,6 +60,10 @@ SPINE_C_API /*@null*/ spine_attachment spine_bounding_box_attachment_get_timelin
 SPINE_C_API void spine_bounding_box_attachment_set_timeline_attachment(spine_bounding_box_attachment self, /*@null*/ spine_attachment attachment);
 SPINE_C_API void spine_bounding_box_attachment_copy_to(spine_bounding_box_attachment self, spine_vertex_attachment other);
 SPINE_C_API const char *spine_bounding_box_attachment_get_name(spine_bounding_box_attachment self);
+SPINE_C_API spine_array_int spine_bounding_box_attachment_get_timeline_slots(spine_bounding_box_attachment self);
+SPINE_C_API void spine_bounding_box_attachment_set_timeline_slots(spine_bounding_box_attachment self, spine_array_int timelineSlots);
+SPINE_C_API bool spine_bounding_box_attachment_is_timeline_active(spine_bounding_box_attachment self, spine_array_slot slots, int slotIndex,
+																  bool appliedPose);
 SPINE_C_API int spine_bounding_box_attachment_get_ref_count(spine_bounding_box_attachment self);
 SPINE_C_API void spine_bounding_box_attachment_reference(spine_bounding_box_attachment self);
 SPINE_C_API void spine_bounding_box_attachment_dereference(spine_bounding_box_attachment self);

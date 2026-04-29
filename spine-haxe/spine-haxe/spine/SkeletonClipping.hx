@@ -537,7 +537,7 @@ class SkeletonClipping {
 				ey:Float = edgeY - polygon[i + 3];
 			var outputStart:Int = output.length;
 			var fragmentStart:Int = inverseVertices.length;
-			inverseVertices.push(0); // placeholder for fragment size
+			inverseVertices.push(0);
 
 			var ii:Int = 0;
 			var nn:Int = input.length - 2;

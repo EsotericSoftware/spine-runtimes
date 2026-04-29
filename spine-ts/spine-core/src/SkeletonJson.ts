@@ -30,13 +30,12 @@
 import { AlphaTimeline, Animation, AttachmentTimeline, type BoneTimeline2, type CurveTimeline, type CurveTimeline1, DeformTimeline, DrawOrderFolderTimeline, DrawOrderTimeline, EventTimeline, IkConstraintTimeline, InheritTimeline, PathConstraintMixTimeline, PathConstraintPositionTimeline, PathConstraintSpacingTimeline, PhysicsConstraintDampingTimeline, PhysicsConstraintGravityTimeline, PhysicsConstraintInertiaTimeline, PhysicsConstraintMassTimeline, PhysicsConstraintMixTimeline, PhysicsConstraintResetTimeline, PhysicsConstraintStrengthTimeline, PhysicsConstraintWindTimeline, RGB2Timeline, RGBA2Timeline, RGBATimeline, RGBTimeline, RotateTimeline, ScaleTimeline, ScaleXTimeline, ScaleYTimeline, SequenceTimeline, ShearTimeline, ShearXTimeline, ShearYTimeline, SliderMixTimeline, SliderTimeline, type Timeline, TransformConstraintTimeline, TranslateTimeline, TranslateXTimeline, TranslateYTimeline } from "./Animation.js";
 import type { Attachment, VertexAttachment } from "./attachments/Attachment.js";
 import type { AttachmentLoader } from "./attachments/AttachmentLoader.js";
-import type { HasSequence } from "./attachments/HasSequence.js";
 import type { MeshAttachment } from "./attachments/MeshAttachment.js";
 import { Sequence, SequenceMode } from "./attachments/Sequence.js";
 import { BoneData, Inherit } from "./BoneData.js";
 import { Event } from "./Event.js";
 import { EventData } from "./EventData.js";
-import { IkConstraintData } from "./IkConstraintData.js";
+import { IkConstraintData, ScaleY } from "./IkConstraintData.js";
 import { PathConstraintData, PositionMode, RotateMode, SpacingMode } from "./PathConstraintData.js";
 import { PhysicsConstraintData } from "./PhysicsConstraintData.js";
 import { SkeletonData } from "./SkeletonData.js";
@@ -109,6 +108,9 @@ export class SkeletonJson {
 
 				const color = getValue(boneMap, "color", null);
 				if (color) data.color.setFromString(color);
+				data.icon = getValue(boneMap, "icon", undefined);
+				data.iconSize = getValue(boneMap, "iconSize", 1);
+				data.iconRotation = getValue(boneMap, "iconRotation", 0);
 
 				skeletonData.bones.push(data);
 			}
@@ -158,7 +160,9 @@ export class SkeletonJson {
 						if (!target) throw new Error(`Couldn't find target bone ${targetName} for IK constraint ${name}.`);
 						data.target = target;
 
-						data.uniform = getValue(constraintMap, "uniform", false);
+						const scaleY = getValue(constraintMap, "scaleY", null);
+						if (scaleY != null) data.scaleY = Utils.enumValue(ScaleY, scaleY);
+
 						const setup = data.setupPose;
 						setup.mix = getValue(constraintMap, "mix", 1);
 						setup.softness = getValue(constraintMap, "softness", 0) * scale;
@@ -436,11 +440,21 @@ export class SkeletonJson {
 			const linkedMesh = this.linkedMeshes[i];
 			const skin = !linkedMesh.skin ? skeletonData.defaultSkin : skeletonData.findSkin(linkedMesh.skin);
 			if (!skin) throw new Error(`Skin not found: ${linkedMesh.skin}`);
-			const parent = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
-			if (!parent) throw new Error(`Parent mesh not found: ${linkedMesh.parent}`);
-			linkedMesh.mesh.timelineAttachment = linkedMesh.inheritTimeline ? <VertexAttachment>parent : <VertexAttachment>linkedMesh.mesh;
-			linkedMesh.mesh.setParentMesh(<MeshAttachment>parent);
+			const source = skin.getAttachment(linkedMesh.sourceIndex, linkedMesh.source);
+			if (!source) throw new Error(`Source mesh not found: ${linkedMesh.source}`);
+			linkedMesh.mesh.timelineAttachment = linkedMesh.inheritTimelines ? source : linkedMesh.mesh;
+			linkedMesh.mesh.setSourceMesh(source as MeshAttachment);
 			linkedMesh.mesh.updateSequence();
+			// biome-ignore lint/suspicious/noConfusingLabels: reference runtime
+			outer:
+			if (linkedMesh.inheritTimelines && linkedMesh.slotIndex !== linkedMesh.sourceIndex) {
+				const slots = source.timelineSlots;
+				for (const existing of slots)
+					if (existing === linkedMesh.slotIndex) break outer;
+				const newSlots = [...slots];
+				newSlots[slots.length] = linkedMesh.slotIndex;
+				source.timelineSlots = newSlots;
+			}
 		}
 		this.linkedMeshes.length = 0;
 
@@ -558,9 +572,17 @@ export class SkeletonJson {
 				mesh.width = getValue(map, "width", 0) * scale;
 				mesh.height = getValue(map, "height", 0) * scale;
 
-				const parent: string = getValue(map, "parent", null);
-				if (parent) {
-					this.linkedMeshes.push(new LinkedMesh(mesh, <string>getValue(map, "skin", null), slotIndex, parent, getValue(map, "timelines", true)));
+				const source: string = getValue(map, "source", null);
+				if (source) {
+					let sourceIndex = slotIndex;
+					const slot = getValue(map, "slot", null);
+					if (slot) {
+						const sourceSlot = skeletonData.findSlot(slot);
+						if (!sourceSlot) throw new Error(`Source mesh slot not found: ${slot}`);
+						sourceIndex = sourceSlot.index;
+					}
+					this.linkedMeshes.push(new LinkedMesh(mesh, getValue(map, "skin", null), slotIndex, sourceIndex, source,
+						getValue(map, "timelines", true)));
 					return mesh;
 				}
 
@@ -609,6 +631,9 @@ export class SkeletonJson {
 
 				const end = getValue(map, "end", null);
 				if (end) clip.endSlot = skeletonData.findSlot(end);
+
+				clip.convex = getValue(map, "convex", false);
+				clip.inverse = getValue(map, "inverse", false);
 
 				const vertexCount = map.vertexCount;
 				this.readVertices(map, clip, vertexCount << 1);
@@ -1154,7 +1179,7 @@ export class SkeletonJson {
 								}
 								timelines.push(timeline);
 							} else if (timelineMapName === "sequence") {
-								const timeline = new SequenceTimeline(timelineMap.length, slotIndex, attachment as unknown as HasSequence);
+								const timeline = new SequenceTimeline(timelineMap.length, slotIndex, attachment as Attachment);
 								let lastDelay = 0;
 								for (let frame = 0; frame < timelineMap.length; frame++) {
 									const delay = getValue(keyMap, "delay", lastDelay);
@@ -1206,7 +1231,7 @@ export class SkeletonJson {
 			}
 		}
 
-		// Event timelines.
+		// Event timeline.
 		if (map.events) {
 			const timeline = new EventTimeline(map.events.length);
 			let frame = 0;
@@ -1231,22 +1256,29 @@ export class SkeletonJson {
 		let duration = 0;
 		for (let i = 0, n = timelines.length; i < n; i++)
 			duration = Math.max(duration, timelines[i].getDuration());
-		skeletonData.animations.push(new Animation(name, timelines, duration));
+
+		const animation = new Animation(name, timelines, duration);
+		const color = getValue(map, "color", null);
+		if (color !== null) animation.color.setFromString(color);
+
+		skeletonData.animations.push(animation);
 	}
 }
 
 class LinkedMesh {
-	parent: string; skin: string;
-	slotIndex: number;
+	source: string; skin: string;
+	slotIndex: number; sourceIndex: number;
 	mesh: MeshAttachment;
-	inheritTimeline: boolean;
+	inheritTimelines: boolean;
 
-	constructor (mesh: MeshAttachment, skin: string, slotIndex: number, parent: string, inheritDeform: boolean) {
+	constructor (mesh: MeshAttachment, skin: string, slotIndex: number, sourceIndex: number, source: string,
+		inheritTimelines: boolean) {
 		this.mesh = mesh;
 		this.skin = skin;
 		this.slotIndex = slotIndex;
-		this.parent = parent;
-		this.inheritTimeline = inheritDeform;
+		this.sourceIndex = sourceIndex;
+		this.source = source;
+		this.inheritTimelines = inheritTimelines;
 	}
 }
 

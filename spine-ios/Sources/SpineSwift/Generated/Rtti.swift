@@ -49,14 +49,12 @@ public class Rtti: NSObject {
     }
 
     public func isExactly(_ rtti: Rtti) -> Bool {
-        let result = spine_rtti_is_exactly(
-            _ptr.assumingMemoryBound(to: spine_rtti_wrapper.self), rtti._ptr.assumingMemoryBound(to: spine_rtti_wrapper.self))
+        let result = spine_rtti_is_exactly(_ptr.assumingMemoryBound(to: spine_rtti_wrapper.self), rtti._ptr.assumingMemoryBound(to: spine_rtti_wrapper.self))
         return result
     }
 
     public func instanceOf(_ rtti: Rtti) -> Bool {
-        let result = spine_rtti_instance_of(
-            _ptr.assumingMemoryBound(to: spine_rtti_wrapper.self), rtti._ptr.assumingMemoryBound(to: spine_rtti_wrapper.self))
+        let result = spine_rtti_instance_of(_ptr.assumingMemoryBound(to: spine_rtti_wrapper.self), rtti._ptr.assumingMemoryBound(to: spine_rtti_wrapper.self))
         return result
     }
 

@@ -30,6 +30,7 @@
 package spine;
 
 import haxe.DynamicAccess;
+import spine.IkConstraintData.ScaleY;
 import spine.animation.BoneTimeline2;
 import spine.animation.SliderMixTimeline;
 import spine.animation.SliderTimeline;
@@ -144,6 +145,10 @@ class SkeletonJson {
 			var color:String = Reflect.getProperty(boneMap, "color");
 			if (color != null)
 				data.color.setFromString(color);
+			data.icon = Reflect.getProperty(boneMap, "icon");
+			data.iconSize = getFloat(boneMap, "iconSize", 1);
+			data.iconRotation = getFloat(boneMap, "iconRotation");
+			data.visible = Reflect.hasField(boneMap, "visible") ? cast(Reflect.getProperty(boneMap, "visible"), Bool) : true;
 
 			skeletonData.bones.push(data);
 		}
@@ -194,8 +199,9 @@ class SkeletonJson {
 						if (data.target == null)
 							throw new SpineException("Target bone not found: " + Reflect.getProperty(constraintMap, "target"));
 
-						data.uniform = (Reflect.hasField(constraintMap, "uniform")
-							&& cast(Reflect.getProperty(constraintMap, "uniform"), Bool));
+						var scaleY:String = Reflect.getProperty(constraintMap, "scaleY");
+						if (scaleY != null)
+							data.scaleY = ScaleY.fromName(scaleY);
 						var setup = data.setupPose;
 						setup.mix = getFloat(constraintMap, "mix", 1);
 						setup.softness = getFloat(constraintMap, "softness", 0) * scale;
@@ -490,15 +496,30 @@ class SkeletonJson {
 
 		// Linked meshes.
 		for (linkedMesh in linkedMeshes) {
-			var parentSkin:Skin = linkedMesh.skin == null ? skeletonData.defaultSkin : skeletonData.findSkin(linkedMesh.skin);
-			if (parentSkin == null)
+			var sourceSkin:Skin = linkedMesh.skin == null ? skeletonData.defaultSkin : skeletonData.findSkin(linkedMesh.skin);
+			if (sourceSkin == null)
 				throw new SpineException("Skin not found: " + linkedMesh.skin);
-			var parentMesh:Attachment = parentSkin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
-			if (parentMesh == null)
-				throw new SpineException("Parent mesh not found: " + linkedMesh.parent);
-			linkedMesh.mesh.timelineAttachment = linkedMesh.inheritTimeline ? cast(parentMesh, VertexAttachment) : linkedMesh.mesh;
-			linkedMesh.mesh.parentMesh = cast(parentMesh, MeshAttachment);
+			var source:Attachment = sourceSkin.getAttachment(linkedMesh.sourceIndex, linkedMesh.source);
+			if (source == null)
+				throw new SpineException("Source mesh not found: " + linkedMesh.source);
+			linkedMesh.mesh.timelineAttachment = linkedMesh.inheritTimelines ? source : linkedMesh.mesh;
+			linkedMesh.mesh.sourceMesh = cast(source, MeshAttachment);
 			linkedMesh.mesh.updateSequence();
+			if (linkedMesh.inheritTimelines && linkedMesh.slotIndex != linkedMesh.sourceIndex) {
+				var slots = source.timelineSlots;
+				var found = false;
+				for (existing in slots) {
+					if (existing == linkedMesh.slotIndex) {
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					var newSlots = slots.copy();
+					newSlots.push(linkedMesh.slotIndex);
+					source.timelineSlots = newSlots;
+				}
+			}
 		}
 		linkedMeshes.resize(0);
 
@@ -615,9 +636,18 @@ class SkeletonJson {
 				mesh.width = getFloat(map, "width") * scale;
 				mesh.height = getFloat(map, "height") * scale;
 
-				if (Reflect.field(map, "parent") != null) {
+				var source:String = Reflect.field(map, "source");
+				if (source != null) {
 					var inheritTimelines:Bool = Reflect.hasField(map, "timelines") ? cast(Reflect.field(map, "timelines"), Bool) : true;
-					linkedMeshes.push(new LinkedMesh(mesh, Reflect.field(map, "skin"), slotIndex, Reflect.field(map, "parent"), inheritTimelines));
+					var sourceIndex = slotIndex;
+					var slotName:String = Reflect.field(map, "slot");
+					if (slotName != null) {
+						var sourceSlot = skeletonData.findSlot(slotName);
+						if (sourceSlot == null)
+							throw new SpineException("Source mesh slot not found: " + slotName);
+						sourceIndex = sourceSlot.index;
+					}
+					linkedMeshes.push(new LinkedMesh(mesh, Reflect.field(map, "skin"), slotIndex, sourceIndex, source, inheritTimelines));
 					return mesh;
 				}
 
@@ -673,6 +703,8 @@ class SkeletonJson {
 						throw new SpineException("Clipping end slot not found: " + end);
 					clip.endSlot = slot;
 				}
+				clip.convex = getBoolean(map, "convex", false);
+				clip.inverse = getBoolean(map, "inverse", false);
 				readVertices(map, clip, getInt(map, "vertexCount", 0) << 1);
 				color = Reflect.getProperty(map, "color");
 				if (color != null) {
@@ -1336,7 +1368,7 @@ class SkeletonJson {
 
 								timelines.push(deformTimeline);
 							case "sequence":
-								var timeline = new SequenceTimeline(timelineMap.length, slotIndex, cast(attachment, HasSequence));
+								var timeline = new SequenceTimeline(timelineMap.length, slotIndex, attachment);
 								var lastDelay:Float = 0;
 								var frame:Int = 0;
 								while (frame < timelineMap.length) {
@@ -1428,7 +1460,11 @@ class SkeletonJson {
 			duration = Math.max(duration, timelines[i].getDuration());
 		}
 
-		skeletonData.animations.push(new Animation(name, timelines, duration));
+		var animation = new Animation(name, timelines, duration);
+		var color:String = Reflect.getProperty(map, "color");
+		if (color != null)
+			animation.color.setFromString(color);
+		skeletonData.animations.push(animation);
 	}
 
 	static private function readTimeline(timelines:Array<Timeline>, keys:Array<Dynamic>, timeline:CurveTimeline1, defaultValue:Float, scale:Float) {
@@ -1560,17 +1596,19 @@ class SkeletonJson {
 }
 
 class LinkedMesh {
-	public var parent(default, null):String;
+	public var source(default, null):String;
 	public var skin(default, null):String;
 	public var slotIndex(default, null):Int;
+	public var sourceIndex(default, null):Int;
 	public var mesh(default, null):MeshAttachment;
-	public var inheritTimeline(default, null):Bool;
+	public var inheritTimelines(default, null):Bool;
 
-	public function new(mesh:MeshAttachment, skin:String, slotIndex:Int, parent:String, inheritTimeline:Bool) {
+	public function new(mesh:MeshAttachment, skin:String, slotIndex:Int, sourceIndex:Int, source:String, inheritTimelines:Bool) {
 		this.mesh = mesh;
 		this.skin = skin;
 		this.slotIndex = slotIndex;
-		this.parent = parent;
-		this.inheritTimeline = inheritTimeline;
+		this.sourceIndex = sourceIndex;
+		this.source = source;
+		this.inheritTimelines = inheritTimelines;
 	}
 }

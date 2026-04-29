@@ -23,7 +23,7 @@ void ASpineboyCppPawn::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 	USpineSkeletonAnimationComponent *animationComponent = FindComponentByClass<USpineSkeletonAnimationComponent>();
 	spine::AnimationState *state = animationComponent->GetAnimationState();
-	spine::TrackEntry *entry = state->getCurrent(0);
+	spine::TrackEntry *entry = state->getTrack(0);
 	if (entry) {
 		GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Yellow, FString(entry->getAnimation().getName().buffer()));
 	}

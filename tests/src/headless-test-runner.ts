@@ -339,7 +339,7 @@ function executeJava (args: TestArgs): string {
 	try {
 		const output = execSync(`java -cp "${jarFile}" com.esotericsoftware.spine.HeadlessTest ${testArgs.join(' ')}`, {
 			encoding: 'utf8',
-			maxBuffer: 50 * 1024 * 1024 // 50MB buffer for large output
+			maxBuffer: 200 * 1024 * 1024 // 200MB buffer for dense frame output
 		});
 		log_ok();
 		return output;
@@ -397,7 +397,7 @@ function executeCpp (args: TestArgs): string {
 	try {
 		const output = execSync(`${headlessTest} ${testArgs.join(' ')}`, {
 			encoding: 'utf8',
-			maxBuffer: 50 * 1024 * 1024 // 50MB buffer for large output
+			maxBuffer: 200 * 1024 * 1024 // 200MB buffer for dense frame output
 		});
 		log_ok();
 		return output;
@@ -451,7 +451,7 @@ function executeHaxe (args: TestArgs): string {
 	try {
 		const output = execSync(`${headlessTest} ${testArgs.join(' ')}`, {
 			encoding: 'utf8',
-			maxBuffer: 50 * 1024 * 1024 // 50MB buffer for large output
+			maxBuffer: 200 * 1024 * 1024 // 200MB buffer for dense frame output
 		});
 		log_ok();
 		return output;
@@ -462,7 +462,7 @@ function executeHaxe (args: TestArgs): string {
 	}
 }
 
-function parseOutput (output: string): { skeletonData: any, skeletonState: any, animationState?: any, transitionFrames?: any[] } {
+function parseOutput (output: string): { skeletonData: any, skeletonState: any, animationState?: any, animationFrames?: any[], transitionFrames?: any[] } {
 	// Split output by section headers, keeping the headers
 	const headerRegex = /=== ([A-Z 0-9]+?) ===/g;
 	const headers: string[] = [];
@@ -478,7 +478,7 @@ function parseOutput (output: string): { skeletonData: any, skeletonState: any, 
 	}
 
 	try {
-		const result: { skeletonData: any, skeletonState: any, animationState?: any, transitionFrames?: any[] } = {
+		const result: { skeletonData: any, skeletonState: any, animationState?: any, animationFrames?: any[], transitionFrames?: any[] } = {
 			skeletonData: JSON.parse(sections[1].trim()),
 			skeletonState: JSON.parse(sections[2].trim())
 		};
@@ -487,6 +487,16 @@ function parseOutput (output: string): { skeletonData: any, skeletonState: any, 
 		if (sections.length >= 4 && sections[3].trim()) {
 			result.animationState = JSON.parse(sections[3].trim());
 		}
+
+		// Animation frames
+		const animationFrames: any[] = [];
+		for (let i = 0; i < headers.length; i++) {
+			if (headers[i].startsWith('ANIMATION FRAME')) {
+				const sectionContent = sections[i + 1].trim();
+				if (sectionContent) animationFrames.push(JSON.parse(sectionContent));
+			}
+		}
+		if (animationFrames.length > 0) result.animationFrames = animationFrames;
 
 		// Transition frames
 		const transitionFrames: any[] = [];
@@ -593,6 +603,9 @@ function saveJsonFiles (args: TestArgs, parsed: any, javaParsed?: any, fixFloats
 			skeletonState: fixFloatsAndPropertyIds(parsed.skeletonState, javaParsed.skeletonState, '', args.language),
 			animationState: parsed.animationState && javaParsed.animationState ?
 				fixFloatsAndPropertyIds(parsed.animationState, javaParsed.animationState, '', args.language) : parsed.animationState,
+			animationFrames: parsed.animationFrames && javaParsed.animationFrames ?
+				parsed.animationFrames.map((frame: any, i: number) =>
+					fixFloatsAndPropertyIds(frame, javaParsed.animationFrames[i], '', args.language)) : parsed.animationFrames,
 			transitionFrames: parsed.transitionFrames && javaParsed.transitionFrames ?
 				parsed.transitionFrames.map((frame: any, i: number) =>
 					fixFloatsAndPropertyIds(frame, javaParsed.transitionFrames[i], '', args.language)) : parsed.transitionFrames
@@ -607,6 +620,13 @@ function saveJsonFiles (args: TestArgs, parsed: any, javaParsed?: any, fixFloats
 	// Only save animation state if it exists
 	if (outputData.animationState) {
 		writeFileSync(join(outputDir, `animation-state-${args.language}-${format}.json`), JSON.stringify(outputData.animationState, null, 2));
+	}
+
+	// Save animation frames if they exist
+	if (outputData.animationFrames) {
+		for (let i = 0; i < outputData.animationFrames.length; i++) {
+			writeFileSync(join(outputDir, `animation-frame-${i}-${args.language}-${format}.json`), JSON.stringify(outputData.animationFrames[i], null, 2));
+		}
 	}
 
 	// Save transition frames if they exist
@@ -679,6 +699,20 @@ function verifyOutputsMatch (targetLanguage: string): void {
 		[`skeleton-data-java-skel.json`, `skeleton-data-${targetLanguage}-skel.json`],
 		[`skeleton-state-java-skel.json`, `skeleton-state-${targetLanguage}-skel.json`]
 	];
+
+	// Add animation frame comparisons
+	for (let i = 0; ; i++) {
+		const javaFile = `animation-frame-${i}-java-json.json`;
+		const targetFile = `animation-frame-${i}-${targetLanguage}-json.json`;
+		if (!existsSync(join(outputDir, javaFile)) || !existsSync(join(outputDir, targetFile))) break;
+		comparisons.push([javaFile, targetFile]);
+	}
+	for (let i = 0; ; i++) {
+		const javaFile = `animation-frame-${i}-java-skel.json`;
+		const targetFile = `animation-frame-${i}-${targetLanguage}-skel.json`;
+		if (!existsSync(join(outputDir, javaFile)) || !existsSync(join(outputDir, targetFile))) break;
+		comparisons.push([javaFile, targetFile]);
+	}
 
 	// Add transition frame comparisons
 	for (let i = 0; ; i++) {

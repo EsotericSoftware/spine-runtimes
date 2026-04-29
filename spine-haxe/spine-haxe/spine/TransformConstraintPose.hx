@@ -31,22 +31,22 @@ package spine;
 
 /** Stores a pose for a transform constraint. */
 class TransformConstraintPose implements Pose<TransformConstraintPose> {
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotation. */
+	/** A percentage (unbounded) that controls the mix between the constrained and unconstrained rotation. */
 	public var mixRotate = 0.;
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained translation X. */
+	/** A percentage (unbounded) that controls the mix between the constrained and unconstrained translation X. */
 	public var mixX = 0.;
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained translation Y. */
+	/** A percentage (unbounded) that controls the mix between the constrained and unconstrained translation Y. */
 	public var mixY = 0.;
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained scale X. */
+	/** A percentage (unbounded) that controls the mix between the constrained and unconstrained scale X. */
 	public var mixScaleX = 0.;
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained scale Y. */
+	/** A percentage (unbounded) that controls the mix between the constrained and unconstrained scale Y. */
 	public var mixScaleY = 0.;
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained shear Y. */
+	/** A percentage (unbounded) that controls the mix between the constrained and unconstrained shear Y. */
 	public var mixShearY = 0.;
 
 	public function new() {}

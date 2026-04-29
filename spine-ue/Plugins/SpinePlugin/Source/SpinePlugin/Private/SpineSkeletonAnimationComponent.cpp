@@ -193,9 +193,9 @@ void USpineSkeletonAnimationComponent::SetAutoPlay(bool bInAutoPlays) {
 void USpineSkeletonAnimationComponent::SetPlaybackTime(float InPlaybackTime, bool bCallDelegates) {
 	CheckState();
 
-	if (state && state->getCurrent(0)) {
-		spine::Animation &CurrentAnimation = state->getCurrent(0)->getAnimation();
-		const float CurrentTime = state->getCurrent(0)->getTrackTime();
+	if (state && state->getTrack(0)) {
+		spine::Animation &CurrentAnimation = state->getTrack(0)->getAnimation();
+		const float CurrentTime = state->getTrack(0)->getTrackTime();
 		InPlaybackTime = FMath::Clamp(InPlaybackTime, 0.0f, CurrentAnimation.getDuration());
 		const float DeltaTime = InPlaybackTime - CurrentTime;
 		state->update(DeltaTime);
@@ -276,10 +276,10 @@ UTrackEntry *USpineSkeletonAnimationComponent::AddEmptyAnimation(int trackIndex,
 		return NewObject<UTrackEntry>();
 }
 
-UTrackEntry *USpineSkeletonAnimationComponent::GetCurrent(int trackIndex) {
+UTrackEntry *USpineSkeletonAnimationComponent::GetTrack(int trackIndex) {
 	CheckState();
-	if (state && state->getCurrent(trackIndex)) {
-		TrackEntry *entry = state->getCurrent(trackIndex);
+	if (state && state->getTrack(trackIndex)) {
+		TrackEntry *entry = state->getTrack(trackIndex);
 		if (entry->getRendererObject()) {
 			return (UTrackEntry *) entry->getRendererObject();
 		} else {

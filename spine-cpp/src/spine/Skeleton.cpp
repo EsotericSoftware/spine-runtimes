@@ -111,10 +111,10 @@ void Skeleton::updateCache() {
 	_updateCache.clear();
 	_resetCache.clear();
 
-	_drawOrder.pose();
+	_drawOrder.unconstrained();
 	Slot **slots = _slots.buffer();
 	for (size_t i = 0, n = _slots.size(); i < n; i++) {
-		slots[i]->pose();
+		slots[i]->unconstrained();
 	}
 
 	size_t boneCount = _bones.size();
@@ -123,7 +123,7 @@ void Skeleton::updateCache() {
 		Bone *bone = bones[i];
 		bone->_sorted = bone->_data.getSkinRequired();
 		bone->_active = !bone->_sorted;
-		bone->pose();
+		bone->unconstrained();
 	}
 
 	if (_skin) {
@@ -141,7 +141,7 @@ void Skeleton::updateCache() {
 	Constraint **constraints = _constraints.buffer();
 	size_t n = _constraints.size();
 	for (size_t i = 0; i < n; i++) {
-		constraints[i]->pose();
+		constraints[i]->unconstrained();
 	}
 	for (size_t i = 0; i < n; i++) {
 		Constraint *constraint = constraints[i];

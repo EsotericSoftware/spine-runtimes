@@ -4,40 +4,38 @@
 	pma: true
 	scale: 0.5
 basket-ball
-	bounds: 889, 498, 69, 69
+	bounds: 889, 495, 69, 69
 basket-lambertian
-	bounds: 818, 498, 69, 69
+	bounds: 818, 495, 69, 69
 billiard-ball
-	bounds: 983, 894, 17, 17
+	bounds: 983, 891, 17, 17
 billiard-lambertian
-	bounds: 1002, 913, 17, 17
+	bounds: 1002, 910, 17, 17
 billiard-specular
-	bounds: 983, 913, 17, 17
+	bounds: 983, 910, 17, 17
 bowling-ball
-	bounds: 818, 443, 53, 53
+	bounds: 818, 440, 53, 53
 bowling-lambertian
-	bounds: 960, 459, 53, 53
+	bounds: 960, 456, 53, 53
 bowling-specular
-	bounds: 960, 514, 53, 53
+	bounds: 960, 511, 53, 53
 obstacle-course
-	bounds: 2, 313, 814, 663
+	bounds: 2, 310, 814, 663
 platform
-	bounds: 818, 569, 163, 407
+	bounds: 818, 566, 163, 407
 ring-big
 	bounds: 518, 2, 309, 306
-	rotate: 90
 tennis-ball
-	bounds: 983, 932, 21, 21
+	bounds: 983, 929, 21, 21
 tennis-lambertian
-	bounds: 983, 955, 21, 21
+	bounds: 983, 952, 21, 21
 water
-	bounds: 2, 39, 514, 272
+	bounds: 2, 36, 514, 272
 
 2-the-12-principles-pma_2.png
-	size: 256, 512
+	size: 512, 256
 	filter: Linear, Linear
 	pma: true
 	scale: 0.5
 ring-small
 	bounds: 2, 2, 253, 239
-	rotate: 90

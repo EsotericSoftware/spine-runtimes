@@ -68,9 +68,9 @@ void spine_animation_state_set_empty_animations(spine_animation_state self, floa
 	_self->setEmptyAnimations(mixDuration);
 }
 
-/*@null*/ spine_track_entry spine_animation_state_get_current(spine_animation_state self, size_t trackIndex) {
+/*@null*/ spine_track_entry spine_animation_state_get_track(spine_animation_state self, size_t trackIndex) {
 	AnimationState *_self = (AnimationState *) self;
-	return (spine_track_entry) _self->getCurrent(trackIndex);
+	return (spine_track_entry) _self->getTrack(trackIndex);
 }
 
 spine_animation_state_data spine_animation_state_get_data(spine_animation_state self) {

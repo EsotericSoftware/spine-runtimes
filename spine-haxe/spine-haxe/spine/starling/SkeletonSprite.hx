@@ -36,6 +36,7 @@ import openfl.geom.Matrix;
 import openfl.geom.Point;
 import openfl.geom.Rectangle as OpenFlRectangle;
 import spine.Bone;
+import spine.MathUtils;
 import spine.Skeleton;
 import spine.SkeletonClipping;
 import spine.SkeletonData;
@@ -79,6 +80,59 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 
 	public var beforeUpdateWorldTransforms:SkeletonSprite->Void = function(_) {};
 	public var afterUpdateWorldTransforms:SkeletonSprite->Void = function(_) {};
+
+	private var _physicsPositionInheritanceFactorX:Float = 1;
+	private var _physicsPositionInheritanceFactorY:Float = 1;
+	private var _physicsRotationInheritanceFactor:Float = 1;
+	private var hasLastPhysicsTransform:Bool = false;
+	private var lastPhysicsX:Float = 0;
+	private var lastPhysicsY:Float = 0;
+	private var lastPhysicsRotation:Float = 0;
+	private final currentPhysicsPosition:Array<Float> = [0., 0.];
+	private final lastPhysicsPosition:Array<Float> = [0., 0.];
+
+	/** Scales how much horizontal translation of this Starling display object is inherited by skeleton physics constraints. */
+	public var physicsPositionInheritanceFactorX(get, never):Float;
+
+	private function get_physicsPositionInheritanceFactorX():Float {
+		return _physicsPositionInheritanceFactorX;
+	}
+
+	/** Scales how much vertical translation of this Starling display object is inherited by skeleton physics constraints. */
+	public var physicsPositionInheritanceFactorY(get, never):Float;
+
+	private function get_physicsPositionInheritanceFactorY():Float {
+		return _physicsPositionInheritanceFactorY;
+	}
+
+	/** Sets how much translation of this Starling display object is inherited by skeleton physics constraints.
+	 * The default is (1, 1), which applies display object translation normally. Use (0, 0) to prevent display object translation from
+	 * affecting physics constraints. */
+	public function setPhysicsPositionInheritanceFactor(x:Float, y:Float):Void {
+		var wasDisabled = _physicsPositionInheritanceFactorX == 0 && _physicsPositionInheritanceFactorY == 0;
+		var isEnabled = x != 0 || y != 0;
+		_physicsPositionInheritanceFactorX = x;
+		_physicsPositionInheritanceFactorY = y;
+		if (wasDisabled && isEnabled)
+			resetPhysicsPosition();
+	}
+
+	/** Scales how much rotation of this Starling display object is inherited by skeleton physics constraints.
+	 * The default is 1, which applies display object rotation normally. Use 0 to prevent display object rotation from affecting
+	 * physics constraints. */
+	public var physicsRotationInheritanceFactor(get, set):Float;
+
+	private function get_physicsRotationInheritanceFactor():Float {
+		return _physicsRotationInheritanceFactor;
+	}
+
+	private function set_physicsRotationInheritanceFactor(value:Float):Float {
+		var wasDisabled = _physicsRotationInheritanceFactor == 0;
+		_physicsRotationInheritanceFactor = value;
+		if (wasDisabled && value != 0)
+			resetPhysicsRotation();
+		return _physicsRotationInheritanceFactor;
+	}
 
 	/** Creates an uninitialized SkeletonSprite. The skeleton and animation state must be set before use. */
 	public function new(skeletonData:SkeletonData, animationStateData:AnimationStateData = null, ?boundsProvider:BoundsProvider) {
@@ -323,11 +377,92 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 	public function advanceTime(time:Float):Void {
 		state.update(time);
 		state.apply(skeleton);
+		applyTransformMovementToPhysics();
 		this.beforeUpdateWorldTransforms(this);
 		skeleton.update(time);
 		skeleton.updateWorldTransform(Physics.update);
 		this.afterUpdateWorldTransforms(this);
 		this.setRequiresRedraw();
+	}
+
+	/** Resets the position used for calculating inherited physics translation. */
+	public function resetPhysicsPosition():Void {
+		var transform = this.transformationMatrix;
+		lastPhysicsX = transform.tx;
+		lastPhysicsY = transform.ty;
+		if (!hasLastPhysicsTransform)
+			lastPhysicsRotation = getPhysicsRotation();
+		hasLastPhysicsTransform = true;
+	}
+
+	/** Resets the rotation used for calculating inherited physics rotation. */
+	public function resetPhysicsRotation():Void {
+		var transform = this.transformationMatrix;
+		lastPhysicsRotation = getPhysicsRotation();
+		if (!hasLastPhysicsTransform) {
+			lastPhysicsX = transform.tx;
+			lastPhysicsY = transform.ty;
+		}
+		hasLastPhysicsTransform = true;
+	}
+
+	/** Resets the transform used for calculating inherited physics translation and rotation. */
+	public function resetPhysicsTransform():Void {
+		resetPhysicsPosition();
+		resetPhysicsRotation();
+	}
+
+	private function applyTransformMovementToPhysics():Void {
+		var transform = this.transformationMatrix;
+		var currentX = transform.tx;
+		var currentY = transform.ty;
+		var currentRotation = getPhysicsRotation();
+		if (hasLastPhysicsTransform) {
+			applyPositionMovementToPhysics(currentX, currentY);
+			applyRotationMovementToPhysics(currentRotation);
+		}
+		setLastPhysicsTransform(currentX, currentY, currentRotation);
+	}
+
+	private function applyPositionMovementToPhysics(currentX:Float, currentY:Float):Void {
+		if (_physicsPositionInheritanceFactorX == 0 && _physicsPositionInheritanceFactorY == 0)
+			return;
+
+		currentPhysicsPosition[0] = currentX;
+		currentPhysicsPosition[1] = currentY;
+		haxeWorldCoordinatesToSkeleton(currentPhysicsPosition);
+
+		lastPhysicsPosition[0] = lastPhysicsX;
+		lastPhysicsPosition[1] = lastPhysicsY;
+		haxeWorldCoordinatesToSkeleton(lastPhysicsPosition);
+
+		skeleton.physicsTranslate((currentPhysicsPosition[0] - lastPhysicsPosition[0]) * _physicsPositionInheritanceFactorX,
+			(currentPhysicsPosition[1] - lastPhysicsPosition[1]) * _physicsPositionInheritanceFactorY);
+	}
+
+	private function applyRotationMovementToPhysics(currentRotation:Float):Void {
+		var rotationFactor = _physicsRotationInheritanceFactor;
+		if (rotationFactor == 0)
+			return;
+		skeleton.physicsRotate(0, 0, getRotationDelta(currentRotation, lastPhysicsRotation) * rotationFactor);
+	}
+
+	private function setLastPhysicsTransform(x:Float, y:Float, rotation:Float):Void {
+		lastPhysicsX = x;
+		lastPhysicsY = y;
+		lastPhysicsRotation = rotation;
+		hasLastPhysicsTransform = true;
+	}
+
+	private function getPhysicsRotation():Float {
+		var transform = this.transformationMatrix;
+		return Math.atan2(transform.b, transform.a) * MathUtils.radDeg;
+	}
+
+	private function getRotationDelta(current:Float, previous:Float):Float {
+		var delta = current - previous;
+		delta = (delta + 180) % 360 - 180;
+		return delta < -180 ? delta + 360 : delta;
 	}
 
 	public function skeletonToHaxeWorldCoordinates(point:Array<Float>):Void {

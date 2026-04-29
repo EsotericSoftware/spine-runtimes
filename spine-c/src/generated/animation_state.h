@@ -132,7 +132,7 @@ SPINE_C_API void spine_animation_state_set_empty_animations(spine_animation_stat
  *
  * @return The track entry for the animation currently playing on the track, or NULL if no animation is currently playing.
  */
-SPINE_C_API /*@null*/ spine_track_entry spine_animation_state_get_current(spine_animation_state self, size_t trackIndex);
+SPINE_C_API /*@null*/ spine_track_entry spine_animation_state_get_track(spine_animation_state self, size_t trackIndex);
 /**
  * The AnimationStateData to look up mix durations.
  */

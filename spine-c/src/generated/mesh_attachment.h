@@ -30,13 +30,13 @@ SPINE_C_API const char *spine_mesh_attachment_get_path(spine_mesh_attachment sel
 SPINE_C_API void spine_mesh_attachment_set_path(spine_mesh_attachment self, const char *inValue);
 SPINE_C_API spine_color spine_mesh_attachment_get_color(spine_mesh_attachment self);
 /**
- * The parent mesh if this is a linked mesh, else NULL. A linked mesh shares the
+ * The source mesh if this is a linked mesh, else NULL. A linked mesh shares the
  * bones, vertices, regionUVs, triangles, hullLength, edges, width, and height
- * with the parent mesh, but may have a different name or path, and therefore a
+ * with the source mesh, but may have a different name or path, and therefore a
  * different texture region.
  */
-SPINE_C_API /*@null*/ spine_mesh_attachment spine_mesh_attachment_get_parent_mesh(spine_mesh_attachment self);
-SPINE_C_API void spine_mesh_attachment_set_parent_mesh(spine_mesh_attachment self, /*@null*/ spine_mesh_attachment inValue);
+SPINE_C_API /*@null*/ spine_mesh_attachment spine_mesh_attachment_get_source_mesh(spine_mesh_attachment self);
+SPINE_C_API void spine_mesh_attachment_set_source_mesh(spine_mesh_attachment self, /*@null*/ spine_mesh_attachment inValue);
 /**
  * Vertex index pairs describing edges for controlling triangulation, or empty
  * if nonessential data was not exported. Mesh triangles do not cross edges.
@@ -81,6 +81,9 @@ SPINE_C_API /*@null*/ spine_attachment spine_mesh_attachment_get_timeline_attach
 SPINE_C_API void spine_mesh_attachment_set_timeline_attachment(spine_mesh_attachment self, /*@null*/ spine_attachment attachment);
 SPINE_C_API void spine_mesh_attachment_copy_to(spine_mesh_attachment self, spine_vertex_attachment other);
 SPINE_C_API const char *spine_mesh_attachment_get_name(spine_mesh_attachment self);
+SPINE_C_API spine_array_int spine_mesh_attachment_get_timeline_slots(spine_mesh_attachment self);
+SPINE_C_API void spine_mesh_attachment_set_timeline_slots(spine_mesh_attachment self, spine_array_int timelineSlots);
+SPINE_C_API bool spine_mesh_attachment_is_timeline_active(spine_mesh_attachment self, spine_array_slot slots, int slotIndex, bool appliedPose);
 SPINE_C_API int spine_mesh_attachment_get_ref_count(spine_mesh_attachment self);
 SPINE_C_API void spine_mesh_attachment_reference(spine_mesh_attachment self);
 SPINE_C_API void spine_mesh_attachment_dereference(spine_mesh_attachment self);

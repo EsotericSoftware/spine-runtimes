@@ -42,6 +42,9 @@ SPINE_C_API spine_attachment spine_point_attachment_copy(spine_point_attachment 
 SPINE_C_API const char *spine_point_attachment_get_name(spine_point_attachment self);
 SPINE_C_API /*@null*/ spine_attachment spine_point_attachment_get_timeline_attachment(spine_point_attachment self);
 SPINE_C_API void spine_point_attachment_set_timeline_attachment(spine_point_attachment self, /*@null*/ spine_attachment attachment);
+SPINE_C_API spine_array_int spine_point_attachment_get_timeline_slots(spine_point_attachment self);
+SPINE_C_API void spine_point_attachment_set_timeline_slots(spine_point_attachment self, spine_array_int timelineSlots);
+SPINE_C_API bool spine_point_attachment_is_timeline_active(spine_point_attachment self, spine_array_slot slots, int slotIndex, bool appliedPose);
 SPINE_C_API int spine_point_attachment_get_ref_count(spine_point_attachment self);
 SPINE_C_API void spine_point_attachment_reference(spine_point_attachment self);
 SPINE_C_API void spine_point_attachment_dereference(spine_point_attachment self);

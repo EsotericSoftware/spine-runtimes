@@ -60,7 +60,7 @@ public class AnimationStateData: NSObject {
     public var defaultMix: Float {
         get {
             let result = spine_animation_state_data_get_default_mix(_ptr.assumingMemoryBound(to: spine_animation_state_data_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_animation_state_data_set_default_mix(_ptr.assumingMemoryBound(to: spine_animation_state_data_wrapper.self), newValue)
@@ -70,9 +70,7 @@ public class AnimationStateData: NSObject {
     /// Returns the mix duration to use when changing from the specified animation to the other on
     /// the same track, or the default mix if no mix duration has been set.
     public func getMix(_ from: Animation, _ to: Animation) -> Float {
-        let result = spine_animation_state_data_get_mix(
-            _ptr.assumingMemoryBound(to: spine_animation_state_data_wrapper.self), from._ptr.assumingMemoryBound(to: spine_animation_wrapper.self),
-            to._ptr.assumingMemoryBound(to: spine_animation_wrapper.self))
+        let result = spine_animation_state_data_get_mix(_ptr.assumingMemoryBound(to: spine_animation_state_data_wrapper.self), from._ptr.assumingMemoryBound(to: spine_animation_wrapper.self), to._ptr.assumingMemoryBound(to: spine_animation_wrapper.self))
         return result
     }
 
@@ -89,9 +87,7 @@ public class AnimationStateData: NSObject {
     /// Sets a mix duration when changing from the specified animation to the other. See
     /// TrackEntry.MixDuration.
     public func setMix2(_ from: Animation, _ to: Animation, _ duration: Float) {
-        spine_animation_state_data_set_mix_2(
-            _ptr.assumingMemoryBound(to: spine_animation_state_data_wrapper.self), from._ptr.assumingMemoryBound(to: spine_animation_wrapper.self),
-            to._ptr.assumingMemoryBound(to: spine_animation_wrapper.self), duration)
+        spine_animation_state_data_set_mix_2(_ptr.assumingMemoryBound(to: spine_animation_state_data_wrapper.self), from._ptr.assumingMemoryBound(to: spine_animation_wrapper.self), to._ptr.assumingMemoryBound(to: spine_animation_wrapper.self), duration)
     }
 
     public func dispose() {

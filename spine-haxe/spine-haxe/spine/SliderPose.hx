@@ -32,6 +32,8 @@ package spine;
 /** Stores a pose for a slider. */
 class SliderPose implements Pose<SliderPose> {
 	public var time = 0.;
+
+	/** A percentage (unbounded) that controls the mix between the constrained and unconstrained poses. */
 	public var mix = 0.;
 
 	public function new() {}

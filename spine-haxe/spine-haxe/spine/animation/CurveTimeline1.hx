@@ -89,13 +89,13 @@ abstract class CurveTimeline1 extends CurveTimeline {
 		if (time < frames[0])
 			return fromSetup ? setup : current;
 		var value:Float = getCurveValue(time);
-		return fromSetup ? setup + (value - setup) * alpha : current + (add ? value : value - current) * alpha;
+		return fromSetup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
 	}
 
 	public function getAbsoluteValue2(time:Float, alpha:Float, fromSetup:Bool, add:Bool, current:Float, setup:Float, value:Float):Float {
 		if (time < frames[0])
 			return fromSetup ? setup : current;
-		return fromSetup ? setup + (value - setup) * alpha : current + (add ? value : value - current) * alpha;
+		return fromSetup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
 	}
 
 	public function getScaleValue(time:Float, alpha:Float, fromSetup:Bool, add:Bool, out:Bool, current:Float, setup:Float):Float {

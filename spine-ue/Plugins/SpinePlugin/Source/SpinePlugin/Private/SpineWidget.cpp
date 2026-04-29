@@ -420,9 +420,9 @@ void USpineWidget::SetAutoPlay(bool bInAutoPlays) {
 void USpineWidget::SetPlaybackTime(float InPlaybackTime, bool bCallDelegates) {
 	CheckState();
 
-	if (state && state->getCurrent(0)) {
-		spine::Animation &CurrentAnimation = state->getCurrent(0)->getAnimation();
-		const float CurrentTime = state->getCurrent(0)->getTrackTime();
+	if (state && state->getTrack(0)) {
+		spine::Animation &CurrentAnimation = state->getTrack(0)->getAnimation();
+		const float CurrentTime = state->getTrack(0)->getTrackTime();
 		InPlaybackTime = FMath::Clamp(InPlaybackTime, 0.0f, CurrentAnimation.getDuration());
 		const float DeltaTime = InPlaybackTime - CurrentTime;
 		state->update(DeltaTime);
@@ -502,10 +502,10 @@ UTrackEntry *USpineWidget::AddEmptyAnimation(int trackIndex, float mixDuration, 
 		return NewObject<UTrackEntry>();
 }
 
-UTrackEntry *USpineWidget::GetCurrent(int trackIndex) {
+UTrackEntry *USpineWidget::GetTrack(int trackIndex) {
 	CheckState();
-	if (state && state->getCurrent(trackIndex)) {
-		TrackEntry *entry = state->getCurrent(trackIndex);
+	if (state && state->getTrack(trackIndex)) {
+		TrackEntry *entry = state->getTrack(trackIndex);
 		if (entry->getRendererObject()) {
 			return (UTrackEntry *) entry->getRendererObject();
 		} else {

@@ -885,6 +885,15 @@ namespace Spine {
 			queue.Clear();
 		}
 
+		public void DelayListenerNotifications () {
+			queue.drainDisabled = true;
+		}
+
+		public void IssueDelayedListenerNotifications () {
+			queue.drainDisabled = false;
+			queue.Drain();
+		}
+
 		/// <summary>
 		/// <para>Multiplier for the delta time when the animation state is updated, causing time for all animations and mixes to play slower
 		/// or faster. Defaults to 1.</para>
@@ -1089,13 +1098,10 @@ namespace Spine {
 		/// </summary>
 		public float AnimationTime {
 			get {
-				if (loop) {
-					float duration = animationEnd - animationStart;
-					if (duration == 0) return animationStart;
-					return (trackTime % duration) + animationStart;
-				}
-				float animationTime = trackTime + animationStart;
-				return animationEnd >= animation.duration ? animationTime : Math.Min(animationTime, animationEnd);
+				if (!loop) return Math.Min(trackTime + animationStart, animationEnd);
+				float duration = animationEnd - animationStart;
+				if (duration == 0) return animationStart;
+				return (trackTime % duration) + animationStart;
 			}
 		}
 

@@ -51,7 +51,7 @@ public class AtlasPage: NSObject {
     public var name: String {
         get {
             let result = spine_atlas_page_get_name(_ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self))
-            return String(cString: result!)
+        return String(cString: result!)
         }
         set {
             spine_atlas_page_set_name(_ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self), newValue)
@@ -61,7 +61,7 @@ public class AtlasPage: NSObject {
     public var texturePath: String {
         get {
             let result = spine_atlas_page_get_texture_path(_ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self))
-            return String(cString: result!)
+        return String(cString: result!)
         }
         set {
             spine_atlas_page_set_texture_path(_ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self), newValue)
@@ -71,62 +71,57 @@ public class AtlasPage: NSObject {
     public var format: Format {
         get {
             let result = spine_atlas_page_get_format(_ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self))
-            return Format(rawValue: Int32(result.rawValue))!
+        return Format(rawValue: Int32(result.rawValue))!
         }
         set {
-            spine_atlas_page_set_format(
-                _ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self), spine_format(rawValue: UInt32(newValue.rawValue)))
+            spine_atlas_page_set_format(_ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self), spine_format(rawValue: UInt32(newValue.rawValue)))
         }
     }
 
     public var minFilter: TextureFilter {
         get {
             let result = spine_atlas_page_get_min_filter(_ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self))
-            return TextureFilter(rawValue: Int32(result.rawValue))!
+        return TextureFilter(rawValue: Int32(result.rawValue))!
         }
         set {
-            spine_atlas_page_set_min_filter(
-                _ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self), spine_texture_filter(rawValue: UInt32(newValue.rawValue)))
+            spine_atlas_page_set_min_filter(_ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self), spine_texture_filter(rawValue: UInt32(newValue.rawValue)))
         }
     }
 
     public var magFilter: TextureFilter {
         get {
             let result = spine_atlas_page_get_mag_filter(_ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self))
-            return TextureFilter(rawValue: Int32(result.rawValue))!
+        return TextureFilter(rawValue: Int32(result.rawValue))!
         }
         set {
-            spine_atlas_page_set_mag_filter(
-                _ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self), spine_texture_filter(rawValue: UInt32(newValue.rawValue)))
+            spine_atlas_page_set_mag_filter(_ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self), spine_texture_filter(rawValue: UInt32(newValue.rawValue)))
         }
     }
 
     public var uWrap: TextureWrap {
         get {
             let result = spine_atlas_page_get_u_wrap(_ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self))
-            return TextureWrap(rawValue: Int32(result.rawValue))!
+        return TextureWrap(rawValue: Int32(result.rawValue))!
         }
         set {
-            spine_atlas_page_set_u_wrap(
-                _ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self), spine_texture_wrap(rawValue: UInt32(newValue.rawValue)))
+            spine_atlas_page_set_u_wrap(_ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self), spine_texture_wrap(rawValue: UInt32(newValue.rawValue)))
         }
     }
 
     public var vWrap: TextureWrap {
         get {
             let result = spine_atlas_page_get_v_wrap(_ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self))
-            return TextureWrap(rawValue: Int32(result.rawValue))!
+        return TextureWrap(rawValue: Int32(result.rawValue))!
         }
         set {
-            spine_atlas_page_set_v_wrap(
-                _ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self), spine_texture_wrap(rawValue: UInt32(newValue.rawValue)))
+            spine_atlas_page_set_v_wrap(_ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self), spine_texture_wrap(rawValue: UInt32(newValue.rawValue)))
         }
     }
 
     public var width: Int32 {
         get {
             let result = spine_atlas_page_get_width(_ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_atlas_page_set_width(_ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self), newValue)
@@ -136,7 +131,7 @@ public class AtlasPage: NSObject {
     public var height: Int32 {
         get {
             let result = spine_atlas_page_get_height(_ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_atlas_page_set_height(_ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self), newValue)
@@ -146,7 +141,7 @@ public class AtlasPage: NSObject {
     public var pma: Bool {
         get {
             let result = spine_atlas_page_get_pma(_ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_atlas_page_set_pma(_ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self), newValue)
@@ -156,7 +151,7 @@ public class AtlasPage: NSObject {
     public var index: Int32 {
         get {
             let result = spine_atlas_page_get_index(_ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self))
-            return result
+        return result
         }
         set {
             spine_atlas_page_set_index(_ptr.assumingMemoryBound(to: spine_atlas_page_wrapper.self), newValue)

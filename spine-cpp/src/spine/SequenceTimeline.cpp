@@ -44,7 +44,7 @@ using namespace spine;
 RTTI_IMPL_MULTI(SequenceTimeline, Timeline, SlotTimeline)
 
 SequenceTimeline::SequenceTimeline(size_t frameCount, int slotIndex, Attachment &attachment)
-	: Timeline(frameCount, ENTRIES), SlotTimeline(), _slotIndex(slotIndex), _attachment((HasTextureRegion *) &attachment) {
+	: Timeline(frameCount, ENTRIES), SlotTimeline(), _slotIndex(slotIndex), _attachment(&attachment) {
 	_instant = true;
 	int sequenceId = 0;
 	if (attachment.getRTTI().instanceOf(RegionAttachment::rtti)) sequenceId = ((RegionAttachment *) &attachment)->getSequence().getId();
@@ -79,27 +79,21 @@ void SequenceTimeline::apply(Skeleton &skeleton, float lastTime, float time, Arr
 	SP_UNUSED(events);
 	SP_UNUSED(add);
 
-	Slot *slot = skeleton.getSlots()[getSlotIndex()];
-	if (!slot->getBone().isActive()) return;
-	SlotPose &pose = appliedPose ? slot->getAppliedPose() : slot->getPose();
+	Array<Slot *> &slots = skeleton.getSlots();
+	if (!_attachment->isTimelineActive(slots, getSlotIndex(), appliedPose)) return;
+	Array<int> &timelineSlots = _attachment->getTimelineSlots();
 
-	Attachment *slotAttachment = pose.getAttachment();
-	if (slotAttachment != (Attachment *) _attachment) {
-		if (slotAttachment == NULL || slotAttachment->getTimelineAttachment() != (Attachment *) _attachment) return;
-	}
 	Sequence *sequence = NULL;
-	if (((Attachment *) _attachment)->getRTTI().instanceOf(RegionAttachment::rtti)) sequence = &((RegionAttachment *) _attachment)->getSequence();
-	if (((Attachment *) _attachment)->getRTTI().instanceOf(MeshAttachment::rtti)) sequence = &((MeshAttachment *) _attachment)->getSequence();
+	if (_attachment->getRTTI().instanceOf(RegionAttachment::rtti)) sequence = &static_cast<RegionAttachment *>(_attachment)->getSequence();
+	if (_attachment->getRTTI().instanceOf(MeshAttachment::rtti)) sequence = &static_cast<MeshAttachment *>(_attachment)->getSequence();
 	if (!sequence) return;
 
-	if (out) {
-		if (fromSetup) pose.setSequenceIndex(-1);
-		return;
-	}
-
 	Array<float> &frames = this->_frames;
-	if (time < frames[0]) {
-		if (fromSetup) pose.setSequenceIndex(-1);
+	if (out || time < frames[0]) {
+		if (fromSetup) {
+			setupPose(*slots[getSlotIndex()], appliedPose);
+			for (size_t i = 0; i < timelineSlots.size(); ++i) setupPose(*slots[timelineSlots[i]], appliedPose);
+		}
 		return;
 	}
 
@@ -108,7 +102,26 @@ void SequenceTimeline::apply(Skeleton &skeleton, float lastTime, float time, Arr
 	int modeAndIndex = (int) frames[i + MODE];
 	float delay = frames[i + DELAY];
 
-	int index = modeAndIndex >> 4, count = (int) sequence->getRegions().size();
+	applyToSlot(*slots[getSlotIndex()], appliedPose, *sequence, time, before, modeAndIndex, delay);
+	for (size_t j = 0; j < timelineSlots.size(); ++j)
+		applyToSlot(*slots[timelineSlots[j]], appliedPose, *sequence, time, before, modeAndIndex, delay);
+}
+
+void SequenceTimeline::setupPose(Slot &slot, bool appliedPose) {
+	if (!slot.getBone().isActive()) return;
+	SlotPose &pose = appliedPose ? slot.getAppliedPose() : slot.getPose();
+	Attachment *attachment = pose.getAttachment();
+	if (attachment == NULL || attachment->getTimelineAttachment() != _attachment) return;
+	pose.setSequenceIndex(-1);
+}
+
+void SequenceTimeline::applyToSlot(Slot &slot, bool appliedPose, Sequence &sequence, float time, float before, int modeAndIndex, float delay) {
+	if (!slot.getBone().isActive()) return;
+	SlotPose &pose = appliedPose ? slot.getAppliedPose() : slot.getPose();
+	Attachment *attachment = pose.getAttachment();
+	if (attachment == NULL || attachment->getTimelineAttachment() != _attachment) return;
+
+	int index = modeAndIndex >> 4, count = (int) sequence.getRegions().size();
 	int mode = modeAndIndex & 0xf;
 	if (mode != SequenceMode_hold) {
 		index += (int) (((time - before) / delay + 0.0001));

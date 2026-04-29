@@ -35,7 +35,7 @@ namespace Spine {
 	public class IkConstraintData : ConstraintData<IkConstraint, IkConstraintPose> {
 		internal ExposedList<BoneData> bones = new ExposedList<BoneData>(2);
 		internal BoneData target;
-		internal bool uniform;
+		internal ScaleYMode scaleY = ScaleYMode.None;
 
 		public IkConstraintData (string name)
 			: base(name, new IkConstraintPose()) {
@@ -57,12 +57,25 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// When true and <see cref="IkConstraintPose.Compress"/> or <see cref="IkConstraintPose.Stretch"/> is used, the bone is scaled
-		/// on both the X and Y axes.
+		/// Determines how the <see cref="BonePose.scaleY"/> changes when <see cref="IkConstraintPose.Compress"/> or
+		/// <see cref="IkConstraintPose.Stretch"/> set <see cref="BonePose.ScaleX"/>.
 		/// </summary>
-		public bool Uniform {
-			get { return uniform; }
-			set { uniform = value; }
+		public ScaleYMode ScaleY {
+			get { return scaleY; }
+			set { scaleY = value; }
+		}
+
+		/// <summary>
+		/// Determines how the <see cref="BonePose.scaleY"/> changes when <see cref="IkConstraintPose.Compress"/> or
+		/// <see cref="IkConstraintPose.Stretch"/> set <see cref="BonePose.ScaleX"/>.
+		/// </summary>
+		public enum ScaleYMode {
+			/// <summary>scaleY is not changed.</summary>
+			None,
+			/// <summary>scaleY is multiplied by the scaleX factor, preserving the bone's aspect ratio.</summary>
+			Uniform,
+			/// <summary>scaleY is divided by the scaleX factor, preserving the bone's area.</summary>
+			Volume
 		}
 	}
 }

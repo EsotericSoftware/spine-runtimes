@@ -16,6 +16,12 @@ spine_rtti spine_deform_timeline_get_rtti(spine_deform_timeline self) {
 	return (spine_rtti) &_self->getRTTI();
 }
 
+void spine_deform_timeline_apply(spine_deform_timeline self, spine_skeleton skeleton, float lastTime, float time, /*@null*/ spine_array_event events,
+								 float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
+	DeformTimeline *_self = (DeformTimeline *) self;
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
+}
+
 void spine_deform_timeline_set_frame(spine_deform_timeline self, int frameIndex, float time, spine_array_float vertices) {
 	DeformTimeline *_self = (DeformTimeline *) self;
 	_self->setFrame(frameIndex, time, *((Array<float> *) vertices));
@@ -45,12 +51,6 @@ float spine_deform_timeline_get_curve_percent(spine_deform_timeline self, float 
 size_t spine_deform_timeline_get_frame_count(spine_deform_timeline self) {
 	DeformTimeline *_self = (DeformTimeline *) self;
 	return _self->getFrameCount();
-}
-
-void spine_deform_timeline_apply(spine_deform_timeline self, spine_skeleton skeleton, float lastTime, float time, /*@null*/ spine_array_event events,
-								 float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
-	DeformTimeline *_self = (DeformTimeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
 }
 
 int spine_deform_timeline_get_slot_index(spine_deform_timeline self) {

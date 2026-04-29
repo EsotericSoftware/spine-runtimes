@@ -176,6 +176,7 @@ Color &RegionAttachment::getColor() {
 Attachment &RegionAttachment::copy() {
 	RegionAttachment *copy = new (__FILE__, __LINE__) RegionAttachment(getName(), new (__FILE__, __LINE__) Sequence(*_sequence));
 	copy->setTimelineAttachment(getTimelineAttachment());
+	copy->setTimelineSlots(getTimelineSlots());
 	copy->_path = _path;
 	copy->_x = _x;
 	copy->_y = _y;

@@ -113,6 +113,10 @@ namespace Spine.Unity {
 		[SerializeField] protected Vector2 physicsPositionInheritanceFactor = Vector2.one;
 		/// <seealso cref="PhysicsRotationInheritanceFactor"/>
 		[SerializeField] protected float physicsRotationInheritanceFactor = 1.0f;
+		/// <seealso cref="PhysicsPositionInheritanceLimit"/>
+		[SerializeField] protected Vector2 physicsPositionInheritanceLimit = Vector2.positiveInfinity;
+		/// <seealso cref="PhysicsRotationInheritanceLimit"/>
+		[SerializeField] protected float physicsRotationInheritanceLimit = float.MaxValue;
 		/// <summary>Reference transform relative to which physics movement will be calculated, or null to use world location.</summary>
 		[SerializeField] protected Transform physicsMovementRelativeTo = null;
 
@@ -246,6 +250,24 @@ namespace Spine.Unity {
 				if (physicsRotationInheritanceFactor == 0f && value != 0f) ResetLastRotation();
 				physicsRotationInheritanceFactor = value;
 			}
+		}
+
+		/// <summary>
+		/// Limits Transform position movement in X and Y direction that is applied to skeleton PhysicsConstraints,
+		/// after it has been multiplied by <see cref="PhysicsPositionInheritanceFactor"/>.
+		/// </summary>
+		public Vector2 PhysicsPositionInheritanceLimit {
+			get { return physicsPositionInheritanceLimit; }
+			set { physicsPositionInheritanceLimit = value; }
+		}
+
+		/// <summary>
+		/// Limits Transform rotation movement that is applied to skeleton PhysicsConstraints,
+		/// after it has been multiplied by <see cref="PhysicsRotationInheritanceFactor"/>.
+		/// </summary>
+		public float PhysicsRotationInheritanceLimit {
+			get { return physicsRotationInheritanceLimit; }
+			set { physicsRotationInheritanceLimit = value; }
 		}
 
 		/// <summary>Reference transform relative to which physics movement will be calculated, or null to use world location.</summary>
@@ -426,13 +448,16 @@ namespace Spine.Unity {
 					}
 					positionDelta.x *= physicsPositionInheritanceFactor.x;
 					positionDelta.y *= physicsPositionInheritanceFactor.y;
-
+					positionDelta.x = Mathf.Clamp(positionDelta.x, -physicsPositionInheritanceLimit.x, physicsPositionInheritanceLimit.x);
+					positionDelta.y = Mathf.Clamp(positionDelta.y, -physicsPositionInheritanceLimit.y, physicsPositionInheritanceLimit.y);
 					lastPosition = position;
 				}
 				if (physicsRotationInheritanceFactor != 0f) {
 					float rotation = GetPhysicsTransformRotation();
 					rotationDelta = rotation - lastRotation;
-
+					if (rotationDelta > 180f) rotationDelta -= 360f;
+					else if (rotationDelta < -180f) rotationDelta += 360f;
+					rotationDelta = Mathf.Clamp(rotationDelta, -physicsRotationInheritanceLimit, physicsRotationInheritanceLimit);
 					lastRotation = rotation;
 				}
 			}

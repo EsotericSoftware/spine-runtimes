@@ -105,8 +105,12 @@ namespace Spine.Unity.Examples {
 			referenceMeshFilter = referenceRenderer.GetComponent<MeshFilter>();
 
 			// subscribe to OnMeshAndMaterialsUpdated
-			SkeletonAnimation skeletonRenderer = referenceRenderer.GetComponent<SkeletonAnimation>();
-			if (skeletonRenderer) {
+#if UNITY_2019_4_OR_NEWER
+			ISkeletonRenderer skeletonRenderer = referenceRenderer.GetComponent<ISkeletonRenderer>();
+#else
+			SkeletonAnimationBase skeletonRenderer = referenceRenderer.GetComponent<SkeletonAnimationBase>();
+#endif
+			if (skeletonRenderer != null) {
 				skeletonRenderer.OnMeshAndMaterialsUpdated -= UpdateOnCallback;
 				skeletonRenderer.OnMeshAndMaterialsUpdated += UpdateOnCallback;
 				updateViaSkeletonCallback = true;

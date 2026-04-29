@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 #if UNITY_6000_3_OR_NEWER
-#define GET_ASSET_PATH_USES_ENTITY_ID
+#define USES_ENTITY_ID
 #endif
 
 #if UNITY_2022_2_OR_NEWER
@@ -155,7 +155,7 @@ namespace Spine.Unity.Editor {
 			if (SpineInspectorUtility.LargeCenteredButton(SpineInspectorUtility.TempContent("Set Mipmap Bias to " + SpinePreferences.DEFAULT_MIPMAPBIAS, tooltip: "This may help textures with mipmaps be less blurry when used for 2D sprites."))) {
 				foreach (Material m in atlasAsset.materials) {
 					Texture texture = m.mainTexture;
-#if GET_ASSET_PATH_USES_ENTITY_ID
+#if USES_ENTITY_ID
 					string texturePath = AssetDatabase.GetAssetPath(texture.GetEntityId());
 #else
 					string texturePath = AssetDatabase.GetAssetPath(texture.GetInstanceID());
@@ -336,7 +336,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		static public void UpdateSpriteSlices (Texture texture, Atlas atlas) {
-#if GET_ASSET_PATH_USES_ENTITY_ID
+#if USES_ENTITY_ID
 			string texturePath = AssetDatabase.GetAssetPath(texture.GetEntityId());
 #else
 			string texturePath = AssetDatabase.GetAssetPath(texture.GetInstanceID());

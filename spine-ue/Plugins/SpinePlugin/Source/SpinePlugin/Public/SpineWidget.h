@@ -202,7 +202,7 @@ public:
 	UTrackEntry *AddEmptyAnimation(int trackIndex, float mixDuration, float delay);
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Animation")
-	UTrackEntry *GetCurrent(int trackIndex);
+	UTrackEntry *GetTrack(int trackIndex);
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Animation")
 	void ClearTracks();

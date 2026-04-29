@@ -65,11 +65,7 @@ namespace Spine.Unity.Examples {
 			if (!skeletonAnimation.IsValid) return;
 
 			eventData = skeletonAnimation.Skeleton.Data.FindEvent(eventName);
-#if USE_THREADED_ANIMATION_UPDATE
-			skeletonAnimation.MainThreadEvent += HandleAnimationStateEvent;
-#else
 			skeletonAnimation.AnimationState.Event += HandleAnimationStateEvent;
-#endif
 		}
 
 		private void HandleAnimationStateEvent (TrackEntry trackEntry, Event e) {

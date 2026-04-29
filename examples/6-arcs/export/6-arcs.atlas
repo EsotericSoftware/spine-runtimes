@@ -5,9 +5,8 @@
 arc-tracker
 	bounds: 536, 191, 9, 9
 ball
-	bounds: 593, 122, 78, 78
+	bounds: 728, 122, 78, 78
 platform
 	bounds: 2, 2, 532, 198
 tail
-	bounds: 536, 10, 190, 56
-	rotate: 90
+	bounds: 536, 144, 190, 56

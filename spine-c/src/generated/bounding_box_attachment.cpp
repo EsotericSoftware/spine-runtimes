@@ -95,6 +95,21 @@ const char *spine_bounding_box_attachment_get_name(spine_bounding_box_attachment
 	return _self->getName().buffer();
 }
 
+spine_array_int spine_bounding_box_attachment_get_timeline_slots(spine_bounding_box_attachment self) {
+	BoundingBoxAttachment *_self = (BoundingBoxAttachment *) self;
+	return (spine_array_int) &_self->getTimelineSlots();
+}
+
+void spine_bounding_box_attachment_set_timeline_slots(spine_bounding_box_attachment self, spine_array_int timelineSlots) {
+	BoundingBoxAttachment *_self = (BoundingBoxAttachment *) self;
+	_self->setTimelineSlots(*((Array<int> *) timelineSlots));
+}
+
+bool spine_bounding_box_attachment_is_timeline_active(spine_bounding_box_attachment self, spine_array_slot slots, int slotIndex, bool appliedPose) {
+	BoundingBoxAttachment *_self = (BoundingBoxAttachment *) self;
+	return _self->isTimelineActive(*((Array<Slot *> *) slots), slotIndex, appliedPose);
+}
+
 int spine_bounding_box_attachment_get_ref_count(spine_bounding_box_attachment self) {
 	BoundingBoxAttachment *_self = (BoundingBoxAttachment *) self;
 	return _self->getRefCount();

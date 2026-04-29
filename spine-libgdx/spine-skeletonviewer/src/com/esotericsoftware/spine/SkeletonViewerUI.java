@@ -479,7 +479,7 @@ class SkeletonViewerUI {
 				alphaLabel.setText(Integer.toString((int)(alphaSlider.getValue() * 100)) + "%");
 				int track = trackButtons.getCheckedIndex();
 				if (track > 0) {
-					TrackEntry current = viewer.state.getCurrent(track);
+					TrackEntry current = viewer.state.getTrack(track);
 					if (current != null) {
 						current.setAlpha(alphaSlider.getValue());
 						current.resetRotationDirections();
@@ -555,7 +555,7 @@ class SkeletonViewerUI {
 			public void changed (ChangeEvent event, Actor actor) {
 				int track = trackButtons.getCheckedIndex();
 				if (track == -1) return;
-				TrackEntry current = viewer.state.getCurrent(track);
+				TrackEntry current = viewer.state.getTrack(track);
 				animationList.getSelection().setProgrammaticChangeEvents(false);
 				animationList.setSelected(current == null ? null : current.animation.name);
 				animationList.getSelection().setProgrammaticChangeEvents(true);
@@ -654,7 +654,7 @@ class SkeletonViewerUI {
 	}
 
 	void render () {
-		if (viewer.state != null && viewer.state.getCurrent(trackButtons.getCheckedIndex()) == null) {
+		if (viewer.state != null && viewer.state.getTrack(trackButtons.getCheckedIndex()) == null) {
 			animationList.getSelection().setProgrammaticChangeEvents(false);
 			animationList.setSelected(null);
 			animationList.getSelection().setProgrammaticChangeEvents(true);
@@ -719,7 +719,7 @@ class SkeletonViewerUI {
 		prefs.putFloat("x", camera.position.x);
 		prefs.putFloat("y", camera.position.y);
 		if (viewer.state != null) {
-			TrackEntry current = viewer.state.getCurrent(0);
+			TrackEntry current = viewer.state.getTrack(0);
 			if (current != null) {
 				String name = current.animation.name;
 				if (name.equals("<empty>")) name = current.next == null ? "" : current.next.animation.name;

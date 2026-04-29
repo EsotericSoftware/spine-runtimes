@@ -34,6 +34,65 @@
 #include <string.h>
 #include <stdarg.h>
 #include <locale.h>
+#include <math.h>
+
+static void printBonePoseJson(spine::BonePose &pose) {
+	printf("{");
+	printf("\"x\":%.6f,\"y\":%.6f,\"rotation\":%.6f,\"scaleX\":%.6f,\"scaleY\":%.6f,\"shearX\":%.6f,\"shearY\":%.6f,", pose.getX(), pose.getY(),
+		   pose.getRotation(), pose.getScaleX(), pose.getScaleY(), pose.getShearX(), pose.getShearY());
+	printf("\"a\":%.6f,\"b\":%.6f,\"c\":%.6f,\"d\":%.6f,", pose.getA(), pose.getB(), pose.getC(), pose.getD());
+	printf("\"worldX\":%.6f,\"worldY\":%.6f,\"worldRotationX\":%.6f,\"worldRotationY\":%.6f,\"worldScaleX\":%.6f,\"worldScaleY\":%.6f",
+		   pose.getWorldX(), pose.getWorldY(), pose.getWorldRotationX(), pose.getWorldRotationY(), pose.getWorldScaleX(), pose.getWorldScaleY());
+	printf("}");
+}
+
+static void printSlotPoseJson(spine::SlotPose &pose) {
+	printf("{");
+	printf("\"attachment\":");
+	spine::Attachment *attachment = pose.getAttachment();
+	if (attachment)
+		printf("\"%s\"", attachment->getName().buffer());
+	else
+		printf("null");
+	printf(",\"sequenceIndex\":%d,", pose.getSequenceIndex());
+	spine::Color &color = pose.getColor();
+	printf("\"color\":{\"r\":%.6f,\"g\":%.6f,\"b\":%.6f,\"a\":%.6f}", color.r, color.g, color.b, color.a);
+	printf("}");
+}
+
+static void printSkeletonFrameJson(spine::Skeleton &skeleton, int frame) {
+	printf("\n=== ANIMATION FRAME %d ===\n", frame);
+	printf("{");
+	printf("\"frame\":%d,", frame);
+	printf("\"time\":%.6f,", skeleton.getTime());
+	printf("\"bones\":[");
+	spine::Array<spine::Bone *> &bones = skeleton.getBones();
+	for (size_t i = 0; i < bones.size(); i++) {
+		if (i) printf(",");
+		spine::Bone *bone = bones[i];
+		printf("{");
+		printf("\"name\":\"%s\",", bone->getData().getName().buffer());
+		printf("\"pose\":");
+		printBonePoseJson(bone->getPose());
+		printf(",\"appliedPose\":");
+		printBonePoseJson(bone->getAppliedPose());
+		printf("}");
+	}
+	printf("],\"slots\":[");
+	spine::Array<spine::Slot *> &slots = skeleton.getSlots();
+	for (size_t i = 0; i < slots.size(); i++) {
+		if (i) printf(",");
+		spine::Slot *slot = slots[i];
+		printf("{");
+		printf("\"name\":\"%s\",", slot->getData().getName().buffer());
+		printf("\"pose\":");
+		printSlotPoseJson(slot->getPose());
+		printf(",\"appliedPose\":");
+		printSlotPoseJson(slot->getAppliedPose());
+		printf("}");
+	}
+	printf("]}");
+}
 
 using namespace spine;
 
@@ -146,6 +205,36 @@ int main(int argc, char *argv[]) {
 	if (state != nullptr) {
 		printf("\n=== ANIMATION STATE ===\n");
 		printf("%s", serializer.serializeAnimationState(state).buffer());
+	}
+
+	// Full animation sampling: if a single animation is provided, sample skeleton state for every
+	// frame across the full non-looping animation duration at 60 FPS.
+	if (state != nullptr && animationName2 == nullptr) {
+		Animation *animation = skeletonData->findAnimation(animationName);
+		if (!animation) {
+			fprintf(stderr, "Animation not found: %s\n", animationName);
+			delete state;
+			delete stateData;
+			delete skeletonData;
+			delete atlas;
+			return 1;
+		}
+
+		skeleton.setupPose();
+		state->clearTracks();
+		state->setAnimation(0, *animation, false);
+		state->apply(skeleton);
+		skeleton.updateWorldTransform(Physics_Update);
+
+		int frameCount = (int) ceilf(animation->getDuration() * 60.0f);
+		for (int i = 0; i <= frameCount; i++) {
+			if (i > 0) {
+				state->update(1 / 60.0f);
+				state->apply(skeleton);
+				skeleton.updateWorldTransform(Physics_Update);
+			}
+			printSkeletonFrameJson(skeleton, i);
+		}
 	}
 
 	// Transition test: if a second animation is provided, play A for 10 frames, transition to B,

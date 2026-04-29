@@ -87,15 +87,12 @@ open class IkConstraintBase: PosedActive, Posed, Constraint {
     }
 
     public func sort(_ skeleton: Skeleton) {
-        spine_ik_constraint_base_sort(
-            _ptr.assumingMemoryBound(to: spine_ik_constraint_base_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
+        spine_ik_constraint_base_sort(_ptr.assumingMemoryBound(to: spine_ik_constraint_base_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self))
     }
 
     /// Inherited from Update
     public func update(_ skeleton: Skeleton, _ physics: Physics) {
-        spine_ik_constraint_base_update(
-            _ptr.assumingMemoryBound(to: spine_ik_constraint_base_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self),
-            spine_physics(rawValue: UInt32(physics.rawValue)))
+        spine_ik_constraint_base_update(_ptr.assumingMemoryBound(to: spine_ik_constraint_base_wrapper.self), skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self), spine_physics(rawValue: UInt32(physics.rawValue)))
     }
 
     public static func rttiStatic() -> Rtti {

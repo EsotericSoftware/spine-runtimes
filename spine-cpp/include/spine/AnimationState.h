@@ -143,9 +143,11 @@ namespace spine {
 
 		void setDelay(float inValue);
 
-		/// Current time in seconds this track entry has been the current track entry. The track time determines
-		/// getAnimationTime(). The track time can be set to start the animation at a time other than 0, without affecting
-		/// looping.
+		/// The time in seconds this track entry has been the current track entry, starting at 0 and increasing forever.
+		/// Compare to getAnimationTime(), which is always between animationStart and animationEnd.
+		///
+		/// The track time can be set to start the animation at a time other than 0, without affecting looping. When doing so,
+		/// animationLast can be set to the same value to avoid firing events from the start of the animation.
 		float getTrackTime();
 
 		void setTrackTime(float inValue);
@@ -161,16 +163,16 @@ namespace spine {
 
 		void setTrackEnd(float inValue);
 
-		/// Seconds when this animation starts, both initially and after looping. Defaults to 0.
+		/// The time in seconds for the first frame of this animation, both initially and after looping. Defaults to 0.
 		///
-		/// When changing the animation start time, it often makes sense to set TrackEntry.AnimationLast to the same value to
-		/// prevent timeline keys before the start time from triggering.
+		/// When setting the animation start time, animationLast can be set to the same value to avoid firing events from the
+		/// start of the animation.
 		float getAnimationStart();
 
 		void setAnimationStart(float inValue);
 
-		/// Seconds for the last frame of this animation. Non-looping animations won't play past this time. Looping animations will
-		/// loop back to TrackEntry.AnimationStart at this time. Defaults to the animation duration.
+		/// The time in seconds for the last frame of this animation. Past this time, non-looping animations hold the pose at this
+		/// time while looping animations will loop back to animationStart. Defaults to the animation duration.
 		float getAnimationEnd();
 
 		void setAnimationEnd(float inValue);
@@ -182,10 +184,8 @@ namespace spine {
 
 		void setAnimationLast(float inValue);
 
-		/// Uses the track time to compute animationTime. When trackTime is 0, animationTime is equal to animationStart.
-		///
-		/// animationTime is between animationStart and animationEnd, except if this track entry is non-looping and animationEnd is
-		/// >= the animation duration, then animationTime continues to increase past animationEnd.
+		/// Uses the track time to compute animationTime, which is always between animationStart and animationEnd. When trackTime is
+		/// 0, animationTime is equal to animationStart.
 		float getAnimationTime();
 
 		/// Multiplier for the delta time when this track entry is updated, causing time for this animation to pass slower or
@@ -498,7 +498,7 @@ namespace spine {
 		void setEmptyAnimations(float mixDuration);
 
 		/// @return The track entry for the animation currently playing on the track, or NULL if no animation is currently playing.
-		TrackEntry *getCurrent(size_t trackIndex);
+		TrackEntry *getTrack(size_t trackIndex);
 
 		/// The AnimationStateData to look up mix durations.
 		AnimationStateData &getData();
@@ -586,8 +586,10 @@ namespace spine {
 
 		void queueEvents(TrackEntry *entry, float animationTime);
 
+		void eventsReverse(TrackEntry *entry, float animationLast, float animationTime);
+
 		/// Sets the active TrackEntry for a given track number.
-		void setCurrent(size_t index, TrackEntry *current, bool interrupt);
+		void setTrack(size_t index, TrackEntry *current, bool interrupt);
 
 		/// Removes the specified entry's next track entry and all entries after it.
 		void clearNext(TrackEntry *entry);

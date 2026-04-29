@@ -34,6 +34,7 @@ import 'package:universal_ffi/ffi_utils.dart';
 import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
 import 'rtti.dart';
+import 'arrays.dart';
 import 'bounding_box_attachment.dart';
 import 'clipping_attachment.dart';
 import 'mesh_attachment.dart';
@@ -121,6 +122,21 @@ abstract class Attachment {
   set timelineAttachment(Attachment? value) {
     SpineBindings.bindings
         .spine_attachment_set_timeline_attachment(_ptr, value?.nativePtr.cast() ?? Pointer.fromAddress(0));
+  }
+
+  ArrayInt get timelineSlots {
+    final result = SpineBindings.bindings.spine_attachment_get_timeline_slots(_ptr);
+    return ArrayInt.fromPointer(result);
+  }
+
+  set timelineSlots(ArrayInt value) {
+    SpineBindings.bindings.spine_attachment_set_timeline_slots(_ptr, value.nativePtr.cast());
+  }
+
+  bool isTimelineActive(ArraySlot slots, int slotIndex, bool appliedPose) {
+    final result = SpineBindings.bindings
+        .spine_attachment_is_timeline_active(_ptr, slots.nativePtr.cast(), slotIndex, appliedPose);
+    return result;
   }
 
   int get refCount {

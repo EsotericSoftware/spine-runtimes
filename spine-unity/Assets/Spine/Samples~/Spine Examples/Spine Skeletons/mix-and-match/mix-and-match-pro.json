@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "MqW8PYyU7h4",
-	"spine": "4.3.45-beta",
+	"hash": "8jhiBvRLAn4",
+	"spine": "4.3.74-beta",
 	"x": -240.5813,
 	"y": -3.380449,
 	"width": 410.3569,
@@ -2036,7 +2036,7 @@
 		"bones": [ "scarf-back", "zip-girl" ],
 		"attachments": {
 			"arm-back": {
-				"arm-back": { "name": "girl/arm-front", "type": "linkedmesh", "skin": "full-skins/boy", "parent": "arm-back", "width": 71.0, "height": 229.0 }
+				"arm-back": { "name": "girl/arm-front", "type": "linkedmesh", "skin": "full-skins/boy", "source": "arm-back", "width": 71.0, "height": 229.0 }
 			},
 			"body": {
 				"body": {
@@ -2071,7 +2071,7 @@
 				"scarf-back": { "name": "girl/scarf-back", "x": 46.87948, "y": 3.262665, "rotation": 177.98157, "width": 143, "height": 102 }
 			},
 			"sleeve-front": {
-				"sleeve-front": { "name": "girl/arm-front", "type": "linkedmesh", "skin": "full-skins/boy", "parent": "sleeve-front", "width": 71.0, "height": 229.0 }
+				"sleeve-front": { "name": "girl/arm-front", "type": "linkedmesh", "skin": "full-skins/boy", "source": "sleeve-front", "width": 71.0, "height": 229.0 }
 			},
 			"zip-girl": {
 				"zip-girl": { "name": "girl/zip", "x": 19.664124, "y": 3.688469, "rotation": 80.65533, "width": 37, "height": 49 }
@@ -2096,7 +2096,7 @@
 				}
 			},
 			"body": {
-				"body": { "name": "boy/body", "type": "linkedmesh", "skin": "full-skins/girl", "parent": "body", "width": 194.0, "height": 263.0 }
+				"body": { "name": "boy/body", "type": "linkedmesh", "skin": "full-skins/girl", "source": "body", "width": 194.0, "height": 263.0 }
 			},
 			"collar": {
 				"collar": {
@@ -2575,7 +2575,7 @@
 				"base-head": { "x": 74.7363, "y": -10.088684, "rotation": -87.57072, "width": 189, "height": 145 }
 			},
 			"body": {
-				"body": { "name": "boy/body", "type": "linkedmesh", "skin": "full-skins/girl", "parent": "body", "width": 194.0, "height": 263.0 }
+				"body": { "name": "boy/body", "type": "linkedmesh", "skin": "full-skins/girl", "source": "body", "width": 194.0, "height": 263.0 }
 			},
 			"boot-ribbon-back": {
 				"boot-ribbon-back": {
@@ -2919,7 +2919,7 @@
 		"transform": [ "hat-control", "leg-down-back-up", "leg-up-back" ],
 		"attachments": {
 			"arm-back": {
-				"arm-back": { "name": "girl/arm-front", "type": "linkedmesh", "skin": "full-skins/boy", "parent": "arm-back", "width": 71.0, "height": 229.0 }
+				"arm-back": { "name": "girl/arm-front", "type": "linkedmesh", "skin": "full-skins/boy", "source": "arm-back", "width": 71.0, "height": 229.0 }
 			},
 			"bag-base": {
 				"bag-base": {
@@ -3404,7 +3404,7 @@
 				"scarf-back": { "name": "girl/scarf-back", "x": 46.87948, "y": 3.262665, "rotation": 177.98157, "width": 143, "height": 102 }
 			},
 			"sleeve-front": {
-				"sleeve-front": { "name": "girl/arm-front", "type": "linkedmesh", "skin": "full-skins/boy", "parent": "sleeve-front", "width": 71.0, "height": 229.0 }
+				"sleeve-front": { "name": "girl/arm-front", "type": "linkedmesh", "skin": "full-skins/boy", "source": "sleeve-front", "width": 71.0, "height": 229.0 }
 			},
 			"zip-girl": {
 				"zip-girl": { "name": "girl/zip", "x": 19.664124, "y": 3.688469, "rotation": 80.65533, "width": 37, "height": 49 }

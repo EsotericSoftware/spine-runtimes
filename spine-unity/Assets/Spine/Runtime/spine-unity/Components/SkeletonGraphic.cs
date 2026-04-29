@@ -106,6 +106,12 @@ namespace Spine.Unity {
 		public Material additiveMaterial;
 		public Material multiplyMaterial;
 		public Material screenMaterial;
+		/// <summary>
+		/// Normally when <see cref="MeshGenerator.Settings.pmaVertexColors">PMA Vertex Colors</see> is enabled,
+		/// additive blend mode is drawn in a single pass with normal blend mode and the normal material is used.
+		/// Enable this setting to use a separate additive material regardless.
+		/// </summary>
+		public bool forceAdditiveMaterial = false;
 
 		// Layout
 		protected float meshScale = 1f;
@@ -195,7 +201,18 @@ namespace Spine.Unity {
 		}
 
 		protected bool HasMaterialOrTextureOverride {
-			get { return (customMaterialOverride.Count > 0 || customTextureOverride.Count > 0); }
+			get {
+				return (customMaterialOverride.Count > 0
+					|| customSlotMaterials.Count > 0
+					|| customTextureOverride.Count > 0);
+			}
+		}
+
+		protected bool HasMaterialOverride {
+			get {
+				return customMaterialOverride.Count > 0
+					|| customSlotMaterials.Count > 0;
+			}
 		}
 
 		/// <summary>Use this Dictionary to override a Texture with a different Texture.</summary>
@@ -1149,9 +1166,16 @@ namespace Spine.Unity {
 			Texture[] usedTextureItems = usedTextures.Items;
 			SubmeshInstruction[] instructionItems = instructions.Items;
 
+			if (sharedMaterials.Length > 0)
+				sharedMaterials[0] = material; // required as materialForRendering below calls GetModifiedMaterial().
+			Material modifiedRenderingMaterial = this.materialForRendering;
+
+			bool hasSlotOverrides = customSlotMaterials.Count > 0;
 			for (int i = 0, count = sharedMaterials.Length; i < count; ++i) {
-				usedTextureItems[i] = instructionItems[i].material.mainTexture;
-				sharedMaterials[i] = this.materialForRendering;
+				Material instructionMaterial = instructionItems[i].material;
+				usedTextureItems[i] = instructionMaterial.mainTexture;
+				bool isExplicitSlotOverride = hasSlotOverrides && customSlotMaterials.ContainsValue(instructionMaterial);
+				sharedMaterials[i] = isExplicitSlotOverride ? instructionMaterial : modifiedRenderingMaterial;
 			}
 
 			BlendModeMaterials blendModeMaterials = skeletonDataAsset.blendModeMaterials;
@@ -1163,20 +1187,22 @@ namespace Spine.Unity {
 #if HAS_CULL_TRANSPARENT_MESH
 			bool mainCullTransparentMesh = this.canvasRenderer.cullTransparentMesh;
 #endif
-			if (HasMaterialOrTextureOverride || hasBlendModeMaterials || hasPMAAdditiveSlots) {
+			if (hasMaterialOrTextureOverride || hasBlendModeMaterials || hasPMAAdditiveSlots) {
 				for (int i = 0, count = sharedMaterials.Length; i < count; ++i) {
-					Texture originalTexture = instructionItems[i].material.mainTexture;
+					Material instructionMaterial = instructionItems[i].material;
+					Texture originalTexture = instructionMaterial.mainTexture;
 
-					if (hasMaterialOrTextureOverride) {
+					bool isSlotOverride = hasSlotOverrides && customSlotMaterials.ContainsValue(instructionMaterial);
+					if (hasMaterialOrTextureOverride && originalTexture != null) {
 						Material replacementMaterial;
 						Texture replacementTexture;
-						if (customMaterialOverride.TryGetValue(originalTexture, out replacementMaterial))
+						if (!isSlotOverride && customMaterialOverride.TryGetValue(originalTexture, out replacementMaterial))
 							sharedMaterials[i] = replacementMaterial;
 						if (customTextureOverride.TryGetValue(originalTexture, out replacementTexture) ||
 							customTextureOverride.TryGetValue(Texture2D.whiteTexture, out replacementTexture)) // white texture entry = replace-all
 							usedTextureItems[i] = replacementTexture;
 					}
-					if (hasBlendModeMaterials || hasPMAAdditiveSlots) {
+					if (!isSlotOverride && (hasBlendModeMaterials || hasPMAAdditiveSlots)) {
 						bool allowCullTransparentMesh = true;
 						Material blendModeMaterial = GetBlendModeMaterial(instructionItems[i], blendModeMaterials,
 							pmaVertexColors, ref allowCullTransparentMesh);
@@ -1195,6 +1221,8 @@ namespace Spine.Unity {
 				for (int i = 0, count = sharedMaterials.Length; i < count; ++i) {
 					sharedMaterials[i] = submeshGraphics[i].UpdateModifiedMaterial(sharedMaterials[i]);
 				}
+			} else {
+				canvasRenderer.SetMaterial(sharedMaterials[0], usedTextures.Items[0]);
 			}
 		}
 
@@ -1221,7 +1249,7 @@ namespace Spine.Unity {
 			} else if (blendMode == BlendMode.Additive) {
 				if (pmaVertexColors)
 					allowCullTransparentMesh = false;
-				else if (additiveMaterial)
+				if (additiveMaterial && (!pmaVertexColors || forceAdditiveMaterial))
 					blendModeMaterial = additiveMaterial;
 			} else if (blendMode == BlendMode.Multiply && multiplyMaterial)
 				blendModeMaterial = multiplyMaterial;
@@ -1244,6 +1272,15 @@ namespace Spine.Unity {
 				return false;
 			}
 			return true;
+		}
+
+		public override Material GetModifiedMaterial (Material baseMaterial) {
+			if (!HasMaterialOverride || allowMultipleCanvasRenderers)
+				return base.GetModifiedMaterial(baseMaterial);
+			Material[] sharedMaterials = rendererBuffers.sharedMaterials;
+			if (sharedMaterials == null || sharedMaterials.Length == 0)
+				return base.GetModifiedMaterial(baseMaterial);
+			return base.GetModifiedMaterial(sharedMaterials[0]);
 		}
 
 		/// <summary>

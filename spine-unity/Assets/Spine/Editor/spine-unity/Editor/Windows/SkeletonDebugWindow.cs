@@ -403,7 +403,7 @@ namespace Spine.Unity.Editor {
 										EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(ikConstraint.Data.Name, Icons.constraintIK));
 										FalseDropDown("Goal", ikConstraint.Target.Data.Name, Icons.bone, true);
 										using (new EditorGUI.DisabledGroupScope(true)) {
-											EditorGUILayout.Toggle(SpineInspectorUtility.TempContent("Data.Uniform", tooltip: "Uniformly scales a bone when Ik stretches or compresses."), ikConstraint.Data.Uniform);
+											EditorGUILayout.EnumPopup(SpineInspectorUtility.TempContent("Data.ScaleY", tooltip: "Determines how BonePose scaleY changes when IkConstraintPose compress or stretch sets BonePose scaleX."), ikConstraint.Data.ScaleY);
 										}
 
 										EditorGUI.BeginChangeCheck();

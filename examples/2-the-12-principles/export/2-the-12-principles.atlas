@@ -3,34 +3,32 @@
 	filter: Linear, Linear
 	scale: 0.4
 basket-ball
-	bounds: 932, 670, 55, 55
+	bounds: 961, 697, 55, 55
 basket-lambertian
-	bounds: 875, 670, 55, 55
+	bounds: 904, 697, 55, 55
 billiard-ball
-	bounds: 1007, 679, 14, 14
+	bounds: 948, 637, 14, 14
 billiard-lambertian
-	bounds: 1007, 695, 14, 14
+	bounds: 1008, 645, 14, 14
 billiard-specular
-	bounds: 1007, 711, 14, 14
+	bounds: 992, 645, 14, 14
 bowling-ball
-	bounds: 963, 626, 42, 42
+	bounds: 904, 609, 42, 42
 bowling-lambertian
-	bounds: 919, 626, 42, 42
+	bounds: 948, 653, 42, 42
 bowling-specular
-	bounds: 875, 626, 42, 42
+	bounds: 904, 653, 42, 42
 obstacle-course
-	bounds: 2, 195, 651, 530
+	bounds: 2, 222, 651, 530
 platform
-	bounds: 2, 63, 130, 325
-	rotate: 90
+	bounds: 655, 181, 130, 325
 ring-big
-	bounds: 655, 68, 247, 244
+	bounds: 655, 508, 247, 244
 ring-small
-	bounds: 329, 2, 202, 191
+	bounds: 787, 315, 202, 191
 tennis-ball
-	bounds: 989, 691, 16, 16
+	bounds: 992, 661, 16, 16
 tennis-lambertian
-	bounds: 989, 709, 16, 16
+	bounds: 992, 679, 16, 16
 water
-	bounds: 655, 314, 411, 218
-	rotate: 90
+	bounds: 2, 2, 411, 218

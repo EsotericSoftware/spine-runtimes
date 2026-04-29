@@ -56,6 +56,9 @@ public class Animation {
 	LongSet timelineIds;
 	IntArray bones;
 
+	// Nonessential.
+	final Color color = new Color(1, 1, 1, 1);
+
 	/** Creates a new animation. {@link #timelines} must be set before use. */
 	public Animation (String name) {
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
@@ -157,6 +160,11 @@ public class Animation {
 	 * See {@link SkeletonData#findAnimation(String)}. */
 	public String getName () {
 		return name;
+	}
+
+	/** The color of the animation as it was in Spine, or a default color if nonessential data was not exported. */
+	public Color getColor () {
+		return color;
 	}
 
 	public String toString () {
@@ -453,7 +461,7 @@ public class Animation {
 		public float getAbsoluteValue (float time, float alpha, boolean fromSetup, boolean add, float current, float setup) {
 			if (time < frames[0]) return fromSetup ? setup : current;
 			float value = getCurveValue(time);
-			return fromSetup ? setup + (value - setup) * alpha : current + (add ? value : value - current) * alpha;
+			return fromSetup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
 		}
 
 		/** Returns the interpolated value for properties set as absolute values, using the specified timeline value rather than
@@ -466,7 +474,7 @@ public class Animation {
 		public float getAbsoluteValue (float time, float alpha, boolean fromSetup, boolean add, float current, float setup,
 			float value) {
 			if (time < frames[0]) return fromSetup ? setup : current;
-			return fromSetup ? setup + (value - setup) * alpha : current + (add ? value : value - current) * alpha;
+			return fromSetup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
 		}
 
 		/** Returns the interpolated value for scale properties. The timeline and setup values are multiplied and sign adjusted.
@@ -527,7 +535,7 @@ public class Animation {
 
 		/** @param bezierCount The maximum number of Bezier curves. See {@link #shrink(int)}. */
 		public BoneTimeline2 (int frameCount, int bezierCount, int boneIndex, long property1, long property2) {
-			super(frameCount, bezierCount, property1 << 53 | boneIndex, property2 << 53 | +boneIndex);
+			super(frameCount, bezierCount, property1 << 53 | boneIndex, property2 << 53 | boneIndex);
 			this.boneIndex = boneIndex;
 			additive = true;
 		}
@@ -1344,13 +1352,14 @@ public class Animation {
 	}
 
 	/** Changes {@link SlotPose#deform} to deform a {@link VertexAttachment}. */
-	static public class DeformTimeline extends SlotCurveTimeline {
+	static public class DeformTimeline extends CurveTimeline implements SlotTimeline {
+		final int slotIndex;
 		final VertexAttachment attachment;
 		private final float[][] vertices;
 
 		public DeformTimeline (int frameCount, int bezierCount, int slotIndex, VertexAttachment attachment) {
-			super(frameCount, bezierCount, slotIndex,
-				(long)Property.deform.ordinal() << 53 | (long)slotIndex << 32 | +attachment.getId());
+			super(frameCount, bezierCount, (long)Property.deform.ordinal() << 53 | (long)slotIndex << 32 | attachment.getId());
+			this.slotIndex = slotIndex;
 			this.attachment = attachment;
 			vertices = new float[frameCount][];
 			additive = true;
@@ -1358,6 +1367,10 @@ public class Animation {
 
 		public int getFrameCount () {
 			return frames.length;
+		}
+
+		public int getSlotIndex () {
+			return slotIndex;
 		}
 
 		/** The attachment that will be deformed.
@@ -1433,122 +1446,149 @@ public class Animation {
 			return y + (1 - y) * (time - x) / (frames[frame + getFrameEntries()] - x);
 		}
 
-		protected void apply (Slot slot, SlotPose pose, float time, float alpha, boolean fromSetup, boolean add) {
-			if (!(pose.attachment instanceof VertexAttachment vertexAttachment)
-				|| vertexAttachment.getTimelineAttachment() != attachment) return;
-
-			FloatArray deformArray = pose.deform;
-			if (deformArray.size == 0) fromSetup = true;
-
-			float[][] vertices = this.vertices;
-			int vertexCount = vertices[0].length;
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
+			boolean add, boolean out, boolean appliedPose) {
+			Slot[] slots = skeleton.slots.items;
+			if (!attachment.isTimelineActive(slots, slotIndex, appliedPose)) return;
+			int[] timelineSlots = attachment.getTimelineSlots();
 
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				if (fromSetup) deformArray.clear();
+				applyBeforeFirst(slots[slotIndex], appliedPose, fromSetup);
+				for (int slotIndex : timelineSlots)
+					applyBeforeFirst(slots[slotIndex], appliedPose, fromSetup);
 				return;
 			}
 
+			float[] v1, v2;
+			float percent;
+			if (time >= frames[frames.length - 1]) {
+				percent = 0;
+				v1 = vertices[frames.length - 1];
+				v2 = null;
+			} else {
+				int frame = search(frames, time);
+				percent = getCurvePercent(time, frame);
+				v1 = vertices[frame];
+				v2 = vertices[frame + 1];
+			}
+
+			int vertexCount = vertices[0].length;
+			applyToSlot(slots[slotIndex], appliedPose, v1, v2, percent, vertexCount, alpha, fromSetup, add);
+			for (int slotIndex : timelineSlots)
+				applyToSlot(slots[slotIndex], appliedPose, v1, v2, percent, vertexCount, alpha, fromSetup, add);
+		}
+
+		private void applyBeforeFirst (Slot slot, boolean appliedPose, boolean fromSetup) {
+			if (!slot.bone.active) return;
+			SlotPose pose = appliedPose ? slot.appliedPose : slot.pose;
+			if (pose.attachment == null || pose.attachment.getTimelineAttachment() != attachment) return;
+			if (pose.deform.size == 0) fromSetup = true;
+			if (fromSetup) pose.deform.clear();
+		}
+
+		private void applyToSlot (Slot slot, boolean appliedPose, float[] v1, @Null float[] v2, float percent, int vertexCount,
+			float alpha, boolean fromSetup, boolean add) {
+			if (!slot.bone.active) return;
+			SlotPose pose = appliedPose ? slot.appliedPose : slot.pose;
+			if (pose.attachment == null || pose.attachment.getTimelineAttachment() != attachment) return;
+
+			var vertexAttachment = (VertexAttachment)pose.attachment;
+			FloatArray deformArray = pose.deform;
+			if (deformArray.size == 0) fromSetup = true;
 			float[] deform = deformArray.setSize(vertexCount);
 
-			if (time >= frames[frames.length - 1]) { // Time is after last frame.
-				float[] lastVertices = vertices[frames.length - 1];
+			if (v2 == null) { // Time is after last frame.
 				if (alpha == 1) {
 					if (add && !fromSetup) {
 						if (vertexAttachment.getBones() == null) { // Unweighted vertex positions, no alpha.
 							float[] setupVertices = vertexAttachment.getVertices();
 							for (int i = 0; i < vertexCount; i++)
-								deform[i] += lastVertices[i] - setupVertices[i];
+								deform[i] += v1[i] - setupVertices[i];
 						} else { // Weighted deform offsets, no alpha.
 							for (int i = 0; i < vertexCount; i++)
-								deform[i] += lastVertices[i];
+								deform[i] += v1[i];
 						}
 					} else // Vertex positions or deform offsets, no alpha.
-						arraycopy(lastVertices, 0, deform, 0, vertexCount);
+						arraycopy(v1, 0, deform, 0, vertexCount);
 				} else if (fromSetup) {
 					if (vertexAttachment.getBones() == null) { // Unweighted vertex positions, with alpha.
 						float[] setupVertices = vertexAttachment.getVertices();
 						for (int i = 0; i < vertexCount; i++) {
 							float setup = setupVertices[i];
-							deform[i] = setup + (lastVertices[i] - setup) * alpha;
+							deform[i] = setup + (v1[i] - setup) * alpha;
 						}
 					} else { // Weighted deform offsets, with alpha.
 						for (int i = 0; i < vertexCount; i++)
-							deform[i] = lastVertices[i] * alpha;
+							deform[i] = v1[i] * alpha;
 					}
 				} else if (add) {
 					if (vertexAttachment.getBones() == null) { // Unweighted vertex positions, with alpha.
 						float[] setupVertices = vertexAttachment.getVertices();
 						for (int i = 0; i < vertexCount; i++)
-							deform[i] += (lastVertices[i] - setupVertices[i]) * alpha;
+							deform[i] += (v1[i] - setupVertices[i]) * alpha;
 					} else { // Weighted deform offsets, with alpha.
 						for (int i = 0; i < vertexCount; i++)
-							deform[i] += lastVertices[i] * alpha;
+							deform[i] += v1[i] * alpha;
 					}
 				} else { // Vertex positions or deform offsets, with alpha.
 					for (int i = 0; i < vertexCount; i++)
-						deform[i] += (lastVertices[i] - deform[i]) * alpha;
+						deform[i] += (v1[i] - deform[i]) * alpha;
 				}
-				return;
-			}
-
-			int frame = search(frames, time);
-			float percent = getCurvePercent(time, frame);
-			float[] prevVertices = vertices[frame];
-			float[] nextVertices = vertices[frame + 1];
-
-			if (alpha == 1) {
-				if (add && !fromSetup) {
-					if (vertexAttachment.getBones() == null) { // Unweighted vertex positions, no alpha.
+			} else { // Between frames.
+				if (alpha == 1) {
+					if (add && !fromSetup) {
+						if (vertexAttachment.getBones() == null) { // Unweighted vertex positions, no alpha.
+							float[] setupVertices = vertexAttachment.getVertices();
+							for (int i = 0; i < vertexCount; i++) {
+								float prev = v1[i];
+								deform[i] += prev + (v2[i] - prev) * percent - setupVertices[i];
+							}
+						} else { // Weighted deform offsets, no alpha.
+							for (int i = 0; i < vertexCount; i++) {
+								float prev = v1[i];
+								deform[i] += prev + (v2[i] - prev) * percent;
+							}
+						}
+					} else if (percent == 0)
+						arraycopy(v1, 0, deform, 0, vertexCount);
+					else { // Vertex positions or deform offsets, no alpha.
+						for (int i = 0; i < vertexCount; i++) {
+							float prev = v1[i];
+							deform[i] = prev + (v2[i] - prev) * percent;
+						}
+					}
+				} else if (fromSetup) {
+					if (vertexAttachment.getBones() == null) { // Unweighted vertex positions, with alpha.
 						float[] setupVertices = vertexAttachment.getVertices();
 						for (int i = 0; i < vertexCount; i++) {
-							float prev = prevVertices[i];
-							deform[i] += prev + (nextVertices[i] - prev) * percent - setupVertices[i];
+							float prev = v1[i], setup = setupVertices[i];
+							deform[i] = setup + (prev + (v2[i] - prev) * percent - setup) * alpha;
 						}
-					} else { // Weighted deform offsets, no alpha.
+					} else { // Weighted deform offsets, with alpha.
 						for (int i = 0; i < vertexCount; i++) {
-							float prev = prevVertices[i];
-							deform[i] += prev + (nextVertices[i] - prev) * percent;
+							float prev = v1[i];
+							deform[i] = (prev + (v2[i] - prev) * percent) * alpha;
 						}
 					}
-				} else if (percent == 0)
-					arraycopy(prevVertices, 0, deform, 0, vertexCount);
-				else { // Vertex positions or deform offsets, no alpha.
-					for (int i = 0; i < vertexCount; i++) {
-						float prev = prevVertices[i];
-						deform[i] = prev + (nextVertices[i] - prev) * percent;
+				} else if (add) {
+					if (vertexAttachment.getBones() == null) { // Unweighted vertex positions, with alpha.
+						float[] setupVertices = vertexAttachment.getVertices();
+						for (int i = 0; i < vertexCount; i++) {
+							float prev = v1[i];
+							deform[i] += (prev + (v2[i] - prev) * percent - setupVertices[i]) * alpha;
+						}
+					} else { // Weighted deform offsets, with alpha.
+						for (int i = 0; i < vertexCount; i++) {
+							float prev = v1[i];
+							deform[i] += (prev + (v2[i] - prev) * percent) * alpha;
+						}
 					}
-				}
-			} else if (fromSetup) {
-				if (vertexAttachment.getBones() == null) { // Unweighted vertex positions, with alpha.
-					float[] setupVertices = vertexAttachment.getVertices();
+				} else { // Vertex positions or deform offsets, with alpha.
 					for (int i = 0; i < vertexCount; i++) {
-						float prev = prevVertices[i], setup = setupVertices[i];
-						deform[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
+						float prev = v1[i];
+						deform[i] += (prev + (v2[i] - prev) * percent - deform[i]) * alpha;
 					}
-				} else { // Weighted deform offsets, with alpha.
-					for (int i = 0; i < vertexCount; i++) {
-						float prev = prevVertices[i];
-						deform[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
-					}
-				}
-			} else if (add) {
-				if (vertexAttachment.getBones() == null) { // Unweighted vertex positions, with alpha.
-					float[] setupVertices = vertexAttachment.getVertices();
-					for (int i = 0; i < vertexCount; i++) {
-						float prev = prevVertices[i];
-						deform[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
-					}
-				} else { // Weighted deform offsets, with alpha.
-					for (int i = 0; i < vertexCount; i++) {
-						float prev = prevVertices[i];
-						deform[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
-					}
-				}
-			} else { // Vertex positions or deform offsets, with alpha.
-				for (int i = 0; i < vertexCount; i++) {
-					float prev = prevVertices[i];
-					deform[i] += (prev + (nextVertices[i] - prev) * percent - deform[i]) * alpha;
 				}
 			}
 		}
@@ -1560,13 +1600,13 @@ public class Animation {
 		static private final int MODE = 1, DELAY = 2;
 
 		final int slotIndex;
-		final HasSequence attachment;
+		final Attachment attachment;
 
 		public SequenceTimeline (int frameCount, int slotIndex, Attachment attachment) {
 			super(frameCount,
 				(long)Property.sequence.ordinal() << 53 | (long)slotIndex << 32 | ((HasSequence)attachment).getSequence().getId());
 			this.slotIndex = slotIndex;
-			this.attachment = (HasSequence)attachment;
+			this.attachment = attachment;
 			instant = true;
 		}
 
@@ -1582,7 +1622,7 @@ public class Animation {
 		 * <p>
 		 * See {@link VertexAttachment#getTimelineAttachment()}. */
 		public Attachment getAttachment () {
-			return (Attachment)attachment;
+			return attachment;
 		}
 
 		/** Sets the time, mode, index, and frame time for the specified frame.
@@ -1597,21 +1637,17 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,
 			boolean add, boolean out, boolean appliedPose) {
-			Slot slot = skeleton.slots.items[slotIndex];
-			if (!slot.bone.active) return;
-			SlotPose pose = appliedPose ? slot.appliedPose : slot.pose;
-
-			Attachment slotAttachment = pose.attachment;
-			if (!(slotAttachment instanceof HasSequence hasSequence) || slotAttachment.getTimelineAttachment() != attachment) return;
-
-			if (out) {
-				if (fromSetup) pose.setSequenceIndex(-1);
-				return;
-			}
+			Slot[] slots = skeleton.slots.items;
+			if (!attachment.isTimelineActive(slots, slotIndex, appliedPose)) return;
+			int[] timelineSlots = attachment.getTimelineSlots();
 
 			float[] frames = this.frames;
-			if (time < frames[0]) {
-				if (fromSetup) pose.setSequenceIndex(-1);
+			if (out || time < frames[0]) {
+				if (fromSetup) {
+					setupPose(slots[slotIndex], appliedPose);
+					for (int slotIndex : timelineSlots)
+						setupPose(slots[slotIndex], appliedPose);
+				}
 				return;
 			}
 
@@ -1620,7 +1656,24 @@ public class Animation {
 			int modeAndIndex = (int)frames[i + MODE];
 			float delay = frames[i + DELAY];
 
-			int index = modeAndIndex >> 4, count = hasSequence.getSequence().getRegions().length;
+			applyToSlot(slots[slotIndex], appliedPose, time, before, modeAndIndex, delay);
+			for (int slotIndex : timelineSlots)
+				applyToSlot(slots[slotIndex], appliedPose, time, before, modeAndIndex, delay);
+		}
+
+		private void setupPose (Slot slot, boolean appliedPose) {
+			if (!slot.bone.active) return;
+			SlotPose pose = appliedPose ? slot.appliedPose : slot.pose;
+			if (pose.attachment == null || pose.attachment.getTimelineAttachment() != attachment) return;
+			pose.setSequenceIndex(-1);
+		}
+
+		private void applyToSlot (Slot slot, boolean appliedPose, float time, float before, int modeAndIndex, float delay) {
+			if (!slot.bone.active) return;
+			SlotPose pose = appliedPose ? slot.appliedPose : slot.pose;
+			if (pose.attachment == null || pose.attachment.getTimelineAttachment() != attachment) return;
+
+			int index = modeAndIndex >> 4, count = ((HasSequence)pose.attachment).getSequence().getRegions().length;
 			SequenceMode mode = SequenceMode.values[modeAndIndex & 0xf];
 			if (mode != SequenceMode.hold) {
 				index += (time - before) / delay + 0.0001f;
@@ -2108,7 +2161,6 @@ public class Animation {
 		public PathConstraintMixTimeline (int frameCount, int bezierCount, int constraintIndex) {
 			super(frameCount, bezierCount, (long)Property.pathConstraintMix.ordinal() << 53 | constraintIndex);
 			this.constraintIndex = constraintIndex;
-			additive = true;
 		}
 
 		public int getFrameEntries () {
@@ -2421,7 +2473,6 @@ public class Animation {
 	static public class SliderTimeline extends ConstraintTimeline1 {
 		public SliderTimeline (int frameCount, int bezierCount, int constraintIndex) {
 			super(frameCount, bezierCount, constraintIndex, Property.sliderTime.ordinal());
-			additive = true;
 		}
 
 		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, boolean fromSetup,

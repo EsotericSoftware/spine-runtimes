@@ -34,6 +34,7 @@ import static com.esotericsoftware.spine.utils.SpineUtils.*;
 import com.badlogic.gdx.utils.Array;
 
 import com.esotericsoftware.spine.BoneData.Inherit;
+import com.esotericsoftware.spine.IkConstraintData.ScaleY;
 
 /** Adjusts the local rotation of 1 or 2 constrained bones so the world position of the tip of the last bone is as close to the
  * target bone as possible.
@@ -67,8 +68,8 @@ public class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 		BonePose target = this.target.appliedPose;
 		BonePose[] bones = this.bones.items;
 		switch (this.bones.size) {
-		case 1 -> apply(skeleton, bones[0], target.worldX, target.worldY, p.compress, p.stretch, data.uniform, p.mix);
-		case 2 -> apply(skeleton, bones[0], bones[1], target.worldX, target.worldY, p.bendDirection, p.stretch, data.uniform,
+		case 1 -> apply(skeleton, bones[0], target.worldX, target.worldY, p.compress, p.stretch, data.scaleY, p.mix);
+		case 2 -> apply(skeleton, bones[0], bones[1], target.worldX, target.worldY, p.bendDirection, p.stretch, data.scaleY,
 			p.softness, p.mix);
 		}
 	}
@@ -105,7 +106,7 @@ public class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 
 	/** Applies 1 bone IK. The target is specified in the world coordinate system. */
 	static public void apply (Skeleton skeleton, BonePose bone, float targetX, float targetY, boolean compress, boolean stretch,
-		boolean uniform, float mix) {
+		ScaleY scaleY, float mix) {
 		if (bone == null) throw new IllegalArgumentException("bone cannot be null.");
 		bone.modifyLocal(skeleton);
 		BonePose p = bone.bone.parent.appliedPose;
@@ -155,7 +156,10 @@ public class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 				if ((compress && dd < b * b) || (stretch && dd > b * b)) {
 					float s = ((float)Math.sqrt(dd) / b - 1) * mix + 1;
 					bone.scaleX *= s;
-					if (uniform) bone.scaleY *= s;
+					switch (scaleY) {
+					case uniform -> bone.scaleY *= s;
+					case volume -> bone.scaleY /= s;
+					}
 				}
 			}
 		}
@@ -164,7 +168,7 @@ public class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 	/** Applies 2 bone IK. The target is specified in the world coordinate system.
 	 * @param child A direct descendant of the parent bone. */
 	static public void apply (Skeleton skeleton, BonePose parent, BonePose child, float targetX, float targetY, int bendDir,
-		boolean stretch, boolean uniform, float softness, float mix) {
+		boolean stretch, ScaleY scaleY, float softness, float mix) {
 		if (parent == null) throw new IllegalArgumentException("parent cannot be null.");
 		if (child == null) throw new IllegalArgumentException("child cannot be null.");
 		if (parent.inherit != Inherit.normal || child.inherit != Inherit.normal) return;
@@ -209,7 +213,7 @@ public class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 		float dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
 		float l1 = (float)Math.sqrt(dx * dx + dy * dy), l2 = child.bone.data.length * csx, a1, a2;
 		if (l1 < 0.0001f) {
-			apply(skeleton, parent, targetX, targetY, false, stretch, false, mix);
+			apply(skeleton, parent, targetX, targetY, false, stretch, ScaleY.none, mix);
 			child.rotation = 0;
 			return;
 		}
@@ -241,7 +245,10 @@ public class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 				if (stretch) {
 					a = ((float)Math.sqrt(dd) / (l1 + l2) - 1) * mix + 1;
 					parent.scaleX *= a;
-					if (uniform) parent.scaleY *= a;
+					switch (scaleY) {
+					case uniform -> parent.scaleY *= a;
+					case volume -> parent.scaleY /= a;
+					}
 				}
 			} else
 				a2 = (float)Math.acos(cos) * bendDir;

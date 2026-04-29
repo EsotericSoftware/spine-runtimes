@@ -39,6 +39,10 @@
 #define USE_FIND_OBJECTS_BY_TYPE
 #endif
 
+#if UNITY_6000_3_OR_NEWER
+#define USES_ENTITY_ID
+#endif
+
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -53,7 +57,11 @@ namespace Spine.Unity.Editor {
 	public partial class SpineEditorUtilities {
 		public static class DataReloadHandler {
 
+#if USES_ENTITY_ID
+			internal static Dictionary<EntityId, string> savedSkeletonDataAssetAtSKeletonGraphicID = new Dictionary<EntityId, string>();
+#else
 			internal static Dictionary<int, string> savedSkeletonDataAssetAtSKeletonGraphicID = new Dictionary<int, string>();
+#endif
 
 #if NEWPLAYMODECALLBACKS
 			internal static void OnPlaymodeStateChanged (PlayModeStateChange stateChange) {
@@ -96,7 +104,11 @@ namespace Spine.Unity.Editor {
 					SkeletonDataAsset skeletonDataAsset = skeletonGraphic.skeletonDataAsset;
 					if (skeletonDataAsset != null) {
 						string assetPath = AssetDatabase.GetAssetPath(skeletonDataAsset);
+#if USES_ENTITY_ID
+						EntityId sgID = skeletonGraphic.GetEntityId();
+#else
 						int sgID = skeletonGraphic.GetInstanceID();
+#endif
 						savedSkeletonDataAssetAtSKeletonGraphicID[sgID] = assetPath;
 						skeletonDataAssetsToReload.Add(skeletonDataAsset);
 					}

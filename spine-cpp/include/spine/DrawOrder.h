@@ -61,7 +61,7 @@ namespace spine {
 
 	private:
 		/// Sets the applied pose to the unconstrained pose, for when no constraints will modify the draw order.
-		void pose();
+		void unconstrained();
 
 		/// Sets the applied pose to the constrained pose, in anticipation of the applied pose being modified by constraints.
 		void constrained();

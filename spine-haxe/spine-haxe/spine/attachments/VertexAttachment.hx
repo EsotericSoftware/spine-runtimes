@@ -155,5 +155,6 @@ class VertexAttachment extends Attachment {
 
 		attachment.worldVerticesLength = worldVerticesLength;
 		attachment.timelineAttachment = timelineAttachment;
+		attachment.timelineSlots = timelineSlots;
 	}
 }
