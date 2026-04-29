@@ -550,7 +550,7 @@
               },
               "apply-mode": {
                 "name": "Apply",
-                "desc": "Once: the pose is applied for the current frame only. Hold: the pose is re-applied every frame until released. In hold mode, values left as empty string preserve the previously held value on that axis.",
+                "desc": "Once: the pose is applied for the current frame only. Hold: the pose is re-applied every frame until released. Use an empty string to leave a component unchanged.",
                 "items": {
                   "once": "Once",
                   "hold": "Hold"

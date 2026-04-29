@@ -483,27 +483,27 @@
           {
             "id": "x",
             "type": "any",
-            "initialValue": ""
+            "initialValue": "\"\""
           },
           {
             "id": "y",
             "type": "any",
-            "initialValue": ""
+            "initialValue": "\"\""
           },
           {
             "id": "rotation",
             "type": "any",
-            "initialValue": ""
+            "initialValue": "\"\""
           },
           {
             "id": "scaleX",
             "type": "any",
-            "initialValue": "1"
+            "initialValue": "\"\""
           },
           {
             "id": "scaleY",
             "type": "any",
-            "initialValue": "1"
+            "initialValue": "\"\""
           }
         ]
       },
