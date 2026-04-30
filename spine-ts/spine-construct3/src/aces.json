@@ -715,6 +715,37 @@
         ]
       },
       {
+        "id": "set-object-collision-bounding-box",
+        "scriptName": "SetObjectCollisionBoundingBox",
+        "highlight": false,
+        "params": [
+          {
+            "id": "slot-name",
+            "type": "string"
+          },
+          {
+            "id": "attachment-name",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "clear-object-collision-bounding-box",
+        "scriptName": "ClearObjectCollisionBoundingBox",
+        "highlight": false
+      },
+      {
+        "id": "set-object-collision-bounding-box-debug",
+        "scriptName": "SetObjectCollisionBoundingBoxDebug",
+        "highlight": false,
+        "params": [
+          {
+            "id": "enabled",
+            "type": "boolean"
+          }
+        ]
+      },
+      {
         "id": "set-bounds",
         "scriptName": "SetBounds",
         "highlight": false,

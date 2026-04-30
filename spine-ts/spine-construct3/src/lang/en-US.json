@@ -757,7 +757,7 @@
           "set-collision-bounding-box": {
             "list-name": "Set collision bounding box",
             "display-text": "Set collision body to bounding box {1} on slot {0}",
-            "description": "Use a Spine bounding box attachment to update the internal Sprite collision body mesh each tick. The attachment is applied once when this action is called."
+            "description": "Use a Spine bounding box attachment to update the internal Sprite collision body mesh each tick. The attachment is applied once when this action is called.",
             "params": {
               "slot-name": {
                 "name": "Slot name",
@@ -782,6 +782,37 @@
               "enabled": {
                 "name": "Enabled",
                 "desc": "Whether to draw the collision bounding box mesh outline"
+              }
+            }
+          },
+          "set-object-collision-bounding-box": {
+            "list-name": "Set object collision bounding box",
+            "display-text": "Set object collision polygon to bounding box {1} on slot {0}",
+            "description": "Use a Spine bounding box attachment as the collision polygon for the Spine object itself. The attachment is applied once when this action is called.",
+            "params": {
+              "slot-name": {
+                "name": "Slot name",
+                "desc": "Name of the slot containing the bounding box attachment"
+              },
+              "attachment-name": {
+                "name": "Attachment name",
+                "desc": "Name of the bounding box attachment to use for the Spine object collision polygon"
+              }
+            }
+          },
+          "clear-object-collision-bounding-box": {
+            "list-name": "Clear object collision bounding box",
+            "display-text": "Clear object collision bounding box",
+            "description": "Stop using a Spine bounding box attachment as the Spine object's collision mesh."
+          },
+          "set-object-collision-bounding-box-debug": {
+            "list-name": "Set object collision bounding box debug",
+            "display-text": "Set object collision bounding box debug to {0}",
+            "description": "Draw the active Spine object collision bounding box polygon outline for debugging.",
+            "params": {
+              "enabled": {
+                "name": "Enabled",
+                "desc": "Whether to draw the Spine object collision bounding box polygon outline"
               }
             }
           },

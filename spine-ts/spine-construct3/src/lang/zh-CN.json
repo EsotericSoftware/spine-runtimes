@@ -757,7 +757,7 @@
           "set-collision-bounding-box": {
             "list-name": "设置碰撞边界框",
             "display-text": "将碰撞体设置为插槽{0}上的边界框{1}",
-            "description": "使用Spine边界框附件每帧更新内部Sprite碰撞体网格。调用此动作时会应用一次该附件。"
+            "description": "使用Spine边界框附件每帧更新内部Sprite碰撞体网格。调用此动作时会应用一次该附件。",
             "params": {
               "slot-name": {
                 "name": "插槽名称",
@@ -782,6 +782,37 @@
               "enabled": {
                 "name": "启用",
                 "desc": "是否绘制碰撞边界框网格轮廓"
+              }
+            }
+          },
+          "set-object-collision-bounding-box": {
+            "list-name": "设置对象碰撞边界框",
+            "display-text": "将对象碰撞多边形设置为插槽{0}上的边界框{1}",
+            "description": "使用Spine边界框附件作为Spine对象本身的碰撞多边形。调用此动作时会应用一次该附件。",
+            "params": {
+              "slot-name": {
+                "name": "插槽名称",
+                "desc": "包含边界框附件的插槽名称"
+              },
+              "attachment-name": {
+                "name": "附件名称",
+                "desc": "用于Spine对象碰撞多边形的边界框附件名称"
+              }
+            }
+          },
+          "clear-object-collision-bounding-box": {
+            "list-name": "清除对象碰撞边界框",
+            "display-text": "清除对象碰撞边界框",
+            "description": "停止使用Spine边界框附件作为Spine对象的碰撞网格。"
+          },
+          "set-object-collision-bounding-box-debug": {
+            "list-name": "设置对象碰撞边界框调试",
+            "display-text": "将对象碰撞边界框调试设置为{0}",
+            "description": "绘制当前Spine对象碰撞边界框多边形轮廓以便调试。",
+            "params": {
+              "enabled": {
+                "name": "启用",
+                "desc": "是否绘制Spine对象碰撞边界框多边形轮廓"
               }
             }
           },
