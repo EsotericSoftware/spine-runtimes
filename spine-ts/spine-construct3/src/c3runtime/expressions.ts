@@ -154,6 +154,10 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Exps =
 
 	BoundsHeight (this: SpineC3Instance) {
 		return this.getBounds().height;
+	},
+
+	CollisionBodyUID (this: SpineC3Instance) {
+		return this.getCollisionBodyUid();
 	}
 };
 

@@ -137,6 +137,11 @@
             "display-text": "是否正在播放",
             "description": "检查动画是否正在播放"
           },
+          "has-collision-body": {
+            "list-name": "有碰撞体",
+            "display-text": "有碰撞体",
+            "description": "检查此Spine实例当前是否有生成的碰撞体。"
+          },
           "is-inside-slot": {
             "list-name": "点是否在插槽内",
             "display-text": "点({0}, {1})是否在插槽{2}内",
@@ -785,34 +790,14 @@
               }
             }
           },
-          "set-object-collision-bounding-box": {
-            "list-name": "设置对象碰撞边界框",
-            "display-text": "将对象碰撞多边形设置为插槽{0}上的边界框{1}",
-            "description": "使用Spine边界框附件作为Spine对象本身的碰撞多边形。调用此动作时会应用一次该附件。",
-            "params": {
-              "slot-name": {
-                "name": "插槽名称",
-                "desc": "包含边界框附件的插槽名称"
-              },
-              "attachment-name": {
-                "name": "附件名称",
-                "desc": "用于Spine对象碰撞多边形的边界框附件名称"
-              }
-            }
-          },
-          "clear-object-collision-bounding-box": {
-            "list-name": "清除对象碰撞边界框",
-            "display-text": "清除对象碰撞边界框",
-            "description": "停止使用Spine边界框附件作为Spine对象的碰撞网格。"
-          },
-          "set-object-collision-bounding-box-debug": {
-            "list-name": "设置对象碰撞边界框调试",
-            "display-text": "将对象碰撞边界框调试设置为{0}",
-            "description": "绘制当前Spine对象碰撞边界框多边形轮廓以便调试。",
+          "set-collision-body-drives-object": {
+            "list-name": "设置碰撞体驱动对象",
+            "display-text": "将碰撞体驱动对象设置为{0}",
+            "description": "启用时，生成的Sprite碰撞体的移动会移动Spine对象。适用于将移动行为添加到碰撞体。",
             "params": {
               "enabled": {
                 "name": "启用",
-                "desc": "是否绘制Spine对象碰撞边界框多边形轮廓"
+                "desc": "生成的碰撞体是否应驱动Spine对象的位置"
               }
             }
           },
@@ -1030,6 +1015,10 @@
           "bounds-height": {
             "description": "获取当前边界的高度。",
             "translated-name": "BoundsHeight"
+          },
+          "collision-body-uid": {
+            "description": "获取此Spine实例生成的碰撞体UID；如果没有则返回-1。可与碰撞体对象的按比较选取条件一起使用，以配置碰撞体上的行为。"
+            "translated-name": "CollisionBodyUID"
           }
         },
         "custom_ui": {

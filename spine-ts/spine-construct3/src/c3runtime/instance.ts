@@ -34,40 +34,6 @@ const spine = globalThis.spine;
 
 spine.Skeleton.yDown = true;
 
-type RuntimeCollisionPoly = {
-	setPoints: (points: number[]) => void,
-	pointsArr: () => NumberArrayLike,
-};
-
-type RuntimeWorldInfo = {
-	GetInstance: () => { GetUID: () => number },
-	GetX: () => number,
-	GetY: () => number,
-	GetSourceCollisionPoly: () => RuntimeCollisionPoly | null,
-	GetTransformedCollisionPoly: () => RuntimeCollisionPoly,
-	HasOwnCollisionPoly: () => boolean,
-	SetSourceCollisionPoly: (poly: RuntimeCollisionPoly | null) => void,
-	SetBboxChanged: () => void,
-};
-
-const worldInfoByUid = new Map<number, RuntimeWorldInfo>();
-
-function patchWorldInfoAccess () {
-	const worldInfoPrototype = (C3 as unknown as { WorldInfo?: { prototype: RuntimeWorldInfo & { __spineWorldInfoAccessPatched?: boolean } } }).WorldInfo?.prototype;
-	if (!worldInfoPrototype || worldInfoPrototype.__spineWorldInfoAccessPatched) return;
-
-	worldInfoPrototype.__spineWorldInfoAccessPatched = true;
-	for (const methodName of ["GetBoundingBox", "GetBoundingQuad", "SetBboxChanged"] as const) {
-		const original = (worldInfoPrototype as unknown as Record<string, (...args: unknown[]) => unknown>)[methodName];
-		if (typeof original !== "function") continue;
-
-		(worldInfoPrototype as unknown as Record<string, (...args: unknown[]) => unknown>)[methodName] = function (this: RuntimeWorldInfo, ...args: unknown[]) {
-			worldInfoByUid.set(this.GetInstance().GetUID(), this);
-			return original.apply(this, args);
-		};
-	}
-}
-
 type BoneOverride = Partial<BonePose> & { mode: "game" | "local" };
 type BoneFollower = {
 	uid: number,
@@ -106,15 +72,9 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	private collisionBoundingBoxGamePoints: number[] = [];
 	private collisionBoundingBoxDebug = false;
 	private collisionBoundingBoxMeshSize: [number, number] = [0, 0];
-	private objectCollisionBoundingBoxSlotName = "";
-	private objectCollisionBoundingBoxAttachmentName = "";
-	private objectCollisionBoundingBoxSlot?: Slot;
-	private objectCollisionBoundingBoxGamePoints: number[] = [];
-	private objectCollisionBoundingBoxPolyPoints: number[] = [];
-	private objectCollisionBoundingBoxDebug = false;
-	private objectCollisionBoundingBoxActive = false;
-	private objectCollisionBoundingBoxPoly?: RuntimeCollisionPoly;
-	private objectCollisionBoundingBoxPreviousPoly?: RuntimeCollisionPoly | null;
+	private collisionBodyDrivesObject = false;
+	private collisionBodyPrevX = 0;
+	private collisionBodyPrevY = 0;
 	isPlaying = true;
 	physicsMode = spine.Physics.update;
 	customSkins: Record<string, Skin> = {};
@@ -186,8 +146,6 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 		this.collisionSpriteClassName = `${this.objectType.name}_CollisionBody`;
 
-		patchWorldInfoAccess();
-
 		this.assetLoader = new spine.AssetLoader();
 		this.matrix = new spine.C3Matrix();
 
@@ -229,7 +187,6 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			this.height / this.spineBounds.height * this.propScaleY);
 
 		this.updateCollisionSprite();
-		this.updateObjectCollisionBoundingBoxPolygon();
 
 		if (this.isPlaying) this.update(this.dt);
 	}
@@ -250,7 +207,6 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		skeleton.updateWorldTransform(physicsMode);
 
 		this.updateCollisionSprite();
-		this.updateObjectCollisionBoundingBoxPolygon();
 		this.updateBoneFollowers(matrix);
 
 		this.runtime.sdk.updateRender();
@@ -272,7 +228,6 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 		if (this.propDebugSkeleton) this.skeletonRenderer.drawDebug(skeleton, this.x, this.y, this.getBoundingQuad(false));
 		this.renderCollisionBoundingBoxDebug(renderer);
-		this.renderObjectCollisionBoundingBoxDebug(renderer);
 		this.renderDragHandles();
 	}
 
@@ -286,32 +241,6 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		for (let i = 0; i < points.length; i += 2) {
 			const next = (i + 2) % points.length;
 			renderer.line(points[i], points[i + 1], points[next], points[next + 1]);
-		}
-		renderer.popLineWidth();
-		renderer.setTextureFillMode();
-		renderer.setColorRgba(1, 1, 1, 1);
-	}
-
-	private renderObjectCollisionBoundingBoxDebug (renderer: IRenderer) {
-		if (!this.objectCollisionBoundingBoxDebug) return;
-
-		const worldInfo = this.getRuntimeWorldInfo();
-		let points = this.objectCollisionBoundingBoxGamePoints;
-		let offsetX = 0;
-		let offsetY = 0;
-		if (worldInfo?.HasOwnCollisionPoly()) {
-			points = worldInfo.GetTransformedCollisionPoly().pointsArr() as number[];
-			offsetX = worldInfo.GetX();
-			offsetY = worldInfo.GetY();
-		}
-		if (points.length < 6) return;
-
-		renderer.setColorFillMode();
-		renderer.setColorRgba(worldInfo?.HasOwnCollisionPoly() ? 0 : 1, 1, 0, 1);
-		renderer.pushLineWidth(2);
-		for (let i = 0; i < points.length; i += 2) {
-			const next = (i + 2) % points.length;
-			renderer.line(points[i] + offsetX, points[i + 1] + offsetY, points[next] + offsetX, points[next + 1] + offsetY);
 		}
 		renderer.popLineWidth();
 		renderer.setTextureFillMode();
@@ -542,8 +471,6 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	}
 
 	_release () {
-		this.releaseObjectCollisionBoundingBoxPolygon();
-		worldInfoByUid.delete(this.uid);
 		super._release();
 		this.assetLoader.releaseInstanceResources(this.propSkel, this.propAtlas, this.propLoaderScale);
 		this.textureAtlas = undefined;
@@ -625,6 +552,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	}
 
 	private updateCollisionSprite () {
+		this.updateObjectFromCollisionBody();
 		if (!this.collisionSpriteInstance) return;
 
 		if (this.collisionBoundingBoxSlotName && this.collisionBoundingBoxAttachmentName) {
@@ -639,6 +567,10 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 		this.collisionSpriteInstance.isCollisionEnabled = true;
 		this.collisionSpriteInstance.setPosition(this.x, this.y);
+		if (this.collisionBodyDrivesObject) {
+			this.collisionBodyPrevX = this.collisionSpriteInstance.x;
+			this.collisionBodyPrevY = this.collisionSpriteInstance.y;
+		}
 		this.collisionSpriteInstance.setSize(this.width, this.height);
 		this.collisionSpriteInstance.angleDegrees = this.angleDegrees;
 		this.collisionSpriteInstance.setOrigin(this.originX, this.originY);
@@ -700,6 +632,10 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 		collisionSpriteInstance.isCollisionEnabled = true;
 		collisionSpriteInstance.setPosition(minX, minY);
+		if (this.collisionBodyDrivesObject) {
+			this.collisionBodyPrevX = collisionSpriteInstance.x;
+			this.collisionBodyPrevY = collisionSpriteInstance.y;
+		}
 		collisionSpriteInstance.setSize(width, height);
 		collisionSpriteInstance.angle = 0;
 		collisionSpriteInstance.setOrigin(0, 0);
@@ -739,120 +675,47 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		this.runtime.sdk.updateRender();
 	}
 
-	private updateObjectCollisionBoundingBoxPolygon () {
-		const { skeleton } = this;
-		if (!skeleton || !this.objectCollisionBoundingBoxSlotName || !this.objectCollisionBoundingBoxAttachmentName) return;
-
-		const slot = this.objectCollisionBoundingBoxSlot ?? skeleton.findSlot(this.objectCollisionBoundingBoxSlotName) ?? undefined;
-		this.objectCollisionBoundingBoxSlot = slot;
-		if (!slot || !slot.bone.active) {
-			this.releaseObjectCollisionBoundingBoxPolygon();
-			return;
-		}
-
-		const attachment = slot.appliedPose.attachment;
-		if (!(attachment instanceof spine.BoundingBoxAttachment) || attachment.name !== this.objectCollisionBoundingBoxAttachmentName) {
-			this.releaseObjectCollisionBoundingBoxPolygon();
-			return;
-		}
-
-		const vertexCount = attachment.worldVerticesLength >> 1;
-		if (vertexCount < 3) {
-			this.releaseObjectCollisionBoundingBoxPolygon();
-			return;
-		}
-
-		if (this.collisionBoundingBoxVertices.length < attachment.worldVerticesLength)
-			this.collisionBoundingBoxVertices = spine.Utils.newFloatArray(attachment.worldVerticesLength);
-
-		attachment.computeWorldVertices(skeleton, slot, 0, attachment.worldVerticesLength, this.collisionBoundingBoxVertices, 0, 2);
-
-		const gamePoints = this.objectCollisionBoundingBoxGamePoints;
-		const polyPoints = this.objectCollisionBoundingBoxPolyPoints;
-		gamePoints.length = 0;
-		polyPoints.length = 0;
-		for (let i = 0; i < attachment.worldVerticesLength; i += 2) {
-			const point = this.matrix.skeletonToGame(this.collisionBoundingBoxVertices[i], this.collisionBoundingBoxVertices[i + 1]);
-			gamePoints.push(point.x, point.y);
-			const polyPoint = this.gamePointToObjectCollisionPolyPoint(point.x, point.y);
-			polyPoints.push(polyPoint.x, polyPoint.y);
-		}
-
-		this.setObjectCollisionPoly(polyPoints);
+	public hasCollisionBody () {
+		return !!this.collisionSpriteInstance;
 	}
 
-	private gamePointToObjectCollisionPolyPoint (x: number, y: number) {
-		const dx = x - this.x;
-		const dy = y - this.y;
-		const cos = Math.cos(-this.angle);
-		const sin = Math.sin(-this.angle);
-		const localX = cos * dx - sin * dy;
-		const localY = sin * dx + cos * dy;
-		return {
-			x: localX / this.width,
-			y: localY / this.height,
-		};
+	public getCollisionBodyUid () {
+		return this.collisionSpriteInstance?.uid ?? -1;
 	}
 
-	private getRuntimeWorldInfo () {
-		patchWorldInfoAccess();
-		// Trigger the patched WorldInfo.GetBoundingBox wrapper so the hidden WorldInfo is cached by UID.
-		this.getBoundingBox();
-		return worldInfoByUid.get(this.uid);
-	}
+	public setCollisionBodyDrivesObject (enabled: boolean) {
+		if (enabled === this.collisionBodyDrivesObject) return;
 
-	private setObjectCollisionPoly (points: number[]) {
-		const worldInfo = this.getRuntimeWorldInfo();
-		const CollisionPoly = (C3 as unknown as { CollisionPoly?: new (points: number[]) => RuntimeCollisionPoly }).CollisionPoly;
-		if (!worldInfo || !CollisionPoly) return;
-
-		this.isCollisionEnabled = true;
-
-		if (!this.objectCollisionBoundingBoxActive)
-			this.objectCollisionBoundingBoxPreviousPoly = worldInfo.GetSourceCollisionPoly();
-
-		if (!this.objectCollisionBoundingBoxPoly) {
-			this.objectCollisionBoundingBoxPoly = new CollisionPoly(points);
+		if (enabled) {
+			this.collisionBodyDrivesObject = false;
+			this.updateCollisionSprite();
+			this.collisionBodyDrivesObject = true;
+			this.collisionBodyPrevX = this.collisionSpriteInstance?.x ?? this.x;
+			this.collisionBodyPrevY = this.collisionSpriteInstance?.y ?? this.y;
 		} else {
-			this.objectCollisionBoundingBoxPoly.setPoints(points);
+			this.collisionBodyDrivesObject = false;
+			this.updateCollisionSprite();
 		}
-		// Re-assign every update so WorldInfo discards its cached transformed collision polygon.
-		worldInfo.SetSourceCollisionPoly(this.objectCollisionBoundingBoxPoly ?? null);
-		this.objectCollisionBoundingBoxActive = true;
-		worldInfo.SetBboxChanged();
 	}
 
-	private releaseObjectCollisionBoundingBoxPolygon () {
-		const worldInfo = this.getRuntimeWorldInfo();
-		if (worldInfo && this.objectCollisionBoundingBoxActive) {
-			worldInfo.SetSourceCollisionPoly(this.objectCollisionBoundingBoxPreviousPoly ?? null);
-			worldInfo.SetBboxChanged();
-		}
-		this.objectCollisionBoundingBoxActive = false;
-		this.objectCollisionBoundingBoxPreviousPoly = undefined;
-		this.objectCollisionBoundingBoxGamePoints.length = 0;
-		this.objectCollisionBoundingBoxPolyPoints.length = 0;
-	}
+	private updateObjectFromCollisionBody () {
+		const collisionSpriteInstance = this.collisionSpriteInstance;
+		if (!this.collisionBodyDrivesObject || !collisionSpriteInstance) return;
 
-	public setObjectCollisionBoundingBox (slotName: string, attachmentName: string) {
-		this.objectCollisionBoundingBoxSlotName = slotName;
-		this.objectCollisionBoundingBoxAttachmentName = attachmentName;
-		this.objectCollisionBoundingBoxSlot = this.skeleton?.findSlot(slotName) ?? undefined;
-		if (slotName && attachmentName) this.skeleton?.setAttachment(slotName, attachmentName);
-		this.updateObjectCollisionBoundingBoxPolygon();
-	}
+		const dx = collisionSpriteInstance.x - this.collisionBodyPrevX;
+		const dy = collisionSpriteInstance.y - this.collisionBodyPrevY;
+		this.collisionBodyPrevX = collisionSpriteInstance.x;
+		this.collisionBodyPrevY = collisionSpriteInstance.y;
+		if (dx === 0 && dy === 0) return;
 
-	public clearObjectCollisionBoundingBox () {
-		this.objectCollisionBoundingBoxSlotName = "";
-		this.objectCollisionBoundingBoxAttachmentName = "";
-		this.objectCollisionBoundingBoxSlot = undefined;
-		this.releaseObjectCollisionBoundingBoxPolygon();
-	}
-
-	public setObjectCollisionBoundingBoxDebug (enabled: boolean) {
-		this.objectCollisionBoundingBoxDebug = enabled;
-		this.requestRedraw = true;
-		this.runtime.sdk.updateRender();
+		this.offsetPosition(dx, dy);
+		this.matrix.update(
+			this.x + this.propOffsetX,
+			this.y + this.propOffsetY,
+			this.totalZ,
+			this.angle + this.propOffsetAngle,
+			this.width / this.spineBounds.width * this.propScaleX,
+			this.height / this.spineBounds.height * this.propScaleY);
 	}
 
 	private calculateBounds () {

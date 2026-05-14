@@ -37,7 +37,10 @@
         spineboy.state.data.defaultMix = 0.2;
 
         // Set animation "run" on track 0, looped.
-        spineboy.state.setAnimation(0, "run", true);
+        spineboy.state.setAnimation(0, "run", false);
+        setTimeout(() => {
+          spineboy.state.addAnimation(0, "run", false, 1);
+        }, 2000)
 
         // Center the spine object on screen.
         spineboy.x = window.innerWidth / 2;

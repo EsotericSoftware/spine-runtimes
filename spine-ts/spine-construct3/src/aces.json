@@ -50,6 +50,11 @@
         "isTrigger": false
       },
       {
+        "id": "has-collision-body",
+        "scriptName": "HasCollisionBody",
+        "isTrigger": false
+      },
+      {
         "id": "is-inside-slot",
         "scriptName": "IsInsideSlot",
         "isTrigger": false,
@@ -715,28 +720,8 @@
         ]
       },
       {
-        "id": "set-object-collision-bounding-box",
-        "scriptName": "SetObjectCollisionBoundingBox",
-        "highlight": false,
-        "params": [
-          {
-            "id": "slot-name",
-            "type": "string"
-          },
-          {
-            "id": "attachment-name",
-            "type": "string"
-          }
-        ]
-      },
-      {
-        "id": "clear-object-collision-bounding-box",
-        "scriptName": "ClearObjectCollisionBoundingBox",
-        "highlight": false
-      },
-      {
-        "id": "set-object-collision-bounding-box-debug",
-        "scriptName": "SetObjectCollisionBoundingBoxDebug",
+        "id": "set-collision-body-drives-object",
+        "scriptName": "SetCollisionBodyDrivesObject",
         "highlight": false,
         "params": [
           {
@@ -1005,6 +990,12 @@
       {
         "id": "bounds-height",
         "expressionName": "BoundsHeight",
+        "highlight": false,
+        "returnType": "number"
+      },
+      {
+        "id": "collision-body-uid",
+        "expressionName": "CollisionBodyUID",
         "highlight": false,
         "returnType": "number"
       }

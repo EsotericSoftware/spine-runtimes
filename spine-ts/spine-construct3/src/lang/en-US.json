@@ -137,6 +137,11 @@
             "display-text": "Is playing",
             "description": "Check if the animation is currently playing"
           },
+          "has-collision-body": {
+            "list-name": "Has collision body",
+            "display-text": "Has collision body",
+            "description": "Check if this Spine instance currently has a generated collision body."
+          },
           "is-inside-slot": {
             "list-name": "Is point inside slot",
             "display-text": "Is point ({0}, {1}) inside slot {2}",
@@ -785,34 +790,14 @@
               }
             }
           },
-          "set-object-collision-bounding-box": {
-            "list-name": "Set object collision bounding box",
-            "display-text": "Set object collision polygon to bounding box {1} on slot {0}",
-            "description": "Use a Spine bounding box attachment as the collision polygon for the Spine object itself. The attachment is applied once when this action is called.",
-            "params": {
-              "slot-name": {
-                "name": "Slot name",
-                "desc": "Name of the slot containing the bounding box attachment"
-              },
-              "attachment-name": {
-                "name": "Attachment name",
-                "desc": "Name of the bounding box attachment to use for the Spine object collision polygon"
-              }
-            }
-          },
-          "clear-object-collision-bounding-box": {
-            "list-name": "Clear object collision bounding box",
-            "display-text": "Clear object collision bounding box",
-            "description": "Stop using a Spine bounding box attachment as the Spine object's collision mesh."
-          },
-          "set-object-collision-bounding-box-debug": {
-            "list-name": "Set object collision bounding box debug",
-            "display-text": "Set object collision bounding box debug to {0}",
-            "description": "Draw the active Spine object collision bounding box polygon outline for debugging.",
+          "set-collision-body-drives-object": {
+            "list-name": "Set collision body drives object",
+            "display-text": "Set collision body drives object to {0}",
+            "description": "When enabled, movement of the generated Sprite collision body moves the Spine object. Useful for putting movement behaviors on the collision body.",
             "params": {
               "enabled": {
                 "name": "Enabled",
-                "desc": "Whether to draw the Spine object collision bounding box polygon outline"
+                "desc": "Whether the generated collision body should drive the Spine object's position"
               }
             }
           },
@@ -1030,6 +1015,10 @@
           "bounds-height": {
             "description": "Get the height of the current bounds.",
             "translated-name": "BoundsHeight"
+          },
+          "collision-body-uid": {
+            "description": "Get the UID of this Spine instance's generated collision body, or -1 if it does not have one. Use with the collision body object's Pick by comparison condition to configure behaviors on the body.",
+            "translated-name": "CollisionBodyUID"
           }
         },
         "custom_ui": {

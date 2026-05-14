@@ -193,17 +193,10 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 		this.setCollisionBoundingBoxDebug(enabled);
 	},
 
-	SetObjectCollisionBoundingBox (this: SDKInstanceClass, slotName: string, attachmentName: string) {
-		this.setObjectCollisionBoundingBox(slotName, attachmentName);
+	SetCollisionBodyDrivesObject (this: SDKInstanceClass, enabled: boolean) {
+		this.setCollisionBodyDrivesObject(enabled);
 	},
 
-	ClearObjectCollisionBoundingBox (this: SDKInstanceClass) {
-		this.clearObjectCollisionBoundingBox();
-	},
-
-	SetObjectCollisionBoundingBoxDebug (this: SDKInstanceClass, enabled: boolean) {
-		this.setObjectCollisionBoundingBoxDebug(enabled);
-	},
 
 	SetBounds (this: SDKInstanceClass, x: number, y: number, width: number, height: number) {
 		this.setBounds(x, y, width, height);
