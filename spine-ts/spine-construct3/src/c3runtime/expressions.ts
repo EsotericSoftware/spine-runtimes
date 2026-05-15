@@ -158,6 +158,46 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Exps =
 
 	CollisionBodyUID (this: SpineC3Instance) {
 		return this.getCollisionBodyUid();
+	},
+
+	BoundingBoxPointCount (this: SpineC3Instance, slotName: string, attachmentName: string) {
+		return this.getBoundingBoxPointCount(slotName, attachmentName);
+	},
+
+	BoundingBoxPointX (this: SpineC3Instance, slotName: string, attachmentName: string, index: number) {
+		return this.getBoundingBoxPointX(slotName, attachmentName, index);
+	},
+
+	BoundingBoxPointY (this: SpineC3Instance, slotName: string, attachmentName: string, index: number) {
+		return this.getBoundingBoxPointY(slotName, attachmentName, index);
+	},
+
+	BoundingBoxCenterX (this: SpineC3Instance, slotName: string, attachmentName: string) {
+		return this.getBoundingBoxCenterX(slotName, attachmentName);
+	},
+
+	BoundingBoxCenterY (this: SpineC3Instance, slotName: string, attachmentName: string) {
+		return this.getBoundingBoxCenterY(slotName, attachmentName);
+	},
+
+	BoundingBoxLeft (this: SpineC3Instance, slotName: string, attachmentName: string) {
+		return this.getBoundingBoxLeft(slotName, attachmentName);
+	},
+
+	BoundingBoxTop (this: SpineC3Instance, slotName: string, attachmentName: string) {
+		return this.getBoundingBoxTop(slotName, attachmentName);
+	},
+
+	BoundingBoxRight (this: SpineC3Instance, slotName: string, attachmentName: string) {
+		return this.getBoundingBoxRight(slotName, attachmentName);
+	},
+
+	BoundingBoxBottom (this: SpineC3Instance, slotName: string, attachmentName: string) {
+		return this.getBoundingBoxBottom(slotName, attachmentName);
+	},
+
+	BoundingBoxPolygonJson (this: SpineC3Instance, slotName: string, attachmentName: string) {
+		return this.getBoundingBoxPolygonJson(slotName, attachmentName);
 	}
 };
 

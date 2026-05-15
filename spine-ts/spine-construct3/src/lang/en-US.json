@@ -1019,6 +1019,88 @@
           "collision-body-uid": {
             "description": "Get the UID of this Spine instance's generated collision body, or -1 if it does not have one. Use with the collision body object's Pick by comparison condition to configure behaviors on the body.",
             "translated-name": "CollisionBodyUID"
+          },
+          "bounding-box-point-count": {
+            "description": "Get the number of points in a Spine bounding box attachment polygon.",
+            "translated-name": "BoundingBoxPointCount",
+            "params": {
+              "slot-name": { "name": "Slot name", "desc": "Name of the slot" },
+              "attachment-name": { "name": "Attachment name", "desc": "Name of the bounding box attachment" }
+            }
+          },
+          "bounding-box-point-x": {
+            "description": "Get the game X coordinate of a bounding box polygon point.",
+            "translated-name": "BoundingBoxPointX",
+            "params": {
+              "slot-name": { "name": "Slot name", "desc": "Name of the slot" },
+              "attachment-name": { "name": "Attachment name", "desc": "Name of the bounding box attachment" },
+              "index": { "name": "Index", "desc": "Zero-based point index" }
+            }
+          },
+          "bounding-box-point-y": {
+            "description": "Get the game Y coordinate of a bounding box polygon point.",
+            "translated-name": "BoundingBoxPointY",
+            "params": {
+              "slot-name": { "name": "Slot name", "desc": "Name of the slot" },
+              "attachment-name": { "name": "Attachment name", "desc": "Name of the bounding box attachment" },
+              "index": { "name": "Index", "desc": "Zero-based point index" }
+            }
+          },
+          "bounding-box-center-x": {
+            "description": "Get the game X coordinate of the bounding box AABB center.",
+            "translated-name": "BoundingBoxCenterX",
+            "params": {
+              "slot-name": { "name": "Slot name", "desc": "Name of the slot" },
+              "attachment-name": { "name": "Attachment name", "desc": "Name of the bounding box attachment" }
+            }
+          },
+          "bounding-box-center-y": {
+            "description": "Get the game Y coordinate of the bounding box AABB center.",
+            "translated-name": "BoundingBoxCenterY",
+            "params": {
+              "slot-name": { "name": "Slot name", "desc": "Name of the slot" },
+              "attachment-name": { "name": "Attachment name", "desc": "Name of the bounding box attachment" }
+            }
+          },
+          "bounding-box-left": {
+            "description": "Get the left/minimum game X coordinate of the bounding box polygon.",
+            "translated-name": "BoundingBoxLeft",
+            "params": {
+              "slot-name": { "name": "Slot name", "desc": "Name of the slot" },
+              "attachment-name": { "name": "Attachment name", "desc": "Name of the bounding box attachment" }
+            }
+          },
+          "bounding-box-top": {
+            "description": "Get the top/minimum game Y coordinate of the bounding box polygon.",
+            "translated-name": "BoundingBoxTop",
+            "params": {
+              "slot-name": { "name": "Slot name", "desc": "Name of the slot" },
+              "attachment-name": { "name": "Attachment name", "desc": "Name of the bounding box attachment" }
+            }
+          },
+          "bounding-box-right": {
+            "description": "Get the right/maximum game X coordinate of the bounding box polygon.",
+            "translated-name": "BoundingBoxRight",
+            "params": {
+              "slot-name": { "name": "Slot name", "desc": "Name of the slot" },
+              "attachment-name": { "name": "Attachment name", "desc": "Name of the bounding box attachment" }
+            }
+          },
+          "bounding-box-bottom": {
+            "description": "Get the bottom/maximum game Y coordinate of the bounding box polygon.",
+            "translated-name": "BoundingBoxBottom",
+            "params": {
+              "slot-name": { "name": "Slot name", "desc": "Name of the slot" },
+              "attachment-name": { "name": "Attachment name", "desc": "Name of the bounding box attachment" }
+            }
+          },
+          "bounding-box-polygon-json": {
+            "description": "Get the bounding box polygon as a flat JSON array in game coordinates: [x0,y0,x1,y1,...].",
+            "translated-name": "BoundingBoxPolygonJson",
+            "params": {
+              "slot-name": { "name": "Slot name", "desc": "Name of the slot" },
+              "attachment-name": { "name": "Attachment name", "desc": "Name of the bounding box attachment" }
+            }
           }
         },
         "custom_ui": {

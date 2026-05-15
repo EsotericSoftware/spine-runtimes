@@ -1017,8 +1017,90 @@
             "translated-name": "BoundsHeight"
           },
           "collision-body-uid": {
-            "description": "获取此Spine实例生成的碰撞体UID；如果没有则返回-1。可与碰撞体对象的按比较选取条件一起使用，以配置碰撞体上的行为。"
+            "description": "获取此Spine实例生成的碰撞体UID；如果没有则返回-1。可与碰撞体对象的按比较选取条件一起使用，以配置碰撞体上的行为。",
             "translated-name": "CollisionBodyUID"
+          },
+          "bounding-box-point-count": {
+            "description": "获取Spine边界框附件多边形中的点数。",
+            "translated-name": "BoundingBoxPointCount",
+            "params": {
+              "slot-name": { "name": "插槽名称", "desc": "插槽名称" },
+              "attachment-name": { "name": "附件名称", "desc": "边界框附件名称" }
+            }
+          },
+          "bounding-box-point-x": {
+            "description": "获取边界框多边形点的游戏X坐标。",
+            "translated-name": "BoundingBoxPointX",
+            "params": {
+              "slot-name": { "name": "插槽名称", "desc": "插槽名称" },
+              "attachment-name": { "name": "附件名称", "desc": "边界框附件名称" },
+              "index": { "name": "索引", "desc": "从0开始的点索引" }
+            }
+          },
+          "bounding-box-point-y": {
+            "description": "获取边界框多边形点的游戏Y坐标。",
+            "translated-name": "BoundingBoxPointY",
+            "params": {
+              "slot-name": { "name": "插槽名称", "desc": "插槽名称" },
+              "attachment-name": { "name": "附件名称", "desc": "边界框附件名称" },
+              "index": { "name": "索引", "desc": "从0开始的点索引" }
+            }
+          },
+          "bounding-box-center-x": {
+            "description": "获取边界框AABB中心的游戏X坐标。",
+            "translated-name": "BoundingBoxCenterX",
+            "params": {
+              "slot-name": { "name": "插槽名称", "desc": "插槽名称" },
+              "attachment-name": { "name": "附件名称", "desc": "边界框附件名称" }
+            }
+          },
+          "bounding-box-center-y": {
+            "description": "获取边界框AABB中心的游戏Y坐标。",
+            "translated-name": "BoundingBoxCenterY",
+            "params": {
+              "slot-name": { "name": "插槽名称", "desc": "插槽名称" },
+              "attachment-name": { "name": "附件名称", "desc": "边界框附件名称" }
+            }
+          },
+          "bounding-box-left": {
+            "description": "获取边界框多边形的左侧/最小游戏X坐标。",
+            "translated-name": "BoundingBoxLeft",
+            "params": {
+              "slot-name": { "name": "插槽名称", "desc": "插槽名称" },
+              "attachment-name": { "name": "附件名称", "desc": "边界框附件名称" }
+            }
+          },
+          "bounding-box-top": {
+            "description": "获取边界框多边形的顶部/最小游戏Y坐标。",
+            "translated-name": "BoundingBoxTop",
+            "params": {
+              "slot-name": { "name": "插槽名称", "desc": "插槽名称" },
+              "attachment-name": { "name": "附件名称", "desc": "边界框附件名称" }
+            }
+          },
+          "bounding-box-right": {
+            "description": "获取边界框多边形的右侧/最大游戏X坐标。",
+            "translated-name": "BoundingBoxRight",
+            "params": {
+              "slot-name": { "name": "插槽名称", "desc": "插槽名称" },
+              "attachment-name": { "name": "附件名称", "desc": "边界框附件名称" }
+            }
+          },
+          "bounding-box-bottom": {
+            "description": "获取边界框多边形的底部/最大游戏Y坐标。",
+            "translated-name": "BoundingBoxBottom",
+            "params": {
+              "slot-name": { "name": "插槽名称", "desc": "插槽名称" },
+              "attachment-name": { "name": "附件名称", "desc": "边界框附件名称" }
+            }
+          },
+          "bounding-box-polygon-json": {
+            "description": "以游戏坐标中的扁平JSON数组获取边界框多边形：[x0,y0,x1,y1,...]。",
+            "translated-name": "BoundingBoxPolygonJson",
+            "params": {
+              "slot-name": { "name": "插槽名称", "desc": "插槽名称" },
+              "attachment-name": { "name": "附件名称", "desc": "边界框附件名称" }
+            }
           }
         },
         "custom_ui": {

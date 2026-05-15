@@ -998,6 +998,108 @@
         "expressionName": "CollisionBodyUID",
         "highlight": false,
         "returnType": "number"
+      },
+      {
+        "id": "bounding-box-point-count",
+        "expressionName": "BoundingBoxPointCount",
+        "highlight": false,
+        "returnType": "number",
+        "params": [
+          { "id": "slot-name", "type": "string" },
+          { "id": "attachment-name", "type": "string" }
+        ]
+      },
+      {
+        "id": "bounding-box-point-x",
+        "expressionName": "BoundingBoxPointX",
+        "highlight": false,
+        "returnType": "number",
+        "params": [
+          { "id": "slot-name", "type": "string" },
+          { "id": "attachment-name", "type": "string" },
+          { "id": "index", "type": "number" }
+        ]
+      },
+      {
+        "id": "bounding-box-point-y",
+        "expressionName": "BoundingBoxPointY",
+        "highlight": false,
+        "returnType": "number",
+        "params": [
+          { "id": "slot-name", "type": "string" },
+          { "id": "attachment-name", "type": "string" },
+          { "id": "index", "type": "number" }
+        ]
+      },
+      {
+        "id": "bounding-box-center-x",
+        "expressionName": "BoundingBoxCenterX",
+        "highlight": false,
+        "returnType": "number",
+        "params": [
+          { "id": "slot-name", "type": "string" },
+          { "id": "attachment-name", "type": "string" }
+        ]
+      },
+      {
+        "id": "bounding-box-center-y",
+        "expressionName": "BoundingBoxCenterY",
+        "highlight": false,
+        "returnType": "number",
+        "params": [
+          { "id": "slot-name", "type": "string" },
+          { "id": "attachment-name", "type": "string" }
+        ]
+      },
+      {
+        "id": "bounding-box-left",
+        "expressionName": "BoundingBoxLeft",
+        "highlight": false,
+        "returnType": "number",
+        "params": [
+          { "id": "slot-name", "type": "string" },
+          { "id": "attachment-name", "type": "string" }
+        ]
+      },
+      {
+        "id": "bounding-box-top",
+        "expressionName": "BoundingBoxTop",
+        "highlight": false,
+        "returnType": "number",
+        "params": [
+          { "id": "slot-name", "type": "string" },
+          { "id": "attachment-name", "type": "string" }
+        ]
+      },
+      {
+        "id": "bounding-box-right",
+        "expressionName": "BoundingBoxRight",
+        "highlight": false,
+        "returnType": "number",
+        "params": [
+          { "id": "slot-name", "type": "string" },
+          { "id": "attachment-name", "type": "string" }
+        ]
+      },
+      {
+        "id": "bounding-box-bottom",
+        "expressionName": "BoundingBoxBottom",
+        "highlight": false,
+        "returnType": "number",
+        "params": [
+          { "id": "slot-name", "type": "string" },
+          { "id": "attachment-name", "type": "string" }
+        ]
+      },
+      {
+        "id": "bounding-box-polygon-json",
+        "expressionName": "BoundingBoxPolygonJson",
+        "highlight": false,
+        "returnType": "string",
+        "params": [
+          { "id": "slot-name", "type": "string" },
+          { "id": "attachment-name", "type": "string" }
+        ]
       }
     ]
   }

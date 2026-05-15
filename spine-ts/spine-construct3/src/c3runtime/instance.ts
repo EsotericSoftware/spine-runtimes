@@ -683,6 +683,87 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		return this.collisionSpriteInstance?.uid ?? -1;
 	}
 
+	private getBoundingBoxInfo (slotName: string, attachmentName: string) {
+		const { skeleton } = this;
+		if (!skeleton || !slotName || !attachmentName) return null;
+
+		const slot = skeleton.findSlot(slotName);
+		if (!slot || !slot.bone.active) return null;
+
+		const attachment = skeleton.getAttachment(slot.data.index, attachmentName);
+		if (!(attachment instanceof spine.BoundingBoxAttachment)) return null;
+
+		const vertexCount = attachment.worldVerticesLength >> 1;
+		if (vertexCount < 3) return null;
+
+		if (this.collisionBoundingBoxVertices.length < attachment.worldVerticesLength)
+			this.collisionBoundingBoxVertices = spine.Utils.newFloatArray(attachment.worldVerticesLength);
+
+		attachment.computeWorldVertices(skeleton, slot, 0, attachment.worldVerticesLength, this.collisionBoundingBoxVertices, 0, 2);
+
+		let left = Number.POSITIVE_INFINITY;
+		let top = Number.POSITIVE_INFINITY;
+		let right = Number.NEGATIVE_INFINITY;
+		let bottom = Number.NEGATIVE_INFINITY;
+		const points: number[] = [];
+		for (let i = 0; i < attachment.worldVerticesLength; i += 2) {
+			const point = this.matrix.skeletonToGame(this.collisionBoundingBoxVertices[i], this.collisionBoundingBoxVertices[i + 1]);
+			points.push(point.x, point.y);
+			left = Math.min(left, point.x);
+			top = Math.min(top, point.y);
+			right = Math.max(right, point.x);
+			bottom = Math.max(bottom, point.y);
+		}
+
+		return { points, left, top, right, bottom };
+	}
+
+	public getBoundingBoxPointCount (slotName: string, attachmentName: string) {
+		return (this.getBoundingBoxInfo(slotName, attachmentName)?.points.length ?? 0) / 2;
+	}
+
+	public getBoundingBoxPointX (slotName: string, attachmentName: string, index: number) {
+		const points = this.getBoundingBoxInfo(slotName, attachmentName)?.points;
+		const pointIndex = Math.floor(index) * 2;
+		return points && pointIndex >= 0 && pointIndex < points.length ? points[pointIndex] : 0;
+	}
+
+	public getBoundingBoxPointY (slotName: string, attachmentName: string, index: number) {
+		const points = this.getBoundingBoxInfo(slotName, attachmentName)?.points;
+		const pointIndex = Math.floor(index) * 2 + 1;
+		return points && pointIndex >= 1 && pointIndex < points.length ? points[pointIndex] : 0;
+	}
+
+	public getBoundingBoxCenterX (slotName: string, attachmentName: string) {
+		const info = this.getBoundingBoxInfo(slotName, attachmentName);
+		return info ? (info.left + info.right) / 2 : 0;
+	}
+
+	public getBoundingBoxCenterY (slotName: string, attachmentName: string) {
+		const info = this.getBoundingBoxInfo(slotName, attachmentName);
+		return info ? (info.top + info.bottom) / 2 : 0;
+	}
+
+	public getBoundingBoxLeft (slotName: string, attachmentName: string) {
+		return this.getBoundingBoxInfo(slotName, attachmentName)?.left ?? 0;
+	}
+
+	public getBoundingBoxTop (slotName: string, attachmentName: string) {
+		return this.getBoundingBoxInfo(slotName, attachmentName)?.top ?? 0;
+	}
+
+	public getBoundingBoxRight (slotName: string, attachmentName: string) {
+		return this.getBoundingBoxInfo(slotName, attachmentName)?.right ?? 0;
+	}
+
+	public getBoundingBoxBottom (slotName: string, attachmentName: string) {
+		return this.getBoundingBoxInfo(slotName, attachmentName)?.bottom ?? 0;
+	}
+
+	public getBoundingBoxPolygonJson (slotName: string, attachmentName: string) {
+		return JSON.stringify(this.getBoundingBoxInfo(slotName, attachmentName)?.points ?? []);
+	}
+
 	public setCollisionBodyDrivesObject (enabled: boolean) {
 		if (enabled === this.collisionBodyDrivesObject) return;
 
