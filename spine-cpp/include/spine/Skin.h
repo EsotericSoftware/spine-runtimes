@@ -56,11 +56,11 @@ namespace spine {
 		public:
 			struct SP_API Entry {
 				size_t _slotIndex;
-				String _placeholderName;
+				String _placeholder;
 				Attachment *_attachment;
 
-				Entry(size_t slotIndex, const String &placeholderName, Attachment *attachment)
-					: _slotIndex(slotIndex), _placeholderName(placeholderName), _attachment(attachment) {
+				Entry(size_t slotIndex, const String &placeholder, Attachment *attachment)
+					: _slotIndex(slotIndex), _placeholder(placeholder), _attachment(attachment) {
 				}
 			};
 
@@ -96,11 +96,11 @@ namespace spine {
 				size_t _bucketIndex;
 			};
 
-			void put(size_t slotIndex, const String &placeholderName, Attachment *attachment);
+			void put(size_t slotIndex, const String &placeholder, Attachment *attachment);
 
-			Attachment *get(size_t slotIndex, const String &placeholderName);
+			Attachment *get(size_t slotIndex, const String &placeholder);
 
-			void remove(size_t slotIndex, const String &placeholderName);
+			void remove(size_t slotIndex, const String &placeholder);
 
 			Entries getEntries();
 
@@ -108,7 +108,7 @@ namespace spine {
 			AttachmentMap();
 
 		private:
-			int findInBucket(Array<Entry> &, const String &placeholderName);
+			int findInBucket(Array<Entry> &, const String &placeholder);
 
 			Array<Array<Entry>> _buckets;
 		};
@@ -119,13 +119,13 @@ namespace spine {
 
 		/// Adds an attachment to the skin for the specified slot index and placeholder name.
 		/// If the placeholder name already exists for the slot, the previous value is replaced.
-		void setAttachment(size_t slotIndex, const String &placeholderName, Attachment *attachment);
+		void setAttachment(size_t slotIndex, const String &placeholder, Attachment *attachment);
 
 		/// Returns the attachment for the specified slot index and placeholder name, or NULL.
-		Attachment *getAttachment(size_t slotIndex, const String &placeholderName);
+		Attachment *getAttachment(size_t slotIndex, const String &placeholder);
 
 		// Removes the attachment from the skin.
-		void removeAttachment(size_t slotIndex, const String &placeholderName);
+		void removeAttachment(size_t slotIndex, const String &placeholder);
 
 		/// Finds the placeholder names for a given slot. The results are added to the passed array.
 		/// @param slotIndex The target slotIndex. To find the slot index, use SkeletonData::findSlot and SlotData::getIndex.

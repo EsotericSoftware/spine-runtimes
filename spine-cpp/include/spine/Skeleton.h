@@ -233,17 +233,17 @@ namespace spine {
 		/// Finds an attachment by looking in getSkin() and SkeletonData::getDefaultSkin() using the slot name and skin
 		/// placeholder name. First the skin is checked and if the attachment was not found, the default skin is checked.
 		/// @return May be NULL.
-		Attachment *getAttachment(const String &slotName, const String &placeholderName);
+		Attachment *getAttachment(const String &slotName, const String &placeholder);
 
 		/// Finds an attachment by looking in getSkin() and SkeletonData::getDefaultSkin() using the slot index and skin
 		/// placeholder name. First the skin is checked and if the attachment was not found, the default skin is checked.
 		/// @return May be NULL.
-		Attachment *getAttachment(int slotIndex, const String &placeholderName);
+		Attachment *getAttachment(int slotIndex, const String &placeholder);
 
 		/// A convenience method to set an attachment by finding the slot with findSlot(String), finding the attachment with
 		/// getAttachment(int, String), then setting the slot's SlotPose::getAttachment().
-		/// @param placeholderName May be empty.
-		void setAttachment(const String &slotName, const String &placeholderName);
+		/// @param placeholder May be empty.
+		void setAttachment(const String &slotName, const String &placeholder);
 
 		Array<Constraint *> &getConstraints();
 

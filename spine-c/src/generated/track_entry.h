@@ -145,32 +145,32 @@ SPINE_C_API void spine_track_entry_set_time_scale(spine_track_entry self, float 
 SPINE_C_API float spine_track_entry_get_alpha(spine_track_entry self);
 SPINE_C_API void spine_track_entry_set_alpha(spine_track_entry self, float inValue);
 /**
- * When the mix percentage (mix time / mix duration) is less than the event
- * threshold, event timelines for the animation being mixed out will be applied.
- * Defaults to 0, so event timelines are not applied for an animation being
- * mixed out.
+ * When the interpolated mix percentage is less than the event threshold, event
+ * timelines for the animation being mixed out will be applied. Defaults to 0,
+ * so event timelines are not applied for an animation being mixed out.
  */
 SPINE_C_API float spine_track_entry_get_event_threshold(spine_track_entry self);
 SPINE_C_API void spine_track_entry_set_event_threshold(spine_track_entry self, float inValue);
 /**
- * When the mix percentage (mix time / mix duration) is less than the attachment
- * threshold, attachment timelines for the animation being mixed out will be
- * applied. Defaults to 0, so attachment timelines are not applied for an
- * animation being mixed out.
+ * When the interpolated mix percentage is less than the attachment threshold,
+ * attachment timelines for the animation being mixed out will be applied.
+ * Defaults to 0, so attachment timelines are not applied for an animation being
+ * mixed out.
  */
 SPINE_C_API float spine_track_entry_get_mix_attachment_threshold(spine_track_entry self);
 SPINE_C_API void spine_track_entry_set_mix_attachment_threshold(spine_track_entry self, float inValue);
 /**
- * When alpha is greater than alphaAttachmentThreshold, attachment timelines are
- * applied. Defaults to 0, so attachment timelines are always applied.
+ * When the computed alpha is greater than alphaAttachmentThreshold, attachment
+ * timelines are applied. The computed alpha includes alpha and the interpolated
+ * mix percentage. Defaults to 0, so attachment timelines are always applied.
  */
 SPINE_C_API float spine_track_entry_get_alpha_attachment_threshold(spine_track_entry self);
 SPINE_C_API void spine_track_entry_set_alpha_attachment_threshold(spine_track_entry self, float inValue);
 /**
- * When the mix percentage (mix time / mix duration) is less than the draw order
- * threshold, draw order timelines for the animation being mixed out will be
- * applied. Defaults to 0, so draw order timelines are not applied for an
- * animation being mixed out.
+ * When the interpolated mix percentage is less than the draw order threshold,
+ * draw order timelines for the animation being mixed out will be applied.
+ * Defaults to 0, so draw order timelines are not applied for an animation being
+ * mixed out.
  */
 SPINE_C_API float spine_track_entry_get_mix_draw_order_threshold(spine_track_entry self);
 SPINE_C_API void spine_track_entry_set_mix_draw_order_threshold(spine_track_entry self, float inValue);
@@ -210,6 +210,13 @@ SPINE_C_API void spine_track_entry_set_mix_duration_1(spine_track_entry self, fl
  * @param delay If > 0, sets delay. If < = 0, the delay set is the duration of the previous track entry minus the specified mix duration plus the specified delay (ie the mix ends at (delay = 0) or before (delay < 0) the previous track entry duration). If the previous entry is looping, its next loop completion is used instead of its duration.
  */
 SPINE_C_API void spine_track_entry_set_mix_duration_2(spine_track_entry self, float mixDuration, float delay);
+/**
+ * The interpolation to apply to the mix percentage (mix time / mix duration)
+ * when mixing from the previous animation to this animation. Defaults to
+ * linear.
+ */
+SPINE_C_API spine_interpolation spine_track_entry_get_mix_interpolation(spine_track_entry self);
+SPINE_C_API void spine_track_entry_set_mix_interpolation(spine_track_entry self, spine_interpolation mixInterpolation);
 /**
  * The track entry for the previous animation when mixing to this animation, or
  * NULL if no mixing is currently occurring. When mixing from multiple

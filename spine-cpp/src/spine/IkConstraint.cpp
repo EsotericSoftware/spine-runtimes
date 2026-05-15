@@ -62,10 +62,10 @@ void IkConstraint::update(Skeleton &skeleton, Physics physics) {
 	BonePose &target = *_target->_appliedPose;
 	switch (_bones.size()) {
 		case 1: {
-			apply(skeleton, *_bones[0], target._worldX, target._worldY, p._compress, p._stretch, _data._uniform, p._mix);
+			apply(skeleton, *_bones[0], target._worldX, target._worldY, p._compress, p._stretch, _data._scaleYMode, p._mix);
 		} break;
 		case 2: {
-			apply(skeleton, *_bones[0], *_bones[1], target._worldX, target._worldY, p._bendDirection, p._stretch, _data._uniform, p._softness,
+			apply(skeleton, *_bones[0], *_bones[1], target._worldX, target._worldY, p._bendDirection, p._stretch, _data._scaleYMode, p._softness,
 				  p._mix);
 		} break;
 	}
@@ -98,7 +98,8 @@ bool IkConstraint::isSourceActive() {
 	return _target->_active;
 }
 
-void IkConstraint::apply(Skeleton &skeleton, BonePose &bone, float targetX, float targetY, bool compress, bool stretch, bool uniform, float mix) {
+void IkConstraint::apply(Skeleton &skeleton, BonePose &bone, float targetX, float targetY, bool compress, bool stretch, ScaleYMode scaleYMode,
+						 float mix) {
 	bone.modifyLocal(skeleton);
 	BonePose &p = *bone._bone->_parent->_appliedPose;
 	float pa = p._a, pb = p._b, pc = p._c, pd = p._d;
@@ -151,14 +152,23 @@ void IkConstraint::apply(Skeleton &skeleton, BonePose &bone, float targetX, floa
 			if ((compress && dd < b * b) || (stretch && dd > b * b)) {
 				float s = (MathUtil::sqrt(dd) / b - 1) * mix + 1;
 				bone._scaleX *= s;
-				if (uniform) bone._scaleY *= s;
+				switch (scaleYMode) {
+					case ScaleYMode_Uniform:
+						bone._scaleY *= s;
+						break;
+					case ScaleYMode_Volume:
+						bone._scaleY /= s;
+						break;
+					default:
+						break;
+				}
 			}
 		}
 	}
 }
 
-void IkConstraint::apply(Skeleton &skeleton, BonePose &parent, BonePose &child, float targetX, float targetY, int bendDir, bool stretch, bool uniform,
-						 float softness, float mix) {
+void IkConstraint::apply(Skeleton &skeleton, BonePose &parent, BonePose &child, float targetX, float targetY, int bendDir, bool stretch,
+						 ScaleYMode scaleYMode, float softness, float mix) {
 	if (parent._inherit != Inherit_Normal || child._inherit != Inherit_Normal) return;
 	parent.modifyLocal(skeleton);
 	child.modifyLocal(skeleton);
@@ -201,7 +211,7 @@ void IkConstraint::apply(Skeleton &skeleton, BonePose &parent, BonePose &child, 
 	float dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
 	float l1 = MathUtil::sqrt(dx * dx + dy * dy), l2 = child._bone->_data.getLength() * csx, a1, a2;
 	if (l1 < 0.0001f) {
-		apply(skeleton, parent, targetX, targetY, false, stretch, false, mix);
+		apply(skeleton, parent, targetX, targetY, false, stretch, ScaleYMode_None, mix);
 		child._rotation = 0;
 		return;
 	}
@@ -233,7 +243,16 @@ void IkConstraint::apply(Skeleton &skeleton, BonePose &parent, BonePose &child, 
 			if (stretch) {
 				a = (MathUtil::sqrt(dd) / (l1 + l2) - 1) * mix + 1;
 				parent._scaleX *= a;
-				if (uniform) parent._scaleY *= a;
+				switch (scaleYMode) {
+					case ScaleYMode_Uniform:
+						parent._scaleY *= a;
+						break;
+					case ScaleYMode_Volume:
+						parent._scaleY /= a;
+						break;
+					default:
+						break;
+				}
 			}
 		} else
 			a2 = MathUtil::acos(cos) * bendDir;

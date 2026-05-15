@@ -34,7 +34,7 @@ import type { AnimationStateData } from "./AnimationStateData.js";
 import type { Event } from "./Event.js";
 import type { Skeleton } from "./Skeleton.js";
 import type { Slot } from "./Slot.js";
-import { MathUtils, Pool, StringSet, Utils } from "./Utils.js";
+import { Interpolation, MathUtils, Pool, StringSet, Utils } from "./Utils.js";
 
 
 /** Applies animations over time, queues animations for later playback, mixes (crossfading) between animations, and applies
@@ -197,13 +197,13 @@ export class AnimationState {
 					Utils.webkit602BugfixHelper(alpha);
 					const timeline = timelines[ii];
 					if (timeline instanceof AttachmentTimeline)
-						this.applyAttachmentTimeline(timeline, skeleton, applyTime, true, false, true);
+						this.applyAttachmentTimeline(timeline, skeleton, applyTime, true, true);
 					else
 						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, true, false, false, false);
 				}
 			} else {
 				const timelineMode = current.timelineMode;
-				const attachments = alpha >= current.alphaAttachmentThreshold;
+				const retainAttachments = alpha >= current.alphaAttachmentThreshold;
 				const add = current.additive, shortestRotation = add || current.shortestRotation;
 				const firstFrame = !shortestRotation && current.timelinesRotation.length !== timelineCount << 1;
 				if (firstFrame) current.timelinesRotation.length = timelineCount << 1;
@@ -214,7 +214,7 @@ export class AnimationState {
 					if (!shortestRotation && timeline instanceof RotateTimeline) {
 						this.applyRotateTimeline(timeline, skeleton, applyTime, alpha, fromSetup, current.timelinesRotation, ii << 1, firstFrame);
 					} else if (timeline instanceof AttachmentTimeline) {
-						this.applyAttachmentTimeline(timeline, skeleton, applyTime, fromSetup, false, attachments);
+						this.applyAttachmentTimeline(timeline, skeleton, applyTime, fromSetup, retainAttachments);
 					} else {
 						// This fixes the WebKit 602 specific issue described at https://esotericsoftware.com/forum/d/10109-ios-10-disappearing-graphics
 						Utils.webkit602BugfixHelper(alpha);
@@ -229,9 +229,7 @@ export class AnimationState {
 			current.nextTrackLast = current.trackTime;
 		}
 
-		// Set slots attachments to the setup pose, if needed. This occurs if an animation that is mixing out sets attachments so
-		// subsequent timelines see any deform, but the subsequent timelines don't set an attachment (eg they are also mixing out or
-		// the time is before the first key).
+		// Set slot attachments to the setup pose if they were set temporarily to apply deform timelines.
 		const setupState = this.unkeyedState + SETUP;
 		const slots = skeleton.slots;
 		for (let i = 0, n = skeleton.slots.length; i < n; i++) {
@@ -241,7 +239,7 @@ export class AnimationState {
 				slot.pose.setAttachment(!attachmentName ? null : skeleton.getAttachment(slot.data.index, attachmentName));
 			}
 		}
-		this.unkeyedState += 2; // Increasing after each use avoids the need to reset attachmentState for every slot.
+		this.unkeyedState += 2; // Reset.
 
 		this.queue.drain();
 		return applied;
@@ -250,7 +248,7 @@ export class AnimationState {
 	applyMixingFrom (to: TrackEntry, skeleton: Skeleton) {
 		const from = to.mixingFrom!;
 		const fromMix = from.mixingFrom !== null ? this.applyMixingFrom(from, skeleton) : 1;
-		const mix: number = to.mixDuration === 0 ? 1 : Math.min(1, to.mixTime / to.mixDuration);
+		const mix = to.mix();
 
 		const a = from.alpha * fromMix, keep = 1 - mix * to.alpha;
 		const alphaMix = a * (1 - mix), alphaHold = keep > 0 ? alphaMix / keep : a;
@@ -260,7 +258,7 @@ export class AnimationState {
 		const timelineMode = from.timelineMode;
 		const timelineHoldMix = from.timelineHoldMix;
 
-		const attachments = mix < from.mixAttachmentThreshold, drawOrder = mix < from.mixDrawOrderThreshold;
+		const retainAttachments = mix < from.mixAttachmentThreshold, drawOrder = mix < from.mixDrawOrderThreshold;
 		const add = from.additive, shortestRotation = add || from.shortestRotation;
 		const firstFrame = !shortestRotation && from.timelinesRotation.length !== timelineCount << 1;
 		if (firstFrame) from.timelinesRotation.length = timelineCount << 1;
@@ -281,7 +279,7 @@ export class AnimationState {
 			let alpha = 0;
 			if ((mode & HOLD) !== 0) {
 				const holdMix = timelineHoldMix[i];
-				alpha = holdMix == null ? alphaHold : alphaHold * Math.max(0, 1 - holdMix.mixTime / holdMix.mixDuration);
+				alpha = holdMix == null ? alphaHold : alphaHold * (1 - holdMix.mix());
 			} else {
 				if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
 				alpha = alphaMix;
@@ -291,8 +289,8 @@ export class AnimationState {
 			if (!shortestRotation && timeline instanceof RotateTimeline) {
 				this.applyRotateTimeline(timeline, skeleton, applyTime, alpha, fromSetup, timelinesRotation, i << 1, firstFrame);
 			} else if (timeline instanceof AttachmentTimeline)
-				this.applyAttachmentTimeline(timeline, skeleton, applyTime, fromSetup, true,
-					attachments && alpha >= from.alphaAttachmentThreshold);
+				this.applyAttachmentTimeline(timeline, skeleton, applyTime, fromSetup,
+					retainAttachments && alpha >= from.alphaAttachmentThreshold);
 			else {
 				const out = !drawOrder || !(timeline instanceof DrawOrderTimeline) || !fromSetup;
 				timeline.apply(skeleton, animationLast, applyTime, events, alpha, fromSetup, add, out, false);
@@ -309,26 +307,27 @@ export class AnimationState {
 	}
 
 	/** Applies the attachment timeline and sets {@link Slot.attachmentState}.
-	 * @param attachments False when: 1) the attachment timeline is mixing out, 2) mix < attachmentThreshold, and 3) the timeline
-	 * is not the last timeline to set the slot's attachment. In that case the timeline is applied only so subsequent
-	 * timelines see any deform. */
-	applyAttachmentTimeline (timeline: AttachmentTimeline, skeleton: Skeleton, time: number, fromSetup: boolean,
-		out: boolean, attachments: boolean) {
+	 * @param retain True if the attachment remains after apply, false if temporary for deform timelines. */
+	applyAttachmentTimeline (timeline: AttachmentTimeline, skeleton: Skeleton, time: number, fromSetup: boolean, retain: boolean) {
 		const slot = skeleton.slots[timeline.slotIndex];
 		if (!slot.bone.active) return;
+		if (!retain && slot.attachmentState === this.unkeyedState + RETAIN) return;
 
-		if (out || time < timeline.frames[0]) {
-			if (fromSetup) this.setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
-		} else
-			this.setAttachment(skeleton, slot, timeline.attachmentNames[Timeline.search(timeline.frames, time)], attachments);
-
-		// If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.
-		if (slot.attachmentState <= this.unkeyedState) slot.attachmentState = this.unkeyedState + SETUP;
-	}
-
-	setAttachment (skeleton: Skeleton, slot: Slot, attachmentName: string | null, attachments: boolean) {
-		slot.pose.setAttachment(!attachmentName ? null : skeleton.getAttachment(slot.data.index, attachmentName));
-		if (attachments) slot.attachmentState = this.unkeyedState + CURRENT;
+		let setup = time < timeline.frames[0];
+		let name = null;
+		if (!setup) {
+			name = timeline.attachmentNames[Timeline.search(timeline.frames, time)];
+			setup = !retain && name == null;
+		}
+		if (setup) {
+			if (!fromSetup) return;
+			name = slot.data.attachmentName;
+		}
+		slot.pose.setAttachment(name == null ? null : skeleton.getAttachment(slot.data.index, name));
+		if (retain)
+			slot.attachmentState = this.unkeyedState + RETAIN;
+		else if (!setup) //
+			slot.attachmentState = this.unkeyedState + SETUP;
 	}
 
 	/** Applies the rotate timeline, mixing with the current pose while keeping the same rotation direction chosen as the shortest
@@ -470,6 +469,7 @@ export class AnimationState {
 	 * Usually you want to use {@link setEmptyAnimation} to mix the skeletons back to the setup pose, rather than
 	 * leaving them in their current pose. */
 	clearTrack (trackIndex: number) {
+		if (trackIndex < 0) throw new Error("trackIndex must be >= 0.");
 		if (trackIndex >= this.tracks.length) return;
 		const current = this.tracks[trackIndex];
 		if (!current) return;
@@ -499,6 +499,7 @@ export class AnimationState {
 		current.previous = null;
 
 		if (from) {
+			from.next = null;
 			if (interrupt) this.queue.interrupt(from);
 			current.mixingFrom = from;
 			from.mixingTo = current;
@@ -596,6 +597,7 @@ export class AnimationState {
 	}
 
 	private addAnimation2 (trackIndex: number, animation: Animation, loop: boolean = false, delay: number = 0) {
+		if (trackIndex < 0) throw new Error("trackIndex must be >= 0.");
 		if (!animation) throw new Error("animation cannot be null.");
 
 		let last = this.expandToIndex(trackIndex);
@@ -808,11 +810,6 @@ export class AnimationState {
 		return this.tracks[trackIndex];
 	}
 
-	/** Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing.
-	 * @deprecated Use {@link getTrack}. */
-	getCurrent (trackIndex: number) {
-		return this.getTrack(trackIndex);
-	}
 
 	/** Adds a listener to receive events for all track entries. */
 	addListener (listener: AnimationStateListener) {
@@ -893,24 +890,24 @@ export class TrackEntry {
 
 	keepHold = false;
 
-	/** When the mix percentage ({@link mixTime} / {@link mixDuration}) is less than the `eventThreshold`, event
-	 * timelines are applied while this animation is being mixed out. Defaults to 0, so event timelines are not applied while
-	 * this animation is being mixed out. */
+	/** When the interpolated mix percentage is less than the `eventThreshold` , event timelines are applied while
+	 * this animation is being mixed out. Defaults to 0, so event timelines are not applied while this animation is being mixed
+	 * out. */
 	eventThreshold = 0;
 
-	/** When the mix percentage ({@link mixTime} / {@link mixDuration}) is less than the `mixAttachmentThreshold`,
-	 * attachment timelines are applied while this animation is being mixed out. Defaults to 0, so attachment timelines are not
-	 * applied while this animation is being mixed out. */
+	/** When the interpolated mix percentage is less than the `mixAttachmentThreshold`, attachment timelines are
+	 * applied while this animation is being mixed out. Defaults to 0, so attachment timelines are not applied while this
+	 * animation is being mixed out. */
 	mixAttachmentThreshold = 0;
 
 	/** When the computed alpha is greater than `alphaAttachmentThreshold`, attachment timelines are applied. The
-	 * computed alpha includes {@link alpha} and the mix percentage. Defaults to 0, so attachment timelines are always
-	 * applied. */
+	 * computed alpha includes {@link alpha} and the interpolated mix percentage. Defaults to 0, so attachment timelines are
+	 * always applied. */
 	alphaAttachmentThreshold = 0;
 
-	/** When the mix percentage ({@link mixTime} / {@link mixDuration}) is less than the `mixDrawOrderThreshold`,
-	 * draw order timelines are applied while this animation is being mixed out. Defaults to 0, so draw order timelines are not
-	 * applied while this animation is being mixed out. */
+	/** When the interpolated mix percentage is less than the `mixAttachmentThreshold`, attachment timelines are
+	 * applied while this animation is being mixed out. Defaults to 0, so attachment timelines are not applied while this
+	 * animation is being mixed out. */
 	mixDrawOrderThreshold = 0;
 
 	/** The time in seconds for the first frame of this animation, both initially and after looping. Defaults to 0.
@@ -1021,6 +1018,8 @@ export class TrackEntry {
 
 	totalAlpha = 0;
 
+	mixInterpolation: Interpolation = Interpolation.linear;
+
 	/** Sets both {@link getMixDuration} and {@link getDelay}.
 	 * @param delay If > 0, sets {@link getDelay}. If <= 0, the delay set is the duration of the previous track entry minus
 	 *           the specified mix duration plus the specified `delay` (ie the mix ends at (when `delay` =
@@ -1032,6 +1031,24 @@ export class TrackEntry {
 			if (delay <= 0) delay = this.previous == null ? 0 : Math.max(delay + this.previous.getTrackComplete() - mixDuration, 0);
 			this.delay = delay;
 		}
+	}
+
+	/** The interpolation to apply to the mix percentage ({@link mixTime} / {@link mixDuration}) when mixing from the previous
+	 * animation to this animation. Defaults to linear. */
+	setMixInterpolation (mixInterpolation: Interpolation) {
+		if (!mixInterpolation) throw new Error("mixInterpolation cannot be null.");
+		this.mixInterpolation = mixInterpolation;
+	}
+
+	mix (): number {
+		if (this.mixDuration === 0) return 1;
+		let mix = this.mixTime / this.mixDuration;
+		if (mix >= 1) return 1;
+		if (this.mixInterpolation === Interpolation.linear) return mix;
+		mix = this.mixInterpolation.apply(mix);
+		if (mix < 0) return 0;
+		if (mix > 1) return 1;
+		return mix;
 	}
 
 	/** For each timeline:
@@ -1048,6 +1065,7 @@ export class TrackEntry {
 		this.previous = null;
 		this.mixingFrom = null;
 		this.mixingTo = null;
+		this.mixInterpolation = Interpolation.linear;
 		this.animation = null;
 		this.listener = null;
 		this.timelineMode.length = 0;
@@ -1163,12 +1181,11 @@ export class EventQueue {
 		if (this.drainDisabled) return; // Not reentrant.
 		this.drainDisabled = true;
 
-		const listeners = this.animState.listeners;
-
 		for (let i = 0; i < this.objects.length; i += 2) {
 			const objects = this.objects;
 			const type = objects[i] as EventType;
 			const entry = objects[i + 1] as TrackEntry;
+			const listeners = this.animState.listeners.slice();
 			switch (type) {
 				case EventType.start:
 					if (entry.listener?.start) entry.listener.start(entry);
@@ -1299,4 +1316,4 @@ export const HOLD = 2;
 export const HOLD_FIRST = 3;
 
 export const SETUP = 1;
-export const CURRENT = 2;
+export const RETAIN = 2;

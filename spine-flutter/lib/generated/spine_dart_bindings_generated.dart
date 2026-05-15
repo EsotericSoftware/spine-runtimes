@@ -6011,21 +6011,6 @@ class SpineDartBindings {
   late final _spine_bone_pose_modify_world =
       _spine_bone_pose_modify_worldPtr.asFunction<void Function(spine_bone_pose, int)>();
 
-  void spine_bone_pose_reset_world(
-    spine_bone_pose self,
-    int update,
-  ) {
-    return _spine_bone_pose_reset_world(
-      self,
-      update,
-    );
-  }
-
-  late final _spine_bone_pose_reset_worldPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(spine_bone_pose, ffi.Int)>>('spine_bone_pose_reset_world');
-  late final _spine_bone_pose_reset_world =
-      _spine_bone_pose_reset_worldPtr.asFunction<void Function(spine_bone_pose, int)>();
-
   /// The world transform [a b][c d] x-axis x component.
   double spine_bone_pose_get_a(
     spine_bone_pose self,
@@ -15885,6 +15870,21 @@ class SpineDartBindings {
   late final _spine_animation_get_bones =
       _spine_animation_get_bonesPtr.asFunction<spine_array_int Function(spine_animation)>();
 
+  /// The color of the animation as it was in Spine, or a default color if
+  /// nonessential data was not exported.
+  spine_color spine_animation_get_color(
+    spine_animation self,
+  ) {
+    return _spine_animation_get_color(
+      self,
+    );
+  }
+
+  late final _spine_animation_get_colorPtr =
+      _lookup<ffi.NativeFunction<spine_color Function(spine_animation)>>('spine_animation_get_color');
+  late final _spine_animation_get_color =
+      _spine_animation_get_colorPtr.asFunction<spine_color Function(spine_animation)>();
+
   /// @param target After the first and before the last entry.
   int spine_animation_search_1(
     spine_array_float values,
@@ -16575,6 +16575,7 @@ class SpineDartBindings {
   spine_region_attachment spine_atlas_attachment_loader_new_region_attachment(
     spine_atlas_attachment_loader self,
     spine_skin skin,
+    ffi.Pointer<ffi.Char> placeholder,
     ffi.Pointer<ffi.Char> name,
     ffi.Pointer<ffi.Char> path,
     spine_sequence sequence,
@@ -16582,6 +16583,7 @@ class SpineDartBindings {
     return _spine_atlas_attachment_loader_new_region_attachment(
       self,
       skin,
+      placeholder,
       name,
       path,
       sequence,
@@ -16590,16 +16592,22 @@ class SpineDartBindings {
 
   late final _spine_atlas_attachment_loader_new_region_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          spine_region_attachment Function(spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>, spine_sequence)>>('spine_atlas_attachment_loader_new_region_attachment');
+          spine_region_attachment Function(
+              spine_atlas_attachment_loader,
+              spine_skin,
+              ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>,
+              spine_sequence)>>('spine_atlas_attachment_loader_new_region_attachment');
   late final _spine_atlas_attachment_loader_new_region_attachment =
       _spine_atlas_attachment_loader_new_region_attachmentPtr.asFunction<
           spine_region_attachment Function(spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>, spine_sequence)>();
+              ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>, spine_sequence)>();
 
   spine_mesh_attachment spine_atlas_attachment_loader_new_mesh_attachment(
     spine_atlas_attachment_loader self,
     spine_skin skin,
+    ffi.Pointer<ffi.Char> placeholder,
     ffi.Pointer<ffi.Char> name,
     ffi.Pointer<ffi.Char> path,
     spine_sequence sequence,
@@ -16607,6 +16615,7 @@ class SpineDartBindings {
     return _spine_atlas_attachment_loader_new_mesh_attachment(
       self,
       skin,
+      placeholder,
       name,
       path,
       sequence,
@@ -16615,91 +16624,109 @@ class SpineDartBindings {
 
   late final _spine_atlas_attachment_loader_new_mesh_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          spine_mesh_attachment Function(spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>, spine_sequence)>>('spine_atlas_attachment_loader_new_mesh_attachment');
+          spine_mesh_attachment Function(
+              spine_atlas_attachment_loader,
+              spine_skin,
+              ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>,
+              spine_sequence)>>('spine_atlas_attachment_loader_new_mesh_attachment');
   late final _spine_atlas_attachment_loader_new_mesh_attachment =
       _spine_atlas_attachment_loader_new_mesh_attachmentPtr.asFunction<
           spine_mesh_attachment Function(spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>, spine_sequence)>();
+              ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>, spine_sequence)>();
 
   spine_bounding_box_attachment spine_atlas_attachment_loader_new_bounding_box_attachment(
     spine_atlas_attachment_loader self,
     spine_skin skin,
+    ffi.Pointer<ffi.Char> placeholder,
     ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_atlas_attachment_loader_new_bounding_box_attachment(
       self,
       skin,
+      placeholder,
       name,
     );
   }
 
   late final _spine_atlas_attachment_loader_new_bounding_box_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          spine_bounding_box_attachment Function(spine_atlas_attachment_loader, spine_skin,
+          spine_bounding_box_attachment Function(spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
               ffi.Pointer<ffi.Char>)>>('spine_atlas_attachment_loader_new_bounding_box_attachment');
   late final _spine_atlas_attachment_loader_new_bounding_box_attachment =
       _spine_atlas_attachment_loader_new_bounding_box_attachmentPtr.asFunction<
-          spine_bounding_box_attachment Function(spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>)>();
+          spine_bounding_box_attachment Function(
+              spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 
   spine_path_attachment spine_atlas_attachment_loader_new_path_attachment(
     spine_atlas_attachment_loader self,
     spine_skin skin,
+    ffi.Pointer<ffi.Char> placeholder,
     ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_atlas_attachment_loader_new_path_attachment(
       self,
       skin,
+      placeholder,
       name,
     );
   }
 
   late final _spine_atlas_attachment_loader_new_path_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          spine_path_attachment Function(spine_atlas_attachment_loader, spine_skin,
+          spine_path_attachment Function(spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
               ffi.Pointer<ffi.Char>)>>('spine_atlas_attachment_loader_new_path_attachment');
-  late final _spine_atlas_attachment_loader_new_path_attachment = _spine_atlas_attachment_loader_new_path_attachmentPtr
-      .asFunction<spine_path_attachment Function(spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>)>();
+  late final _spine_atlas_attachment_loader_new_path_attachment =
+      _spine_atlas_attachment_loader_new_path_attachmentPtr.asFunction<
+          spine_path_attachment Function(
+              spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 
   spine_point_attachment spine_atlas_attachment_loader_new_point_attachment(
     spine_atlas_attachment_loader self,
     spine_skin skin,
+    ffi.Pointer<ffi.Char> placeholder,
     ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_atlas_attachment_loader_new_point_attachment(
       self,
       skin,
+      placeholder,
       name,
     );
   }
 
   late final _spine_atlas_attachment_loader_new_point_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          spine_point_attachment Function(spine_atlas_attachment_loader, spine_skin,
+          spine_point_attachment Function(spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
               ffi.Pointer<ffi.Char>)>>('spine_atlas_attachment_loader_new_point_attachment');
   late final _spine_atlas_attachment_loader_new_point_attachment =
       _spine_atlas_attachment_loader_new_point_attachmentPtr.asFunction<
-          spine_point_attachment Function(spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>)>();
+          spine_point_attachment Function(
+              spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 
   spine_clipping_attachment spine_atlas_attachment_loader_new_clipping_attachment(
     spine_atlas_attachment_loader self,
     spine_skin skin,
+    ffi.Pointer<ffi.Char> placeholder,
     ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_atlas_attachment_loader_new_clipping_attachment(
       self,
       skin,
+      placeholder,
       name,
     );
   }
 
   late final _spine_atlas_attachment_loader_new_clipping_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          spine_clipping_attachment Function(spine_atlas_attachment_loader, spine_skin,
+          spine_clipping_attachment Function(spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
               ffi.Pointer<ffi.Char>)>>('spine_atlas_attachment_loader_new_clipping_attachment');
   late final _spine_atlas_attachment_loader_new_clipping_attachment =
       _spine_atlas_attachment_loader_new_clipping_attachmentPtr.asFunction<
-          spine_clipping_attachment Function(spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>)>();
+          spine_clipping_attachment Function(
+              spine_atlas_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 
   spine_atlas_region spine_atlas_attachment_loader_find_region(
     spine_atlas_attachment_loader self,
@@ -17884,6 +17911,11 @@ class SpineDartBindings {
   late final _spine_attachment_set_timeline_slots =
       _spine_attachment_set_timeline_slotsPtr.asFunction<void Function(spine_attachment, spine_array_int)>();
 
+  /// Returns true if the slotIndex or any getTimelineSlots() have an attachment
+  /// whose getTimelineAttachment() is this attachment.
+  ///
+  /// @param slots The Skeleton::getSlots().
+  /// @param slotIndex The timeline's primary slot index.
   bool spine_attachment_is_timeline_active(
     spine_attachment self,
     spine_array_slot slots,
@@ -17965,6 +17997,7 @@ class SpineDartBindings {
   spine_region_attachment spine_attachment_loader_new_region_attachment(
     spine_attachment_loader self,
     spine_skin skin,
+    ffi.Pointer<ffi.Char> placeholder,
     ffi.Pointer<ffi.Char> name,
     ffi.Pointer<ffi.Char> path,
     spine_sequence sequence,
@@ -17972,6 +18005,7 @@ class SpineDartBindings {
     return _spine_attachment_loader_new_region_attachment(
       self,
       skin,
+      placeholder,
       name,
       path,
       sequence,
@@ -17980,16 +18014,22 @@ class SpineDartBindings {
 
   late final _spine_attachment_loader_new_region_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          spine_region_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>, spine_sequence)>>('spine_attachment_loader_new_region_attachment');
+          spine_region_attachment Function(
+              spine_attachment_loader,
+              spine_skin,
+              ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>,
+              spine_sequence)>>('spine_attachment_loader_new_region_attachment');
   late final _spine_attachment_loader_new_region_attachment =
       _spine_attachment_loader_new_region_attachmentPtr.asFunction<
-          spine_region_attachment Function(
-              spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>, spine_sequence)>();
+          spine_region_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>, spine_sequence)>();
 
   spine_mesh_attachment spine_attachment_loader_new_mesh_attachment(
     spine_attachment_loader self,
     spine_skin skin,
+    ffi.Pointer<ffi.Char> placeholder,
     ffi.Pointer<ffi.Char> name,
     ffi.Pointer<ffi.Char> path,
     spine_sequence sequence,
@@ -17997,6 +18037,7 @@ class SpineDartBindings {
     return _spine_attachment_loader_new_mesh_attachment(
       self,
       skin,
+      placeholder,
       name,
       path,
       sequence,
@@ -18005,88 +18046,107 @@ class SpineDartBindings {
 
   late final _spine_attachment_loader_new_mesh_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          spine_mesh_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>, spine_sequence)>>('spine_attachment_loader_new_mesh_attachment');
+          spine_mesh_attachment Function(
+              spine_attachment_loader,
+              spine_skin,
+              ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>,
+              spine_sequence)>>('spine_attachment_loader_new_mesh_attachment');
   late final _spine_attachment_loader_new_mesh_attachment = _spine_attachment_loader_new_mesh_attachmentPtr.asFunction<
-      spine_mesh_attachment Function(
-          spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>, spine_sequence)>();
+      spine_mesh_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>,
+          ffi.Pointer<ffi.Char>, spine_sequence)>();
 
   spine_bounding_box_attachment spine_attachment_loader_new_bounding_box_attachment(
     spine_attachment_loader self,
     spine_skin skin,
+    ffi.Pointer<ffi.Char> placeholder,
     ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_attachment_loader_new_bounding_box_attachment(
       self,
       skin,
+      placeholder,
       name,
     );
   }
 
   late final _spine_attachment_loader_new_bounding_box_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          spine_bounding_box_attachment Function(spine_attachment_loader, spine_skin,
+          spine_bounding_box_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
               ffi.Pointer<ffi.Char>)>>('spine_attachment_loader_new_bounding_box_attachment');
   late final _spine_attachment_loader_new_bounding_box_attachment =
       _spine_attachment_loader_new_bounding_box_attachmentPtr.asFunction<
-          spine_bounding_box_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>)>();
+          spine_bounding_box_attachment Function(
+              spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 
   spine_path_attachment spine_attachment_loader_new_path_attachment(
     spine_attachment_loader self,
     spine_skin skin,
+    ffi.Pointer<ffi.Char> placeholder,
     ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_attachment_loader_new_path_attachment(
       self,
       skin,
+      placeholder,
       name,
     );
   }
 
   late final _spine_attachment_loader_new_path_attachmentPtr = _lookup<
-          ffi
-          .NativeFunction<spine_path_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>)>>(
-      'spine_attachment_loader_new_path_attachment');
-  late final _spine_attachment_loader_new_path_attachment = _spine_attachment_loader_new_path_attachmentPtr
-      .asFunction<spine_path_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>)>();
+      ffi.NativeFunction<
+          spine_path_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>)>>('spine_attachment_loader_new_path_attachment');
+  late final _spine_attachment_loader_new_path_attachment = _spine_attachment_loader_new_path_attachmentPtr.asFunction<
+      spine_path_attachment Function(
+          spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 
   spine_point_attachment spine_attachment_loader_new_point_attachment(
     spine_attachment_loader self,
     spine_skin skin,
+    ffi.Pointer<ffi.Char> placeholder,
     ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_attachment_loader_new_point_attachment(
       self,
       skin,
+      placeholder,
       name,
     );
   }
 
   late final _spine_attachment_loader_new_point_attachmentPtr = _lookup<
-          ffi
-          .NativeFunction<spine_point_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>)>>(
-      'spine_attachment_loader_new_point_attachment');
-  late final _spine_attachment_loader_new_point_attachment = _spine_attachment_loader_new_point_attachmentPtr
-      .asFunction<spine_point_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>)>();
+      ffi.NativeFunction<
+          spine_point_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>)>>('spine_attachment_loader_new_point_attachment');
+  late final _spine_attachment_loader_new_point_attachment =
+      _spine_attachment_loader_new_point_attachmentPtr.asFunction<
+          spine_point_attachment Function(
+              spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 
   spine_clipping_attachment spine_attachment_loader_new_clipping_attachment(
     spine_attachment_loader self,
     spine_skin skin,
+    ffi.Pointer<ffi.Char> placeholder,
     ffi.Pointer<ffi.Char> name,
   ) {
     return _spine_attachment_loader_new_clipping_attachment(
       self,
       skin,
+      placeholder,
       name,
     );
   }
 
   late final _spine_attachment_loader_new_clipping_attachmentPtr = _lookup<
       ffi.NativeFunction<
-          spine_clipping_attachment Function(spine_attachment_loader, spine_skin,
+          spine_clipping_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>,
               ffi.Pointer<ffi.Char>)>>('spine_attachment_loader_new_clipping_attachment');
-  late final _spine_attachment_loader_new_clipping_attachment = _spine_attachment_loader_new_clipping_attachmentPtr
-      .asFunction<spine_clipping_attachment Function(spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>)>();
+  late final _spine_attachment_loader_new_clipping_attachment =
+      _spine_attachment_loader_new_clipping_attachmentPtr.asFunction<
+          spine_clipping_attachment Function(
+              spine_attachment_loader, spine_skin, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 
   spine_attachment_timeline spine_attachment_timeline_create(
     int frameCount,
@@ -18689,6 +18749,66 @@ class SpineDartBindings {
           'spine_bone_data_set_icon');
   late final _spine_bone_data_set_icon =
       _spine_bone_data_set_iconPtr.asFunction<void Function(spine_bone_data, ffi.Pointer<ffi.Char>)>();
+
+  /// The bone icon's display size scale, or 1 if nonessential data was not
+  /// exported.
+  double spine_bone_data_get_icon_size(
+    spine_bone_data self,
+  ) {
+    return _spine_bone_data_get_icon_size(
+      self,
+    );
+  }
+
+  late final _spine_bone_data_get_icon_sizePtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_bone_data)>>('spine_bone_data_get_icon_size');
+  late final _spine_bone_data_get_icon_size =
+      _spine_bone_data_get_icon_sizePtr.asFunction<double Function(spine_bone_data)>();
+
+  void spine_bone_data_set_icon_size(
+    spine_bone_data self,
+    double iconSize,
+  ) {
+    return _spine_bone_data_set_icon_size(
+      self,
+      iconSize,
+    );
+  }
+
+  late final _spine_bone_data_set_icon_sizePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_bone_data, ffi.Float)>>('spine_bone_data_set_icon_size');
+  late final _spine_bone_data_set_icon_size =
+      _spine_bone_data_set_icon_sizePtr.asFunction<void Function(spine_bone_data, double)>();
+
+  /// The bone icon's display rotation in degrees, or 0 if nonessential data was
+  /// not exported.
+  double spine_bone_data_get_icon_rotation(
+    spine_bone_data self,
+  ) {
+    return _spine_bone_data_get_icon_rotation(
+      self,
+    );
+  }
+
+  late final _spine_bone_data_get_icon_rotationPtr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_bone_data)>>('spine_bone_data_get_icon_rotation');
+  late final _spine_bone_data_get_icon_rotation =
+      _spine_bone_data_get_icon_rotationPtr.asFunction<double Function(spine_bone_data)>();
+
+  void spine_bone_data_set_icon_rotation(
+    spine_bone_data self,
+    double iconRotation,
+  ) {
+    return _spine_bone_data_set_icon_rotation(
+      self,
+      iconRotation,
+    );
+  }
+
+  late final _spine_bone_data_set_icon_rotationPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_bone_data, ffi.Float)>>('spine_bone_data_set_icon_rotation');
+  late final _spine_bone_data_set_icon_rotation =
+      _spine_bone_data_set_icon_rotationPtr.asFunction<void Function(spine_bone_data, double)>();
 
   bool spine_bone_data_get_visible(
     spine_bone_data self,
@@ -20275,6 +20395,11 @@ class SpineDartBindings {
   late final _spine_bounding_box_attachment_set_timeline_slots = _spine_bounding_box_attachment_set_timeline_slotsPtr
       .asFunction<void Function(spine_bounding_box_attachment, spine_array_int)>();
 
+  /// Returns true if the slotIndex or any getTimelineSlots() have an attachment
+  /// whose getTimelineAttachment() is this attachment.
+  ///
+  /// @param slots The Skeleton::getSlots().
+  /// @param slotIndex The timeline's primary slot index.
   bool spine_bounding_box_attachment_is_timeline_active(
     spine_bounding_box_attachment self,
     spine_array_slot slots,
@@ -20784,6 +20909,11 @@ class SpineDartBindings {
   late final _spine_clipping_attachment_set_timeline_slots = _spine_clipping_attachment_set_timeline_slotsPtr
       .asFunction<void Function(spine_clipping_attachment, spine_array_int)>();
 
+  /// Returns true if the slotIndex or any getTimelineSlots() have an attachment
+  /// whose getTimelineAttachment() is this attachment.
+  ///
+  /// @param slots The Skeleton::getSlots().
+  /// @param slotIndex The timeline's primary slot index.
   bool spine_clipping_attachment_is_timeline_active(
     spine_clipping_attachment self,
     spine_array_slot slots,
@@ -24749,7 +24879,7 @@ class SpineDartBindings {
     double targetY,
     bool compress,
     bool stretch,
-    bool uniform,
+    int scaleYMode,
     double mix,
   ) {
     return _spine_ik_constraint_apply_1(
@@ -24759,17 +24889,17 @@ class SpineDartBindings {
       targetY,
       compress,
       stretch,
-      uniform,
+      scaleYMode,
       mix,
     );
   }
 
   late final _spine_ik_constraint_apply_1Ptr = _lookup<
       ffi.NativeFunction<
-          ffi.Void Function(spine_skeleton, spine_bone_pose, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Bool,
+          ffi.Void Function(spine_skeleton, spine_bone_pose, ffi.Float, ffi.Float, ffi.Bool, ffi.Bool, ffi.Int32,
               ffi.Float)>>('spine_ik_constraint_apply_1');
   late final _spine_ik_constraint_apply_1 = _spine_ik_constraint_apply_1Ptr
-      .asFunction<void Function(spine_skeleton, spine_bone_pose, double, double, bool, bool, bool, double)>();
+      .asFunction<void Function(spine_skeleton, spine_bone_pose, double, double, bool, bool, int, double)>();
 
   /// Adjusts the parent and child bone rotations so the tip of the child is as
   /// close to the target position as possible. The target is specified in the
@@ -24784,7 +24914,7 @@ class SpineDartBindings {
     double targetY,
     int bendDirection,
     bool stretch,
-    bool uniform,
+    int scaleYMode,
     double softness,
     double mix,
   ) {
@@ -24796,7 +24926,7 @@ class SpineDartBindings {
       targetY,
       bendDirection,
       stretch,
-      uniform,
+      scaleYMode,
       softness,
       mix,
     );
@@ -24805,10 +24935,10 @@ class SpineDartBindings {
   late final _spine_ik_constraint_apply_2Ptr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(spine_skeleton, spine_bone_pose, spine_bone_pose, ffi.Float, ffi.Float, ffi.Int, ffi.Bool,
-              ffi.Bool, ffi.Float, ffi.Float)>>('spine_ik_constraint_apply_2');
+              ffi.Int32, ffi.Float, ffi.Float)>>('spine_ik_constraint_apply_2');
   late final _spine_ik_constraint_apply_2 = _spine_ik_constraint_apply_2Ptr.asFunction<
       void Function(
-          spine_skeleton, spine_bone_pose, spine_bone_pose, double, double, int, bool, bool, double, double)>();
+          spine_skeleton, spine_bone_pose, spine_bone_pose, double, double, int, bool, int, double, double)>();
 
   spine_ik_constraint_data spine_ik_constraint_get_data(
     spine_ik_constraint self,
@@ -25253,37 +25383,38 @@ class SpineDartBindings {
   late final _spine_ik_constraint_data_set_target =
       _spine_ik_constraint_data_set_targetPtr.asFunction<void Function(spine_ik_constraint_data, spine_bone_data)>();
 
-  /// When true and IkConstraintPose::getCompress() or
-  /// IkConstraintPose::getStretch() is used, the bone is scaled on both the X and
-  /// Y axes.
-  bool spine_ik_constraint_data_get_uniform(
+  /// Determines how BonePose::getScaleY() changes when
+  /// IkConstraintPose::getCompress() or IkConstraintPose::getStretch() sets
+  /// BonePose::getScaleX().
+  int spine_ik_constraint_data_get_scale_y_mode(
     spine_ik_constraint_data self,
   ) {
-    return _spine_ik_constraint_data_get_uniform(
+    return _spine_ik_constraint_data_get_scale_y_mode(
       self,
     );
   }
 
-  late final _spine_ik_constraint_data_get_uniformPtr =
-      _lookup<ffi.NativeFunction<ffi.Bool Function(spine_ik_constraint_data)>>('spine_ik_constraint_data_get_uniform');
-  late final _spine_ik_constraint_data_get_uniform =
-      _spine_ik_constraint_data_get_uniformPtr.asFunction<bool Function(spine_ik_constraint_data)>();
+  late final _spine_ik_constraint_data_get_scale_y_modePtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(spine_ik_constraint_data)>>(
+          'spine_ik_constraint_data_get_scale_y_mode');
+  late final _spine_ik_constraint_data_get_scale_y_mode =
+      _spine_ik_constraint_data_get_scale_y_modePtr.asFunction<int Function(spine_ik_constraint_data)>();
 
-  void spine_ik_constraint_data_set_uniform(
+  void spine_ik_constraint_data_set_scale_y_mode(
     spine_ik_constraint_data self,
-    bool uniform,
+    int scaleYMode,
   ) {
-    return _spine_ik_constraint_data_set_uniform(
+    return _spine_ik_constraint_data_set_scale_y_mode(
       self,
-      uniform,
+      scaleYMode,
     );
   }
 
-  late final _spine_ik_constraint_data_set_uniformPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(spine_ik_constraint_data, ffi.Bool)>>(
-          'spine_ik_constraint_data_set_uniform');
-  late final _spine_ik_constraint_data_set_uniform =
-      _spine_ik_constraint_data_set_uniformPtr.asFunction<void Function(spine_ik_constraint_data, bool)>();
+  late final _spine_ik_constraint_data_set_scale_y_modePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_ik_constraint_data, ffi.Int32)>>(
+          'spine_ik_constraint_data_set_scale_y_mode');
+  late final _spine_ik_constraint_data_set_scale_y_mode =
+      _spine_ik_constraint_data_set_scale_y_modePtr.asFunction<void Function(spine_ik_constraint_data, int)>();
 
   /// Resolve ambiguity by forwarding to PosedData's implementation
   ffi.Pointer<ffi.Char> spine_ik_constraint_data_get_name(
@@ -26161,6 +26292,87 @@ class SpineDartBindings {
       _lookup<ffi.NativeFunction<spine_rtti Function()>>('spine_inherit_timeline_rtti');
   late final _spine_inherit_timeline_rtti = _spine_inherit_timeline_rttiPtr.asFunction<spine_rtti Function()>();
 
+  /// @param a Alpha value between 0 and 1.
+  double spine_interpolation_apply_1(
+    spine_interpolation self,
+    double a,
+  ) {
+    return _spine_interpolation_apply_1(
+      self,
+      a,
+    );
+  }
+
+  late final _spine_interpolation_apply_1Ptr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_interpolation, ffi.Float)>>('spine_interpolation_apply_1');
+  late final _spine_interpolation_apply_1 =
+      _spine_interpolation_apply_1Ptr.asFunction<double Function(spine_interpolation, double)>();
+
+  double spine_interpolation_apply_2(
+    spine_interpolation self,
+    double start,
+    double end,
+    double a,
+  ) {
+    return _spine_interpolation_apply_2(
+      self,
+      start,
+      end,
+      a,
+    );
+  }
+
+  late final _spine_interpolation_apply_2Ptr =
+      _lookup<ffi.NativeFunction<ffi.Float Function(spine_interpolation, ffi.Float, ffi.Float, ffi.Float)>>(
+          'spine_interpolation_apply_2');
+  late final _spine_interpolation_apply_2 =
+      _spine_interpolation_apply_2Ptr.asFunction<double Function(spine_interpolation, double, double, double)>();
+
+  spine_interpolation spine_interpolation_linear() {
+    return _spine_interpolation_linear();
+  }
+
+  late final _spine_interpolation_linearPtr =
+      _lookup<ffi.NativeFunction<spine_interpolation Function()>>('spine_interpolation_linear');
+  late final _spine_interpolation_linear = _spine_interpolation_linearPtr.asFunction<spine_interpolation Function()>();
+
+  /// Aka "smoothstep".
+  spine_interpolation spine_interpolation_smooth() {
+    return _spine_interpolation_smooth();
+  }
+
+  late final _spine_interpolation_smoothPtr =
+      _lookup<ffi.NativeFunction<spine_interpolation Function()>>('spine_interpolation_smooth');
+  late final _spine_interpolation_smooth = _spine_interpolation_smoothPtr.asFunction<spine_interpolation Function()>();
+
+  /// Slow, then fast.
+  spine_interpolation spine_interpolation_slow_fast() {
+    return _spine_interpolation_slow_fast();
+  }
+
+  late final _spine_interpolation_slow_fastPtr =
+      _lookup<ffi.NativeFunction<spine_interpolation Function()>>('spine_interpolation_slow_fast');
+  late final _spine_interpolation_slow_fast =
+      _spine_interpolation_slow_fastPtr.asFunction<spine_interpolation Function()>();
+
+  /// Fast, then slow.
+  spine_interpolation spine_interpolation_fast_slow() {
+    return _spine_interpolation_fast_slow();
+  }
+
+  late final _spine_interpolation_fast_slowPtr =
+      _lookup<ffi.NativeFunction<spine_interpolation Function()>>('spine_interpolation_fast_slow');
+  late final _spine_interpolation_fast_slow =
+      _spine_interpolation_fast_slowPtr.asFunction<spine_interpolation Function()>();
+
+  spine_interpolation spine_interpolation_circle() {
+    return _spine_interpolation_circle();
+  }
+
+  late final _spine_interpolation_circlePtr =
+      _lookup<ffi.NativeFunction<spine_interpolation Function()>>('spine_interpolation_circle');
+  late final _spine_interpolation_circle = _spine_interpolation_circlePtr.asFunction<spine_interpolation Function()>();
+
   spine_linked_mesh spine_linked_mesh_create(
     spine_mesh_attachment mesh,
     int skinIndex,
@@ -26854,6 +27066,11 @@ class SpineDartBindings {
   late final _spine_mesh_attachment_set_timeline_slots =
       _spine_mesh_attachment_set_timeline_slotsPtr.asFunction<void Function(spine_mesh_attachment, spine_array_int)>();
 
+  /// Returns true if the slotIndex or any getTimelineSlots() have an attachment
+  /// whose getTimelineAttachment() is this attachment.
+  ///
+  /// @param slots The Skeleton::getSlots().
+  /// @param slotIndex The timeline's primary slot index.
   bool spine_mesh_attachment_is_timeline_active(
     spine_mesh_attachment self,
     spine_array_slot slots,
@@ -27351,6 +27568,11 @@ class SpineDartBindings {
   late final _spine_path_attachment_set_timeline_slots =
       _spine_path_attachment_set_timeline_slotsPtr.asFunction<void Function(spine_path_attachment, spine_array_int)>();
 
+  /// Returns true if the slotIndex or any getTimelineSlots() have an attachment
+  /// whose getTimelineAttachment() is this attachment.
+  ///
+  /// @param slots The Skeleton::getSlots().
+  /// @param slotIndex The timeline's primary slot index.
   bool spine_path_attachment_is_timeline_active(
     spine_path_attachment self,
     spine_array_slot slots,
@@ -35881,6 +36103,11 @@ class SpineDartBindings {
   late final _spine_point_attachment_set_timeline_slots = _spine_point_attachment_set_timeline_slotsPtr
       .asFunction<void Function(spine_point_attachment, spine_array_int)>();
 
+  /// Returns true if the slotIndex or any getTimelineSlots() have an attachment
+  /// whose getTimelineAttachment() is this attachment.
+  ///
+  /// @param slots The Skeleton::getSlots().
+  /// @param slotIndex The timeline's primary slot index.
   bool spine_point_attachment_is_timeline_active(
     spine_point_attachment self,
     spine_array_slot slots,
@@ -36705,6 +36932,11 @@ class SpineDartBindings {
   late final _spine_region_attachment_set_timeline_slots = _spine_region_attachment_set_timeline_slotsPtr
       .asFunction<void Function(spine_region_attachment, spine_array_int)>();
 
+  /// Returns true if the slotIndex or any getTimelineSlots() have an attachment
+  /// whose getTimelineAttachment() is this attachment.
+  ///
+  /// @param slots The Skeleton::getSlots().
+  /// @param slotIndex The timeline's primary slot index.
   bool spine_region_attachment_is_timeline_active(
     spine_region_attachment self,
     spine_array_slot slots,
@@ -42259,12 +42491,12 @@ class SpineDartBindings {
   spine_attachment spine_skeleton_get_attachment_1(
     spine_skeleton self,
     ffi.Pointer<ffi.Char> slotName,
-    ffi.Pointer<ffi.Char> placeholderName,
+    ffi.Pointer<ffi.Char> placeholder,
   ) {
     return _spine_skeleton_get_attachment_1(
       self,
       slotName,
-      placeholderName,
+      placeholder,
     );
   }
 
@@ -42277,12 +42509,12 @@ class SpineDartBindings {
   spine_attachment spine_skeleton_get_attachment_2(
     spine_skeleton self,
     int slotIndex,
-    ffi.Pointer<ffi.Char> placeholderName,
+    ffi.Pointer<ffi.Char> placeholder,
   ) {
     return _spine_skeleton_get_attachment_2(
       self,
       slotIndex,
-      placeholderName,
+      placeholder,
     );
   }
 
@@ -42296,16 +42528,16 @@ class SpineDartBindings {
   /// findSlot(String), finding the attachment with getAttachment(int, String),
   /// then setting the slot's SlotPose::getAttachment().
   ///
-  /// @param placeholderName May be empty.
+  /// @param placeholder May be empty.
   void spine_skeleton_set_attachment(
     spine_skeleton self,
     ffi.Pointer<ffi.Char> slotName,
-    ffi.Pointer<ffi.Char> placeholderName,
+    ffi.Pointer<ffi.Char> placeholder,
   ) {
     return _spine_skeleton_set_attachment(
       self,
       slotName,
-      placeholderName,
+      placeholder,
     );
   }
 
@@ -43634,13 +43866,13 @@ class SpineDartBindings {
   void spine_skin_set_attachment(
     spine_skin self,
     int slotIndex,
-    ffi.Pointer<ffi.Char> placeholderName,
+    ffi.Pointer<ffi.Char> placeholder,
     spine_attachment attachment,
   ) {
     return _spine_skin_set_attachment(
       self,
       slotIndex,
-      placeholderName,
+      placeholder,
       attachment,
     );
   }
@@ -43654,12 +43886,12 @@ class SpineDartBindings {
   spine_attachment spine_skin_get_attachment(
     spine_skin self,
     int slotIndex,
-    ffi.Pointer<ffi.Char> placeholderName,
+    ffi.Pointer<ffi.Char> placeholder,
   ) {
     return _spine_skin_get_attachment(
       self,
       slotIndex,
-      placeholderName,
+      placeholder,
     );
   }
 
@@ -43673,12 +43905,12 @@ class SpineDartBindings {
   void spine_skin_remove_attachment(
     spine_skin self,
     int slotIndex,
-    ffi.Pointer<ffi.Char> placeholderName,
+    ffi.Pointer<ffi.Char> placeholder,
   ) {
     return _spine_skin_remove_attachment(
       self,
       slotIndex,
-      placeholderName,
+      placeholder,
     );
   }
 
@@ -45134,8 +45366,8 @@ class SpineDartBindings {
   late final _spine_slider_pose_set_time =
       _spine_slider_pose_set_timePtr.asFunction<void Function(spine_slider_pose, double)>();
 
-  /// A percentage that controls the mix between the constrained and unconstrained
-  /// poses.
+  /// A percentage (unbounded) that controls the mix between the constrained and
+  /// unconstrained poses.
   double spine_slider_pose_get_mix(
     spine_slider_pose self,
   ) {
@@ -48096,10 +48328,9 @@ class SpineDartBindings {
   late final _spine_track_entry_set_alpha =
       _spine_track_entry_set_alphaPtr.asFunction<void Function(spine_track_entry, double)>();
 
-  /// When the mix percentage (mix time / mix duration) is less than the event
-  /// threshold, event timelines for the animation being mixed out will be applied.
-  /// Defaults to 0, so event timelines are not applied for an animation being
-  /// mixed out.
+  /// When the interpolated mix percentage is less than the event threshold, event
+  /// timelines for the animation being mixed out will be applied. Defaults to 0,
+  /// so event timelines are not applied for an animation being mixed out.
   double spine_track_entry_get_event_threshold(
     spine_track_entry self,
   ) {
@@ -48129,10 +48360,10 @@ class SpineDartBindings {
   late final _spine_track_entry_set_event_threshold =
       _spine_track_entry_set_event_thresholdPtr.asFunction<void Function(spine_track_entry, double)>();
 
-  /// When the mix percentage (mix time / mix duration) is less than the attachment
-  /// threshold, attachment timelines for the animation being mixed out will be
-  /// applied. Defaults to 0, so attachment timelines are not applied for an
-  /// animation being mixed out.
+  /// When the interpolated mix percentage is less than the attachment threshold,
+  /// attachment timelines for the animation being mixed out will be applied.
+  /// Defaults to 0, so attachment timelines are not applied for an animation being
+  /// mixed out.
   double spine_track_entry_get_mix_attachment_threshold(
     spine_track_entry self,
   ) {
@@ -48163,8 +48394,9 @@ class SpineDartBindings {
   late final _spine_track_entry_set_mix_attachment_threshold =
       _spine_track_entry_set_mix_attachment_thresholdPtr.asFunction<void Function(spine_track_entry, double)>();
 
-  /// When alpha is greater than alphaAttachmentThreshold, attachment timelines are
-  /// applied. Defaults to 0, so attachment timelines are always applied.
+  /// When the computed alpha is greater than alphaAttachmentThreshold, attachment
+  /// timelines are applied. The computed alpha includes alpha and the interpolated
+  /// mix percentage. Defaults to 0, so attachment timelines are always applied.
   double spine_track_entry_get_alpha_attachment_threshold(
     spine_track_entry self,
   ) {
@@ -48195,10 +48427,10 @@ class SpineDartBindings {
   late final _spine_track_entry_set_alpha_attachment_threshold =
       _spine_track_entry_set_alpha_attachment_thresholdPtr.asFunction<void Function(spine_track_entry, double)>();
 
-  /// When the mix percentage (mix time / mix duration) is less than the draw order
-  /// threshold, draw order timelines for the animation being mixed out will be
-  /// applied. Defaults to 0, so draw order timelines are not applied for an
-  /// animation being mixed out.
+  /// When the interpolated mix percentage is less than the draw order threshold,
+  /// draw order timelines for the animation being mixed out will be applied.
+  /// Defaults to 0, so draw order timelines are not applied for an animation being
+  /// mixed out.
   double spine_track_entry_get_mix_draw_order_threshold(
     spine_track_entry self,
   ) {
@@ -48347,6 +48579,39 @@ class SpineDartBindings {
           'spine_track_entry_set_mix_duration_2');
   late final _spine_track_entry_set_mix_duration_2 =
       _spine_track_entry_set_mix_duration_2Ptr.asFunction<void Function(spine_track_entry, double, double)>();
+
+  /// The interpolation to apply to the mix percentage (mix time / mix duration)
+  /// when mixing from the previous animation to this animation. Defaults to
+  /// linear.
+  spine_interpolation spine_track_entry_get_mix_interpolation(
+    spine_track_entry self,
+  ) {
+    return _spine_track_entry_get_mix_interpolation(
+      self,
+    );
+  }
+
+  late final _spine_track_entry_get_mix_interpolationPtr =
+      _lookup<ffi.NativeFunction<spine_interpolation Function(spine_track_entry)>>(
+          'spine_track_entry_get_mix_interpolation');
+  late final _spine_track_entry_get_mix_interpolation =
+      _spine_track_entry_get_mix_interpolationPtr.asFunction<spine_interpolation Function(spine_track_entry)>();
+
+  void spine_track_entry_set_mix_interpolation(
+    spine_track_entry self,
+    spine_interpolation mixInterpolation,
+  ) {
+    return _spine_track_entry_set_mix_interpolation(
+      self,
+      mixInterpolation,
+    );
+  }
+
+  late final _spine_track_entry_set_mix_interpolationPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(spine_track_entry, spine_interpolation)>>(
+          'spine_track_entry_set_mix_interpolation');
+  late final _spine_track_entry_set_mix_interpolation =
+      _spine_track_entry_set_mix_interpolationPtr.asFunction<void Function(spine_track_entry, spine_interpolation)>();
 
   spine_track_entry spine_track_entry_get_mixing_from(
     spine_track_entry self,
@@ -49552,8 +49817,8 @@ class SpineDartBindings {
   late final _spine_transform_constraint_pose_set = _spine_transform_constraint_pose_setPtr
       .asFunction<void Function(spine_transform_constraint_pose, spine_transform_constraint_pose)>();
 
-  /// A percentage that controls the mix between the constrained and unconstrained
-  /// rotation.
+  /// A percentage (unbounded) that controls the mix between the constrained and
+  /// unconstrained rotation.
   double spine_transform_constraint_pose_get_mix_rotate(
     spine_transform_constraint_pose self,
   ) {
@@ -49584,8 +49849,8 @@ class SpineDartBindings {
   late final _spine_transform_constraint_pose_set_mix_rotate = _spine_transform_constraint_pose_set_mix_rotatePtr
       .asFunction<void Function(spine_transform_constraint_pose, double)>();
 
-  /// A percentage that controls the mix between the constrained and unconstrained
-  /// translation X.
+  /// A percentage (unbounded) that controls the mix between the constrained and
+  /// unconstrained translation X.
   double spine_transform_constraint_pose_get_mix_x(
     spine_transform_constraint_pose self,
   ) {
@@ -49616,8 +49881,8 @@ class SpineDartBindings {
   late final _spine_transform_constraint_pose_set_mix_x = _spine_transform_constraint_pose_set_mix_xPtr
       .asFunction<void Function(spine_transform_constraint_pose, double)>();
 
-  /// A percentage that controls the mix between the constrained and unconstrained
-  /// translation Y.
+  /// A percentage (unbounded) that controls the mix between the constrained and
+  /// unconstrained translation Y.
   double spine_transform_constraint_pose_get_mix_y(
     spine_transform_constraint_pose self,
   ) {
@@ -49648,8 +49913,8 @@ class SpineDartBindings {
   late final _spine_transform_constraint_pose_set_mix_y = _spine_transform_constraint_pose_set_mix_yPtr
       .asFunction<void Function(spine_transform_constraint_pose, double)>();
 
-  /// A percentage that controls the mix between the constrained and unconstrained
-  /// scale X.
+  /// A percentage (unbounded) that controls the mix between the constrained and
+  /// unconstrained scale X.
   double spine_transform_constraint_pose_get_mix_scale_x(
     spine_transform_constraint_pose self,
   ) {
@@ -49680,8 +49945,8 @@ class SpineDartBindings {
   late final _spine_transform_constraint_pose_set_mix_scale_x = _spine_transform_constraint_pose_set_mix_scale_xPtr
       .asFunction<void Function(spine_transform_constraint_pose, double)>();
 
-  /// A percentage that controls the mix between the constrained and unconstrained
-  /// scale Y.
+  /// A percentage (unbounded) that controls the mix between the constrained and
+  /// unconstrained scale Y.
   double spine_transform_constraint_pose_get_mix_scale_y(
     spine_transform_constraint_pose self,
   ) {
@@ -49712,8 +49977,8 @@ class SpineDartBindings {
   late final _spine_transform_constraint_pose_set_mix_scale_y = _spine_transform_constraint_pose_set_mix_scale_yPtr
       .asFunction<void Function(spine_transform_constraint_pose, double)>();
 
-  /// A percentage that controls the mix between the constrained and unconstrained
-  /// shear Y.
+  /// A percentage (unbounded) that controls the mix between the constrained and
+  /// unconstrained shear Y.
   double spine_transform_constraint_pose_get_mix_shear_y(
     spine_transform_constraint_pose self,
   ) {
@@ -51794,6 +52059,11 @@ class SpineDartBindings {
   late final _spine_vertex_attachment_set_timeline_slots = _spine_vertex_attachment_set_timeline_slotsPtr
       .asFunction<void Function(spine_vertex_attachment, spine_array_int)>();
 
+  /// Returns true if the slotIndex or any getTimelineSlots() have an attachment
+  /// whose getTimelineAttachment() is this attachment.
+  ///
+  /// @param slots The Skeleton::getSlots().
+  /// @param slotIndex The timeline's primary slot index.
   bool spine_vertex_attachment_is_timeline_active(
     spine_vertex_attachment self,
     spine_array_slot slots,
@@ -51961,6 +52231,8 @@ final class spine_ik_constraint_pose_wrapper extends ffi.Opaque {}
 final class spine_ik_constraint_timeline_wrapper extends ffi.Opaque {}
 
 final class spine_inherit_timeline_wrapper extends ffi.Opaque {}
+
+final class spine_interpolation_wrapper extends ffi.Opaque {}
 
 final class spine_linked_mesh_wrapper extends ffi.Opaque {}
 
@@ -52223,6 +52495,12 @@ abstract class spine_rotate_mode {
   static const int SPINE_ROTATE_MODE_TANGENT = 0;
   static const int SPINE_ROTATE_MODE_CHAIN = 1;
   static const int SPINE_ROTATE_MODE_CHAIN_SCALE = 2;
+}
+
+abstract class spine_scale_y_mode {
+  static const int SPINE_SCALE_Y_MODE_NONE = 0;
+  static const int SPINE_SCALE_Y_MODE_UNIFORM = 1;
+  static const int SPINE_SCALE_Y_MODE_VOLUME = 2;
 }
 
 abstract class spine_sequence_mode {
@@ -52718,10 +52996,10 @@ typedef spine_translate_x_timeline = ffi.Pointer<spine_translate_x_timeline_wrap
 typedef spine_translate_y_timeline = ffi.Pointer<spine_translate_y_timeline_wrapper>;
 
 /// Forward declarations for all non-enum types
-typedef spine_sequence = ffi.Pointer<spine_sequence_wrapper>;
+typedef spine_color = ffi.Pointer<spine_color_wrapper>;
 
 /// Forward declarations for all non-enum types
-typedef spine_color = ffi.Pointer<spine_color_wrapper>;
+typedef spine_sequence = ffi.Pointer<spine_sequence_wrapper>;
 
 /// Forward declarations for all non-enum types
 typedef spine_draw_order = ffi.Pointer<spine_draw_order_wrapper>;
@@ -52731,6 +53009,9 @@ typedef spine_event_queue_entry = ffi.Pointer<spine_event_queue_entry_wrapper>;
 
 /// Forward declarations for all non-enum types
 typedef spine_ik_constraint_pose = ffi.Pointer<spine_ik_constraint_pose_wrapper>;
+
+/// Forward declarations for all non-enum types
+typedef spine_interpolation = ffi.Pointer<spine_interpolation_wrapper>;
 
 /// Forward declarations for all non-enum types
 typedef spine_linked_mesh = ffi.Pointer<spine_linked_mesh_wrapper>;

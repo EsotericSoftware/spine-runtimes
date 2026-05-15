@@ -10,7 +10,6 @@ on:
       - 'spine-glfw/**'
       - 'spine-sdl/**'
       - 'spine-sfml/**'
-      - 'spine-cocos2dx/**'
       - 'spine-ios/**'
       - 'spine-flutter/ios/**'
       - 'spine-flutter/macos/**'

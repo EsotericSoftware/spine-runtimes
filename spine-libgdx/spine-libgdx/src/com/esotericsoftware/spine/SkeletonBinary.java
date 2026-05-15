@@ -284,7 +284,7 @@ public class SkeletonBinary extends SkeletonLoader {
 					data.target = bones[input.readInt(true)];
 					int flags = input.read();
 					data.skinRequired = (flags & 1) != 0;
-					if ((flags & 2) != 0) data.scaleY = IkConstraintData.ScaleY.values[input.read()];
+					if ((flags & 2) != 0) data.scaleYMode = IkConstraintData.ScaleYMode.values[input.read()];
 					IkConstraintPose setup = data.setupPose;
 					setup.bendDirection = (flags & 4) != 0 ? -1 : 1;
 					setup.compress = (flags & 8) != 0;
@@ -549,20 +549,20 @@ public class SkeletonBinary extends SkeletonLoader {
 		for (int i = 0; i < slotCount; i++) {
 			int slotIndex = input.readInt(true);
 			for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
-				String name = input.readStringRef();
-				Attachment attachment = readAttachment(input, skeletonData, skin, slotIndex, name, nonessential);
-				if (attachment != null) skin.setAttachment(slotIndex, name, attachment);
+				String placeholder = input.readStringRef();
+				Attachment attachment = readAttachment(input, skeletonData, skin, slotIndex, placeholder, nonessential);
+				if (attachment != null) skin.setAttachment(slotIndex, placeholder, attachment);
 			}
 		}
 		return skin;
 	}
 
 	private Attachment readAttachment (SkeletonInput input, SkeletonData skeletonData, Skin skin, int slotIndex,
-		String attachmentName, boolean nonessential) throws IOException {
+		String placeholder, boolean nonessential) throws IOException {
 		float scale = this.scale;
 
 		int flags = input.readByte();
-		String name = (flags & 8) != 0 ? input.readStringRef() : attachmentName;
+		String name = (flags & 8) != 0 ? input.readStringRef() : placeholder;
 		return switch (AttachmentType.values[flags & 0b111]) {
 		case region -> {
 			String path = (flags & 16) != 0 ? input.readStringRef() : null;
@@ -577,7 +577,7 @@ public class SkeletonBinary extends SkeletonLoader {
 			float height = input.readFloat();
 
 			if (path == null) path = name;
-			RegionAttachment region = attachmentLoader.newRegionAttachment(skin, name, path, sequence);
+			RegionAttachment region = attachmentLoader.newRegionAttachment(skin, placeholder, name, path, sequence);
 			if (region == null) yield null;
 			region.setPath(path);
 			region.setX(x * scale);
@@ -595,7 +595,7 @@ public class SkeletonBinary extends SkeletonLoader {
 			Vertices vertices = readVertices(input, (flags & 16) != 0);
 			int color = nonessential ? input.readInt() : 0;
 
-			BoundingBoxAttachment box = attachmentLoader.newBoundingBoxAttachment(skin, name);
+			BoundingBoxAttachment box = attachmentLoader.newBoundingBoxAttachment(skin, placeholder, name);
 			if (box == null) yield null;
 			box.setWorldVerticesLength(vertices.length);
 			box.setVertices(vertices.vertices);
@@ -628,7 +628,7 @@ public class SkeletonBinary extends SkeletonLoader {
 				height = input.readFloat();
 			}
 
-			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, name, path, sequence);
+			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, placeholder, name, path, sequence);
 			if (mesh == null) yield null;
 			mesh.setPath(path);
 			Color.rgba8888ToColor(mesh.getColor(), color);
@@ -662,7 +662,7 @@ public class SkeletonBinary extends SkeletonLoader {
 				height = input.readFloat();
 			}
 
-			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, name, path, sequence);
+			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, placeholder, name, path, sequence);
 			if (mesh == null) yield null;
 			mesh.setPath(path);
 			Color.rgba8888ToColor(mesh.getColor(), color);
@@ -680,7 +680,7 @@ public class SkeletonBinary extends SkeletonLoader {
 			float[] lengths = readFloatArray(input, vertices.length / 6, scale);
 			int color = nonessential ? input.readInt() : 0;
 
-			PathAttachment path = attachmentLoader.newPathAttachment(skin, name);
+			PathAttachment path = attachmentLoader.newPathAttachment(skin, placeholder, name);
 			if (path == null) yield null;
 			path.setClosed(closed);
 			path.setConstantSpeed(constantSpeed);
@@ -697,7 +697,7 @@ public class SkeletonBinary extends SkeletonLoader {
 			float y = input.readFloat();
 			int color = nonessential ? input.readInt() : 0;
 
-			PointAttachment point = attachmentLoader.newPointAttachment(skin, name);
+			PointAttachment point = attachmentLoader.newPointAttachment(skin, placeholder, name);
 			if (point == null) yield null;
 			point.setX(x * scale);
 			point.setY(y * scale);
@@ -710,7 +710,7 @@ public class SkeletonBinary extends SkeletonLoader {
 			Vertices vertices = readVertices(input, (flags & 16) != 0);
 			int color = nonessential ? input.readInt() : 0;
 
-			ClippingAttachment clip = attachmentLoader.newClippingAttachment(skin, name);
+			ClippingAttachment clip = attachmentLoader.newClippingAttachment(skin, placeholder, name);
 			if (clip == null) yield null;
 			clip.setEndSlot(skeletonData.slots.items[endSlotIndex]);
 			clip.setConvex((flags & 32) != 0);

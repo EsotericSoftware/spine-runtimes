@@ -84,7 +84,7 @@ namespace Spine.Unity.Playables {
 		protected void HandlePause (Playable playable) {
 			if (animationStateComponent.IsNullOrDestroyed()) return;
 
-			TrackEntry current = animationStateComponent.AnimationState.GetCurrent(trackIndex);
+			TrackEntry current = animationStateComponent.AnimationState.GetTrack(trackIndex);
 			if (current != null && current == timelineStartedTrackEntry) {
 				previousTimeScale = current.TimeScale;
 				current.TimeScale = 0;
@@ -95,7 +95,7 @@ namespace Spine.Unity.Playables {
 		protected void HandleResume (Playable playable) {
 			if (animationStateComponent.IsNullOrDestroyed()) return;
 
-			TrackEntry current = animationStateComponent.AnimationState.GetCurrent(trackIndex);
+			TrackEntry current = animationStateComponent.AnimationState.GetTrack(trackIndex);
 			if (current != null && current == pausedTrackEntry) {
 				current.TimeScale = previousTimeScale;
 			}
@@ -107,7 +107,7 @@ namespace Spine.Unity.Playables {
 			AnimationState state = animationStateComponent.AnimationState;
 			if (endAtClipEnd &&
 				timelineStartedTrackEntry != null &&
-				timelineStartedTrackEntry == state.GetCurrent(trackIndex)) {
+				timelineStartedTrackEntry == state.GetTrack(trackIndex)) {
 
 				if (endMixOutDuration >= 0)
 					state.SetEmptyAnimation(trackIndex, endMixOutDuration);
@@ -179,7 +179,7 @@ namespace Spine.Unity.Playables {
 						startingClips[numStartingClips++] = clipPlayable;
 					}
 				} else if (rootSpeedChanged) {
-					TrackEntry currentEntry = state.GetCurrent(trackIndex);
+					TrackEntry currentEntry = state.GetTrack(trackIndex);
 					AdjustTrackEntryTimeScale(playable, i, currentEntry);
 				}
 			}
@@ -207,7 +207,7 @@ namespace Spine.Unity.Playables {
 					if (clipData.animationReference.Animation != null) {
 						animationStateComponent.UnscaledTime = this.unscaledTime;
 
-						TrackEntry currentEntry = state.GetCurrent(trackIndex);
+						TrackEntry currentEntry = state.GetTrack(trackIndex);
 						Spine.TrackEntry trackEntry;
 						float customMixDuration = clipData.customDuration ? GetCustomMixDuration(clipData) : 0.0f;
 						if (currentEntry == null && customMixDuration > 0) {
@@ -323,7 +323,7 @@ namespace Spine.Unity.Playables {
 				if (fromAnimation != null && mixDuration > 0 && toClipTime < mixDuration) {
 					dummyAnimationState = dummyAnimationState ?? new AnimationState(skeletonComponent.SkeletonDataAsset.GetAnimationStateData());
 
-					TrackEntry toEntry = dummyAnimationState.GetCurrent(0);
+					TrackEntry toEntry = dummyAnimationState.GetTrack(0);
 					TrackEntry fromEntry = toEntry != null ? toEntry.MixingFrom : null;
 					bool isAnimationTransitionMatch = (toEntry != null && toEntry.Animation == toAnimation && fromEntry != null && fromEntry.Animation == fromAnimation);
 

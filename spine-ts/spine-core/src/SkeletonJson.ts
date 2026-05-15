@@ -35,7 +35,7 @@ import { Sequence, SequenceMode } from "./attachments/Sequence.js";
 import { BoneData, Inherit } from "./BoneData.js";
 import { Event } from "./Event.js";
 import { EventData } from "./EventData.js";
-import { IkConstraintData, ScaleY } from "./IkConstraintData.js";
+import { IkConstraintData, ScaleYMode } from "./IkConstraintData.js";
 import { PathConstraintData, PositionMode, RotateMode, SpacingMode } from "./PathConstraintData.js";
 import { PhysicsConstraintData } from "./PhysicsConstraintData.js";
 import { SkeletonData } from "./SkeletonData.js";
@@ -161,7 +161,7 @@ export class SkeletonJson {
 						data.target = target;
 
 						const scaleY = getValue(constraintMap, "scaleY", null);
-						if (scaleY != null) data.scaleY = Utils.enumValue(ScaleY, scaleY);
+						if (scaleY != null) data.scaleYMode = Utils.enumValue(ScaleYMode, scaleY);
 
 						const setup = data.setupPose;
 						setup.mix = getValue(constraintMap, "mix", 1);
@@ -525,15 +525,15 @@ export class SkeletonJson {
 	}
 
 	// biome-ignore lint/suspicious/noExplicitAny: it is any until we define a schema
-	readAttachment (map: any, skin: Skin, slotIndex: number, name: string, skeletonData: SkeletonData): Attachment | null {
+	readAttachment (map: any, skin: Skin, slotIndex: number, placeholder: string, skeletonData: SkeletonData): Attachment | null {
 		const scale = this.scale;
-		name = getValue(map, "name", name);
+		const name = getValue(map, "name", placeholder);
 
 		switch (getValue(map, "type", "region")) {
 			case "region": {
 				const path = getValue(map, "path", name);
 				const sequence = this.readSequence(getValue(map, "sequence", null));
-				const region = this.attachmentLoader.newRegionAttachment(skin, name, path, sequence);
+				const region = this.attachmentLoader.newRegionAttachment(skin, placeholder, name, path, sequence);
 				if (!region) return null;
 				region.path = path;
 				region.x = getValue(map, "x", 0) * scale;
@@ -551,7 +551,7 @@ export class SkeletonJson {
 				return region;
 			}
 			case "boundingbox": {
-				const box = this.attachmentLoader.newBoundingBoxAttachment(skin, name);
+				const box = this.attachmentLoader.newBoundingBoxAttachment(skin, placeholder, name);
 				if (!box) return null;
 				this.readVertices(map, box, map.vertexCount << 1);
 				const color: string = getValue(map, "color", null);
@@ -562,7 +562,7 @@ export class SkeletonJson {
 			case "linkedmesh": {
 				const path = getValue(map, "path", name);
 				const sequence = this.readSequence(getValue(map, "sequence", null));
-				const mesh = this.attachmentLoader.newMeshAttachment(skin, name, path, sequence);
+				const mesh = this.attachmentLoader.newMeshAttachment(skin, placeholder, name, path, sequence);
 				if (!mesh) return null;
 				mesh.path = path;
 
@@ -597,7 +597,7 @@ export class SkeletonJson {
 				return mesh;
 			}
 			case "path": {
-				const path = this.attachmentLoader.newPathAttachment(skin, name);
+				const path = this.attachmentLoader.newPathAttachment(skin, placeholder, name);
 				if (!path) return null;
 				path.closed = getValue(map, "closed", false);
 				path.constantSpeed = getValue(map, "constantSpeed", true);
@@ -615,7 +615,7 @@ export class SkeletonJson {
 				return path;
 			}
 			case "point": {
-				const point = this.attachmentLoader.newPointAttachment(skin, name);
+				const point = this.attachmentLoader.newPointAttachment(skin, placeholder, name);
 				if (!point) return null;
 				point.x = getValue(map, "x", 0) * scale;
 				point.y = getValue(map, "y", 0) * scale;
@@ -626,7 +626,7 @@ export class SkeletonJson {
 				return point;
 			}
 			case "clipping": {
-				const clip = this.attachmentLoader.newClippingAttachment(skin, name);
+				const clip = this.attachmentLoader.newClippingAttachment(skin, placeholder, name);
 				if (!clip) return null;
 
 				const end = getValue(map, "end", null);

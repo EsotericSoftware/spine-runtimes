@@ -187,7 +187,7 @@ namespace Spine {
 				object[] o;
 
 				// Strings.
-				o = input.strings = new String[n = input.ReadInt(true)];
+				o = input.strings = new string[n = input.ReadInt(true)];
 				for (int i = 0; i < n; i++)
 					o[i] = input.ReadString();
 
@@ -530,20 +530,20 @@ namespace Spine {
 			for (int i = 0; i < slotCount; i++) {
 				int slotIndex = input.ReadInt(true);
 				for (int ii = 0, nn = input.ReadInt(true); ii < nn; ii++) {
-					String name = input.ReadStringRef();
-					Attachment attachment = ReadAttachment(input, skeletonData, skin, slotIndex, name, nonessential);
-					if (attachment != null) skin.SetAttachment(slotIndex, name, attachment);
+					string placeholder = input.ReadStringRef();
+					Attachment attachment = ReadAttachment(input, skeletonData, skin, slotIndex, placeholder, nonessential);
+					if (attachment != null) skin.SetAttachment(slotIndex, placeholder, attachment);
 				}
 			}
 			return skin;
 		}
 
 		private Attachment ReadAttachment (SkeletonInput input, SkeletonData skeletonData, Skin skin, int slotIndex,
-			String attachmentName, bool nonessential) {
+			string placeholder, bool nonessential) {
 			float scale = this.scale;
 
 			int flags = input.ReadUByte();
-			string name = (flags & 8) != 0 ? input.ReadStringRef() : attachmentName;
+			string name = (flags & 8) != 0 ? input.ReadStringRef() : placeholder;
 
 			switch ((AttachmentType)(flags & 0x7)) { // 0b111
 			case AttachmentType.Region: {
@@ -559,7 +559,7 @@ namespace Spine {
 				float height = input.ReadFloat();
 
 				if (path == null) path = name;
-				RegionAttachment region = attachmentLoader.NewRegionAttachment(skin, name, path, sequence);
+				RegionAttachment region = attachmentLoader.NewRegionAttachment(skin, placeholder, name, path, sequence);
 				if (region == null) return null;
 				region.Path = path;
 				region.x = x * scale;
@@ -577,7 +577,7 @@ namespace Spine {
 				Vertices vertices = ReadVertices(input, (flags & 16) != 0);
 				if (nonessential) input.ReadInt(); // discard, int color = nonessential ? input.readInt() : 0;
 
-				BoundingBoxAttachment box = attachmentLoader.NewBoundingBoxAttachment(skin, name);
+				BoundingBoxAttachment box = attachmentLoader.NewBoundingBoxAttachment(skin, placeholder, name);
 				if (box == null) return null;
 				box.worldVerticesLength = vertices.length;
 				box.vertices = vertices.vertices;
@@ -610,7 +610,7 @@ namespace Spine {
 					height = input.ReadFloat();
 				}
 
-				MeshAttachment mesh = attachmentLoader.NewMeshAttachment(skin, name, path, sequence);
+				MeshAttachment mesh = attachmentLoader.NewMeshAttachment(skin, placeholder, name, path, sequence);
 				if (mesh == null) return null;
 				mesh.Path = path;
 				mesh.SetColor(color.RGBA8888ToColor());
@@ -643,7 +643,7 @@ namespace Spine {
 					height = input.ReadFloat();
 				}
 
-				MeshAttachment mesh = attachmentLoader.NewMeshAttachment(skin, name, path, sequence);
+				MeshAttachment mesh = attachmentLoader.NewMeshAttachment(skin, placeholder, name, path, sequence);
 				if (mesh == null) return null;
 				mesh.Path = path;
 				mesh.SetColor(color.RGBA8888ToColor());
@@ -661,7 +661,7 @@ namespace Spine {
 				float[] lengths = ReadFloatArray(input, vertices.length / 6, scale);
 				if (nonessential) input.ReadInt(); // discard, int color = nonessential ? input.ReadInt() : 0;
 
-				PathAttachment path = attachmentLoader.NewPathAttachment(skin, name);
+				PathAttachment path = attachmentLoader.NewPathAttachment(skin, placeholder, name);
 				if (path == null) return null;
 				path.closed = closed;
 				path.constantSpeed = constantSpeed;
@@ -678,7 +678,7 @@ namespace Spine {
 				float y = input.ReadFloat();
 				if (nonessential) input.ReadInt(); // discard, int color = nonessential ? input.ReadInt() : 0;
 
-				PointAttachment point = attachmentLoader.NewPointAttachment(skin, name);
+				PointAttachment point = attachmentLoader.NewPointAttachment(skin, placeholder, name);
 				if (point == null) return null;
 				point.x = x * scale;
 				point.y = y * scale;
@@ -691,7 +691,7 @@ namespace Spine {
 				Vertices vertices = ReadVertices(input, (flags & 16) != 0);
 				if (nonessential) input.ReadInt(); // discard, int color = nonessential ? input.readInt() : 0;
 
-				ClippingAttachment clip = attachmentLoader.NewClippingAttachment(skin, name);
+				ClippingAttachment clip = attachmentLoader.NewClippingAttachment(skin, placeholder, name);
 				if (clip == null) return null;
 				clip.EndSlot = skeletonData.slots.Items[endSlotIndex];
 				clip.Convex = (flags & 32) != 0;
@@ -1467,7 +1467,7 @@ namespace Spine {
 			}
 
 			/// <return>May be null.</return>
-			public String ReadStringRef () {
+			public string ReadStringRef () {
 				int index = ReadInt(true);
 				return index == 0 ? null : strings[index - 1];
 			}

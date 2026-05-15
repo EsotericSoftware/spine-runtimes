@@ -58,9 +58,9 @@ public class Skin {
 	}
 
 	/** Adds an attachment to the skin for the specified slot index and placeholder name. */
-	public void setAttachment (int slotIndex, String placeholderName, Attachment attachment) {
+	public void setAttachment (int slotIndex, String placeholder, Attachment attachment) {
 		if (attachment == null) throw new IllegalArgumentException("attachment cannot be null.");
-		var entry = new SkinEntry(slotIndex, placeholderName, attachment);
+		var entry = new SkinEntry(slotIndex, placeholder, attachment);
 		if (!attachments.add(entry)) attachments.get(entry).attachment = attachment;
 	}
 
@@ -75,7 +75,7 @@ public class Skin {
 			if (!constraints.contains(data, true)) constraints.add(data);
 
 		for (SkinEntry entry : skin.attachments.orderedItems())
-			setAttachment(entry.slotIndex, entry.placeholderName, entry.attachment);
+			setAttachment(entry.slotIndex, entry.placeholder, entry.attachment);
 	}
 
 	/** Adds all bones and constraints and copies of all attachments from the specified skin to this skin. Mesh attachments are not
@@ -91,22 +91,22 @@ public class Skin {
 
 		for (SkinEntry entry : skin.attachments.orderedItems()) {
 			if (entry.attachment instanceof MeshAttachment mesh)
-				setAttachment(entry.slotIndex, entry.placeholderName, mesh.newLinkedMesh());
+				setAttachment(entry.slotIndex, entry.placeholder, mesh.newLinkedMesh());
 			else
-				setAttachment(entry.slotIndex, entry.placeholderName, entry.attachment != null ? entry.attachment.copy() : null);
+				setAttachment(entry.slotIndex, entry.placeholder, entry.attachment != null ? entry.attachment.copy() : null);
 		}
 	}
 
 	/** Returns the attachment for the specified slot index and placeholder name, or null. */
-	public @Null Attachment getAttachment (int slotIndex, String placeholderName) {
-		lookup.set(slotIndex, placeholderName);
+	public @Null Attachment getAttachment (int slotIndex, String placeholder) {
+		lookup.set(slotIndex, placeholder);
 		SkinEntry entry = attachments.get(lookup);
 		return entry != null ? entry.attachment : null;
 	}
 
 	/** Removes the attachment in the skin for the specified slot index and placeholder name, if any. */
-	public void removeAttachment (int slotIndex, String placeholderName) {
-		lookup.set(slotIndex, placeholderName);
+	public void removeAttachment (int slotIndex, String placeholder) {
+		lookup.set(slotIndex, placeholder);
 		attachments.remove(lookup);
 	}
 
@@ -160,7 +160,7 @@ public class Skin {
 		for (SkinEntry entry : oldSkin.attachments.orderedItems()) {
 			SlotPose slot = slots[entry.slotIndex].pose;
 			if (slot.attachment == entry.attachment) {
-				Attachment attachment = getAttachment(entry.slotIndex, entry.placeholderName);
+				Attachment attachment = getAttachment(entry.slotIndex, entry.placeholder);
 				if (attachment != null) slot.setAttachment(attachment);
 			}
 		}
@@ -169,21 +169,21 @@ public class Skin {
 	/** Stores an entry in the skin consisting of the slot index and placeholder name. */
 	static public class SkinEntry {
 		int slotIndex;
-		String placeholderName;
+		String placeholder;
 		@Null Attachment attachment;
 		private int hashCode;
 
-		SkinEntry (int slotIndex, String placeholderName, @Null Attachment attachment) {
-			set(slotIndex, placeholderName);
+		SkinEntry (int slotIndex, String placeholder, @Null Attachment attachment) {
+			set(slotIndex, placeholder);
 			this.attachment = attachment;
 		}
 
-		void set (int slotIndex, String placeholderName) {
+		void set (int slotIndex, String placeholder) {
 			if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
-			if (placeholderName == null) throw new IllegalArgumentException("placeholderName cannot be null.");
+			if (placeholder == null) throw new IllegalArgumentException("placeholder cannot be null.");
 			this.slotIndex = slotIndex;
-			this.placeholderName = placeholderName;
-			hashCode = placeholderName.hashCode() + slotIndex * 37;
+			this.placeholder = placeholder;
+			hashCode = placeholder.hashCode() + slotIndex * 37;
 		}
 
 		/** The {@link Skeleton#slots} index. */
@@ -192,8 +192,8 @@ public class Skin {
 		}
 
 		/** The placeholder name that the attachment is associated with. */
-		public String getPlaceholderName () {
-			return placeholderName;
+		public String getPlaceholder () {
+			return placeholder;
 		}
 
 		/** The attachment for this skin entry. */
@@ -209,11 +209,11 @@ public class Skin {
 			if (object == null) return false;
 			var other = (SkinEntry)object;
 			if (slotIndex != other.slotIndex) return false;
-			return placeholderName.equals(other.placeholderName);
+			return placeholder.equals(other.placeholder);
 		}
 
 		public String toString () {
-			return slotIndex + ":" + placeholderName;
+			return slotIndex + ":" + placeholder;
 		}
 	}
 }

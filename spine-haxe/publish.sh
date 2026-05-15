@@ -6,6 +6,12 @@ cd "$(dirname "$0")"
 # Source logging utilities
 source ../formatters/logging/logging.sh
 
+BRANCH=$(git symbolic-ref --short -q HEAD)
+if ! echo "$BRANCH" | grep -qE '^[0-9]+\.[0-9]+$'; then
+    echo "Error: publish.sh can only be run from release branches named number.number, e.g. 4.3. Current branch: $BRANCH"
+    exit 1
+fi
+
 currentVersion=$(grep -o '"version": "[^"]*' haxelib.json | grep -o '[^"]*$')
 
 major=$(echo "$currentVersion" | cut -d. -f1)
@@ -16,6 +22,7 @@ newVersion="$major.$minor.$newPatch"
 
 log_title "Spine-Haxe Publish"
 
+log_detail "Branch: $BRANCH"
 log_detail "Current version: $currentVersion"
 log_detail "New version: $newVersion"
 
@@ -44,7 +51,7 @@ if [ "$answer" = "Y" ] || [ "$answer" = "y" ]; then
     fi
     
     log_action "Pushing to origin"
-    if PUSH_OUTPUT=$(git push origin 4.2 2>&1); then
+    if PUSH_OUTPUT=$(git push origin "$BRANCH" 2>&1); then
         log_ok
         log_summary "✓ Version $newVersion published successfully"
     else

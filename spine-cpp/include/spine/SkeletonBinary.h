@@ -240,7 +240,7 @@ namespace spine {
 
 		Skin *readSkin(DataInput &input, SkeletonData &skeletonData, bool defaultSkin, bool nonessential);
 
-		Attachment *readAttachment(DataInput &input, Skin &skin, int slotIndex, const String &attachmentName, SkeletonData &skeletonData,
+		Attachment *readAttachment(DataInput &input, Skin &skin, int slotIndex, const String &placeholder, SkeletonData &skeletonData,
 								   bool nonessential);
 
 		Sequence *readSequence(DataInput &input, bool hasPathSuffix);
@@ -251,7 +251,7 @@ namespace spine {
 
 		void readUnsignedShortArray(DataInput &input, Array<unsigned short> &array, int n);
 
-		Animation *readAnimation(DataInput &input, const String &name, SkeletonData &skeletonData);
+		Animation *readAnimation(DataInput &input, const String &name, SkeletonData &skeletonData, bool nonessential);
 
 		void readTimeline(DataInput &input, Array<Timeline *> &timelines, CurveTimeline1 &timeline, float scale);
 

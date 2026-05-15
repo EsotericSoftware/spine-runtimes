@@ -51,52 +51,6 @@ export type Mixin<GameObjectComponent, GameObjectConstraint extends Phaser.GameO
 	BaseGameObject: GameObjectType
 ) => GameObjectType & Type<GameObjectComponent>;
 
-/**
- * Copies prototype properties from the given mixins onto the target class.
- * Fallback for Phaser's ESM build, which does not export `Phaser.Class`.
- */
-function applyMixinsFallback (target: Function, mixins: any[]): void {
-	for (const mixin of mixins) {
-		const source = mixin.prototype || mixin;
-		for (const key of Object.getOwnPropertyNames(source)) {
-			if (key === "constructor") continue;
-			let descriptor = Object.getOwnPropertyDescriptor(source, key);
-			if (!descriptor) continue;
-
-			// Phaser 4 components ship accessors as `{ value: { get, set } }`; unwrap to a real accessor descriptor, matching `Phaser.Class.mixin` semantics.
-			if (
-				"writable" in descriptor &&
-				descriptor.value &&
-				typeof descriptor.value === "object" &&
-				(typeof (descriptor.value as any).get === "function" ||
-					typeof (descriptor.value as any).set === "function")
-			) {
-				const accessor = descriptor.value as { get?: () => any; set?: (v: any) => void };
-				descriptor = {
-					configurable: true,
-					enumerable: descriptor.enumerable ?? true,
-					get: accessor.get,
-					set: accessor.set,
-				};
-			}
-
-			Object.defineProperty(target.prototype, key, descriptor);
-		}
-	}
-}
-
-// Computed key hides the access from Rollup/Vite static analysis (Phaser ESM does not export `Class`).
-const PHASER_CLASS_KEY = "Class" as const;
-
-function applyMixins (target: Function, mixins: any[]): void {
-	const phaserClass = (Phaser as unknown as Record<string, any>)[PHASER_CLASS_KEY];
-	if (phaserClass?.mixin) {
-		phaserClass.mixin(target, mixins);
-	} else {
-		applyMixinsFallback(target, mixins);
-	}
-}
-
 export function createMixin<
 	GameObjectComponent,
 	GameObjectConstraint extends Phaser.GameObjects.GameObject = Phaser.GameObjects.GameObject
@@ -104,7 +58,7 @@ export function createMixin<
 	...component: GameObjectComponent[]
 ): Mixin<GameObjectComponent, GameObjectConstraint> {
 	return (BaseGameObject) => {
-		applyMixins(BaseGameObject, component);
+		(Phaser as any).Class.mixin(BaseGameObject, component);
 		return BaseGameObject as any;
 	};
 }

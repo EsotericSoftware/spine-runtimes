@@ -18,7 +18,14 @@ COMMIT_MSG=$(git log -1 --pretty=%B)
 log_title "Spine-Haxe Build"
 log_detail "Branch: $BRANCH"
 
-# Public only if the commit message is in the correct format
+if ! echo "$BRANCH" | grep -qE '^[0-9]+\.[0-9]+$'; then
+    log_warn "Branch is not a release branch - skipping publish"
+    log_detail "Release branches must be named number.number, e.g. 4.3"
+    log_summary "Build skipped"
+    exit 0
+fi
+
+# Publish only if the commit message is in the correct format
 if echo "$COMMIT_MSG" | grep -qE '^\[haxe\] Release [0-9]+\.[0-9]+\.[0-9]+$'; then
     VERSION=$(echo "$COMMIT_MSG" | sed -E 's/^\[haxe\] Release ([0-9]+\.[0-9]+\.[0-9]+)$/\1/')
     log_detail "Version: $VERSION"

@@ -7,7 +7,7 @@ This directory contains formatting scripts and tools to ensure consistent code s
 ### format-cpp.sh
 Formats C/C++ source files using clang-format.
 - **Prerequisites**: clang-format 18.1.8
-- **Coverage**: All C/C++ files in spine-cpp, spine-c, spine-godot, spine-ue, spine-glfw, spine-sdl, spine-sfml, spine-cocos2dx, spine-ios, spine-flutter
+- **Coverage**: All C/C++ files in spine-cpp, spine-c, spine-godot, spine-ue, spine-glfw, spine-sdl, spine-sfml, spine-ios, spine-flutter
 - **Configuration**: Uses .clang-format configuration file
 - **Behavior**: Batches all files in a single clang-format call for performance
 

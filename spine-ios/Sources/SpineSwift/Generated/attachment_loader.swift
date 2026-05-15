@@ -35,10 +35,10 @@ import SpineC
 /// AttachmentLoader wrapper
 public protocol AttachmentLoader {
     var _ptr: UnsafeMutableRawPointer { get }
-    func newRegionAttachment(_ skin: Skin, _ name: String, _ path: String, _ sequence: Sequence?) -> RegionAttachment?
-    func newMeshAttachment(_ skin: Skin, _ name: String, _ path: String, _ sequence: Sequence?) -> MeshAttachment?
-    func newBoundingBoxAttachment(_ skin: Skin, _ name: String) -> BoundingBoxAttachment?
-    func newPathAttachment(_ skin: Skin, _ name: String) -> PathAttachment?
-    func newPointAttachment(_ skin: Skin, _ name: String) -> PointAttachment?
-    func newClippingAttachment(_ skin: Skin, _ name: String) -> ClippingAttachment?
+    func newRegionAttachment(_ skin: Skin, _ placeholder: String, _ name: String, _ path: String, _ sequence: Sequence?) -> RegionAttachment?
+    func newMeshAttachment(_ skin: Skin, _ placeholder: String, _ name: String, _ path: String, _ sequence: Sequence?) -> MeshAttachment?
+    func newBoundingBoxAttachment(_ skin: Skin, _ placeholder: String, _ name: String) -> BoundingBoxAttachment?
+    func newPathAttachment(_ skin: Skin, _ placeholder: String, _ name: String) -> PathAttachment?
+    func newPointAttachment(_ skin: Skin, _ placeholder: String, _ name: String) -> PointAttachment?
+    func newClippingAttachment(_ skin: Skin, _ placeholder: String, _ name: String) -> ClippingAttachment?
 }

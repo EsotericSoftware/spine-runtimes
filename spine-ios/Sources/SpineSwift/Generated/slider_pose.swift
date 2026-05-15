@@ -59,7 +59,8 @@ public class SliderPose: NSObject {
         }
     }
 
-    /// A percentage that controls the mix between the constrained and unconstrained poses.
+    /// A percentage (unbounded) that controls the mix between the constrained and unconstrained
+    /// poses.
     public var mix: Float {
         get {
             let result = spine_slider_pose_get_mix(_ptr.assumingMemoryBound(to: spine_slider_pose_wrapper.self))

@@ -1,1 +1,1 @@
-This Spine-Unity runtime works with data exported from Spine Editor version: 4.3.xx
+This Spine-Unity runtime works with data exported from Spine Editor version 4.3.74 and newer.

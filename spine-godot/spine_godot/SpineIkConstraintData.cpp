@@ -35,8 +35,8 @@ void SpineIkConstraintData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_bones"), &SpineIkConstraintData::get_bones);
 	ClassDB::bind_method(D_METHOD("get_target"), &SpineIkConstraintData::get_target);
 	ClassDB::bind_method(D_METHOD("set_target", "v"), &SpineIkConstraintData::set_target);
-	ClassDB::bind_method(D_METHOD("get_uniform"), &SpineIkConstraintData::get_uniform);
-	ClassDB::bind_method(D_METHOD("set_uniform", "v"), &SpineIkConstraintData::set_uniform);
+	ClassDB::bind_method(D_METHOD("get_scale_y_mode"), &SpineIkConstraintData::get_scale_y_mode);
+	ClassDB::bind_method(D_METHOD("set_scale_y_mode", "v"), &SpineIkConstraintData::set_scale_y_mode);
 	ClassDB::bind_method(D_METHOD("get_setup_pose"), &SpineIkConstraintData::get_setup_pose);
 }
 
@@ -69,14 +69,14 @@ void SpineIkConstraintData::set_target(Ref<SpineBoneData> v) {
 	}
 }
 
-bool SpineIkConstraintData::get_uniform() {
-	SPINE_CHECK(get_spine_object(), false)
-	return get_spine_constraint_data()->getUniform();
+SpineConstant::ScaleYMode SpineIkConstraintData::get_scale_y_mode() {
+	SPINE_CHECK(get_spine_object(), SpineConstant::ScaleYMode_None)
+	return (SpineConstant::ScaleYMode) get_spine_constraint_data()->getScaleYMode();
 }
 
-void SpineIkConstraintData::set_uniform(bool v) {
+void SpineIkConstraintData::set_scale_y_mode(SpineConstant::ScaleYMode v) {
 	SPINE_CHECK(get_spine_object(), )
-	get_spine_constraint_data()->setUniform(v);
+	get_spine_constraint_data()->setScaleYMode((spine::ScaleYMode) v);
 }
 
 Ref<SpineIkConstraintPose> SpineIkConstraintData::get_setup_pose() {

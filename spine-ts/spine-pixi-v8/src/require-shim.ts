@@ -30,7 +30,7 @@
 // biome-ignore-all lint: ignore biome for this file
 
 if (typeof window !== 'undefined' && (window as any).PIXI) {
-	const prevRequire = window.require;
+	const prevRequire = (window as any).require;
 	(window as any).require = (x: string) => {
 		if (prevRequire) return prevRequire(x);
 		else if (x.startsWith("@pixi/") || x.startsWith("pixi.js")) return (window as any).PIXI;

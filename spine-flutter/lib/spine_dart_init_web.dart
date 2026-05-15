@@ -125,6 +125,7 @@ Future<SpineDartFFI> initSpineDartFFI(bool useStaticLinkage) async {
     registerOpaqueType<spine_ik_constraint_timeline_wrapper>();
     registerOpaqueType<spine_ik_constraint_wrapper>();
     registerOpaqueType<spine_inherit_timeline_wrapper>();
+    registerOpaqueType<spine_interpolation_wrapper>();
     registerOpaqueType<spine_linked_mesh_wrapper>();
     registerOpaqueType<spine_mesh_attachment_wrapper>();
     registerOpaqueType<spine_path_attachment_wrapper>();

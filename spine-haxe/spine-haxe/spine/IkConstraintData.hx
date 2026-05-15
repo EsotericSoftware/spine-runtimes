@@ -40,7 +40,7 @@ class IkConstraintData extends ConstraintData<IkConstraint, IkConstraintPose> {
 	public var target(default, set):BoneData;
 
 	/** Determines how BonePose.scaleY changes when IkConstraintPose.compress or IkConstraintPose.stretch set BonePose.scaleX. */
-	public var scaleY:ScaleY = ScaleY.none;
+	public var scaleYMode:ScaleYMode = ScaleYMode.none;
 
 	public function new(name:String) {
 		super(name, new IkConstraintPose());
@@ -59,17 +59,17 @@ class IkConstraintData extends ConstraintData<IkConstraint, IkConstraintPose> {
 }
 
 /** Determines how BonePose.scaleY changes when IkConstraintPose.compress or IkConstraintPose.stretch set BonePose.scaleX. */
-class ScaleY {
+class ScaleYMode {
 	/** scaleY is not changed. */
-	public static var none(default, never):ScaleY = new ScaleY(0, "none");
+	public static var none(default, never):ScaleYMode = new ScaleYMode(0, "none");
 
 	/** scaleY is multiplied by the scaleX factor, preserving the bone's aspect ratio. */
-	public static var uniform(default, never):ScaleY = new ScaleY(1, "uniform");
+	public static var uniform(default, never):ScaleYMode = new ScaleYMode(1, "uniform");
 
 	/** scaleY is divided by the scaleX factor, preserving the bone's area. */
-	public static var volume(default, never):ScaleY = new ScaleY(2, "volume");
+	public static var volume(default, never):ScaleYMode = new ScaleYMode(2, "volume");
 
-	public static var values:Array<ScaleY> = [none, uniform, volume];
+	public static var values:Array<ScaleYMode> = [none, uniform, volume];
 
 	public final ordinal:Int;
 	public final name:String;
@@ -83,10 +83,10 @@ class ScaleY {
 		return name;
 	}
 
-	public static function fromName(name:String):ScaleY {
-		for (scaleY in values)
-			if (scaleY.name == name)
-				return scaleY;
+	public static function fromName(name:String):ScaleYMode {
+		for (scaleYMode in values)
+			if (scaleYMode.name == name)
+				return scaleYMode;
 		return none;
 	}
 }

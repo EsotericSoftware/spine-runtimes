@@ -51,11 +51,11 @@ export class IkConstraintData extends ConstraintData<IkConstraint, IkConstraintP
 
 	/** Determines how the {@link BonePose.scaleY} changes when {@link IkConstraintPose.compress} or
 	  * {@link IkConstraintPose.stretch} set {@link BonePose.scaleX}. */
-	_scaleY = ScaleY.None;
-	public set scaleY (scaleY: ScaleY) { this._scaleY = scaleY; }
-	public get scaleY () {
-		if (this._scaleY == null) throw new Error("scaleY cannot be null.")
-		return this._scaleY;
+	_scaleYMode = ScaleYMode.None;
+	public set scaleYMode (scaleYMode: ScaleYMode) { this._scaleYMode = scaleYMode; }
+	public get scaleYMode () {
+		if (this._scaleYMode == null) throw new Error("scaleYMode cannot be null.")
+		return this._scaleYMode;
 	}
 
 	constructor (name: string) {
@@ -69,7 +69,7 @@ export class IkConstraintData extends ConstraintData<IkConstraint, IkConstraintP
 
 /** Determines how the {@link BonePose.scaleY} changes when {@link IkConstraintPose.compress} or
  * {@link IkConstraintPose.stretch} set {@link BonePose.scaleX}. */
-export enum ScaleY {
+export enum ScaleYMode {
 	/** scaleY is not changed. */
 	None,
 	/** scaleY is multiplied by the scaleX factor, preserving the bone's aspect ratio. */

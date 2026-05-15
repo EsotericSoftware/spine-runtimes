@@ -31,7 +31,7 @@ import type { Pose } from "./Pose.js";
 import { Posed } from "./Posed.js";
 import type { PosedData } from "./PosedData.js";
 
-import type { Skeleton } from "./Skeleton";
+import type { Skeleton } from "./Skeleton.js";
 import type { Skin } from "./Skin.js";
 
 /** A posed object that may be active or inactive. */

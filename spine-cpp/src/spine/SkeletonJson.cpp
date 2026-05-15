@@ -230,6 +230,8 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 			if (color) Color::valueOf(color, data->getColor());
 
 			data->_icon = Json::getString(boneMap, "icon", "");
+			data->_iconSize = Json::getFloat(boneMap, "iconSize", 1);
+			data->_iconRotation = Json::getFloat(boneMap, "iconRotation", 0);
 			data->_visible = Json::getBoolean(boneMap, "visible", true);
 
 			skeletonData->_bones[bonesCount] = data;
@@ -288,7 +290,8 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 				data->_target = skeletonData->findBone(targetName);
 				if (!data->_target) SKELETON_JSON_ERROR(root, "IK target bone not found: ", targetName);
 
-				data->_uniform = Json::getBoolean(constraintMap, "uniform", false);
+				const char *scaleY = Json::getString(constraintMap, "scaleY", NULL);
+				if (scaleY) data->_scaleYMode = ScaleYMode_valueOf(scaleY);
 				IkConstraintPose &setup = data->_setupPose;
 				setup._mix = Json::getFloat(constraintMap, "mix", 1);
 				setup._softness = Json::getFloat(constraintMap, "softness", 0) * _scale;
@@ -631,18 +634,18 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 	return skeletonData;
 }
 
-Attachment *SkeletonJson::readAttachment(Json *map, Skin *skin, int slotIndex, const char *name, SkeletonData *skeletonData) {
+Attachment *SkeletonJson::readAttachment(Json *map, Skin *skin, int slotIndex, const char *placeholder, SkeletonData *skeletonData) {
 	float scale = _scale;
-	const char *nameStr = Json::getString(map, "name", name);
+	const char *name = Json::getString(map, "name", placeholder);
 
 	const char *typeStr = Json::getString(map, "type", "region");
 	AttachmentType type = AttachmentType_valueOf(typeStr);
 	switch (type) {
 		case AttachmentType_Region: {
-			const char *path = Json::getString(map, "path", nameStr);
+			const char *path = Json::getString(map, "path", name);
 			Json *sequenceJson = Json::getItem(map, "sequence");
 			Sequence *sequence = readSequence(sequenceJson);
-			RegionAttachment *region = _attachmentLoader->newRegionAttachment(*skin, nameStr, path, sequence);
+			RegionAttachment *region = _attachmentLoader->newRegionAttachment(*skin, placeholder, name, path, sequence);
 			if (!region) return NULL;
 			region->_path = path;
 			region->setX(Json::getFloat(map, "x", 0) * scale);
@@ -660,7 +663,7 @@ Attachment *SkeletonJson::readAttachment(Json *map, Skin *skin, int slotIndex, c
 			return region;
 		}
 		case AttachmentType_Boundingbox: {
-			BoundingBoxAttachment *box = _attachmentLoader->newBoundingBoxAttachment(*skin, nameStr);
+			BoundingBoxAttachment *box = _attachmentLoader->newBoundingBoxAttachment(*skin, placeholder, name);
 			if (!box) return NULL;
 			readVertices(map, box, Json::getInt(map, "vertexCount", 0) << 1);
 
@@ -670,9 +673,9 @@ Attachment *SkeletonJson::readAttachment(Json *map, Skin *skin, int slotIndex, c
 		}
 		case AttachmentType_Mesh:
 		case AttachmentType_Linkedmesh: {
-			const char *path = Json::getString(map, "path", nameStr);
+			const char *path = Json::getString(map, "path", name);
 			Sequence *sequence = readSequence(Json::getItem(map, "sequence"));
-			MeshAttachment *mesh = _attachmentLoader->newMeshAttachment(*skin, nameStr, path, sequence);
+			MeshAttachment *mesh = _attachmentLoader->newMeshAttachment(*skin, placeholder, name, path, sequence);
 			if (!mesh) return NULL;
 			mesh->_path = path;
 
@@ -717,7 +720,7 @@ Attachment *SkeletonJson::readAttachment(Json *map, Skin *skin, int slotIndex, c
 			return mesh;
 		}
 		case AttachmentType_Path: {
-			PathAttachment *path = _attachmentLoader->newPathAttachment(*skin, nameStr);
+			PathAttachment *path = _attachmentLoader->newPathAttachment(*skin, placeholder, name);
 			if (!path) return NULL;
 			path->setClosed(Json::getBoolean(map, "closed", false));
 			path->setConstantSpeed(Json::getBoolean(map, "constantSpeed", true));
@@ -733,7 +736,7 @@ Attachment *SkeletonJson::readAttachment(Json *map, Skin *skin, int slotIndex, c
 			return path;
 		}
 		case AttachmentType_Point: {
-			PointAttachment *point = _attachmentLoader->newPointAttachment(*skin, nameStr);
+			PointAttachment *point = _attachmentLoader->newPointAttachment(*skin, placeholder, name);
 			if (!point) return NULL;
 			point->setX(Json::getFloat(map, "x", 0) * scale);
 			point->setY(Json::getFloat(map, "y", 0) * scale);
@@ -744,7 +747,7 @@ Attachment *SkeletonJson::readAttachment(Json *map, Skin *skin, int slotIndex, c
 			return point;
 		}
 		case AttachmentType_Clipping: {
-			ClippingAttachment *clip = _attachmentLoader->newClippingAttachment(*skin, nameStr);
+			ClippingAttachment *clip = _attachmentLoader->newClippingAttachment(*skin, placeholder, name);
 			if (!clip) return NULL;
 
 			const char *end = Json::getString(map, "end", NULL);
@@ -1434,6 +1437,8 @@ Animation *SkeletonJson::readAnimation(Json *map, SkeletonData *skeletonData) {
 	Animation *animation = new (__FILE__, __LINE__) Animation(String(map->_name));
 	animation->setTimelines(timelines, bones);
 	animation->setDuration(duration);
+	const char *color = Json::getString(map, "color", NULL);
+	if (color) Color::valueOf(color, animation->getColor());
 	return animation;
 }
 

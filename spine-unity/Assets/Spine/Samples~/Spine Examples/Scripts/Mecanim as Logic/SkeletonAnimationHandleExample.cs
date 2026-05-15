@@ -153,7 +153,7 @@ namespace Spine.Unity.Examples {
 		}
 
 		Spine.Animation GetCurrentAnimation (int layerIndex) {
-			TrackEntry currentTrackEntry = skeletonAnimation.AnimationState.GetCurrent(layerIndex);
+			TrackEntry currentTrackEntry = skeletonAnimation.AnimationState.GetTrack(layerIndex);
 			return (currentTrackEntry != null) ? currentTrackEntry.Animation : null;
 		}
 

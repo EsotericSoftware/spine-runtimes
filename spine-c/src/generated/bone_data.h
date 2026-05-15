@@ -30,6 +30,18 @@ SPINE_C_API spine_color spine_bone_data_get_color(spine_bone_data self);
  */
 SPINE_C_API const char *spine_bone_data_get_icon(spine_bone_data self);
 SPINE_C_API void spine_bone_data_set_icon(spine_bone_data self, const char *icon);
+/**
+ * The bone icon's display size scale, or 1 if nonessential data was not
+ * exported.
+ */
+SPINE_C_API float spine_bone_data_get_icon_size(spine_bone_data self);
+SPINE_C_API void spine_bone_data_set_icon_size(spine_bone_data self, float iconSize);
+/**
+ * The bone icon's display rotation in degrees, or 0 if nonessential data was
+ * not exported.
+ */
+SPINE_C_API float spine_bone_data_get_icon_rotation(spine_bone_data self);
+SPINE_C_API void spine_bone_data_set_icon_rotation(spine_bone_data self, float iconRotation);
 SPINE_C_API bool spine_bone_data_get_visible(spine_bone_data self);
 SPINE_C_API void spine_bone_data_set_visible(spine_bone_data self, bool inValue);
 /**

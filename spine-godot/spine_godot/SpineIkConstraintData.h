@@ -31,6 +31,7 @@
 
 #include "SpineConstraintData.h"
 #include "SpineBoneData.h"
+#include "SpineConstant.h"
 #include <spine/IkConstraintData.h>
 
 class SpineIkConstraintPose;
@@ -51,8 +52,8 @@ public:
 	Ref<SpineBoneData> get_target();
 	void set_target(Ref<SpineBoneData> v);
 
-	bool get_uniform();
-	void set_uniform(bool v);
+	SpineConstant::ScaleYMode get_scale_y_mode();
+	void set_scale_y_mode(SpineConstant::ScaleYMode v);
 
 	Ref<SpineIkConstraintPose> get_setup_pose();
 };

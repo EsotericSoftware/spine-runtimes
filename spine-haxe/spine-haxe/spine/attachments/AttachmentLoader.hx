@@ -37,20 +37,20 @@ import spine.Skin;
  */
 interface AttachmentLoader {
 	/** @return May be null to not load the attachment. */
-	function newRegionAttachment(skin:Skin, name:String, path:String, sequence:Sequence):RegionAttachment;
+	function newRegionAttachment(skin:Skin, placeholder:String, name:String, path:String, sequence:Sequence):RegionAttachment;
 
 	/** @return May be null to not load the attachment. In that case null should also be returned for child meshes. */
-	function newMeshAttachment(skin:Skin, name:String, path:String, sequence:Sequence):MeshAttachment;
+	function newMeshAttachment(skin:Skin, placeholder:String, name:String, path:String, sequence:Sequence):MeshAttachment;
 
 	/** @return May be null to not load the attachment. */
-	function newBoundingBoxAttachment(skin:Skin, name:String):BoundingBoxAttachment;
+	function newBoundingBoxAttachment(skin:Skin, placeholder:String, name:String):BoundingBoxAttachment;
 
 	/** @return May be null to not load the attachment. */
-	function newPathAttachment(skin:Skin, name:String):PathAttachment;
+	function newPathAttachment(skin:Skin, placeholder:String, name:String):PathAttachment;
 
 	/** @return May be null to not load the attachment. */
-	function newPointAttachment(skin:Skin, name:String):PointAttachment;
+	function newPointAttachment(skin:Skin, placeholder:String, name:String):PointAttachment;
 
 	/** @return May be null to not load the attachment. */
-	function newClippingAttachment(skin:Skin, name:String):ClippingAttachment;
+	function newClippingAttachment(skin:Skin, placeholder:String, name:String):ClippingAttachment;
 }

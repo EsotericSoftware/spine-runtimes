@@ -31,18 +31,18 @@ package spine;
 
 import spine.attachments.Attachment;
 
-/** Stores an entry in the skin consisting of the slot index and the attachment name. */
+/** Stores an entry in the skin consisting of the slot index and placeholder name. */
 class SkinEntry {
 	public var slotIndex:Int = 0;
 
 	/** The placeholder name that the attachment is associated with. */
-	public var placeholderName:String;
+	public var placeholder:String;
 
 	public var attachment:Attachment;
 
-	public function new(slotIndex:Int, placeholderName:String, attachment:Attachment) {
+	public function new(slotIndex:Int, placeholder:String, attachment:Attachment) {
 		this.slotIndex = slotIndex;
-		this.placeholderName = placeholderName;
+		this.placeholder = placeholder;
 		this.attachment = attachment;
 	}
 }

@@ -28,11 +28,11 @@
  *****************************************************************************/
 
 import type { Attachment } from "./attachments/Attachment.js";
-import type { SkeletonData } from "./SkeletonData.js";
 import { MeshAttachment } from "./attachments/MeshAttachment.js";
 import type { BoneData } from "./BoneData.js";
 import type { ConstraintData } from "./ConstraintData.js";
 import type { Skeleton } from "./Skeleton.js";
+import type { SkeletonData } from "./SkeletonData.js";
 import { Color, type StringMap } from "./Utils.js";
 
 /** Stores an entry in the skin consisting of the slot index, name, and attachment **/
@@ -41,14 +41,14 @@ export class SkinEntry {
 	/** The {@link Skeleton.slots} index. */
 	slotIndex: number = 0;
 
-	placeholderName: string;
+	placeholder: string;
 
 	/** The attachment for this skin entry. */
 	attachment: Attachment
 
-	constructor (slotIndex: number = 0, placeholderName: string, attachment: Attachment) {
+	constructor (slotIndex: number = 0, placeholder: string, attachment: Attachment) {
 		this.slotIndex = slotIndex;
-		this.placeholderName = placeholderName;
+		this.placeholder = placeholder;
 		this.attachment = attachment;
 	}
 }
@@ -77,12 +77,12 @@ export class Skin {
 	}
 
 	/** Adds an attachment to the skin for the specified slot index and name. */
-	setAttachment (slotIndex: number, placeholderName: string, attachment: Attachment) {
+	setAttachment (slotIndex: number, placeholder: string, attachment: Attachment) {
 		if (!attachment) throw new Error("attachment cannot be null.");
 		const attachments = this.attachments;
 		if (slotIndex >= attachments.length) attachments.length = slotIndex + 1;
 		if (!attachments[slotIndex]) attachments[slotIndex] = {};
-		attachments[slotIndex][placeholderName] = attachment;
+		attachments[slotIndex][placeholder] = attachment;
 	}
 
 	/** Adds all attachments, bones, and constraints from the specified skin to this skin. */
@@ -114,7 +114,7 @@ export class Skin {
 		const attachments = skin.getAttachments();
 		for (let i = 0; i < attachments.length; i++) {
 			const attachment = attachments[i];
-			this.setAttachment(attachment.slotIndex, attachment.placeholderName, attachment.attachment);
+			this.setAttachment(attachment.slotIndex, attachment.placeholder, attachment.attachment);
 		}
 	}
 
@@ -151,24 +151,24 @@ export class Skin {
 			if (!attachment.attachment) continue;
 			if (attachment.attachment instanceof MeshAttachment) {
 				attachment.attachment = attachment.attachment.newLinkedMesh();
-				this.setAttachment(attachment.slotIndex, attachment.placeholderName, attachment.attachment);
+				this.setAttachment(attachment.slotIndex, attachment.placeholder, attachment.attachment);
 			} else {
 				attachment.attachment = attachment.attachment.copy();
-				this.setAttachment(attachment.slotIndex, attachment.placeholderName, attachment.attachment);
+				this.setAttachment(attachment.slotIndex, attachment.placeholder, attachment.attachment);
 			}
 		}
 	}
 
-	/** Returns the attachment for the specified slot index and placeholderName, or null. */
-	getAttachment (slotIndex: number, placeholderName: string): Attachment | null {
+	/** Returns the attachment for the specified slot index and placeholder, or null. */
+	getAttachment (slotIndex: number, placeholder: string): Attachment | null {
 		const dictionary = this.attachments[slotIndex];
-		return dictionary ? dictionary[placeholderName] : null;
+		return dictionary ? dictionary[placeholder] : null;
 	}
 
-	/** Removes the attachment in the skin for the specified slot index and placeholderName, if any. */
-	removeAttachment (slotIndex: number, placeholderName: string) {
+	/** Removes the attachment in the skin for the specified slot index and placeholder, if any. */
+	removeAttachment (slotIndex: number, placeholder: string) {
 		const dictionary = this.attachments[slotIndex];
-		if (dictionary) delete dictionary[placeholderName];
+		if (dictionary) delete dictionary[placeholder];
 	}
 
 	/** Returns all attachments in this skin. */
@@ -212,10 +212,10 @@ export class Skin {
 			const slotAttachment = slot.pose.getAttachment();
 			if (slotAttachment && slotIndex < oldSkin.attachments.length) {
 				const dictionary = oldSkin.attachments[slotIndex];
-				for (const placeholderName in dictionary) {
-					const skinAttachment: Attachment = dictionary[placeholderName];
+				for (const placeholder in dictionary) {
+					const skinAttachment: Attachment = dictionary[placeholder];
 					if (slotAttachment === skinAttachment) {
-						const attachment = this.getAttachment(slotIndex, placeholderName);
+						const attachment = this.getAttachment(slotIndex, placeholder);
 						if (attachment) slot.pose.setAttachment(attachment);
 						break;
 					}

@@ -380,10 +380,10 @@ namespace Spine {
 		/// name.</summary>
 		/// <returns>May be null.</returns>
 		/// <seealso cref="GetAttachment(int, string)"/>
-		public Attachment GetAttachment (string slotName, string placeholderName) {
+		public Attachment GetAttachment (string slotName, string placeholder) {
 			SlotData slot = data.FindSlot(slotName);
 			if (slot == null) throw new ArgumentException("Slot not found: " + slotName, "slotName");
-			return GetAttachment(slot.index, placeholderName);
+			return GetAttachment(slot.index, placeholder);
 		}
 
 		/// <summary>Finds an attachment by looking in the skin and skeletonData.defaultSkin using the slot index and skin
@@ -391,29 +391,29 @@ namespace Spine {
 		/// <para>
 		/// See <a href="http://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide.</para>
 		/// <returns>May be null.</returns>
-		public Attachment GetAttachment (int slotIndex, string placeholderName) {
-			if (placeholderName == null) throw new ArgumentNullException("placeholderName", "placeholderName cannot be null.");
+		public Attachment GetAttachment (int slotIndex, string placeholder) {
+			if (placeholder == null) throw new ArgumentNullException("placeholder", "placeholder cannot be null.");
 			if (skin != null) {
-				Attachment attachment = skin.GetAttachment(slotIndex, placeholderName);
+				Attachment attachment = skin.GetAttachment(slotIndex, placeholder);
 				if (attachment != null) return attachment;
 			}
-			if (data.defaultSkin != null) return data.defaultSkin.GetAttachment(slotIndex, placeholderName);
+			if (data.defaultSkin != null) return data.defaultSkin.GetAttachment(slotIndex, placeholder);
 			return null;
 		}
 
 		/// <summary>A convenience method to set an attachment by finding the slot with <see cref="FindSlot(string)"/>, finding the attachment with
 		/// <see cref="GetAttachment(int, string)"/>, then setting the slot's <see cref="SlotPose.Attachment"/>.</summary>
-		/// <param name="placeholderName">May be null to clear the slot's attachment.</param>
-		public void SetAttachment (string slotName, string placeholderName) {
+		/// <param name="placeholder">May be null to clear the slot's attachment.</param>
+		public void SetAttachment (string slotName, string placeholder) {
 			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
 
 			Slot slot = FindSlot(slotName);
 			if (slot == null) throw new ArgumentException("Slot not found: " + slotName, "slotName");
 			Attachment attachment = null;
-			if (placeholderName != null) {
-				attachment = GetAttachment(slot.data.index, placeholderName);
+			if (placeholder != null) {
+				attachment = GetAttachment(slot.data.index, placeholder);
 				if (attachment == null)
-					throw new ArgumentException("Attachment not found: " + placeholderName + ", for slot: " + slotName, "placeholderName");
+					throw new ArgumentException("Attachment not found: " + placeholder + ", for slot: " + slotName, "placeholder");
 			}
 			slot.pose.Attachment = attachment;
 		}

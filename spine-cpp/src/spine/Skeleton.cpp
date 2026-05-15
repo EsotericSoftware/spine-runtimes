@@ -213,7 +213,7 @@ void Skeleton::sortReset(Array<Bone *> &bones) {
 void Skeleton::updateWorldTransform(Physics physics) {
 	_update++;
 
-	_drawOrder.reset();
+	if (_drawOrder._appliedPose == &_drawOrder._constrainedPose) _drawOrder.reset();
 	Posed **resetCache = _resetCache.buffer();
 	for (size_t i = 0, n = _resetCache.size(); i < n; i++) {
 		resetCache[i]->resetConstrained();
@@ -326,29 +326,29 @@ void Skeleton::setSkin(Skin *newSkin) {
 	updateCache();
 }
 
-Attachment *Skeleton::getAttachment(const String &slotName, const String &attachmentName) {
+Attachment *Skeleton::getAttachment(const String &slotName, const String &placeholder) {
 	SlotData *slot = _data.findSlot(slotName);
 	if (slot == NULL) return NULL;
-	return getAttachment(slot->getIndex(), attachmentName);
+	return getAttachment(slot->getIndex(), placeholder);
 }
 
-Attachment *Skeleton::getAttachment(int slotIndex, const String &attachmentName) {
-	if (attachmentName.isEmpty()) return NULL;
+Attachment *Skeleton::getAttachment(int slotIndex, const String &placeholder) {
+	if (placeholder.isEmpty()) return NULL;
 	if (_skin != NULL) {
-		Attachment *attachment = _skin->getAttachment(slotIndex, attachmentName);
+		Attachment *attachment = _skin->getAttachment(slotIndex, placeholder);
 		if (attachment != NULL) return attachment;
 	}
-	if (_data.getDefaultSkin() != NULL) return _data.getDefaultSkin()->getAttachment(slotIndex, attachmentName);
+	if (_data.getDefaultSkin() != NULL) return _data.getDefaultSkin()->getAttachment(slotIndex, placeholder);
 	return NULL;
 }
 
-void Skeleton::setAttachment(const String &slotName, const String &attachmentName) {
+void Skeleton::setAttachment(const String &slotName, const String &placeholder) {
 	if (slotName.isEmpty()) return;
 	Slot *slot = findSlot(slotName);
 	if (slot == NULL) return;
 	Attachment *attachment = NULL;
-	if (!attachmentName.isEmpty()) {
-		attachment = getAttachment(slot->_data.getIndex(), attachmentName);
+	if (!placeholder.isEmpty()) {
+		attachment = getAttachment(slot->_data.getIndex(), placeholder);
 		if (attachment == NULL) return;
 	}
 	slot->_pose.setAttachment(attachment);

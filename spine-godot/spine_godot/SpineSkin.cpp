@@ -34,9 +34,9 @@
 #include "SpineSprite.h"
 
 void SpineSkin::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("set_attachment", "slot_index", "name", "attachment"), &SpineSkin::set_attachment);
-	ClassDB::bind_method(D_METHOD("get_attachment", "slot_index", "name"), &SpineSkin::get_attachment);
-	ClassDB::bind_method(D_METHOD("remove_attachment", "slot_index", "name"), &SpineSkin::remove_attachment);
+	ClassDB::bind_method(D_METHOD("set_attachment", "slot_index", "placeholder", "attachment"), &SpineSkin::set_attachment);
+	ClassDB::bind_method(D_METHOD("get_attachment", "slot_index", "placeholder"), &SpineSkin::get_attachment);
+	ClassDB::bind_method(D_METHOD("remove_attachment", "slot_index", "placeholder"), &SpineSkin::remove_attachment);
 	ClassDB::bind_method(D_METHOD("find_names_for_slot", "slot_index"), &SpineSkin::find_names_for_slot);
 	ClassDB::bind_method(D_METHOD("find_attachments_for_slot", "slot_index"), &SpineSkin::find_attachments_for_slot);
 	ClassDB::bind_method(D_METHOD("get_name"), &SpineSkin::get_name);
@@ -72,24 +72,24 @@ Ref<SpineSkin> SpineSkin::init(const String &name, SpineSprite *sprite) {
 	return this;
 }
 
-void SpineSkin::set_attachment(int slot_index, const String &name, Ref<SpineAttachment> attachment) {
+void SpineSkin::set_attachment(int slot_index, const String &placeholder, Ref<SpineAttachment> attachment) {
 	SPINE_CHECK(get_spine_object(), )
-	get_spine_object()->setAttachment(slot_index, SPINE_STRING(name),
+	get_spine_object()->setAttachment(slot_index, SPINE_STRING(placeholder),
 									  attachment.is_valid() && attachment->get_spine_owner() ? attachment->get_spine_object() : nullptr);
 }
 
-Ref<SpineAttachment> SpineSkin::get_attachment(int slot_index, const String &name) {
+Ref<SpineAttachment> SpineSkin::get_attachment(int slot_index, const String &placeholder) {
 	SPINE_CHECK(get_spine_object(), nullptr)
-	auto attachment = get_spine_object()->getAttachment(slot_index, SPINE_STRING(name));
+	auto attachment = get_spine_object()->getAttachment(slot_index, SPINE_STRING(placeholder));
 	if (attachment) return nullptr;
 	Ref<SpineAttachment> attachment_ref(memnew(SpineAttachment));
 	attachment_ref->set_spine_object(get_spine_owner(), attachment);
 	return attachment_ref;
 }
 
-void SpineSkin::remove_attachment(int slot_index, const String &name) {
+void SpineSkin::remove_attachment(int slot_index, const String &placeholder) {
 	SPINE_CHECK(get_spine_object(), )
-	get_spine_object()->removeAttachment(slot_index, SPINE_STRING(name));
+	get_spine_object()->removeAttachment(slot_index, SPINE_STRING(placeholder));
 }
 
 Array SpineSkin::find_names_for_slot(int slot_index) {
@@ -163,7 +163,7 @@ Array SpineSkin::get_attachments() {
 			attachment_ref = Ref<SpineAttachment>(memnew(SpineAttachment));
 			attachment_ref->set_spine_object(get_spine_owner(), entry._attachment);
 		}
-		entry_ref->init(entry._slotIndex, entry._placeholderName.buffer(), attachment_ref);
+		entry_ref->init(entry._slotIndex, entry._placeholder.buffer(), attachment_ref);
 		result.push_back(entry_ref);
 	}
 	return result;

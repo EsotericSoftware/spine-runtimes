@@ -57,7 +57,7 @@ namespace spine {
 		float getTime();
 		void setTime(float time);
 
-		/// A percentage that controls the mix between the constrained and unconstrained poses.
+		/// A percentage (unbounded) that controls the mix between the constrained and unconstrained poses.
 		float getMix();
 		void setMix(float mix);
 	};

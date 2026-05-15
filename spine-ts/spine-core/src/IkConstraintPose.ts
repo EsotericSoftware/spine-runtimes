@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import type { Pose } from "./Pose";
+import type { Pose } from "./Pose.js";
 
 /** Stores a pose for an IK constraint. */
 export class IkConstraintPose implements Pose<IkConstraintPose> {

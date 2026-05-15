@@ -73,29 +73,29 @@ namespace Spine {
 			return null;
 		}
 
-		public RegionAttachment NewRegionAttachment (Skin skin, string name, string path, Sequence sequence) {
+		public RegionAttachment NewRegionAttachment (Skin skin, string placeholder, string name, string path, Sequence sequence) {
 			FindRegions(name, path, sequence);
 			return new RegionAttachment(name, sequence);
 		}
 
-		public MeshAttachment NewMeshAttachment (Skin skin, string name, string path, Sequence sequence) {
+		public MeshAttachment NewMeshAttachment (Skin skin, string placeholder, string name, string path, Sequence sequence) {
 			FindRegions(name, path, sequence);
 			return new MeshAttachment(name, sequence);
 		}
 
-		public BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, string name) {
+		public BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, string placeholder, string name) {
 			return new BoundingBoxAttachment(name);
 		}
 
-		public PathAttachment NewPathAttachment (Skin skin, string name) {
+		public PathAttachment NewPathAttachment (Skin skin, string placeholder, string name) {
 			return new PathAttachment(name);
 		}
 
-		public PointAttachment NewPointAttachment (Skin skin, string name) {
+		public PointAttachment NewPointAttachment (Skin skin, string placeholder, string name) {
 			return new PointAttachment(name);
 		}
 
-		public ClippingAttachment NewClippingAttachment (Skin skin, string name) {
+		public ClippingAttachment NewClippingAttachment (Skin skin, string placeholder, string name) {
 			return new ClippingAttachment(name);
 		}
 	}

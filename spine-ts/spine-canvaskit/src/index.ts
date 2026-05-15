@@ -70,11 +70,27 @@ function toCkBlendMode (ck: CanvasKit, blendMode: BlendMode) {
 	}
 }
 
-function bufferToUtf8String (buffer: ArrayBuffer | Buffer) {
-	if (typeof Buffer !== "undefined") {
+type NodeBufferLike = {
+	readonly buffer: ArrayBufferLike;
+	readonly byteOffset: number;
+	readonly byteLength: number;
+	toString (encoding?: "utf-8" | "utf8"): string;
+};
+
+type BinaryData = ArrayBuffer | Uint8Array | NodeBufferLike;
+
+function binaryDataToUint8Array (buffer: BinaryData): Uint8Array {
+	if (buffer instanceof ArrayBuffer) return new Uint8Array(buffer);
+	if (buffer instanceof Uint8Array) return buffer;
+	return new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+}
+
+function bufferToUtf8String (buffer: BinaryData) {
+	const globalBuffer = (globalThis as { Buffer?: { isBuffer: (value: unknown) => boolean } }).Buffer;
+	if (globalBuffer?.isBuffer(buffer)) {
 		return buffer.toString("utf-8");
 	} else if (typeof TextDecoder !== "undefined") {
-		return new TextDecoder("utf-8").decode(buffer);
+		return new TextDecoder("utf-8").decode(binaryDataToUint8Array(buffer));
 	} else {
 		throw new Error("Unsupported environment");
 	}
@@ -104,11 +120,11 @@ class CanvasKitTexture extends Texture {
 	static async fromFile (
 		ck: CanvasKit,
 		path: string,
-		readFile: (path: string) => Promise<ArrayBuffer | Buffer>
+		readFile: (path: string) => Promise<BinaryData>
 	): Promise<CanvasKitTexture> {
 		const imgData = await readFile(path);
 		if (!imgData) throw new Error(`Could not load image ${path}`);
-		const image = ck.MakeImageFromEncoded(imgData);
+		const image = ck.MakeImageFromEncoded(binaryDataToUint8Array(imgData));
 		if (!image) throw new Error(`Could not load image ${path}`);
 		const paintPerBlendMode = new Map<BlendMode, Paint>();
 		const shaders: Shader[] = [];
@@ -141,7 +157,7 @@ class CanvasKitTexture extends Texture {
 export async function loadTextureAtlas (
 	ck: CanvasKit,
 	atlasFile: string,
-	readFile: (path: string) => Promise<ArrayBuffer | Buffer>
+	readFile: (path: string) => Promise<BinaryData>
 ): Promise<TextureAtlas> {
 	const atlas = new TextureAtlas(bufferToUtf8String(await readFile(atlasFile)));
 	const slashIndex = atlasFile.lastIndexOf("/");
@@ -165,7 +181,7 @@ export async function loadTextureAtlas (
 export async function loadSkeletonData (
 	skeletonFile: string,
 	atlas: TextureAtlas,
-	readFile: (path: string) => Promise<ArrayBuffer | Buffer>,
+	readFile: (path: string) => Promise<BinaryData>,
 	scale = 1
 ): Promise<SkeletonData> {
 	const attachmentLoader = new AtlasAttachmentLoader(atlas);
@@ -177,7 +193,7 @@ export async function loadSkeletonData (
 	if (loader instanceof SkeletonJson) {
 		return loader.readSkeletonData(bufferToUtf8String(data))
 	}
-	return loader.readSkeletonData(data);
+	return loader.readSkeletonData(binaryDataToUint8Array(data));
 }
 
 /**

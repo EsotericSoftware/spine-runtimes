@@ -75,8 +75,8 @@ abstract public class Attachment {
 		this.timelineSlots = timelineSlots;
 	}
 
-	/** Returns true if the {@code slotIndex} or any {@link #timelineSlots} have an attachment whose {@link #timelineAttachment} is
-	 * this attachment.
+	/** Returns true if the <code>slotIndex</code> or any {@link #timelineSlots} have an attachment whose
+	 * {@link #timelineAttachment} is this attachment.
 	 * @param slots The {@link Skeleton#getSlots()}.
 	 * @param slotIndex The timeline's primary slot index. */
 	public boolean isTimelineActive (Slot[] slots, int slotIndex, boolean appliedPose) {

@@ -93,6 +93,12 @@ public:
 		BlendMode_Screen
 	};
 
+	enum ScaleYMode {
+		ScaleYMode_None = 0,
+		ScaleYMode_Uniform,
+		ScaleYMode_Volume
+	};
+
 	enum UpdateMode {
 		UpdateMode_Process,
 		UpdateMode_Physics,
@@ -110,6 +116,14 @@ public:
 		Physics_Update,
 		Physics_Pose
 	};
+
+	enum MixInterpolation {
+		MixInterpolation_Linear,
+		MixInterpolation_Smooth,
+		MixInterpolation_SlowFast,
+		MixInterpolation_FastSlow,
+		MixInterpolation_Circle
+	};
 };
 
 VARIANT_ENUM_CAST(SpineConstant::PropertyId)
@@ -118,6 +132,8 @@ VARIANT_ENUM_CAST(SpineConstant::PositionMode)
 VARIANT_ENUM_CAST(SpineConstant::SpacingMode)
 VARIANT_ENUM_CAST(SpineConstant::RotateMode)
 VARIANT_ENUM_CAST(SpineConstant::BlendMode)
+VARIANT_ENUM_CAST(SpineConstant::ScaleYMode)
 VARIANT_ENUM_CAST(SpineConstant::UpdateMode)
 VARIANT_ENUM_CAST(SpineConstant::BoneMode)
 VARIANT_ENUM_CAST(SpineConstant::Physics)
+VARIANT_ENUM_CAST(SpineConstant::MixInterpolation)

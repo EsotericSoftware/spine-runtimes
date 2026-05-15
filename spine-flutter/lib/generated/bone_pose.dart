@@ -117,10 +117,6 @@ class BonePose extends BoneLocal implements Update {
     SpineBindings.bindings.spine_bone_pose_modify_world(_ptr, update);
   }
 
-  void resetWorld(int update) {
-    SpineBindings.bindings.spine_bone_pose_reset_world(_ptr, update);
-  }
-
   /// The world transform [a b][c d] x-axis x component.
   double get a {
     final result = SpineBindings.bindings.spine_bone_pose_get_a(_ptr);

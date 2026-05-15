@@ -275,9 +275,9 @@ public class Skeleton: NSObject {
     /// the attachment with getAttachment(int, String), then setting the slot's
     /// SlotPose::getAttachment().
     ///
-    /// - Parameter placeholderName: May be empty.
-    public func setAttachment(_ slotName: String, _ placeholderName: String) {
-        spine_skeleton_set_attachment(_ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self), slotName, placeholderName)
+    /// - Parameter placeholder: May be empty.
+    public func setAttachment(_ slotName: String, _ placeholder: String) {
+        spine_skeleton_set_attachment(_ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self), slotName, placeholder)
     }
 
     public func setScale(_ scaleX: Float, _ scaleY: Float) {
@@ -329,8 +329,8 @@ public class Skeleton: NSObject {
     /// found, the default skin is checked.
     ///
     /// - Returns: May be NULL.
-    public func getAttachment(_ slotName: String, _ placeholderName: String) -> Attachment? {
-        let result = spine_skeleton_get_attachment_1(_ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self), slotName, placeholderName)
+    public func getAttachment(_ slotName: String, _ placeholder: String) -> Attachment? {
+        let result = spine_skeleton_get_attachment_1(_ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self), slotName, placeholder)
         guard let ptr = result else { return nil }
         let rtti = spine_attachment_get_rtti(ptr)
         let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)
@@ -363,8 +363,8 @@ public class Skeleton: NSObject {
     /// not found, the default skin is checked.
     ///
     /// - Returns: May be NULL.
-    public func getAttachment2(_ slotIndex: Int32, _ placeholderName: String) -> Attachment? {
-        let result = spine_skeleton_get_attachment_2(_ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self), slotIndex, placeholderName)
+    public func getAttachment2(_ slotIndex: Int32, _ placeholder: String) -> Attachment? {
+        let result = spine_skeleton_get_attachment_2(_ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self), slotIndex, placeholder)
         guard let ptr = result else { return nil }
         let rtti = spine_attachment_get_rtti(ptr)
         let rttiClassName = String(cString: spine_rtti_get_class_name(rtti)!)

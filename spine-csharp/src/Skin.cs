@@ -58,9 +58,9 @@ namespace Spine {
 		}
 
 		/// <summary>Adds an attachment to the skin for the specified slot index and placeholder name.</summary>
-		public void SetAttachment (int slotIndex, string placeholderName, Attachment attachment) {
+		public void SetAttachment (int slotIndex, string placeholder, Attachment attachment) {
 			if (attachment == null) throw new ArgumentNullException("attachment", "attachment cannot be null.");
-			attachments[new SkinKey(slotIndex, placeholderName)] = new SkinEntry(slotIndex, placeholderName, attachment);
+			attachments[new SkinKey(slotIndex, placeholder)] = new SkinEntry(slotIndex, placeholder, attachment);
 		}
 
 		/// <summary>Adds all attachments, bones, and constraints from the specified skin to this skin.</summary>
@@ -73,7 +73,7 @@ namespace Spine {
 
 			foreach (KeyValuePair<SkinKey, SkinEntry> item in skin.attachments) {
 				SkinEntry entry = item.Value;
-				SetAttachment(entry.slotIndex, entry.placeholderName, entry.attachment);
+				SetAttachment(entry.slotIndex, entry.placeholder, entry.attachment);
 			}
 		}
 
@@ -88,24 +88,24 @@ namespace Spine {
 			foreach (KeyValuePair<SkinKey, SkinEntry> item in skin.attachments) {
 				SkinEntry entry = item.Value;
 				if (entry.attachment is MeshAttachment) {
-					SetAttachment(entry.slotIndex, entry.placeholderName,
+					SetAttachment(entry.slotIndex, entry.placeholder,
 					   entry.attachment != null ? ((MeshAttachment)entry.attachment).NewLinkedMesh() : null);
 				} else
-					SetAttachment(entry.slotIndex, entry.placeholderName, entry.attachment != null ? entry.attachment.Copy() : null);
+					SetAttachment(entry.slotIndex, entry.placeholder, entry.attachment != null ? entry.attachment.Copy() : null);
 			}
 		}
 
 		/// <summary>Returns the attachment for the specified slot index and placeholder name, or null.</summary>
 		/// <returns>May be null.</returns>
-		public Attachment GetAttachment (int slotIndex, string placeholderName) {
+		public Attachment GetAttachment (int slotIndex, string placeholder) {
 			SkinEntry entry;
-			bool containsKey = attachments.TryGetValue(new SkinKey(slotIndex, placeholderName), out entry);
+			bool containsKey = attachments.TryGetValue(new SkinKey(slotIndex, placeholder), out entry);
 			return containsKey ? entry.attachment : null;
 		}
 
 		/// <summary> Removes the attachment in the skin for the specified slot index and placeholder name, if any.</summary>
-		public void RemoveAttachment (int slotIndex, string placeholderName) {
-			attachments.Remove(new SkinKey(slotIndex, placeholderName));
+		public void RemoveAttachment (int slotIndex, string placeholder) {
+			attachments.Remove(new SkinKey(slotIndex, placeholder));
 		}
 
 		/// <summary>Returns all attachments in this skin for the specified slot index.</summary>
@@ -137,7 +137,7 @@ namespace Spine {
 				SkinEntry entry = item.Value;
 				SlotPose slot = slots[entry.slotIndex].pose;
 				if (slot.Attachment == entry.attachment) {
-					Attachment attachment = GetAttachment(entry.slotIndex, entry.placeholderName);
+					Attachment attachment = GetAttachment(entry.slotIndex, entry.placeholder);
 					if (attachment != null) slot.Attachment = attachment;
 				}
 			}
@@ -147,12 +147,12 @@ namespace Spine {
 		/// <summary>Stores an entry in the skin consisting of the slot index, placeholder name and attachment.</summary>
 		public struct SkinEntry {
 			internal readonly int slotIndex;
-			internal readonly string placeholderName;
+			internal readonly string placeholder;
 			internal readonly Attachment attachment;
 
-			public SkinEntry (int slotIndex, string placeholderName, Attachment attachment) {
+			public SkinEntry (int slotIndex, string placeholder, Attachment attachment) {
 				this.slotIndex = slotIndex;
-				this.placeholderName = placeholderName;
+				this.placeholder = placeholder;
 				this.attachment = attachment;
 			}
 
@@ -164,9 +164,9 @@ namespace Spine {
 			}
 
 			/// <summary>The placeholder name that the attachment is associated with.</summary>
-			public string PlaceholderName {
+			public string Placeholder {
 				get {
-					return placeholderName;
+					return placeholder;
 				}
 			}
 
@@ -180,15 +180,15 @@ namespace Spine {
 
 		private struct SkinKey {
 			internal readonly int slotIndex;
-			internal readonly string placeholderName;
+			internal readonly string placeholder;
 			internal readonly int hashCode;
 
-			public SkinKey (int slotIndex, string placeholderName) {
+			public SkinKey (int slotIndex, string placeholder) {
 				if (slotIndex < 0) throw new ArgumentException("slotIndex must be >= 0.");
-				if (placeholderName == null) throw new ArgumentNullException("placeholderName", "placeholderName cannot be null");
+				if (placeholder == null) throw new ArgumentNullException("placeholder", "placeholder cannot be null");
 				this.slotIndex = slotIndex;
-				this.placeholderName = placeholderName;
-				this.hashCode = placeholderName.GetHashCode() + slotIndex * 37;
+				this.placeholder = placeholder;
+				this.hashCode = placeholder.GetHashCode() + slotIndex * 37;
 			}
 		}
 
@@ -196,7 +196,7 @@ namespace Spine {
 			internal static readonly SkinKeyComparer Instance = new SkinKeyComparer();
 
 			bool IEqualityComparer<SkinKey>.Equals (SkinKey e1, SkinKey e2) {
-				return e1.slotIndex == e2.slotIndex && string.Equals(e1.placeholderName, e2.placeholderName, StringComparison.Ordinal);
+				return e1.slotIndex == e2.slotIndex && string.Equals(e1.placeholder, e2.placeholder, StringComparison.Ordinal);
 			}
 
 			int IEqualityComparer<SkinKey>.GetHashCode (SkinKey e) {

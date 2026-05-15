@@ -29,7 +29,7 @@
 
 package spine;
 
-import spine.IkConstraintData.ScaleY;
+import spine.IkConstraintData.ScaleYMode;
 
 /** Stores the current pose for an IK constraint. An IK constraint adjusts the rotation of 1 or 2 constrained bones so the tip of
  * the last bone is as close to the target bone as possible.
@@ -67,9 +67,9 @@ class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkConstrai
 		var target = target.appliedPose;
 		switch (bones.length) {
 			case 1:
-				apply1(skeleton, bones[0], target.worldX, target.worldY, p.compress, p.stretch, data.scaleY, p.mix);
+				apply1(skeleton, bones[0], target.worldX, target.worldY, p.compress, p.stretch, data.scaleYMode, p.mix);
 			case 2:
-				apply2(skeleton, bones[0], bones[1], target.worldX, target.worldY, p.bendDirection, p.stretch, data.scaleY, p.softness, p.mix);
+				apply2(skeleton, bones[0], bones[1], target.worldX, target.worldY, p.bendDirection, p.stretch, data.scaleYMode, p.softness, p.mix);
 		}
 	}
 
@@ -97,7 +97,8 @@ class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkConstrai
 	}
 
 	/** Applies 1 bone IK. The target is specified in the world coordinate system. */
-	static public function apply1(skeleton:Skeleton, bone:BonePose, targetX:Float, targetY:Float, compress:Bool, stretch:Bool, scaleY:ScaleY, mix:Float) {
+	static public function apply1(skeleton:Skeleton, bone:BonePose, targetX:Float, targetY:Float, compress:Bool, stretch:Bool, scaleYMode:ScaleYMode,
+			mix:Float) {
 		if (bone == null)
 			throw new SpineException("bone cannot be null.");
 		bone.modifyLocal(skeleton);
@@ -152,12 +153,12 @@ class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkConstrai
 				if ((compress && dd < b * b) || (stretch && dd > b * b)) {
 					var s = (Math.sqrt(dd) / b - 1) * mix + 1;
 					bone.scaleX *= s;
-					switch (scaleY) {
-						case ScaleY.uniform:
+					switch (scaleYMode) {
+						case ScaleYMode.uniform:
 							bone.scaleY *= s;
-						case ScaleY.volume:
+						case ScaleYMode.volume:
 							bone.scaleY /= s;
-						case ScaleY.none:
+						case ScaleYMode.none:
 					}
 				}
 			}
@@ -166,8 +167,8 @@ class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkConstrai
 
 	/** Applies 2 bone IK. The target is specified in the world coordinate system.
 	 * @param child A direct descendant of the parent bone. */
-	static public function apply2(skeleton:Skeleton, parent:BonePose, child:BonePose, targetX:Float, targetY:Float, bendDir:Int, stretch:Bool, scaleY:ScaleY,
-			softness:Float, mix:Float):Void {
+	static public function apply2(skeleton:Skeleton, parent:BonePose, child:BonePose, targetX:Float, targetY:Float, bendDir:Int, stretch:Bool,
+			scaleYMode:ScaleYMode, softness:Float, mix:Float):Void {
 		if (parent == null)
 			throw new SpineException("parent cannot be null.");
 		if (child == null)
@@ -215,7 +216,7 @@ class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkConstrai
 		var dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
 		var l1 = Math.sqrt(dx * dx + dy * dy), l2 = child.bone.data.length * csx, a1 = 0., a2 = 0.;
 		if (l1 < 0.0001) {
-			apply1(skeleton, parent, targetX, targetY, false, stretch, ScaleY.none, mix);
+			apply1(skeleton, parent, targetX, targetY, false, stretch, ScaleYMode.none, mix);
 			child.rotation = 0;
 			return;
 		}
@@ -248,12 +249,12 @@ class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkConstrai
 				if (stretch) {
 					a = (Math.sqrt(dd) / (l1 + l2) - 1) * mix + 1;
 					parent.scaleX *= a;
-					switch (scaleY) {
-						case ScaleY.uniform:
+					switch (scaleYMode) {
+						case ScaleYMode.uniform:
 							parent.scaleY *= a;
-						case ScaleY.volume:
+						case ScaleYMode.volume:
 							parent.scaleY /= a;
-						case ScaleY.none:
+						case ScaleYMode.none:
 					}
 				}
 			}

@@ -46,11 +46,6 @@ void spine_bone_pose_modify_world(spine_bone_pose self, int update) {
 	_self->modifyWorld(update);
 }
 
-void spine_bone_pose_reset_world(spine_bone_pose self, int update) {
-	BonePose *_self = (BonePose *) self;
-	_self->resetWorld(update);
-}
-
 float spine_bone_pose_get_a(spine_bone_pose self) {
 	BonePose *_self = (BonePose *) self;
 	return _self->getA();

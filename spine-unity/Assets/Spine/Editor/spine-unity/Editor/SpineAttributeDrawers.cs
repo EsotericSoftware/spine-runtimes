@@ -202,7 +202,7 @@ namespace Spine.Unity.Editor {
 		protected virtual void HandleSelect (object menuItemObject) {
 			SpineDrawerValuePair clickedItem = (SpineDrawerValuePair)menuItemObject;
 			SerializedProperty serializedProperty = clickedItem.property;
-			if (serializedProperty.serializedObject.isEditingMultipleObjects) serializedProperty.stringValue = "oaifnoiasf��123526"; // HACK: to trigger change on multi-editing.
+			if (serializedProperty.serializedObject.isEditingMultipleObjects) serializedProperty.stringValue = "oaifnoiasf°ñ123526"; // HACK: to trigger change on multi-editing.
 			serializedProperty.stringValue = clickedItem.stringValue;
 			serializedProperty.serializedObject.ApplyModifiedProperties();
 		}
@@ -591,17 +591,17 @@ namespace Spine.Unity.Editor {
 					List<Skin.SkinEntry> skinEntries = new List<Skin.SkinEntry>();
 					skin.GetAttachments(i, skinEntries);
 					foreach (Skin.SkinEntry entry in skinEntries) {
-						attachmentNames.Add(entry.PlaceholderName);
+						attachmentNames.Add(entry.Placeholder);
 					}
 
 					if (skin != defaultSkin) {
 						foreach (Skin.SkinEntry entry in skinEntries) {
-							placeholderNames.Add(entry.PlaceholderName);
+							placeholderNames.Add(entry.Placeholder);
 						}
 						skinEntries.Clear();
 						defaultSkin.GetAttachments(i, skinEntries);
 						foreach (Skin.SkinEntry entry in skinEntries) {
-							attachmentNames.Add(entry.PlaceholderName);
+							attachmentNames.Add(entry.Placeholder);
 						}
 					}
 

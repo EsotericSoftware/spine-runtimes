@@ -233,7 +233,7 @@ public class Skeleton {
 	public void updateWorldTransform (Physics physics) {
 		update++;
 
-		drawOrder.reset();
+		if (drawOrder.appliedPose == drawOrder.constrainedPose) drawOrder.reset();
 		Posed[] resetCache = this.resetCache.items;
 		for (int i = 0, n = this.resetCache.size; i < n; i++)
 			resetCache[i].reset();
@@ -253,7 +253,7 @@ public class Skeleton {
 
 		update++;
 
-		drawOrder.reset();
+		if (drawOrder.appliedPose == drawOrder.constrainedPose) drawOrder.reset();
 		Posed[] resetCache = this.resetCache.items;
 		for (int i = 0, n = this.resetCache.size; i < n; i++)
 			resetCache[i].reset();
@@ -408,38 +408,38 @@ public class Skeleton {
 	 * name.
 	 * <p>
 	 * See {@link #getAttachment(int, String)}. */
-	public @Null Attachment getAttachment (String slotName, String placeholderName) {
+	public @Null Attachment getAttachment (String slotName, String placeholder) {
 		SlotData slot = data.findSlot(slotName);
 		if (slot == null) throw new IllegalArgumentException("Slot not found: " + slotName);
-		return getAttachment(slot.getIndex(), placeholderName);
+		return getAttachment(slot.getIndex(), placeholder);
 	}
 
 	/** Finds an attachment by looking in the {@link #skin} and {@link SkeletonData#defaultSkin} using the slot index and skin
 	 * placeholder name. First the skin is checked and if the attachment was not found, the default skin is checked.
 	 * <p>
 	 * See <a href="https://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide. */
-	public @Null Attachment getAttachment (int slotIndex, String placeholderName) {
-		if (placeholderName == null) throw new IllegalArgumentException("placeholderName cannot be null.");
+	public @Null Attachment getAttachment (int slotIndex, String placeholder) {
+		if (placeholder == null) throw new IllegalArgumentException("placeholder cannot be null.");
 		if (skin != null) {
-			Attachment attachment = skin.getAttachment(slotIndex, placeholderName);
+			Attachment attachment = skin.getAttachment(slotIndex, placeholder);
 			if (attachment != null) return attachment;
 		}
-		if (data.defaultSkin != null) return data.defaultSkin.getAttachment(slotIndex, placeholderName);
+		if (data.defaultSkin != null) return data.defaultSkin.getAttachment(slotIndex, placeholder);
 		return null;
 	}
 
 	/** A convenience method to set an attachment by finding the slot with {@link #findSlot(String)}, finding the attachment with
 	 * {@link #getAttachment(int, String)}, then setting the slot's {@link SlotPose#attachment}.
-	 * @param placeholderName May be null to clear the slot's attachment. */
-	public void setAttachment (String slotName, @Null String placeholderName) {
+	 * @param placeholder May be null to clear the slot's attachment. */
+	public void setAttachment (String slotName, @Null String placeholder) {
 		if (slotName == null) throw new IllegalArgumentException("slotName cannot be null.");
 		Slot slot = findSlot(slotName);
 		if (slot == null) throw new IllegalArgumentException("Slot not found: " + slotName);
 		Attachment attachment = null;
-		if (placeholderName != null) {
-			attachment = getAttachment(slot.data.index, placeholderName);
+		if (placeholder != null) {
+			attachment = getAttachment(slot.data.index, placeholder);
 			if (attachment == null)
-				throw new IllegalArgumentException("Attachment not found: " + placeholderName + ", for slot: " + slotName);
+				throw new IllegalArgumentException("Attachment not found: " + placeholder + ", for slot: " + slotName);
 		}
 		slot.pose.setAttachment(attachment);
 	}

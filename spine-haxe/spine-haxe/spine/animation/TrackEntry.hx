@@ -30,6 +30,7 @@
 package spine.animation;
 
 import spine.animation.Listeners.EventListeners;
+import spine.Interpolation;
 import spine.Poolable;
 
 /** Stores settings and other state for the playback of an animation on an spine.animation.AnimationState track.
@@ -81,23 +82,20 @@ class TrackEntry implements Poolable {
 
 	public var keepHold:Bool = false;
 
-	/** When the mix percentage (TrackEntry.getMixTime() / TrackEntry.getMixDuration()) is less than the
-	 * eventThreshold, event timelines are applied while this animation is being mixed out. Defaults to 0, so event
-	 * timelines are not applied while this animation is being mixed out. */
+	/** When the interpolated mix percentage is less than the eventThreshold, event timelines are applied while this animation
+	 * is being mixed out. Defaults to 0, so event timelines are not applied while this animation is being mixed out. */
 	public var eventThreshold:Float = 0;
 
-	/** When the mix percentage (TrackEntry.getMixTime() / TrackEntry.getMixDuration()) is less than the
-	 * mixAttachmentThreshold, attachment timelines are applied while this animation is being mixed out. Defaults
-	 * to 0, so attachment timelines are not applied while this animation is being mixed out. */
+	/** When the interpolated mix percentage is less than the mixAttachmentThreshold, attachment timelines are applied while this
+	 * animation is being mixed out. Defaults to 0, so attachment timelines are not applied while this animation is being mixed out. */
 	public var mixAttachmentThreshold:Float = 0;
 
-	/** When TrackEntry.getAlpha() is greater than alphaAttachmentThreshold, attachment timelines are applied.
-	 * Defaults to 0, so attachment timelines are always applied. */
+	/** When TrackEntry.getAlpha() is greater than alphaAttachmentThreshold, attachment timelines are applied. The computed alpha
+	 * includes alpha and the interpolated mix percentage. Defaults to 0, so attachment timelines are always applied. */
 	public var alphaAttachmentThreshold:Float = 0;
 
-	/** When the mix percentage (TrackEntry.getMixTime() / TrackEntry.getMixDuration()) is less than the
-	 * mixDrawOrderThreshold, draw order timelines are applied while this animation is being mixed out. Defaults to
-	 * 0, so draw order timelines are not applied while this animation is being mixed out. */
+	/** When the interpolated mix percentage is less than the mixDrawOrderThreshold, draw order timelines are applied while this
+	 * animation is being mixed out. Defaults to 0, so draw order timelines are not applied while this animation is being mixed out. */
 	public var mixDrawOrderThreshold:Float = 0;
 
 	/** The time in seconds for the first frame of this animation, both initially and after looping. Defaults to 0.
@@ -199,6 +197,10 @@ class TrackEntry implements Poolable {
 
 	public var totalAlpha:Float = 0;
 
+	/** The interpolation to apply to the mix percentage (mixTime / mixDuration) when mixing from the previous animation to this
+	 * animation. Defaults to linear. */
+	public var mixInterpolation:Interpolation = Interpolation.linear;
+
 	public var timelineMode:Array<Int> = new Array<Int>();
 	public var timelineHoldMix:Array<TrackEntry> = new Array<TrackEntry>();
 	public var timelinesRotation:Array<Float> = new Array<Float>();
@@ -262,6 +264,7 @@ class TrackEntry implements Poolable {
 		previous = null;
 		mixingFrom = null;
 		mixingTo = null;
+		mixInterpolation = Interpolation.linear;
 		animation = null;
 		onStart.listeners.resize(0);
 		onInterrupt.listeners.resize(0);
@@ -286,18 +289,36 @@ class TrackEntry implements Poolable {
 	}
 
 	/** Sets both TrackEntry.getMixDuration() and TrackEntry.getDelay().
-	 * @param mixDuration If > 0, sets TrackEntry.getDelay(). If <= 0, the delay set is the duration of the previous track
+	 * @param delay If > 0, sets TrackEntry.getDelay(). If <= 0, the delay set is the duration of the previous track
 	 *           entry minus the specified mix duration plus the specified delay (ie the mix ends at
 	 *           (delay = 0) or before (delay < 0) the previous track entry duration). If the previous
 	 *           entry is looping, its next loop completion is used instead of its duration. */
-	public function setMixDurationWithDelay(mixDuration:Float):Float {
+	public function setMixDurationWithDelay(mixDuration:Float, delay:Float):Void {
 		this.mixDuration = mixDuration;
-		if (delay <= 0) {
-			if (this.previous != null)
-				delay = Math.max(delay + this.previous.getTrackComplete() - mixDuration, 0);
-			else
-				delay = 0;
-		}
-		return mixDuration;
+		if (delay <= 0)
+			delay = this.previous == null ? 0 : Math.max(delay + this.previous.getTrackComplete() - mixDuration, 0);
+		this.delay = delay;
+	}
+
+	public function setMixInterpolation(mixInterpolation:Interpolation):Void {
+		if (mixInterpolation == null)
+			throw new SpineException("mixInterpolation cannot be null.");
+		this.mixInterpolation = mixInterpolation;
+	}
+
+	public function mix():Float {
+		if (mixDuration == 0)
+			return 1;
+		var mix:Float = mixTime / mixDuration;
+		if (mix >= 1)
+			return 1;
+		if (mixInterpolation == Interpolation.linear)
+			return mix;
+		mix = mixInterpolation.apply(mix);
+		if (mix < 0)
+			return 0;
+		if (mix > 1)
+			return 1;
+		return mix;
 	}
 }

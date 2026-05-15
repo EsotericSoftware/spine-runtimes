@@ -60,29 +60,29 @@ class AtlasAttachmentLoader implements AttachmentLoader {
 		return region;
 	}
 
-	public function newRegionAttachment(skin:Skin, name:String, path:String, sequence:Sequence):RegionAttachment {
+	public function newRegionAttachment(skin:Skin, placeholder:String, name:String, path:String, sequence:Sequence):RegionAttachment {
 		findRegions(name, path, sequence);
 		return new RegionAttachment(name, sequence);
 	}
 
-	public function newMeshAttachment(skin:Skin, name:String, path:String, sequence:Sequence):MeshAttachment {
+	public function newMeshAttachment(skin:Skin, placeholder:String, name:String, path:String, sequence:Sequence):MeshAttachment {
 		findRegions(name, path, sequence);
 		return new MeshAttachment(name, sequence);
 	}
 
-	public function newBoundingBoxAttachment(skin:Skin, name:String):BoundingBoxAttachment {
+	public function newBoundingBoxAttachment(skin:Skin, placeholder:String, name:String):BoundingBoxAttachment {
 		return new BoundingBoxAttachment(name);
 	}
 
-	public function newPathAttachment(skin:Skin, name:String):PathAttachment {
+	public function newPathAttachment(skin:Skin, placeholder:String, name:String):PathAttachment {
 		return new PathAttachment(name);
 	}
 
-	public function newPointAttachment(skin:Skin, name:String):PointAttachment {
+	public function newPointAttachment(skin:Skin, placeholder:String, name:String):PointAttachment {
 		return new PointAttachment(name);
 	}
 
-	public function newClippingAttachment(skin:Skin, name:String):ClippingAttachment {
+	public function newClippingAttachment(skin:Skin, placeholder:String, name:String):ClippingAttachment {
 		return new ClippingAttachment(name);
 	}
 }

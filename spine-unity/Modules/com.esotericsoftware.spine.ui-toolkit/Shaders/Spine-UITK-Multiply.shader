@@ -20,6 +20,7 @@ Shader "Spine/UITK/Multiply"
             "IgnoreProjector"="True"
             "PreviewType"="Plane"
             "CanUseSpriteAtlas"="True"
+            "isCustomUITKShader"="true"
         }
         
         Pass

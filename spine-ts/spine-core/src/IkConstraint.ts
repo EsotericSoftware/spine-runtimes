@@ -31,7 +31,7 @@ import type { Bone } from "./Bone.js";
 import { Inherit } from "./BoneData.js";
 import type { BonePose } from "./BonePose.js";
 import { Constraint } from "./Constraint.js";
-import { type IkConstraintData, ScaleY } from "./IkConstraintData.js";
+import { type IkConstraintData, ScaleYMode } from "./IkConstraintData.js";
 import { IkConstraintPose } from "./IkConstraintPose.js";
 import type { Physics } from "./Physics.js";
 import type { Skeleton } from "./Skeleton.js";
@@ -72,10 +72,10 @@ export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 		const bones = this.bones;
 		switch (bones.length) {
 			case 1:
-				IkConstraint.apply(skeleton, bones[0], target.worldX, target.worldY, p.compress, p.stretch, this.data.scaleY, p.mix);
+				IkConstraint.apply(skeleton, bones[0], target.worldX, target.worldY, p.compress, p.stretch, this.data.scaleYMode, p.mix);
 				break;
 			case 2:
-				IkConstraint.apply(skeleton, bones[0], bones[1], target.worldX, target.worldY, p.bendDirection, p.stretch, this.data.scaleY,
+				IkConstraint.apply(skeleton, bones[0], bones[1], target.worldX, target.worldY, p.bendDirection, p.stretch, this.data.scaleYMode,
 					p.softness, p.mix);
 				break;
 		}
@@ -97,23 +97,23 @@ export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 	}
 
 	/** Applies 1 bone IK. The target is specified in the world coordinate system. */
-	public static apply (skeleton: Skeleton, bone: BonePose, targetX: number, targetY: number, compress: boolean, stretch: boolean, scaleY: ScaleY, mix: number): void;
+	public static apply (skeleton: Skeleton, bone: BonePose, targetX: number, targetY: number, compress: boolean, stretch: boolean, scaleYMode: ScaleYMode, mix: number): void;
 
 	/** Applies 2 bone IK. The target is specified in the world coordinate system.
 	 * @param child A direct descendant of the parent bone. */
-	public static apply (skeleton: Skeleton, parent: BonePose, child: BonePose, targetX: number, targetY: number, bendDir: number, stretch: boolean, scaleY: ScaleY, softness: number, mix: number): void;
+	public static apply (skeleton: Skeleton, parent: BonePose, child: BonePose, targetX: number, targetY: number, bendDir: number, stretch: boolean, scaleYMode: ScaleYMode, softness: number, mix: number): void;
 
 	public static apply (skeleton: Skeleton, boneOrParent: BonePose, targetXorChild: number | BonePose, targetYOrTargetX: number, compressOrTargetY: boolean | number,
-		stretchOrBendDir: boolean | number, scaleYOrStretch: ScaleY | boolean, mixOrScaleY: number | boolean, softness?: number, mix?: number) {
+		stretchOrBendDir: boolean | number, scaleYModeOrStretch: ScaleYMode | boolean, mixOrScaleYMode: number | boolean, softness?: number, mix?: number) {
 
 		if (typeof targetXorChild === "number")
-			IkConstraint.apply1(skeleton, boneOrParent, targetXorChild, targetYOrTargetX, compressOrTargetY as boolean, stretchOrBendDir as boolean, scaleYOrStretch as ScaleY, mixOrScaleY as number);
+			IkConstraint.apply1(skeleton, boneOrParent, targetXorChild, targetYOrTargetX, compressOrTargetY as boolean, stretchOrBendDir as boolean, scaleYModeOrStretch as ScaleYMode, mixOrScaleYMode as number);
 		else
 			IkConstraint.apply2(skeleton, boneOrParent, targetXorChild as BonePose, targetYOrTargetX, compressOrTargetY as number, stretchOrBendDir as number,
-				scaleYOrStretch as boolean, mixOrScaleY as ScaleY, softness as number, mix as number);
+				scaleYModeOrStretch as boolean, mixOrScaleYMode as ScaleYMode, softness as number, mix as number);
 	}
 
-	private static apply1 (skeleton: Skeleton, bone: BonePose, targetX: number, targetY: number, compress: boolean, stretch: boolean, scaleY: ScaleY, mix: number) {
+	private static apply1 (skeleton: Skeleton, bone: BonePose, targetX: number, targetY: number, compress: boolean, stretch: boolean, scaleYMode: ScaleYMode, mix: number) {
 		bone.modifyLocal(skeleton);
 
 		// biome-ignore lint/style/noNonNullAssertion: reference runtime
@@ -169,9 +169,9 @@ export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 				if ((compress && dd < b * b) || (stretch && dd > b * b)) {
 					const s = (Math.sqrt(dd) / b - 1) * mix + 1;
 					bone.scaleX *= s;
-					switch (scaleY) {
-						case ScaleY.Uniform: bone.scaleY *= s; break;
-						case ScaleY.Volume: bone.scaleY /= s;
+					switch (scaleYMode) {
+						case ScaleYMode.Uniform: bone.scaleY *= s; break;
+						case ScaleYMode.Volume: bone.scaleY /= s;
 					}
 				}
 			}
@@ -180,7 +180,7 @@ export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 
 	/** Applies 2 bone IK. The target is specified in the world coordinate system.
 	 * @param child A direct descendant of the parent bone. */
-	private static apply2 (skeleton: Skeleton, parent: BonePose, child: BonePose, targetX: number, targetY: number, bendDir: number, stretch: boolean, scaleY: ScaleY, softness: number, mix: number) {
+	private static apply2 (skeleton: Skeleton, parent: BonePose, child: BonePose, targetX: number, targetY: number, bendDir: number, stretch: boolean, scaleYMode: ScaleYMode, softness: number, mix: number) {
 		if (parent.inherit !== Inherit.Normal || child.inherit !== Inherit.Normal) return;
 		parent.modifyLocal(skeleton);
 		child.modifyLocal(skeleton);
@@ -224,7 +224,7 @@ export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 		const dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
 		let l1 = Math.sqrt(dx * dx + dy * dy), l2 = child.bone.data.length * csx, a1: number, a2: number;
 		if (l1 < 0.0001) {
-			IkConstraint.apply(skeleton, parent, targetX, targetY, false, stretch, ScaleY.None, mix);
+			IkConstraint.apply(skeleton, parent, targetX, targetY, false, stretch, ScaleYMode.None, mix);
 			child.rotation = 0;
 			return;
 		}
@@ -257,9 +257,9 @@ export class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 				if (stretch) {
 					a = (Math.sqrt(dd) / (l1 + l2) - 1) * mix + 1;
 					parent.scaleX *= a;
-					switch (scaleY) {
-						case ScaleY.Uniform: parent.scaleY *= a; break;
-						case ScaleY.Volume: parent.scaleY /= a;
+					switch (scaleYMode) {
+						case ScaleYMode.Uniform: parent.scaleY *= a; break;
+						case ScaleYMode.Volume: parent.scaleY /= a;
 					}
 				}
 			} else

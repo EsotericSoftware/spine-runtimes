@@ -60,20 +60,22 @@ namespace spine {
 		virtual ~AttachmentLoader();
 
 		/// @return May be NULL to not load any attachment.
-		virtual RegionAttachment *newRegionAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence) = 0;
+		virtual RegionAttachment *newRegionAttachment(Skin &skin, const String &placeholder, const String &name, const String &path,
+													  Sequence *sequence) = 0;
 
 		/// @return May be NULL to not load any attachment.
-		virtual MeshAttachment *newMeshAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence) = 0;
+		virtual MeshAttachment *newMeshAttachment(Skin &skin, const String &placeholder, const String &name, const String &path,
+												  Sequence *sequence) = 0;
 
 		/// @return May be NULL to not load any attachment.
-		virtual BoundingBoxAttachment *newBoundingBoxAttachment(Skin &skin, const String &name) = 0;
+		virtual BoundingBoxAttachment *newBoundingBoxAttachment(Skin &skin, const String &placeholder, const String &name) = 0;
 
 		/// @return May be NULL to not load any attachment
-		virtual PathAttachment *newPathAttachment(Skin &skin, const String &name) = 0;
+		virtual PathAttachment *newPathAttachment(Skin &skin, const String &placeholder, const String &name) = 0;
 
-		virtual PointAttachment *newPointAttachment(Skin &skin, const String &name) = 0;
+		virtual PointAttachment *newPointAttachment(Skin &skin, const String &placeholder, const String &name) = 0;
 
-		virtual ClippingAttachment *newClippingAttachment(Skin &skin, const String &name) = 0;
+		virtual ClippingAttachment *newClippingAttachment(Skin &skin, const String &placeholder, const String &name) = 0;
 	};
 }
 

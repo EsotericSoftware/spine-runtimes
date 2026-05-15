@@ -110,19 +110,19 @@ void spine_skeleton_set_skin_2(spine_skeleton self, /*@null*/ spine_skin newSkin
 	_self->setSkin((Skin *) newSkin);
 }
 
-/*@null*/ spine_attachment spine_skeleton_get_attachment_1(spine_skeleton self, const char *slotName, const char *placeholderName) {
+/*@null*/ spine_attachment spine_skeleton_get_attachment_1(spine_skeleton self, const char *slotName, const char *placeholder) {
 	Skeleton *_self = (Skeleton *) self;
-	return (spine_attachment) _self->getAttachment(String(slotName), String(placeholderName));
+	return (spine_attachment) _self->getAttachment(String(slotName), String(placeholder));
 }
 
-/*@null*/ spine_attachment spine_skeleton_get_attachment_2(spine_skeleton self, int slotIndex, const char *placeholderName) {
+/*@null*/ spine_attachment spine_skeleton_get_attachment_2(spine_skeleton self, int slotIndex, const char *placeholder) {
 	Skeleton *_self = (Skeleton *) self;
-	return (spine_attachment) _self->getAttachment(slotIndex, String(placeholderName));
+	return (spine_attachment) _self->getAttachment(slotIndex, String(placeholder));
 }
 
-void spine_skeleton_set_attachment(spine_skeleton self, const char *slotName, const char *placeholderName) {
+void spine_skeleton_set_attachment(spine_skeleton self, const char *slotName, const char *placeholder) {
 	Skeleton *_self = (Skeleton *) self;
-	_self->setAttachment(String(slotName), String(placeholderName));
+	_self->setAttachment(String(slotName), String(placeholder));
 }
 
 spine_array_constraint spine_skeleton_get_constraints(spine_skeleton self) {

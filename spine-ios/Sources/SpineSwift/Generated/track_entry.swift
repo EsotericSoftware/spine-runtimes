@@ -260,9 +260,9 @@ public class TrackEntry: NSObject {
         }
     }
 
-    /// When the mix percentage (mix time / mix duration) is less than the event threshold, event
-    /// timelines for the animation being mixed out will be applied. Defaults to 0, so event
-    /// timelines are not applied for an animation being mixed out.
+    /// When the interpolated mix percentage is less than the event threshold, event timelines for
+    /// the animation being mixed out will be applied. Defaults to 0, so event timelines are not
+    /// applied for an animation being mixed out.
     public var eventThreshold: Float {
         get {
             let result = spine_track_entry_get_event_threshold(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))
@@ -273,9 +273,9 @@ public class TrackEntry: NSObject {
         }
     }
 
-    /// When the mix percentage (mix time / mix duration) is less than the attachment threshold,
-    /// attachment timelines for the animation being mixed out will be applied. Defaults to 0, so
-    /// attachment timelines are not applied for an animation being mixed out.
+    /// When the interpolated mix percentage is less than the attachment threshold, attachment
+    /// timelines for the animation being mixed out will be applied. Defaults to 0, so attachment
+    /// timelines are not applied for an animation being mixed out.
     public var mixAttachmentThreshold: Float {
         get {
             let result = spine_track_entry_get_mix_attachment_threshold(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))
@@ -286,8 +286,9 @@ public class TrackEntry: NSObject {
         }
     }
 
-    /// When alpha is greater than alphaAttachmentThreshold, attachment timelines are applied.
-    /// Defaults to 0, so attachment timelines are always applied.
+    /// When the computed alpha is greater than alphaAttachmentThreshold, attachment timelines are
+    /// applied. The computed alpha includes alpha and the interpolated mix percentage. Defaults to
+    /// 0, so attachment timelines are always applied.
     public var alphaAttachmentThreshold: Float {
         get {
             let result = spine_track_entry_get_alpha_attachment_threshold(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))
@@ -298,9 +299,9 @@ public class TrackEntry: NSObject {
         }
     }
 
-    /// When the mix percentage (mix time / mix duration) is less than the draw order threshold,
-    /// draw order timelines for the animation being mixed out will be applied. Defaults to 0, so
-    /// draw order timelines are not applied for an animation being mixed out.
+    /// When the interpolated mix percentage is less than the draw order threshold, draw order
+    /// timelines for the animation being mixed out will be applied. Defaults to 0, so draw order
+    /// timelines are not applied for an animation being mixed out.
     public var mixDrawOrderThreshold: Float {
         get {
             let result = spine_track_entry_get_mix_draw_order_threshold(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))
@@ -347,6 +348,18 @@ public class TrackEntry: NSObject {
     public var mixDuration: Float {
         let result = spine_track_entry_get_mix_duration(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))
         return result
+    }
+
+    /// The interpolation to apply to the mix percentage (mix time / mix duration) when mixing from
+    /// the previous animation to this animation. Defaults to linear.
+    public var mixInterpolation: Interpolation {
+        get {
+            let result = spine_track_entry_get_mix_interpolation(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))
+        return Interpolation(fromPointer: result!)
+        }
+        set {
+            spine_track_entry_set_mix_interpolation(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self), newValue._ptr.assumingMemoryBound(to: spine_interpolation_wrapper.self))
+        }
     }
 
     /// The track entry for the previous animation when mixing to this animation, or NULL if no

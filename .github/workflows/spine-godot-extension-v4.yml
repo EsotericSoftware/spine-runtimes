@@ -47,6 +47,7 @@ jobs:
         with:
           name: gdextension-windows-${{ env.GODOT_TAG }}
           path: spine-godot/example-v4-extension/bin/windows/*.dll
+          retention-days: 1
 
   build-linux-x86_64:
     runs-on: ubuntu-22.04
@@ -74,6 +75,7 @@ jobs:
         with:
           name: gdextension-linux-x86_64-${{ env.GODOT_TAG }}
           path: spine-godot/example-v4-extension/bin/linux/*.so
+          retention-days: 1
 
   build-macos:
     runs-on: macos-latest
@@ -96,6 +98,7 @@ jobs:
         with:
           name: gdextension-macos-${{ env.GODOT_TAG }}
           path: spine-godot/example-v4-extension/bin/macos/**/*
+          retention-days: 1
 
   build-ios:
     runs-on: macos-latest
@@ -118,6 +121,7 @@ jobs:
         with:
           name: gdextension-ios-${{ env.GODOT_TAG }}
           path: spine-godot/example-v4-extension/bin/ios/**/*
+          retention-days: 1
 
   build-android:
     runs-on: ubuntu-latest
@@ -161,6 +165,7 @@ jobs:
         with:
           name: gdextension-android-${{ env.GODOT_TAG }}
           path: spine-godot/example-v4-extension/bin/android/*.so
+          retention-days: 1
 
   build-web:
     runs-on: ubuntu-latest
@@ -188,6 +193,7 @@ jobs:
         with:
           name: gdextension-web-${{ env.GODOT_TAG }}
           path: spine-godot/example-v4-extension/bin/web/*.wasm
+          retention-days: 1
 
   upload-to-s3:
     needs: [build-windows, build-linux-x86_64, build-macos, build-ios, build-android, build-web]

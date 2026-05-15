@@ -73,6 +73,10 @@ void SpineConstant::_bind_methods() {
 	BIND_ENUM_CONSTANT(BlendMode_Multiply)
 	BIND_ENUM_CONSTANT(BlendMode_Screen)
 
+	BIND_ENUM_CONSTANT(ScaleYMode_None)
+	BIND_ENUM_CONSTANT(ScaleYMode_Uniform)
+	BIND_ENUM_CONSTANT(ScaleYMode_Volume)
+
 	BIND_ENUM_CONSTANT(UpdateMode_Process)
 	BIND_ENUM_CONSTANT(UpdateMode_Physics)
 	BIND_ENUM_CONSTANT(UpdateMode_Manual)
@@ -84,4 +88,10 @@ void SpineConstant::_bind_methods() {
 	BIND_ENUM_CONSTANT(Physics_Reset);
 	BIND_ENUM_CONSTANT(Physics_Update);
 	BIND_ENUM_CONSTANT(Physics_Pose);
+
+	BIND_ENUM_CONSTANT(MixInterpolation_Linear);
+	BIND_ENUM_CONSTANT(MixInterpolation_Smooth);
+	BIND_ENUM_CONSTANT(MixInterpolation_SlowFast);
+	BIND_ENUM_CONSTANT(MixInterpolation_FastSlow);
+	BIND_ENUM_CONSTANT(MixInterpolation_Circle);
 }

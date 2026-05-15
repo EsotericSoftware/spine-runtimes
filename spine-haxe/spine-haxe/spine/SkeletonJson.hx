@@ -30,7 +30,7 @@
 package spine;
 
 import haxe.DynamicAccess;
-import spine.IkConstraintData.ScaleY;
+import spine.IkConstraintData.ScaleYMode;
 import spine.animation.BoneTimeline2;
 import spine.animation.SliderMixTimeline;
 import spine.animation.SliderTimeline;
@@ -201,7 +201,7 @@ class SkeletonJson {
 
 						var scaleY:String = Reflect.getProperty(constraintMap, "scaleY");
 						if (scaleY != null)
-							data.scaleY = ScaleY.fromName(scaleY);
+							data.scaleYMode = ScaleYMode.fromName(scaleY);
 						var setup = data.setupPose;
 						setup.mix = getFloat(constraintMap, "mix", 1);
 						setup.softness = getFloat(constraintMap, "softness", 0) * scale;
@@ -477,11 +477,11 @@ class SkeletonJson {
 					for (slotName in Reflect.fields(attachments)) {
 						var slot:SlotData = skeletonData.findSlot(slotName);
 						var slotEntry:Dynamic = Reflect.getProperty(attachments, slotName);
-						for (attachmentName in Reflect.fields(slotEntry)) {
-							var attachment:Attachment = readAttachment(Reflect.getProperty(slotEntry, attachmentName), skin, slot.index, attachmentName,
+						for (placeholder in Reflect.fields(slotEntry)) {
+							var attachment:Attachment = readAttachment(Reflect.getProperty(slotEntry, placeholder), skin, slot.index, placeholder,
 								skeletonData);
 							if (attachment != null) {
-								skin.setAttachment(slot.index, attachmentName, attachment);
+								skin.setAttachment(slot.index, placeholder, attachment);
 							}
 						}
 					}
@@ -594,7 +594,8 @@ class SkeletonJson {
 		return scaleValue;
 	}
 
-	private function readAttachment(map:Dynamic, skin:Skin, slotIndex:Int, name:String, skeletonData:SkeletonData):Attachment {
+	private function readAttachment(map:Dynamic, skin:Skin, slotIndex:Int, placeholder:String, skeletonData:SkeletonData):Attachment {
+		var name = placeholder;
 		if (Reflect.field(map, "name") != null)
 			name = Reflect.field(map, "name");
 
@@ -603,7 +604,7 @@ class SkeletonJson {
 			case AttachmentType.region:
 				var path = getString(map, "path", name);
 				var sequence = readSequence(Reflect.field(map, "sequence"));
-				var region:RegionAttachment = attachmentLoader.newRegionAttachment(skin, name, path, sequence);
+				var region:RegionAttachment = attachmentLoader.newRegionAttachment(skin, placeholder, name, path, sequence);
 				if (region == null)
 					return null;
 				region.path = path;
@@ -623,7 +624,7 @@ class SkeletonJson {
 			case AttachmentType.mesh, AttachmentType.linkedmesh:
 				var path = getString(map, "path", name);
 				var sequence = readSequence(Reflect.field(map, "sequence"));
-				var mesh:MeshAttachment = attachmentLoader.newMeshAttachment(skin, name, path, sequence);
+				var mesh:MeshAttachment = attachmentLoader.newMeshAttachment(skin, placeholder, name, path, sequence);
 				if (mesh == null)
 					return null;
 				mesh.path = path;
@@ -662,13 +663,13 @@ class SkeletonJson {
 				mesh.updateSequence();
 				return mesh;
 			case AttachmentType.boundingbox:
-				var box:BoundingBoxAttachment = attachmentLoader.newBoundingBoxAttachment(skin, name);
+				var box:BoundingBoxAttachment = attachmentLoader.newBoundingBoxAttachment(skin, placeholder, name);
 				if (box == null)
 					return null;
 				readVertices(map, box, getInt(map, "vertexCount", 0) << 1);
 				return box;
 			case AttachmentType.path:
-				var path:PathAttachment = attachmentLoader.newPathAttachment(skin, name);
+				var path:PathAttachment = attachmentLoader.newPathAttachment(skin, placeholder, name);
 				if (path == null)
 					return null;
 				path.closed = Reflect.hasField(map, "closed") ? cast(Reflect.field(map, "closed"), Bool) : false;
@@ -681,7 +682,7 @@ class SkeletonJson {
 				path.lengths = lengths;
 				return path;
 			case AttachmentType.point:
-				var point:PointAttachment = attachmentLoader.newPointAttachment(skin, name);
+				var point:PointAttachment = attachmentLoader.newPointAttachment(skin, placeholder, name);
 				if (point == null)
 					return null;
 				point.x = getFloat(map, "x", 0) * scale;
@@ -693,7 +694,7 @@ class SkeletonJson {
 				}
 				return point;
 			case AttachmentType.clipping:
-				var clip:ClippingAttachment = attachmentLoader.newClippingAttachment(skin, name);
+				var clip:ClippingAttachment = attachmentLoader.newClippingAttachment(skin, placeholder, name);
 				if (clip == null)
 					return null;
 				var end:String = getString(map, "end", null);

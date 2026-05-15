@@ -36,8 +36,8 @@ import { Bone } from "./Bone.js";
 import type { Constraint } from "./Constraint.js";
 import { DrawOrder } from "./DrawOrder.js";
 import type { Physics } from "./Physics.js";
-import type { PhysicsConstraintPose } from "./PhysicsConstraintPose.js";
 import { PhysicsConstraint } from "./PhysicsConstraint.js";
+import type { PhysicsConstraintPose } from "./PhysicsConstraintPose.js";
 import type { Posed } from "./Posed.js";
 import type { SkeletonClipping } from "./SkeletonClipping.js";
 import type { SkeletonData } from "./SkeletonData.js";
@@ -262,7 +262,7 @@ export class Skeleton {
 	updateWorldTransform (physics: Physics): void {
 		this._update++;
 
-		this.drawOrder.resetConstrained();
+		if (this.drawOrder.appliedPose === this.drawOrder.constrainedPose) this.drawOrder.resetConstrained();
 		const resetCache = this.resetCache;
 		for (let i = 0, n = this.resetCache.length; i < n; i++)
 			resetCache[i].resetConstrained();
@@ -377,18 +377,18 @@ export class Skeleton {
 	 * name.
 	 *
 	 * See {@link getAttachment}. */
-	getAttachment (slotName: string, placeholderName: string): Attachment | null;
+	getAttachment (slotName: string, placeholder: string): Attachment | null;
 
 	/** Finds an attachment by looking in the {@link skin} and {@link SkeletonData.defaultSkin} using the slot index and
 	 * attachment name. First the skin is checked and if the attachment was not found, the default skin is checked.
 	 *
 	 * See <a href="https://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide. */
-	getAttachment (slotIndex: number, placeholderName: string): Attachment | null;
+	getAttachment (slotIndex: number, placeholder: string): Attachment | null;
 
-	getAttachment (slotNameOrIndex: string | number, placeholderName: string): Attachment | null {
+	getAttachment (slotNameOrIndex: string | number, placeholder: string): Attachment | null {
 		if (typeof slotNameOrIndex === 'string')
-			return this.getAttachmentByName(slotNameOrIndex, placeholderName);
-		return this.getAttachmentByIndex(slotNameOrIndex, placeholderName);
+			return this.getAttachmentByName(slotNameOrIndex, placeholder);
+		return this.getAttachmentByIndex(slotNameOrIndex, placeholder);
 	}
 
 	/** Finds an attachment by looking in the {@link skin} and {@link SkeletonData.defaultSkin} using the slot name and attachment
@@ -396,10 +396,10 @@ export class Skeleton {
 	 *
 	 * See {@link getAttachment}.
 	 * @returns May be null. */
-	private getAttachmentByName (slotName: string, placeholderName: string): Attachment | null {
+	private getAttachmentByName (slotName: string, placeholder: string): Attachment | null {
 		const slot = this.data.findSlot(slotName);
 		if (!slot) throw new Error(`Can't find slot with name ${slotName}`);
-		return this.getAttachment(slot.index, placeholderName);
+		return this.getAttachment(slot.index, placeholder);
 	}
 
 	/** Finds an attachment by looking in the {@link skin} and {@link SkeletonData.defaultSkin} using the slot index and
@@ -407,28 +407,28 @@ export class Skeleton {
 	 *
 	 * See [Runtime skins](http://esotericsoftware.com/spine-runtime-skins) in the Spine Runtimes Guide.
 	 * @returns May be null. */
-	private getAttachmentByIndex (slotIndex: number, attachmentName: string): Attachment | null {
-		if (!attachmentName) throw new Error("attachmentName cannot be null.");
+	private getAttachmentByIndex (slotIndex: number, placeholder: string): Attachment | null {
+		if (!placeholder) throw new Error("placeholder cannot be null.");
 		if (this.skin) {
-			const attachment = this.skin.getAttachment(slotIndex, attachmentName);
+			const attachment = this.skin.getAttachment(slotIndex, placeholder);
 			if (attachment) return attachment;
 		}
-		if (this.data.defaultSkin) return this.data.defaultSkin.getAttachment(slotIndex, attachmentName);
+		if (this.data.defaultSkin) return this.data.defaultSkin.getAttachment(slotIndex, placeholder);
 		return null;
 	}
 
 	/** A convenience method to set an attachment by finding the slot with {@link findSlot}, finding the attachment with
 	 * {@link getAttachment}, then setting the slot's {@link Slot.attachment}.
-	 * @param attachmentName May be null to clear the slot's attachment. */
-	setAttachment (slotName: string, attachmentName: string | null) {
+	 * @param placeholder May be null to clear the slot's attachment. */
+	setAttachment (slotName: string, placeholder: string | null) {
 		if (!slotName) throw new Error("slotName cannot be null.");
 		const slot = this.findSlot(slotName);
 		if (!slot) throw new Error(`Slot not found: ${slotName}`);
 		let attachment: Attachment | null = null;
-		if (attachmentName) {
-			attachment = this.getAttachment(slot.data.index, attachmentName);
+		if (placeholder) {
+			attachment = this.getAttachment(slot.data.index, placeholder);
 			if (!attachment)
-				throw new Error(`Attachment not found: ${attachmentName}, for slot: ${slotName}`);
+				throw new Error(`Attachment not found: ${placeholder}, for slot: ${slotName}`);
 		}
 		slot.pose.setAttachment(attachment);
 	}

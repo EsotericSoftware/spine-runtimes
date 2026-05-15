@@ -43,7 +43,6 @@ SPINE_C_API void spine_bone_pose_update_local_transform(spine_bone_pose self, sp
 SPINE_C_API void spine_bone_pose_validate_local_transform(spine_bone_pose self, spine_skeleton skeleton);
 SPINE_C_API void spine_bone_pose_modify_local(spine_bone_pose self, spine_skeleton skeleton);
 SPINE_C_API void spine_bone_pose_modify_world(spine_bone_pose self, int update);
-SPINE_C_API void spine_bone_pose_reset_world(spine_bone_pose self, int update);
 /**
  * The world transform [a b][c d] x-axis x component.
  */

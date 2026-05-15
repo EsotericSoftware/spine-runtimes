@@ -4254,10 +4254,10 @@ class SkeletonSerializer {
 		});
 
 		json.writeName("scaleY");
-		writeProperty(obj, "getScaleY().name()", {
+		writeProperty(obj, "getScaleYMode().name()", {
 			"kind": "primitive",
 			"name": "scaleY",
-			"getter": "getScaleY().name()",
+			"getter": "getScaleYMode().name()",
 			"valueType": "String",
 			"isNullable": false
 		});

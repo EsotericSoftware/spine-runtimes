@@ -184,6 +184,7 @@ namespace Spine.Unity {
 		public SkeletonClipping SkeletonClipping { get { return meshGenerator.SkeletonClipping; } }
 		public bool Freeze { get { return false; } }
 		public float MeshScale { get { return 1; } }
+		public Vector2 MeshOffset { get { return Vector2.zero; } }
 		protected bool UsesSingleSubmesh { get { return singleSubmesh; } }
 		protected bool NeedsToGenerateMesh { get { return (meshRenderer && meshRenderer.enabled) || HasGenerateMeshOverride; } }
 #if USE_THREADED_SKELETON_UPDATE

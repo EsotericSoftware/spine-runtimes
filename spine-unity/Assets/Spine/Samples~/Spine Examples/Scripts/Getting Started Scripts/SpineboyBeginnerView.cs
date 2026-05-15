@@ -116,8 +116,8 @@ namespace Spine.Unity.Examples {
 		[ContextMenu("Check Tracks")]
 		void CheckTracks () {
 			AnimationState state = skeletonAnimation.AnimationState;
-			Debug.Log(state.GetCurrent(0));
-			Debug.Log(state.GetCurrent(1));
+			Debug.Log(state.GetTrack(0));
+			Debug.Log(state.GetTrack(1));
 		}
 
 #region Transient Actions

@@ -43,7 +43,7 @@ var meshesDemo = function (canvas, bgColor) {
 			if (isPlaying) playButton.click();
 			if (!isPlaying) {
 				var active = skeletons[activeSkeleton];
-				var animationDuration = active.state.getCurrent(0).animation.duration;
+				var animationDuration = active.state.getTrack(0).animation.duration;
 				var time = animationDuration * percent;
 				active.state.update(time - active.playTime);
 				active.state.apply(active.skeleton);
@@ -62,7 +62,7 @@ var meshesDemo = function (canvas, bgColor) {
 		list.change(function () {
 			activeSkeleton = $("#meshes-skeleton option:selected").text();
 			var active = skeletons[activeSkeleton];
-			var animationDuration = active.state.getCurrent(0).animation.duration;
+			var animationDuration = active.state.getTrack(0).animation.duration;
 			timeline.set(active.playTime / animationDuration);
 		})
 
@@ -125,7 +125,7 @@ var meshesDemo = function (canvas, bgColor) {
 		gl.clear(gl.COLOR_BUFFER_BIT);
 
 		if (isPlaying) {
-			var animationDuration = state.getCurrent(0).animation.duration;
+			var animationDuration = state.getTrack(0).animation.duration;
 			active.playTime += delta;
 			while (active.playTime >= animationDuration)
 				active.playTime -= animationDuration;

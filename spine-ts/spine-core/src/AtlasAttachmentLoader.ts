@@ -68,29 +68,29 @@ export class AtlasAttachmentLoader implements AttachmentLoader {
 		return region;
 	}
 
-	newRegionAttachment (skin: Skin, name: string, path: string, sequence: Sequence): RegionAttachment {
+	newRegionAttachment (skin: Skin, placeholder: string, name: string, path: string, sequence: Sequence): RegionAttachment {
 		this.findRegions(name, path, sequence);
 		return new RegionAttachment(name, sequence);
 	}
 
-	newMeshAttachment (skin: Skin, name: string, path: string, sequence: Sequence): MeshAttachment {
+	newMeshAttachment (skin: Skin, placeholder: string, name: string, path: string, sequence: Sequence): MeshAttachment {
 		this.findRegions(name, path, sequence);
 		return new MeshAttachment(name, sequence);
 	}
 
-	newBoundingBoxAttachment (skin: Skin, name: string): BoundingBoxAttachment {
+	newBoundingBoxAttachment (skin: Skin, placeholder: string, name: string): BoundingBoxAttachment {
 		return new BoundingBoxAttachment(name);
 	}
 
-	newPathAttachment (skin: Skin, name: string): PathAttachment {
+	newPathAttachment (skin: Skin, placeholder: string, name: string): PathAttachment {
 		return new PathAttachment(name);
 	}
 
-	newPointAttachment (skin: Skin, name: string): PointAttachment {
+	newPointAttachment (skin: Skin, placeholder: string, name: string): PointAttachment {
 		return new PointAttachment(name);
 	}
 
-	newClippingAttachment (skin: Skin, name: string): ClippingAttachment {
+	newClippingAttachment (skin: Skin, placeholder: string, name: string): ClippingAttachment {
 		return new ClippingAttachment(name);
 	}
 }

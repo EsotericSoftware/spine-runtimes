@@ -36,10 +36,37 @@
 #include <spine/ConstraintData.h>
 #include <spine/PosedData.h>
 #include <spine/IkConstraintPose.h>
+#include <string.h>
 
 namespace spine {
 	class BoneData;
 	class IkConstraint;
+
+	enum ScaleYMode {
+		ScaleYMode_None = 0,
+		ScaleYMode_Uniform,
+		ScaleYMode_Volume
+	};
+
+	inline ScaleYMode ScaleYMode_valueOf(const char *value) {
+		if (strcmp(value, "uniform") == 0)
+			return ScaleYMode_Uniform;
+		else if (strcmp(value, "volume") == 0)
+			return ScaleYMode_Volume;
+		else
+			return ScaleYMode_None;
+	}
+
+	inline const char *ScaleYMode_toString(ScaleYMode scaleYMode) {
+		switch (scaleYMode) {
+			case ScaleYMode_Uniform:
+				return "uniform";
+			case ScaleYMode_Volume:
+				return "volume";
+			default:
+				return "none";
+		}
+	}
 
 	class SP_API IkConstraintData : public ConstraintDataGeneric<IkConstraint, IkConstraintPose> {
 		friend class SkeletonBinary;
@@ -67,16 +94,16 @@ namespace spine {
 
 		void setTarget(BoneData &inValue);
 
-		/// When true and IkConstraintPose::getCompress() or IkConstraintPose::getStretch() is used, the bone is scaled on both the
-		/// X and Y axes.
-		bool getUniform();
+		/// Determines how BonePose::getScaleY() changes when IkConstraintPose::getCompress() or IkConstraintPose::getStretch()
+		/// sets BonePose::getScaleX().
+		ScaleYMode getScaleYMode();
 
-		void setUniform(bool uniform);
+		void setScaleYMode(ScaleYMode scaleYMode);
 
 	private:
 		Array<BoneData *> _bones;
 		BoneData *_target;
-		bool _uniform;
+		ScaleYMode _scaleYMode;
 	};
 }
 

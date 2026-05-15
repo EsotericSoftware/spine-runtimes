@@ -14,7 +14,7 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-unity works with data exported from Spine 4.3.xx.
+spine-unity works with data exported from Spine 4.3.74 and newer.
 
 spine-unity supports all Spine features.
 
@@ -22,7 +22,7 @@ Unity's physics components do not support dynamically assigned vertices so they 
 
 ## Unity version
 
-spine-unity is compatible with Unity 2017.1-6000.3.
+spine-unity is compatible with Unity 2017.1-6000.4.
 
 ## Usage
 

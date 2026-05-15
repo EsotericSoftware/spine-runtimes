@@ -33,6 +33,7 @@ import haxe.ds.StringMap;
 import spine.animation.EventTimeline;
 import spine.animation.Listeners.EventListeners;
 import spine.Event;
+import spine.Interpolation;
 import spine.Pool;
 import spine.Skeleton;
 
@@ -49,7 +50,7 @@ class AnimationState {
 	public static inline var HOLD_FIRST:Int = 3;
 
 	public static inline var SETUP:Int = 1;
-	public static inline var CURRENT:Int = 2;
+	public static inline var RETAIN:Int = 2;
 
 	private static var emptyAnimation:Animation = new Animation("<empty>", new Array<Timeline>(), 0);
 
@@ -228,13 +229,13 @@ class AnimationState {
 			if (i == 0 && alpha == 1) {
 				for (timeline in timelines) {
 					if (Std.isOfType(timeline, AttachmentTimeline))
-						applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, true, false, true);
+						applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, true, true);
 					else
 						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, true, false, false, false);
 				}
 			} else {
 				var timelineMode:Array<Int> = current.timelineMode;
-				var attachments:Bool = alpha >= current.alphaAttachmentThreshold;
+				var retainAttachments:Bool = alpha >= current.alphaAttachmentThreshold;
 				var add = current.additive,
 					shortestRotation = add || current.shortestRotation;
 				var firstFrame:Bool = !shortestRotation && current.timelinesRotation.length != timelineCount << 1;
@@ -248,7 +249,7 @@ class AnimationState {
 						applyRotateTimeline(cast(timeline, RotateTimeline), skeleton, applyTime, alpha, fromSetup, current.timelinesRotation, ii << 1,
 							firstFrame);
 					} else if (Std.isOfType(timeline, AttachmentTimeline)) {
-						applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, fromSetup, false, attachments);
+						applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, fromSetup, retainAttachments);
 					} else {
 						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, fromSetup, add, false, false);
 					}
@@ -262,9 +263,7 @@ class AnimationState {
 			current.nextTrackLast = current.trackTime;
 		}
 
-		// Set slots attachments to the setup pose, if needed. This occurs if an animation that is mixing out sets attachments so
-		// subsequent timelines see any deform, but the subsequent timelines don't set an attachment (eg they are also mixing out or
-		// the time is before the first key).
+		// Set slot attachments to the setup pose if they were set temporarily to apply deform timelines.
 		var setupState:Int = unkeyedState + SETUP;
 		for (slot in skeleton.slots) {
 			if (slot.attachmentState == setupState) {
@@ -272,7 +271,7 @@ class AnimationState {
 				slot.pose.attachment = attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slot.data.index, attachmentName);
 			}
 		}
-		unkeyedState += 2; // Increasing after each use avoids the need to reset attachmentState for every slot.
+		unkeyedState += 2; // Reset.
 
 		queue.drain();
 		return applied;
@@ -281,7 +280,7 @@ class AnimationState {
 	private function applyMixingFrom(to:TrackEntry, skeleton:Skeleton):Float {
 		var from:TrackEntry = to.mixingFrom;
 		var fromMix:Float = from.mixingFrom != null ? applyMixingFrom(from, skeleton) : 1;
-		var mix:Float = to.mixDuration == 0 ? 1 : Math.min(1, to.mixTime / to.mixDuration);
+		var mix:Float = to.mix();
 
 		var a = from.alpha * fromMix, keep = 1 - mix * to.alpha;
 		var alphaMix = a * (1 - mix),
@@ -292,7 +291,7 @@ class AnimationState {
 		var timelineMode:Array<Int> = from.timelineMode;
 		var timelineHoldMix:Array<TrackEntry> = from.timelineHoldMix;
 
-		var attachments:Bool = mix < from.mixAttachmentThreshold,
+		var retainAttachments:Bool = mix < from.mixAttachmentThreshold,
 			drawOrder:Bool = mix < from.mixDrawOrderThreshold;
 		var add = from.additive,
 			shortestRotation = add || from.shortestRotation;
@@ -318,7 +317,7 @@ class AnimationState {
 			var alpha:Float = 0;
 			if ((mode & HOLD) != 0) {
 				var holdMix:TrackEntry = timelineHoldMix[i];
-				alpha = holdMix == null ? alphaHold : alphaHold * Math.max(0, 1 - holdMix.mixTime / holdMix.mixDuration);
+				alpha = holdMix == null ? alphaHold : alphaHold * (1 - holdMix.mix());
 			} else {
 				if (!drawOrder && Std.isOfType(timeline, DrawOrderTimeline))
 					continue;
@@ -329,8 +328,8 @@ class AnimationState {
 			if (!shortestRotation && Std.isOfType(timeline, RotateTimeline)) {
 				applyRotateTimeline(cast(timeline, RotateTimeline), skeleton, applyTime, alpha, fromSetup, timelinesRotation, i << 1, firstFrame);
 			} else if (Std.isOfType(timeline, AttachmentTimeline)) {
-				applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, fromSetup,
-					true, attachments && alpha >= from.alphaAttachmentThreshold);
+				applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime,
+					fromSetup, retainAttachments && alpha >= from.alphaAttachmentThreshold);
 			} else {
 				var out = !drawOrder || !Std.isOfType(timeline, DrawOrderTimeline) || !fromSetup;
 				timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, fromSetup, add, out, false);
@@ -350,23 +349,30 @@ class AnimationState {
 
 	/**
 	 * Applies the attachment timeline and sets spine.Slot.attachmentState.
-	 * @param attachments False when: 1) the attachment timeline is mixing out, 2) mix < attachmentThreshold, and 3) the timeline
-	 *           is not the last timeline to set the slot's attachment. In that case the timeline is applied only so subsequent
-	 *           timelines see any deform.
+	 * @param retain True if the attachment remains after apply, false if temporary for deform timelines.
 	 */
-	public function applyAttachmentTimeline(timeline:AttachmentTimeline, skeleton:Skeleton, time:Float, fromSetup:Bool, out:Bool, attachments:Bool) {
+	public function applyAttachmentTimeline(timeline:AttachmentTimeline, skeleton:Skeleton, time:Float, fromSetup:Bool, retain:Bool) {
 		var slot = skeleton.slots[timeline.slotIndex];
 		if (!slot.bone.active)
 			return;
+		if (!retain && slot.attachmentState == this.unkeyedState + RETAIN)
+			return;
 
-		if (out || time < timeline.frames[0]) {
-			if (fromSetup)
-				this.setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
-		} else
-			this.setAttachment(skeleton, slot, timeline.attachmentNames[Timeline.search1(timeline.frames, time)], attachments);
-
-		// If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.
-		if (slot.attachmentState <= this.unkeyedState)
+		var setup:Bool = time < timeline.frames[0];
+		var name:String = null;
+		if (!setup) {
+			name = timeline.attachmentNames[Timeline.search1(timeline.frames, time)];
+			setup = !retain && name == null;
+		}
+		if (setup) {
+			if (!fromSetup)
+				return;
+			name = slot.data.attachmentName;
+		}
+		slot.pose.attachment = name == null ? null : skeleton.getAttachmentForSlotIndex(slot.data.index, name);
+		if (retain)
+			slot.attachmentState = this.unkeyedState + RETAIN;
+		else if (!setup)
 			slot.attachmentState = this.unkeyedState + SETUP;
 	}
 
@@ -431,12 +437,6 @@ class AnimationState {
 		pose.rotation = r1 + total * alpha;
 	}
 
-	private function setAttachment(skeleton:Skeleton, slot:Slot, attachmentName:String, attachments:Bool):Void {
-		slot.pose.attachment = attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slot.data.index, attachmentName);
-		if (attachments)
-			slot.attachmentState = unkeyedState + CURRENT;
-	}
-
 	private function queueEvents(entry:TrackEntry, animationTime:Float):Void {
 		var animationStart:Float = entry.animationStart,
 			animationEnd:Float = entry.animationEnd;
@@ -451,13 +451,16 @@ class AnimationState {
 		var i:Int = 0;
 		var n:Int = events.length;
 		while (i < n) {
-			event = events[i++];
-			if (event == null)
+			event = events[i];
+			if (event == null) {
+				i++;
 				continue;
+			}
 			if ((event.time < split) != reverse)
 				break;
 			if (event.time >= animationStart && event.time <= animationEnd)
 				queue.event(entry, event);
+			i++;
 		}
 
 		// Queue complete if completed a loop iteration or the animation.
@@ -551,6 +554,8 @@ class AnimationState {
 	 * rather than leaving them in their current pose.
 	 */
 	public function clearTrack(trackIndex:Int):Void {
+		if (trackIndex < 0)
+			throw new SpineException("trackIndex must be >= 0.");
 		if (trackIndex >= tracks.length)
 			return;
 		var current:TrackEntry = tracks[trackIndex];
@@ -582,6 +587,7 @@ class AnimationState {
 		current.previous = null;
 
 		if (from != null) {
+			from.next = null;
 			if (interrupt)
 				queue.interrupt(from);
 			current.mixingFrom = from;
@@ -615,6 +621,8 @@ class AnimationState {
 	 *         after the spine.animation.AnimationStateListener.dispose() event occurs.
 	 */
 	public function setAnimation(trackIndex:Int, animation:Animation, loop:Bool):TrackEntry {
+		if (trackIndex < 0)
+			throw new SpineException("trackIndex must be >= 0.");
 		if (animation == null)
 			throw new SpineException("animation cannot be null.");
 		var interrupt:Bool = true;
@@ -660,6 +668,8 @@ class AnimationState {
 	 *         after the spine.animation.AnimationStateListener.dispose() event occurs.
 	 */
 	public function addAnimation(trackIndex:Int, animation:Animation, loop:Bool, delay:Float):TrackEntry {
+		if (trackIndex < 0)
+			throw new SpineException("trackIndex must be >= 0.");
 		if (animation == null)
 			throw new SpineException("animation cannot be null.");
 
@@ -791,6 +801,7 @@ class AnimationState {
 		entry.alpha = 1;
 		entry.mixTime = 0;
 		entry.mixDuration = last == null ? 0 : data.getMix(last.animation, animation);
+		entry.mixInterpolation = Interpolation.linear;
 		entry.totalAlpha = 0;
 		entry.keepHold = false;
 		return entry;
@@ -892,18 +903,6 @@ class AnimationState {
 		if (trackIndex >= tracks.length)
 			return null;
 		return tracks[trackIndex];
-	}
-
-	/** Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing. */
-	@:deprecated("Use getTrack()")
-	public function getCurrent(trackIndex:Int):TrackEntry {
-		return getTrack(trackIndex);
-	}
-
-	public var fHasEndListener(get, never):Bool;
-
-	private function get_fHasEndListener():Bool {
-		return onComplete.listeners.length > 0 || onEnd.listeners.length > 0;
 	}
 
 	/**

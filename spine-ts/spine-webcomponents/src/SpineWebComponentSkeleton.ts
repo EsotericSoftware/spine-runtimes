@@ -902,7 +902,7 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 				height: maxY - minY
 			};
 		} else {
-			bounds = this.calculateAnimationViewport(state.getCurrent(0)?.animation as (Animation | undefined));
+			bounds = this.calculateAnimationViewport(state.getTrack(0)?.animation as (Animation | undefined));
 		}
 
 		bounds.x /= skeleton.scaleX;

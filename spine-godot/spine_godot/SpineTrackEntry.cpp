@@ -30,6 +30,30 @@
 #include "SpineTrackEntry.h"
 #include "SpineCommon.h"
 
+static spine::Interpolation &to_spine_mix_interpolation(SpineConstant::MixInterpolation mix_interpolation) {
+	switch (mix_interpolation) {
+		case SpineConstant::MixInterpolation_Smooth:
+			return spine::Interpolation::smooth();
+		case SpineConstant::MixInterpolation_SlowFast:
+			return spine::Interpolation::slowFast();
+		case SpineConstant::MixInterpolation_FastSlow:
+			return spine::Interpolation::fastSlow();
+		case SpineConstant::MixInterpolation_Circle:
+			return spine::Interpolation::circle();
+		case SpineConstant::MixInterpolation_Linear:
+		default:
+			return spine::Interpolation::linear();
+	}
+}
+
+static SpineConstant::MixInterpolation from_spine_mix_interpolation(spine::Interpolation &mix_interpolation) {
+	if (&mix_interpolation == &spine::Interpolation::smooth()) return SpineConstant::MixInterpolation_Smooth;
+	if (&mix_interpolation == &spine::Interpolation::slowFast()) return SpineConstant::MixInterpolation_SlowFast;
+	if (&mix_interpolation == &spine::Interpolation::fastSlow()) return SpineConstant::MixInterpolation_FastSlow;
+	if (&mix_interpolation == &spine::Interpolation::circle()) return SpineConstant::MixInterpolation_Circle;
+	return SpineConstant::MixInterpolation_Linear;
+}
+
 void SpineTrackEntry::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_track_index"), &SpineTrackEntry::get_track_index);
 	ClassDB::bind_method(D_METHOD("get_animation"), &SpineTrackEntry::get_animation);
@@ -74,6 +98,8 @@ void SpineTrackEntry::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_mix_duration"), &SpineTrackEntry::get_mix_duration);
 	ClassDB::bind_method(D_METHOD("set_mix_duration", "v"), &SpineTrackEntry::set_mix_duration);
 	ClassDB::bind_method(D_METHOD("set_mix_duration_and_delay", "v", "delay"), &SpineTrackEntry::set_mix_duration_and_delay);
+	ClassDB::bind_method(D_METHOD("get_mix_interpolation"), &SpineTrackEntry::get_mix_interpolation);
+	ClassDB::bind_method(D_METHOD("set_mix_interpolation", "mix_interpolation"), &SpineTrackEntry::set_mix_interpolation);
 
 	ClassDB::bind_method(D_METHOD("get_mixing_from"), &SpineTrackEntry::get_mixing_from);
 	ClassDB::bind_method(D_METHOD("get_mixing_to"), &SpineTrackEntry::get_mixing_to);
@@ -306,6 +332,16 @@ void SpineTrackEntry::set_mix_duration(float v) {
 void SpineTrackEntry::set_mix_duration_and_delay(float v, float delay) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setMixDuration(v, delay);
+}
+
+SpineConstant::MixInterpolation SpineTrackEntry::get_mix_interpolation() {
+	SPINE_CHECK(get_spine_object(), SpineConstant::MixInterpolation_Linear)
+	return from_spine_mix_interpolation(get_spine_object()->getMixInterpolation());
+}
+
+void SpineTrackEntry::set_mix_interpolation(SpineConstant::MixInterpolation mix_interpolation) {
+	SPINE_CHECK(get_spine_object(), )
+	get_spine_object()->setMixInterpolation(to_spine_mix_interpolation(mix_interpolation));
 }
 
 Ref<SpineTrackEntry> SpineTrackEntry::get_mixing_from() {

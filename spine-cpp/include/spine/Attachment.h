@@ -59,6 +59,9 @@ namespace spine {
 
 		void setTimelineSlots(Array<int> &timelineSlots);
 
+		/// Returns true if the slotIndex or any getTimelineSlots() have an attachment whose getTimelineAttachment() is this attachment.
+		/// @param slots The Skeleton::getSlots().
+		/// @param slotIndex The timeline's primary slot index.
 		bool isTimelineActive(Array<Slot *> &slots, int slotIndex, bool appliedPose);
 
 		int getRefCount();

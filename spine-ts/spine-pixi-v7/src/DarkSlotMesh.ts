@@ -28,6 +28,7 @@
  *****************************************************************************/
 
 import type { BlendMode, NumberArrayLike } from "@esotericsoftware/spine-core";
+import type { ITypedArray } from "@pixi/core";
 import { DarkTintMesh } from "./darkTintMesh/DarkTintMesh.js";
 import type { ISlotMesh } from "./Spine.js";
 import { SpineTexture } from "./SpineTexture.js";
@@ -56,12 +57,12 @@ export class DarkSlotMesh extends DarkTintMesh implements ISlotMesh {
 
 		const textureCoord = this.geometry.getBuffer("aTextureCoord");
 		if (textureCoord.data?.length !== vertLenght) {
-			textureCoord.data = new Float32Array(vertLenght);
+			textureCoord.data = new Float32Array(vertLenght) as unknown as ITypedArray;
 		}
 
 		const vertexCoord = this.geometry.getBuffer("aVertexPosition");
 		if (vertexCoord.data?.length !== vertLenght) {
-			vertexCoord.data = new Float32Array(vertLenght);
+			vertexCoord.data = new Float32Array(vertLenght) as unknown as ITypedArray;
 		}
 
 		let vertIndex = 0;
@@ -107,7 +108,7 @@ export class DarkSlotMesh extends DarkTintMesh implements ISlotMesh {
 
 		const indexBuffer = this.geometry.indexBuffer;
 		if (indexBuffer.data.length !== finalIndices.length) {
-			indexBuffer.data = new Uint32Array(finalIndices);
+			indexBuffer.data = new Uint32Array(finalIndices) as unknown as ITypedArray;
 		} else {
 			const indexBufferData = indexBuffer.data;
 			for (let i = 0; i < finalIndicesLength; i++) {

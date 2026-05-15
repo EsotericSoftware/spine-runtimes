@@ -428,7 +428,7 @@
 
                 const setDefaultState = () => {
 
-                    const currentEntry = widget1.state.getCurrent(trackNumber);
+                    const currentEntry = widget1.state.getTrack(trackNumber);
                     if (!currentEntry) return;
 
                     if (currentEntry.animation.name === `shake-${itemName}`) {
@@ -459,7 +459,7 @@
 
                     if (event === "leave") {
                         onItem = false;
-                        const currentEntry = widget1.state.getCurrent(trackNumber);
+                        const currentEntry = widget1.state.getTrack(trackNumber);
                         if (currentEntry.animation.name === `shake-${itemName}`) {
                             widget1.state.setEmptyAnimation(trackNumber);
                         } else if (currentEntry.next && currentEntry.next.animation && currentEntry.next.animation.name === `shake-${itemName}`) {
@@ -467,7 +467,7 @@
                             widget1.state.addEmptyAnimation(trackNumber);
                         }
 
-                        const currentEntryZero = widget1.state.getCurrent(0);
+                        const currentEntryZero = widget1.state.getTrack(0);
                         if (currentEntryZero.animation.name === `focus-${itemName}`) {
                             widget1.state.setAnimation(0, "animation", true);
                         }

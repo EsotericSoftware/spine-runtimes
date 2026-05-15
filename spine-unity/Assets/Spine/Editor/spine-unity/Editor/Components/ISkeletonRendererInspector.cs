@@ -205,7 +205,7 @@ namespace Spine.Unity.Editor {
 			var transform = skeletonRenderer.Component.transform;
 			if (skeleton == null) return;
 
-			SpineHandles.DrawBones(transform, skeleton, skeletonRenderer.MeshScale);
+			SpineHandles.DrawBones(transform, skeleton, skeletonRenderer.MeshScale, skeletonRenderer.MeshOffset);
 		}
 
 		override public void OnInspectorGUI () {

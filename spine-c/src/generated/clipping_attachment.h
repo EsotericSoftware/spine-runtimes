@@ -82,6 +82,13 @@ SPINE_C_API void spine_clipping_attachment_copy_to(spine_clipping_attachment sel
 SPINE_C_API const char *spine_clipping_attachment_get_name(spine_clipping_attachment self);
 SPINE_C_API spine_array_int spine_clipping_attachment_get_timeline_slots(spine_clipping_attachment self);
 SPINE_C_API void spine_clipping_attachment_set_timeline_slots(spine_clipping_attachment self, spine_array_int timelineSlots);
+/**
+ * Returns true if the slotIndex or any getTimelineSlots() have an attachment
+ * whose getTimelineAttachment() is this attachment.
+ *
+ * @param slots The Skeleton::getSlots().
+ * @param slotIndex The timeline's primary slot index.
+ */
 SPINE_C_API bool spine_clipping_attachment_is_timeline_active(spine_clipping_attachment self, spine_array_slot slots, int slotIndex,
 															  bool appliedPose);
 SPINE_C_API int spine_clipping_attachment_get_ref_count(spine_clipping_attachment self);

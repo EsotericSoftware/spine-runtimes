@@ -77,6 +77,15 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpineAnimationCompleteDelegate, UTr
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpineAnimationEndDelegate, UTrackEntry *, entry);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpineAnimationDisposeDelegate, UTrackEntry *, entry);
 
+UENUM(BlueprintType)
+enum class ESpineMixInterpolation : uint8 {
+	Linear UMETA(DisplayName = "Linear"),
+	Smooth UMETA(DisplayName = "Smooth"),
+	SlowFast UMETA(DisplayName = "SlowFast"),
+	FastSlow UMETA(DisplayName = "FastSlow"),
+	Circle UMETA(DisplayName = "Circle")
+};
+
 UCLASS(ClassGroup = (Spine), meta = (BlueprintSpawnableComponent), BlueprintType)
 class SPINEPLUGIN_API UTrackEntry : public UObject {
 	GENERATED_BODY()
@@ -228,6 +237,39 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
 	void SetMixDuration(float mixDuration) {
 		if (entry) entry->setMixDuration(mixDuration);
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
+	ESpineMixInterpolation GetMixInterpolation() {
+		if (!entry) return ESpineMixInterpolation::Linear;
+		spine::Interpolation &mixInterpolation = entry->getMixInterpolation();
+		if (&mixInterpolation == &spine::Interpolation::smooth()) return ESpineMixInterpolation::Smooth;
+		if (&mixInterpolation == &spine::Interpolation::slowFast()) return ESpineMixInterpolation::SlowFast;
+		if (&mixInterpolation == &spine::Interpolation::fastSlow()) return ESpineMixInterpolation::FastSlow;
+		if (&mixInterpolation == &spine::Interpolation::circle()) return ESpineMixInterpolation::Circle;
+		return ESpineMixInterpolation::Linear;
+	}
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
+	void SetMixInterpolation(ESpineMixInterpolation mixInterpolation) {
+		if (!entry) return;
+		switch (mixInterpolation) {
+			case ESpineMixInterpolation::Smooth:
+				entry->setMixInterpolation(spine::Interpolation::smooth());
+				break;
+			case ESpineMixInterpolation::SlowFast:
+				entry->setMixInterpolation(spine::Interpolation::slowFast());
+				break;
+			case ESpineMixInterpolation::FastSlow:
+				entry->setMixInterpolation(spine::Interpolation::fastSlow());
+				break;
+			case ESpineMixInterpolation::Circle:
+				entry->setMixInterpolation(spine::Interpolation::circle());
+				break;
+			case ESpineMixInterpolation::Linear:
+			default:
+				entry->setMixInterpolation(spine::Interpolation::linear());
+				break;
+		}
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")

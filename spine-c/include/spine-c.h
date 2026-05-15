@@ -91,6 +91,7 @@
 #include "../src/generated/ik_constraint_pose.h"
 #include "../src/generated/ik_constraint_timeline.h"
 #include "../src/generated/inherit_timeline.h"
+#include "../src/generated/interpolation.h"
 #include "../src/generated/linked_mesh.h"
 #include "../src/generated/mesh_attachment.h"
 #include "../src/generated/path_attachment.h"

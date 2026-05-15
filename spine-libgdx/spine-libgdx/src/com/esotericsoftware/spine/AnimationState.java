@@ -29,6 +29,7 @@
 
 package com.esotericsoftware.spine;
 
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.IntArray;
@@ -51,7 +52,7 @@ import com.esotericsoftware.spine.Animation.Timeline;
  * See <a href='https://esotericsoftware.com/spine-applying-animations#AnimationState-API'>Applying Animations</a> in the Spine
  * Runtimes Guide. */
 public class AnimationState {
-	static private final int SUBSEQUENT = 0, FIRST = 1, HOLD = 2, HOLD_FIRST = 3, SETUP = 1, CURRENT = 2;
+	static private final int SUBSEQUENT = 0, FIRST = 1, HOLD = 2, HOLD_FIRST = 3, SETUP = 1, RETAIN = 2;
 
 	static final Animation emptyAnimation = new Animation("<empty>");
 	static {
@@ -207,13 +208,13 @@ public class AnimationState {
 				for (int ii = 0; ii < timelineCount; ii++) {
 					Timeline timeline = timelines[ii];
 					if (timeline instanceof AttachmentTimeline attachmentTimeline)
-						applyAttachmentTimeline(attachmentTimeline, skeleton, applyTime, true, false, true);
+						applyAttachmentTimeline(attachmentTimeline, skeleton, applyTime, true, true);
 					else
 						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, true, false, false, false);
 				}
 			} else {
 				int[] timelineMode = current.timelineMode.items;
-				boolean attachments = alpha >= current.alphaAttachmentThreshold;
+				boolean retainAttachments = alpha >= current.alphaAttachmentThreshold;
 				boolean add = current.additive, shortestRotation = add || current.shortestRotation;
 				boolean firstFrame = !shortestRotation && current.timelinesRotation.size != timelineCount << 1;
 				float[] timelinesRotation = firstFrame ? current.timelinesRotation.setSize(timelineCount << 1)
@@ -225,7 +226,7 @@ public class AnimationState {
 						applyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, fromSetup, timelinesRotation, ii << 1,
 							firstFrame);
 					} else if (timeline instanceof AttachmentTimeline attachmentTimeline)
-						applyAttachmentTimeline(attachmentTimeline, skeleton, applyTime, fromSetup, false, attachments);
+						applyAttachmentTimeline(attachmentTimeline, skeleton, applyTime, fromSetup, retainAttachments);
 					else
 						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, fromSetup, add, false, false);
 				}
@@ -237,9 +238,7 @@ public class AnimationState {
 			current.nextTrackLast = current.trackTime;
 		}
 
-		// Set slots attachments to the setup pose, if needed. This occurs if an animation that is mixing out sets attachments so
-		// subsequent timelines see any deform, but the subsequent timelines don't set an attachment (eg they are also mixing out or
-		// the time is before the first key).
+		// Set slot attachments to the setup pose if they were set temporarily to apply deform timelines.
 		int setupState = unkeyedState + SETUP;
 		Slot[] slots = skeleton.slots.items;
 		for (int i = 0, n = skeleton.slots.size; i < n; i++) {
@@ -249,7 +248,7 @@ public class AnimationState {
 				slot.pose.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slot.data.index, attachmentName));
 			}
 		}
-		unkeyedState += 2; // Increasing after each use avoids the need to reset attachmentState for every slot.
+		unkeyedState += 2; // Reset.
 
 		queue.drain();
 		return applied;
@@ -258,7 +257,7 @@ public class AnimationState {
 	private float applyMixingFrom (TrackEntry to, Skeleton skeleton) {
 		TrackEntry from = to.mixingFrom;
 		float fromMix = from.mixingFrom != null ? applyMixingFrom(from, skeleton) : 1;
-		float mix = to.mixDuration == 0 ? 1 : Math.min(1, to.mixTime / to.mixDuration);
+		float mix = to.mix();
 
 		float a = from.alpha * fromMix, keep = 1 - mix * to.alpha;
 		float alphaMix = a * (1 - mix), alphaHold = keep > 0 ? alphaMix / keep : a;
@@ -268,7 +267,7 @@ public class AnimationState {
 		int[] timelineMode = from.timelineMode.items;
 		TrackEntry[] timelineHoldMix = from.timelineHoldMix.items;
 
-		boolean attachments = mix < from.mixAttachmentThreshold, drawOrder = mix < from.mixDrawOrderThreshold;
+		boolean retainAttachments = mix < from.mixAttachmentThreshold, drawOrder = mix < from.mixDrawOrderThreshold;
 		boolean add = from.additive, shortestRotation = add || from.shortestRotation;
 		boolean firstFrame = !shortestRotation && from.timelinesRotation.size != timelineCount << 1;
 		float[] timelinesRotation = firstFrame ? from.timelinesRotation.setSize(timelineCount << 1) : from.timelinesRotation.items;
@@ -287,7 +286,7 @@ public class AnimationState {
 			float alpha;
 			if ((mode & HOLD) != 0) {
 				TrackEntry holdMix = timelineHoldMix[i];
-				alpha = holdMix == null ? alphaHold : alphaHold * Math.max(0, 1 - holdMix.mixTime / holdMix.mixDuration);
+				alpha = holdMix == null ? alphaHold : alphaHold * (1 - holdMix.mix());
 			} else {
 				if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
 				alpha = alphaMix;
@@ -297,8 +296,8 @@ public class AnimationState {
 			if (!shortestRotation && timeline instanceof RotateTimeline rotateTimeline) {
 				applyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, fromSetup, timelinesRotation, i << 1, firstFrame);
 			} else if (timeline instanceof AttachmentTimeline attachmentTimeline)
-				applyAttachmentTimeline(attachmentTimeline, skeleton, applyTime, fromSetup, true,
-					attachments && alpha >= from.alphaAttachmentThreshold);
+				applyAttachmentTimeline(attachmentTimeline, skeleton, applyTime, fromSetup,
+					retainAttachments && alpha >= from.alphaAttachmentThreshold);
 			else {
 				boolean out = !drawOrder || !(timeline instanceof DrawOrderTimeline) || !fromSetup;
 				timeline.apply(skeleton, animationLast, applyTime, events, alpha, fromSetup, add, out, false);
@@ -315,27 +314,29 @@ public class AnimationState {
 	}
 
 	/** Applies the attachment timeline and sets {@link Slot#attachmentState}.
-	 * @param attachments False when: 1) the attachment timeline is mixing out, 2) mix < attachmentThreshold, and 3) the timeline
-	 *           is not the last timeline to set the slot's attachment. In that case the timeline is applied only so subsequent
-	 *           timelines see any deform. */
+	 * @param retain True if the attachment remains after apply, false if temporary for deform timelines. */
 	private void applyAttachmentTimeline (AttachmentTimeline timeline, Skeleton skeleton, float time, boolean fromSetup,
-		boolean out, boolean attachments) {
+		boolean retain) {
 
 		Slot slot = skeleton.slots.items[timeline.slotIndex];
 		if (!slot.bone.active) return;
+		if (!retain && slot.attachmentState == unkeyedState + RETAIN) return;
 
-		if (out || time < timeline.frames[0]) {
-			if (fromSetup) setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
-		} else
-			setAttachment(skeleton, slot, timeline.attachmentNames[Timeline.search(timeline.frames, time)], attachments);
-
-		// If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.
-		if (slot.attachmentState <= unkeyedState) slot.attachmentState = unkeyedState + SETUP;
-	}
-
-	private void setAttachment (Skeleton skeleton, Slot slot, String attachmentName, boolean attachments) {
-		slot.pose.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slot.data.index, attachmentName));
-		if (attachments) slot.attachmentState = unkeyedState + CURRENT;
+		boolean setup = time < timeline.frames[0];
+		String name = null;
+		if (!setup) {
+			name = timeline.attachmentNames[Timeline.search(timeline.frames, time)];
+			setup = !retain && name == null;
+		}
+		if (setup) {
+			if (!fromSetup) return;
+			name = slot.data.attachmentName;
+		}
+		slot.pose.setAttachment(name == null ? null : skeleton.getAttachment(slot.data.index, name));
+		if (retain)
+			slot.attachmentState = unkeyedState + RETAIN;
+		else if (!setup) //
+			slot.attachmentState = unkeyedState + SETUP;
 	}
 
 	/** Applies the rotate timeline, mixing with the current pose while keeping the same rotation direction chosen as the shortest
@@ -506,6 +507,7 @@ public class AnimationState {
 		current.previous = null;
 
 		if (from != null) {
+			from.next = null;
 			if (interrupt) queue.interrupt(from);
 			current.mixingFrom = from;
 			from.mixingTo = current;
@@ -697,6 +699,7 @@ public class AnimationState {
 		entry.alpha = 1;
 		entry.mixTime = 0;
 		entry.mixDuration = last == null ? 0 : data.getMix(last.animation, animation);
+		entry.mixInterpolation = Interpolation.linear;
 		entry.totalAlpha = 0;
 		entry.keepHold = false;
 		return entry;
@@ -863,6 +866,7 @@ public class AnimationState {
 		float animationStart, animationEnd, animationLast, nextAnimationLast;
 		float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale;
 		float alpha, mixTime, mixDuration, totalAlpha;
+		Interpolation mixInterpolation = Interpolation.linear;
 
 		/** For each timeline:
 		 * <li>Bit 0, FIRST: 0 = mix from current pose, 1 = mix from setup pose. Timeline is first to set the property.
@@ -878,6 +882,7 @@ public class AnimationState {
 			next = null;
 			mixingFrom = null;
 			mixingTo = null;
+			mixInterpolation = Interpolation.linear;
 			animation = null;
 			listener = null;
 			timelineMode.clear();
@@ -1067,9 +1072,9 @@ public class AnimationState {
 			this.alpha = alpha;
 		}
 
-		/** When the mix percentage ({@link #mixTime} / {@link #mixDuration}) is less than the <code>eventThreshold</code>, event
-		 * timelines are applied while this animation is being mixed out. Defaults to 0, so event timelines are not applied while
-		 * this animation is being mixed out. */
+		/** When the interpolated mix percentage is less than the <code>eventThreshold</code>, event timelines are applied while
+		 * this animation is being mixed out. Defaults to 0, so event timelines are not applied while this animation is being mixed
+		 * out. */
 		public float getEventThreshold () {
 			return eventThreshold;
 		}
@@ -1079,8 +1084,8 @@ public class AnimationState {
 		}
 
 		/** When the computed alpha is greater than <code>alphaAttachmentThreshold</code>, attachment timelines are applied. The
-		 * computed alpha includes {@link #alpha} and the mix percentage. Defaults to 0, so attachment timelines are always
-		 * applied. */
+		 * computed alpha includes {@link #alpha} and the interpolated mix percentage. Defaults to 0, so attachment timelines are
+		 * always applied. */
 		public float getAlphaAttachmentThreshold () {
 			return alphaAttachmentThreshold;
 		}
@@ -1089,9 +1094,9 @@ public class AnimationState {
 			this.alphaAttachmentThreshold = alphaAttachmentThreshold;
 		}
 
-		/** When the mix percentage ({@link #mixTime} / {@link #mixDuration}) is less than the <code>mixAttachmentThreshold</code>,
-		 * attachment timelines are applied while this animation is being mixed out. Defaults to 0, so attachment timelines are not
-		 * applied while this animation is being mixed out. */
+		/** When the interpolated mix percentage is less than the <code>mixAttachmentThreshold</code>, attachment timelines are
+		 * applied while this animation is being mixed out. Defaults to 0, so attachment timelines are not applied while this
+		 * animation is being mixed out. */
 		public float getMixAttachmentThreshold () {
 			return mixAttachmentThreshold;
 		}
@@ -1100,9 +1105,9 @@ public class AnimationState {
 			this.mixAttachmentThreshold = mixAttachmentThreshold;
 		}
 
-		/** When the mix percentage ({@link #mixTime} / {@link #mixDuration}) is less than the <code>mixDrawOrderThreshold</code>,
-		 * draw order timelines are applied while this animation is being mixed out. Defaults to 0, so draw order timelines are not
-		 * applied while this animation is being mixed out. */
+		/** When the interpolated mix percentage is less than the <code>mixDrawOrderThreshold</code>, draw order timelines are
+		 * applied while this animation is being mixed out. Defaults to 0, so draw order timelines are not applied while this
+		 * animation is being mixed out. */
 		public float getMixDrawOrderThreshold () {
 			return mixDrawOrderThreshold;
 		}
@@ -1196,6 +1201,28 @@ public class AnimationState {
 			this.mixDuration = mixDuration;
 			if (delay <= 0) delay = previous == null ? 0 : Math.max(delay + previous.getTrackComplete() - mixDuration, 0);
 			this.delay = delay;
+		}
+
+		/** The interpolation to apply to the mix percentage ({@link #mixTime} / {@link #mixDuration}) when mixing from the previous
+		 * animation to this animation. Defaults to linear. */
+		public Interpolation getMixInterpolation () {
+			return mixInterpolation;
+		}
+
+		public void setMixInterpolation (Interpolation mixInterpolation) {
+			if (mixInterpolation == null) throw new IllegalArgumentException("mixInterpolation cannot be null.");
+			this.mixInterpolation = mixInterpolation;
+		}
+
+		float mix () {
+			if (mixDuration == 0) return 1;
+			float mix = mixTime / mixDuration;
+			if (mix >= 1) return 1;
+			if (mixInterpolation == Interpolation.linear) return mix;
+			mix = mixInterpolation.apply(mix);
+			if (mix < 0) return 0;
+			if (mix > 1) return 1;
+			return mix;
 		}
 
 		/** When true, timelines in this animation that support additive have their values added to the setup or current pose values

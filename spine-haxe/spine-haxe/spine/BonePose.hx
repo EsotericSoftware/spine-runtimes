@@ -324,7 +324,7 @@ class BonePose implements Pose<BonePose> implements Update {
 		resetWorld(update);
 	}
 
-	public function resetWorld(update:Int) {
+	private function resetWorld(update:Int) {
 		var children = bone.children;
 		for (i in 0...bone.children.length) {
 			var child = children[i].appliedPose;

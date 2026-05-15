@@ -5,6 +5,12 @@ cd "$(dirname "$0")"
 # Source logging utilities
 source ../formatters/logging/logging.sh
 
+BRANCH=$(git symbolic-ref --short -q HEAD)
+if ! echo "$BRANCH" | grep -qE '^[0-9]+\.[0-9]+$'; then
+    echo "Error: publish.sh can only be run from release branches named number.number, e.g. 4.3. Current branch: $BRANCH"
+    exit 1
+fi
+
 log_title "Spine TypeScript Publisher"
 
 # Get current version
@@ -15,6 +21,7 @@ patch=$(echo "$currentVersion" | cut -d. -f3)
 newPatch=$((patch + 1))
 newVersion="$major.$minor.$newPatch"
 
+log_detail "Branch: $BRANCH"
 log_detail "Current version: $currentVersion"
 log_detail "New version: $newVersion"
 packages=(

@@ -133,6 +133,11 @@ abstract class Attachment {
     SpineBindings.bindings.spine_attachment_set_timeline_slots(_ptr, value.nativePtr.cast());
   }
 
+  /// Returns true if the slotIndex or any getTimelineSlots() have an attachment
+  /// whose getTimelineAttachment() is this attachment.
+  ///
+  /// [slots] The Skeleton::getSlots().
+  /// [slotIndex] The timeline's primary slot index.
   bool isTimelineActive(ArraySlot slots, int slotIndex, bool appliedPose) {
     final result = SpineBindings.bindings
         .spine_attachment_is_timeline_active(_ptr, slots.nativePtr.cast(), slotIndex, appliedPose);

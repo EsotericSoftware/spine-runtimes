@@ -112,27 +112,27 @@ void USpineSkeletonDataAsset::BeginDestroy() {
 
 class SP_API NullAttachmentLoader : public AttachmentLoader {
 public:
-	virtual RegionAttachment *newRegionAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence) {
+	virtual RegionAttachment *newRegionAttachment(Skin &skin, const String &placeholder, const String &name, const String &path, Sequence *sequence) {
 		return new (__FILE__, __LINE__) RegionAttachment(name, sequence);
 	}
 
-	virtual MeshAttachment *newMeshAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence) {
+	virtual MeshAttachment *newMeshAttachment(Skin &skin, const String &placeholder, const String &name, const String &path, Sequence *sequence) {
 		return new (__FILE__, __LINE__) MeshAttachment(name, sequence);
 	}
 
-	virtual BoundingBoxAttachment *newBoundingBoxAttachment(Skin &skin, const String &name) {
+	virtual BoundingBoxAttachment *newBoundingBoxAttachment(Skin &skin, const String &placeholder, const String &name) {
 		return new (__FILE__, __LINE__) BoundingBoxAttachment(name);
 	}
 
-	virtual PathAttachment *newPathAttachment(Skin &skin, const String &name) {
+	virtual PathAttachment *newPathAttachment(Skin &skin, const String &placeholder, const String &name) {
 		return new (__FILE__, __LINE__) PathAttachment(name);
 	}
 
-	virtual PointAttachment *newPointAttachment(Skin &skin, const String &name) {
+	virtual PointAttachment *newPointAttachment(Skin &skin, const String &placeholder, const String &name) {
 		return new (__FILE__, __LINE__) PointAttachment(name);
 	}
 
-	virtual ClippingAttachment *newClippingAttachment(Skin &skin, const String &name) {
+	virtual ClippingAttachment *newClippingAttachment(Skin &skin, const String &placeholder, const String &name) {
 		return new (__FILE__, __LINE__) ClippingAttachment(name);
 	}
 

@@ -46,6 +46,26 @@ void spine_bone_data_set_icon(spine_bone_data self, const char *icon) {
 	_self->setIcon(String(icon));
 }
 
+float spine_bone_data_get_icon_size(spine_bone_data self) {
+	BoneData *_self = (BoneData *) self;
+	return _self->getIconSize();
+}
+
+void spine_bone_data_set_icon_size(spine_bone_data self, float iconSize) {
+	BoneData *_self = (BoneData *) self;
+	_self->setIconSize(iconSize);
+}
+
+float spine_bone_data_get_icon_rotation(spine_bone_data self) {
+	BoneData *_self = (BoneData *) self;
+	return _self->getIconRotation();
+}
+
+void spine_bone_data_set_icon_rotation(spine_bone_data self, float iconRotation) {
+	BoneData *_self = (BoneData *) self;
+	_self->setIconRotation(iconRotation);
+}
+
 bool spine_bone_data_get_visible(spine_bone_data self) {
 	BoneData *_self = (BoneData *) self;
 	return _self->getVisible();

@@ -37,6 +37,7 @@
 #include <spine/DrawOrderTimeline.h>
 #include <spine/Event.h>
 #include <spine/EventTimeline.h>
+#include <spine/Interpolation.h>
 #include <spine/RotateTimeline.h>
 #include <spine/Skeleton.h>
 #include <spine/SkeletonData.h>
@@ -77,7 +78,8 @@ TrackEntry::TrackEntry()
 	  _reverse(false), _shortestRotation(false), _keepHold(false), _eventThreshold(0), _mixAttachmentThreshold(0), _alphaAttachmentThreshold(0),
 	  _mixDrawOrderThreshold(0), _animationStart(0), _animationEnd(0), _animationLast(0), _nextAnimationLast(0), _delay(0), _trackTime(0),
 	  _trackLast(0), _nextTrackLast(0), _trackEnd(0), _timeScale(1.0f), _alpha(0), _mixTime(0), _mixDuration(0), _totalAlpha(0),
-	  _listener(dummyOnAnimationEventFunc), SP_ANIMATION_LISTENER_USER_DATA_CTOR _listenerObject(NULL), _state(NULL) {
+	  _mixInterpolation(&Interpolation::linear()), _listener(dummyOnAnimationEventFunc), SP_ANIMATION_LISTENER_USER_DATA_CTOR _listenerObject(NULL),
+	  _state(NULL) {
 }
 
 TrackEntry::~TrackEntry() {
@@ -268,6 +270,25 @@ void TrackEntry::setMixDuration(float mixDuration, float delay) {
 	this->_delay = delay;
 }
 
+Interpolation &TrackEntry::getMixInterpolation() {
+	return *_mixInterpolation;
+}
+
+void TrackEntry::setMixInterpolation(Interpolation &mixInterpolation) {
+	_mixInterpolation = &mixInterpolation;
+}
+
+float TrackEntry::mix() {
+	if (_mixDuration == 0) return 1;
+	float mix = _mixTime / _mixDuration;
+	if (mix >= 1) return 1;
+	if (_mixInterpolation == &Interpolation::linear()) return mix;
+	mix = _mixInterpolation->apply(mix);
+	if (mix < 0) return 0;
+	if (mix > 1) return 1;
+	return mix;
+}
+
 TrackEntry *TrackEntry::getMixingFrom() {
 	return _mixingFrom;
 }
@@ -305,6 +326,7 @@ void TrackEntry::reset() {
 	_next = NULL;
 	_mixingFrom = NULL;
 	_mixingTo = NULL;
+	_mixInterpolation = &Interpolation::linear();
 
 	setRendererObject(NULL);
 
@@ -575,13 +597,13 @@ bool AnimationState::apply(Skeleton &skeleton) {
 			for (size_t ii = 0; ii < timelineCount; ++ii) {
 				Timeline *timeline = timelines[ii];
 				if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti))
-					applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, true, false, true);
+					applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, true, true);
 				else
 					timeline->apply(skeleton, animationLast, applyTime, applyEvents, alpha, true, false, false, false);
 			}
 		} else {
 			Array<int> &timelineMode = current._timelineMode;
-			bool attachments = alpha >= current._alphaAttachmentThreshold;
+			bool retainAttachments = alpha >= current._alphaAttachmentThreshold;
 			bool add = current._additive, shortestRotation = add || current._shortestRotation;
 			bool firstFrame = !shortestRotation && current._timelinesRotation.size() != timelines.size() << 1;
 			if (firstFrame) current._timelinesRotation.setSize(timelines.size() << 1, 0);
@@ -597,7 +619,7 @@ bool AnimationState::apply(Skeleton &skeleton) {
 					applyRotateTimeline(static_cast<RotateTimeline *>(timeline), skeleton, applyTime, alpha, fromSetup, timelinesRotation, ii << 1,
 										firstFrame);
 				else if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti))
-					applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, fromSetup, false, attachments);
+					applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, fromSetup, retainAttachments);
 				else
 					timeline->apply(skeleton, animationLast, applyTime, applyEvents, alpha, fromSetup, add, false, false);
 			}
@@ -818,20 +840,26 @@ Animation *AnimationState::getEmptyAnimation() {
 	return &ret;
 }
 
-void AnimationState::applyAttachmentTimeline(AttachmentTimeline *attachmentTimeline, Skeleton &skeleton, float time, bool fromSetup, bool out,
-											 bool attachments) {
+void AnimationState::applyAttachmentTimeline(AttachmentTimeline *attachmentTimeline, Skeleton &skeleton, float time, bool fromSetup, bool retain) {
 	Slot *slot = skeleton.getSlots()[attachmentTimeline->getSlotIndex()];
 	if (!slot->getBone().isActive()) return;
+	if (!retain && slot->_attachmentState == _unkeyedState + Retain) return;
 
-	if (out || time < attachmentTimeline->getFrames()[0]) {
-		if (fromSetup) setAttachment(skeleton, *slot, slot->getData().getAttachmentName(), attachments);
-	} else {
-		setAttachment(skeleton, *slot, attachmentTimeline->getAttachmentNames()[Animation::search(attachmentTimeline->getFrames(), time)],
-					  attachments);
+	bool setup = time < attachmentTimeline->getFrames()[0];
+	const String *name = NULL;
+	if (!setup) {
+		name = &attachmentTimeline->getAttachmentNames()[Animation::search(attachmentTimeline->getFrames(), time)];
+		setup = !retain && name->isEmpty();
 	}
-
-	/* If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.*/
-	if (slot->_attachmentState <= _unkeyedState) slot->_attachmentState = _unkeyedState + Setup;
+	if (setup) {
+		if (!fromSetup) return;
+		name = &slot->getData().getAttachmentName();
+	}
+	slot->_pose.setAttachment(name->isEmpty() ? NULL : skeleton.getAttachment(slot->getData().getIndex(), *name));
+	if (retain)
+		slot->_attachmentState = _unkeyedState + Retain;
+	else if (!setup)
+		slot->_attachmentState = _unkeyedState + Setup;
 }
 
 
@@ -925,7 +953,7 @@ bool AnimationState::updateMixingFrom(TrackEntry *to, float delta) {
 float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton) {
 	TrackEntry *from = to->_mixingFrom;
 	float fromMix = from->_mixingFrom != NULL ? applyMixingFrom(from, skeleton) : 1;
-	float mix = to->_mixDuration == 0 ? 1 : MathUtil::min(1.0f, to->_mixTime / to->_mixDuration);
+	float mix = to->mix();
 
 	float a = from->_alpha * fromMix, keep = 1 - mix * to->_alpha;
 	float alphaMix = a * (1 - mix), alphaHold = keep > 0 ? alphaMix / keep : a;
@@ -935,7 +963,7 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton) {
 	Array<int> &timelineMode = from->_timelineMode;
 	Array<TrackEntry *> &timelineHoldMix = from->_timelineHoldMix;
 
-	bool attachments = mix < from->_mixAttachmentThreshold, drawOrder = mix < from->_mixDrawOrderThreshold;
+	bool retainAttachments = mix < from->_mixAttachmentThreshold, drawOrder = mix < from->_mixDrawOrderThreshold;
 	bool add = from->_additive, shortestRotation = add || from->_shortestRotation;
 	bool firstFrame = !shortestRotation && from->_timelinesRotation.size() != timelines.size() << 1;
 	if (firstFrame) from->_timelinesRotation.setSize(timelines.size() << 1, 0);
@@ -956,7 +984,7 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton) {
 		float alpha;
 		if ((mode & Hold) != 0) {
 			TrackEntry *holdMix = timelineHoldMix[i];
-			alpha = holdMix == NULL ? alphaHold : alphaHold * MathUtil::max(0.0f, 1.0f - holdMix->_mixTime / holdMix->_mixDuration);
+			alpha = holdMix == NULL ? alphaHold : alphaHold * (1 - holdMix->mix());
 		} else {
 			if (!drawOrder && timeline->getRTTI().isExactly(DrawOrderTimeline::rtti)) continue;
 			alpha = alphaMix;
@@ -966,8 +994,8 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton) {
 		if (!shortestRotation && timeline->getRTTI().isExactly(RotateTimeline::rtti)) {
 			applyRotateTimeline((RotateTimeline *) timeline, skeleton, applyTime, alpha, fromSetup, timelinesRotation, i << 1, firstFrame);
 		} else if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti)) {
-			applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, fromSetup, true,
-									attachments && alpha >= from->_alphaAttachmentThreshold);
+			applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, fromSetup,
+									retainAttachments && alpha >= from->_alphaAttachmentThreshold);
 		} else {
 			bool out = !drawOrder || !timeline->getRTTI().isExactly(DrawOrderTimeline::rtti) || !fromSetup;
 			timeline->apply(skeleton, animationLast, applyTime, events, alpha, fromSetup, add, out, false);
@@ -984,11 +1012,6 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton) {
 	from->_nextAnimationLast = animationTime;
 	from->_nextTrackLast = from->_trackTime;
 	return mix;
-}
-
-void AnimationState::setAttachment(Skeleton &skeleton, Slot &slot, const String &attachmentName, bool attachments) {
-	slot._pose.setAttachment(attachmentName.isEmpty() ? NULL : skeleton.getAttachment(slot.getData().getIndex(), attachmentName));
-	if (attachments) slot._attachmentState = _unkeyedState + Current;
 }
 
 void AnimationState::queueEvents(TrackEntry *entry, float animationTime) {
@@ -1060,6 +1083,7 @@ void AnimationState::setTrack(size_t index, TrackEntry *current, bool interrupt)
 	current->_previous = NULL;
 
 	if (from != NULL) {
+		from->_next = NULL;
 		if (interrupt) _queue->interrupt(from);
 
 		current->_mixingFrom = from;
@@ -1110,6 +1134,7 @@ TrackEntry *AnimationState::newTrackEntry(size_t trackIndex, Animation *animatio
 	entry._alpha = 1;
 	entry._mixTime = 0;
 	entry._mixDuration = (last == NULL) ? 0 : _data->getMix(*last->_animation, *animation);
+	entry._mixInterpolation = &Interpolation::linear();
 	entry._totalAlpha = 0;
 	entry._keepHold = false;
 

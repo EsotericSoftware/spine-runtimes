@@ -95,7 +95,7 @@ SPINE_C_API void spine_skeleton_set_skin_2(spine_skeleton self, /*@null*/ spine_
  *
  * @return May be NULL.
  */
-SPINE_C_API /*@null*/ spine_attachment spine_skeleton_get_attachment_1(spine_skeleton self, const char *slotName, const char *placeholderName);
+SPINE_C_API /*@null*/ spine_attachment spine_skeleton_get_attachment_1(spine_skeleton self, const char *slotName, const char *placeholder);
 /**
  * Finds an attachment by looking in getSkin() and
  * SkeletonData::getDefaultSkin() using the slot index and skin placeholder
@@ -104,15 +104,15 @@ SPINE_C_API /*@null*/ spine_attachment spine_skeleton_get_attachment_1(spine_ske
  *
  * @return May be NULL.
  */
-SPINE_C_API /*@null*/ spine_attachment spine_skeleton_get_attachment_2(spine_skeleton self, int slotIndex, const char *placeholderName);
+SPINE_C_API /*@null*/ spine_attachment spine_skeleton_get_attachment_2(spine_skeleton self, int slotIndex, const char *placeholder);
 /**
  * A convenience method to set an attachment by finding the slot with
  * findSlot(String), finding the attachment with getAttachment(int, String),
  * then setting the slot's SlotPose::getAttachment().
  *
- * @param placeholderName May be empty.
+ * @param placeholder May be empty.
  */
-SPINE_C_API void spine_skeleton_set_attachment(spine_skeleton self, const char *slotName, const char *placeholderName);
+SPINE_C_API void spine_skeleton_set_attachment(spine_skeleton self, const char *slotName, const char *placeholder);
 SPINE_C_API spine_array_constraint spine_skeleton_get_constraints(spine_skeleton self);
 /**
  * The skeleton's physics constraints.

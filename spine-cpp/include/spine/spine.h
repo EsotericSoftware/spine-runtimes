@@ -72,6 +72,7 @@
 #include <spine/InheritTimeline.h>
 #include <spine/Json.h>
 #include <spine/LinkedMesh.h>
+#include <spine/Interpolation.h>
 #include <spine/MathUtil.h>
 #include <spine/MeshAttachment.h>
 #include <spine/PathAttachment.h>

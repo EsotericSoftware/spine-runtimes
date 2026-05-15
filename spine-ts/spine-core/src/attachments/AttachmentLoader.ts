@@ -42,20 +42,20 @@ import type { Sequence } from "./Sequence.js";
  * Runtimes Guide. */
 export interface AttachmentLoader {
 	/** @return May be null to not load an attachment. */
-	newRegionAttachment (skin: Skin, name: string, path: string, sequence: Sequence): RegionAttachment;
+	newRegionAttachment (skin: Skin, placeholder: string, name: string, path: string, sequence: Sequence): RegionAttachment;
 
 	/** @return May be null to not load an attachment. */
-	newMeshAttachment (skin: Skin, name: string, path: string, sequence: Sequence): MeshAttachment;
+	newMeshAttachment (skin: Skin, placeholder: string, name: string, path: string, sequence: Sequence): MeshAttachment;
 
 	/** @return May be null to not load an attachment. */
-	newBoundingBoxAttachment (skin: Skin, name: string): BoundingBoxAttachment;
+	newBoundingBoxAttachment (skin: Skin, placeholder: string, name: string): BoundingBoxAttachment;
 
 	/** @return May be null to not load an attachment */
-	newPathAttachment (skin: Skin, name: string): PathAttachment;
+	newPathAttachment (skin: Skin, placeholder: string, name: string): PathAttachment;
 
 	/** @return May be null to not load an attachment */
-	newPointAttachment (skin: Skin, name: string): PointAttachment;
+	newPointAttachment (skin: Skin, placeholder: string, name: string): PointAttachment;
 
 	/** @return May be null to not load an attachment */
-	newClippingAttachment (skin: Skin, name: string): ClippingAttachment;
+	newClippingAttachment (skin: Skin, placeholder: string, name: string): ClippingAttachment;
 }

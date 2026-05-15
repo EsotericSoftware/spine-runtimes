@@ -68,15 +68,15 @@ public class IkConstraintData: PosedData, ConstraintData {
         }
     }
 
-    /// When true and IkConstraintPose::getCompress() or IkConstraintPose::getStretch() is used, the
-    /// bone is scaled on both the X and Y axes.
-    public var uniform: Bool {
+    /// Determines how BonePose::getScaleY() changes when IkConstraintPose::getCompress() or
+    /// IkConstraintPose::getStretch() sets BonePose::getScaleX().
+    public var scaleYMode: ScaleYMode {
         get {
-            let result = spine_ik_constraint_data_get_uniform(_ptr.assumingMemoryBound(to: spine_ik_constraint_data_wrapper.self))
-        return result
+            let result = spine_ik_constraint_data_get_scale_y_mode(_ptr.assumingMemoryBound(to: spine_ik_constraint_data_wrapper.self))
+        return ScaleYMode(rawValue: Int32(result.rawValue))!
         }
         set {
-            spine_ik_constraint_data_set_uniform(_ptr.assumingMemoryBound(to: spine_ik_constraint_data_wrapper.self), newValue)
+            spine_ik_constraint_data_set_scale_y_mode(_ptr.assumingMemoryBound(to: spine_ik_constraint_data_wrapper.self), spine_scale_y_mode(rawValue: UInt32(newValue.rawValue)))
         }
     }
 

@@ -164,7 +164,7 @@ namespace Spine.Unity {
 		}
 
 		public TrackEntry GetCurrent () {
-			return currentSkeletonAnimation.AnimationState.GetCurrent(MainTrackIndex);
+			return currentSkeletonAnimation.AnimationState.GetTrack(MainTrackIndex);
 		}
 		#endregion
 	}

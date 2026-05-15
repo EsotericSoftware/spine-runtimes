@@ -16,6 +16,13 @@ fi
 log_title "Spine-TS Build"
 log_detail "Branch: $BRANCH"
 
+if ! echo "$BRANCH" | grep -qE '^[0-9]+\.[0-9]+$'; then
+	log_warn "Branch is not a release branch - skipping publish"
+	log_detail "Release branches must be named number.number, e.g. 4.3"
+	log_summary "Build skipped"
+	exit 0
+fi
+
 log_action "Installing dependencies"
 if npm install > /tmp/npm-install.log 2>&1; then
 	log_ok

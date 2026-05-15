@@ -39,20 +39,20 @@ import com.esotericsoftware.spine.Skin;
  * Runtimes Guide. */
 public interface AttachmentLoader {
 	/** @return May be null to not load the attachment. */
-	public @Null RegionAttachment newRegionAttachment (Skin skin, String name, String path, Sequence sequence);
+	public @Null RegionAttachment newRegionAttachment (Skin skin, String placeholder, String name, String path, Sequence sequence);
 
 	/** @return May be null to not load the attachment. In that case null should also be returned for child meshes. */
-	public @Null MeshAttachment newMeshAttachment (Skin skin, String name, String path, Sequence sequence);
+	public @Null MeshAttachment newMeshAttachment (Skin skin, String placeholder, String name, String path, Sequence sequence);
 
 	/** @return May be null to not load the attachment. */
-	public @Null BoundingBoxAttachment newBoundingBoxAttachment (Skin skin, String name);
+	public @Null BoundingBoxAttachment newBoundingBoxAttachment (Skin skin, String placeholder, String name);
 
 	/** @return May be null to not load the attachment. */
-	public @Null ClippingAttachment newClippingAttachment (Skin skin, String name);
+	public @Null ClippingAttachment newClippingAttachment (Skin skin, String placeholder, String name);
 
 	/** @return May be null to not load the attachment. */
-	public @Null PathAttachment newPathAttachment (Skin skin, String name);
+	public @Null PathAttachment newPathAttachment (Skin skin, String placeholder, String name);
 
 	/** @return May be null to not load the attachment. */
-	public @Null PointAttachment newPointAttachment (Skin skin, String name);
+	public @Null PointAttachment newPointAttachment (Skin skin, String placeholder, String name);
 }

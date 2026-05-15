@@ -50,11 +50,11 @@ public:
 
 	Ref<SpineSkin> init(const String &name, SpineSprite *sprite);
 
-	void set_attachment(int slot_index, const String &name, Ref<SpineAttachment> attachment);
+	void set_attachment(int slot_index, const String &placeholder, Ref<SpineAttachment> attachment);
 
-	Ref<SpineAttachment> get_attachment(int slot_index, const String &name);
+	Ref<SpineAttachment> get_attachment(int slot_index, const String &placeholder);
 
-	void remove_attachment(int slot_index, const String &name);
+	void remove_attachment(int slot_index, const String &placeholder);
 
 	Array find_names_for_slot(int slot_index);
 

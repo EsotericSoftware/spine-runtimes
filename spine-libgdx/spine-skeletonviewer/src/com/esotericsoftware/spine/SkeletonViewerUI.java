@@ -43,6 +43,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -55,6 +56,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -64,6 +66,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -143,6 +146,8 @@ class SkeletonViewerUI {
 	Slider mixSlider = new Slider(0, 4, 0.01f, false, skin);
 	Label mixLabel = new Label("0.3s", skin);
 
+	SelectBox<MixInterpolation> mixInterpolation = new SelectBox(skin, "default");
+
 	Label statusLabel = new Label("", skin);
 	WidgetGroup toasts = new WidgetGroup();
 
@@ -188,6 +193,14 @@ class SkeletonViewerUI {
 
 		mixSlider.setValue(0.3f);
 		mixSlider.setSnapToValues(0.12f, 1, 1.5f, 2, 2.5f, 3, 3.5f);
+
+		mixInterpolation.setItems(Array.with( //
+			new MixInterpolation("linear", linear), //
+			new MixInterpolation("slowFast", slowFast), //
+			new MixInterpolation("fastSlow", fastSlow), //
+			new MixInterpolation("smooth", smooth), //
+			new MixInterpolation("circle", circle) //
+		));
 
 		speedSlider.setValue(1);
 		speedSlider.setSnapToValues(0.09f, 0.5f, 0.75f, 1, 1.25f, 1.5f, 2, 2.5f);
@@ -318,6 +331,7 @@ class SkeletonViewerUI {
 			Table table = table();
 			table.add(mixLabel).width(29);
 			table.add(mixSlider).growX();
+			table.add(mixInterpolation);
 			root.add(table).fill().row();
 		}
 
@@ -775,6 +789,20 @@ class SkeletonViewerUI {
 		protected Drawable getImageDrawable () {
 			if (trackButtons.getCheckedIndex() == 0) return getStyle().checkboxOffDisabled;
 			return super.getImageDrawable();
+		}
+	}
+
+	static class MixInterpolation {
+		String name;
+		Interpolation interpolation;
+
+		MixInterpolation (String name, Interpolation interpolation) {
+			this.name = name;
+			this.interpolation = interpolation;
+		}
+
+		public final String toString () {
+			return name;
 		}
 	}
 }

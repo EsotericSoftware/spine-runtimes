@@ -123,7 +123,7 @@ namespace Spine.Unity {
 				if (!this.IsValid) {
 					return animationName;
 				} else {
-					TrackEntry entry = state.GetCurrent(0);
+					TrackEntry entry = state.GetTrack(0);
 					return entry == null ? null : entry.Animation.Name;
 				}
 			}
@@ -135,7 +135,7 @@ namespace Spine.Unity {
 				}
 
 				if (animationName == value) {
-					TrackEntry entry = state.GetCurrent(0);
+					TrackEntry entry = state.GetTrack(0);
 					if (entry != null && entry.Loop == loop)
 						return;
 				}

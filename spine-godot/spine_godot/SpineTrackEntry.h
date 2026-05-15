@@ -129,6 +129,9 @@ public:
 
 	void set_mix_duration_and_delay(float v, float delay);
 
+	SpineConstant::MixInterpolation get_mix_interpolation();
+
+	void set_mix_interpolation(SpineConstant::MixInterpolation mix_interpolation);
 
 	Ref<SpineTrackEntry> get_mixing_from();
 

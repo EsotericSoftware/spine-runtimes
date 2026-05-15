@@ -1,6 +1,6 @@
 {
   "name": "@esotericsoftware/spine-webcomponents",
-  "version": "4.2.82",
+  "version": "4.3.0",
   "description": "The official Spine webcomponents.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -31,6 +31,6 @@
   },
   "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme",
   "dependencies": {
-    "@esotericsoftware/spine-webgl": "4.2.82"
+    "@esotericsoftware/spine-webgl": "4.3.0"
   }
 }

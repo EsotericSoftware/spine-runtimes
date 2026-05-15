@@ -99,7 +99,6 @@ namespace spine {
 
 		void modifyLocal(Skeleton &skeleton);
 		void modifyWorld(int update);
-		void resetWorld(int update);
 
 		/// The world transform <code>[a b][c d]</code> x-axis x component.
 		float getA();
@@ -157,6 +156,9 @@ namespace spine {
 
 		/// Rotates the world transform the specified amount.
 		void rotateWorld(float degrees);
+
+	private:
+		void resetWorld(int update);
 
 	protected:
 		Bone *_bone;

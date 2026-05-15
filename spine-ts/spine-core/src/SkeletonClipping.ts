@@ -46,12 +46,12 @@ export class SkeletonClipping {
 	clippedTriangles = [] as number[];
 	inverseVertices = [] as number[];
 
-	_clippedVerticesTyped = new Float32Array(1024);
-	_clippedUVsTyped = new Float32Array(1024);
-	_clippedTrianglesTyped = new Uint16Array(1024);
-	clippedVerticesTyped = new Float32Array(0);
-	clippedUVsTyped = new Float32Array(0);
-	clippedTrianglesTyped = new Uint16Array(0);
+	_clippedVerticesTyped: Float32Array = new Float32Array(1024);
+	_clippedUVsTyped: Float32Array = new Float32Array(1024);
+	_clippedTrianglesTyped: Uint16Array = new Uint16Array(1024);
+	clippedVerticesTyped: Float32Array = new Float32Array(0);
+	clippedUVsTyped: Float32Array = new Float32Array(0);
+	clippedTrianglesTyped: Uint16Array = new Uint16Array(0);
 	clippedVerticesLength = 0;
 	clippedUVsLength = 0;
 	clippedTrianglesLength = 0;

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="SpineSkin" inherits="SpineObjectWrapper" version="3.4">
 	<brief_description>
-		Stores attachments by slot index and attachment name.
+		Stores attachments by slot index and placeholder name.
 	</brief_description>
 	<description>
-		Stores attachments by slot index and attachment name.
+		Stores attachments by slot index and placeholder name.
 		See [url]http://esotericsoftware.com/spine-runtime-skins[/url] in the Spine Runtimes Guide.
 	</description>
 	<tutorials>
@@ -41,9 +41,9 @@
 		<method name="get_attachment">
 			<return type="SpineAttachment" />
 			<argument index="0" name="slot_index" type="int" />
-			<argument index="1" name="name" type="String" />
+			<argument index="1" name="placeholder" type="String" />
 			<description>
-				Returns the attachment for the specified slot index and name, or null.
+				Returns the attachment for the specified slot index and placeholder, or null.
 			</description>
 		</method>
 		<method name="get_attachments">
@@ -73,18 +73,18 @@
 		<method name="remove_attachment">
 			<return type="void" />
 			<argument index="0" name="slot_index" type="int" />
-			<argument index="1" name="name" type="String" />
+			<argument index="1" name="placeholder" type="String" />
 			<description>
-				Removes the attachment in the skin for the specified slot index and name, if any.
+				Removes the attachment in the skin for the specified slot index and placeholder, if any.
 			</description>
 		</method>
 		<method name="set_attachment">
 			<return type="void" />
 			<argument index="0" name="slot_index" type="int" />
-			<argument index="1" name="name" type="String" />
+			<argument index="1" name="placeholder" type="String" />
 			<argument index="2" name="attachment" type="SpineAttachment" />
 			<description>
-				Adds an attachment to the skin for the specified slot index and name.
+				Adds an attachment to the skin for the specified slot index and placeholder.
 			</description>
 		</method>
 	</methods>

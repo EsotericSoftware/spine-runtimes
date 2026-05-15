@@ -65,7 +65,7 @@ class SliderPose {
     SpineBindings.bindings.spine_slider_pose_set_time(_ptr, value);
   }
 
-  /// A percentage that controls the mix between the constrained and
+  /// A percentage (unbounded) that controls the mix between the constrained and
   /// unconstrained poses.
   double get mix {
     final result = SpineBindings.bindings.spine_slider_pose_get_mix(_ptr);

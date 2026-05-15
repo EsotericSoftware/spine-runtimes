@@ -67,16 +67,16 @@ class Skin {
   /// Adds an attachment to the skin for the specified slot index and
   /// placeholder name. If the placeholder name already exists for the slot, the
   /// previous value is replaced.
-  void setAttachment(int slotIndex, String placeholderName, Attachment? attachment) {
-    SpineBindings.bindings.spine_skin_set_attachment(_ptr, slotIndex, placeholderName.toNativeUtf8().cast<Char>(),
+  void setAttachment(int slotIndex, String placeholder, Attachment? attachment) {
+    SpineBindings.bindings.spine_skin_set_attachment(_ptr, slotIndex, placeholder.toNativeUtf8().cast<Char>(),
         attachment?.nativePtr.cast() ?? Pointer.fromAddress(0));
   }
 
   /// Returns the attachment for the specified slot index and placeholder name,
   /// or NULL.
-  Attachment? getAttachment(int slotIndex, String placeholderName) {
+  Attachment? getAttachment(int slotIndex, String placeholder) {
     final result =
-        SpineBindings.bindings.spine_skin_get_attachment(_ptr, slotIndex, placeholderName.toNativeUtf8().cast<Char>());
+        SpineBindings.bindings.spine_skin_get_attachment(_ptr, slotIndex, placeholder.toNativeUtf8().cast<Char>());
     if (result.address == 0) return null;
     final rtti = SpineBindings.bindings.spine_attachment_get_rtti(result);
     final className = SpineBindings.bindings.spine_rtti_get_class_name(rtti).cast<Utf8>().toDartString();
@@ -105,8 +105,8 @@ class Skin {
   }
 
   /// Removes the attachment from the skin.
-  void removeAttachment(int slotIndex, String placeholderName) {
-    SpineBindings.bindings.spine_skin_remove_attachment(_ptr, slotIndex, placeholderName.toNativeUtf8().cast<Char>());
+  void removeAttachment(int slotIndex, String placeholder) {
+    SpineBindings.bindings.spine_skin_remove_attachment(_ptr, slotIndex, placeholder.toNativeUtf8().cast<Char>());
   }
 
   /// Finds the attachments for a given slot. The results are added to the

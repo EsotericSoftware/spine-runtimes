@@ -49,37 +49,37 @@ static void disposeAttachment(Attachment *attachment) {
 	if (attachment->getRefCount() == 0) delete attachment;
 }
 
-void Skin::AttachmentMap::put(size_t slotIndex, const String &placeholderName, Attachment *attachment) {
+void Skin::AttachmentMap::put(size_t slotIndex, const String &placeholder, Attachment *attachment) {
 	if (slotIndex >= _buckets.size()) _buckets.setSize(slotIndex + 1, Array<Entry>());
 	Array<Entry> &bucket = _buckets[slotIndex];
-	int existing = findInBucket(bucket, placeholderName);
+	int existing = findInBucket(bucket, placeholder);
 	attachment->reference();
 	if (existing >= 0) {
 		disposeAttachment(bucket[existing]._attachment);
 		bucket[existing]._attachment = attachment;
 	} else {
-		bucket.add(Entry(slotIndex, placeholderName, attachment));
+		bucket.add(Entry(slotIndex, placeholder, attachment));
 	}
 }
 
-Attachment *Skin::AttachmentMap::get(size_t slotIndex, const String &placeholderName) {
+Attachment *Skin::AttachmentMap::get(size_t slotIndex, const String &placeholder) {
 	if (slotIndex >= _buckets.size()) return NULL;
-	int existing = findInBucket(_buckets[slotIndex], placeholderName);
+	int existing = findInBucket(_buckets[slotIndex], placeholder);
 	return existing >= 0 ? _buckets[slotIndex][existing]._attachment : NULL;
 }
 
-void Skin::AttachmentMap::remove(size_t slotIndex, const String &placeholderName) {
+void Skin::AttachmentMap::remove(size_t slotIndex, const String &placeholder) {
 	if (slotIndex >= _buckets.size()) return;
-	int existing = findInBucket(_buckets[slotIndex], placeholderName);
+	int existing = findInBucket(_buckets[slotIndex], placeholder);
 	if (existing >= 0) {
 		disposeAttachment(_buckets[slotIndex][existing]._attachment);
 		_buckets[slotIndex].removeAt(existing);
 	}
 }
 
-int Skin::AttachmentMap::findInBucket(Array<Entry> &bucket, const String &placeholderName) {
+int Skin::AttachmentMap::findInBucket(Array<Entry> &bucket, const String &placeholder) {
 	for (size_t i = 0; i < bucket.size(); i++)
-		if (bucket[i]._placeholderName == placeholderName) return (int) i;
+		if (bucket[i]._placeholder == placeholder) return (int) i;
 	return -1;
 }
 
@@ -99,16 +99,16 @@ Skin::~Skin() {
 	}
 }
 
-void Skin::setAttachment(size_t slotIndex, const String &placeholderName, Attachment *attachment) {
-	_attachments.put(slotIndex, placeholderName, attachment);
+void Skin::setAttachment(size_t slotIndex, const String &placeholder, Attachment *attachment) {
+	_attachments.put(slotIndex, placeholder, attachment);
 }
 
-Attachment *Skin::getAttachment(size_t slotIndex, const String &placeholderName) {
-	return _attachments.get(slotIndex, placeholderName);
+Attachment *Skin::getAttachment(size_t slotIndex, const String &placeholder) {
+	return _attachments.get(slotIndex, placeholder);
 }
 
-void Skin::removeAttachment(size_t slotIndex, const String &placeholderName) {
-	_attachments.remove(slotIndex, placeholderName);
+void Skin::removeAttachment(size_t slotIndex, const String &placeholder) {
+	_attachments.remove(slotIndex, placeholder);
 }
 
 void Skin::findNamesForSlot(size_t slotIndex, Array<String> &names) {
@@ -116,7 +116,7 @@ void Skin::findNamesForSlot(size_t slotIndex, Array<String> &names) {
 	while (entries.hasNext()) {
 		Skin::AttachmentMap::Entry &entry = entries.next();
 		if (entry._slotIndex == slotIndex) {
-			names.add(entry._placeholderName);
+			names.add(entry._placeholder);
 		}
 	}
 }
@@ -146,7 +146,7 @@ void Skin::attachAll(Skeleton &skeleton, Skin &oldSkin) {
 		Slot *slot = slots[slotIndex];
 
 		if (slot->getPose().getAttachment() == entry._attachment) {
-			Attachment *attachment = getAttachment(slotIndex, entry._placeholderName);
+			Attachment *attachment = getAttachment(slotIndex, entry._placeholder);
 			if (attachment) slot->getPose().setAttachment(attachment);
 		}
 	}
@@ -162,7 +162,7 @@ void Skin::addSkin(Skin &other) {
 	AttachmentMap::Entries entries = other.getAttachments();
 	while (entries.hasNext()) {
 		AttachmentMap::Entry &entry = entries.next();
-		setAttachment(entry._slotIndex, entry._placeholderName, entry._attachment);
+		setAttachment(entry._slotIndex, entry._placeholder, entry._attachment);
 	}
 }
 
@@ -177,9 +177,9 @@ void Skin::copySkin(Skin &other) {
 	while (entries.hasNext()) {
 		AttachmentMap::Entry &entry = entries.next();
 		if (entry._attachment->getRTTI().isExactly(MeshAttachment::rtti))
-			setAttachment(entry._slotIndex, entry._placeholderName, &static_cast<MeshAttachment *>(entry._attachment)->newLinkedMesh());
+			setAttachment(entry._slotIndex, entry._placeholder, &static_cast<MeshAttachment *>(entry._attachment)->newLinkedMesh());
 		else
-			setAttachment(entry._slotIndex, entry._placeholderName, &entry._attachment->copy());
+			setAttachment(entry._slotIndex, entry._placeholder, &entry._attachment->copy());
 	}
 }
 

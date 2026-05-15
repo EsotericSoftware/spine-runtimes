@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import type { BonePose } from "src/BonePose.js";
+import type { BonePose } from "../BonePose.js";
 import { Color, MathUtils, type Vector2 } from "../Utils.js";
 import { type Attachment, VertexAttachment } from "./Attachment.js";
 

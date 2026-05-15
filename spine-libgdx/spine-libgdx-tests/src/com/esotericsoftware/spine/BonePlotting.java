@@ -45,27 +45,28 @@ public class BonePlotting {
 	static public void main (String[] args) throws Exception {
 		// Create a skeleton loader that doesn't use an atlas and doesn't create any attachments.
 		SkeletonJson json = new SkeletonJson(new AttachmentLoader() {
-			public RegionAttachment newRegionAttachment (Skin skin, String name, String path, Sequence sequence) {
+			public RegionAttachment newRegionAttachment (Skin skin, String placeholder, String name, String path,
+				Sequence sequence) {
 				return null;
 			}
 
-			public MeshAttachment newMeshAttachment (Skin skin, String name, String path, Sequence sequence) {
+			public MeshAttachment newMeshAttachment (Skin skin, String placeholder, String name, String path, Sequence sequence) {
 				return null;
 			}
 
-			public BoundingBoxAttachment newBoundingBoxAttachment (Skin skin, String name) {
+			public BoundingBoxAttachment newBoundingBoxAttachment (Skin skin, String placeholder, String name) {
 				return null;
 			}
 
-			public ClippingAttachment newClippingAttachment (Skin skin, String name) {
+			public ClippingAttachment newClippingAttachment (Skin skin, String placeholder, String name) {
 				return null;
 			}
 
-			public PathAttachment newPathAttachment (Skin skin, String name) {
+			public PathAttachment newPathAttachment (Skin skin, String placeholder, String name) {
 				return null;
 			}
 
-			public PointAttachment newPointAttachment (Skin skin, String name) {
+			public PointAttachment newPointAttachment (Skin skin, String placeholder, String name) {
 				return null;
 			}
 		});

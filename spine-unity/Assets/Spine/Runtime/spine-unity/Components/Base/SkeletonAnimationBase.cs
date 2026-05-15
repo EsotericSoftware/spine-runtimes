@@ -90,6 +90,8 @@ namespace Spine.Unity {
 #endif
 #if USE_THREADED_ANIMATION_UPDATE
 		#region Threaded update system
+		protected static int mainThreadID = -1;
+
 		protected static float externalDeltaTime = 0f;
 		protected static float unscaledDeltaTime = 0f;
 
@@ -153,6 +155,31 @@ namespace Spine.Unity {
 		}
 #endif
 #endif
+		#region Threading Asserts
+		[System.Diagnostics.Conditional("UNITY_EDITOR")]
+		protected void InitializeMainThreadID () {
+#if USE_THREADED_ANIMATION_UPDATE
+			if (mainThreadID == -1)
+				mainThreadID = System.Threading.Thread.CurrentThread.ManagedThreadId;
+#endif
+		}
+
+		[System.Diagnostics.Conditional("UNITY_EDITOR")]
+		private void AssertIsMainThread () {
+#if USE_THREADED_ANIMATION_UPDATE
+			if (System.Threading.Thread.CurrentThread.ManagedThreadId != mainThreadID)
+				Debug.LogError("AssertIsMainThread failed: worker thread calling main thread code. Thread ID:" + System.Threading.Thread.CurrentThread.ManagedThreadId);
+#endif
+		}
+
+		[System.Diagnostics.Conditional("UNITY_EDITOR")]
+		private void AssertIsWorkerThread () {
+#if USE_THREADED_ANIMATION_UPDATE
+			if (System.Threading.Thread.CurrentThread.ManagedThreadId == mainThreadID)
+				Debug.LogError("AssertIsWorkerThread failed: main thread calling worker thread code! Thread ID:" + System.Threading.Thread.CurrentThread.ManagedThreadId);
+#endif
+		}
+		#endregion
 
 		#region Interface Implementation
 		public UnityEngine.MonoBehaviour Component { get { return this; } }
@@ -226,6 +253,7 @@ namespace Spine.Unity {
 #if UNITY_EDITOR && AUTO_UPGRADE_TO_43_COMPONENTS
 			UpgradeTo43();
 #endif
+			InitializeMainThreadID();
 #if UNITY_EDITOR
 			SkeletonAnimationBase.ApplicationIsPlaying = Application.isPlaying;
 #endif
@@ -462,18 +490,27 @@ namespace Spine.Unity {
 			if (coroutineIterator.IsDone)
 				return CoroutineIterator.Done;
 
-			const int StateBits = 1;
+			const int StateBits = 2;
 			const uint StateMask = (1 << StateBits) - 1;
 			switch (coroutineIterator.State(StateMask)) {
 			case 0:
-				if (_BeforeApply != null)
-					_BeforeApply(this);
-
-				ApplyStateToSkeleton(calledFromMainThread: false);
-				goto case 1;
+				if (_BeforeApply != null) {
+					AssertIsWorkerThread();
+					return coroutineIterator.YieldReturnAtState(1, StateMask);
+				} else {
+					goto case 2;
+				}
 			case 1:
+				AssertIsMainThread();
+				_BeforeApply(this);
+				return coroutineIterator.YieldReturnAtState(2, StateMask);
+			case 2:
+				AssertIsWorkerThread();
+				ApplyStateToSkeleton(calledFromMainThread: false);
+				goto case 3;
+			case 3:
 				return skeletonRenderer.AfterAnimationAppliedSplit(coroutineIterator.ToNestedCall(StateBits))
-					.FromNestedCall(1, StateBits);
+					.FromNestedCall(3, StateBits);
 			default:
 				Debug.LogError(string.Format(
 					"Internal coroutine logic error: SkeletonAnimationBase.ApplyAnimationSplit state was {0}.",

@@ -7,10 +7,10 @@
     "inlineSources": true,
     "inlineSourceMap": true,
     "esModuleInterop": true,
-    "lib": ["DOM", "ES2015", "ScriptHost"],
+    "lib": ["DOM", "ES2017", "ScriptHost"],
     "declaration": true,
     "composite": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "skipLibCheck": true,
     "strict": true
   }

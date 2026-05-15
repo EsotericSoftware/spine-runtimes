@@ -358,7 +358,7 @@ export class BonePose implements Pose<BonePose>, Update {
 		this.resetWorld(update);
 	}
 
-	resetWorld (update: number): void {
+	private resetWorld (update: number): void {
 		const children = this.bone.children;
 		for (let i = 0, n = children.length; i < n; i++) {
 			const child = children[i].appliedPose;

@@ -66,7 +66,7 @@ var vineDemo = function (canvas, bgColor) {
 		timeLine.changed = function (percent) {
 			if (isPlaying) playButton.click();
 			if (!isPlaying) {
-				var animationDuration = state.getCurrent(0).animation.duration;
+				var animationDuration = state.getTrack(0).animation.duration;
 				time = animationDuration * percent;
 				state.update(time - playTime);
 				state.apply(skeleton);
@@ -106,7 +106,7 @@ var vineDemo = function (canvas, bgColor) {
 		var delta = timeKeeper.delta;
 
 		if (isPlaying) {
-			var animationDuration = state.getCurrent(0).animation.duration;
+			var animationDuration = state.getTrack(0).animation.duration;
 			playTime += delta;
 			while (playTime >= animationDuration) {
 				playTime -= animationDuration;

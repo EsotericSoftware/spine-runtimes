@@ -75,29 +75,29 @@ public class AtlasAttachmentLoader implements AttachmentLoader {
 		return region;
 	}
 
-	public RegionAttachment newRegionAttachment (Skin skin, String name, String path, Sequence sequence) {
+	public RegionAttachment newRegionAttachment (Skin skin, String placeholder, String name, String path, Sequence sequence) {
 		findRegions(name, path, sequence);
 		return new RegionAttachment(name, sequence);
 	}
 
-	public MeshAttachment newMeshAttachment (Skin skin, String name, String path, Sequence sequence) {
+	public MeshAttachment newMeshAttachment (Skin skin, String placeholder, String name, String path, Sequence sequence) {
 		findRegions(name, path, sequence);
 		return new MeshAttachment(name, sequence);
 	}
 
-	public BoundingBoxAttachment newBoundingBoxAttachment (Skin skin, String name) {
+	public BoundingBoxAttachment newBoundingBoxAttachment (Skin skin, String placeholder, String name) {
 		return new BoundingBoxAttachment(name);
 	}
 
-	public ClippingAttachment newClippingAttachment (Skin skin, String name) {
+	public ClippingAttachment newClippingAttachment (Skin skin, String placeholder, String name) {
 		return new ClippingAttachment(name);
 	}
 
-	public PathAttachment newPathAttachment (Skin skin, String name) {
+	public PathAttachment newPathAttachment (Skin skin, String placeholder, String name) {
 		return new PathAttachment(name);
 	}
 
-	public PointAttachment newPointAttachment (Skin skin, String name) {
+	public PointAttachment newPointAttachment (Skin skin, String placeholder, String name) {
 		return new PointAttachment(name);
 	}
 }

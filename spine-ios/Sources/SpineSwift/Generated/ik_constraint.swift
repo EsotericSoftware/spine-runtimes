@@ -68,16 +68,16 @@ public class IkConstraint: IkConstraintBase {
 
     /// Adjusts the local rotation of the bone so the world position of the tip is as close to the
     /// target position as possible. The target is specified in the world coordinate system.
-    public static func apply(_ skeleton: Skeleton, _ bone: BonePose, _ targetX: Float, _ targetY: Float, _ compress: Bool, _ stretch: Bool, _ uniform: Bool, _ mix: Float) {
-        spine_ik_constraint_apply_1(skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self), bone._ptr.assumingMemoryBound(to: spine_bone_pose_wrapper.self), targetX, targetY, compress, stretch, uniform, mix)
+    public static func apply(_ skeleton: Skeleton, _ bone: BonePose, _ targetX: Float, _ targetY: Float, _ compress: Bool, _ stretch: Bool, _ scaleYMode: ScaleYMode, _ mix: Float) {
+        spine_ik_constraint_apply_1(skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self), bone._ptr.assumingMemoryBound(to: spine_bone_pose_wrapper.self), targetX, targetY, compress, stretch, spine_scale_y_mode(rawValue: UInt32(scaleYMode.rawValue)), mix)
     }
 
     /// Adjusts the parent and child bone rotations so the tip of the child is as close to the
     /// target position as possible. The target is specified in the world coordinate system.
     ///
     /// - Parameter child: A direct descendant of the parent bone.
-    public static func apply2(_ skeleton: Skeleton, _ parent: BonePose, _ child: BonePose, _ targetX: Float, _ targetY: Float, _ bendDirection: Int32, _ stretch: Bool, _ uniform: Bool, _ softness: Float, _ mix: Float) {
-        spine_ik_constraint_apply_2(skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self), parent._ptr.assumingMemoryBound(to: spine_bone_pose_wrapper.self), child._ptr.assumingMemoryBound(to: spine_bone_pose_wrapper.self), targetX, targetY, bendDirection, stretch, uniform, softness, mix)
+    public static func apply2(_ skeleton: Skeleton, _ parent: BonePose, _ child: BonePose, _ targetX: Float, _ targetY: Float, _ bendDirection: Int32, _ stretch: Bool, _ scaleYMode: ScaleYMode, _ softness: Float, _ mix: Float) {
+        spine_ik_constraint_apply_2(skeleton._ptr.assumingMemoryBound(to: spine_skeleton_wrapper.self), parent._ptr.assumingMemoryBound(to: spine_bone_pose_wrapper.self), child._ptr.assumingMemoryBound(to: spine_bone_pose_wrapper.self), targetX, targetY, bendDirection, stretch, spine_scale_y_mode(rawValue: UInt32(scaleYMode.rawValue)), softness, mix)
     }
 
     public override func dispose() {

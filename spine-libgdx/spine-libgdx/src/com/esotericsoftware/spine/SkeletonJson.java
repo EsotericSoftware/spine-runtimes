@@ -252,7 +252,7 @@ public class SkeletonJson extends SkeletonLoader {
 					if (data.target == null) throw new SerializationException("IK target bone not found: " + targetName);
 
 					String scaleY = constraintMap.getString("scaleY", null);
-					if (scaleY != null) data.scaleY = IkConstraintData.ScaleY.valueOf(scaleY);
+					if (scaleY != null) data.scaleYMode = IkConstraintData.ScaleYMode.valueOf(scaleY);
 
 					IkConstraintPose setup = data.setupPose;
 					setup.mix = constraintMap.getFloat("mix", 1);
@@ -578,15 +578,15 @@ public class SkeletonJson extends SkeletonLoader {
 		};
 	}
 
-	private Attachment readAttachment (JsonValue map, Skin skin, int slotIndex, String name, SkeletonData skeletonData) {
+	private Attachment readAttachment (JsonValue map, Skin skin, int slotIndex, String placeholder, SkeletonData skeletonData) {
 		float scale = this.scale;
-		name = map.getString("name", name);
+		String name = map.getString("name", placeholder);
 
 		return switch (AttachmentType.valueOf(map.getString("type", AttachmentType.region.name()))) {
 		case region -> {
 			String path = map.getString("path", name);
 			Sequence sequence = readSequence(map.get("sequence"));
-			RegionAttachment region = attachmentLoader.newRegionAttachment(skin, name, path, sequence);
+			RegionAttachment region = attachmentLoader.newRegionAttachment(skin, placeholder, name, path, sequence);
 			if (region == null) yield null;
 			region.setPath(path);
 			region.setX(map.getFloat("x", 0) * scale);
@@ -604,7 +604,7 @@ public class SkeletonJson extends SkeletonLoader {
 			yield region;
 		}
 		case boundingbox -> {
-			BoundingBoxAttachment box = attachmentLoader.newBoundingBoxAttachment(skin, name);
+			BoundingBoxAttachment box = attachmentLoader.newBoundingBoxAttachment(skin, placeholder, name);
 			if (box == null) yield null;
 			readVertices(map, box, map.getInt("vertexCount") << 1);
 
@@ -615,7 +615,7 @@ public class SkeletonJson extends SkeletonLoader {
 		case mesh, linkedmesh -> {
 			String path = map.getString("path", name);
 			Sequence sequence = readSequence(map.get("sequence"));
-			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, name, path, sequence);
+			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, placeholder, name, path, sequence);
 			if (mesh == null) yield null;
 			mesh.setPath(path);
 
@@ -651,7 +651,7 @@ public class SkeletonJson extends SkeletonLoader {
 			yield mesh;
 		}
 		case path -> {
-			PathAttachment path = attachmentLoader.newPathAttachment(skin, name);
+			PathAttachment path = attachmentLoader.newPathAttachment(skin, placeholder, name);
 			if (path == null) yield null;
 			path.setClosed(map.getBoolean("closed", false));
 			path.setConstantSpeed(map.getBoolean("constantSpeed", true));
@@ -670,7 +670,7 @@ public class SkeletonJson extends SkeletonLoader {
 			yield path;
 		}
 		case point -> {
-			PointAttachment point = attachmentLoader.newPointAttachment(skin, name);
+			PointAttachment point = attachmentLoader.newPointAttachment(skin, placeholder, name);
 			if (point == null) yield null;
 			point.setX(map.getFloat("x", 0) * scale);
 			point.setY(map.getFloat("y", 0) * scale);
@@ -681,7 +681,7 @@ public class SkeletonJson extends SkeletonLoader {
 			yield point;
 		}
 		case clipping -> {
-			ClippingAttachment clip = attachmentLoader.newClippingAttachment(skin, name);
+			ClippingAttachment clip = attachmentLoader.newClippingAttachment(skin, placeholder, name);
 			if (clip == null) yield null;
 
 			String end = map.getString("end", null);

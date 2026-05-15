@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import type { SlotPose } from "src/SlotPose.js";
+import type { SlotPose } from "../SlotPose.js";
 import type { Slot } from "../Slot.js";
 import type { TextureRegion } from "../Texture.js";
 import { Color, MathUtils, type NumberArrayLike } from "../Utils.js";

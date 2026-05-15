@@ -392,7 +392,7 @@ export class SpinePlayer implements Disposable {
 			timeline.appendChild(this.timelineSlider.create());
 			this.timelineSlider.change = (percentage) => {
 				this.pause();
-				const animationDuration = this.animationState!.getCurrent(0)!.animation!.duration;
+				const animationDuration = this.animationState!.getTrack(0)!.animation!.duration;
 				const time = animationDuration * percentage;
 				this.animationState!.update(time - this.playTime);
 				this.animationState!.apply(this.skeleton!);
@@ -561,7 +561,7 @@ export class SpinePlayer implements Disposable {
 
 		if (config.success) config.success(this);
 
-		let entry = this.animationState.getCurrent(0);
+		let entry = this.animationState.getTrack(0);
 		if (!entry) {
 			if (config.animation) {
 				entry = this.setAnimation(config.animation);
@@ -863,7 +863,7 @@ export class SpinePlayer implements Disposable {
 
 					if (config.showControls) {
 						this.playTime += playDelta;
-						const entry = this.animationState!.getCurrent(0);
+						const entry = this.animationState!.getTrack(0);
 						if (entry) {
 							const duration = entry.animation!.duration;
 							while (this.playTime >= duration && duration !== 0)
@@ -1057,7 +1057,7 @@ export class SpinePlayer implements Disposable {
 		this.skeleton.updateWorldTransform(Physics.pose);
 
 		// Recalculate the viewport for the current animation since skin changes affect bounds.
-		const entry = this.animationState?.getCurrent(0);
+		const entry = this.animationState?.getTrack(0);
 		if (entry && entry.animation) this.setViewport(entry.animation);
 	}
 

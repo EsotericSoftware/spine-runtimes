@@ -33,13 +33,17 @@ method: TrackEntry::setListener
 method: TrackEntry::getListener
 method: Atlas::Atlas
 
-# Used in UE4/cocos2dx, not used anywhere else
+# Used in UE4, not used anywhere else
 method: AnimationState::setRendererObject
 method: TrackEntry::setRendererObject
 
 # Array<String> returning methods and fields not supported
 method: AttachmentTimeline::getAttachmentNames
 method: Skin::findNamesForSlot
+
+# Interpolation built-in singletons are exposed but should not be constructed or disposed through C.
+method: Interpolation::Interpolation
+method: Interpolation::~Interpolation
 method: AtlasRegion::getNames
 method: AtlasRegion::setNames
 

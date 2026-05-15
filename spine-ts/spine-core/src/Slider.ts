@@ -84,7 +84,7 @@ export class Slider extends Constraint<Slider, SliderData, SliderPose> {
 	sort (skeleton: Skeleton) {
 		const bone = this.bone;
 		const data = this.data;
-		if (bone && data.local) skeleton.sortBone(bone);
+		if (bone && !data.local) skeleton.sortBone(bone);
 		skeleton._updateCache.push(this);
 
 		const bones = skeleton.bones;

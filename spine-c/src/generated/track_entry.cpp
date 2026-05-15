@@ -231,6 +231,16 @@ void spine_track_entry_set_mix_duration_2(spine_track_entry self, float mixDurat
 	_self->setMixDuration(mixDuration, delay);
 }
 
+spine_interpolation spine_track_entry_get_mix_interpolation(spine_track_entry self) {
+	TrackEntry *_self = (TrackEntry *) self;
+	return (spine_interpolation) &_self->getMixInterpolation();
+}
+
+void spine_track_entry_set_mix_interpolation(spine_track_entry self, spine_interpolation mixInterpolation) {
+	TrackEntry *_self = (TrackEntry *) self;
+	_self->setMixInterpolation(*((Interpolation *) mixInterpolation));
+}
+
 /*@null*/ spine_track_entry spine_track_entry_get_mixing_from(spine_track_entry self) {
 	TrackEntry *_self = (TrackEntry *) self;
 	return (spine_track_entry) _self->getMixingFrom();

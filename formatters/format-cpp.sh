@@ -58,10 +58,6 @@ cpp_dirs=(
     "../spine-sfml/cpp/src/spine"
     "../spine-sfml/cpp/example"
 
-    # spine-cocos2dx
-    "../spine-cocos2dx/spine-cocos2dx/src/spine"
-    "../spine-cocos2dx/example/Classes"
-
     # spine-ios
     "../spine-ios/Sources/SpineCppLite"
     "../spine-ios/Sources/SpineCppLite/include"

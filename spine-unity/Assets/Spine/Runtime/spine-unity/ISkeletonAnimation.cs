@@ -170,6 +170,7 @@ namespace Spine.Unity {
 		UpdateMode UpdateMode { get; set; }
 		UpdateMode UpdateWhenInvisible { get; set; }
 		float MeshScale { get; }
+		Vector2 MeshOffset { get; }
 		Vector2 PhysicsPositionInheritanceFactor { get; set; }
 		float PhysicsRotationInheritanceFactor { get; set; }
 

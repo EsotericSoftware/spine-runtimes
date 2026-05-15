@@ -239,8 +239,8 @@ namespace Spine.Unity.Editor {
 						List<Skin.SkinEntry> skinEntries = new List<Skin.SkinEntry>();
 						skin.GetAttachments(s, skinEntries);
 						foreach (Skin.SkinEntry entry in skinEntries) {
-							if (!attachmentNames.Contains(entry.PlaceholderName))
-								attachmentNames.Add(entry.PlaceholderName);
+							if (!attachmentNames.Contains(entry.Placeholder))
+								attachmentNames.Add(entry.Placeholder);
 						}
 					}
 					slotLookup.Add(s, attachmentNames);
@@ -361,7 +361,7 @@ namespace Spine.Unity.Editor {
 
 					for (int a = 0; a < skinEntries.Count; a++) {
 						Attachment attachment = skinEntries[a].Attachment;
-						string attachmentName = skinEntries[a].PlaceholderName;
+						string attachmentName = skinEntries[a].Placeholder;
 						string attachmentMeshName = "[" + slotData.Name + "] " + attachmentName;
 						Vector3 offset = Vector3.zero;
 						float rotation = 0;

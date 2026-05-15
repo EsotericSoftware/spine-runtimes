@@ -238,8 +238,51 @@ export class MathUtils {
 }
 
 export abstract class Interpolation {
+	static readonly linear: Interpolation = new class extends Interpolation {
+		protected applyInternal (a: number): number {
+			return a;
+		}
+	}();
+
+	/** Aka "smoothstep". */
+	static readonly smooth: Interpolation = new class extends Interpolation {
+		protected applyInternal (a: number): number {
+			return a * a * (3 - 2 * a);
+		}
+	}();
+
+	/** Slow, then fast. */
+	static readonly slowFast: Interpolation = new class extends Interpolation {
+		protected applyInternal (a: number): number {
+			return a * a;
+		}
+	}();
+
+	/** Fast, then slow. */
+	static readonly fastSlow: Interpolation = new class extends Interpolation {
+		protected applyInternal (a: number): number {
+			return (a - 1) * (a - 1) * -1 + 1;
+		}
+	}();
+
+	static readonly circle: Interpolation = new class extends Interpolation {
+		protected applyInternal (a: number): number {
+			if (a <= 0.5) {
+				a *= 2;
+				return (1 - Math.sqrt(1 - a * a)) / 2;
+			}
+			a--;
+			a *= 2;
+			return (Math.sqrt(1 - a * a) + 1) / 2;
+		}
+	}();
+
 	protected abstract applyInternal (a: number): number;
-	apply (start: number, end: number, a: number): number {
+
+	apply (a: number): number;
+	apply (start: number, end: number, a: number): number;
+	apply (start: number, end?: number, a?: number): number {
+		if (end === undefined || a === undefined) return this.applyInternal(start);
 		return start + (end - start) * this.applyInternal(a);
 	}
 }
@@ -325,7 +368,7 @@ export class Utils {
 		}
 	}
 
-	static toFloatArray (array: Array<number>) {
+	static toFloatArray (array: Array<number>): number[] | Float32Array {
 		return Utils.SUPPORTS_TYPED_ARRAYS ? new Float32Array(array) : array;
 	}
 

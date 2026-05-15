@@ -27,8 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import type { Slot } from "./Slot";
-import { Utils } from "./Utils";
+import type { Slot } from "./Slot.js";
+import { Utils } from "./Utils.js";
 
 /** Stores the skeleton's draw order, which is the order that each slot's attachment is rendered. */
 export class DrawOrder {

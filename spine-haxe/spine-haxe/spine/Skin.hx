@@ -41,7 +41,7 @@ class Skin {
 	/** The skin's name, which is unique across all skins in the skeleton. */
 	public final name:String;
 
-	/** Returns the attachment for the specified slot index and name, or null. */
+	/** Returns the attachment for the specified slot index and placeholder name, or null. */
 	public final attachments:Array<StringMap<Attachment>> = new Array<StringMap<Attachment>>();
 
 	public final bones:Array<BoneData> = new Array<BoneData>();
@@ -57,14 +57,14 @@ class Skin {
 	}
 
 	/** Adds an attachment to the skin for the specified slot index and placeholder name. */
-	public function setAttachment(slotIndex:Int, placeholderName:String, attachment:Attachment):Void {
+	public function setAttachment(slotIndex:Int, placeholder:String, attachment:Attachment):Void {
 		if (attachment == null)
 			throw new SpineException("attachment cannot be null.");
 		if (slotIndex >= attachments.length)
 			attachments.resize(slotIndex + 1);
 		if (attachments[slotIndex] == null)
 			attachments[slotIndex] = new StringMap<Attachment>();
-		attachments[slotIndex].set(placeholderName, attachment);
+		attachments[slotIndex].set(placeholder, attachment);
 	}
 
 	/** Adds all attachments, bones, and constraints from the specified skin to this skin. */
@@ -99,7 +99,7 @@ class Skin {
 		var attachments:Array<SkinEntry> = skin.getAttachments();
 		for (i in 0...attachments.length) {
 			var attachment:SkinEntry = attachments[i];
-			setAttachment(attachment.slotIndex, attachment.placeholderName, attachment.attachment);
+			setAttachment(attachment.slotIndex, attachment.placeholder, attachment.attachment);
 		}
 	}
 
@@ -143,27 +143,27 @@ class Skin {
 			if (Std.isOfType(attachment.attachment, MeshAttachment)) {
 				var mesh = cast(attachment.attachment, MeshAttachment);
 				attachment.attachment = mesh.newLinkedMesh();
-				setAttachment(attachment.slotIndex, attachment.placeholderName, attachment.attachment);
+				setAttachment(attachment.slotIndex, attachment.placeholder, attachment.attachment);
 			} else {
 				attachment.attachment = attachment.attachment.copy();
-				setAttachment(attachment.slotIndex, attachment.placeholderName, attachment.attachment);
+				setAttachment(attachment.slotIndex, attachment.placeholder, attachment.attachment);
 			}
 		}
 	}
 
 	/** Returns the attachment for the specified slot index and placeholder name, or null. */
-	public function getAttachment(slotIndex:Int, placeholderName:String):Attachment {
+	public function getAttachment(slotIndex:Int, placeholder:String):Attachment {
 		if (slotIndex >= attachments.length)
 			return null;
 		var dictionary:StringMap<Attachment> = attachments[slotIndex];
-		return dictionary != null ? dictionary.get(placeholderName) : null;
+		return dictionary != null ? dictionary.get(placeholder) : null;
 	}
 
 	/** Removes the attachment in the skin for the specified slot index and placeholder name, if any. */
-	public function removeAttachment(slotIndex:Int, placeholderName:String):Void {
+	public function removeAttachment(slotIndex:Int, placeholder:String):Void {
 		var dictionary:StringMap<Attachment> = attachments[slotIndex];
 		if (dictionary != null)
-			dictionary.remove(placeholderName);
+			dictionary.remove(placeholder);
 	}
 
 	/** Returns all attachments in this skin. */
@@ -172,10 +172,10 @@ class Skin {
 		for (slotIndex in 0...attachments.length) {
 			var attachments:StringMap<Attachment> = attachments[slotIndex];
 			if (attachments != null) {
-				for (placeholderName in attachments.keys()) {
-					var attachment:Attachment = attachments.get(placeholderName);
+				for (placeholder in attachments.keys()) {
+					var attachment:Attachment = attachments.get(placeholder);
 					if (attachment != null)
-						entries.push(new SkinEntry(slotIndex, placeholderName, attachment));
+						entries.push(new SkinEntry(slotIndex, placeholder, attachment));
 				}
 			}
 		}
@@ -187,10 +187,10 @@ class Skin {
 		var entries:Array<SkinEntry> = new Array<SkinEntry>();
 		var attachments:StringMap<Attachment> = attachments[slotIndex];
 		if (attachments != null) {
-			for (placeholderName in attachments.keys()) {
-				var attachment:Attachment = attachments.get(placeholderName);
+			for (placeholder in attachments.keys()) {
+				var attachment:Attachment = attachments.get(placeholder);
 				if (attachment != null)
-					entries.push(new SkinEntry(slotIndex, placeholderName, attachment));
+					entries.push(new SkinEntry(slotIndex, placeholder, attachment));
 			}
 		}
 		return entries;
@@ -213,7 +213,7 @@ class Skin {
 		for (entry in oldEntries) {
 			var slot = skeleton.slots[entry.slotIndex].pose;
 			if (slot.attachment == entry.attachment) {
-				var attachment = getAttachment(entry.slotIndex, entry.placeholderName);
+				var attachment = getAttachment(entry.slotIndex, entry.placeholder);
 				if (attachment != null)
 					slot.attachment = attachment;
 			}

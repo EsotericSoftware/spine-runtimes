@@ -85,6 +85,7 @@ SPINE_OPAQUE_TYPE(spine_ik_constraint_data)
 SPINE_OPAQUE_TYPE(spine_ik_constraint_pose)
 SPINE_OPAQUE_TYPE(spine_ik_constraint_timeline)
 SPINE_OPAQUE_TYPE(spine_inherit_timeline)
+SPINE_OPAQUE_TYPE(spine_interpolation)
 SPINE_OPAQUE_TYPE(spine_linked_mesh)
 SPINE_OPAQUE_TYPE(spine_mesh_attachment)
 SPINE_OPAQUE_TYPE(spine_path_attachment)
@@ -179,6 +180,7 @@ SPINE_OPAQUE_TYPE(spine_vertex_attachment)
 #include "position_mode.h"
 #include "property.h"
 #include "rotate_mode.h"
+#include "scale_y_mode.h"
 #include "sequence_mode.h"
 #include "spacing_mode.h"
 #include "texture_filter.h"

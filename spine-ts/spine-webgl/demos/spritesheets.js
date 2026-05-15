@@ -104,7 +104,7 @@ var spritesheetsDemo = function (canvas, bgColor) {
 			if (oldValue !== newValue) timeSliderLabel.textContent = newValue;
 		}
 
-		var animationDuration = animationState.getCurrent(0).animation.duration;
+		var animationDuration = animationState.getTrack(0).animation.duration;
 		playTime += delta;
 		while (playTime >= animationDuration) {
 			playTime -= animationDuration;
@@ -119,7 +119,7 @@ var spritesheetsDemo = function (canvas, bgColor) {
 		skeletonSeq.updateWorldTransform(spine.Physics.update);
 
 		animationState.update(delta);
-		var current = animationState.getCurrent(0);
+		var current = animationState.getTrack(0);
 		if (current.animation.name == "walk") current.trackTime = walkLastTimePrecise;
 		animationState.apply(skeleton);
 		skeleton.updateWorldTransform(spine.Physics.update);

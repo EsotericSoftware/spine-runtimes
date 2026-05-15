@@ -174,10 +174,10 @@ class Skeleton {
   /// findSlot(String), finding the attachment with getAttachment(int, String),
   /// then setting the slot's SlotPose::getAttachment().
   ///
-  /// [placeholderName] May be empty.
-  void setAttachment(String slotName, String placeholderName) {
+  /// [placeholder] May be empty.
+  void setAttachment(String slotName, String placeholder) {
     SpineBindings.bindings.spine_skeleton_set_attachment(
-        _ptr, slotName.toNativeUtf8().cast<Char>(), placeholderName.toNativeUtf8().cast<Char>());
+        _ptr, slotName.toNativeUtf8().cast<Char>(), placeholder.toNativeUtf8().cast<Char>());
   }
 
   ArrayConstraint get constraints {
@@ -341,9 +341,9 @@ class Skeleton {
   /// default skin is checked.
   ///
   /// Returns May be NULL.
-  Attachment? getAttachment(String slotName, String placeholderName) {
+  Attachment? getAttachment(String slotName, String placeholder) {
     final result = SpineBindings.bindings.spine_skeleton_get_attachment_1(
-        _ptr, slotName.toNativeUtf8().cast<Char>(), placeholderName.toNativeUtf8().cast<Char>());
+        _ptr, slotName.toNativeUtf8().cast<Char>(), placeholder.toNativeUtf8().cast<Char>());
     if (result.address == 0) return null;
     final rtti = SpineBindings.bindings.spine_attachment_get_rtti(result);
     final className = SpineBindings.bindings.spine_rtti_get_class_name(rtti).cast<Utf8>().toDartString();
@@ -377,9 +377,9 @@ class Skeleton {
   /// default skin is checked.
   ///
   /// Returns May be NULL.
-  Attachment? getAttachment2(int slotIndex, String placeholderName) {
+  Attachment? getAttachment2(int slotIndex, String placeholder) {
     final result = SpineBindings.bindings
-        .spine_skeleton_get_attachment_2(_ptr, slotIndex, placeholderName.toNativeUtf8().cast<Char>());
+        .spine_skeleton_get_attachment_2(_ptr, slotIndex, placeholder.toNativeUtf8().cast<Char>());
     if (result.address == 0) return null;
     final rtti = SpineBindings.bindings.spine_attachment_get_rtti(result);
     final className = SpineBindings.bindings.spine_rtti_get_class_name(rtti).cast<Utf8>().toDartString();

@@ -67,11 +67,11 @@ namespace Spine {
 		public float Angle { get { return angle; } set { angle = value * MathUtils.DegRad; } }
 		public float CenterX { get; set; }
 		public float CenterY { get; set; }
-		public IInterpolation Interpolation { get; set; }
+		public Interpolation Interpolation { get; set; }
 
 		public SwirlEffect (float radius) {
 			Radius = radius;
-			Interpolation = IInterpolation.Pow2;
+			Interpolation = Interpolation.Pow2;
 		}
 
 		public void Begin (Skeleton skeleton) {

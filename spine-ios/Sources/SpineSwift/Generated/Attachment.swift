@@ -131,6 +131,11 @@ open class Attachment: NSObject {
         }
     }
 
+    /// Returns true if the slotIndex or any getTimelineSlots() have an attachment whose
+    /// getTimelineAttachment() is this attachment.
+    ///
+    /// - Parameter slots: The Skeleton::getSlots().
+    /// - Parameter slotIndex: The timeline's primary slot index.
     public func isTimelineActive(_ slots: ArraySlot, _ slotIndex: Int32, _ appliedPose: Bool) -> Bool {
         let result = spine_attachment_is_timeline_active(_ptr.assumingMemoryBound(to: spine_attachment_wrapper.self), slots._ptr.assumingMemoryBound(to: spine_array_slot_wrapper.self), slotIndex, appliedPose)
         return result

@@ -43,7 +43,7 @@ Multi-language runtime libraries for Spine 2D skeletal animations. Provides core
 - **Flutter pub** - Dart package management
 
 ### Frameworks & Engines
-- **Game Engines**: Unity, Unreal Engine (4.27-5.5), Godot, Cocos2d-x, libGDX
+- **Game Engines**: Unity, Unreal Engine (4.27-5.5), Godot, libGDX
 - **Web**: Phaser.js (v3/v4), PixiJS (v7/v8), Three.js, HTML5 Canvas, WebGL
 - **Mobile/Desktop**: Flutter, MonoGame, SDL, SFML, GLFW
 - **Graphics**: OpenGL/ES, WebGL, Metal, DirectX (UE)
@@ -60,7 +60,7 @@ Multi-language runtime libraries for Spine 2D skeletal animations. Provides core
 
 ### Integration Runtimes (Engine-specific)
 **Using spine-cpp:**
-- spine-cocos2dx, spine-flutter, spine-glfw, spine-godot, spine-ios, spine-sdl, spine-sfml, spine-ue
+- spine-flutter, spine-glfw, spine-godot, spine-ios, spine-sdl, spine-sfml, spine-ue
 
 **Using spine-csharp:**
 - spine-unity, spine-monogame, spine-xna

@@ -189,10 +189,6 @@ public class BonePose: BoneLocal, Update {
         spine_bone_pose_modify_world(_ptr.assumingMemoryBound(to: spine_bone_pose_wrapper.self), update)
     }
 
-    public func resetWorld(_ update: Int32) {
-        spine_bone_pose_reset_world(_ptr.assumingMemoryBound(to: spine_bone_pose_wrapper.self), update)
-    }
-
     /// Transforms a world rotation to a local rotation.
     public func worldToLocalRotation(_ worldRotation: Float) -> Float {
         let result = spine_bone_pose_world_to_local_rotation(_ptr.assumingMemoryBound(to: spine_bone_pose_wrapper.self), worldRotation)

@@ -18,16 +18,16 @@ SPINE_C_API void spine_skin_dispose(spine_skin self);
  * name. If the placeholder name already exists for the slot, the previous value
  * is replaced.
  */
-SPINE_C_API void spine_skin_set_attachment(spine_skin self, size_t slotIndex, const char *placeholderName, /*@null*/ spine_attachment attachment);
+SPINE_C_API void spine_skin_set_attachment(spine_skin self, size_t slotIndex, const char *placeholder, /*@null*/ spine_attachment attachment);
 /**
  * Returns the attachment for the specified slot index and placeholder name, or
  * NULL.
  */
-SPINE_C_API /*@null*/ spine_attachment spine_skin_get_attachment(spine_skin self, size_t slotIndex, const char *placeholderName);
+SPINE_C_API /*@null*/ spine_attachment spine_skin_get_attachment(spine_skin self, size_t slotIndex, const char *placeholder);
 /**
  * Removes the attachment from the skin.
  */
-SPINE_C_API void spine_skin_remove_attachment(spine_skin self, size_t slotIndex, const char *placeholderName);
+SPINE_C_API void spine_skin_remove_attachment(spine_skin self, size_t slotIndex, const char *placeholder);
 /**
  * Finds the attachments for a given slot. The results are added to the passed
  * array of Attachments.

@@ -348,7 +348,7 @@ public class BonePose implements Pose<BonePose>, Update {
 		resetWorld(update);
 	}
 
-	void resetWorld (int update) {
+	private void resetWorld (int update) {
 		Bone[] children = bone.children.items;
 		for (int i = 0, n = bone.children.size; i < n; i++) {
 			BonePose child = children[i].appliedPose;

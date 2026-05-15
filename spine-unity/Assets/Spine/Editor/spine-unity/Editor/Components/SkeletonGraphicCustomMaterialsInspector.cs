@@ -146,7 +146,7 @@ namespace Spine.Unity.Editor {
 			_customTextureOverridesPrev = CopyList(componentCustomTextureOverrides);
 			_customSlotMaterialsPrev = CopyList(componentCustomSlotMaterials);
 
-			if (componentCustomSlotMaterials.Count > 0 &&
+			if (componentCustomSlotMaterials.Count > 0 && !skeletonGraphic.allowMultipleCanvasRenderers &&
 				componentCustomSlotMaterials.Any(entry => entry.overrideEnabled)) {
 				EditorGUILayout.HelpBox("Please enable 'Advanced - Multiple CanvasRenderers' at the SkeletonGraphic " +
 					"component when using Custom Slot Materials.", MessageType.Warning, true);

@@ -592,7 +592,7 @@ namespace Spine.Unity.Editor {
 								Skin.SkinEntry skinEntry = slotAttachments[a];
 								Attachment attachment = skinEntry.Attachment;
 								var slotPose = slot.AppliedPose;
-								string attachmentName = skinEntry.PlaceholderName;
+								string attachmentName = skinEntry.Placeholder;
 								bool attachmentIsFromSkin = !defaultSkinAttachments.Contains(skinEntry);
 
 								Texture2D attachmentTypeIcon = Icons.GetAttachmentIcon(attachment);
@@ -822,12 +822,12 @@ namespace Spine.Unity.Editor {
 		public bool IsPlayingAnimation {
 			get {
 				if (!IsValid) return false;
-				TrackEntry currentTrack = skeletonAnimation.AnimationState.GetCurrent(0);
+				TrackEntry currentTrack = skeletonAnimation.AnimationState.GetTrack(0);
 				return currentTrack != null && currentTrack.TimeScale > 0;
 			}
 		}
 
-		public TrackEntry ActiveTrack { get { return IsValid ? skeletonAnimation.AnimationState.GetCurrent(0) : null; } }
+		public TrackEntry ActiveTrack { get { return IsValid ? skeletonAnimation.AnimationState.GetTrack(0) : null; } }
 
 		public Vector3 PreviewCameraPosition {
 			get { return PreviewUtilityCamera.transform.position; }
@@ -911,7 +911,8 @@ namespace Spine.Unity.Editor {
 #endif
 					}
 
-					if (this.ActiveTrack != null) cameraAdjustEndFrame = EditorApplication.timeSinceStartup + skeletonAnimation.AnimationState.GetCurrent(0).Alpha;
+					if (this.ActiveTrack != null) cameraAdjustEndFrame = EditorApplication.timeSinceStartup
+							+ skeletonAnimation.AnimationState.GetTrack(0).Alpha;
 					AdjustCameraGoals();
 				} catch {
 					DestroyPreviewGameObject();
@@ -1190,7 +1191,7 @@ namespace Spine.Unity.Editor {
 
 			Rect lineRect = new Rect(barRect);
 			float lineRectWidth = lineRect.width;
-			TrackEntry t = skeletonAnimation.AnimationState.GetCurrent(0);
+			TrackEntry t = skeletonAnimation.AnimationState.GetTrack(0);
 
 			if (t != null && Icons.userEvent != null) { // when changing to play mode, Icons.userEvent  will not be reset
 				int loopCount = (int)(t.TrackTime / t.TrackEnd);

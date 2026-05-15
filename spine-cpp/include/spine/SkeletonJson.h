@@ -107,7 +107,7 @@ namespace spine {
 
 		Animation *readAnimation(Json *root, SkeletonData *skeletonData);
 
-		Attachment *readAttachment(Json *map, Skin *skin, int slotIndex, const char *name, SkeletonData *skeletonData);
+		Attachment *readAttachment(Json *map, Skin *skin, int slotIndex, const char *placeholder, SkeletonData *skeletonData);
 
 		void readVertices(Json *attachmentMap, VertexAttachment *attachment, size_t verticesLength);
 

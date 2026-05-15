@@ -79,7 +79,7 @@ export class DarkTintMesh extends Mesh<DarkTintMaterial> {
 
 		// set properties for batching..
 		this.calculateVertices();
-		this.indices = geometry.indexBuffer.data as Uint16Array;
+		this.indices = geometry.indexBuffer.data as unknown as Uint16Array;
 		this._tintRGB = shader._tintRGB;
 		this._darkTintRGB = shader._darkTintRGB;
 		this._texture = shader.texture;

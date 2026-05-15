@@ -87,6 +87,13 @@ public class Animation: NSObject {
         return ArrayInt(fromPointer: result!)
     }
 
+    /// The color of the animation as it was in Spine, or a default color if nonessential data was
+    /// not exported.
+    public var color: Color {
+        let result = spine_animation_get_color(_ptr.assumingMemoryBound(to: spine_animation_wrapper.self))
+        return Color(fromPointer: result!)
+    }
+
     /// Sets the timelines and bone indices.
     public func setTimelines(_ timelines: ArrayTimeline, _ bones: ArrayInt) {
         spine_animation_set_timelines(_ptr.assumingMemoryBound(to: spine_animation_wrapper.self), timelines._ptr.assumingMemoryBound(to: spine_array_timeline_wrapper.self), bones._ptr.assumingMemoryBound(to: spine_array_int_wrapper.self))

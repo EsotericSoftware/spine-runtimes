@@ -237,7 +237,8 @@ class Skeleton {
 	public function updateWorldTransform(physics:Physics):Void {
 		_update++;
 
-		drawOrder.resetConstrained();
+		if (drawOrder.appliedPose == drawOrder.constrainedPose)
+			drawOrder.resetConstrained();
 		for (resetable in resetCache)
 			resetable.resetConstrained();
 
@@ -361,46 +362,46 @@ class Skeleton {
 		return skin;
 	}
 
-	/** Finds an attachment by looking in the Skeleton.skin and spine.SkeletonData defaultSkin using the slot name and attachment
+	/** Finds an attachment by looking in the Skeleton.skin and spine.SkeletonData defaultSkin using the slot name and skin placeholder
 	 * name.
 	 *
 	 * See Skeleton.getAttachmentForSlotIndex(). */
-	public function getAttachmentForSlotName(slotName:String, attachmentName:String):Attachment {
-		return getAttachmentForSlotIndex(data.findSlot(slotName).index, attachmentName);
+	public function getAttachmentForSlotName(slotName:String, placeholder:String):Attachment {
+		return getAttachmentForSlotIndex(data.findSlot(slotName).index, placeholder);
 	}
 
-	/** Finds an attachment by looking in the Skeleton.skin and spine.SkeletonData defaultSkin using the slot index and
-	 * attachment name. First the skin is checked and if the attachment was not found, the default skin is checked.
+	/** Finds an attachment by looking in the Skeleton.skin and spine.SkeletonData defaultSkin using the slot index and skin
+	 * placeholder name. First the skin is checked and if the attachment was not found, the default skin is checked.
 	 *
 	 * @see https://esotericsoftware.com/spine-runtime-skins Runtime skins in the Spine Runtimes Guide
 	 */
-	public function getAttachmentForSlotIndex(slotIndex:Int, attachmentName:String):Attachment {
-		if (attachmentName == null)
-			throw new SpineException("attachmentName cannot be null.");
+	public function getAttachmentForSlotIndex(slotIndex:Int, placeholder:String):Attachment {
+		if (placeholder == null)
+			throw new SpineException("placeholder cannot be null.");
 		if (skin != null) {
-			var attachment:Attachment = skin.getAttachment(slotIndex, attachmentName);
+			var attachment:Attachment = skin.getAttachment(slotIndex, placeholder);
 			if (attachment != null)
 				return attachment;
 		}
 		if (data.defaultSkin != null)
-			return data.defaultSkin.getAttachment(slotIndex, attachmentName);
+			return data.defaultSkin.getAttachment(slotIndex, placeholder);
 		return null;
 	}
 
 	/** A convenience method to set an attachment by finding the slot with Skeleton.findSlot(), finding the attachment with
 	 * Skeleton.getAttachmentForSlotIndex(), then setting the slot's spine.Slot attachment.
-	 * @param attachmentName May be null to clear the slot's attachment. */
-	public function setAttachment(slotName:String, attachmentName:String):Void {
+	 * @param placeholder May be null to clear the slot's attachment. */
+	public function setAttachment(slotName:String, placeholder:String):Void {
 		if (slotName == null)
 			throw new SpineException("slotName cannot be null.");
 		var i:Int = 0;
 		for (slot in slots) {
 			if (slot.data.name == slotName) {
 				var attachment:Attachment = null;
-				if (attachmentName != null) {
-					attachment = getAttachmentForSlotIndex(i, attachmentName);
+				if (placeholder != null) {
+					attachment = getAttachmentForSlotIndex(i, placeholder);
 					if (attachment == null) {
-						throw new SpineException("Attachment not found: " + attachmentName + ", for slot: " + slotName);
+						throw new SpineException("Attachment not found: " + placeholder + ", for slot: " + slotName);
 					}
 				}
 				slot.pose.attachment = attachment;

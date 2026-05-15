@@ -169,10 +169,32 @@ namespace Spine.Unity {
 			public int threadIndex;
 		}
 
+		public struct SkeletonAnimationListModification {
+			public bool isAdd;
+			public UpdateTiming timing;
+			public SkeletonAnimationBase animation;
+		}
+
+		public struct SkeletonRendererListModification {
+			public bool isAdd;
+			public ISkeletonRenderer renderer;
+		}
+
 		public List<SkeletonAnimationBase> skeletonAnimationsUpdate = new List<SkeletonAnimationBase>();
 		public List<SkeletonAnimationBase> skeletonAnimationsFixedUpdate = new List<SkeletonAnimationBase>();
 		public List<SkeletonAnimationBase> skeletonAnimationsLateUpdate = new List<SkeletonAnimationBase>();
 		public List<ISkeletonRenderer> skeletonRenderers = new List<ISkeletonRenderer>();
+
+		/// <summary>Deferred add/remove operations recorded when e.g. <c>SetActive</c> is called during a
+		/// skeleton event while processing all skeletons. Access is limited to the main thread, as
+		/// <c>SetActive</c> can't be called from a worker thread.</summary>
+		List<SkeletonAnimationListModification> skeletonAnimationModifications = new List<SkeletonAnimationListModification>();
+		/// <summary>Deferred add/remove operations recorded when e.g. <c>SetActive</c> is called during a
+		/// skeleton event while processing all skeletons. Access is limited to the main thread, as
+		/// <c>SetActive</c> can't be called from a worker thread.</summary>
+		List<SkeletonRendererListModification> skeletonRendererModifications = new List<SkeletonRendererListModification>();
+		bool isProcessingAnimations = false;
+		bool isProcessingRenderers = false;
 		WorkerPoolTask[] genericSkeletonTasks = null;
 
 		public WorkerPool workerPool;
@@ -250,35 +272,63 @@ namespace Spine.Unity {
 #if USE_THREADED_ANIMATION_UPDATE
 		public void RegisterForUpdate (UpdateTiming updateTiming, SkeletonAnimationBase skeletonAnimation) {
 			skeletonAnimation.IsUpdatedExternally = true;
+			if (isProcessingAnimations) {
+				skeletonAnimationModifications.Add(new SkeletonAnimationListModification {
+					isAdd = true,
+					timing = updateTiming,
+					animation = skeletonAnimation
+				});
+			} else {
+				var skeletonAnimations = skeletonAnimationsUpdate;
+				if (updateTiming == UpdateTiming.InFixedUpdate) skeletonAnimations = skeletonAnimationsFixedUpdate;
+				else if (updateTiming == UpdateTiming.InLateUpdate) skeletonAnimations = skeletonAnimationsLateUpdate;
 
-			var skeletonAnimations = skeletonAnimationsUpdate;
-			if (updateTiming == UpdateTiming.InFixedUpdate) skeletonAnimations = skeletonAnimationsFixedUpdate;
-			else if (updateTiming == UpdateTiming.InLateUpdate) skeletonAnimations = skeletonAnimationsLateUpdate;
-
-			if (skeletonAnimations.Contains(skeletonAnimation))
-				return;
-			skeletonAnimations.Add(skeletonAnimation);
+				if (skeletonAnimations.Contains(skeletonAnimation))
+					return;
+				skeletonAnimations.Add(skeletonAnimation);
+			}
 		}
 
 		public void UnregisterFromUpdate (UpdateTiming updateTiming, SkeletonAnimationBase skeletonAnimation) {
-			var skeletonAnimations = skeletonAnimationsUpdate;
-			if (updateTiming == UpdateTiming.InFixedUpdate) skeletonAnimations = skeletonAnimationsFixedUpdate;
-			else if (updateTiming == UpdateTiming.InLateUpdate) skeletonAnimations = skeletonAnimationsLateUpdate;
-
-			skeletonAnimations.Remove(skeletonAnimation);
+			if (isProcessingAnimations) {
+				skeletonAnimationModifications.Add(new SkeletonAnimationListModification {
+					isAdd = false,
+					timing = updateTiming,
+					animation = skeletonAnimation
+				});
+			} else {
+				var skeletonAnimations = skeletonAnimationsUpdate;
+				if (updateTiming == UpdateTiming.InFixedUpdate) skeletonAnimations = skeletonAnimationsFixedUpdate;
+				else if (updateTiming == UpdateTiming.InLateUpdate) skeletonAnimations = skeletonAnimationsLateUpdate;
+				skeletonAnimations.Remove(skeletonAnimation);
+			}
 			skeletonAnimation.IsUpdatedExternally = false;
 		}
 #endif
 
 		public void RegisterForUpdate (ISkeletonRenderer renderer) {
 			renderer.IsUpdatedExternally = true;
-			if (skeletonRenderers.Contains(renderer))
-				return;
-			skeletonRenderers.Add(renderer);
+			if (isProcessingRenderers) {
+				skeletonRendererModifications.Add(new SkeletonRendererListModification {
+					isAdd = true,
+					renderer = renderer
+				});
+			} else {
+				if (skeletonRenderers.Contains(renderer))
+					return;
+				skeletonRenderers.Add(renderer);
+			}
 		}
 
 		public void UnregisterFromUpdate (ISkeletonRenderer renderer) {
-			skeletonRenderers.Remove(renderer);
+			if (isProcessingRenderers) {
+				skeletonRendererModifications.Add(new SkeletonRendererListModification {
+					isAdd = false,
+					renderer = renderer
+				});
+			} else {
+				skeletonRenderers.Remove(renderer);
+			}
 			renderer.IsUpdatedExternally = false;
 		}
 
@@ -353,6 +403,7 @@ namespace Spine.Unity {
 
 			SkeletonAnimationBase.ExternalDeltaTime = Time.deltaTime;
 			SkeletonAnimationBase.ExternalUnscaledDeltaTime = Time.unscaledDeltaTime;
+			isProcessingAnimations = true;
 			MainThreadBeforeUpdate(skeletons, skeletonEnd);
 
 #if RUN_ALL_ON_MAIN_THREAD
@@ -368,9 +419,12 @@ namespace Spine.Unity {
 					numAsyncThreads, skeletonEnd);
 #endif
 			MainThreadAfterUpdate(skeletons, skeletonEnd);
+
+			isProcessingAnimations = false;
+			FlushSkeletonAnimationListModifications();
 		}
 
-		protected void PartitionTasks(ref ExposedList<SkeletonPartitionRange> taskPartitions, out int outAsyncEndExclusive,
+		protected void PartitionTasks (ref ExposedList<SkeletonPartitionRange> taskPartitions, out int outAsyncEndExclusive,
 			int tasksPerThread, int skeletonCount, int numAsyncThreads, int numAvailableThreads) {
 
 			int numAsyncTasks = numAsyncThreads * tasksPerThread;
@@ -591,6 +645,7 @@ namespace Spine.Unity {
 				skeletonsLateUpdatedAtTask[t] = 0;
 			}
 #endif
+			isProcessingRenderers = true;
 			MainThreadPrepareLateUpdate(endIndexThreaded);
 
 			SkeletonPartitionRange[] asyncPartitionsItems = asyncTaskPartitions.Items;
@@ -626,8 +681,9 @@ namespace Spine.Unity {
 				};
 				LateUpdateSkeletonsSynchronous(range);
 			}
-
 #if RUN_ALL_ON_MAIN_THREAD
+			isProcessingRenderers = false;
+			FlushSkeletonRendererListModifications();
 			return; // nothing left to do after all processed as LateUpdateSkeletonsSynchronous
 #endif
 
@@ -690,6 +746,8 @@ namespace Spine.Unity {
 					skeletonRenderer.UpdateMeshAndMaterialsToBuffers();
 			}
 #endif
+			isProcessingRenderers = false;
+			FlushSkeletonRendererListModifications();
 		}
 
 		protected void MainThreadPrepareLateUpdate (int endIndexThreaded) {
@@ -723,6 +781,33 @@ namespace Spine.Unity {
 				}
 				numExceptionsSet = 0;
 			}
+		}
+
+		private void FlushSkeletonRendererListModifications () {
+			foreach (SkeletonRendererListModification entry in skeletonRendererModifications) {
+				if (entry.isAdd) {
+					if (skeletonRenderers.Contains(entry.renderer)) continue;
+					skeletonRenderers.Add(entry.renderer);
+				} else {
+					skeletonRenderers.Remove(entry.renderer);
+				}
+			}
+			skeletonRendererModifications.Clear();
+		}
+
+		private void FlushSkeletonAnimationListModifications () {
+			foreach (SkeletonAnimationListModification entry in skeletonAnimationModifications) {
+				var skeletonAnimations = skeletonAnimationsUpdate;
+				if (entry.timing == UpdateTiming.InFixedUpdate) skeletonAnimations = skeletonAnimationsFixedUpdate;
+				else if (entry.timing == UpdateTiming.InLateUpdate) skeletonAnimations = skeletonAnimationsLateUpdate;
+				if (entry.isAdd) {
+					if (skeletonAnimations.Contains(entry.animation)) continue;
+					skeletonAnimations.Add(entry.animation);
+				} else {
+					skeletonAnimations.Remove(entry.animation);
+				}
+			}
+			skeletonAnimationModifications.Clear();
 		}
 
 #if !DONT_WAIT_FOR_ALL_LATEUPDATE_TASKS
@@ -787,7 +872,7 @@ namespace Spine.Unity {
 			}
 			instance.updateDone[taskIndex].Set();
 #if SPINE_ENABLE_THREAD_PROFILING
-				instance.profilerSamplerUpdate[threadIndex].End();
+			instance.profilerSamplerUpdate[threadIndex].End();
 #endif
 		}
 
@@ -899,7 +984,7 @@ namespace Spine.Unity {
 		static void LateUpdateSkeletonsAsyncImpl (SkeletonUpdateRange range, int threadIndex) {
 			int start = range.rangeStart;
 			int end = range.rangeEndExclusive;
-			int taskIndex = range.taskIndex; 
+			int taskIndex = range.taskIndex;
 			var instance = Instance;
 
 #if SPINE_ENABLE_THREAD_PROFILING

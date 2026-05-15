@@ -34,6 +34,7 @@ import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
 import 'animation.dart';
 import 'animation_state.dart';
+import 'interpolation.dart';
 
 /// State for the playback of an animation
 class TrackEntry {
@@ -262,10 +263,10 @@ class TrackEntry {
     SpineBindings.bindings.spine_track_entry_set_alpha(_ptr, value);
   }
 
-  /// When the mix percentage (mix time / mix duration) is less than the event
-  /// threshold, event timelines for the animation being mixed out will be
-  /// applied. Defaults to 0, so event timelines are not applied for an
-  /// animation being mixed out.
+  /// When the interpolated mix percentage is less than the event threshold,
+  /// event timelines for the animation being mixed out will be applied.
+  /// Defaults to 0, so event timelines are not applied for an animation being
+  /// mixed out.
   double get eventThreshold {
     final result = SpineBindings.bindings.spine_track_entry_get_event_threshold(_ptr);
     return result;
@@ -275,10 +276,10 @@ class TrackEntry {
     SpineBindings.bindings.spine_track_entry_set_event_threshold(_ptr, value);
   }
 
-  /// When the mix percentage (mix time / mix duration) is less than the
-  /// attachment threshold, attachment timelines for the animation being mixed
-  /// out will be applied. Defaults to 0, so attachment timelines are not
-  /// applied for an animation being mixed out.
+  /// When the interpolated mix percentage is less than the attachment
+  /// threshold, attachment timelines for the animation being mixed out will be
+  /// applied. Defaults to 0, so attachment timelines are not applied for an
+  /// animation being mixed out.
   double get mixAttachmentThreshold {
     final result = SpineBindings.bindings.spine_track_entry_get_mix_attachment_threshold(_ptr);
     return result;
@@ -288,8 +289,10 @@ class TrackEntry {
     SpineBindings.bindings.spine_track_entry_set_mix_attachment_threshold(_ptr, value);
   }
 
-  /// When alpha is greater than alphaAttachmentThreshold, attachment timelines
-  /// are applied. Defaults to 0, so attachment timelines are always applied.
+  /// When the computed alpha is greater than alphaAttachmentThreshold,
+  /// attachment timelines are applied. The computed alpha includes alpha and
+  /// the interpolated mix percentage. Defaults to 0, so attachment timelines
+  /// are always applied.
   double get alphaAttachmentThreshold {
     final result = SpineBindings.bindings.spine_track_entry_get_alpha_attachment_threshold(_ptr);
     return result;
@@ -299,10 +302,10 @@ class TrackEntry {
     SpineBindings.bindings.spine_track_entry_set_alpha_attachment_threshold(_ptr, value);
   }
 
-  /// When the mix percentage (mix time / mix duration) is less than the draw
-  /// order threshold, draw order timelines for the animation being mixed out
-  /// will be applied. Defaults to 0, so draw order timelines are not applied
-  /// for an animation being mixed out.
+  /// When the interpolated mix percentage is less than the draw order
+  /// threshold, draw order timelines for the animation being mixed out will be
+  /// applied. Defaults to 0, so draw order timelines are not applied for an
+  /// animation being mixed out.
   double get mixDrawOrderThreshold {
     final result = SpineBindings.bindings.spine_track_entry_get_mix_draw_order_threshold(_ptr);
     return result;
@@ -350,6 +353,18 @@ class TrackEntry {
   double get mixDuration {
     final result = SpineBindings.bindings.spine_track_entry_get_mix_duration(_ptr);
     return result;
+  }
+
+  /// The interpolation to apply to the mix percentage (mix time / mix duration)
+  /// when mixing from the previous animation to this animation. Defaults to
+  /// linear.
+  Interpolation get mixInterpolation {
+    final result = SpineBindings.bindings.spine_track_entry_get_mix_interpolation(_ptr);
+    return Interpolation.fromPointer(result);
+  }
+
+  set mixInterpolation(Interpolation value) {
+    SpineBindings.bindings.spine_track_entry_set_mix_interpolation(_ptr, value.nativePtr.cast());
   }
 
   /// The track entry for the previous animation when mixing to this animation,

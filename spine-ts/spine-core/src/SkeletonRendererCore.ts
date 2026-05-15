@@ -27,11 +27,11 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { ClippingAttachment, MeshAttachment, RegionAttachment } from "./attachments";
-import type { Skeleton } from "./Skeleton";
-import { SkeletonClipping } from "./SkeletonClipping";
-import { BlendMode } from "./SlotData";
-import type { Color, NumberArrayLike } from "./Utils";
+import { ClippingAttachment, MeshAttachment, RegionAttachment } from "./attachments/index.js";
+import type { Skeleton } from "./Skeleton.js";
+import { SkeletonClipping } from "./SkeletonClipping.js";
+import { BlendMode } from "./SlotData.js";
+import type { Color, NumberArrayLike } from "./Utils.js";
 
 export class SkeletonRendererCore {
 	private commandPool = new CommandPool();

@@ -500,7 +500,7 @@ export class Downloader {
 		}
 	}
 
-	base64ToUint8Array (base64: string) {
+	base64ToUint8Array (base64: string): Uint8Array {
 		var binary_string = window.atob(base64);
 		var len = binary_string.length;
 		var bytes = new Uint8Array(len);
@@ -510,7 +510,7 @@ export class Downloader {
 		return bytes;
 	}
 
-	dataUriToUint8Array (dataUri: string) {
+	dataUriToUint8Array (dataUri: string): Uint8Array {
 		if (!dataUri.startsWith("data:")) {
 			throw new Error("Not a data URI.");
 		}

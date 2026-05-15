@@ -51,35 +51,43 @@ static void findRegions(Atlas *atlas, AtlasAttachmentLoader *loader, const Strin
 	}
 }
 
-RegionAttachment *AtlasAttachmentLoader::newRegionAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence) {
+RegionAttachment *AtlasAttachmentLoader::newRegionAttachment(Skin &skin, const String &placeholder, const String &name, const String &path,
+															 Sequence *sequence) {
 	SP_UNUSED(skin);
+	SP_UNUSED(placeholder);
 	findRegions(_atlas, this, name, path, sequence);
 	return new (__FILE__, __LINE__) RegionAttachment(name, sequence);
 }
 
-MeshAttachment *AtlasAttachmentLoader::newMeshAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence) {
+MeshAttachment *AtlasAttachmentLoader::newMeshAttachment(Skin &skin, const String &placeholder, const String &name, const String &path,
+														 Sequence *sequence) {
 	SP_UNUSED(skin);
+	SP_UNUSED(placeholder);
 	findRegions(_atlas, this, name, path, sequence);
 	return new (__FILE__, __LINE__) MeshAttachment(name, sequence);
 }
 
-BoundingBoxAttachment *AtlasAttachmentLoader::newBoundingBoxAttachment(Skin &skin, const String &name) {
+BoundingBoxAttachment *AtlasAttachmentLoader::newBoundingBoxAttachment(Skin &skin, const String &placeholder, const String &name) {
 	SP_UNUSED(skin);
+	SP_UNUSED(placeholder);
 	return new (__FILE__, __LINE__) BoundingBoxAttachment(name);
 }
 
-PathAttachment *AtlasAttachmentLoader::newPathAttachment(Skin &skin, const String &name) {
+PathAttachment *AtlasAttachmentLoader::newPathAttachment(Skin &skin, const String &placeholder, const String &name) {
 	SP_UNUSED(skin);
+	SP_UNUSED(placeholder);
 	return new (__FILE__, __LINE__) PathAttachment(name);
 }
 
-PointAttachment *AtlasAttachmentLoader::newPointAttachment(Skin &skin, const String &name) {
+PointAttachment *AtlasAttachmentLoader::newPointAttachment(Skin &skin, const String &placeholder, const String &name) {
 	SP_UNUSED(skin);
+	SP_UNUSED(placeholder);
 	return new (__FILE__, __LINE__) PointAttachment(name);
 }
 
-ClippingAttachment *AtlasAttachmentLoader::newClippingAttachment(Skin &skin, const String &name) {
+ClippingAttachment *AtlasAttachmentLoader::newClippingAttachment(Skin &skin, const String &placeholder, const String &name) {
 	SP_UNUSED(skin);
+	SP_UNUSED(placeholder);
 	return new (__FILE__, __LINE__) ClippingAttachment(name);
 }
 

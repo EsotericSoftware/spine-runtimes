@@ -44,27 +44,27 @@ namespace Spine {
 		}
 
 		class NullAttachmentLoader : AttachmentLoader {
-			public RegionAttachment NewRegionAttachment (Skin skin, string name, string path, Sequence sequence) {
+			public RegionAttachment NewRegionAttachment (Skin skin, string placeholder, string name, string path, Sequence sequence) {
 				return null;
 			}
 
-			public MeshAttachment NewMeshAttachment (Skin skin, string name, string path, Sequence sequence) {
+			public MeshAttachment NewMeshAttachment (Skin skin, string placeholder, string name, string path, Sequence sequence) {
 				return null;
 			}
 
-			public BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, string name) {
+			public BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, string placeholder, string name) {
 				return null;
 			}
 
-			public ClippingAttachment NewClippingAttachment (Skin skin, string name) {
+			public ClippingAttachment NewClippingAttachment (Skin skin, string placeholder, string name) {
 				return null;
 			}
 
-			public PathAttachment NewPathAttachment (Skin skin, string name) {
+			public PathAttachment NewPathAttachment (Skin skin, string placeholder, string name) {
 				return null;
 			}
 
-			public PointAttachment NewPointAttachment (Skin skin, string name) {
+			public PointAttachment NewPointAttachment (Skin skin, string placeholder, string name) {
 				return null;
 			}
 		}

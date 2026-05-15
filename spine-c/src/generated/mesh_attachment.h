@@ -83,6 +83,13 @@ SPINE_C_API void spine_mesh_attachment_copy_to(spine_mesh_attachment self, spine
 SPINE_C_API const char *spine_mesh_attachment_get_name(spine_mesh_attachment self);
 SPINE_C_API spine_array_int spine_mesh_attachment_get_timeline_slots(spine_mesh_attachment self);
 SPINE_C_API void spine_mesh_attachment_set_timeline_slots(spine_mesh_attachment self, spine_array_int timelineSlots);
+/**
+ * Returns true if the slotIndex or any getTimelineSlots() have an attachment
+ * whose getTimelineAttachment() is this attachment.
+ *
+ * @param slots The Skeleton::getSlots().
+ * @param slotIndex The timeline's primary slot index.
+ */
 SPINE_C_API bool spine_mesh_attachment_is_timeline_active(spine_mesh_attachment self, spine_array_slot slots, int slotIndex, bool appliedPose);
 SPINE_C_API int spine_mesh_attachment_get_ref_count(spine_mesh_attachment self);
 SPINE_C_API void spine_mesh_attachment_reference(spine_mesh_attachment self);

@@ -46,7 +46,6 @@ git diff COMPARE_BRANCH..CURRENT_BRANCH -- spine-libgdx/spine-libgdx/src/com/eso
   - [ ] **GLFW** (`spine-glfw/`)
 
 - [ ] **C++** (`spine-cpp/`) - Check `src/spine/*.cpp` and `include/spine/*.h`
-  - [ ] **Cocos2d-x** (in examples if present)
   - [ ] **SFML** (`spine-sfml/cpp/`)
   - [ ] **UE** (`spine-ue/`)
   - [ ] **Godot** (`spine-godot/`)

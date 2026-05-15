@@ -113,6 +113,9 @@ public class SkeletonSerializer {
 		json.writeName("duration");
 		json.writeValue(obj.getDuration());
 
+		json.writeName("color");
+		writeColor(obj.getColor());
+
 		json.writeName("bones");
 		writeIntArray(obj.getBones());
 
@@ -2039,6 +2042,12 @@ public class SkeletonSerializer {
 		json.writeName("icon");
 		json.writeValue(obj.getIcon());
 
+		json.writeName("iconSize");
+		json.writeValue(obj.getIconSize());
+
+		json.writeName("iconRotation");
+		json.writeValue(obj.getIconRotation());
+
 		json.writeName("visible");
 		json.writeValue(obj.getVisible());
 
@@ -2433,7 +2442,7 @@ public class SkeletonSerializer {
 		writeBoneData(obj.getTarget());
 
 		json.writeName("scaleY");
-		json.writeValue(obj.getScaleY().name());
+		json.writeValue(obj.getScaleYMode().name());
 
 		json.writeName("name");
 		json.writeValue(obj.getName());
@@ -3341,7 +3350,7 @@ public class SkeletonSerializer {
 			json.writeValue(visitedObjects.get(obj));
 			return;
 		}
-		String refString = obj.getPlaceholderName() != null ? "<SkinEntry-" + obj.getPlaceholderName() + ">"
+		String refString = obj.getPlaceholder() != null ? "<SkinEntry-" + obj.getPlaceholder() + ">"
 			: "<SkinEntry-" + (nextId++) + ">";
 		visitedObjects.put(obj, refString);
 
@@ -3355,7 +3364,7 @@ public class SkeletonSerializer {
 		json.writeValue(obj.getSlotIndex());
 
 		json.writeName("name");
-		json.writeValue(obj.getPlaceholderName());
+		json.writeValue(obj.getPlaceholder());
 
 		json.writeName("attachment");
 		writeAttachment(obj.getAttachment());

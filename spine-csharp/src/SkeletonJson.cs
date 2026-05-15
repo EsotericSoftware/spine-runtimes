@@ -589,9 +589,9 @@ namespace Spine {
 			}
 		}
 
-		private Attachment ReadAttachment (Dictionary<string, Object> map, Skin skin, int slotIndex, string name, SkeletonData skeletonData) {
+		private Attachment ReadAttachment (Dictionary<string, Object> map, Skin skin, int slotIndex, string placeholder, SkeletonData skeletonData) {
 			float scale = this.scale;
-			name = GetString(map, "name", name);
+			string name = GetString(map, "name", placeholder);
 
 			string typeName = GetString(map, "type", "region");
 			AttachmentType type = (AttachmentType)Enum.Parse(typeof(AttachmentType), typeName, true);
@@ -602,7 +602,7 @@ namespace Spine {
 				object sequenceJson;
 				map.TryGetValue("sequence", out sequenceJson);
 				Sequence sequence = ReadSequence(sequenceJson);
-				RegionAttachment region = attachmentLoader.NewRegionAttachment(skin, name, path, sequence);
+				RegionAttachment region = attachmentLoader.NewRegionAttachment(skin, placeholder, name, path, sequence);
 				if (region == null) return null;
 				region.Path = path;
 				region.x = GetFloat(map, "x", 0) * scale;
@@ -622,7 +622,7 @@ namespace Spine {
 				return region;
 			}
 			case AttachmentType.Boundingbox:
-				BoundingBoxAttachment box = attachmentLoader.NewBoundingBoxAttachment(skin, name);
+				BoundingBoxAttachment box = attachmentLoader.NewBoundingBoxAttachment(skin, placeholder, name);
 				if (box == null) return null;
 				ReadVertices(map, box, GetInt(map, "vertexCount", 0) << 1);
 				return box;
@@ -632,7 +632,7 @@ namespace Spine {
 				object sequenceJson;
 				map.TryGetValue("sequence", out sequenceJson);
 				Sequence sequence = ReadSequence(sequenceJson);
-				MeshAttachment mesh = attachmentLoader.NewMeshAttachment(skin, name, path, sequence);
+				MeshAttachment mesh = attachmentLoader.NewMeshAttachment(skin, placeholder, name, path, sequence);
 				if (mesh == null) return null;
 				mesh.Path = path;
 
@@ -669,7 +669,7 @@ namespace Spine {
 				return mesh;
 			}
 			case AttachmentType.Path: {
-				PathAttachment pathAttachment = attachmentLoader.NewPathAttachment(skin, name);
+				PathAttachment pathAttachment = attachmentLoader.NewPathAttachment(skin, placeholder, name);
 				if (pathAttachment == null) return null;
 				pathAttachment.closed = GetBoolean(map, "closed", false);
 				pathAttachment.constantSpeed = GetBoolean(map, "constantSpeed", true);
@@ -682,7 +682,7 @@ namespace Spine {
 				return pathAttachment;
 			}
 			case AttachmentType.Point: {
-				PointAttachment point = attachmentLoader.NewPointAttachment(skin, name);
+				PointAttachment point = attachmentLoader.NewPointAttachment(skin, placeholder, name);
 				if (point == null) return null;
 				point.x = GetFloat(map, "x", 0) * scale;
 				point.y = GetFloat(map, "y", 0) * scale;
@@ -693,7 +693,7 @@ namespace Spine {
 				return point;
 			}
 			case AttachmentType.Clipping: {
-				ClippingAttachment clip = attachmentLoader.NewClippingAttachment(skin, name);
+				ClippingAttachment clip = attachmentLoader.NewClippingAttachment(skin, placeholder, name);
 				if (clip == null) return null;
 
 				string end = GetString(map, "end", null);

@@ -32,7 +32,7 @@ package spine;
 import spine.animation.SliderMixTimeline;
 import spine.animation.SliderTimeline;
 import spine.TransformConstraintData;
-import spine.IkConstraintData.ScaleY;
+import spine.IkConstraintData.ScaleYMode;
 import haxe.io.Bytes;
 import StringTools;
 import spine.animation.AlphaTimeline;
@@ -250,7 +250,7 @@ class SkeletonBinary {
 					var flags = input.readByte();
 					data.skinRequired = (flags & 1) != 0;
 					if ((flags & 2) != 0)
-						data.scaleY = ScaleY.values[input.readUnsignedByte()];
+						data.scaleYMode = ScaleYMode.values[input.readUnsignedByte()];
 					var setup = data.setupPose;
 					setup.bendDirection = (flags & 4) != 0 ? -1 : 1;
 					setup.compress = (flags & 8) != 0;
@@ -540,12 +540,12 @@ class SkeletonBinary {
 		for (i in 0...slotCount) {
 			var slotIndex:Int = input.readInt(true);
 			for (ii in 0...input.readInt(true)) {
-				var name:String = input.readStringRef();
-				if (name == null)
+				var placeholder:String = input.readStringRef();
+				if (placeholder == null)
 					throw new SpineException("Attachment name must not be null");
-				var attachment:Attachment = readAttachment(input, skeletonData, skin, slotIndex, name, nonessential);
+				var attachment:Attachment = readAttachment(input, skeletonData, skin, slotIndex, placeholder, nonessential);
 				if (attachment != null)
-					skin.setAttachment(slotIndex, name, attachment);
+					skin.setAttachment(slotIndex, placeholder, attachment);
 			}
 		}
 		return skin;
@@ -561,8 +561,7 @@ class SkeletonBinary {
 		return sequence;
 	}
 
-	private function readAttachment(input:BinaryInput, skeletonData:SkeletonData, skin:Skin, slotIndex:Int, attachmentName:String,
-			nonessential:Bool):Attachment {
+	private function readAttachment(input:BinaryInput, skeletonData:SkeletonData, skin:Skin, slotIndex:Int, placeholder:String, nonessential:Bool):Attachment {
 		var vertices:Vertices;
 		var path:String;
 		var rotation:Float;
@@ -576,7 +575,7 @@ class SkeletonBinary {
 		var mesh:MeshAttachment;
 
 		var flags = input.readByte();
-		var name = (flags & 8) != 0 ? input.readStringRef() : attachmentName;
+		var name = (flags & 8) != 0 ? input.readStringRef() : placeholder;
 		switch (AttachmentType.values[flags & 7]) {
 			case AttachmentType.region:
 				path = (flags & 16) != 0 ? input.readStringRef() : null;
@@ -592,7 +591,7 @@ class SkeletonBinary {
 
 				if (path == null)
 					path = name;
-				var region:RegionAttachment = attachmentLoader.newRegionAttachment(skin, name, path, sequence);
+				var region:RegionAttachment = attachmentLoader.newRegionAttachment(skin, placeholder, name, path, sequence);
 				if (region == null)
 					return null;
 				region.path = path;
@@ -610,7 +609,7 @@ class SkeletonBinary {
 				vertices = readVertices(input, (flags & 16) != 0);
 				color = nonessential ? input.readInt32() : 0;
 
-				var box:BoundingBoxAttachment = attachmentLoader.newBoundingBoxAttachment(skin, name);
+				var box:BoundingBoxAttachment = attachmentLoader.newBoundingBoxAttachment(skin, placeholder, name);
 				if (box == null)
 					return null;
 				box.worldVerticesLength = vertices.length;
@@ -647,7 +646,7 @@ class SkeletonBinary {
 
 				if (path == null)
 					path = name;
-				mesh = attachmentLoader.newMeshAttachment(skin, name, path, sequence);
+				mesh = attachmentLoader.newMeshAttachment(skin, placeholder, name, path, sequence);
 				if (mesh == null)
 					return null;
 				mesh.path = path;
@@ -683,7 +682,7 @@ class SkeletonBinary {
 					height = input.readFloat();
 				}
 
-				mesh = attachmentLoader.newMeshAttachment(skin, name, path, sequence);
+				mesh = attachmentLoader.newMeshAttachment(skin, placeholder, name, path, sequence);
 				if (mesh == null)
 					return null;
 				mesh.path = path;
@@ -701,7 +700,7 @@ class SkeletonBinary {
 				var lengths:Array<Float> = readFloatArray(input, Std.int(vertices.length / 6), scale);
 				color = nonessential ? input.readInt32() : 0;
 
-				var pathAttachment:PathAttachment = attachmentLoader.newPathAttachment(skin, name);
+				var pathAttachment:PathAttachment = attachmentLoader.newPathAttachment(skin, placeholder, name);
 				if (pathAttachment == null)
 					return null;
 				pathAttachment.closed = closed;
@@ -720,7 +719,7 @@ class SkeletonBinary {
 				y = input.readFloat();
 				color = nonessential ? input.readInt32() : 0;
 
-				var point:PointAttachment = attachmentLoader.newPointAttachment(skin, name);
+				var point:PointAttachment = attachmentLoader.newPointAttachment(skin, placeholder, name);
 				if (point == null)
 					return null;
 				point.x = x * scale;
@@ -734,7 +733,7 @@ class SkeletonBinary {
 				vertices = readVertices(input, (flags & 16) != 0);
 				color = nonessential ? input.readInt32() : 0;
 
-				var clip:ClippingAttachment = attachmentLoader.newClippingAttachment(skin, name);
+				var clip:ClippingAttachment = attachmentLoader.newClippingAttachment(skin, placeholder, name);
 				if (clip == null)
 					return null;
 				clip.endSlot = skeletonData.slots[endSlotIndex];

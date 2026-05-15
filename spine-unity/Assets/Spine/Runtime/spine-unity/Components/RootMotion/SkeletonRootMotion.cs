@@ -57,7 +57,7 @@ namespace Spine.Unity {
 		SkeletonGraphic skeletonGraphic;
 
 		public override Vector2 GetRemainingRootMotion (int trackIndex) {
-			TrackEntry entry = animationState.GetCurrent(trackIndex);
+			TrackEntry entry = animationState.GetTrack(trackIndex);
 			if (entry == null)
 				return Vector2.zero;
 
@@ -68,7 +68,7 @@ namespace Spine.Unity {
 		}
 
 		public override RootMotionInfo GetRootMotionInfo (int trackIndex) {
-			TrackEntry entry = animationState.GetCurrent(trackIndex);
+			TrackEntry entry = animationState.GetTrack(trackIndex);
 			if (entry == null)
 				return new RootMotionInfo();
 
@@ -106,7 +106,7 @@ namespace Spine.Unity {
 				if (animationTrackFlags != -1 && (animationTrackFlags & 1 << trackIndex) == 0)
 					continue;
 
-				TrackEntry entry = animationState.GetCurrent(trackIndex);
+				TrackEntry entry = animationState.GetTrack(trackIndex);
 				TrackEntry next = null;
 				while (entry != null) {
 					Animation animation = entry.Animation;
@@ -136,7 +136,7 @@ namespace Spine.Unity {
 				if (animationTrackFlags != -1 && (animationTrackFlags & 1 << trackIndex) == 0)
 					continue;
 
-				TrackEntry entry = animationState.GetCurrent(trackIndex);
+				TrackEntry entry = animationState.GetTrack(trackIndex);
 				TrackEntry next = null;
 				while (entry != null) {
 					Animation animation = entry.Animation;
