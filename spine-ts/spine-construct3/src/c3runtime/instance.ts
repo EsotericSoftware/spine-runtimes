@@ -417,7 +417,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			return false;
 		}
 
-		const track = this.state.tracks[trackIndex];
+		const track = this.state.getTrack(trackIndex);
 		if (!track) return false;
 
 		if (animationName === "") return true;
@@ -855,7 +855,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		const { state } = this;
 		if (!state) return "";
 
-		const track = state.tracks[trackIndex];
+		const track = state.getTrack(trackIndex);
 		if (!track || !track.animation) return "";
 
 		return track.animation.name;
@@ -866,7 +866,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		if (track < 0) {
 			this.state.timeScale = timeScale;
 		} else {
-			const entry = this.state.getCurrent(track);
+			const entry = this.state.getTrack(track);
 			if (entry) entry.timeScale = timeScale;
 		}
 	}
@@ -874,7 +874,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	public setAnimationTime (units: 0 | 1, time: number, track: number) {
 		if (!this.state) return;
 
-		const trackEntry = this.state.tracks[track];
+		const trackEntry = this.state.getTrack(track);
 		if (!trackEntry) return;
 
 		if (units === 0) {
@@ -920,7 +920,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			return;
 		}
 
-		const track = state.tracks[trackIndex];
+		const track = state.getTrack(trackIndex);
 		if (!track) {
 			console.warn(`[Spine] setAlpha: track ${trackIndex} not found`);
 			return;
