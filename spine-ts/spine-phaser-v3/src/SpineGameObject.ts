@@ -50,6 +50,7 @@ import {
 	Skin,
 	Vector2,
 } from "@esotericsoftware/spine-core";
+import * as Phaser from "phaser";
 
 class BaseSpineGameObject extends Phaser.GameObjects.GameObject {
 	constructor (scene: Phaser.Scene, type: string) {

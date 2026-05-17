@@ -216,6 +216,13 @@ export class AssetManagerBase implements Disposable {
 				try {
 					const atlas = this.createTextureAtlas(path, atlasText);
 					let toLoad = atlas.pages.length, abort = false;
+
+					if (toLoad === 0) {
+						this.success(success, path, atlas);
+						resolve(atlas);
+						return;
+					}
+
 					for (let page of atlas.pages) {
 						this.loadTexture(!fileAlias ? parent + page.name : fileAlias[page.name!],
 							(imagePath: string, texture: Texture) => {

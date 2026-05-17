@@ -57,6 +57,8 @@ export class SceneRenderer implements Disposable {
 	private shapes: ShapeRenderer;
 	private shapesShader: Shader;
 	private activeRenderer: PolygonBatcher | ShapeRenderer | SkeletonDebugRenderer | null = null;
+	private maxCanvasWidth = 0;
+	private maxCanvasHeight = 0;
 	skeletonRenderer: SkeletonRenderer;
 	skeletonDebugRenderer: SkeletonDebugRenderer;
 
@@ -465,7 +467,7 @@ export class SceneRenderer implements Disposable {
 
 	resize (resizeMode: ResizeMode) {
 		let canvas = this.canvas;
-		var dpr = window.devicePixelRatio || 1;
+		var dpr = this.getSafeDevicePixelRatio(canvas.clientWidth, canvas.clientHeight);
 		var w = Math.round(canvas.clientWidth * dpr);
 		var h = Math.round(canvas.clientHeight * dpr);
 
@@ -487,6 +489,21 @@ export class SceneRenderer implements Disposable {
 			this.camera.setViewport(sourceWidth * scale, sourceHeight * scale);
 		}
 		this.camera.update();
+	}
+
+	private getSafeDevicePixelRatio (cssWidth: number, cssHeight: number): number {
+		const dpr = window.devicePixelRatio || 1;
+		if (cssWidth <= 0 || cssHeight <= 0) return dpr;
+
+		if (this.maxCanvasWidth === 0 || this.maxCanvasHeight === 0) {
+			const gl = this.context.gl;
+			const maxRenderbufferSize = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
+			const maxViewportDims = gl.getParameter(gl.MAX_VIEWPORT_DIMS);
+			this.maxCanvasWidth = Math.min(maxRenderbufferSize, maxViewportDims[0]);
+			this.maxCanvasHeight = Math.min(maxRenderbufferSize, maxViewportDims[1]);
+		}
+
+		return Math.min(dpr, this.maxCanvasWidth / cssWidth, this.maxCanvasHeight / cssHeight);
 	}
 
 	private enableRenderer (renderer: PolygonBatcher | ShapeRenderer | SkeletonDebugRenderer) {

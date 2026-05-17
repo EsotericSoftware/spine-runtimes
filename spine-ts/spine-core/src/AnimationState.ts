@@ -1093,11 +1093,11 @@ export class EventQueue {
 		this.drainDisabled = true;
 
 		let objects = this.objects;
-		let listeners = this.animState.listeners;
 
 		for (let i = 0; i < objects.length; i += 2) {
 			let type = objects[i] as EventType;
 			let entry = objects[i + 1] as TrackEntry;
+			let listeners = this.animState.listeners.slice();
 			switch (type) {
 				case EventType.start:
 					if (entry.listener && entry.listener.start) entry.listener.start(entry);

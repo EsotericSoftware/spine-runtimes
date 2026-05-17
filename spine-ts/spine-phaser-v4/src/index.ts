@@ -27,6 +27,7 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+// biome-ignore assist/source/organizeImports: require-shim.js must be before other .js imports otherwise IIFE won't work.
 export * from "./require-shim.js"
 export * from "./SpinePlugin.js"
 export * from "./SpineGameObject.js"

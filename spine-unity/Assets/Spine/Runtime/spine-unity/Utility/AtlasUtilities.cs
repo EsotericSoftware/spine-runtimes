@@ -318,6 +318,10 @@ namespace Spine.Unity.AttachmentTools {
 
 			if (sourceAttachments == null) throw new System.ArgumentNullException("sourceAttachments");
 			if (outputAttachments == null) throw new System.ArgumentNullException("outputAttachments");
+			if (additionalOutputTextures != null && additionalTexturePropertyIDsToCopy != null &&
+				additionalOutputTextures.Length < additionalTexturePropertyIDsToCopy.Length)
+				throw new System.ArgumentException("If non-null, additionalOutputTextures.Length must match " +
+					"additionalTexturePropertyIDsToCopy.Length.", "additionalOutputTextures");
 			outputTexture = null;
 			if (additionalTexturePropertyIDsToCopy != null && additionalTextureIsLinear == null) {
 				additionalTextureIsLinear = new bool[additionalTexturePropertyIDsToCopy.Length];
@@ -332,7 +336,6 @@ namespace Spine.Unity.AttachmentTools {
 
 			// Collect all textures from original attachments.
 			int numTextureParamsToRepack = 1 + (additionalTexturePropertyIDsToCopy == null ? 0 : additionalTexturePropertyIDsToCopy.Length);
-			additionalOutputTextures = (additionalTexturePropertyIDsToCopy == null ? null : new Texture2D[additionalTexturePropertyIDsToCopy.Length]);
 			if (texturesToPackAtParam.Length < numTextureParamsToRepack)
 				Array.Resize(ref texturesToPackAtParam, numTextureParamsToRepack);
 			for (int i = 0; i < numTextureParamsToRepack; ++i) {
@@ -426,7 +429,8 @@ namespace Spine.Unity.AttachmentTools {
 					outputTexture = newTexture;
 				} else {
 					newMaterial.SetTexture(additionalTexturePropertyIDsToCopy[i - 1], newTexture);
-					additionalOutputTextures[i - 1] = newTexture;
+					if (additionalOutputTextures != null)
+						additionalOutputTextures[i - 1] = newTexture;
 				}
 			}
 
@@ -767,8 +771,15 @@ namespace Spine.Unity.AttachmentTools {
 
 			// Note: originalW and originalH need to be scaled according to the
 			// repacked width and height, repacking can mess with aspect ratio, etc.
-			int originalW = Mathf.RoundToInt((float)w * ((float)referenceRegion.originalWidth / (float)referenceRegion.width));
-			int originalH = Mathf.RoundToInt((float)h * ((float)referenceRegion.originalHeight / (float)referenceRegion.height));
+			bool flipsWH = referenceRegion.degrees == 90;
+			float toOriginalRatioW = (float)referenceRegion.originalWidth /
+				(flipsWH ? (float)referenceRegion.height : (float)referenceRegion.width);
+			float toOriginalRatioH = (float)referenceRegion.originalHeight /
+				(flipsWH ? (float)referenceRegion.width : (float)referenceRegion.height);
+			int originalWUnflipped = Mathf.RoundToInt((float)w * toOriginalRatioW);
+			int originalHUnflipped = Mathf.RoundToInt((float)h * toOriginalRatioH);
+			int originalW = flipsWH ? originalHUnflipped : originalWUnflipped;
+			int originalH = flipsWH ? originalWUnflipped : originalHUnflipped;
 
 			int offsetX = Mathf.RoundToInt((float)referenceRegion.offsetX * ((float)w / (float)referenceRegion.width));
 			int offsetY = Mathf.RoundToInt((float)referenceRegion.offsetY * ((float)h / (float)referenceRegion.height));

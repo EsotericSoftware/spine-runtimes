@@ -24,7 +24,9 @@ SOFTWARE.
 
 // Adapted from https://github.com/agogpixel/phaser3-ts-utils/tree/main
 
-let components = (Phaser.GameObjects.Components as any);
+import * as Phaser from "phaser";
+
+const components = (Phaser.GameObjects.Components as any);
 export const ComputedSize = components.ComputedSize;
 export const Depth = components.Depth;
 export const Flip = components.Flip;

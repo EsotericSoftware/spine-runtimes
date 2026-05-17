@@ -29,6 +29,8 @@
 
 package spine.animation;
 
+import spine.ArrayUtils;
+
 /** The base class for timelines that interpolate between frame values using stepped, linear, or a Bezier curve. */
 class CurveTimeline extends Timeline {
 	private static inline var LINEAR:Int = 0;
@@ -42,8 +44,7 @@ class CurveTimeline extends Timeline {
 	 * @param propertyIds Unique identifiers for the properties the timeline modifies. */
 	public function new(frameCount:Int, bezierCount:Int, propertyIds:Array<String>) {
 		super(frameCount, propertyIds);
-		curves = new Array<Float>();
-		curves.resize(frameCount + bezierCount * BEZIER_SIZE);
+		curves = ArrayUtils.resize(new Array<Float>(), frameCount + bezierCount * BEZIER_SIZE, 0);
 		curves[frameCount - 1] = STEPPED;
 	}
 
