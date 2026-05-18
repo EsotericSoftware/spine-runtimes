@@ -60,6 +60,12 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 	private positionModePrevAngle = 0;
 	private positionModePrevWidth = 0;
 	private positionModePrevHeight = 0;
+	private positionModePrevScaleX = 1;
+	private positionModePrevScaleY = 1;
+	private positionModePrevOffsetX = 0;
+	private positionModePrevOffsetY = 0;
+	private positionModePrevOffsetAngle = 0;
+	private suppressPositionModePropertyChange = false;
 
 	/*
 	 * C3 GameObjects have two sizes:
@@ -189,14 +195,24 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 
 		if (id === PLUGIN_CLASS.PROP_BOUNDS_PROVIDER_MOVE) {
 			value = value as boolean;
-			if (value) {
-				this.positionModePrevX = this._inst.GetX();
-				this.positionModePrevY = this._inst.GetY();
-				this.positionModePrevAngle = this._inst.GetAngle();
-				this.positionModePrevWidth = this._inst.GetWidth();
-				this.positionModePrevHeight = this._inst.GetHeight();
-			}
+			if (value) this.capturePositionModeState();
 			this.positioningBounds = value;
+			return;
+		}
+
+		if (id === PLUGIN_CLASS.PROP_SKELETON_OFFSET_SCALE_X || id === PLUGIN_CLASS.PROP_SKELETON_OFFSET_SCALE_Y) {
+			if (!this.suppressPositionModePropertyChange && this.positioningBounds) {
+				this.applyPositionModeScalePropertyChange(id);
+				this.layoutView?.Refresh();
+			}
+			return;
+		}
+
+		if (id === PLUGIN_CLASS.PROP_BOUNDS_OFFSET_X || id === PLUGIN_CLASS.PROP_BOUNDS_OFFSET_Y || id === PLUGIN_CLASS.PROP_BOUNDS_OFFSET_ANGLE) {
+			if (!this.suppressPositionModePropertyChange && this.positioningBounds) {
+				this.applyPositionModeOffsetPropertyChange(id);
+				this.layoutView?.Refresh();
+			}
 			return;
 		}
 
@@ -241,6 +257,8 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 					this.propScaleY = this.propScaleY * this.positionModePrevHeight / currentHeight;
 					this.positionModePrevWidth = currentWidth;
 					this.positionModePrevHeight = currentHeight;
+					this.positionModePrevScaleX = this.propScaleX;
+					this.positionModePrevScaleY = this.propScaleY;
 				}
 			}
 
@@ -404,6 +422,48 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 		this.update(0);
 
 		this.layoutView?.Refresh();
+	}
+
+	private capturePositionModeState () {
+		this.positionModePrevX = this._inst.GetX();
+		this.positionModePrevY = this._inst.GetY();
+		this.positionModePrevAngle = this._inst.GetAngle();
+		this.positionModePrevWidth = this._inst.GetWidth();
+		this.positionModePrevHeight = this._inst.GetHeight();
+		this.positionModePrevScaleX = this.propScaleX;
+		this.positionModePrevScaleY = this.propScaleY;
+		this.positionModePrevOffsetX = this.propOffsetX;
+		this.positionModePrevOffsetY = this.propOffsetY;
+		this.positionModePrevOffsetAngle = this.propOffsetAngle;
+	}
+
+	private applyPositionModeOffsetPropertyChange (id: string) {
+		if (id === PLUGIN_CLASS.PROP_BOUNDS_OFFSET_X) {
+			this._inst.SetX(this._inst.GetX() + this.positionModePrevOffsetX - this.propOffsetX);
+		} else if (id === PLUGIN_CLASS.PROP_BOUNDS_OFFSET_Y) {
+			this._inst.SetY(this._inst.GetY() + this.positionModePrevOffsetY - this.propOffsetY);
+		} else {
+			this._inst.SetAngle(this._inst.GetAngle() + this.positionModePrevOffsetAngle - this.propOffsetAngle);
+		}
+
+		this.capturePositionModeState();
+	}
+
+	private applyPositionModeScalePropertyChange (id: string) {
+		const scaleXChanged = id === PLUGIN_CLASS.PROP_SKELETON_OFFSET_SCALE_X;
+		const oldScale = scaleXChanged ? this.positionModePrevScaleX : this.positionModePrevScaleY;
+		const newScale = scaleXChanged ? this.propScaleX : this.propScaleY;
+		if (oldScale === newScale || newScale === 0) return;
+
+		const width = this._inst.GetWidth();
+		const height = this._inst.GetHeight();
+		if (scaleXChanged) {
+			this._inst.SetSize(width * oldScale / newScale, height);
+		} else {
+			this._inst.SetSize(width, height * oldScale / newScale);
+		}
+
+		this.capturePositionModeState();
 	}
 
 	private setBoundsFromBoundsProvider () {
@@ -571,7 +631,9 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 	}
 
 	private set propScaleX (value: number) {
+		this.suppressPositionModePropertyChange = true;
 		this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_OFFSET_SCALE_X, value);
+		this.suppressPositionModePropertyChange = false;
 	}
 
 	private get propScaleY () {
@@ -579,7 +641,9 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 	}
 
 	private set propScaleY (value: number) {
+		this.suppressPositionModePropertyChange = true;
 		this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_SKELETON_OFFSET_SCALE_Y, value);
+		this.suppressPositionModePropertyChange = false;
 	}
 
 	private get propOffsetX () {
@@ -587,7 +651,9 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 	}
 
 	private set propOffsetX (value: number) {
+		this.suppressPositionModePropertyChange = true;
 		this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_X, value);
+		this.suppressPositionModePropertyChange = false;
 	}
 
 	private get propOffsetY () {
@@ -595,7 +661,9 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 	}
 
 	private set propOffsetY (value: number) {
+		this.suppressPositionModePropertyChange = true;
 		this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_Y, value);
+		this.suppressPositionModePropertyChange = false;
 	}
 
 	private get propOffsetAngle () {
@@ -603,7 +671,9 @@ class SpineC3PluginInstance extends SDK.IWorldInstanceBase {
 	}
 
 	private set propOffsetAngle (value: number) {
+		this.suppressPositionModePropertyChange = true;
 		this._inst.SetPropertyValue(PLUGIN_CLASS.PROP_BOUNDS_OFFSET_ANGLE, value);
+		this.suppressPositionModePropertyChange = false;
 	}
 
 	private async managePropCollision (value: boolean) {
