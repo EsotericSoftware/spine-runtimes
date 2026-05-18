@@ -801,6 +801,35 @@
               }
             }
           },
+          "set-runtime-asset-cache-retained-when-unused": {
+            "list-name": "Set runtime asset cache retained when unused",
+            "display-text": "Set runtime asset cache retained when unused to {0} for {1}",
+            "description": "Control whether cached Spine runtime assets are kept when no live instances are using them. This can avoid reload flicker when switching layouts.",
+            "params": {
+              "enabled": {
+                "name": "Enabled",
+                "desc": "Whether unused cached Spine runtime assets should be retained"
+              },
+              "scope": {
+                "name": "Scope",
+                "desc": "Whether this applies to this Spine object type's assets or all Spine objects",
+                "items": {
+                  "this-object-type": "This object type",
+                  "all-spine-objects": "All Spine objects"
+                }
+              }
+            }
+          },
+          "release-cached-spine-assets": {
+            "list-name": "Release cached Spine assets",
+            "display-text": "Release cached Spine assets for this object type",
+            "description": "Stop retaining this object type's cached Spine runtime assets and release them if no live instances are using them."
+          },
+          "release-all-cached-spine-assets": {
+            "list-name": "Release all cached Spine assets",
+            "display-text": "Release all cached Spine assets",
+            "description": "Release all cached Spine runtime assets that are not currently used by live instances."
+          },
           "set-bounds": {
             "list-name": "Set bounds",
             "display-text": "Set bounds to ({0}, {1}, {2}, {3})",

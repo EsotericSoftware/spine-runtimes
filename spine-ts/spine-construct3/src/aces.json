@@ -731,6 +731,35 @@
         ]
       },
       {
+        "id": "set-runtime-asset-cache-retained-when-unused",
+        "scriptName": "SetRuntimeAssetCacheRetainedWhenUnused",
+        "highlight": false,
+        "params": [
+          {
+            "id": "enabled",
+            "type": "boolean"
+          },
+          {
+            "id": "scope",
+            "type": "combo",
+            "items": [
+              "this-object-type",
+              "all-spine-objects"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "release-cached-spine-assets",
+        "scriptName": "ReleaseCachedSpineAssets",
+        "highlight": false
+      },
+      {
+        "id": "release-all-cached-spine-assets",
+        "scriptName": "ReleaseAllCachedSpineAssets",
+        "highlight": false
+      },
+      {
         "id": "set-bounds",
         "scriptName": "SetBounds",
         "highlight": false,

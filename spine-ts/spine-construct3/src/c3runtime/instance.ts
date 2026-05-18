@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import type { AnimationState, AssetLoader, Bone, BonePose, C3Matrix, C3RendererRuntime, Event, NumberArrayLike, Skeleton, Skin, Slot, SpineBoundsProvider, SpineBoundsProviderType, TextureAtlas, } from "@esotericsoftware/spine-construct3-lib";
+import type { AnimationState, AssetLoader, Bone, BonePose, C3Matrix, C3RendererRuntime, Event, NumberArrayLike, Skeleton, SkeletonData, Skin, Slot, SpineBoundsProvider, SpineBoundsProviderType, TextureAtlas, } from "@esotericsoftware/spine-construct3-lib";
 
 const C3 = globalThis.C3;
 const spine = globalThis.spine;
@@ -95,6 +95,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	private skeletonRenderer?: C3RendererRuntime;
 	private matrix: C3Matrix;
 	private requestRedraw = false;
+	private triggerSkeletonLoadedOnFirstTick = false;
 
 	private spineBounds = {
 		x: 0,
@@ -148,6 +149,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 		this.assetLoader = new spine.AssetLoader();
 		this.matrix = new spine.C3Matrix();
+		this.renderer ||= this.runtime.renderer;
+		this.initializeCachedSpine(false);
 
 		this._setTicking(true);
 	}
@@ -168,14 +171,16 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		this.renderer ||= this.runtime.renderer;
 		if (!this.renderer) return;
 
-		if (!this.atlasLoaded) {
-			this.loadAtlas();
-			return;
+		if (!this.skeletonLoaded) {
+			if (!this.initializeCachedSpine(true)) {
+				this.loadSpine();
+				return;
+			}
 		}
 
-		if (!this.skeletonLoaded) {
-			this.loadSkeleton();
-			return;
+		if (this.triggerSkeletonLoadedOnFirstTick) {
+			this.triggerSkeletonLoadedOnFirstTick = false;
+			this._trigger(C3.Plugins.EsotericSoftware_SpineConstruct3.Cnds.OnSkeletonLoaded);
 		}
 
 		this.matrix.update(
@@ -491,52 +496,79 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	*  Spine Internals
 	*/
 
-	private async loadAtlas () {
+	private initializeCachedSpine (triggerLoaded: boolean) {
+		if (this.skeletonLoaded || !this.renderer) return false;
+
+		const cached = this.assetLoader.getCachedRuntimeSkeletonAndAtlas(this.propSkel, this.propAtlas, this.propLoaderScale);
+		if (!cached) return false;
+
+		this.initializeSkeleton(cached.textureAtlas, cached.skeletonData, triggerLoaded);
+		return true;
+	}
+
+	private async loadSpine () {
 		const { renderer } = this;
-		if (this.atlasLoading || !renderer) return;
+		if (this.skeletonLoading || this.skeletonLoaded || !renderer) return;
+
+		if (this.initializeCachedSpine(true)) return;
+
+		this.skeletonLoading = true;
 		this.atlasLoading = true;
 
 		const textureAtlas = await this.assetLoader.loadAtlasRuntime(this.propAtlas, this.plugin.runtime, renderer);
-		if (!textureAtlas) return;
+		if (!textureAtlas) {
+			this.skeletonLoading = false;
+			this.atlasLoading = false;
+			return;
+		}
 
 		this.textureAtlas = textureAtlas;
 		this.atlasLoaded = true;
-	}
-
-	private async loadSkeleton () {
-		if (this.skeletonLoading || !this.atlasLoaded) return;
-		this.skeletonLoading = true;
+		this.atlasLoading = false;
 
 		const propValue = this.propSkel;
+		const skeletonData = await this.assetLoader.loadSkeletonRuntime(propValue, textureAtlas, this.propLoaderScale, this.plugin.runtime);
+		if (!skeletonData) {
+			this.skeletonLoading = false;
+			return;
+		}
 
-		if (this.atlasLoaded && this.textureAtlas) {
-			const skeletonData = await this.assetLoader.loadSkeletonRuntime(propValue, this.textureAtlas, this.propLoaderScale, this.plugin.runtime);
-			if (!skeletonData) return;
+		this.initializeSkeleton(textureAtlas, skeletonData, true);
+	}
 
-			this.skeleton = new spine.Skeleton(skeletonData);
-			const animationStateData = new spine.AnimationStateData(skeletonData);
-			this.state = new spine.AnimationState(animationStateData);
-			this.state.addListener({
-				start: (entry) => this.triggerAnimationEvent("start", entry.trackIndex, entry.animation?.name ?? ""),
-				dispose: (entry) => this.triggerAnimationEvent("dispose", entry.trackIndex, entry.animation?.name ?? ""),
-				event: (entry, event) => this.triggerAnimationEvent("event", entry.trackIndex, entry.animation?.name ?? "", event),
-				interrupt: (entry) => this.triggerAnimationEvent("interrupt", entry.trackIndex, entry.animation?.name ?? ""),
-				end: (entry) => this.triggerAnimationEvent("end", entry.trackIndex, entry.animation?.name ?? ""),
-				complete: (entry) => this.triggerAnimationEvent("complete", entry.trackIndex, entry.animation?.name ?? ""),
-			});
+	private initializeSkeleton (textureAtlas: TextureAtlas, skeletonData: SkeletonData, triggerLoaded: boolean) {
+		this.textureAtlas = textureAtlas;
+		this.atlasLoaded = true;
+		this.atlasLoading = false;
 
-			if (this.propAnimation) this.setAnimation(0, this.propAnimation, true);
+		this.skeleton = new spine.Skeleton(skeletonData);
+		const animationStateData = new spine.AnimationStateData(skeletonData);
+		this.state = new spine.AnimationState(animationStateData);
+		this.state.addListener({
+			start: (entry) => this.triggerAnimationEvent("start", entry.trackIndex, entry.animation?.name ?? ""),
+			dispose: (entry) => this.triggerAnimationEvent("dispose", entry.trackIndex, entry.animation?.name ?? ""),
+			event: (entry, event) => this.triggerAnimationEvent("event", entry.trackIndex, entry.animation?.name ?? "", event),
+			interrupt: (entry) => this.triggerAnimationEvent("interrupt", entry.trackIndex, entry.animation?.name ?? ""),
+			end: (entry) => this.triggerAnimationEvent("end", entry.trackIndex, entry.animation?.name ?? ""),
+			complete: (entry) => this.triggerAnimationEvent("complete", entry.trackIndex, entry.animation?.name ?? ""),
+		});
 
-			this._setSkin();
+		if (this.propAnimation) this.setAnimation(0, this.propAnimation, true);
 
-			this.calculateBounds();
+		this._setSkin();
 
-			this.update(0);
+		this.calculateBounds();
 
-			this.createCollisionSprite();
+		this.update(0);
 
-			this.skeletonLoaded = true;
+		this.createCollisionSprite();
+
+		this.skeletonLoaded = true;
+		this.skeletonLoading = false;
+		if (triggerLoaded) {
 			this._trigger(C3.Plugins.EsotericSoftware_SpineConstruct3.Cnds.OnSkeletonLoaded);
+		} else {
+			this.triggerSkeletonLoadedOnFirstTick = true;
 		}
 	}
 
@@ -762,6 +794,22 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 	public getBoundingBoxPolygonJson (slotName: string, attachmentName: string) {
 		return JSON.stringify(this.getBoundingBoxInfo(slotName, attachmentName)?.points ?? []);
+	}
+
+	public setRuntimeAssetCacheRetainedWhenUnused (enabled: boolean, scope: "object-type" | "all") {
+		if (scope === "all") {
+			this.assetLoader.setAllRuntimeResourcesRetained(enabled);
+		} else {
+			this.assetLoader.retainInstanceResources(this.propSkel, this.propAtlas, this.propLoaderScale, enabled);
+		}
+	}
+
+	public releaseCachedSpineAssets () {
+		this.assetLoader.releaseRetainedInstanceResources(this.propSkel, this.propAtlas, this.propLoaderScale);
+	}
+
+	public releaseAllCachedSpineAssets () {
+		this.assetLoader.releaseAllUnusedRuntimeResources();
 	}
 
 	public setCollisionBodyDrivesObject (enabled: boolean) {

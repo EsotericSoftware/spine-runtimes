@@ -38,12 +38,15 @@ interface CacheEntry<T> {
 }
 
 type ResourceCache<T> = Map<string, CacheEntry<T>>;
+type RuntimeCacheType = "skeleton" | "atlas" | "texture";
 
 export class AssetLoader {
 
 	private static CacheSkeleton: ResourceCache<SkeletonData> = new Map();
 	private static CacheAtlas: ResourceCache<TextureAtlas> = new Map();
 	private static CacheTexture: ResourceCache<C3TextureRuntime> = new Map();
+	private static retainAllUnusedRuntimeResources = false;
+	private static retainedRuntimeResourceKeys = new Set<string>();
 
 	public async loadSkeletonEditor (sid: number, textureAtlas: TextureAtlas, scale = 1, instance: SDK.IWorldInstance) {
 		const projectFile = instance.GetProject().GetProjectFileBySID(sid);
@@ -96,6 +99,20 @@ export class AssetLoader {
 
 		const content = projectFile.GetBlob();
 		return AssetLoader.createImageBitmapFromBlob(content, pma);
+	}
+
+	public getCachedRuntimeSkeletonAndAtlas (skeletonPath: string, atlasPath: string, scale = 1) {
+		const skeletonKey = `${skeletonPath}|scale${scale}`;
+		const skeletonEntry = AssetLoader.CacheSkeleton.get(skeletonKey);
+		const atlasEntry = AssetLoader.CacheAtlas.get(atlasPath);
+		if (!skeletonEntry?.data || !atlasEntry?.data) return null;
+
+		skeletonEntry.refCount++;
+		atlasEntry.refCount++;
+		return {
+			skeletonData: skeletonEntry.data,
+			textureAtlas: atlasEntry.data,
+		};
 	}
 
 	public async loadSkeletonRuntime (path: string, textureAtlas: TextureAtlas, scale = 1, instance: IRuntime) {
@@ -170,15 +187,15 @@ export class AssetLoader {
 	}
 
 	public releaseInstanceResources (skeletonPath: string, atlasPath: string, loaderScale: number) {
-		this.releaseResource(AssetLoader.CacheSkeleton, `${skeletonPath}|scale${loaderScale}`);
+		this.releaseResource("skeleton", AssetLoader.CacheSkeleton, `${skeletonPath}|scale${loaderScale}`);
 
 		const atlasEntry = AssetLoader.CacheAtlas.get(atlasPath);
 		if (atlasEntry) {
-			this.releaseResource(AssetLoader.CacheAtlas, atlasPath, async () => {
+			this.releaseResource("atlas", AssetLoader.CacheAtlas, atlasPath, async () => {
 				const basePath = atlasPath.substring(0, atlasPath.lastIndexOf("/") + 1);
 				for (const page of (await atlasEntry.promise).pages) {
 					const textureKey = basePath + page.name;
-					this.releaseResource(AssetLoader.CacheTexture, textureKey, (texture) => {
+					this.releaseResource("texture", AssetLoader.CacheTexture, textureKey, (texture) => {
 						texture?.dispose();
 					});
 				}
@@ -186,16 +203,84 @@ export class AssetLoader {
 		}
 	}
 
-	private releaseResource<T> (cache: ResourceCache<T>, key: string, disposer?: (data?: T) => void) {
+	public retainInstanceResources (skeletonPath: string, atlasPath: string, loaderScale: number, retained: boolean) {
+		const skeletonKey = `${skeletonPath}|scale${loaderScale}`;
+		this.setRuntimeResourceRetained("skeleton", skeletonKey, retained);
+		this.setRuntimeResourceRetained("atlas", atlasPath, retained);
+
+		const atlasEntry = AssetLoader.CacheAtlas.get(atlasPath);
+		if (atlasEntry) {
+			const basePath = atlasPath.substring(0, atlasPath.lastIndexOf("/") + 1);
+			atlasEntry.promise.then(textureAtlas => {
+				for (const page of textureAtlas.pages)
+					this.setRuntimeResourceRetained("texture", basePath + page.name, retained);
+			});
+		}
+	}
+
+	public setAllRuntimeResourcesRetained (retained: boolean) {
+		AssetLoader.retainAllUnusedRuntimeResources = retained;
+		if (!retained) this.releaseAllUnusedRuntimeResources();
+	}
+
+	public releaseRetainedInstanceResources (skeletonPath: string, atlasPath: string, loaderScale: number) {
+		this.retainInstanceResources(skeletonPath, atlasPath, loaderScale, false);
+	}
+
+	public releaseAllUnusedRuntimeResources () {
+		AssetLoader.retainedRuntimeResourceKeys.clear();
+		for (const key of Array.from(AssetLoader.CacheSkeleton.keys()))
+			this.deleteResourceIfUnused("skeleton", AssetLoader.CacheSkeleton, key, undefined, true);
+		for (const key of Array.from(AssetLoader.CacheAtlas.keys()))
+			this.deleteAtlasResourceIfUnused(key, true);
+		for (const key of Array.from(AssetLoader.CacheTexture.keys()))
+			this.deleteResourceIfUnused("texture", AssetLoader.CacheTexture, key, texture => texture?.dispose(), true);
+	}
+
+	private setRuntimeResourceRetained (type: RuntimeCacheType, key: string, retained: boolean) {
+		const retainKey = AssetLoader.getRetainKey(type, key);
+		if (retained) {
+			AssetLoader.retainedRuntimeResourceKeys.add(retainKey);
+		} else {
+			AssetLoader.retainedRuntimeResourceKeys.delete(retainKey);
+			switch (type) {
+				case "skeleton": this.deleteResourceIfUnused(type, AssetLoader.CacheSkeleton, key); break;
+				case "atlas": this.deleteAtlasResourceIfUnused(key); break;
+				case "texture": this.deleteResourceIfUnused(type, AssetLoader.CacheTexture, key, texture => texture?.dispose()); break;
+			}
+		}
+	}
+
+	private releaseResource<T> (type: RuntimeCacheType, cache: ResourceCache<T>, key: string, disposer?: (data?: T) => void) {
 		const entry = cache.get(key);
 		if (!entry) return;
 
 		entry.refCount--;
+		this.deleteResourceIfUnused(type, cache, key, disposer);
+	}
 
-		if (entry.refCount <= 0) {
-			if (disposer) disposer(entry.data);
-			cache.delete(key);
-		}
+	private deleteAtlasResourceIfUnused (key: string, force = false) {
+		const atlasEntry = AssetLoader.CacheAtlas.get(key);
+		if (!atlasEntry) return;
+
+		this.deleteResourceIfUnused("atlas", AssetLoader.CacheAtlas, key, async () => {
+			const basePath = key.substring(0, key.lastIndexOf("/") + 1);
+			for (const page of (await atlasEntry.promise).pages)
+				this.releaseResource("texture", AssetLoader.CacheTexture, basePath + page.name, texture => texture?.dispose());
+		}, force);
+	}
+
+	private deleteResourceIfUnused<T> (type: RuntimeCacheType, cache: ResourceCache<T>, key: string, disposer?: (data?: T) => void, force = false) {
+		const entry = cache.get(key);
+		if (!entry || entry.refCount > 0) return;
+		if (!force && (AssetLoader.retainAllUnusedRuntimeResources || AssetLoader.retainedRuntimeResourceKeys.has(AssetLoader.getRetainKey(type, key)))) return;
+
+		if (disposer) disposer(entry.data);
+		cache.delete(key);
+	}
+
+	private static getRetainKey (type: RuntimeCacheType, key: string) {
+		return `${type}:${key}`;
 	}
 
 	private async loadRuntimeResource<T> (cacheKey: string, resourceCache: ResourceCache<T>, loader: () => Promise<T>): Promise<T> {

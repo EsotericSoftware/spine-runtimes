@@ -197,6 +197,17 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 		this.setCollisionBodyDrivesObject(enabled);
 	},
 
+	SetRuntimeAssetCacheRetainedWhenUnused (this: SDKInstanceClass, enabled: boolean, scope: 0 | 1) {
+		this.setRuntimeAssetCacheRetainedWhenUnused(enabled, scope === 0 ? "object-type" : "all");
+	},
+
+	ReleaseCachedSpineAssets (this: SDKInstanceClass) {
+		this.releaseCachedSpineAssets();
+	},
+
+	ReleaseAllCachedSpineAssets (this: SDKInstanceClass) {
+		this.releaseAllCachedSpineAssets();
+	},
 
 	SetBounds (this: SDKInstanceClass, x: number, y: number, width: number, height: number) {
 		this.setBounds(x, y, width, height);

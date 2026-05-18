@@ -801,6 +801,35 @@
               }
             }
           },
+          "set-runtime-asset-cache-retained-when-unused": {
+            "list-name": "设置运行时资源缓存未使用时保留",
+            "display-text": "将{1}的运行时资源缓存未使用时保留设置为{0}",
+            "description": "控制当没有实时实例使用缓存的Spine运行时资源时是否保留它们。这可以避免切换布局时重新加载造成的闪烁。",
+            "params": {
+              "enabled": {
+                "name": "启用",
+                "desc": "是否保留未使用的Spine运行时资源缓存"
+              },
+              "scope": {
+                "name": "范围",
+                "desc": "应用于此Spine对象类型的资源或所有Spine对象",
+                "items": {
+                  "this-object-type": "此对象类型",
+                  "all-spine-objects": "所有Spine对象"
+                }
+              }
+            }
+          },
+          "release-cached-spine-assets": {
+            "list-name": "释放缓存的Spine资源",
+            "display-text": "释放此对象类型缓存的Spine资源",
+            "description": "停止保留此对象类型缓存的Spine运行时资源，并在没有实时实例使用它们时释放。"
+          },
+          "release-all-cached-spine-assets": {
+            "list-name": "释放所有缓存的Spine资源",
+            "display-text": "释放所有缓存的Spine资源",
+            "description": "释放所有当前没有被实时实例使用的Spine运行时资源。"
+          },
           "set-bounds": {
             "list-name": "设置边界",
             "display-text": "设置边界为({0}, {1}, {2}, {3})",
