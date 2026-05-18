@@ -36,6 +36,32 @@ if [ -z "$C3_UPDATE_URL" ] || [ -z "$BRANCH" ]; then
 	exit 0
 fi
 
+if [ "$BRANCH" = "c3" ]; then
+	if [ ! -d "../node_modules" ]; then
+		log_action "Installing dependencies"
+		pushd ".." > /dev/null
+		if NPM_OUTPUT=$(npm install 2>&1); then
+			log_ok
+		else
+			log_fail
+			log_error_output "$NPM_OUTPUT"
+			exit 1
+		fi
+		popd > /dev/null
+	fi
+
+	log_action "Building Construct3 plugin"
+	pushd ".." > /dev/null
+	if BUILD_OUTPUT=$(npm run build:construct3 2>&1); then
+		log_ok
+	else
+		log_fail
+		log_error_output "$BUILD_OUTPUT"
+		exit 1
+	fi
+	popd > /dev/null
+fi
+
 log_action "Creating .c3addon"
 pushd "dist" > /dev/null
 if ZIP_OUTPUT=$(zip -r ../EsotericSoftware_SpineConstruct3.c3addon ./* 2>&1); then
