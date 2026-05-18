@@ -959,6 +959,24 @@
             "description": "获取当前皮肤名称。如果有多个皮肤处于活动状态，返回逗号分隔的名称。",
             "translated-name": "CurrentSkin"
           },
+          "animations": {
+            "description": "获取所有动画名称，以换行分隔。",
+            "translated-name": "Animations"
+          },
+          "animations-count": {
+            "description": "获取动画数量。",
+            "translated-name": "AnimationsCount"
+          },
+          "animation-name": {
+            "description": "获取指定索引处的动画名称。如果索引无效，则返回空字符串。",
+            "translated-name": "AnimationName",
+            "params": {
+              "index": {
+                "name": "索引",
+                "desc": "从0开始的动画索引"
+              }
+            }
+          },
           "current-animation": {
             "description": "获取特定轨道上当前播放的动画名称。",
             "translated-name": "CurrentAnimation",

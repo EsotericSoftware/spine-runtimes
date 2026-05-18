@@ -96,6 +96,18 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Exps =
 		return this.getCurrentSkin();
 	},
 
+	Animations (this: SpineC3Instance) {
+		return this.getAnimations();
+	},
+
+	AnimationsCount (this: SpineC3Instance) {
+		return this.getAnimationsCount();
+	},
+
+	AnimationName (this: SpineC3Instance, index: number) {
+		return this.getAnimationName(index);
+	},
+
 	CurrentAnimation (this: SpineC3Instance, trackIndex: number) {
 		return this.getCurrentAnimation(trackIndex);
 	},

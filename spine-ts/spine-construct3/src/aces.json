@@ -913,6 +913,30 @@
         "returnType": "string"
       },
       {
+        "id": "animations",
+        "expressionName": "Animations",
+        "highlight": false,
+        "returnType": "string"
+      },
+      {
+        "id": "animations-count",
+        "expressionName": "AnimationsCount",
+        "highlight": false,
+        "returnType": "number"
+      },
+      {
+        "id": "animation-name",
+        "expressionName": "AnimationName",
+        "highlight": false,
+        "returnType": "string",
+        "params": [
+          {
+            "id": "index",
+            "type": "number"
+          }
+        ]
+      },
+      {
         "id": "current-animation",
         "expressionName": "CurrentAnimation",
         "highlight": false,

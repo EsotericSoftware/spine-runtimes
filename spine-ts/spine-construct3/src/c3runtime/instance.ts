@@ -873,6 +873,18 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	*  Animations
 	*/
 
+	public getAnimations () {
+		return this.skeleton?.data.animations.map(animation => animation.name).join("\n") ?? "";
+	}
+
+	public getAnimationsCount () {
+		return this.skeleton?.data.animations.length ?? 0;
+	}
+
+	public getAnimationName (index: number) {
+		return this.skeleton?.data.animations[Math.floor(index)]?.name ?? "";
+	}
+
 	public setAnimation (track: number, animation: string, loop = false, additive = false) {
 		const { state } = this;
 		if (!state) return;

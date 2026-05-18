@@ -959,6 +959,24 @@
             "description": "Get the current skin name. Returns comma-separated names if multiple skins are active.",
             "translated-name": "CurrentSkin"
           },
+          "animations": {
+            "description": "Get all animation names, separated by newlines.",
+            "translated-name": "Animations"
+          },
+          "animations-count": {
+            "description": "Get the number of animations.",
+            "translated-name": "AnimationsCount"
+          },
+          "animation-name": {
+            "description": "Get the animation name at an index. Returns empty string if the index is invalid.",
+            "translated-name": "AnimationName",
+            "params": {
+              "index": {
+                "name": "Index",
+                "desc": "Zero-based animation index"
+              }
+            }
+          },
           "current-animation": {
             "description": "Get the name of the currently playing animation on a specific track.",
             "translated-name": "CurrentAnimation",
