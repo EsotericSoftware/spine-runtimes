@@ -1032,7 +1032,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		const skins = this.propSkin;
 
 		if (skins.length === 0) {
-			skeleton.skin = null;
+			skeleton.setSkin(null);
 		} else if (skins.length === 1) {
 			const skinName = skins[0];
 			const skin = skeleton.data.findSkin(skinName);

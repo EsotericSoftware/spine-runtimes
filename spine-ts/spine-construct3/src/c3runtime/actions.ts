@@ -34,7 +34,7 @@ const C3 = globalThis.C3;
 C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 {
 	SetSkin (this: SDKInstanceClass, skinList: string) {
-		this.setSkin(skinList.split(","));
+		this.setSkin(skinList === "" ? [] : skinList.split(","));
 	},
 
 	Mirror (this: SDKInstanceClass, isMirrored: boolean) {
