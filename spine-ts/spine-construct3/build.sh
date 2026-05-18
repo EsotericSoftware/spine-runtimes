@@ -18,16 +18,17 @@ COMMIT_MSG=$(git log -1 --pretty=%B)
 log_title "Spine-Construct3 Deploy"
 log_detail "Branch: $BRANCH"
 
-# Only deploy if the commit message matches [ts] Release x.y.z
-if ! echo "$COMMIT_MSG" | grep -qE '^\[ts\] Release [0-9]+\.[0-9]+\.[0-9]+$'; then
-	log_warn "Commit is not a release - skipping deploy"
-	log_detail "To deploy, commit message must be: \"[ts] Release x.y.z\""
-	log_summary "Deploy skipped"
-	exit 0
+# Versioned deploys only happen if the commit message matches [ts] Release x.y.z.
+# Latest deploys happen on every push.
+RELEASE_COMMIT=false
+if echo "$COMMIT_MSG" | grep -qE '^\[ts\] Release [0-9]+\.[0-9]+\.[0-9]+$'; then
+	RELEASE_COMMIT=true
+	VERSION=$(echo "$COMMIT_MSG" | sed -E 's/^\[ts\] Release ([0-9]+\.[0-9]+\.[0-9]+)$/\1/')
+	log_detail "Version: $VERSION"
+else
+	log_warn "Commit is not a release - skipping versioned zip/upload"
+	log_detail "Latest spine-construct3.zip will still be uploaded"
 fi
-
-VERSION=$(echo "$COMMIT_MSG" | sed -E 's/^\[ts\] Release ([0-9]+\.[0-9]+\.[0-9]+)$/\1/')
-log_detail "Version: $VERSION"
 
 if [ -z "$C3_UPDATE_URL" ] || [ -z "$BRANCH" ]; then
 	log_skip "Deployment skipped (C3_UPDATE_URL and/or BRANCH not set)"
@@ -46,8 +47,19 @@ else
 fi
 popd > /dev/null
 
-log_action "Creating versioned zip: spine-construct3-$VERSION.zip"
-if ZIP_OUTPUT=$(zip "spine-construct3-$VERSION.zip" EsotericSoftware_SpineConstruct3.c3addon 2>&1); then
+if [ "$RELEASE_COMMIT" = true ]; then
+	log_action "Creating versioned zip: spine-construct3-$VERSION.zip"
+	if ZIP_OUTPUT=$(zip "spine-construct3-$VERSION.zip" EsotericSoftware_SpineConstruct3.c3addon 2>&1); then
+		log_ok
+	else
+		log_fail
+		log_error_output "$ZIP_OUTPUT"
+		exit 1
+	fi
+fi
+
+log_action "Creating latest zip: spine-construct3.zip"
+if ZIP_OUTPUT=$(zip spine-construct3.zip EsotericSoftware_SpineConstruct3.c3addon 2>&1); then
 	log_ok
 else
 	log_fail
@@ -55,22 +67,15 @@ else
 	exit 1
 fi
 
-log_action "Creating latest zip: spine-construct3.zip"
-if CP_OUTPUT=$(cp "spine-construct3-$VERSION.zip" spine-construct3.zip 2>&1); then
-	log_ok
-else
-	log_fail
-	log_error_output "$CP_OUTPUT"
-	exit 1
-fi
-
-log_action "Uploading spine-construct3-$VERSION.zip to $C3_UPDATE_URL$BRANCH"
-if CURL_OUTPUT=$(curl -f -F "file=@spine-construct3-$VERSION.zip" "$C3_UPDATE_URL$BRANCH" 2>&1); then
-	log_ok
-else
-	log_fail
-	log_error_output "$CURL_OUTPUT"
-	exit 1
+if [ "$RELEASE_COMMIT" = true ]; then
+	log_action "Uploading spine-construct3-$VERSION.zip to $C3_UPDATE_URL$BRANCH"
+	if CURL_OUTPUT=$(curl -f -F "file=@spine-construct3-$VERSION.zip" "$C3_UPDATE_URL$BRANCH" 2>&1); then
+		log_ok
+	else
+		log_fail
+		log_error_output "$CURL_OUTPUT"
+		exit 1
+	fi
 fi
 
 log_action "Uploading spine-construct3.zip (latest) to $C3_UPDATE_URL$BRANCH"
@@ -82,4 +87,7 @@ else
 	exit 1
 fi
 
-log_summary "✓ Construct3 plugin $VERSION deployed successfully"
+log_summary "✓ Construct3 plugin latest deployed successfully"
+if [ "$RELEASE_COMMIT" = true ]; then
+	log_summary "✓ Construct3 plugin $VERSION deployed successfully"
+fi
