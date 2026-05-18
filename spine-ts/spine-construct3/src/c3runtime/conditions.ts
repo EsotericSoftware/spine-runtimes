@@ -43,10 +43,10 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Cnds =
 		return eventMatches && trackMatches && animationMatches;
 	},
 	IsMirrored (this: SpineC3Instance) {
-		return this.isMirrored;
+		return this.width < 0;
 	},
 	IsFlipped (this: SpineC3Instance) {
-		return this.isFlipped;
+		return this.height < 0;
 	},
 	IsSkeletonLoaded (this: SpineC3Instance) {
 		return this.skeletonLoaded;

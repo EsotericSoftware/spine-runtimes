@@ -61,8 +61,6 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	propBoundsProvider: SpineBoundsProviderType = "setup";
 	propEnableCollision = false;
 
-	isMirrored = false;
-	isFlipped = false;
 	collisionSpriteInstance?: IWorldInstance;
 	collisionSpriteClassName = "";
 	private collisionBoundingBoxSlotName = "";
@@ -1175,8 +1173,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			followers.push(follower);
 		}
 
-		if (this.isMirrored) this.mirrorFollower(instance);
-		if (this.isFlipped) this.flipFollower(instance);
+		if (this.width < 0) this.mirrorFollower(instance);
+		if (this.height < 0) this.flipFollower(instance);
 
 		this.isPlaying = true;
 	}
@@ -1207,9 +1205,6 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 		const mirrorChanged = (prevW > 0) !== (this.width > 0);
 		const flipChanged = (prevH > 0) !== (this.height > 0);
-
-		if (mirrorChanged) this.isMirrored = !this.isMirrored;
-		if (flipChanged) this.isFlipped = !this.isFlipped;
 
 		if (this.boneFollowers.size === 0) return;
 		if (!mirrorChanged && !flipChanged) return;
@@ -1254,7 +1249,9 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			const cos = Math.cos(boneGameAngleRad);
 			const sin = Math.sin(boneGameAngleRad);
 
-			const negateAngle = this.isMirrored !== this.isFlipped;
+			const isMirrored = this.width < 0;
+			const isFlipped = this.height < 0;
+			const negateAngle = isMirrored !== isFlipped;
 			const gameObjectAngleDeg = (this.angle + this.propOffsetAngle) * spine.MathUtils.radDeg;
 
 			for (const follower of followers) {
@@ -1276,8 +1273,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 				const sx = Math.abs(this.width) / follower.refSkeletonWidth;
 				const sy = Math.abs(this.height) / follower.refSkeletonHeight;
-				const mirrorSign = this.isMirrored ? -1 : 1;
-				const flipSign = this.isFlipped ? -1 : 1;
+				const mirrorSign = isMirrored ? -1 : 1;
+				const flipSign = isFlipped ? -1 : 1;
 				instance.setSize(
 					follower.originalWidth * sx * mirrorSign,
 					follower.originalHeight * sy * flipSign
@@ -1555,8 +1552,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	*/
 
 	public mirror (isMirrored: boolean) {
-		if (isMirrored !== this.isMirrored) {
-			this.isMirrored = isMirrored;
+		if ((this.width < 0) !== isMirrored) {
 			this.width = -this.width;
 
 			for (const [, followers] of this.boneFollowers) {
@@ -1570,8 +1566,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	}
 
 	public flip (isFlipped: boolean) {
-		if (isFlipped !== this.isFlipped) {
-			this.isFlipped = isFlipped;
+		if ((this.height < 0) !== isFlipped) {
 			this.height = -this.height;
 
 			for (const [, followers] of this.boneFollowers) {
@@ -1613,8 +1608,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 		this.setOrigin(-x / width, 1 + y / height);
 
-		this.width = width * scaleX * (this.isMirrored ? -1 : 1);
-		this.height = height * scaleY * (this.isFlipped ? -1 : 1);
+		this.width = width * scaleX * (this.width < 0 ? -1 : 1);
+		this.height = height * scaleY * (this.height < 0 ? -1 : 1);
 		this.propScaleX = 1;
 		this.propScaleY = 1;
 
