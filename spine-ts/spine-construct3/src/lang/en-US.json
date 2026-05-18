@@ -955,6 +955,41 @@
               }
             }
           },
+          "bone-local-x": {
+            "description": "Get the local X translation of a bone relative to its parent, in Spine units.",
+            "translated-name": "BoneLocalX",
+            "params": { "bone-name": { "name": "Bone name", "desc": "Name of the bone" } }
+          },
+          "bone-local-y": {
+            "description": "Get the local Y translation of a bone relative to its parent, in Spine units.",
+            "translated-name": "BoneLocalY",
+            "params": { "bone-name": { "name": "Bone name", "desc": "Name of the bone" } }
+          },
+          "bone-local-rotation": {
+            "description": "Get the local rotation of a bone in degrees.",
+            "translated-name": "BoneLocalRotation",
+            "params": { "bone-name": { "name": "Bone name", "desc": "Name of the bone" } }
+          },
+          "bone-local-scale-x": {
+            "description": "Get the local X scale of a bone.",
+            "translated-name": "BoneLocalScaleX",
+            "params": { "bone-name": { "name": "Bone name", "desc": "Name of the bone" } }
+          },
+          "bone-local-scale-y": {
+            "description": "Get the local Y scale of a bone.",
+            "translated-name": "BoneLocalScaleY",
+            "params": { "bone-name": { "name": "Bone name", "desc": "Name of the bone" } }
+          },
+          "bone-local-shear-x": {
+            "description": "Get the local X shear of a bone in degrees.",
+            "translated-name": "BoneLocalShearX",
+            "params": { "bone-name": { "name": "Bone name", "desc": "Name of the bone" } }
+          },
+          "bone-local-shear-y": {
+            "description": "Get the local Y shear of a bone in degrees.",
+            "translated-name": "BoneLocalShearY",
+            "params": { "bone-name": { "name": "Bone name", "desc": "Name of the bone" } }
+          },
           "current-skin": {
             "description": "Get the current skin name. Returns comma-separated names if multiple skins are active.",
             "translated-name": "CurrentSkin"

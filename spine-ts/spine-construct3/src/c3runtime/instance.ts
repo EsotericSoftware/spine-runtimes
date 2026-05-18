@@ -1430,6 +1430,50 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		return point.y;
 	}
 
+	private getBoneAppliedPose (boneName: string) {
+		const { skeleton } = this;
+		if (!skeleton) {
+			console.warn('[Spine] getBoneAppliedPose: no skeleton');
+			return undefined;
+		}
+
+		const bone = skeleton.findBone(boneName);
+		if (!bone) {
+			console.warn(`[Spine] getBoneAppliedPose: bone not found: ${boneName}`);
+			return undefined;
+		}
+
+		return bone.appliedPose;
+	}
+
+	public getBoneLocalX (boneName: string) {
+		return this.getBoneAppliedPose(boneName)?.x ?? 0;
+	}
+
+	public getBoneLocalY (boneName: string) {
+		return this.getBoneAppliedPose(boneName)?.y ?? 0;
+	}
+
+	public getBoneLocalRotation (boneName: string) {
+		return this.getBoneAppliedPose(boneName)?.rotation ?? 0;
+	}
+
+	public getBoneLocalScaleX (boneName: string) {
+		return this.getBoneAppliedPose(boneName)?.scaleX ?? 0;
+	}
+
+	public getBoneLocalScaleY (boneName: string) {
+		return this.getBoneAppliedPose(boneName)?.scaleY ?? 0;
+	}
+
+	public getBoneLocalShearX (boneName: string) {
+		return this.getBoneAppliedPose(boneName)?.shearX ?? 0;
+	}
+
+	public getBoneLocalShearY (boneName: string) {
+		return this.getBoneAppliedPose(boneName)?.shearY ?? 0;
+	}
+
 	public setBonePose (boneName: string, mode: "game" | "local", applyMode: "once" | "hold", c3X?: number, c3Y?: number, c3Rotation?: number, scaleX?: number, scaleY?: number) {
 		const bone = this.getBone(boneName);
 		if (!bone) return;

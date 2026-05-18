@@ -92,6 +92,34 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Exps =
 		return this.getBoneWorldY(boneName);
 	},
 
+	BoneLocalX (this: SpineC3Instance, boneName: string) {
+		return this.getBoneLocalX(boneName);
+	},
+
+	BoneLocalY (this: SpineC3Instance, boneName: string) {
+		return this.getBoneLocalY(boneName);
+	},
+
+	BoneLocalRotation (this: SpineC3Instance, boneName: string) {
+		return this.getBoneLocalRotation(boneName);
+	},
+
+	BoneLocalScaleX (this: SpineC3Instance, boneName: string) {
+		return this.getBoneLocalScaleX(boneName);
+	},
+
+	BoneLocalScaleY (this: SpineC3Instance, boneName: string) {
+		return this.getBoneLocalScaleY(boneName);
+	},
+
+	BoneLocalShearX (this: SpineC3Instance, boneName: string) {
+		return this.getBoneLocalShearX(boneName);
+	},
+
+	BoneLocalShearY (this: SpineC3Instance, boneName: string) {
+		return this.getBoneLocalShearY(boneName);
+	},
+
 	CurrentSkin (this: SpineC3Instance) {
 		return this.getCurrentSkin();
 	},

@@ -907,6 +907,55 @@
         ]
       },
       {
+        "id": "bone-local-x",
+        "expressionName": "BoneLocalX",
+        "highlight": false,
+        "returnType": "number",
+        "params": [{ "id": "bone-name", "type": "string" }]
+      },
+      {
+        "id": "bone-local-y",
+        "expressionName": "BoneLocalY",
+        "highlight": false,
+        "returnType": "number",
+        "params": [{ "id": "bone-name", "type": "string" }]
+      },
+      {
+        "id": "bone-local-rotation",
+        "expressionName": "BoneLocalRotation",
+        "highlight": false,
+        "returnType": "number",
+        "params": [{ "id": "bone-name", "type": "string" }]
+      },
+      {
+        "id": "bone-local-scale-x",
+        "expressionName": "BoneLocalScaleX",
+        "highlight": false,
+        "returnType": "number",
+        "params": [{ "id": "bone-name", "type": "string" }]
+      },
+      {
+        "id": "bone-local-scale-y",
+        "expressionName": "BoneLocalScaleY",
+        "highlight": false,
+        "returnType": "number",
+        "params": [{ "id": "bone-name", "type": "string" }]
+      },
+      {
+        "id": "bone-local-shear-x",
+        "expressionName": "BoneLocalShearX",
+        "highlight": false,
+        "returnType": "number",
+        "params": [{ "id": "bone-name", "type": "string" }]
+      },
+      {
+        "id": "bone-local-shear-y",
+        "expressionName": "BoneLocalShearY",
+        "highlight": false,
+        "returnType": "number",
+        "params": [{ "id": "bone-name", "type": "string" }]
+      },
+      {
         "id": "current-skin",
         "expressionName": "CurrentSkin",
         "highlight": false,

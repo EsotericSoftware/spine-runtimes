@@ -955,6 +955,41 @@
               }
             }
           },
+          "bone-local-x": {
+            "description": "获取骨骼相对于父骨骼的本地X位移（Spine单位）。",
+            "translated-name": "BoneLocalX",
+            "params": { "bone-name": { "name": "骨骼名称", "desc": "骨骼的名称" } }
+          },
+          "bone-local-y": {
+            "description": "获取骨骼相对于父骨骼的本地Y位移（Spine单位）。",
+            "translated-name": "BoneLocalY",
+            "params": { "bone-name": { "name": "骨骼名称", "desc": "骨骼的名称" } }
+          },
+          "bone-local-rotation": {
+            "description": "获取骨骼的本地旋转角度（度）。",
+            "translated-name": "BoneLocalRotation",
+            "params": { "bone-name": { "name": "骨骼名称", "desc": "骨骼的名称" } }
+          },
+          "bone-local-scale-x": {
+            "description": "获取骨骼的本地X缩放。",
+            "translated-name": "BoneLocalScaleX",
+            "params": { "bone-name": { "name": "骨骼名称", "desc": "骨骼的名称" } }
+          },
+          "bone-local-scale-y": {
+            "description": "获取骨骼的本地Y缩放。",
+            "translated-name": "BoneLocalScaleY",
+            "params": { "bone-name": { "name": "骨骼名称", "desc": "骨骼的名称" } }
+          },
+          "bone-local-shear-x": {
+            "description": "获取骨骼的本地X剪切角度（度）。",
+            "translated-name": "BoneLocalShearX",
+            "params": { "bone-name": { "name": "骨骼名称", "desc": "骨骼的名称" } }
+          },
+          "bone-local-shear-y": {
+            "description": "获取骨骼的本地Y剪切角度（度）。",
+            "translated-name": "BoneLocalShearY",
+            "params": { "bone-name": { "name": "骨骼名称", "desc": "骨骼的名称" } }
+          },
           "current-skin": {
             "description": "获取当前皮肤名称。如果有多个皮肤处于活动状态，返回逗号分隔的名称。",
             "translated-name": "CurrentSkin"
