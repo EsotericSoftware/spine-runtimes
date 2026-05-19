@@ -236,7 +236,7 @@
           },
           "set-animation": {
             "list-name": "设置动画",
-            "display-text": "Set animation {1} on track {0} with loop {2} additive {3}",
+            "display-text": "在轨道{0}上设置动画{1} 循环{2} 叠加混合{3}",
             "description": "设置动画",
             "params": {
               "track-index": {
@@ -263,7 +263,7 @@
           },
           "add-animation": {
             "list-name": "添加动画",
-            "display-text": "Add animation {1} on track {0} with loop {2} delay {3} additive {4}",
+            "display-text": "在轨道{0}上添加动画{1} 循环{2} 延迟{3} 叠加混合{4}",
             "description": "添加动画",
             "params": {
               "track-index": {
