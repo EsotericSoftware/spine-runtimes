@@ -89,6 +89,9 @@
   * Added IK softness.
   * Exposed `x` and `y` on `SkeletonData` through getters and setters.
 
+* **Bug fixes**
+  * Fixed binary skeleton loading to stop after default skin attachment load errors, preventing corrupted reads when atlas regions are missing.
+
 ### Cocos2d-x
 * Updated to cocos2d-x 3.17.1
 * Added mix-and-match example to demonstrate the new Skin API.
