@@ -10,7 +10,7 @@ let package = Package(
         .tvOS(.v13),
         .macCatalyst(.v13),
         .visionOS(.v1),
-        .macOS(.v10_15),
+        .macOS(.v12),
         .watchOS(.v6),
     ],
     products: [
@@ -32,7 +32,7 @@ let package = Package(
         .target(
             name: "SpineiOSWrapper",
             dependencies: [
-                .target(name: "SpineiOS", condition: .when(platforms: [.iOS, .visionOS, .tvOS, .macCatalyst]))
+                .target(name: "SpineiOS", condition: .when(platforms: [.iOS, .visionOS, .tvOS, .macCatalyst, .macOS]))
             ],
             path: "spine-ios/Sources/SpineiOSWrapper"
         ),
