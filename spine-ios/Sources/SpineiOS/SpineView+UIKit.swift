@@ -27,6 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if canImport(UIKit)
 import SwiftUI
 
 /// A `SwiftUI` `View` to display a Spine skeleton. The skeleton can be loaded from a bundle, local files, http, or a pre-loaded ``SkeletonDrawableWrapper``.
@@ -38,7 +39,6 @@ import SwiftUI
 ///
 /// This is a ``UIViewRepresentable`` of `SpineUIView`.
 public struct SpineView: UIViewRepresentable {
-
     public typealias UIViewType = SpineUIView
 
     private let source: SpineViewSource
@@ -46,7 +46,7 @@ public struct SpineView: UIViewRepresentable {
     private let mode: SpineContentMode
     private let alignment: SpineAlignment
     private let boundsProvider: BoundsProvider
-    private let backgroundColor: UIColor  // Not using `SwiftUI.Color`, as briging to `UIColor` prior iOS 14 might not always work.
+    private let backgroundColor: SpineUIColor  // Not using `SwiftUI.Color`, as briging to `UIColor` prior iOS 14 might not always work.
 
     @Binding
     private var isRendering: Bool?
@@ -74,7 +74,7 @@ public struct SpineView: UIViewRepresentable {
         mode: SpineContentMode = .fit,
         alignment: SpineAlignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .clear,
+        backgroundColor: SpineUIColor = .clear,
         isRendering: Binding<Bool?> = .constant(nil)
     ) {
         self.source = source
@@ -103,3 +103,4 @@ public struct SpineView: UIViewRepresentable {
         }
     }
 }
+#endif
