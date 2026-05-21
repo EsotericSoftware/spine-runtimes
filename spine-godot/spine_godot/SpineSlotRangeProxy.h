@@ -45,6 +45,11 @@
 // pool of SpineMesh2D children and, every frame, mirrors the geometry and blend
 // material that the source SpineSprite already computed for the claimed slots.
 // The source hides its own copy of those slots (see SpineSprite::is_slot_externally_rendered).
+//
+// Tree order matters: the proxy mirrors the source's geometry during its own
+// _process step, so place the proxy after the source SpineSprite in the scene
+// tree. A proxy that processes before its source mirrors the previous frame's
+// geometry and lags the source by one frame during fast motion.
 class SpineSlotRangeProxy : public Node2D {
 	GDCLASS(SpineSlotRangeProxy, Node2D)
 

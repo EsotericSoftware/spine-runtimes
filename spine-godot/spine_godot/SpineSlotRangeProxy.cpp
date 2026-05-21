@@ -250,6 +250,8 @@ void SpineSlotRangeProxy::update_proxy() {
 
 	if (follow_source_transform) set_global_transform(sprite->get_global_transform());
 
+	// Mirror the geometry the source computed for this frame. The source must
+	// process before this proxy for the data to be current; see the header.
 	Vector<SpineMesh2D *> source_meshes;
 	sprite->collect_slot_range_meshes(start_index, end_index, source_meshes);
 

@@ -1042,7 +1042,7 @@ void SpineSprite::_register_proxy(SpineSlotRangeProxy *proxy, int start_slot_ind
 	for (int i = 0; i < render_proxies.size(); i++) {
 		const SpineRenderProxyBinding &other = render_proxies[i];
 		if (start_slot_index <= other.end_slot_index && end_slot_index >= other.start_slot_index) {
-			WARN_PRINT("SpineSlotRangeProxy: overlapping slot ranges claimed on the same SpineSprite. The last registered proxy renders the overlapping slots.");
+			WARN_PRINT("SpineSlotRangeProxy: overlapping slot ranges claimed on the same SpineSprite. Slots in the overlap are rendered by every proxy that claims them, so they will be drawn more than once. Give each proxy a disjoint slot range.");
 			break;
 		}
 	}
