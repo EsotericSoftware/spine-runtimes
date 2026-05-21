@@ -29,7 +29,12 @@
 
 import MetalKit
 import SpineSwift
+
+#if canImport(UIKit)
 import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 
 /// A ``UIView`` to display a Spine skeleton. The skeleton can be loaded from a bundle, local files, http, or a pre-loaded ``SkeletonDrawableWrapper``.
 ///
@@ -55,7 +60,7 @@ public final class SpineUIView: MTKView {
         mode: SpineContentMode = .fit,
         alignment: SpineAlignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .clear
+        backgroundColor: SpineUIColor = .clear
     ) {
         self.controller = controller
         self.mode = mode
@@ -64,7 +69,10 @@ public final class SpineUIView: MTKView {
 
         super.init(frame: .zero, device: SpineObjects.shared.device)
         clearColor = MTLClearColor(backgroundColor)
+        
+#if canImport(UIKit)
         isOpaque = backgroundColor != .clear
+#endif
     }
 
     /// An initializer that constructs a new ``SpineUIView`` from a ``SpineViewSource``.
@@ -87,7 +95,7 @@ public final class SpineUIView: MTKView {
         mode: SpineContentMode = .fit,
         alignment: SpineAlignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .clear
+        backgroundColor: SpineUIColor = .clear
     ) {
         self.init(controller: controller, mode: mode, alignment: alignment, boundsProvider: boundsProvider, backgroundColor: backgroundColor)
         Task.detached(priority: .high) {
@@ -124,7 +132,7 @@ public final class SpineUIView: MTKView {
         mode: SpineContentMode = .fit,
         alignment: SpineAlignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .clear
+        backgroundColor: SpineUIColor = .clear
     ) {
         self.init(
             from: .bundle(atlasFileName: atlasFileName, skeletonFileName: skeletonFileName, bundle: bundle), controller: controller, mode: mode,
@@ -153,7 +161,7 @@ public final class SpineUIView: MTKView {
         mode: SpineContentMode = .fit,
         alignment: SpineAlignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .clear
+        backgroundColor: SpineUIColor = .clear
     ) {
         self.init(
             from: .file(atlasFile: atlasFile, skeletonFile: skeletonFile), controller: controller, mode: mode, alignment: alignment,
@@ -182,7 +190,7 @@ public final class SpineUIView: MTKView {
         mode: SpineContentMode = .fit,
         alignment: SpineAlignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .clear
+        backgroundColor: SpineUIColor = .clear
     ) {
         self.init(
             from: .http(atlasURL: atlasURL, skeletonURL: skeletonURL), controller: controller, mode: mode, alignment: alignment,
@@ -208,7 +216,7 @@ public final class SpineUIView: MTKView {
         mode: SpineContentMode = .fit,
         alignment: SpineAlignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .clear
+        backgroundColor: SpineUIColor = .clear
     ) {
         self.init(
             from: .drawable(drawable), controller: controller, mode: mode, alignment: alignment, boundsProvider: boundsProvider,
@@ -246,7 +254,7 @@ extension SpineUIView {
         controller.initialize()
     }
 
-    private func initRenderer(atlasPages: [UIImage]) throws {
+    private func initRenderer(atlasPages: [SpineUIImage]) throws {
         // Get PMA flag from first atlas page if available
         let pmaFlag = controller.atlas.pages.count > 0 ? (controller.atlas.pages[0]?.pma ?? false) : false
 

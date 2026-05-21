@@ -80,7 +80,7 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
         device: MTLDevice,
         commandQueue: MTLCommandQueue,
         pixelFormat: MTLPixelFormat,
-        atlasPages: [UIImage],
+        atlasPages: [SpineUIImage],
         pma: Bool
     ) throws {
         self.device = device
@@ -98,7 +98,13 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
         let textureLoader = MTKTextureLoader(device: device)
         textures =
             try atlasPages
-            .compactMap { $0.cgImage }
+            .compactMap {
+#if canImport(UIKit)
+                $0.cgImage
+#elseif canImport(AppKit)
+                $0.cgImage(forProposedRect: nil, context: nil, hints: [:])
+#endif
+            }
             .map {
                 try textureLoader.newTexture(
                     cgImage: $0,
@@ -134,8 +140,11 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
 
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
         guard let spineView = view as? SpineUIView else { return }
+        
+        // FIXME: support multi-head display
+        let screenScaleFactor = SpineUIScreen.main?.scale ?? 1.0
 
-        sizeInPoints = CGSize(width: size.width / UIScreen.main.scale, height: size.height / UIScreen.main.scale)
+        sizeInPoints = CGSize(width: size.width / screenScaleFactor, height: size.height / screenScaleFactor)
         viewPortSize = vector_uint2(UInt32(size.width), UInt32(size.height))
         setTransform(
             bounds: spineView.computedBounds,
@@ -187,6 +196,9 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
     }
 
     private func setTransform(bounds: CGRect, mode: SpineContentMode, alignment: SpineAlignment) {
+        // FIXME: support multi-head display
+        let screenScaleFactor = SpineUIScreen.main?.scale ?? 1.0
+        
         let x = -bounds.minX - bounds.width / 2.0
         let y = -bounds.minY - bounds.height / 2.0
 
@@ -207,8 +219,8 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
 
         transform = SpineTransform(
             translation: vector_float2(Float(x), Float(y)),
-            scale: vector_float2(Float(scaleX * UIScreen.main.scale), Float(scaleY * UIScreen.main.scale)),
-            offset: vector_float2(Float(offsetX * UIScreen.main.scale), Float(offsetY * UIScreen.main.scale))
+            scale: vector_float2(Float(scaleX * screenScaleFactor), Float(scaleY * screenScaleFactor)),
+            offset: vector_float2(Float(offsetX * screenScaleFactor), Float(offsetY * screenScaleFactor))
         )
 
         delegate?.spineRendererDidUpdate(

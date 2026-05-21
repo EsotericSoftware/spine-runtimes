@@ -31,7 +31,12 @@ import CoreGraphics
 import Foundation
 import QuartzCore
 import SpineSwift
+
+#if canImport(UIKit)
 import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 
 public typealias SpineControllerCallback = (_ controller: SpineController) -> Void
 
