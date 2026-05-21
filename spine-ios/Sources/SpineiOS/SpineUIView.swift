@@ -68,9 +68,17 @@ public final class SpineUIView: MTKView {
         self.boundsProvider = boundsProvider
 
         super.init(frame: .zero, device: SpineObjects.shared.device)
-        clearColor = MTLClearColor(backgroundColor)
+        
+#if canImport(AppKit)
+        // in AppKit (macOS), MTLClearColor must be constructed with `NSColor.usingColorSpace()`
+        if let color = backgroundColor.usingColorSpace(.sRGB) {
+            clearColor = MTLClearColor(red: color.redComponent, green: color.greenComponent, blue: color.blueComponent, alpha: color.alphaComponent)
+        }
+        layer?.isOpaque = backgroundColor != .clear
+#endif
         
 #if canImport(UIKit)
+        clearColor = MTLClearColor(backgroundColor)
         isOpaque = backgroundColor != .clear
 #endif
     }
