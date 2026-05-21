@@ -69,6 +69,8 @@
 #include "SpineTimeline.h"
 #include "SpineConstant.h"
 #include "SpineSlotNode.h"
+#include "SpineSlotRangeProxy.h"
+#include "SpineSpriteRenderSeparator.h"
 #include "SpineBoneNode.h"
 #include "spine/Bone.h"
 
@@ -183,6 +185,8 @@ void register_spine_godot_types() {
 	GDREGISTER_CLASS(SpineConstant);
 
 	GDREGISTER_CLASS(SpineSlotNode);
+	GDREGISTER_CLASS(SpineSlotRangeProxy);
+	GDREGISTER_CLASS(SpineSpriteRenderSeparator);
 	GDREGISTER_CLASS(SpineBoneNode);
 #ifndef SPINE_GODOT_EXTENSION
 	GDREGISTER_CLASS(SpineAnimationTrack);

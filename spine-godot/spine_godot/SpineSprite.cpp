@@ -852,6 +852,10 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 		spine::Attachment *attachment = slot->getAppliedPose().getAttachment();
 		SpineMesh2D *mesh_instance = mesh_instances[i];
 		mesh_instance->renderer_object = nullptr;
+		// When a SpineSlotRangeProxy claims this slot, the proxy renders it from
+		// elsewhere in the scene tree. Geometry is still computed below so the proxy
+		// can mirror it; only this sprite's own copy is hidden.
+		mesh_instance->set_visible(!is_slot_externally_rendered((int) slot->getData().getIndex()));
 
 		if (!attachment) {
 			skeleton_clipper->clipEnd(*slot);
@@ -1013,6 +1017,59 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 		skeleton_clipper->clipEnd(*slot);
 	}
 	skeleton_clipper->clipEnd();
+}
+
+bool SpineSprite::is_slot_externally_rendered(int slot_index) const {
+	for (int i = 0; i < render_proxies.size(); i++) {
+		const SpineRenderProxyBinding &binding = render_proxies[i];
+		if (slot_index >= binding.start_slot_index && slot_index <= binding.end_slot_index) return true;
+	}
+	return false;
+}
+
+int SpineSprite::get_draw_order_count() const {
+	return (int) mesh_instances.size();
+}
+
+void SpineSprite::_register_proxy(SpineSlotRangeProxy *proxy, int start_slot_index, int end_slot_index) {
+	if (!proxy) return;
+	for (int i = 0; i < render_proxies.size(); i++) {
+		if (render_proxies[i].proxy == proxy) {
+			render_proxies.remove_at(i);
+			break;
+		}
+	}
+	for (int i = 0; i < render_proxies.size(); i++) {
+		const SpineRenderProxyBinding &other = render_proxies[i];
+		if (start_slot_index <= other.end_slot_index && end_slot_index >= other.start_slot_index) {
+			WARN_PRINT("SpineSlotRangeProxy: overlapping slot ranges claimed on the same SpineSprite. The last registered proxy renders the overlapping slots.");
+			break;
+		}
+	}
+	SpineRenderProxyBinding binding;
+	binding.proxy = proxy;
+	binding.start_slot_index = start_slot_index;
+	binding.end_slot_index = end_slot_index;
+	render_proxies.push_back(binding);
+}
+
+void SpineSprite::_unregister_proxy(SpineSlotRangeProxy *proxy) {
+	for (int i = 0; i < render_proxies.size(); i++) {
+		if (render_proxies[i].proxy == proxy) {
+			render_proxies.remove_at(i);
+			return;
+		}
+	}
+}
+
+void SpineSprite::collect_slot_range_meshes(int start_slot_index, int end_slot_index, Vector<SpineMesh2D *> &result) const {
+	if (!skeleton.is_valid() || !skeleton->get_spine_object()) return;
+	auto &draw_order = skeleton->get_spine_object()->getDrawOrder().getAppliedPose();
+	for (int i = 0; i < (int) draw_order.size() && i < mesh_instances.size(); i++) {
+		int slot_index = (int) draw_order[i]->getData().getIndex();
+		if (slot_index < start_slot_index || slot_index > end_slot_index) continue;
+		result.push_back(mesh_instances[i]);
+	}
 }
 
 #ifdef SPINE_GODOT_EXTENSION

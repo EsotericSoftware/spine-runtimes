@@ -43,6 +43,8 @@
 
 class SpineSlotNode;
 
+class SpineSlotRangeProxy;
+
 struct SpineRendererObject;
 
 class SpineSprite;
@@ -53,6 +55,7 @@ class SpineMesh2D : public Node2D {
 	GDCLASS(SpineMesh2D, Node2D);
 
 	friend class SpineSprite;
+	friend class SpineSlotRangeProxy;
 
 protected:
 	void _notification(int what);
@@ -126,6 +129,12 @@ public:
 #endif
 };
 
+struct SpineRenderProxyBinding {
+	SpineSlotRangeProxy *proxy = nullptr;
+	int start_slot_index = 0;
+	int end_slot_index = 0;
+};
+
 class SpineSprite : public Node2D, public spine::AnimationStateListenerObject {
 	GDCLASS(SpineSprite, Node2D)
 
@@ -161,6 +170,7 @@ protected:
 
 	spine::Array<spine::Array<SpineSlotNode *>> slot_nodes;
 	Vector<SpineMesh2D *> mesh_instances;
+	Vector<SpineRenderProxyBinding> render_proxies;
 	Ref<Material> normal_material;
 	Ref<Material> additive_material;
 	Ref<Material> multiply_material;
@@ -359,6 +369,21 @@ public:
 	virtual bool _edit_use_rect() const;
 #endif
 #endif
+
+	// Render separation: SpineSlotRangeProxy support. A proxy claims a contiguous
+	// range of slots and renders them from a different position in the scene tree.
+	void _register_proxy(SpineSlotRangeProxy *proxy, int start_slot_index, int end_slot_index);
+
+	void _unregister_proxy(SpineSlotRangeProxy *proxy);
+
+	bool is_slot_externally_rendered(int slot_index) const;
+
+	// Number of draw-order slots, equal to the number of SpineMesh2D instances.
+	int get_draw_order_count() const;
+
+	// Appends the SpineMesh2D instances whose slot index is within [start_slot_index,
+	// end_slot_index] to result, ordered by the skeleton's current draw order.
+	void collect_slot_range_meshes(int start_slot_index, int end_slot_index, Vector<SpineMesh2D *> &result) const;
 
 	static void clear_statics();
 };
