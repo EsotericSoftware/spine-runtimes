@@ -178,6 +178,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 		if (this.triggerSkeletonLoadedOnFirstTick) {
 			this.triggerSkeletonLoadedOnFirstTick = false;
+			this.initializeInitialSkeletonState();
 			this._trigger(C3.Plugins.EsotericSoftware_SpineConstruct3.Cnds.OnSkeletonLoaded);
 		}
 
@@ -551,23 +552,22 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			complete: (entry) => this.triggerAnimationEvent("complete", entry.trackIndex, entry.animation?.name ?? ""),
 		});
 
-		if (this.propAnimation) this.setAnimation(0, this.propAnimation, true);
-
-		this._setSkin();
-
-		this.calculateBounds();
-
-		this.update(0);
-
-		this.createCollisionSprite();
-
 		this.skeletonLoaded = true;
 		this.skeletonLoading = false;
 		if (triggerLoaded) {
+			this.initializeInitialSkeletonState();
 			this._trigger(C3.Plugins.EsotericSoftware_SpineConstruct3.Cnds.OnSkeletonLoaded);
 		} else {
 			this.triggerSkeletonLoadedOnFirstTick = true;
 		}
+	}
+
+	private initializeInitialSkeletonState () {
+		this._setSkin();
+		if (this.propAnimation) this.setAnimation(0, this.propAnimation, true);
+		this.calculateBounds();
+		this.update(0);
+		this.createCollisionSprite();
 	}
 
 	private createCollisionSprite () {
