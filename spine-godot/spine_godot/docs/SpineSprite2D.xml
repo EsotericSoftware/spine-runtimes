@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="SpineSprite" inherits="Node2D" version="3.4">
+<class name="SpineSprite2D" inherits="Node2D" version="3.4">
 	<brief_description>
 		A node for animating and rendering a Spine skeleton to a 2D scene.
 	</brief_description>
@@ -8,14 +8,17 @@
 		The Spine sprite gets its skeleton, texture atlas data, and animation mixes from a [code]SpineSkeletonDataResource[/code]. The skeleton data resource can and should be shared across multiple Spine sprites to save resources.
 		The Spine sprite provides a [code]SpineAnimationState[/code] via [code]get_animation_state()[/code] through which it can be animated.
 		The Spine sprite also provides acccess to the underlying [code]SpineSkeleton[/code] via [code]get_skeleton[/code] which allows querying bones, slots, constraints, and other parts of the skeleton.
-		The [code]SpineSkeleton[/code] is also used to set the active skin. For mix-and-match scenarios, a new skin can be created via [code]new_skin()[/code] to which the attachments of existing skins can be added via [code]SpineSkin.add_skin()[/code].
-		To insert other nodes into the drawing order of the Spine sprite's slots, a [code]SpineSlotNode[/code] can be used. This allows attaching particle systems, collision shapes, and other Godot nodes to specific slots and bones of the Spine sprite's skeleton.
-		The Spine sprite allows overriding the internal materials through 4 material properties. If set, these materials will be used instead of the default internal materials for all attachments. For more fine grained control, a [code]SpineSlotNode[/code] can override the material of the attachment on a specific slot.
+		The [code]SpineSkeleton[/code] from [code]get_skeleton()[/code] controls the active skin. The [code]SpineAnimationState[/code] from [code]get_animation_state()[/code] controls playback.
+		To play an animation from code, call [code]get_animation_state().set_animation("walk", true, 0)[/code]. The second argument sets looping. The third argument is the track index. Track 0 is the main layer. Call [code]get_animation_state().add_animation("jump", 0, false, 0)[/code] to queue an animation after the current one on the same track.
+		To switch skin from code, call [code]get_skeleton().set_skin_by_name("full-skins/girl")[/code] with a skin name from your skeleton data. Pass [code]null[/code] to [code]get_skeleton().set_skin()[/code] for the default skin. For mix-and-match, create a skin with [code]new_skin("custom-skin")[/code], add parts with [code]SpineSkin.add_skin(get_skeleton().get_data().find_skin("hair/brown"))[/code], then call [code]get_skeleton().set_skin(custom_skin)[/code]. After a skin switch, call [code]get_skeleton().set_slots_to_setup_pose()[/code] so slot attachments refresh.
+		When [code]update_mode[/code] is [code]Manual[/code], call [code]update_skeleton(delta)[/code] each frame after you change skin or animation.
+		To insert other nodes into the drawing order of the Spine sprite's slots, a [code]SpineSlotNode2D[/code] can be used. This allows attaching particle systems, collision shapes, and other Godot nodes to specific slots and bones of the Spine sprite's skeleton.
+		The Spine sprite allows overriding the internal materials through 4 material properties. If set, these materials will be used instead of the default internal materials for all attachments. For more fine grained control, a [code]SpineSlotNode2D[/code] can override the material of the attachment on a specific slot.
 		By default, a Spine sprite is updated during the standard [code]process[/code] update. It can be set to update during the physics update via the [code]process_mode[/code] property. It can also be set to be updated manually, in which case [code]update_skeleton[/code] must be called so the internal animation state is updated and applied to the skeleon.
-		The Spine sprite provides the method to query ([code]get_global_bone_transform()[/code]) and set ([code]set_global_bone_transform[/code]) a bone's global transform. This can be used to have another node follow a bone, or have a bone follow e.g. the mouse or another node. Alternatively, a [code]SpineBoneNode[/code] can be used to achieve the same, without having to manually update and synchronize transforms.
+		The Spine sprite provides the method to query ([code]get_global_bone_transform()[/code]) and set ([code]set_global_bone_transform[/code]) a bone's global transform. This can be used to have another node follow a bone, or have a bone follow e.g. the mouse or another node. Alternatively, a [code]SpineBoneNode2D[/code] can be used to achieve the same, without having to manually update and synchronize transforms.
 		The Spine sprite provides signals to listen for animation state events, such as an animation having completed or when a user defined event occurred. It also provides signals before the animations state is updated and applied, and before and after the world transforms of bones have been computed, allowing to modify the underlying skeleton before these actions happen.
 		In editor mode, the Spine sprite provides properties to show debugging information, such as bone and slot names on hover, regions and meshes, and so forth. This can be used to inspect a skeleton and its hierarchy in the editor viewport.
-		To animate a Spine sprite via the Godot animation player, [code]SpineAnimationTrack[/code] instances can be used. See the Spine Godot Runtimes documentation and the [code]examples/08-animation-player[/code] examople for more information.
+		To animate a Spine sprite via the Godot animation player, add [code]SpineAnimationTrack[/code] keys to an [code]AnimationPlayer[/code].
 	</description>
 	<tutorials>
 	</tutorials>
@@ -23,7 +26,7 @@
 		<method name="get_animation_state">
 			<return type="SpineAnimationState" />
 			<description>
-				Returns the animation state for animating the skeleton.
+				Returns the animation state for this sprite. Use [code]set_animation()[/code] and [code]add_animation()[/code] on the result to change playback from code.
 			</description>
 		</method>
 		<method name="get_global_bone_transform">
@@ -36,19 +39,38 @@
 		<method name="get_skeleton">
 			<return type="SpineSkeleton" />
 			<description>
-				Returns the skeleton.
+				Returns the live skeleton for this sprite. Use [code]set_skin()[/code], [code]set_skin_by_name()[/code], and [code]set_slots_to_setup_pose()[/code] on the result to change skin from code.
+			</description>
+		</method>
+		<method name="get_time_scale">
+			<return type="float" />
+			<description>
+				Returns the animation playback speed multiplier applied during [code]update_skeleton()[/code].
 			</description>
 		</method>
 		<method name="new_skin">
 			<return type="SpineSkin" />
 			<argument index="0" name="name" type="String" />
 			<description>
-				Creates a new skin.
+				Creates a new empty skin on the skeleton. Add attachments from other skins with [code]SpineSkin.add_skin()[/code], then pass the result to [code]get_skeleton().set_skin()[/code].
 			</description>
 		</method>
 		<method name="on_skeleton_data_changed">
 			<return type="void" />
 			<description>
+				Reloads internal skeleton and animation objects after [code]skeleton_data_res[/code] changes. Called automatically when the resource updates.
+			</description>
+		</method>
+		<method name="rebuild_spine_objects">
+			<return type="void" />
+			<description>
+				Rebuilds the skeleton, animation state, and mesh children from [code]skeleton_data_res[/code].
+			</description>
+		</method>
+		<method name="schedule_skeleton_rebuild">
+			<return type="void" />
+			<description>
+				Queues a skeleton rebuild for the next frame. The sprite calls this when skeleton data or atlas resources change.
 			</description>
 		</method>
 		<method name="set_global_bone_transform">
@@ -57,6 +79,25 @@
 			<argument index="1" name="global_transform" type="Transform2D" />
 			<description>
 				Sets a bone's global transform. This must be done before the skeleton world transforms are computed.
+			</description>
+		</method>
+		<method name="set_time_scale">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+				Sets the animation playback speed multiplier applied during [code]update_skeleton()[/code].
+			</description>
+		</method>
+		<method name="teardown_mesh_children">
+			<return type="void" />
+			<description>
+				Removes all [code]SpineMesh2D[/code] child nodes. The sprite calls this during teardown or resource reload.
+			</description>
+		</method>
+		<method name="teardown_spine_objects">
+			<return type="void" />
+			<description>
+				Destroys internal skeleton and animation state objects. The sprite calls this during resource reload or shutdown.
 			</description>
 		</method>
 		<method name="update_skeleton">
@@ -69,47 +110,85 @@
 	</methods>
 	<members>
 		<member name="additive_material" type="Material" setter="set_additive_material" getter="get_additive_material">
+			Optional material for additive blend slots. Overrides the default internal material for every additive slot.
 		</member>
 		<member name="bones" type="bool" setter="set_debug_bones" getter="get_debug_bones" default="false">
+			Draws debug lines for all bones in the editor.
 		</member>
 		<member name="bones_color" type="Color" setter="set_debug_bones_color" getter="get_debug_bones_color" default="Color( 1, 1, 0, 0.5 )">
+			Color used when [code]bones[/code] debug drawing is enabled.
 		</member>
 		<member name="bones_thickness" type="float" setter="set_debug_bones_thickness" getter="get_debug_bones_thickness" default="5.0">
+			Line thickness for bone debug drawing in the editor.
 		</member>
 		<member name="bounding_boxes" type="bool" setter="set_debug_bounding_boxes" getter="get_debug_bounding_boxes" default="false">
+			Draws bounding box attachments in the editor.
 		</member>
 		<member name="bounding_boxes_color" type="Color" setter="set_debug_bounding_boxes_color" getter="get_debug_bounding_boxes_color" default="Color( 0, 1, 0, 0.5 )">
+			Color used when [code]bounding_boxes[/code] debug drawing is enabled.
 		</member>
 		<member name="clipping" type="bool" setter="set_debug_clipping" getter="get_debug_clipping" default="false">
+			Draws clipping attachment outlines in the editor.
 		</member>
 		<member name="meshes" type="bool" setter="set_debug_meshes" getter="get_debug_meshes" default="false">
+			Draws mesh attachment wireframes in the editor.
 		</member>
 		<member name="meshes_color" type="Color" setter="set_debug_meshes_color" getter="get_debug_meshes_color" default="Color( 0, 0, 1, 0.5 )">
+			Color used when [code]meshes[/code] debug drawing is enabled.
 		</member>
 		<member name="multiply_material" type="Material" setter="set_multiply_material" getter="get_multiply_material">
+			Optional material for multiply blend slots. Overrides the default internal material for every multiply slot.
 		</member>
 		<member name="normal_material" type="Material" setter="set_normal_material" getter="get_normal_material">
+			Optional material for normal blend slots. Overrides the default internal material for every normal slot.
 		</member>
 		<member name="paths" type="bool" setter="set_debug_paths" getter="get_debug_paths" default="false">
+			Draws path attachment guides in the editor.
 		</member>
 		<member name="paths_clipping" type="Color" setter="set_debug_clipping_color" getter="get_debug_clipping_color" default="Color( 0.8, 0, 0, 0.8 )">
+			Color used when [code]clipping[/code] debug drawing is enabled.
 		</member>
 		<member name="paths_color" type="Color" setter="set_debug_paths_color" getter="get_debug_paths_color" default="Color( 1, 0.498039, 0, 0.466667 )">
+			Color used when [code]paths[/code] debug drawing is enabled.
+		</member>
+		<member name="preview_animation" type="String">
+			Editor animation picker under the Preview group. Choose [code]None[/code] to show the setup pose. Choose an animation name to preview playback in the viewport.
+		</member>
+		<member name="preview_frame" type="bool" default="false">
+			When [code]true[/code], [code]preview_time[/code] scrubs a single frame in the editor. When [code]false[/code], [code]preview_animation[/code] plays in the editor.
+		</member>
+		<member name="preview_skin" type="String">
+			Editor skin picker under the Preview group. Shows which skin you see in the viewport before you run the game. Defaults to the skeleton default skin.
+		</member>
+		<member name="preview_time" type="float" default="0.0">
+			Playback time in seconds for [code]preview_animation[/code]. Only applies in the editor.
 		</member>
 		<member name="regions" type="bool" setter="set_debug_regions" getter="get_debug_regions" default="false">
+			Draws region attachment outlines in the editor.
 		</member>
 		<member name="regions_color" type="Color" setter="set_debug_regions_color" getter="get_debug_regions_color" default="Color( 0, 0, 1, 0.5 )">
+			Color used when [code]regions[/code] debug drawing is enabled.
+		</member>
+		<member name="root" type="bool" setter="set_debug_root" getter="get_debug_root" default="false">
+			Draws the root bone in the editor.
+		</member>
+		<member name="root_color" type="Color" setter="set_debug_root_color" getter="get_debug_root_color" default="Color( 1, 1, 1, 0.5 )">
+			Color used when [code]root[/code] debug drawing is enabled.
 		</member>
 		<member name="screen_material" type="Material" setter="set_screen_material" getter="get_screen_material">
+			Optional material for screen blend slots. Overrides the default internal material for every screen slot.
 		</member>
 		<member name="skeleton_data_res" type="SpineSkeletonDataResource" setter="set_skeleton_data_res" getter="get_skeleton_data_res">
+			Resource with skeleton data, atlas data, and animation mixes for this sprite.
 		</member>
 		<member name="update_mode" type="int" setter="set_update_mode" getter="get_update_mode" enum="SpineConstant.UpdateMode" default="0">
+			Controls when [code]update_skeleton()[/code] runs: process step, physics step, or manual calls only.
 		</member>
 	</members>
 	<signals>
 		<signal name="_internal_spine_objects_invalidated">
 			<description>
+				Emitted when internal Spine skeleton or animation objects are destroyed and recreated. Advanced tooling uses this to drop stale references.
 			</description>
 		</signal>
 		<signal name="animation_completed">

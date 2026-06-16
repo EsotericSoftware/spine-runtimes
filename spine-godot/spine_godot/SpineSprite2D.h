@@ -41,18 +41,18 @@
 #include "scene/2d/node_2d.h"
 #endif
 
-class SpineSlotNode;
+class SpineSlotNode2D;
 
 struct SpineRendererObject;
 
-class SpineSprite;
+class SpineSprite2D;
 
 class Attachment;
 
 class SpineMesh2D : public Node2D {
 	GDCLASS(SpineMesh2D, Node2D);
 
-	friend class SpineSprite;
+	friend class SpineSprite2D;
 
 protected:
 	void _notification(int what);
@@ -72,6 +72,8 @@ protected:
 	SpineRendererObject *renderer_object;
 
 	bool indices_changed;
+	bool canvas_mesh_drawn;
+	bool canvas_mesh_dirty;
 
 #if VERSION_MAJOR > 3
 	RID mesh;
@@ -97,14 +99,14 @@ protected:
 public:
 #if VERSION_MAJOR > 3
 	SpineMesh2D()
-		: renderer_object(nullptr), indices_changed(true), num_vertices(0), num_indices(0), vertex_stride(0), normal_tangent_stride(0),
-		  attribute_stride(0) {};
+		: renderer_object(nullptr), indices_changed(true), canvas_mesh_drawn(false), canvas_mesh_dirty(true), num_vertices(0), num_indices(0),
+		  vertex_stride(0), normal_tangent_stride(0), attribute_stride(0) {};
 	~SpineMesh2D() {
 		if (mesh.is_valid()) {
 #ifdef SPINE_GODOT_EXTENSION
 			RS::get_singleton()->free_rid(mesh);
 #else
-			RS::get_singleton()->free(mesh);
+			RS::get_singleton()->free_rid(mesh);
 #endif
 		}
 	}
@@ -118,16 +120,22 @@ public:
 #endif
 
 #ifdef SPINE_GODOT_EXTENSION
-	void update_mesh(const PackedVector2Array &vertices, const PackedVector2Array &uvs, const PackedColorArray &colors,
-					 const PackedInt32Array &indices, SpineRendererObject *renderer_object);
+	void update_mesh(const PackedVector2Array &p_vertices, const PackedVector2Array &p_uvs, const PackedColorArray &p_colors,
+					 const PackedInt32Array &p_indices, SpineRendererObject *p_renderer_object);
+	void clear_canvas_mesh();
+	void flush_canvas_item(bool p_force = false);
 #else
-	void update_mesh(const Vector<Point2> &vertices, const Vector<Point2> &uvs, const Vector<Color> &colors, const Vector<int> &indices,
-					 SpineRendererObject *renderer_object);
+	void update_mesh(const Vector<Point2> &p_vertices, const Vector<Point2> &p_uvs, const Vector<Color> &p_colors, const Vector<int> &p_indices,
+					 SpineRendererObject *p_renderer_object);
+#if VERSION_MAJOR > 3
+	void clear_canvas_mesh();
+	void flush_canvas_item(bool p_force = false);
+#endif
 #endif
 };
 
-class SpineSprite : public Node2D, public spine::AnimationStateListenerObject {
-	GDCLASS(SpineSprite, Node2D)
+class SpineSprite2D : public Node2D, public spine::AnimationStateListenerObject {
+	GDCLASS(SpineSprite2D, Node2D)
 
 	friend class SpineBone;
 
@@ -159,7 +167,7 @@ protected:
 	bool debug_clipping;
 	Color debug_clipping_color;
 
-	spine::Array<spine::Array<SpineSlotNode *>> slot_nodes;
+	spine::Array<spine::Array<SpineSlotNode2D *>> slot_nodes;
 	Vector<SpineMesh2D *> mesh_instances;
 	Ref<Material> normal_material;
 	Ref<Material> additive_material;
@@ -171,24 +179,22 @@ protected:
 	static void _bind_methods();
 	void _notification(int what);
 	void _get_property_list(List<PropertyInfo> *list) const;
-	bool _get(const StringName &property, Variant &value) const;
-	bool _set(const StringName &property, const Variant &value);
+	bool _get(const StringName &p_property, Variant &value) const;
+	bool _set(const StringName &p_property, const Variant &value);
 
 	void generate_meshes_for_slots(Ref<SpineSkeleton> skeleton_ref);
 	void remove_meshes();
+	void suspend_rendering();
 	void sort_slot_nodes();
 	void update_meshes(Ref<SpineSkeleton> skeleton_ref);
-	void set_modified_bones() {
-		modified_bones = true;
-	}
 	void draw();
 	void draw_bone(spine::Bone *bone, const Color &color);
 
 	void callback(spine::AnimationState *state, spine::EventType type, spine::TrackEntry *entry, spine::Event *event) override;
 
 public:
-	SpineSprite();
-	~SpineSprite();
+	SpineSprite2D();
+	~SpineSprite2D();
 
 	void set_skeleton_data_res(const Ref<SpineSkeletonDataResource> &_spine_skeleton_data_resource);
 
@@ -199,12 +205,22 @@ public:
 	Ref<SpineAnimationState> get_animation_state();
 
 	void on_skeleton_data_changed();
+	void connect_skeleton_data_res_signals();
+	void disconnect_skeleton_data_res_signals();
+	void teardown_spine_objects();
+	void teardown_mesh_children();
+	void rebuild_spine_objects();
+	void schedule_skeleton_rebuild();
+
+	void set_modified_bones() {
+		modified_bones = true;
+	}
 
 	void update_skeleton(float delta);
 
 	Transform2D get_global_bone_transform(const String &bone_name);
 
-	void set_global_bone_transform(const String &bone_name, Transform2D transform);
+	void set_global_bone_transform(const String &bone_name, Transform2D p_transform);
 
 	SpineConstant::UpdateMode get_update_mode();
 
@@ -214,21 +230,21 @@ public:
 
 	Ref<Material> get_normal_material();
 
-	void set_normal_material(Ref<Material> material);
+	void set_normal_material(Ref<Material> p_material);
 
 	Ref<Material> get_additive_material();
 
-	void set_additive_material(Ref<Material> material);
+	void set_additive_material(Ref<Material> p_material);
 
 	Ref<Material> get_multiply_material();
 
-	void set_multiply_material(Ref<Material> material);
+	void set_multiply_material(Ref<Material> p_material);
 
 	Ref<Material> get_screen_material();
 
-	void set_screen_material(Ref<Material> material);
+	void set_screen_material(Ref<Material> p_material);
 
-	void set_time_scale(float time_scale);
+	void set_time_scale(float p_time_scale);
 
 	float get_time_scale();
 

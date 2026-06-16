@@ -2,22 +2,22 @@ extends Node2D
 
 @onready var footstep_audio: AudioStreamPlayer = $FootstepAudio
 
-func _animation_started(sprite: SpineSprite, animation_state: SpineAnimationState, track_entry: SpineTrackEntry):
+func _animation_started(sprite: SpineSprite2D, animation_state: SpineAnimationState, track_entry: SpineTrackEntry):
 	print("Animation started: " + track_entry.get_animation().get_name())
 
-func _animation_interrupted(sprite: SpineSprite, animation_state: SpineAnimationState, track_entry: SpineTrackEntry):
+func _animation_interrupted(sprite: SpineSprite2D, animation_state: SpineAnimationState, track_entry: SpineTrackEntry):
 	print("Animation interrupted: " + track_entry.get_animation().get_name())
 
-func _animation_ended(sprite: SpineSprite, animation_state: SpineAnimationState, track_entry: SpineTrackEntry):
+func _animation_ended(sprite: SpineSprite2D, animation_state: SpineAnimationState, track_entry: SpineTrackEntry):
 	print("Animation ended: " + track_entry.get_animation().get_name())
 
-func _animation_completed(sprite: SpineSprite, animation_state: SpineAnimationState, track_entry: SpineTrackEntry):
+func _animation_completed(sprite: SpineSprite2D, animation_state: SpineAnimationState, track_entry: SpineTrackEntry):
 	print("Animation completed: " + track_entry.get_animation().get_name())
 
-func _animation_disposed(sprite: SpineSprite, animation_state: SpineAnimationState, track_entry: SpineTrackEntry):
+func _animation_disposed(sprite: SpineSprite2D, animation_state: SpineAnimationState, track_entry: SpineTrackEntry):
 	print("Animation disposed: " + track_entry.get_animation().get_name())
 	
-func _animation_event(sprite: SpineSprite, animation_state: SpineAnimationState, track_entry: SpineTrackEntry, event: SpineEvent):
+func _animation_event(sprite: SpineSprite2D, animation_state: SpineAnimationState, track_entry: SpineTrackEntry, event: SpineEvent):
 	print("Animation event: " + track_entry.get_animation().get_name() + ", " + event.get_data().get_event_name())
 	if (event.get_data().get_event_name() == "footstep"):		
 		footstep_audio.play()

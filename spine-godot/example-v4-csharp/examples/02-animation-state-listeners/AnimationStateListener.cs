@@ -6,7 +6,7 @@ public partial class AnimationStateListener : Node2D
 	public override void _Ready()
 	{
 		var footStepAudio = GetNode<AudioStreamPlayer>("FootstepAudio");
-		var spineboy = GetNode<SpineSprite>("Spineboy");
+		var spineboy = GetNode<SpineSprite2D>("Spineboy");
 		spineboy.AnimationStarted += (sprite, animationState, trackEntry) =>
 		{
 			var spineTrackEntry = trackEntry as SpineTrackEntry;

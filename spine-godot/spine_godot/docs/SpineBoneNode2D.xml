@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineBoneNode2D" inherits="Node2D" version="3.4">
+	<brief_description>
+		Node2D that either follows or drives a bone in a [code]SpineSprite2D[/code].
+	</brief_description>
+	<description>
+		Node2D that either follows or drives a bone in a [code]SpineSprite2D[/code]. If set to follow a bone, the bone's shear will be ignored.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="find_bone">
+			<return type="SpineBone" />
+			<description>
+				Returns the [code]SpineBone[/code] for [code]bone_name[/code] on the parent sprite skeleton. Returns [code]null[/code] when the node is outside the tree, has no parent [code]SpineSprite2D[/code], or the bone name is missing.
+			</description>
+		</method>
+		<method name="find_sprite">
+			<return type="SpineSprite2D" />
+			<description>
+				Returns the nearest parent [code]SpineSprite2D[/code]. Returns [code]null[/code] when no sprite exists in the parent chain.
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="bone_mode" type="int" setter="set_bone_mode" getter="get_bone_mode" enum="SpineConstant.BoneMode" default="0">
+			Selects follow or drive behavior. In follow mode the node copies the bone transform. In drive mode the node pushes its transform to the bone.
+		</member>
+		<member name="bone_name" type="String">
+			Name of the skeleton bone this node follows or drives. Matches a bone on the parent [code]SpineSprite2D[/code] skeleton.
+		</member>
+		<member name="color" type="Color" setter="set_debug_color" getter="get_debug_color" default="Color( 1, 0, 0, 0.466667 )">
+			Debug line color drawn for this bone node in the editor.
+		</member>
+		<member name="enabled" type="bool" setter="set_enabled" getter="get_enabled" default="true">
+			When [code]false[/code], the node stops following or driving the bone.
+		</member>
+		<member name="thickness" type="float" setter="set_debug_thickness" getter="get_debug_thickness" default="5.0">
+			Debug line thickness for this bone node in the editor.
+		</member>
+	</members>
+	<constants>
+	</constants>
+</class>

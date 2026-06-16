@@ -30,7 +30,7 @@
 #pragma once
 
 #ifndef SPINE_GODOT_EXTENSION
-#include "SpineSprite.h"
+#include "SpineSprite2D.h"
 #include "scene/animation/animation_player.h"
 #include "scene/resources/animation.h"
 
@@ -59,7 +59,7 @@ protected:
 	bool blend_tree_mode;
 	bool debug;
 
-	SpineSprite *sprite;
+	SpineSprite2D *sprite;
 
 	static void _bind_methods();
 

@@ -7,7 +7,7 @@
 [node name="Node2D" type="Node2D"]
 script = ExtResource("1_cdnty")
 
-[node name="SpineSprite" type="SpineSprite" parent="."]
+[node name="SpineSprite2D" type="SpineSprite2D" parent="."]
 position = Vector2(576, 506)
 scale = Vector2(0.458967, 0.458967)
 skeleton_data_res = ExtResource("1")

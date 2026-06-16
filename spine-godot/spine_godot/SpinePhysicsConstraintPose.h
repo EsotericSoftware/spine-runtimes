@@ -33,7 +33,7 @@
 #include "spine-cpp/include/spine/PhysicsConstraintPose.h"
 #include <spine/PhysicsConstraintPose.h>
 
-class SpineSprite;
+class SpineSprite2D;
 
 class SpinePhysicsConstraintPose : public SpineObjectWrapper {
 	GDCLASS(SpinePhysicsConstraintPose, SpineObjectWrapper)
@@ -42,7 +42,7 @@ protected:
 	static void _bind_methods();
 
 public:
-	// Can be used by both SpineSprite and SpineSkeletonDataResource
+	// Can be used by both SpineSprite2D and SpineSkeletonDataResource
 	void set_spine_object(void *owner, spine::PhysicsConstraintPose *object) {
 		_set_spine_object_internal(owner, object);
 	}

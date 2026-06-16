@@ -30,57 +30,32 @@
 #pragma once
 
 #include "SpineCommon.h"
-#include "SpineSprite.h"
-#ifdef SPINE_GODOT_EXTENSION
-#include <godot_cpp/classes/node2d.hpp>
-#else
-#include "scene/2d/node_2d.h"
-#include "scene/resources/material.h"
-#endif
+#include "SpineSkeleton.h"
 
-class SpineSlotNode : public Node2D {
-	GDCLASS(SpineSlotNode, Node2D)
+class SpineSprite2D;
+class SpineSkeletonDataResource;
 
-protected:
-	String slot_name;
-	int slot_index;
-	Ref<Material> normal_material;
-	Ref<Material> additive_material;
-	Ref<Material> multiply_material;
-	Ref<Material> screen_material;
+Ref<SpineSkeletonDataResource> spine_sprite_get_skeleton_data_res(Object *owner);
+bool spine_sprite_is_visible_in_tree(Object *owner);
+void spine_sprite_set_modified_bones(Object *owner);
+Transform2D spine_sprite_get_global_transform_2d(Object *owner);
+Transform2D spine_sprite_get_global_transform_2d_affine_inverse(Object *owner);
+Ref<SpineSkeleton> spine_sprite_get_skeleton_ref(Object *owner);
 
-	static void _bind_methods();
-	void _notification(int what);
-	void _get_property_list(List<PropertyInfo> *list) const;
-	bool _get(const StringName &property, Variant &value) const;
-	bool _set(const StringName &property, const Variant &value);
-	void on_world_transforms_changed(const Variant &_sprite);
-	void update_transform(SpineSprite *sprite);
+inline constexpr const char *SPINE_PREVIEW_NONE = "None";
+inline constexpr const char *SPINE_PREVIEW_LEGACY_EMPTY = "-- Empty --";
+inline constexpr const char *SPINE_PREVIEW_LEGACY_DEFAULT_SKIN = "Default";
 
-public:
-	SpineSlotNode();
+String spine_resolve_preview_skin(const Ref<SpineSkeletonDataResource> &data_res, const String &skin);
 
-	void set_slot_name(const String &_slot_name);
-
-	String get_slot_name();
-
-	int get_slot_index() {
-		return slot_index;
+inline String spine_normalize_preview_animation(const String &animation) {
+	if (animation == SPINE_PREVIEW_LEGACY_EMPTY) {
+		return SPINE_PREVIEW_NONE;
 	}
+	return animation;
+}
 
-	Ref<Material> get_normal_material();
-
-	void set_normal_material(Ref<Material> material);
-
-	Ref<Material> get_additive_material();
-
-	void set_additive_material(Ref<Material> material);
-
-	Ref<Material> get_multiply_material();
-
-	void set_multiply_material(Ref<Material> material);
-
-	Ref<Material> get_screen_material();
-
-	void set_screen_material(Ref<Material> material);
-};
+inline bool spine_preview_animation_is_none(const String &animation) {
+	const String normalized = spine_normalize_preview_animation(animation);
+	return normalized.is_empty() || normalized == SPINE_PREVIEW_NONE;
+}

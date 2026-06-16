@@ -33,7 +33,7 @@
 #include "SpineConstant.h"
 #include <spine/BoneLocal.h>
 
-class SpineSprite;
+class SpineSprite2D;
 class SpineSkeletonDataResource;
 
 class SpineBoneLocal : public SpineObjectWrapper {
@@ -43,7 +43,7 @@ protected:
 	static void _bind_methods();
 
 public:
-	// Can be used by both SpineSprite and SpineSkeletonDataResource
+	// Can be used by both SpineSprite2D and SpineSkeletonDataResource
 	void set_spine_object(void *owner, spine::BoneLocal *object) {
 		_set_spine_object_internal(owner, object);
 	}

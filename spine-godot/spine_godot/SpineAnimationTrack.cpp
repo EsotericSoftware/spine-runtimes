@@ -110,7 +110,7 @@ SpineAnimationTrack::SpineAnimationTrack()
 void SpineAnimationTrack::_notification(int what) {
 	switch (what) {
 		case NOTIFICATION_PARENTED: {
-			sprite = Object::cast_to<SpineSprite>(get_parent());
+			sprite = Object::cast_to<SpineSprite2D>(get_parent());
 			if (sprite)
 #if VERSION_MAJOR > 3
 				sprite->connect(SNAME("before_animation_state_update"), callable_mp(this, &SpineAnimationTrack::update_animation_state));
@@ -275,7 +275,7 @@ Ref<Animation> SpineAnimationTrack::create_animation(spine::Animation *animation
 
 void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) {
 	if (track_index < 0) return;
-	sprite = Object::cast_to<SpineSprite>(variant_sprite);
+	sprite = Object::cast_to<SpineSprite2D>(variant_sprite);
 	if (!sprite) return;
 	if (!sprite->get_skeleton_data_res().is_valid() || !sprite->get_skeleton_data_res()->is_skeleton_data_loaded()) return;
 	if (!sprite->get_skeleton().is_valid() || !sprite->get_animation_state().is_valid()) return;
@@ -295,7 +295,7 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 		if (blend_tree_mode) {
 			AnimationTreeEditor *tree_editor = AnimationTreeEditor::get_singleton();
 			// When the animation tree dock is no longer visible, leave the animation
-			// state alone so the SpineSprite preview animation can drive it.
+			// state alone so the SpineSprite2D preview animation can drive it.
 			if (!tree_editor || !tree_editor->is_visible_in_tree()) {
 				if (track_index == 0) animation_state->setTimeScale(1);
 				return;

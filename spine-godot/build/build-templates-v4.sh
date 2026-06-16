@@ -3,6 +3,10 @@ set -e
 set -x
 
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+# shellcheck source=common.sh
+source "$dir/common.sh"
+install_pause_on_exit
+
 pushd "$dir" > /dev/null
 
 if [ "$#" -lt 1 ]; then

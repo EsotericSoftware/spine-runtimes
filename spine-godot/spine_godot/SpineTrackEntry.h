@@ -34,7 +34,7 @@
 #include "SpineConstant.h"
 #include <spine/AnimationState.h>
 
-#include "SpineSprite.h"
+#include "SpineSprite2D.h"
 
 class SpineTrackEntry : public SpineSpriteOwnedObject<spine::TrackEntry> {
 	GDCLASS(SpineTrackEntry, SpineObjectWrapper);

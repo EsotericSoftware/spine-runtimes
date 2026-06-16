@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineMesh2D" inherits="Node2D" version="3.4">
+	<brief_description>
+		Internal canvas mesh node created by [code]SpineSprite2D[/code] for each skeleton slot.
+	</brief_description>
+	<description>
+		[code]SpineMesh2D[/code] is an internal rendering node. [code]SpineSprite2D[/code] creates one child per skeleton slot.
+		Each child holds deformed vertices, UVs, vertex colors, and indices for its slot. The parent updates this data every frame and draws through [code]RenderingServer[/code].
+		On Godot 4 the parent uploads a mesh RID and calls [code]canvas_item_add_mesh()[/code] with the slot atlas texture.
+		Slot draw order follows skeleton slot order. [code]SpineSlotNode2D[/code] inserts extra [code]Node2D[/code] content at a named slot.
+		This class exposes no script API. [code]SpineSprite2D[/code] owns rendering. [code]SpineSlotNode2D[/code] adds draw-order content at a slot.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+	</methods>
+	<members>
+	</members>
+	<signals>
+	</signals>
+	<constants>
+	</constants>
+</class>

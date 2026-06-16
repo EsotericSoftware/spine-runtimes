@@ -173,12 +173,10 @@ protected:
 	}
 };
 
-class SpineSprite;
-
 template<typename OBJECT>
 class SpineSpriteOwnedObject : public SpineObjectWrapper {
 public:
-	void set_spine_object(const SpineSprite *_owner, OBJECT *_object) {
+	void set_spine_object(Object *_owner, OBJECT *_object) {
 		_set_spine_object_internal(_owner, _object);
 	}
 
@@ -186,8 +184,8 @@ public:
 		return (OBJECT *) _get_spine_object_internal();
 	}
 
-	SpineSprite *get_spine_owner() {
-		return (SpineSprite *) _get_spine_owner_internal();
+	Object *get_spine_owner() {
+		return (Object *) _get_spine_owner_internal();
 	}
 };
 

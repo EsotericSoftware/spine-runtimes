@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public partial class MixAndMatch : SpineSprite
+public partial class MixAndMatch : SpineSprite2D
 {
 	public override void _Ready()
 	{

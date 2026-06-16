@@ -13,6 +13,7 @@
 			<return type="int" enum="Error" />
 			<argument index="0" name="path" type="String" />
 			<description>
+				Loads skeleton data from the file at the given path. Returns [code]OK[/code] on success.
 			</description>
 		</method>
 	</methods>

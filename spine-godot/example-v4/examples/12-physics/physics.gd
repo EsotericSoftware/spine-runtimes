@@ -1,6 +1,6 @@
 extends Node2D
 
-@onready var celestial_circus: SpineSprite = $"celestial-circus"
+@onready var celestial_circus: SpineSprite2D = $"celestial-circus"
 
 var last_x = -1
 var last_y = -1

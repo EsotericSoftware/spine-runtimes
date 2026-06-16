@@ -13,17 +13,22 @@
 			<return type="int" enum="Error" />
 			<argument index="0" name="path" type="String" />
 			<description>
+				Loads atlas data from a Spine [code].atlas[/code] file at [code]path[/code]. Returns [code]OK[/code] on success.
 			</description>
 		</method>
 	</methods>
 	<members>
 		<member name="normal_maps" type="Array" setter="" getter="get_normal_maps" default="[  ]">
+			Normal map textures loaded for atlas pages. Read-only. Populated during atlas import.
 		</member>
 		<member name="specular_maps" type="Array" setter="" getter="get_specular_maps" default="[  ]">
+			Specular map textures loaded for atlas pages. Read-only. Populated during atlas import.
 		</member>
 		<member name="source_path" type="String" setter="" getter="get_source_path" default="&quot;&quot;">
+			Filesystem path to the imported [code].atlas[/code] source file.
 		</member>
 		<member name="textures" type="Array" setter="" getter="get_textures" default="[  ]">
+			Diffuse textures for atlas pages. Read-only. Populated during atlas import.
 		</member>
 	</members>
 	<constants>

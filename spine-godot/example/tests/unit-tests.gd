@@ -1,4 +1,4 @@
-extends SpineSprite
+extends SpineSprite2D
 
 func test_spine_animation():
 	var walkAnim: SpineAnimation = get_skeleton().get_data().find_animation("walk")

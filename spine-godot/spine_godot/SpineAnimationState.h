@@ -42,7 +42,7 @@ protected:
 
 private:
 	spine::AnimationState *animation_state;
-	SpineSprite *sprite;
+	Object *sprite;
 
 public:
 	SpineAnimationState();
@@ -52,7 +52,7 @@ public:
 		return animation_state;
 	}
 
-	void set_spine_sprite(SpineSprite *sprite);
+	void set_spine_sprite(Object *sprite);
 
 	void update(float delta);
 

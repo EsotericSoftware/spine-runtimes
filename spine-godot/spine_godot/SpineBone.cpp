@@ -29,7 +29,7 @@
 
 #include "SpineBone.h"
 #include "SpineConstant.h"
-#include "SpineSprite.h"
+#include "SpineSpriteCommon.h"
 #include "SpineSkeleton.h"
 #include "SpineCommon.h"
 
@@ -102,7 +102,7 @@ Ref<SpineBoneData> SpineBone::get_data() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto &bone_data = get_spine_object()->getData();
 	Ref<SpineBoneData> bone_data_ref(memnew(SpineBoneData));
-	bone_data_ref->set_spine_object(*get_spine_owner()->get_skeleton_data_res(), &bone_data);
+	bone_data_ref->set_spine_object(*spine_sprite_get_skeleton_data_res(get_spine_owner()), &bone_data);
 	return bone_data_ref;
 }
 
@@ -159,18 +159,18 @@ Transform2D SpineBone::get_transform() {
 	auto &pose = get_spine_object()->getPose();
 	float rotation_x = spine::MathUtil::Deg_Rad * (pose.getRotation() + pose.getShearX());
 	float rotation_y = spine::MathUtil::Deg_Rad * (pose.getRotation() + 90 + pose.getShearY());
-	Transform2D transform;
-	transform[0] = Vector2(spine::MathUtil::cos(rotation_x) * pose.getScaleX(), spine::MathUtil::sin(rotation_x) * pose.getScaleX());
-	transform[1] = Vector2(spine::MathUtil::cos(rotation_y) * pose.getScaleY(), spine::MathUtil::sin(rotation_y) * pose.getScaleY());
-	transform[2] = Vector2(pose.getX(), pose.getY());
-	return transform;
+	Transform2D bone_transform;
+	bone_transform[0] = Vector2(spine::MathUtil::cos(rotation_x) * pose.getScaleX(), spine::MathUtil::sin(rotation_x) * pose.getScaleX());
+	bone_transform[1] = Vector2(spine::MathUtil::cos(rotation_y) * pose.getScaleY(), spine::MathUtil::sin(rotation_y) * pose.getScaleY());
+	bone_transform[2] = Vector2(pose.getX(), pose.getY());
+	return bone_transform;
 }
 
-void SpineBone::set_transform(Transform2D transform) {
+void SpineBone::set_transform(Transform2D p_transform) {
 	SPINE_CHECK(get_spine_object(), )
-	Vector2 position = transform.get_origin();
-	float rotation = spine::MathUtil::Rad_Deg * transform.get_rotation();
-	Vector2 scale = transform.get_scale();
+	Vector2 position = p_transform.get_origin();
+	float rotation = spine::MathUtil::Rad_Deg * p_transform.get_rotation();
+	Vector2 scale = p_transform.get_scale();
 
 	auto &pose = get_spine_object()->getPose();
 	pose.setX(position.x);
@@ -179,32 +179,32 @@ void SpineBone::set_transform(Transform2D transform) {
 	pose.setScaleX(scale.x);
 	pose.setScaleY(scale.y);
 
-	get_spine_owner()->set_modified_bones();
+	spine_sprite_set_modified_bones(get_spine_owner());
 }
 
 Transform2D SpineBone::get_global_transform() {
 	SPINE_CHECK(get_spine_object(), Transform2D())
 	if (!get_spine_owner()) return get_transform();
-	if (!get_spine_owner()->is_visible_in_tree()) return get_transform();
+	if (!spine_sprite_is_visible_in_tree(get_spine_owner())) return get_transform();
 	auto &applied_pose = get_spine_object()->getAppliedPose();
 	Transform2D local;
 	local[0] = Vector2(applied_pose.getA(), applied_pose.getC());
 	local[1] = Vector2(applied_pose.getB(), applied_pose.getD());
 	local[2] = Vector2(applied_pose.getWorldX(), applied_pose.getWorldY());
-	return get_spine_owner()->get_global_transform() * local;
+	return spine_sprite_get_global_transform_2d(get_spine_owner()) * local;
 }
 
-void SpineBone::set_global_transform(Transform2D transform) {
+void SpineBone::set_global_transform(Transform2D p_transform) {
 	SPINE_CHECK(get_spine_object(), )
 	if (!get_spine_owner()) {
-		set_transform(transform);
+		set_transform(p_transform);
 		return;
 	}
-	if (!get_spine_owner()->is_visible_in_tree()) return;
+	if (!spine_sprite_is_visible_in_tree(get_spine_owner())) return;
 
 	auto bone = get_spine_object();
-	Transform2D inverse_sprite_transform = get_spine_owner()->get_global_transform().affine_inverse();
-	Transform2D local = inverse_sprite_transform * transform;
+	Transform2D inverse_sprite_transform = spine_sprite_get_global_transform_2d_affine_inverse(get_spine_owner());
+	Transform2D local = inverse_sprite_transform * p_transform;
 	auto &applied_pose = bone->getAppliedPose();
 	applied_pose.setA(local[0].x);
 	applied_pose.setC(local[0].y);
@@ -212,10 +212,10 @@ void SpineBone::set_global_transform(Transform2D transform) {
 	applied_pose.setD(local[1].y);
 	applied_pose.setWorldX(local.get_origin().x);
 	applied_pose.setWorldY(local.get_origin().y);
-	applied_pose.updateLocalTransform(*get_spine_owner()->get_skeleton()->get_spine_object());
+	applied_pose.updateLocalTransform(*spine_sprite_get_skeleton_ref(get_spine_owner())->get_spine_object());
 	bone->getPose().set(applied_pose);
 
-	get_spine_owner()->set_modified_bones();
+	spine_sprite_set_modified_bones(get_spine_owner());
 }
 
 void SpineBone::update(Ref<SpineSkeleton> skeleton, SpineConstant::Physics physics) {

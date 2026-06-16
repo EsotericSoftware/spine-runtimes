@@ -32,7 +32,7 @@
 #include "SpineCommon.h"
 #include <spine/SliderPose.h>
 
-class SpineSprite;
+class SpineSprite2D;
 
 class SpineSliderPose : public SpineObjectWrapper {
 	GDCLASS(SpineSliderPose, SpineObjectWrapper)
@@ -41,7 +41,7 @@ protected:
 	static void _bind_methods();
 
 public:
-	// Can be used by both SpineSprite and SpineSkeletonDataResource
+	// Can be used by both SpineSprite2D and SpineSkeletonDataResource
 	void set_spine_object(void *owner, spine::SliderPose *object) {
 		_set_spine_object_internal(owner, object);
 	}

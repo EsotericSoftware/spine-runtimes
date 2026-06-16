@@ -27,12 +27,20 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#define VERSION_MAJOR 4
-
 #ifdef TOOLS_ENABLED
+#include "SpineCommon.h"
 #include "SpineEditorPlugin.h"
 #include "SpineAtlasResource.h"
 #include "SpineSkeletonFileResource.h"
+
+#if VERSION_MAJOR > 3 && !defined(SPINE_GODOT_EXTENSION)
+#include "editor/editor_interface.h"
+#if (VERSION_MAJOR >= 4 && VERSION_MINOR >= 5)
+#include "editor/file_system/editor_file_system.h"
+#else
+#include "editor/editor_file_system.h"
+#endif
+#endif
 
 #if VERSION_MAJOR > 3
 #ifdef SPINE_GODOT_EXTENSION
@@ -221,12 +229,15 @@ void SpineEditorPlugin::_notification(int p_what) {
 	}
 }
 #else
+void SpineEditorPlugin::_bind_methods() {
+}
+
 SpineEditorPlugin::SpineEditorPlugin(EditorNode *node) {
 	add_import_plugin(memnew(SpineAtlasResourceImportPlugin));
 	add_import_plugin(memnew(SpineJsonResourceImportPlugin));
 	add_import_plugin(memnew(SpineBinaryResourceImportPlugin));
 	add_inspector_plugin(memnew(SpineSkeletonDataResourceInspectorPlugin));
-	add_inspector_plugin(memnew(SpineSpriteInspectorPlugin));
+	add_inspector_plugin(memnew(SpineSprite2DInspectorPlugin));
 }
 #endif
 
@@ -384,7 +395,7 @@ void SpineEditorPropertyAnimationMix::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("data_changed"), &SpineEditorPropertyAnimationMix::data_changed);
 }
 
-void SpineEditorPropertyAnimationMix::data_changed(const String &property, const Variant &value, const String &name, bool changing) {
+void SpineEditorPropertyAnimationMix::data_changed(const String &property_name, const Variant &value, const String &name, bool changing) {
 	auto mix = Object::cast_to<SpineAnimationMix>(get_edited_object()->get(get_edited_property()));
 
 #if VERSION_MAJOR > 3
@@ -392,9 +403,9 @@ void SpineEditorPropertyAnimationMix::data_changed(const String &property, const
 #else
 	auto undo_redo = EditorNode::get_undo_redo();
 #endif
-	undo_redo->create_action("Set mix property " + property);
-	undo_redo->add_do_property(mix, property, value);
-	undo_redo->add_undo_property(mix, property, mix->get(property));
+	undo_redo->create_action("Set mix property " + property_name);
+	undo_redo->add_do_property(mix, property_name, value);
+	undo_redo->add_undo_property(mix, property_name, mix->get(property_name));
 	undo_redo->add_do_method(mixes_property, "update_mix_property", index);
 	undo_redo->add_undo_method(mixes_property, "update_mix_property", index);
 	// temporarily disable rebuilding the UI, as commit_action() calls update() which calls update_property(). however,
@@ -402,7 +413,7 @@ void SpineEditorPropertyAnimationMix::data_changed(const String &property, const
 	updating = true;
 	undo_redo->commit_action();
 	updating = false;
-	emit_changed(property, value, name, changing);
+	emit_changed(property_name, value, name, changing);
 }
 
 void SpineEditorPropertyAnimationMix::update_property() {
@@ -682,27 +693,28 @@ void SpineEditorPropertyAnimationMixes::on_mix_value_changed(float value, int mi
 }
 #endif
 
-void SpineSpriteInspectorPlugin::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("button_clicked"), &SpineSpriteInspectorPlugin::button_clicked);
+void SpineSprite2DInspectorPlugin::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("button_clicked"), &SpineSprite2DInspectorPlugin::button_clicked);
 }
 
-void SpineSpriteInspectorPlugin::button_clicked(const String &button_name) {
-}
-
-#ifdef SPINE_GODOT_EXTENSION
-bool SpineSpriteInspectorPlugin::_can_handle(Object *object) const {
-#else
-bool SpineSpriteInspectorPlugin::can_handle(Object *object) {
-#endif
-	return Object::cast_to<SpineSprite>(object) != nullptr;
+void SpineSprite2DInspectorPlugin::button_clicked(const String &button_name) {
 }
 
 #ifdef SPINE_GODOT_EXTENSION
-void SpineSpriteInspectorPlugin::_parse_begin(Object *object) {
+bool SpineSprite2DInspectorPlugin::_can_handle(Object *object) const {
 #else
-void SpineSpriteInspectorPlugin::parse_begin(Object *object) {
+bool SpineSprite2DInspectorPlugin::can_handle(Object *object) {
 #endif
-	sprite = Object::cast_to<SpineSprite>(object);
+	return Object::cast_to<SpineSprite2D>(object) != nullptr;
+}
+
+#ifdef SPINE_GODOT_EXTENSION
+void SpineSprite2DInspectorPlugin::_parse_begin(Object *object) {
+#else
+void SpineSprite2DInspectorPlugin::parse_begin(Object *object) {
+#endif
+	SpineSprite2D *sprite2d = Object::cast_to<SpineSprite2D>(object);
+	sprite = sprite2d;
 	if (!sprite) return;
 	if (!sprite->get_skeleton_data_res().is_valid() || !sprite->get_skeleton_data_res()->is_skeleton_data_loaded()) return;
 }

@@ -37,7 +37,7 @@
 #include <spine/Slot.h>
 
 class SpineSkeleton;
-class SpineSprite;
+class SpineSprite2D;
 
 class SpineSlot : public SpineSpriteOwnedObject<spine::Slot> {
 	GDCLASS(SpineSlot, SpineObjectWrapper)

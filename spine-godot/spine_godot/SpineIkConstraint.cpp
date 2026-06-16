@@ -31,7 +31,7 @@
 #include "SpineIkConstraintPose.h"
 #include "SpineBone.h"
 #include "SpineCommon.h"
-#include "SpineSprite.h"
+#include "SpineSpriteCommon.h"
 
 void SpineIkConstraint::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("update", "skeleton"), &SpineIkConstraint::update);
@@ -54,7 +54,7 @@ Ref<SpineIkConstraintData> SpineIkConstraint::get_data() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto &ik_constraint_data = get_spine_object()->getData();
 	Ref<SpineIkConstraintData> ik_constraint_data_ref(memnew(SpineIkConstraintData));
-	ik_constraint_data_ref->set_spine_object(*get_spine_owner()->get_skeleton_data_res(), &ik_constraint_data);
+	ik_constraint_data_ref->set_spine_object(*spine_sprite_get_skeleton_data_res(get_spine_owner()), &ik_constraint_data);
 	return ik_constraint_data_ref;
 }
 

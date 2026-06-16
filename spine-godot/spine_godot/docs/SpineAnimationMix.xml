@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineAnimationMix" inherits="Resource" version="3.4">
+	<brief_description>
+		Crossfade duration between two named animations on a [code]SpineSkeletonDataResource[/code].
+	</brief_description>
+	<description>
+		One entry in [code]SpineSkeletonDataResource.animation_mixes[/code]. [code]SpineAnimationState[/code] reads these values when it mixes from [code]from[/code] to [code]to[/code].
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+	</methods>
+	<members>
+		<member name="from" type="String" setter="set_from" getter="get_from">
+			Source animation name for this mix entry.
+		</member>
+		<member name="mix" type="float" setter="set_mix" getter="get_mix" default="0.0">
+			Crossfade duration in seconds from [code]from[/code] to [code]to[/code].
+		</member>
+		<member name="to" type="String" setter="set_to" getter="get_to">
+			Target animation name for this mix entry.
+		</member>
+	</members>
+	<constants>
+	</constants>
+</class>

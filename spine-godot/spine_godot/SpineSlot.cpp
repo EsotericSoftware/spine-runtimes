@@ -30,7 +30,7 @@
 #include "SpineSlot.h"
 #include "SpineBone.h"
 #include "SpineCommon.h"
-#include "SpineSprite.h"
+#include "SpineSpriteCommon.h"
 #include "SpineSkeletonDataResource.h"
 
 void SpineSlot::_bind_methods() {
@@ -53,7 +53,7 @@ Ref<SpineSlotData> SpineSlot::get_data() {
 	} else {
 		auto &slot_data = get_spine_object()->getData();
 		Ref<SpineSlotData> slot_data_ref(memnew(SpineSlotData));
-		slot_data_ref->set_spine_object(*get_spine_owner()->get_skeleton_data_res(), &slot_data);
+		slot_data_ref->set_spine_object(*spine_sprite_get_skeleton_data_res(get_spine_owner()), &slot_data);
 		_data = slot_data_ref;
 		return slot_data_ref;
 	}

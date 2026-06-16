@@ -61,30 +61,35 @@
 			<return type="void" />
 			<argument index="0" name="v" type="String" />
 			<description>
+				Sets the attachment name visible for this slot in the setup pose.
 			</description>
 		</method>
 		<method name="set_blend_mode">
 			<return type="void" />
 			<argument index="0" name="v" type="int" enum="SpineConstant.BlendMode" />
 			<description>
+				Sets the blend mode used when drawing this slot's attachment.
 			</description>
 		</method>
 		<method name="set_color">
 			<return type="void" />
 			<argument index="0" name="v" type="Color" />
 			<description>
+				Sets the light tint color for this slot's attachment.
 			</description>
 		</method>
 		<method name="set_dark_color">
 			<return type="void" />
 			<argument index="0" name="v" type="Color" />
 			<description>
+				Sets the dark tint color for two color tinting on this slot's attachment.
 			</description>
 		</method>
 		<method name="set_has_dark_color">
 			<return type="void" />
 			<argument index="0" name="v" type="bool" />
 			<description>
+				Sets whether this slot uses two color tinting.
 			</description>
 		</method>
 	</methods>

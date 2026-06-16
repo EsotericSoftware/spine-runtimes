@@ -5,7 +5,7 @@
 	</brief_description>
 	<description>
 		Resource used to spawn new [code]SpineSkeleton[/code] instances. The skeleton data resource consists of the skeleton data loaded from a .json or .skel [code]SpineSkeletonFileResource[/code], the texture atlas loaded from a .atlas and .png files making up a [code]SpineAtlasResource[/code], as well as animation mixes, governing for how long two specific animations should be cross faded via [code]SpineAnimationState[/code].
-		A single skeleton data resource can be shared among multiple [code]SpineSprite[/code] instances to avoid duplication of resources.
+		A single skeleton data resource can be shared among multiple [code]SpineSprite2D[/code] instances to avoid duplication of resources. Use [code]find_skin()[/code] and [code]find_animation()[/code] on this resource to look up skin and animation names before you pass them to a sprite at runtime.
 	</description>
 	<tutorials>
 	</tutorials>
@@ -57,6 +57,13 @@
 			<argument index="0" name="slot_name" type="String" />
 			<description>
 				Finds a slot by comparing each slot's name. It is more efficient to cache the results of this method than to call it multiple times.
+			</description>
+		</method>
+		<method name="find_physics_constraint_data" qualifiers="const">
+			<return type="SpinePhysicsConstraintData" />
+			<argument index="0" name="constraint_name" type="String" />
+			<description>
+				Finds a physics constraint by comparing each physics constraint's name. It is more efficient to cache the results of this method than to call it multiple times.
 			</description>
 		</method>
 		<method name="find_transform_constraint_data" qualifiers="const">
@@ -133,6 +140,18 @@
 				The skeleton's path constraints. Modifying the array has no effect.
 			</description>
 		</method>
+		<method name="get_physics_constraints" qualifiers="const">
+			<return type="Array" />
+			<description>
+				The skeleton's physics constraints. Modifying the array has no effect.
+			</description>
+		</method>
+		<method name="get_reference_scale" qualifiers="const">
+			<return type="float" />
+			<description>
+				The reference scale for this skeleton data. Defaults to 100.
+			</description>
+		</method>
 		<method name="get_skeleton_name" qualifiers="const">
 			<return type="String" />
 			<description>
@@ -187,6 +206,12 @@
 				Whether the skeleton data file and atlas have been successfully loaded.
 			</description>
 		</method>
+		<method name="schedule_update_skeleton_data">
+			<return type="void" />
+			<description>
+				Queues a reload of skeleton data from [code]atlas_res[/code] and [code]skeleton_file_res[/code]. Runs on the next idle frame in the editor.
+			</description>
+		</method>
 		<method name="set_default_skin">
 			<return type="void" />
 			<argument index="0" name="skin" type="SpineSkin" />
@@ -194,24 +219,43 @@
 				Sets the skeleton's default skin.
 			</description>
 		</method>
+		<method name="set_reference_scale">
+			<return type="void" />
+			<argument index="0" name="reference_scale" type="float" />
+			<description>
+				Sets the reference scale for this skeleton data.
+			</description>
+		</method>
+		<method name="update_skeleton_data">
+			<return type="void" />
+			<description>
+				Reloads skeleton data from [code]atlas_res[/code] and [code]skeleton_file_res[/code]. Emits [code]skeleton_data_changed[/code] on success.
+			</description>
+		</method>
 	</methods>
 	<members>
 		<member name="animation_mixes" type="Array" setter="set_animation_mixes" getter="get_animation_mixes" default="[  ]">
+			Array of animation mix durations between named animation pairs. Used by [code]SpineAnimationState[/code] for crossfades.
 		</member>
 		<member name="atlas_res" type="SpineAtlasResource" setter="set_atlas_res" getter="get_atlas_res">
+			Atlas resource with texture pages referenced by skeleton attachments.
 		</member>
 		<member name="default_mix" type="float" setter="set_default_mix" getter="get_default_mix" default="0.0">
+			Default crossfade duration in seconds when no explicit mix entry exists.
 		</member>
 		<member name="skeleton_file_res" type="SpineSkeletonFileResource" setter="set_skeleton_file_res" getter="get_skeleton_file_res">
+			Skeleton file resource with exported [code].json[/code] or [code].skel[/code] data.
 		</member>
 	</members>
 	<signals>
 		<signal name="_internal_spine_objects_invalidated">
 			<description>
+				Emitted when internal Spine data objects are recreated. Advanced tooling uses this to drop stale references.
 			</description>
 		</signal>
 		<signal name="skeleton_data_changed">
 			<description>
+				Emitted after skeleton data is reloaded from atlas and skeleton file resources.
 			</description>
 		</signal>
 	</signals>

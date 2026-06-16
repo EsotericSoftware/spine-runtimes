@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="SpineTrackEntry" inherits="SpineObjectWrapper" version="3.4">
 	<brief_description>
+		Stores settings and state for animation playback on one animation state track.
 	</brief_description>
 	<description>
 		Stores settings and other state for the playback of an animation on an animation state track.
@@ -48,10 +49,22 @@
 				The animation time is between [code]get_animation_start()[/code] and [code]get_animation_end()[/code], except if this track entry is non-looping and [code]get_animation_end()[/code] is &gt;= to the animation duration, then animation time continues to increase past [code]get_animation_end()[/code].
 			</description>
 		</method>
-		<method name="get_attachment_threshold">
+		<method name="get_additive">
+			<return type="bool" />
+			<description>
+				When true, this track entry mixes in additively. Defaults to false.
+			</description>
+		</method>
+		<method name="get_alpha_attachment_threshold">
 			<return type="float" />
 			<description>
-				When the mix percentage ([code]get_mix_time()[/code] / [code]get_mix_duration()[/code]) is less than the attachment threshold, attachment timelines are applied while this animation is being mixed out. Defaults to 0, so attachment timelines are not applied while this animation is being mixed out.
+				When [code]get_alpha()[/code] is less than this value, attachment timelines are applied while this animation is being mixed out. Defaults to 0.
+			</description>
+		</method>
+		<method name="get_mix_attachment_threshold">
+			<return type="float" />
+			<description>
+				When the mix percentage ([code]get_mix_time()[/code] / [code]get_mix_duration()[/code]) is less than this value, attachment timelines are applied while this animation is being mixed out. Defaults to 0.
 			</description>
 		</method>
 		<method name="get_delay">
@@ -62,10 +75,10 @@
 				When using [code]AnimationState.add_animation()[/code] with a delay &lt;= 0, the delay is set using the mix duration from the skeleton data resource. If mix duration is set afterward, the delay may need to be adjusted.
 			</description>
 		</method>
-		<method name="get_draw_order_threshold">
+		<method name="get_mix_draw_order_threshold">
 			<return type="float" />
 			<description>
-				When the mix percentage ([code]get_mix_time()[/code] / [code]get_mix_duration()[/code]) is less than the draw order threshold, draw order timelines are applied while this animation is being mixed out. Defaults to 0, so draw order timelines are not applied while this animation is being mixed out.
+				When the mix percentage ([code]get_mix_time()[/code] / [code]get_mix_duration()[/code]) is less than this value, draw order timelines are applied while this animation is being mixed out. Defaults to 0.
 			</description>
 		</method>
 		<method name="get_event_threshold">
@@ -74,25 +87,10 @@
 				When the mix percentage ([code]get_mix_time()[/code] / [code]get_mix_duration()[/code]) is less than the event threshold, event timelines are applied while this animation is being mixed out. Defaults to 0, so event timelines are not applied while this animation is being mixed out.
 			</description>
 		</method>
-		<method name="get_hold_previous">
-			<return type="bool" />
-			<description>
-				If true, when mixing from the previous animation to this animation, the previous animation is applied as normal instead of being mixed out.
-				When mixing between animations that key the same property, if a lower track also keys that property then the value will briefly dip toward the lower track value during the mix. This happens because the first animation mixes from 100% to 0% while the second animation mixes from 0% to 100%. Setting hold previous to true applies the first animation at 100% during the mix so the lower track value is overwritten. Such dipping does not occur on the lowest track which keys the property, only when a higher track also keys the property.
-				Snapping will occur if hold previous is true and this animation does not key all the same properties as the previous animation.
-			</description>
-		</method>
 		<method name="get_loop">
 			<return type="bool" />
 			<description>
 				If true, the animation will repeat. If false it will not, instead its last frame is applied if played beyond its duration.
-			</description>
-		</method>
-		<method name="get_mix_blend">
-			<return type="int" enum="SpineConstant.MixBlend" />
-			<description>
-				Controls how properties keyed in the animation are mixed with lower tracks. Defaults to [code]MixBlend.replace[/code]. Track entries on track 0 ignore this setting and always use [code]MixBlend.first[/code].
-				The mix blend can be set for a new track entry only before [code]AnimationState.apply()[/code] is first called.
 			</description>
 		</method>
 		<method name="get_mix_duration">
@@ -101,6 +99,12 @@
 				Seconds for mixing from the previous animation to this animation. Defaults to the value provided by the skeleton data resource based on the animation before this animation (if any).
 				A mix duration of 0 still mixes out over one frame to provide the track entry being mixed out a chance to revert the properties it was animating. The mix duration can be set manually rather than use the value from the skeleton data resource. In that case, themix duration can be set for a new track entry only before [code]AnimationState#update()[/code] is first called.
 				When using [code]AnimationState.add_animation()[/code] with a delay &lt;= 0, the delay is set using the mix duration from the skeleton data resource. If mix duration is set afterward, the delay may need to be adjusted.
+			</description>
+		</method>
+		<method name="get_mix_interpolation">
+			<return type="int" enum="SpineConstant.MixInterpolation" />
+			<description>
+				Interpolation mode used while mixing from the previous animation to this animation. See [code]SpineConstant.MixInterpolation[/code].
 			</description>
 		</method>
 		<method name="get_mix_time">
@@ -188,6 +192,12 @@
 				Returns true if at least one loop has been completed.
 			</description>
 		</method>
+		<method name="was_applied">
+			<return type="bool" />
+			<description>
+				Returns true after this track entry has been applied to a skeleton at least once.
+			</description>
+		</method>
 		<method name="reset_rotation_directions">
 			<return type="void" />
 			<description>
@@ -199,108 +209,141 @@
 			<return type="void" />
 			<argument index="0" name="v" type="float" />
 			<description>
+				Sets the mix amount between this animation and the skeleton's current pose.
 			</description>
 		</method>
 		<method name="set_animation_end">
 			<return type="void" />
 			<argument index="0" name="v" type="float" />
 			<description>
+				Sets the time in seconds for the last frame of this animation.
 			</description>
 		</method>
 		<method name="set_animation_last">
 			<return type="void" />
 			<argument index="0" name="v" type="float" />
 			<description>
+				Sets the time in seconds this animation was last applied.
 			</description>
 		</method>
 		<method name="set_animation_start">
 			<return type="void" />
 			<argument index="0" name="v" type="float" />
 			<description>
+				Sets the time in seconds when this animation starts, including after each loop.
 			</description>
 		</method>
-		<method name="set_attachment_threshold">
+		<method name="set_additive">
+			<return type="void" />
+			<argument index="0" name="v" type="bool" />
+			<description>
+				Sets whether this track entry mixes additively.
+			</description>
+		</method>
+		<method name="set_alpha_attachment_threshold">
 			<return type="void" />
 			<argument index="0" name="v" type="float" />
 			<description>
+				Sets the alpha value below which attachment timelines apply during mix out.
+			</description>
+		</method>
+		<method name="set_mix_attachment_threshold">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+				Sets the mix percentage below which attachment timelines apply during mix out.
 			</description>
 		</method>
 		<method name="set_delay">
 			<return type="void" />
 			<argument index="0" name="v" type="float" />
 			<description>
+				Sets the seconds to postpone playing this animation.
 			</description>
 		</method>
-		<method name="set_draw_order_threshold">
+		<method name="set_mix_draw_order_threshold">
 			<return type="void" />
 			<argument index="0" name="v" type="float" />
 			<description>
+				Sets the mix percentage below which draw order timelines apply during mix out.
 			</description>
 		</method>
 		<method name="set_event_threshold">
 			<return type="void" />
 			<argument index="0" name="v" type="float" />
 			<description>
-			</description>
-		</method>
-		<method name="set_hold_previous">
-			<return type="void" />
-			<argument index="0" name="v" type="bool" />
-			<description>
+				Sets the mix percentage below which event timelines apply during mix out.
 			</description>
 		</method>
 		<method name="set_loop">
 			<return type="void" />
 			<argument index="0" name="v" type="bool" />
 			<description>
-			</description>
-		</method>
-		<method name="set_mix_blend">
-			<return type="void" />
-			<argument index="0" name="v" type="int" enum="SpineConstant.MixBlend" />
-			<description>
+				Sets whether this animation repeats when playback reaches [code]get_animation_end()[/code].
 			</description>
 		</method>
 		<method name="set_mix_duration">
 			<return type="void" />
 			<argument index="0" name="v" type="float" />
 			<description>
+				Sets the seconds used to mix from the previous animation to this animation.
+			</description>
+		</method>
+		<method name="set_mix_duration_and_delay">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<argument index="1" name="delay" type="float" />
+			<description>
+				Sets the mix duration and updates the queued delay to match.
+			</description>
+		</method>
+		<method name="set_mix_interpolation">
+			<return type="void" />
+			<argument index="0" name="mix_interpolation" type="int" enum="SpineConstant.MixInterpolation" />
+			<description>
+				Sets the interpolation mode used while mixing from the previous animation to this animation.
 			</description>
 		</method>
 		<method name="set_mix_time">
 			<return type="void" />
 			<argument index="0" name="v" type="float" />
 			<description>
+				Sets the current mix progress from the previous animation to this animation.
 			</description>
 		</method>
 		<method name="set_reverse">
 			<return type="void" />
 			<argument index="0" name="v" type="bool" />
 			<description>
+				Sets whether this animation applies in reverse.
 			</description>
 		</method>
 		<method name="set_shortest_rotation">
 			<return type="void" />
 			<argument index="0" name="v" type="bool" />
 			<description>
+				Sets whether rotation mixing always uses the shortest rotation direction.
 			</description>
 		</method>
 		<method name="set_time_scale">
 			<return type="void" />
 			<argument index="0" name="v" type="float" />
 			<description>
+				Sets the playback speed multiplier for this track entry.
 			</description>
 		</method>
 		<method name="set_track_end">
 			<return type="void" />
 			<argument index="0" name="v" type="float" />
 			<description>
+				Sets the track time in seconds when this animation is removed from the track.
 			</description>
 		</method>
 		<method name="set_track_time">
 			<return type="void" />
 			<argument index="0" name="v" type="float" />
 			<description>
+				Sets the current track time in seconds for this entry.
 			</description>
 		</method>
 	</methods>

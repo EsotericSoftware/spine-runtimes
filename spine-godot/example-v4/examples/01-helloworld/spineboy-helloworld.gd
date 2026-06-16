@@ -1,4 +1,4 @@
-extends SpineSprite
+extends SpineSprite2D
 
 func _ready():
 	get_animation_state().set_animation("walk", true, 0)

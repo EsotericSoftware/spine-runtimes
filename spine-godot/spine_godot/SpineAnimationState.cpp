@@ -28,6 +28,7 @@
  *****************************************************************************/
 
 #include "SpineAnimationState.h"
+#include "SpineSpriteCommon.h"
 #include "SpineTrackEntry.h"
 
 void SpineAnimationState::_bind_methods() {
@@ -57,12 +58,13 @@ SpineAnimationState::~SpineAnimationState() {
 	delete animation_state;
 }
 
-void SpineAnimationState::set_spine_sprite(SpineSprite *_sprite) {
+void SpineAnimationState::set_spine_sprite(Object *_sprite) {
 	delete animation_state;
 	animation_state = nullptr;
 	sprite = _sprite;
-	if (!sprite || !sprite->get_skeleton_data_res().is_valid() || !sprite->get_skeleton_data_res()->is_skeleton_data_loaded()) return;
-	animation_state = new spine::AnimationState(*sprite->get_skeleton_data_res()->get_animation_state_data());
+	Ref<SpineSkeletonDataResource> data_res = spine_sprite_get_skeleton_data_res(sprite);
+	if (!sprite || !data_res.is_valid() || !data_res->is_skeleton_data_loaded()) return;
+	animation_state = new spine::AnimationState(*data_res->get_animation_state_data());
 }
 
 void SpineAnimationState::update(float delta) {

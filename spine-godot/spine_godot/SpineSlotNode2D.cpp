@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "SpineSlotNode.h"
+#include "SpineSlotNode2D.h"
 
 #ifdef TOOLS_ENABLED
 #ifdef SPINE_GODOT_EXTENSION
@@ -42,17 +42,17 @@
 #include "scene/main/viewport.h"
 #endif
 
-void SpineSlotNode::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("_on_world_transforms_changed", "spine_sprite"), &SpineSlotNode::on_world_transforms_changed);
+void SpineSlotNode2D::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("_on_world_transforms_changed", "spine_sprite"), &SpineSlotNode2D::on_world_transforms_changed);
 
-	ClassDB::bind_method(D_METHOD("set_normal_material", "material"), &SpineSlotNode::set_normal_material);
-	ClassDB::bind_method(D_METHOD("get_normal_material"), &SpineSlotNode::get_normal_material);
-	ClassDB::bind_method(D_METHOD("set_additive_material", "material"), &SpineSlotNode::set_additive_material);
-	ClassDB::bind_method(D_METHOD("get_additive_material"), &SpineSlotNode::get_additive_material);
-	ClassDB::bind_method(D_METHOD("set_multiply_material", "material"), &SpineSlotNode::set_multiply_material);
-	ClassDB::bind_method(D_METHOD("get_multiply_material"), &SpineSlotNode::get_multiply_material);
-	ClassDB::bind_method(D_METHOD("set_screen_material", "material"), &SpineSlotNode::set_screen_material);
-	ClassDB::bind_method(D_METHOD("get_screen_material"), &SpineSlotNode::get_screen_material);
+	ClassDB::bind_method(D_METHOD("set_normal_material", "material"), &SpineSlotNode2D::set_normal_material);
+	ClassDB::bind_method(D_METHOD("get_normal_material"), &SpineSlotNode2D::get_normal_material);
+	ClassDB::bind_method(D_METHOD("set_additive_material", "material"), &SpineSlotNode2D::set_additive_material);
+	ClassDB::bind_method(D_METHOD("get_additive_material"), &SpineSlotNode2D::get_additive_material);
+	ClassDB::bind_method(D_METHOD("set_multiply_material", "material"), &SpineSlotNode2D::set_multiply_material);
+	ClassDB::bind_method(D_METHOD("get_multiply_material"), &SpineSlotNode2D::get_multiply_material);
+	ClassDB::bind_method(D_METHOD("set_screen_material", "material"), &SpineSlotNode2D::set_screen_material);
+	ClassDB::bind_method(D_METHOD("get_screen_material"), &SpineSlotNode2D::get_screen_material);
 
 	ADD_GROUP("Materials", "");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "normal_material", PROPERTY_HINT_RESOURCE_TYPE, "Material"), "set_normal_material",
@@ -65,16 +65,16 @@ void SpineSlotNode::_bind_methods() {
 				 "get_screen_material");
 }
 
-SpineSlotNode::SpineSlotNode() : slot_index(-1) {
+SpineSlotNode2D::SpineSlotNode2D() : slot_index(-1) {
 }
 
-void SpineSlotNode::_notification(int what) {
+void SpineSlotNode2D::_notification(int what) {
 	switch (what) {
 		case NOTIFICATION_PARENTED: {
-			SpineSprite *sprite = cast_to<SpineSprite>(get_parent());
+			SpineSprite2D *sprite = cast_to<SpineSprite2D>(get_parent());
 			if (sprite) {
 #if VERSION_MAJOR > 3
-				sprite->connect(SNAME("world_transforms_changed"), callable_mp(this, &SpineSlotNode::on_world_transforms_changed));
+				sprite->connect(SNAME("world_transforms_changed"), callable_mp(this, &SpineSlotNode2D::on_world_transforms_changed));
 #else
 				sprite->connect(SNAME("world_transforms_changed"), this, SNAME("_on_world_transforms_changed"));
 #endif
@@ -89,16 +89,16 @@ void SpineSlotNode::_notification(int what) {
 				_change_notify("scale");
 #endif
 			} else {
-				WARN_PRINT("SpineSlotNode parent is not a SpineSprite.");
+				WARN_PRINT("SpineSlotNode2D parent is not a SpineSprite2D.");
 			}
 			NOTIFY_PROPERTY_LIST_CHANGED();
 			break;
 		}
 		case NOTIFICATION_UNPARENTED: {
-			SpineSprite *sprite = cast_to<SpineSprite>(get_parent());
+			SpineSprite2D *sprite = cast_to<SpineSprite2D>(get_parent());
 			if (sprite) {
 #if VERSION_MAJOR > 3
-				sprite->disconnect(SNAME("world_transforms_changed"), callable_mp(this, &SpineSlotNode::on_world_transforms_changed));
+				sprite->disconnect(SNAME("world_transforms_changed"), callable_mp(this, &SpineSlotNode2D::on_world_transforms_changed));
 #else
 				sprite->disconnect(SNAME("world_transforms_changed"), this, SNAME("_on_world_transforms_changed"));
 #endif
@@ -110,13 +110,13 @@ void SpineSlotNode::_notification(int what) {
 	}
 }
 
-void SpineSlotNode::_get_property_list(List<PropertyInfo> *list) const {
+void SpineSlotNode2D::_get_property_list(List<PropertyInfo> *list) const {
 #ifdef SPINE_GODOT_EXTENSION
 	PackedStringArray slot_names;
 #else
 	Vector<String> slot_names;
 #endif
-	SpineSprite *sprite = cast_to<SpineSprite>(get_parent());
+	SpineSprite2D *sprite = cast_to<SpineSprite2D>(get_parent());
 	if (sprite && sprite->get_skeleton_data_res().is_valid())
 		sprite->get_skeleton_data_res()->get_slot_names(slot_names);
 	else
@@ -124,7 +124,7 @@ void SpineSlotNode::_get_property_list(List<PropertyInfo> *list) const {
 	auto element = list->front();
 	while (element) {
 		auto property_info = element->get();
-		if (property_info.name == StringName("SpineSlotNode")) break;
+		if (property_info.name == StringName("SpineSlotNode2D")) break;
 		element = element->next();
 	}
 	PropertyInfo slot_name_property;
@@ -136,18 +136,18 @@ void SpineSlotNode::_get_property_list(List<PropertyInfo> *list) const {
 	list->insert_after(element, slot_name_property);
 }
 
-bool SpineSlotNode::_get(const StringName &property, Variant &value) const {
-	if (property == StringName("slot_name")) {
+bool SpineSlotNode2D::_get(const StringName &p_property, Variant &value) const {
+	if (p_property == StringName("slot_name")) {
 		value = slot_name;
 		return true;
 	}
 	return false;
 }
 
-bool SpineSlotNode::_set(const StringName &property, const Variant &value) {
-	if (property == StringName("slot_name")) {
+bool SpineSlotNode2D::_set(const StringName &p_property, const Variant &value) {
+	if (p_property == StringName("slot_name")) {
 		slot_name = value;
-		SpineSprite *sprite = cast_to<SpineSprite>(get_parent());
+		SpineSprite2D *sprite = cast_to<SpineSprite2D>(get_parent());
 		update_transform(sprite);
 #if VERSION_MAJOR == 3
 		_change_notify("transform/translation");
@@ -163,12 +163,12 @@ bool SpineSlotNode::_set(const StringName &property, const Variant &value) {
 	return false;
 }
 
-void SpineSlotNode::on_world_transforms_changed(const Variant &_sprite) {
-	SpineSprite *sprite = cast_to<SpineSprite>(_sprite.operator Object *());
+void SpineSlotNode2D::on_world_transforms_changed(const Variant &_sprite) {
+	SpineSprite2D *sprite = cast_to<SpineSprite2D>(_sprite.operator Object *());
 	update_transform(sprite);
 }
 
-void SpineSlotNode::update_transform(SpineSprite *sprite) {
+void SpineSlotNode2D::update_transform(SpineSprite2D *sprite) {
 	if (!is_visible_in_tree()) return;
 	if (!sprite) return;
 	if (!sprite->get_skeleton().is_valid() || !sprite->get_skeleton()->get_spine_object()) return;
@@ -184,42 +184,42 @@ void SpineSlotNode::update_transform(SpineSprite *sprite) {
 	this->set_global_transform(bone->get_global_transform());
 }
 
-void SpineSlotNode::set_slot_name(const String &_slot_name) {
+void SpineSlotNode2D::set_slot_name(const String &_slot_name) {
 	slot_name = _slot_name;
 }
 
-String SpineSlotNode::get_slot_name() {
+String SpineSlotNode2D::get_slot_name() {
 	return slot_name;
 }
 
-Ref<Material> SpineSlotNode::get_normal_material() {
+Ref<Material> SpineSlotNode2D::get_normal_material() {
 	return normal_material;
 }
 
-void SpineSlotNode::set_normal_material(Ref<Material> material) {
-	normal_material = material;
+void SpineSlotNode2D::set_normal_material(Ref<Material> p_material) {
+	normal_material = p_material;
 }
 
-Ref<Material> SpineSlotNode::get_additive_material() {
+Ref<Material> SpineSlotNode2D::get_additive_material() {
 	return additive_material;
 }
 
-void SpineSlotNode::set_additive_material(Ref<Material> material) {
-	additive_material = material;
+void SpineSlotNode2D::set_additive_material(Ref<Material> p_material) {
+	additive_material = p_material;
 }
 
-Ref<Material> SpineSlotNode::get_multiply_material() {
+Ref<Material> SpineSlotNode2D::get_multiply_material() {
 	return multiply_material;
 }
 
-void SpineSlotNode::set_multiply_material(Ref<Material> material) {
-	multiply_material = material;
+void SpineSlotNode2D::set_multiply_material(Ref<Material> p_material) {
+	multiply_material = p_material;
 }
 
-Ref<Material> SpineSlotNode::get_screen_material() {
+Ref<Material> SpineSlotNode2D::get_screen_material() {
 	return screen_material;
 }
 
-void SpineSlotNode::set_screen_material(Ref<Material> material) {
-	screen_material = material;
+void SpineSlotNode2D::set_screen_material(Ref<Material> p_material) {
+	screen_material = p_material;
 }

@@ -29,6 +29,7 @@
 
 #include "SpineTrackEntry.h"
 #include "SpineCommon.h"
+#include "SpineSpriteCommon.h"
 
 static spine::Interpolation &to_spine_mix_interpolation(SpineConstant::MixInterpolation mix_interpolation) {
 	switch (mix_interpolation) {
@@ -117,7 +118,7 @@ Ref<SpineAnimation> SpineTrackEntry::get_animation() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto animation = &get_spine_object()->getAnimation();
 	Ref<SpineAnimation> animation_ref(memnew(SpineAnimation));
-	animation_ref->set_spine_object(*get_spine_owner()->get_skeleton_data_res(), animation);
+	animation_ref->set_spine_object(*spine_sprite_get_skeleton_data_res(get_spine_owner()), animation);
 	return animation_ref;
 }
 

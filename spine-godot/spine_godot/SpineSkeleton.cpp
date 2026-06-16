@@ -29,7 +29,7 @@
 
 #include "SpineSkeleton.h"
 #include "SpineCommon.h"
-#include "SpineSprite.h"
+#include "SpineSpriteCommon.h"
 #include "SpineIkConstraint.h"
 #include "SpineTransformConstraint.h"
 #include "SpinePathConstraint.h"
@@ -96,17 +96,17 @@ SpineSkeleton::~SpineSkeleton() {
 	delete skeleton;
 }
 
-void SpineSkeleton::set_spine_sprite(SpineSprite *_sprite) {
+void SpineSkeleton::set_spine_sprite(Object *_sprite) {
 	delete skeleton;
 	skeleton = nullptr;
 	sprite = _sprite;
-	if (!sprite || !sprite->get_skeleton_data_res().is_valid() || !sprite->get_skeleton_data_res()->is_skeleton_data_loaded()) return;
-	skeleton = new spine::Skeleton(*sprite->get_skeleton_data_res()->get_skeleton_data());
+	Ref<SpineSkeletonDataResource> data_res = spine_sprite_get_skeleton_data_res(sprite);
+	if (!sprite || !data_res.is_valid() || !data_res->is_skeleton_data_loaded()) return;
+	skeleton = new spine::Skeleton(*data_res->get_skeleton_data());
 }
 
 Ref<SpineSkeletonDataResource> SpineSkeleton::get_skeleton_data_res() const {
-	if (!sprite) return nullptr;
-	return sprite->get_skeleton_data_res();
+	return spine_sprite_get_skeleton_data_res(sprite);
 }
 
 void SpineSkeleton::update_world_transform(SpineConstant::Physics physics) {
@@ -174,7 +174,7 @@ Ref<SpineAttachment> SpineSkeleton::get_attachment_by_slot_name(const String &sl
 	auto attachment = skeleton->getAttachment(SPINE_STRING_TMP(slot_name), SPINE_STRING_TMP(attachment_name));
 	if (!attachment) return nullptr;
 	Ref<SpineAttachment> attachment_ref(memnew(SpineAttachment));
-	attachment_ref->set_spine_object(*sprite->get_skeleton_data_res(), attachment);
+	attachment_ref->set_spine_object(*spine_sprite_get_skeleton_data_res(sprite), attachment);
 	return attachment_ref;
 }
 
@@ -183,7 +183,7 @@ Ref<SpineAttachment> SpineSkeleton::get_attachment_by_slot_index(int slot_index,
 	auto attachment = skeleton->getAttachment(slot_index, SPINE_STRING_TMP(attachment_name));
 	if (!attachment) return nullptr;
 	Ref<SpineAttachment> attachment_ref(memnew(SpineAttachment));
-	attachment_ref->set_spine_object(*sprite->get_skeleton_data_res(), attachment);
+	attachment_ref->set_spine_object(*spine_sprite_get_skeleton_data_res(sprite), attachment);
 	return attachment_ref;
 }
 
@@ -389,7 +389,7 @@ Ref<SpineSkin> SpineSkeleton::get_skin() {
 	auto skin = skeleton->getSkin();
 	if (!skin) return nullptr;
 	Ref<SpineSkin> skin_ref(memnew(SpineSkin));
-	skin_ref->set_spine_object(*sprite->get_skeleton_data_res(), skin);
+	skin_ref->set_spine_object(*spine_sprite_get_skeleton_data_res(sprite), skin);
 	return skin_ref;
 }
 

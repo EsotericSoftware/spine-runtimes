@@ -273,6 +273,104 @@ Array SpineAtlasResource::get_textures() {
 	return textures;
 }
 
+static bool fix_atlas_texture_path(String &path) {
+	const String prefix = "res:/";
+	const int i = path.find(prefix);
+	if (i == -1) {
+		return false;
+	}
+
+	const int sub_str_pos = i + prefix.length() - 1;
+	const String res = path.substr(sub_str_pos);
+	if (!EMPTY(res)) {
+		if (res[0] != '/') {
+			path = prefix + String("/") + res;
+		} else {
+			path = prefix + res;
+		}
+	}
+	return true;
+}
+
+void SpineAtlasResource::reload_page_textures() {
+	if (!atlas) {
+		return;
+	}
+
+	spine::Array<spine::AtlasPage *> &pages = atlas->getPages();
+	for (int i = 0, n = (int)pages.size(); i < n; ++i) {
+		spine::AtlasPage *page = pages[i];
+		SpineRendererObject *renderer_object = (SpineRendererObject *)page->texture;
+		if (!renderer_object || page->texturePath.length() == 0) {
+			continue;
+		}
+
+		String path;
+#if (VERSION_MAJOR >= 4 && VERSION_MINOR >= 5)
+		path = String::utf8(page->texturePath.buffer());
+#else
+		path.parse_utf8(page->texturePath.buffer());
+#endif
+		const bool is_resource = fix_atlas_texture_path(path);
+
+#if VERSION_MAJOR > 3
+		Ref<Texture2D> texture;
+		if (is_resource) {
+#ifdef SPINE_GODOT_EXTENSION
+			texture = ResourceLoader::get_singleton()->load(path, "", ResourceLoader::CACHE_MODE_IGNORE);
+#else
+			texture = ResourceLoader::load(path, "", ResourceFormatLoader::CACHE_MODE_IGNORE);
+#endif
+		} else {
+			Ref<Image> image;
+			image.instantiate();
+			image = image->load_from_file(path);
+			if (image.is_valid()) {
+				texture = ImageTexture::create_from_image(image);
+			}
+		}
+#else
+		Ref<Texture> texture;
+		if (is_resource) {
+			texture = ResourceLoader::load(path);
+		} else {
+			Ref<Image> image;
+			INSTANTIATE(image);
+			image->load(path);
+			Ref<ImageTexture> image_texture;
+			INSTANTIATE(image_texture);
+			image_texture->create_from_image(image);
+			texture = image_texture;
+		}
+#endif
+		if (!texture.is_valid()) {
+			continue;
+		}
+
+		renderer_object->texture = texture;
+#if VERSION_MAJOR > 3
+		if (!renderer_object->canvas_texture.is_valid()) {
+			renderer_object->canvas_texture.instantiate();
+		}
+		renderer_object->canvas_texture->set_diffuse_texture(renderer_object->texture);
+		if (renderer_object->normal_map.is_valid()) {
+			renderer_object->canvas_texture->set_normal_texture(renderer_object->normal_map);
+		}
+		if (renderer_object->specular_map.is_valid()) {
+			renderer_object->canvas_texture->set_specular_texture(renderer_object->specular_map);
+		}
+#endif
+	}
+
+	textures.clear();
+	for (int i = 0, n = (int)pages.size(); i < n; ++i) {
+		SpineRendererObject *page_renderer_object = (SpineRendererObject *)pages[i]->texture;
+		if (page_renderer_object) {
+			textures.append(page_renderer_object->texture);
+		}
+	}
+}
+
 Array SpineAtlasResource::get_normal_maps() {
 	return normal_maps;
 }

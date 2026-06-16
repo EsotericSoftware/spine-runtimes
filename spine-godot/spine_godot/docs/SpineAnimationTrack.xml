@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="SpineAnimationTrack" inherits="Node" version="3.4">
 	<brief_description>
-		Internal class to allow composing animations on [code]SpineSprite[/code] instances via Godot's animation player and animation editor.
+		Internal class to allow composing animations on [code]SpineSprite2D[/code] instances via Godot's animation player and animation editor.
 	</brief_description>
 	<description>
-		Internal class to allow composing animations on [code]SpineSprite[/code] instances via Godot's animation player and animation editor.
+		Internal class to allow composing animations on [code]SpineSprite2D[/code] instances via Godot's animation player and animation editor.
 	</description>
 	<tutorials>
 	</tutorials>
@@ -12,56 +12,70 @@
 		<method name="get_animation_name">
 			<return type="String" />
 			<description>
+				Returns the Spine animation name played by this track key.
 			</description>
 		</method>
 		<method name="get_loop">
 			<return type="bool" />
 			<description>
+				Returns [code]true[/code] when the track key loops the animation.
 			</description>
 		</method>
 		<method name="set_animation_name">
 			<return type="void" />
 			<argument index="0" name="animation_name" type="String" />
 			<description>
+				Sets the Spine animation name played by this track key.
 			</description>
 		</method>
 		<method name="set_loop">
 			<return type="void" />
 			<argument index="0" name="loop" type="bool" />
 			<description>
+				Sets whether the track key loops the animation.
 			</description>
 		</method>
 		<method name="update_animation_state">
 			<return type="void" />
 			<argument index="0" name="spine_sprite" type="Variant" />
 			<description>
+				Applies this track key to the target [code]SpineSprite2D[/code] animation state. Called by the animation player during playback.
 			</description>
 		</method>
 	</methods>
 	<members>
-		<member name="alpha" type="float" setter="set_alpha" getter="get_alpha" default="1.0">
+		<member name="additive" type="bool" setter="set_additive" getter="get_additive" default="false">
+			When [code]true[/code], the created track entry mixes additively.
 		</member>
-		<member name="attachment_threshold" type="float" setter="set_attachment_threshold" getter="get_attachment_threshold" default="0.0">
+		<member name="alpha" type="float" setter="set_alpha" getter="get_alpha" default="1.0">
+			Track entry alpha applied when this key is active.
+		</member>
+		<member name="attachment_threshold" type="float" setter="set_mix_attachment_threshold" getter="get_mix_attachment_threshold" default="0.0">
+			Attachment mix threshold forwarded to the created track entry.
 		</member>
 		<member name="blend_tree_mode" type="bool" setter="set_blend_tree_mode" getter="get_blend_tree_mode" default="false">
+			When [code]true[/code], the track works with animation tree blending instead of direct playback.
 		</member>
 		<member name="debug" type="bool" setter="set_debug" getter="get_debug" default="false">
+			Enables debug output for this animation track key.
 		</member>
-		<member name="draw_order_threshold" type="float" setter="set_draw_order_threshold" getter="get_draw_order_threshold" default="0.0">
-		</member>
-		<member name="hold_previous" type="bool" setter="set_hold_previous" getter="get_hold_previous" default="false">
-		</member>
-		<member name="mix_blend" type="int" setter="set_mix_blend" getter="get_mix_blend" enum="SpineConstant.MixBlend" default="2">
+		<member name="draw_order_threshold" type="float" setter="set_mix_draw_order_threshold" getter="get_mix_draw_order_threshold" default="0.0">
+			Draw order mix threshold forwarded to the created track entry.
 		</member>
 		<member name="mix_duration" type="float" setter="set_mix_duration" getter="get_mix_duration" default="-1.0">
+			Crossfade duration in seconds. A negative value uses the skeleton data default mix.
 		</member>
 		<member name="reverse" type="bool" setter="set_reverse" getter="get_reverse" default="false">
+			When [code]true[/code], the animation plays backward for this key.
 		</member>
 		<member name="shortest_rotation" type="bool" setter="set_shortest_rotation" getter="get_shortest_rotation" default="false">
+			When [code]true[/code], bone rotation uses the shortest path during mixing.
 		</member>
 		<member name="time_scale" type="float" setter="set_time_scale" getter="get_time_scale" default="1.0">
+			Playback speed multiplier for the created track entry.
 		</member>
 		<member name="track_index" type="int" setter="set_track_index" getter="get_track_index" default="-1">
+			Spine animation track index to receive this key. Use [code]-1[/code] to keep the animation player default.
 		</member>
 	</members>
 	<constants>

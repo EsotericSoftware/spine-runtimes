@@ -15,7 +15,7 @@ func _ready():
 	skeleton_data_res.atlas_res = atlas_res
 	
 	# Create a sprite from the skeleton data and add it as a child
-	var sprite = SpineSprite.new();
+	var sprite = SpineSprite2D.new();
 	sprite.skeleton_data_res = skeleton_data_res;
 	sprite.position.x = 200;
 	sprite.position.y = 200;

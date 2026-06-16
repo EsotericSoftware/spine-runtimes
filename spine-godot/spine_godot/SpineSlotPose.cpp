@@ -29,7 +29,7 @@
 
 #include "SpineSlotPose.h"
 #include "SpineCommon.h"
-#include "SpineSprite.h"
+#include "SpineSpriteCommon.h"
 
 void SpineSlotPose::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_color"), &SpineSlotPose::get_color);
@@ -85,7 +85,7 @@ Ref<SpineAttachment> SpineSlotPose::get_attachment() {
 	auto attachment = get_spine_object()->getAttachment();
 	if (!attachment) return nullptr;
 	Ref<SpineAttachment> attachment_ref(memnew(SpineAttachment));
-	attachment_ref->set_spine_object(*get_spine_owner()->get_skeleton_data_res(), attachment);
+	attachment_ref->set_spine_object(*spine_sprite_get_skeleton_data_res(get_spine_owner()), attachment);
 	return attachment_ref;
 }
 

@@ -30,7 +30,7 @@
 #include "SpinePhysicsConstraint.h"
 #include "SpinePhysicsConstraintPose.h"
 #include "SpineCommon.h"
-#include "SpineSprite.h"
+#include "SpineSpriteCommon.h"
 
 void SpinePhysicsConstraint::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("update", "skeleton", "physics"), &SpinePhysicsConstraint::update);
@@ -53,7 +53,7 @@ Ref<SpinePhysicsConstraintData> SpinePhysicsConstraint::get_data() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto &data = get_spine_object()->getData();
 	Ref<SpinePhysicsConstraintData> data_ref(memnew(SpinePhysicsConstraintData));
-	data_ref->set_spine_object(*get_spine_owner()->get_skeleton_data_res(), &data);
+	data_ref->set_spine_object(*spine_sprite_get_skeleton_data_res(get_spine_owner()), &data);
 	return data_ref;
 }
 

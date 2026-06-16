@@ -6,7 +6,7 @@
 [node name="Node2D" type="Node2D"]
 rotation = -3.67884e-05
 
-[node name="SpineSprite" type="SpineSprite" parent="."]
+[node name="SpineSprite2D" type="SpineSprite2D" parent="."]
 position = Vector2( 53.8037, 119.483 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -15,7 +15,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite2" type="SpineSprite" parent="."]
+[node name="SpineSprite2D2" type="SpineSprite2D" parent="."]
 position = Vector2( 111.488, 119.485 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -24,7 +24,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite3" type="SpineSprite" parent="."]
+[node name="SpineSprite2D3" type="SpineSprite2D" parent="."]
 position = Vector2( 164.678, 119.487 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -33,7 +33,7 @@ preview_frame = true
 preview_time = 2.36477e-39
 script = ExtResource( 2 )
 
-[node name="SpineSprite4" type="SpineSprite" parent="."]
+[node name="SpineSprite2D4" type="SpineSprite2D" parent="."]
 position = Vector2( 217.119, 121.736 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -42,7 +42,7 @@ preview_frame = true
 preview_time = 6.85235e-43
 script = ExtResource( 2 )
 
-[node name="SpineSprite5" type="SpineSprite" parent="."]
+[node name="SpineSprite2D5" type="SpineSprite2D" parent="."]
 position = Vector2( 277.051, 120.989 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -51,7 +51,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite6" type="SpineSprite" parent="."]
+[node name="SpineSprite2D6" type="SpineSprite2D" parent="."]
 position = Vector2( 337.733, 118.744 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -60,7 +60,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite7" type="SpineSprite" parent="."]
+[node name="SpineSprite2D7" type="SpineSprite2D" parent="."]
 position = Vector2( 403.658, 120.994 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -69,7 +69,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite8" type="SpineSprite" parent="."]
+[node name="SpineSprite2D8" type="SpineSprite2D" parent="."]
 position = Vector2( 464.34, 120.996 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -78,7 +78,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite9" type="SpineSprite" parent="."]
+[node name="SpineSprite2D9" type="SpineSprite2D" parent="."]
 position = Vector2( 525.021, 120.998 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -87,7 +87,7 @@ preview_frame = false
 preview_time = 51.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite10" type="SpineSprite" parent="."]
+[node name="SpineSprite2D10" type="SpineSprite2D" parent="."]
 position = Vector2( 589.448, 121.001 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -96,7 +96,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite11" type="SpineSprite" parent="."]
+[node name="SpineSprite2D11" type="SpineSprite2D" parent="."]
 position = Vector2( 649.381, 121.752 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -105,7 +105,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite12" type="SpineSprite" parent="."]
+[node name="SpineSprite2D12" type="SpineSprite2D" parent="."]
 position = Vector2( 709.313, 123.253 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -114,7 +114,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite13" type="SpineSprite" parent="."]
+[node name="SpineSprite2D13" type="SpineSprite2D" parent="."]
 position = Vector2( 769.245, 119.509 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -123,7 +123,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite14" type="SpineSprite" parent="."]
+[node name="SpineSprite2D14" type="SpineSprite2D" parent="."]
 position = Vector2( 830.676, 119.511 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -132,7 +132,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite15" type="SpineSprite" parent="."]
+[node name="SpineSprite2D15" type="SpineSprite2D" parent="."]
 position = Vector2( 892.106, 121.761 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -141,7 +141,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite16" type="SpineSprite" parent="."]
+[node name="SpineSprite2D16" type="SpineSprite2D" parent="."]
 position = Vector2( 953.537, 121.763 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -150,7 +150,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite17" type="SpineSprite" parent="."]
+[node name="SpineSprite2D17" type="SpineSprite2D" parent="."]
 position = Vector2( 56.0478, 207.883 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -159,7 +159,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite18" type="SpineSprite" parent="."]
+[node name="SpineSprite2D18" type="SpineSprite2D" parent="."]
 position = Vector2( 113.733, 207.885 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -168,7 +168,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite19" type="SpineSprite" parent="."]
+[node name="SpineSprite2D19" type="SpineSprite2D" parent="."]
 position = Vector2( 166.923, 207.887 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -177,7 +177,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite20" type="SpineSprite" parent="."]
+[node name="SpineSprite2D20" type="SpineSprite2D" parent="."]
 position = Vector2( 219.363, 210.136 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -186,7 +186,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite21" type="SpineSprite" parent="."]
+[node name="SpineSprite2D21" type="SpineSprite2D" parent="."]
 position = Vector2( 279.295, 209.389 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -195,7 +195,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite22" type="SpineSprite" parent="."]
+[node name="SpineSprite2D22" type="SpineSprite2D" parent="."]
 position = Vector2( 339.977, 207.144 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -204,7 +204,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite23" type="SpineSprite" parent="."]
+[node name="SpineSprite2D23" type="SpineSprite2D" parent="."]
 position = Vector2( 405.902, 209.394 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -213,7 +213,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite24" type="SpineSprite" parent="."]
+[node name="SpineSprite2D24" type="SpineSprite2D" parent="."]
 position = Vector2( 466.584, 209.396 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -222,7 +222,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite25" type="SpineSprite" parent="."]
+[node name="SpineSprite2D25" type="SpineSprite2D" parent="."]
 position = Vector2( 527.265, 209.399 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -231,7 +231,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite26" type="SpineSprite" parent="."]
+[node name="SpineSprite2D26" type="SpineSprite2D" parent="."]
 position = Vector2( 591.692, 209.401 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -240,7 +240,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite27" type="SpineSprite" parent="."]
+[node name="SpineSprite2D27" type="SpineSprite2D" parent="."]
 position = Vector2( 651.625, 210.152 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -249,7 +249,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite28" type="SpineSprite" parent="."]
+[node name="SpineSprite2D28" type="SpineSprite2D" parent="."]
 position = Vector2( 711.557, 211.653 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -258,7 +258,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite29" type="SpineSprite" parent="."]
+[node name="SpineSprite2D29" type="SpineSprite2D" parent="."]
 position = Vector2( 771.489, 207.909 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -267,7 +267,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite30" type="SpineSprite" parent="."]
+[node name="SpineSprite2D30" type="SpineSprite2D" parent="."]
 position = Vector2( 832.92, 207.911 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -276,7 +276,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite31" type="SpineSprite" parent="."]
+[node name="SpineSprite2D31" type="SpineSprite2D" parent="."]
 position = Vector2( 894.351, 210.161 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -285,7 +285,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite32" type="SpineSprite" parent="."]
+[node name="SpineSprite2D32" type="SpineSprite2D" parent="."]
 position = Vector2( 955.781, 210.163 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -294,7 +294,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite33" type="SpineSprite" parent="."]
+[node name="SpineSprite2D33" type="SpineSprite2D" parent="."]
 position = Vector2( 60.5394, 300.778 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -303,7 +303,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite34" type="SpineSprite" parent="."]
+[node name="SpineSprite2D34" type="SpineSprite2D" parent="."]
 position = Vector2( 118.224, 300.78 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -312,7 +312,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite35" type="SpineSprite" parent="."]
+[node name="SpineSprite2D35" type="SpineSprite2D" parent="."]
 position = Vector2( 171.414, 300.782 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -321,7 +321,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite36" type="SpineSprite" parent="."]
+[node name="SpineSprite2D36" type="SpineSprite2D" parent="."]
 position = Vector2( 223.855, 303.032 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -330,7 +330,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite37" type="SpineSprite" parent="."]
+[node name="SpineSprite2D37" type="SpineSprite2D" parent="."]
 position = Vector2( 283.787, 302.285 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -339,7 +339,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite38" type="SpineSprite" parent="."]
+[node name="SpineSprite2D38" type="SpineSprite2D" parent="."]
 position = Vector2( 344.468, 300.039 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -348,7 +348,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite39" type="SpineSprite" parent="."]
+[node name="SpineSprite2D39" type="SpineSprite2D" parent="."]
 position = Vector2( 410.394, 302.289 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -357,7 +357,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite40" type="SpineSprite" parent="."]
+[node name="SpineSprite2D40" type="SpineSprite2D" parent="."]
 position = Vector2( 471.075, 302.292 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -366,7 +366,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite41" type="SpineSprite" parent="."]
+[node name="SpineSprite2D41" type="SpineSprite2D" parent="."]
 position = Vector2( 531.757, 302.294 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -375,7 +375,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite42" type="SpineSprite" parent="."]
+[node name="SpineSprite2D42" type="SpineSprite2D" parent="."]
 position = Vector2( 596.184, 302.296 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -384,7 +384,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite43" type="SpineSprite" parent="."]
+[node name="SpineSprite2D43" type="SpineSprite2D" parent="."]
 position = Vector2( 656.116, 303.047 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -393,7 +393,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite44" type="SpineSprite" parent="."]
+[node name="SpineSprite2D44" type="SpineSprite2D" parent="."]
 position = Vector2( 716.048, 304.548 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -402,7 +402,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite45" type="SpineSprite" parent="."]
+[node name="SpineSprite2D45" type="SpineSprite2D" parent="."]
 position = Vector2( 775.981, 300.804 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -411,7 +411,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite46" type="SpineSprite" parent="."]
+[node name="SpineSprite2D46" type="SpineSprite2D" parent="."]
 position = Vector2( 837.411, 300.807 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -420,7 +420,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite47" type="SpineSprite" parent="."]
+[node name="SpineSprite2D47" type="SpineSprite2D" parent="."]
 position = Vector2( 898.842, 303.056 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -429,7 +429,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite48" type="SpineSprite" parent="."]
+[node name="SpineSprite2D48" type="SpineSprite2D" parent="."]
 position = Vector2( 960.273, 303.059 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -438,7 +438,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite49" type="SpineSprite" parent="."]
+[node name="SpineSprite2D49" type="SpineSprite2D" parent="."]
 position = Vector2( 60.5361, 389.178 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -447,7 +447,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite50" type="SpineSprite" parent="."]
+[node name="SpineSprite2D50" type="SpineSprite2D" parent="."]
 position = Vector2( 118.221, 389.18 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -456,7 +456,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite51" type="SpineSprite" parent="."]
+[node name="SpineSprite2D51" type="SpineSprite2D" parent="."]
 position = Vector2( 171.411, 389.182 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -465,7 +465,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite52" type="SpineSprite" parent="."]
+[node name="SpineSprite2D52" type="SpineSprite2D" parent="."]
 position = Vector2( 223.851, 391.432 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -474,7 +474,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite53" type="SpineSprite" parent="."]
+[node name="SpineSprite2D53" type="SpineSprite2D" parent="."]
 position = Vector2( 283.784, 390.685 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -483,7 +483,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite54" type="SpineSprite" parent="."]
+[node name="SpineSprite2D54" type="SpineSprite2D" parent="."]
 position = Vector2( 344.465, 388.44 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -492,7 +492,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite55" type="SpineSprite" parent="."]
+[node name="SpineSprite2D55" type="SpineSprite2D" parent="."]
 position = Vector2( 410.391, 390.689 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -501,7 +501,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite56" type="SpineSprite" parent="."]
+[node name="SpineSprite2D56" type="SpineSprite2D" parent="."]
 position = Vector2( 471.072, 390.692 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -510,7 +510,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite57" type="SpineSprite" parent="."]
+[node name="SpineSprite2D57" type="SpineSprite2D" parent="."]
 position = Vector2( 531.753, 390.694 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -519,7 +519,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite58" type="SpineSprite" parent="."]
+[node name="SpineSprite2D58" type="SpineSprite2D" parent="."]
 position = Vector2( 596.181, 390.696 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -528,7 +528,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite59" type="SpineSprite" parent="."]
+[node name="SpineSprite2D59" type="SpineSprite2D" parent="."]
 position = Vector2( 656.113, 391.448 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -537,7 +537,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite60" type="SpineSprite" parent="."]
+[node name="SpineSprite2D60" type="SpineSprite2D" parent="."]
 position = Vector2( 716.045, 392.948 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -546,7 +546,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite61" type="SpineSprite" parent="."]
+[node name="SpineSprite2D61" type="SpineSprite2D" parent="."]
 position = Vector2( 775.978, 389.204 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -555,7 +555,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite62" type="SpineSprite" parent="."]
+[node name="SpineSprite2D62" type="SpineSprite2D" parent="."]
 position = Vector2( 837.408, 389.207 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -564,7 +564,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite63" type="SpineSprite" parent="."]
+[node name="SpineSprite2D63" type="SpineSprite2D" parent="."]
 position = Vector2( 898.839, 391.456 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -573,7 +573,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite64" type="SpineSprite" parent="."]
+[node name="SpineSprite2D64" type="SpineSprite2D" parent="."]
 position = Vector2( 960.269, 391.459 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -582,7 +582,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite65" type="SpineSprite" parent="."]
+[node name="SpineSprite2D65" type="SpineSprite2D" parent="."]
 position = Vector2( 62.0311, 477.578 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -591,7 +591,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite66" type="SpineSprite" parent="."]
+[node name="SpineSprite2D66" type="SpineSprite2D" parent="."]
 position = Vector2( 119.716, 477.581 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -600,7 +600,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite67" type="SpineSprite" parent="."]
+[node name="SpineSprite2D67" type="SpineSprite2D" parent="."]
 position = Vector2( 172.906, 477.583 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -609,7 +609,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite68" type="SpineSprite" parent="."]
+[node name="SpineSprite2D68" type="SpineSprite2D" parent="."]
 position = Vector2( 225.346, 479.832 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -618,7 +618,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite69" type="SpineSprite" parent="."]
+[node name="SpineSprite2D69" type="SpineSprite2D" parent="."]
 position = Vector2( 285.279, 479.085 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -627,7 +627,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite70" type="SpineSprite" parent="."]
+[node name="SpineSprite2D70" type="SpineSprite2D" parent="."]
 position = Vector2( 345.96, 476.84 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -636,7 +636,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite71" type="SpineSprite" parent="."]
+[node name="SpineSprite2D71" type="SpineSprite2D" parent="."]
 position = Vector2( 411.886, 479.09 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -645,7 +645,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite72" type="SpineSprite" parent="."]
+[node name="SpineSprite2D72" type="SpineSprite2D" parent="."]
 position = Vector2( 472.567, 479.092 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -654,7 +654,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite73" type="SpineSprite" parent="."]
+[node name="SpineSprite2D73" type="SpineSprite2D" parent="."]
 position = Vector2( 533.248, 479.094 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -663,7 +663,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite74" type="SpineSprite" parent="."]
+[node name="SpineSprite2D74" type="SpineSprite2D" parent="."]
 position = Vector2( 597.676, 479.096 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -672,7 +672,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite75" type="SpineSprite" parent="."]
+[node name="SpineSprite2D75" type="SpineSprite2D" parent="."]
 position = Vector2( 657.608, 479.848 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -681,7 +681,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite76" type="SpineSprite" parent="."]
+[node name="SpineSprite2D76" type="SpineSprite2D" parent="."]
 position = Vector2( 717.54, 481.348 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -690,7 +690,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite77" type="SpineSprite" parent="."]
+[node name="SpineSprite2D77" type="SpineSprite2D" parent="."]
 position = Vector2( 777.473, 477.605 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -699,7 +699,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite78" type="SpineSprite" parent="."]
+[node name="SpineSprite2D78" type="SpineSprite2D" parent="."]
 position = Vector2( 838.903, 477.607 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -708,7 +708,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite79" type="SpineSprite" parent="."]
+[node name="SpineSprite2D79" type="SpineSprite2D" parent="."]
 position = Vector2( 900.334, 479.857 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -717,7 +717,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite80" type="SpineSprite" parent="."]
+[node name="SpineSprite2D80" type="SpineSprite2D" parent="."]
 position = Vector2( 961.765, 479.859 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -726,7 +726,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite81" type="SpineSprite" parent="."]
+[node name="SpineSprite2D81" type="SpineSprite2D" parent="."]
 position = Vector2( 66.5229, 562.233 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -735,7 +735,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite82" type="SpineSprite" parent="."]
+[node name="SpineSprite2D82" type="SpineSprite2D" parent="."]
 position = Vector2( 124.208, 562.235 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -744,7 +744,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite83" type="SpineSprite" parent="."]
+[node name="SpineSprite2D83" type="SpineSprite2D" parent="."]
 position = Vector2( 177.398, 562.237 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -753,7 +753,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite84" type="SpineSprite" parent="."]
+[node name="SpineSprite2D84" type="SpineSprite2D" parent="."]
 position = Vector2( 229.838, 564.486 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -762,7 +762,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite85" type="SpineSprite" parent="."]
+[node name="SpineSprite2D85" type="SpineSprite2D" parent="."]
 position = Vector2( 289.77, 563.74 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -771,7 +771,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite86" type="SpineSprite" parent="."]
+[node name="SpineSprite2D86" type="SpineSprite2D" parent="."]
 position = Vector2( 350.452, 561.494 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -780,7 +780,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite87" type="SpineSprite" parent="."]
+[node name="SpineSprite2D87" type="SpineSprite2D" parent="."]
 position = Vector2( 416.377, 563.744 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -789,7 +789,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite88" type="SpineSprite" parent="."]
+[node name="SpineSprite2D88" type="SpineSprite2D" parent="."]
 position = Vector2( 477.059, 563.746 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -798,7 +798,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite89" type="SpineSprite" parent="."]
+[node name="SpineSprite2D89" type="SpineSprite2D" parent="."]
 position = Vector2( 537.74, 563.749 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -807,7 +807,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite90" type="SpineSprite" parent="."]
+[node name="SpineSprite2D90" type="SpineSprite2D" parent="."]
 position = Vector2( 602.167, 563.751 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -816,7 +816,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite91" type="SpineSprite" parent="."]
+[node name="SpineSprite2D91" type="SpineSprite2D" parent="."]
 position = Vector2( 662.1, 564.502 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -825,7 +825,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite92" type="SpineSprite" parent="."]
+[node name="SpineSprite2D92" type="SpineSprite2D" parent="."]
 position = Vector2( 722.032, 566.003 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -834,7 +834,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite93" type="SpineSprite" parent="."]
+[node name="SpineSprite2D93" type="SpineSprite2D" parent="."]
 position = Vector2( 781.964, 562.259 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -843,7 +843,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite94" type="SpineSprite" parent="."]
+[node name="SpineSprite2D94" type="SpineSprite2D" parent="."]
 position = Vector2( 843.395, 562.261 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -852,7 +852,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite95" type="SpineSprite" parent="."]
+[node name="SpineSprite2D95" type="SpineSprite2D" parent="."]
 position = Vector2( 904.826, 564.511 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )
@@ -861,7 +861,7 @@ preview_frame = false
 preview_time = 0.0
 script = ExtResource( 2 )
 
-[node name="SpineSprite96" type="SpineSprite" parent="."]
+[node name="SpineSprite2D96" type="SpineSprite2D" parent="."]
 position = Vector2( 966.256, 564.513 )
 scale = Vector2( 0.1, 0.1 )
 skeleton_data_res = ExtResource( 1 )

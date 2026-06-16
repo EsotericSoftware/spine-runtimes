@@ -32,7 +32,7 @@
 #include "SpineCommon.h"
 #include <spine/IkConstraintPose.h>
 
-class SpineSprite;
+class SpineSprite2D;
 
 class SpineIkConstraintPose : public SpineObjectWrapper {
 	GDCLASS(SpineIkConstraintPose, SpineObjectWrapper)
@@ -41,7 +41,7 @@ protected:
 	static void _bind_methods();
 
 public:
-	// Can be used by both SpineSprite and SpineSkeletonDataResource
+	// Can be used by both SpineSprite2D and SpineSkeletonDataResource
 	void set_spine_object(void *owner, spine::IkConstraintPose *object) {
 		_set_spine_object_internal(owner, object);
 	}

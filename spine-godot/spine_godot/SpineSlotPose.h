@@ -33,7 +33,7 @@
 #include "SpineAttachment.h"
 #include <spine/SlotPose.h>
 
-class SpineSprite;
+class SpineSprite2D;
 
 class SpineSlotPose : public SpineSpriteOwnedObject<spine::SlotPose> {
 	GDCLASS(SpineSlotPose, SpineObjectWrapper)

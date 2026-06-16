@@ -7,6 +7,6 @@
 position = Vector2( 496.659, 431.634 )
 scale = Vector2( 0.7, 0.7 )
 
-[node name="SpineSprite" type="SpineSprite" parent="."]
+[node name="SpineSprite2D" type="SpineSprite2D" parent="."]
 skeleton_data_res = ExtResource( 2 )
 script = ExtResource( 1 )

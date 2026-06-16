@@ -31,6 +31,20 @@
 				Finds a path constraint by comparing each path constraint's name. It is more efficient to cache the results of this method than to call it repeatedly.
 			</description>
 		</method>
+		<method name="find_physics_constraint">
+			<return type="SpinePhysicsConstraint" />
+			<argument index="0" name="constraint_name" type="String" />
+			<description>
+				Finds a physics constraint by comparing each physics constraint's name. It is more efficient to cache the results of this method than to call it repeatedly.
+			</description>
+		</method>
+		<method name="find_slider">
+			<return type="SpineSlider" />
+			<argument index="0" name="slider_name" type="String" />
+			<description>
+				Finds a slider by comparing each slider's name. It is more efficient to cache the results of this method than to call it repeatedly.
+			</description>
+		</method>
 		<method name="find_slot">
 			<return type="SpineSlot" />
 			<argument index="0" name="slot_name" type="String" />
@@ -72,7 +86,7 @@
 		<method name="get_bounds">
 			<return type="Rect2" />
 			<description>
-				Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose. The bounds are relative to the [code]SpineSprite[/code] that stores the skeleton.
+				Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose. The bounds are relative to the [code]SpineSprite2D[/code] that stores the skeleton.
 			</description>
 		</method>
 		<method name="get_color">
@@ -125,6 +139,12 @@
 				Bones that do not inherit scale are still affected by this property.
 			</description>
 		</method>
+		<method name="get_sliders">
+			<return type="Array" />
+			<description>
+				The skeleton's sliders. Modifying the array has no effect.
+			</description>
+		</method>
 		<method name="get_skin">
 			<return type="SpineSkin" />
 			<description>
@@ -137,6 +157,12 @@
 				The skeleton's slots. Modifying the array has no effect.
 			</description>
 		</method>
+		<method name="get_time">
+			<return type="float" />
+			<description>
+				Returns the skeleton physics time in seconds.
+			</description>
+		</method>
 		<method name="get_transform_constraints">
 			<return type="Array" />
 			<description>
@@ -146,15 +172,32 @@
 		<method name="get_x">
 			<return type="float" />
 			<description>
-				Sets the skeleton X position, which is added to the root bone worldX position. Relative to the [code]SpineSprite[/code].
+				Sets the skeleton X position, which is added to the root bone worldX position. Relative to the [code]SpineSprite2D[/code].
 				Bones that do not inherit translation are still affected by this property.
 			</description>
 		</method>
 		<method name="get_y">
 			<return type="float" />
 			<description>
-				Sets the skeleton Y position, which is added to the root bone worldX position. Relative to the [code]SpineSprite[/code].
+				Sets the skeleton Y position, which is added to the root bone worldX position. Relative to the [code]SpineSprite2D[/code].
 				Bones that do not inherit translation are still affected by this property.
+			</description>
+		</method>
+		<method name="physics_rotate">
+			<return type="void" />
+			<argument index="0" name="x" type="float" />
+			<argument index="1" name="y" type="float" />
+			<argument index="2" name="degrees" type="float" />
+			<description>
+				Applies a physics rotation around the point [code](x, y)[/code].
+			</description>
+		</method>
+		<method name="physics_translate">
+			<return type="void" />
+			<argument index="0" name="x" type="float" />
+			<argument index="1" name="y" type="float" />
+			<description>
+				Applies a physics translation by [code](x, y)[/code].
 			</description>
 		</method>
 		<method name="set_attachment">
@@ -183,7 +226,7 @@
 			<return type="void" />
 			<argument index="0" name="position" type="Vector2" />
 			<description>
-				Sets the skeleton position relative to the [code]SpineSprite[/code].
+				Sets the skeleton position relative to the [code]SpineSprite2D[/code].
 			</description>
 		</method>
 		<method name="set_scale_x">
@@ -224,6 +267,13 @@
 				Sets the slots and draw order to their setup pose values.
 			</description>
 		</method>
+		<method name="set_time">
+			<return type="void" />
+			<argument index="0" name="time" type="float" />
+			<description>
+				Sets the skeleton physics time in seconds.
+			</description>
+		</method>
 		<method name="set_to_setup_pose">
 			<return type="void" />
 			<description>
@@ -246,8 +296,16 @@
 				Bones that do not inherit translation are still affected by this property.
 			</description>
 		</method>
+		<method name="update">
+			<return type="void" />
+			<argument index="0" name="delta" type="float" />
+			<description>
+				Advances skeleton physics by [code]delta[/code] seconds.
+			</description>
+		</method>
 		<method name="update_world_transform">
 			<return type="void" />
+			<argument index="0" name="physics" type="int" enum="SpineConstant.Physics" default="0" />
 			<description>
 				Updates the world transform for each bone and applies all constraints.
 				See [url]http://esotericsoftware.com/spine-runtime-skeletons#World-transforms[/url] in the Spine Runtimes Guide.

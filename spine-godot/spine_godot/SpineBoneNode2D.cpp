@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "SpineBoneNode.h"
+#include "SpineBoneNode2D.h"
 
 #ifdef SPINE_GODOT_EXTENSION
 #include <godot_cpp/classes/engine.hpp>
@@ -40,19 +40,19 @@
 #endif
 #endif
 
-void SpineBoneNode::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("set_bone_mode"), &SpineBoneNode::set_bone_mode);
-	ClassDB::bind_method(D_METHOD("get_bone_mode"), &SpineBoneNode::get_bone_mode);
-	ClassDB::bind_method(D_METHOD("set_enabled"), &SpineBoneNode::set_enabled);
-	ClassDB::bind_method(D_METHOD("get_enabled"), &SpineBoneNode::get_enabled);
-	ClassDB::bind_method(D_METHOD("set_debug_thickness"), &SpineBoneNode::set_debug_thickness);
-	ClassDB::bind_method(D_METHOD("get_debug_thickness"), &SpineBoneNode::get_debug_thickness);
-	ClassDB::bind_method(D_METHOD("set_debug_color"), &SpineBoneNode::set_debug_color);
-	ClassDB::bind_method(D_METHOD("get_debug_color"), &SpineBoneNode::get_debug_color);
-	ClassDB::bind_method(D_METHOD("_on_before_world_transforms_change", "spine_sprite"), &SpineBoneNode::on_before_world_transforms_change);
-	ClassDB::bind_method(D_METHOD("_on_world_transforms_changed", "spine_sprite"), &SpineBoneNode::on_world_transforms_changed);
-	ClassDB::bind_method(D_METHOD("find_bone"), &SpineBoneNode::find_bone);
-	ClassDB::bind_method(D_METHOD("find_sprite"), &SpineBoneNode::find_parent_sprite);
+void SpineBoneNode2D::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("set_bone_mode"), &SpineBoneNode2D::set_bone_mode);
+	ClassDB::bind_method(D_METHOD("get_bone_mode"), &SpineBoneNode2D::get_bone_mode);
+	ClassDB::bind_method(D_METHOD("set_enabled"), &SpineBoneNode2D::set_enabled);
+	ClassDB::bind_method(D_METHOD("get_enabled"), &SpineBoneNode2D::get_enabled);
+	ClassDB::bind_method(D_METHOD("set_debug_thickness"), &SpineBoneNode2D::set_debug_thickness);
+	ClassDB::bind_method(D_METHOD("get_debug_thickness"), &SpineBoneNode2D::get_debug_thickness);
+	ClassDB::bind_method(D_METHOD("set_debug_color"), &SpineBoneNode2D::set_debug_color);
+	ClassDB::bind_method(D_METHOD("get_debug_color"), &SpineBoneNode2D::get_debug_color);
+	ClassDB::bind_method(D_METHOD("_on_before_world_transforms_change", "spine_sprite"), &SpineBoneNode2D::on_before_world_transforms_change);
+	ClassDB::bind_method(D_METHOD("_on_world_transforms_changed", "spine_sprite"), &SpineBoneNode2D::on_world_transforms_changed);
+	ClassDB::bind_method(D_METHOD("find_bone"), &SpineBoneNode2D::find_bone);
+	ClassDB::bind_method(D_METHOD("find_sprite"), &SpineBoneNode2D::find_parent_sprite);
 
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "bone_mode", PROPERTY_HINT_ENUM, "Follow,Drive"), "set_bone_mode", "get_bone_mode");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "enabled"), "set_enabled", "get_enabled");
@@ -61,14 +61,14 @@ void SpineBoneNode::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "color"), "set_debug_color", "get_debug_color");
 }
 
-void SpineBoneNode::_notification(int what) {
+void SpineBoneNode2D::_notification(int what) {
 	switch (what) {
 		case NOTIFICATION_PARENTED: {
-			SpineSprite *sprite = find_parent_sprite();
+			SpineSprite2D *sprite = find_parent_sprite();
 			if (sprite) {
 #if VERSION_MAJOR > 3
-				sprite->connect(SNAME("before_world_transforms_change"), callable_mp(this, &SpineBoneNode::on_before_world_transforms_change));
-				sprite->connect(SNAME("world_transforms_changed"), callable_mp(this, &SpineBoneNode::on_world_transforms_changed));
+				sprite->connect(SNAME("before_world_transforms_change"), callable_mp(this, &SpineBoneNode2D::on_before_world_transforms_change));
+				sprite->connect(SNAME("world_transforms_changed"), callable_mp(this, &SpineBoneNode2D::on_world_transforms_changed));
 #else
 				sprite->connect(SNAME("before_world_transforms_change"), this, SNAME("_on_before_world_transforms_change"));
 				sprite->connect(SNAME("world_transforms_changed"), this, SNAME("_on_world_transforms_changed"));
@@ -84,17 +84,17 @@ void SpineBoneNode::_notification(int what) {
 				_change_notify("scale");
 #endif
 			} else {
-				WARN_PRINT("SpineBoneNode parent is not a SpineSprite.");
+				WARN_PRINT("SpineBoneNode2D parent is not a SpineSprite2D.");
 			}
 			NOTIFY_PROPERTY_LIST_CHANGED();
 			break;
 		}
 		case NOTIFICATION_UNPARENTED: {
-			SpineSprite *sprite = find_parent_sprite();
+			SpineSprite2D *sprite = find_parent_sprite();
 			if (sprite) {
 #if VERSION_MAJOR > 3
-				sprite->disconnect(SNAME("before_world_transforms_change"), callable_mp(this, &SpineBoneNode::on_before_world_transforms_change));
-				sprite->disconnect(SNAME("world_transforms_changed"), callable_mp(this, &SpineBoneNode::on_world_transforms_changed));
+				sprite->disconnect(SNAME("before_world_transforms_change"), callable_mp(this, &SpineBoneNode2D::on_before_world_transforms_change));
+				sprite->disconnect(SNAME("world_transforms_changed"), callable_mp(this, &SpineBoneNode2D::on_world_transforms_changed));
 #else
 				sprite->disconnect(SNAME("before_world_transforms_change"), this, SNAME("_on_before_world_transforms_change"));
 				sprite->disconnect(SNAME("world_transforms_changed"), this, SNAME("_on_world_transforms_changed"));
@@ -111,13 +111,13 @@ void SpineBoneNode::_notification(int what) {
 	}
 }
 
-void SpineBoneNode::_get_property_list(List<PropertyInfo> *list) const {
+void SpineBoneNode2D::_get_property_list(List<PropertyInfo> *list) const {
 #ifdef SPINE_GODOT_EXTENSION
 	PackedStringArray bone_names;
 #else
 	Vector<String> bone_names;
 #endif
-	SpineSprite *sprite = find_parent_sprite();
+	SpineSprite2D *sprite = find_parent_sprite();
 	if (sprite)
 		sprite->get_skeleton_data_res()->get_bone_names(bone_names);
 	else
@@ -125,7 +125,7 @@ void SpineBoneNode::_get_property_list(List<PropertyInfo> *list) const {
 	auto element = list->front();
 	while (element) {
 		auto property_info = element->get();
-		if (property_info.name == StringName("SpineBoneNode")) break;
+		if (property_info.name == StringName("SpineBoneNode2D")) break;
 		element = element->next();
 	}
 	PropertyInfo slot_name_property;
@@ -137,33 +137,33 @@ void SpineBoneNode::_get_property_list(List<PropertyInfo> *list) const {
 	list->insert_after(element, slot_name_property);
 }
 
-bool SpineBoneNode::_get(const StringName &property, Variant &value) const {
-	if (property == StringName("bone_name")) {
+bool SpineBoneNode2D::_get(const StringName &p_property, Variant &value) const {
+	if (p_property == StringName("bone_name")) {
 		value = bone_name;
 		return true;
 	}
 	return false;
 }
 
-bool SpineBoneNode::_set(const StringName &property, const Variant &value) {
-	if (property == StringName("bone_name")) {
+bool SpineBoneNode2D::_set(const StringName &p_property, const Variant &value) {
+	if (p_property == StringName("bone_name")) {
 		bone_name = value;
-		SpineSprite *sprite = find_parent_sprite();
+		SpineSprite2D *sprite = find_parent_sprite();
 		init_transform(sprite);
 		return true;
 	}
 	return false;
 }
 
-void SpineBoneNode::on_before_world_transforms_change(const Variant &_sprite) {
+void SpineBoneNode2D::on_before_world_transforms_change(const Variant &_sprite) {
 	if (bone_mode != SpineConstant::BoneMode_Drive) return;
-	SpineSprite *sprite = cast_to<SpineSprite>(_sprite.operator Object *());
+	SpineSprite2D *sprite = cast_to<SpineSprite2D>(_sprite.operator Object *());
 	update_transform(sprite);
 }
 
-void SpineBoneNode::on_world_transforms_changed(const Variant &_sprite) {
+void SpineBoneNode2D::on_world_transforms_changed(const Variant &_sprite) {
 	if (bone_mode != SpineConstant::BoneMode_Follow) return;
-	SpineSprite *sprite = cast_to<SpineSprite>(_sprite.operator Object *());
+	SpineSprite2D *sprite = cast_to<SpineSprite2D>(_sprite.operator Object *());
 	update_transform(sprite);
 #if VERSION_MAJOR > 3
 	queue_redraw();
@@ -172,7 +172,7 @@ void SpineBoneNode::on_world_transforms_changed(const Variant &_sprite) {
 #endif
 }
 
-void SpineBoneNode::update_transform(SpineSprite *sprite) {
+void SpineBoneNode2D::update_transform(SpineSprite2D *sprite) {
 	if (!enabled) return;
 	Ref<SpineBone> bone = find_bone();
 	if (!bone.is_valid()) return;
@@ -199,37 +199,37 @@ void SpineBoneNode::update_transform(SpineSprite *sprite) {
 	}
 }
 
-void SpineBoneNode::init_transform(SpineSprite *sprite) {
+void SpineBoneNode2D::init_transform(SpineSprite2D *sprite) {
 	if (!sprite) return;
 	if (bone_mode == SpineConstant::BoneMode_Drive) return;
 	sprite->get_skeleton()->set_to_setup_pose();
 	sprite->get_skeleton()->update_world_transform(SpineConstant::Physics_Update);
-	Transform2D global_transform = sprite->get_global_bone_transform(bone_name);
-	set_global_transform(global_transform);
+	Transform2D bone_global_transform = sprite->get_global_bone_transform(bone_name);
+	set_global_transform(bone_global_transform);
 	update_transform(sprite);
 }
 
-SpineSprite *SpineBoneNode::find_parent_sprite() const {
+SpineSprite2D *SpineBoneNode2D::find_parent_sprite() const {
 	auto parent = get_parent();
-	SpineSprite *sprite = nullptr;
+	SpineSprite2D *sprite = nullptr;
 	while (parent) {
-		sprite = cast_to<SpineSprite>(parent);
+		sprite = cast_to<SpineSprite2D>(parent);
 		if (sprite) break;
 		parent = parent->get_parent();
 	}
 	return sprite;
 }
 
-Ref<SpineBone> SpineBoneNode::find_bone() const {
+Ref<SpineBone> SpineBoneNode2D::find_bone() const {
 	if (!is_visible_in_tree()) return nullptr;
-	SpineSprite *sprite = find_parent_sprite();
+	SpineSprite2D *sprite = find_parent_sprite();
 	if (!sprite) return nullptr;
 	if (!sprite->get_skeleton().is_valid() || !sprite->get_skeleton()->get_spine_object()) return nullptr;
 	auto bone = sprite->get_skeleton()->find_bone(bone_name);
 	return bone;
 }
 
-void SpineBoneNode::draw() {
+void SpineBoneNode2D::draw() {
 	if (!Engine::get_singleton()->is_editor_hint() && !get_tree()->is_debugging_collisions_hint()) return;
 	Ref<SpineBone> bone = find_bone();
 	if (!bone.is_valid()) return;
@@ -253,35 +253,35 @@ void SpineBoneNode::draw() {
 	}
 }
 
-SpineConstant::BoneMode SpineBoneNode::get_bone_mode() {
+SpineConstant::BoneMode SpineBoneNode2D::get_bone_mode() {
 	return bone_mode;
 }
 
-void SpineBoneNode::set_bone_mode(SpineConstant::BoneMode _bone_mode) {
+void SpineBoneNode2D::set_bone_mode(SpineConstant::BoneMode _bone_mode) {
 	if (bone_mode != _bone_mode) {
 		bone_mode = _bone_mode;
-		SpineSprite *sprite = find_parent_sprite();
+		SpineSprite2D *sprite = find_parent_sprite();
 		init_transform(sprite);
 	}
 }
 
-void SpineBoneNode::set_debug_thickness(float _thickness) {
+void SpineBoneNode2D::set_debug_thickness(float _thickness) {
 	debug_thickness = _thickness;
 }
 
-float SpineBoneNode::get_debug_thickness() {
+float SpineBoneNode2D::get_debug_thickness() {
 	return debug_thickness;
 }
 
-void SpineBoneNode::set_debug_color(Color _color) {
+void SpineBoneNode2D::set_debug_color(Color _color) {
 	debug_color = _color;
 }
 
-Color SpineBoneNode::get_debug_color() {
+Color SpineBoneNode2D::get_debug_color() {
 	return debug_color;
 }
 
-void SpineBoneNode::set_enabled(bool _enabled) {
+void SpineBoneNode2D::set_enabled(bool _enabled) {
 	enabled = _enabled;
 	if (!enabled && Engine::get_singleton()->is_editor_hint()) {
 		auto sprite = find_parent_sprite();
@@ -291,6 +291,6 @@ void SpineBoneNode::set_enabled(bool _enabled) {
 	}
 }
 
-bool SpineBoneNode::get_enabled() {
+bool SpineBoneNode2D::get_enabled() {
 	return enabled;
 }

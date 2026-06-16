@@ -67,7 +67,7 @@
 				Resumes the emission of any animation state events.
 			</description>
 		</method>
-		<method name="get_current">
+		<method name="get_track">
 			<return type="SpineTrackEntry" />
 			<argument index="0" name="track_id" type="int" />
 			<description>

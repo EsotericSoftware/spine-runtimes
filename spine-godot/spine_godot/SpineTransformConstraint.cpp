@@ -31,7 +31,7 @@
 #include "SpineTransformConstraintPose.h"
 #include "SpineCommon.h"
 #include "SpineSkeleton.h"
-#include "SpineSprite.h"
+#include "SpineSpriteCommon.h"
 
 void SpineTransformConstraint::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("update", "skeleton"), &SpineTransformConstraint::update);
@@ -54,7 +54,7 @@ Ref<SpineTransformConstraintData> SpineTransformConstraint::get_data() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto &data = get_spine_object()->getData();
 	Ref<SpineTransformConstraintData> data_ref(memnew(SpineTransformConstraintData));
-	data_ref->set_spine_object(*get_spine_owner()->get_skeleton_data_res(), &data);
+	data_ref->set_spine_object(*spine_sprite_get_skeleton_data_res(get_spine_owner()), &data);
 	return data_ref;
 }
 

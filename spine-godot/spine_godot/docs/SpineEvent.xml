@@ -12,66 +12,78 @@
 		<method name="get_balance">
 			<return type="float" />
 			<description>
+				Returns the audio balance for this fired event.
 			</description>
 		</method>
 		<method name="get_data">
 			<return type="SpineEventData" />
 			<description>
+				Returns the setup pose data for this event.
 			</description>
 		</method>
 		<method name="get_float_value">
 			<return type="float" />
 			<description>
+				Returns the float value for this fired event.
 			</description>
 		</method>
 		<method name="get_int_value">
 			<return type="int" />
 			<description>
+				Returns the integer value for this fired event.
 			</description>
 		</method>
 		<method name="get_string_value">
 			<return type="String" />
 			<description>
+				Returns the string value for this fired event.
 			</description>
 		</method>
 		<method name="get_time">
 			<return type="float" />
 			<description>
+				Returns the time in seconds when this event fired during animation playback.
 			</description>
 		</method>
 		<method name="get_volume">
 			<return type="float" />
 			<description>
+				Returns the audio volume for this fired event.
 			</description>
 		</method>
 		<method name="set_balance">
 			<return type="void" />
 			<argument index="0" name="v" type="float" />
 			<description>
+				Sets the audio balance for this fired event.
 			</description>
 		</method>
 		<method name="set_float_value">
 			<return type="void" />
 			<argument index="0" name="v" type="float" />
 			<description>
+				Sets the float value for this fired event.
 			</description>
 		</method>
 		<method name="set_int_value">
 			<return type="void" />
 			<argument index="0" name="v" type="int" />
 			<description>
+				Sets the integer value for this fired event.
 			</description>
 		</method>
 		<method name="set_string_value">
 			<return type="void" />
 			<argument index="0" name="v" type="String" />
 			<description>
+				Sets the string value for this fired event.
 			</description>
 		</method>
 		<method name="set_volume">
 			<return type="void" />
 			<argument index="0" name="v" type="float" />
 			<description>
+				Sets the audio volume for this fired event.
 			</description>
 		</method>
 	</methods>

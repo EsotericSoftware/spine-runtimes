@@ -33,7 +33,7 @@
 #include <spine/IkConstraint.h>
 
 class SpineBone;
-class SpineSprite;
+class SpineSprite2D;
 class SpineSkeleton;
 class SpineIkConstraintPose;
 

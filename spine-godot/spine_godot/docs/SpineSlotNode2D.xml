@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineSlotNode2D" inherits="Node2D" version="3.4">
+	<brief_description>
+		Inserts child nodes into a [code]SpineSprite2D[/code] draw order at a skeleton slot.
+	</brief_description>
+	<description>
+		[code]SpineSlotNode2D[/code] is a child of [code]SpineSprite2D[/code]. Set [code]slot_name[/code] to a skeleton slot. The node follows the slot bone transform each frame.
+		Child [code]Node2D[/code] nodes draw inside the sprite draw order at [code]slot_name[/code]. They render above the slot attachment. Attach particles, collision shapes, labels, or nested [code]SpineSprite2D[/code] nodes this way.
+		The Materials group overrides the attachment material for this slot only. Each property matches a Spine blend mode: normal, additive, multiply, or screen. Unset properties keep the sprite default material for this slot.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+	</methods>
+	<members>
+		<member name="additive_material" type="Material" setter="set_additive_material" getter="get_additive_material">
+			Material for the slot attachment when the slot blend mode is additive.
+		</member>
+		<member name="multiply_material" type="Material" setter="set_multiply_material" getter="get_multiply_material">
+			Material for the slot attachment when the slot blend mode is multiply.
+		</member>
+		<member name="normal_material" type="Material" setter="set_normal_material" getter="get_normal_material">
+			Material for the slot attachment when the slot blend mode is normal.
+		</member>
+		<member name="screen_material" type="Material" setter="set_screen_material" getter="get_screen_material">
+			Material for the slot attachment when the slot blend mode is screen.
+		</member>
+		<member name="slot_name" type="String">
+			Skeleton slot where this node enters the draw order. The inspector lists slot names from the parent sprite skeleton data.
+		</member>
+	</members>
+	<constants>
+	</constants>
+</class>

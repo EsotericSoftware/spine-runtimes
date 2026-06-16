@@ -31,12 +31,14 @@
 			<return type="void" />
 			<argument index="0" name="v" type="int" />
 			<description>
+				Sets the ordinal for constraint application order during [code]Skeleton.update_world_transform[/code].
 			</description>
 		</method>
 		<method name="set_skin_required">
 			<return type="void" />
 			<argument index="0" name="v" type="bool" />
 			<description>
+				Sets whether [code]Skeleton.update_world_transform[/code] updates this constraint only when the active skin contains it.
 			</description>
 		</method>
 	</methods>

@@ -19,6 +19,7 @@
 			<argument index="5" name="blend" type="int" enum="SpineConstant.MixBlend" />
 			<argument index="6" name="direction" type="int" enum="SpineConstant.MixDirection" />
 			<description>
+				Applies timeline keys to the skeleton between [code]last_time[/code] and [code]time[/code]. Fired events are added to [code]events[/code].
 			</description>
 		</method>
 		<method name="get_duration">

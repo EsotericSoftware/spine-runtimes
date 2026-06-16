@@ -1,11 +1,11 @@
 extends Node2D
 
-@onready var spineboy = $SpineSprite
-@onready var center_bone = $SpineSprite/HoverboardCenterBone
-@onready var center_ray = $SpineSprite/HoverboardCenterBone/CenterRay
-@onready var target_bone = $SpineSprite/HoverboardTargetBone
-@onready var target_ray = $SpineSprite/HoverboardTargetBone/TargetRay
-@onready var hip_bone = $SpineSprite/HipBone
+@onready var spineboy = $SpineSprite2D
+@onready var center_bone = $SpineSprite2D/HoverboardCenterBone
+@onready var center_ray = $SpineSprite2D/HoverboardCenterBone/CenterRay
+@onready var target_bone = $SpineSprite2D/HoverboardTargetBone
+@onready var target_ray = $SpineSprite2D/HoverboardTargetBone/TargetRay
+@onready var hip_bone = $SpineSprite2D/HipBone
 var center_hip_distance = 0
 
 func _ready():

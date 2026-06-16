@@ -3,22 +3,22 @@ using System;
 
 public partial class BoneNode : Node2D
 {
-	private SpineSprite spineboy;
-	private SpineBoneNode centerBone;
+	private SpineSprite2D spineboy;
+	private SpineBoneNode2D centerBone;
 	private RayCast2D centerRay;
-	private SpineBoneNode targetBone;
+	private SpineBoneNode2D targetBone;
 	private RayCast2D targetRay;
-	private SpineBoneNode hipBone;
+	private SpineBoneNode2D hipBone;
 	private float centerHipDistance = 0;
 	
 	public override void _Ready()
 	{
-		spineboy = GetNode<SpineSprite>("SpineSprite");
-		centerBone = GetNode<SpineBoneNode>("SpineSprite/HoverboardCenterBone");
-		centerRay = GetNode<RayCast2D>("SpineSprite/HoverboardCenterBone/CenterRay");
-		targetBone = GetNode<SpineBoneNode>("SpineSprite/HoverboardTargetBone");
-		targetRay = GetNode<RayCast2D>("SpineSprite/HoverboardTargetBone/TargetRay");
-		hipBone = GetNode<SpineBoneNode>("SpineSprite/HipBone");
+		spineboy = GetNode<SpineSprite2D>("SpineSprite2D");
+		centerBone = GetNode<SpineBoneNode2D>("SpineSprite2D/HoverboardCenterBone");
+		centerRay = GetNode<RayCast2D>("SpineSprite2D/HoverboardCenterBone/CenterRay");
+		targetBone = GetNode<SpineBoneNode2D>("SpineSprite2D/HoverboardTargetBone");
+		targetRay = GetNode<RayCast2D>("SpineSprite2D/HoverboardTargetBone/TargetRay");
+		hipBone = GetNode<SpineBoneNode2D>("SpineSprite2D/HipBone");
 		spineboy.GetAnimationState().SetAnimation("hoverboard", true, 0);
 		spineboy.UpdateSkeleton(0);
 		centerHipDistance = hipBone.GlobalPosition.Y - centerBone.GlobalPosition.Y;

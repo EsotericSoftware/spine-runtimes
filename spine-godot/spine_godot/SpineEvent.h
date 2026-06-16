@@ -33,7 +33,7 @@
 #include "SpineEventData.h"
 #include <spine/Event.h>
 
-class SpineSprite;
+class SpineSprite2D;
 
 class SpineEvent : public SpineSpriteOwnedObject<spine::Event> {
 	GDCLASS(SpineEvent, SpineObjectWrapper)

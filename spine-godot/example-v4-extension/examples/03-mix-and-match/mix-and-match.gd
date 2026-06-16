@@ -1,4 +1,4 @@
-extends SpineSprite
+extends SpineSprite2D
 
 func _ready():
 	var data = get_skeleton().get_data()

@@ -37,7 +37,7 @@
 #include <unordered_map>
 
 // Forward declarations to avoid circular includes
-class SpineSprite;
+class SpineSprite2D;
 class SpineIkConstraint;
 class SpineTransformConstraint;
 class SpinePathConstraint;
@@ -50,12 +50,12 @@ class SpineSkeleton : public REFCOUNTED {
 	friend class SpineBone;
 	friend class SpineSlot;
 	friend class SpineTimeline;
-	friend class SpineSprite;
+	friend class SpineSprite2D;
 	friend class SpineAnimation;
 	friend class SpineAnimationState;
 	friend class SpineAnimationTrack;
-	friend class SpineBoneNode;
-	friend class SpineSlotNode;
+	friend class SpineBoneNode2D;
+	friend class SpineSlotNode2D;
 	friend class SpinePhysicsConstraint;
 	friend class SpineIkConstraint;
 	friend class SpineTransformConstraint;
@@ -67,18 +67,18 @@ class SpineSkeleton : public REFCOUNTED {
 protected:
 	static void _bind_methods();
 
-	void set_spine_sprite(SpineSprite *_sprite);
+	void set_spine_sprite(Object *_sprite);
 	spine::Skeleton *get_spine_object() {
 		return skeleton;
 	}
-	SpineSprite *get_spine_owner() {
+	Object *get_spine_owner() {
 		return sprite;
 	}
 	Ref<SpineSkeletonDataResource> get_skeleton_data_res() const;
 
 private:
 	spine::Skeleton *skeleton;
-	SpineSprite *sprite;
+	Object *sprite;
 	spine::Array<float> bounds_vertex_buffer;
 	Ref<SpineSkin> last_skin;
 

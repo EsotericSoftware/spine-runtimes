@@ -33,7 +33,7 @@
 #include "SpineAttachment.h"
 
 class SpineSkeletonDataResource;
-class SpineSprite;
+class SpineSprite2D;
 
 class SpineSkin : public SpineSkeletonDataResourceOwnedObject<spine::Skin> {
 	GDCLASS(SpineSkin, SpineObjectWrapper)
@@ -48,7 +48,7 @@ public:
 	SpineSkin();
 	~SpineSkin() override;
 
-	Ref<SpineSkin> init(const String &name, SpineSprite *sprite);
+	Ref<SpineSkin> init(const String &name, Object *sprite);
 
 	void set_attachment(int slot_index, const String &placeholder, Ref<SpineAttachment> attachment);
 

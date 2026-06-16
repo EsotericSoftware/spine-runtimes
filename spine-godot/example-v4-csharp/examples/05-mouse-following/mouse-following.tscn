@@ -6,7 +6,7 @@
 [node name="Node2D" type="Node2D"]
 script = ExtResource("1_sgiuf")
 
-[node name="Spineboy" type="SpineSprite" parent="."]
+[node name="Spineboy" type="SpineSprite2D" parent="."]
 position = Vector2(481, 457)
 scale = Vector2(0.5, 0.5)
 skeleton_data_res = ExtResource("2")
@@ -15,7 +15,7 @@ preview_animation = "-- Empty --"
 preview_frame = false
 preview_time = 0.0
 
-[node name="CrosshairBone" type="SpineBoneNode" parent="Spineboy"]
+[node name="CrosshairBone" type="SpineBoneNode2D" parent="Spineboy"]
 show_behind_parent = true
 position = Vector2(302.333, -569.714)
 rotation = -0.000872665

@@ -31,15 +31,15 @@
 
 #include "SpineCommon.h"
 #include "SpineSkeleton.h"
-#include "SpineSprite.h"
+#include "SpineSprite2D.h"
 #ifdef SPINE_GODOT_EXTENSION
 #include <godot_cpp/classes/node2d.hpp>
 #else
 #include "scene/2d/node_2d.h"
 #endif
 
-class SpineBoneNode : public Node2D {
-	GDCLASS(SpineBoneNode, Node2D)
+class SpineBoneNode2D : public Node2D {
+	GDCLASS(SpineBoneNode2D, Node2D)
 
 protected:
 	String bone_name;
@@ -51,16 +51,16 @@ protected:
 	static void _bind_methods();
 	void _notification(int what);
 	void _get_property_list(List<PropertyInfo> *list) const;
-	bool _get(const StringName &property, Variant &value) const;
-	bool _set(const StringName &property, const Variant &value);
+	bool _get(const StringName &p_property, Variant &value) const;
+	bool _set(const StringName &p_property, const Variant &value);
 	void on_before_world_transforms_change(const Variant &_sprite);
 	void on_world_transforms_changed(const Variant &_sprite);
-	void update_transform(SpineSprite *sprite);
-	void init_transform(SpineSprite *sprite);
+	void update_transform(SpineSprite2D *sprite);
+	void init_transform(SpineSprite2D *sprite);
 	void draw();
 
 public:
-	SpineBoneNode() : bone_mode(SpineConstant::BoneMode_Follow), enabled(true), debug_color(Color::hex(0xff000077)), debug_thickness(5) {
+	SpineBoneNode2D() : bone_mode(SpineConstant::BoneMode_Follow), enabled(true), debug_color(Color::hex(0xff000077)), debug_thickness(5) {
 	}
 
 	SpineConstant::BoneMode get_bone_mode();
@@ -79,7 +79,7 @@ public:
 
 	Color get_debug_color();
 
-	SpineSprite *find_parent_sprite() const;
+	SpineSprite2D *find_parent_sprite() const;
 
 	Ref<SpineBone> find_bone() const;
 };

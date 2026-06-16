@@ -26,7 +26,7 @@ shader = SubResource("3")
 
 [node name="Node2D" type="Node2D"]
 
-[node name="SpineSprite" type="SpineSprite" parent="."]
+[node name="SpineSprite2D" type="SpineSprite2D" parent="."]
 position = Vector2(501, 507)
 scale = Vector2(0.546374, 0.546373)
 skeleton_data_res = ExtResource("1")
@@ -36,7 +36,7 @@ preview_animation = "-- Empty --"
 preview_frame = false
 preview_time = 0.0
 
-[node name="GunSlot" type="SpineSlotNode" parent="SpineSprite"]
+[node name="GunSlot" type="SpineSlotNode2D" parent="SpineSprite2D"]
 show_behind_parent = true
 position = Vector2(40.8753, -276.036)
 rotation = 0.837234

@@ -3,7 +3,7 @@ using System;
 
 public partial class physics : Node2D
 {
-	private SpineSprite celestial_circus;
+	private SpineSprite2D celestial_circus;
 	
 	private float last_x = -1;
 	private float last_y = -1;
@@ -11,7 +11,7 @@ public partial class physics : Node2D
 
 	public override void _Ready()
 	{
-		celestial_circus = GetNode<SpineSprite>("celestial-circus");
+		celestial_circus = GetNode<SpineSprite2D>("celestial-circus");
 		celestial_circus.GetAnimationState().SetAnimation("wind-idle", true, 0);
 		celestial_circus.GetAnimationState().SetAnimation("eyeblink-long", true, 1);
 		celestial_circus.GetAnimationState().SetAnimation("stars", true, 2);

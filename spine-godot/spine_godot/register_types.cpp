@@ -36,7 +36,7 @@
 #include "SpineAtlasResource.h"
 #include "SpineSkeletonFileResource.h"
 #include "SpineSkeletonDataResource.h"
-#include "SpineSprite.h"
+#include "SpineSprite2D.h"
 #include "SpineSkeleton.h"
 #include "SpineAnimationState.h"
 #include "SpineAnimationTrack.h"
@@ -68,8 +68,15 @@
 #include "SpineSliderPose.h"
 #include "SpineTimeline.h"
 #include "SpineConstant.h"
-#include "SpineSlotNode.h"
-#include "SpineBoneNode.h"
+#include "SpineSlotNode2D.h"
+#include "SpineBoneNode2D.h"
+#ifdef SPINE_GODOT_EXTENSION
+#include "SpineCompatibility2D.h"
+#else
+#if VERSION_MAJOR > 3
+#include "core/object/class_db.h"
+#endif
+#endif
 #include "spine/Bone.h"
 
 static SpineAtlasResourceFormatLoader *atlas_loader;
@@ -145,7 +152,7 @@ void register_spine_godot_types() {
 	GDREGISTER_CLASS(SpineSkeletonFileResource);
 	GDREGISTER_CLASS(SpineSkeletonDataResource);
 	GDREGISTER_CLASS(SpineAnimationMix);
-	GDREGISTER_CLASS(SpineSprite);
+	GDREGISTER_CLASS(SpineSprite2D);
 	GDREGISTER_CLASS(SpineMesh2D);
 	GDREGISTER_CLASS(SpineSkeleton);
 	GDREGISTER_CLASS(SpineAnimationState);
@@ -182,8 +189,19 @@ void register_spine_godot_types() {
 	GDREGISTER_CLASS(SpineTimeline);
 	GDREGISTER_CLASS(SpineConstant);
 
-	GDREGISTER_CLASS(SpineSlotNode);
-	GDREGISTER_CLASS(SpineBoneNode);
+	GDREGISTER_CLASS(SpineSlotNode2D);
+	GDREGISTER_CLASS(SpineBoneNode2D);
+#if VERSION_MAJOR > 3
+#ifdef SPINE_GODOT_EXTENSION
+	GDREGISTER_INTERNAL_CLASS(SpineSprite);
+	GDREGISTER_INTERNAL_CLASS(SpineBoneNode);
+	GDREGISTER_INTERNAL_CLASS(SpineSlotNode);
+#else
+	ClassDB::add_compatibility_class("SpineSprite", "SpineSprite2D");
+	ClassDB::add_compatibility_class("SpineBoneNode", "SpineBoneNode2D");
+	ClassDB::add_compatibility_class("SpineSlotNode", "SpineSlotNode2D");
+#endif
+#endif
 #ifndef SPINE_GODOT_EXTENSION
 	GDREGISTER_CLASS(SpineAnimationTrack);
 #endif
@@ -232,7 +250,7 @@ void register_spine_godot_types() {
 #ifdef SPINE_GODOT_EXTENSION
 void uninitialize_spine_godot_module(ModuleInitializationLevel level) {
 	if (level == MODULE_INITIALIZATION_LEVEL_SCENE) {
-		SpineSprite::clear_statics();
+		SpineSprite2D::clear_statics();
 		return;
 	}
 	if (level != MODULE_INITIALIZATION_LEVEL_CORE) return;
@@ -245,7 +263,7 @@ void uninitialize_spine_godot_module(ModuleInitializationLevel level) {
 #elif VERSION_MAJOR > 3
 void uninitialize_spine_godot_module(ModuleInitializationLevel level) {
 	if (level == MODULE_INITIALIZATION_LEVEL_SCENE) {
-		SpineSprite::clear_statics();
+		SpineSprite2D::clear_statics();
 		return;
 	}
 	if (level != MODULE_INITIALIZATION_LEVEL_CORE) return;

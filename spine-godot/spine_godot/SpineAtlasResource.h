@@ -104,6 +104,8 @@ public:
 
 	Array get_specular_maps();
 
+	void reload_page_textures();
+
 	void clear_native_data() const {
 		this->atlas = nullptr;
 		this->texture_loader = nullptr;

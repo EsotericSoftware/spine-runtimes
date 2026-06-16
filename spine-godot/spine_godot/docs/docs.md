@@ -59,7 +59,7 @@ Based on files in `spine_godot/docs/`:
 - [ ] **SpineAttachment** - `spine_godot/SpineAttachment.h` → `spine-cpp/include/spine/Attachment.h`
 - [ ] **SpineBone** - `spine_godot/SpineBone.h` → `spine-cpp/include/spine/Bone.h`
 - [ ] **SpineBoneData** - `spine_godot/SpineBoneData.h` → `spine-cpp/include/spine/BoneData.h`
-- [ ] **SpineBoneNode** - `spine_godot/SpineBoneNode.h` → (Godot node wrapper)
+- [ ] **SpineBoneNode2D** - `spine_godot/SpineBoneNode2D.h` → (Godot node wrapper)
 - [ ] **SpineConstraintData** - `spine_godot/SpineConstraintData.h` → `spine-cpp/include/spine/ConstraintData.h`
 - [ ] **SpineEvent** - `spine_godot/SpineEvent.h` → `spine-cpp/include/spine/Event.h`
 - [ ] **SpineIkConstraint** - `spine_godot/SpineIkConstraint.h` → `spine-cpp/include/spine/IkConstraint.h`
@@ -72,8 +72,8 @@ Based on files in `spine_godot/docs/`:
 - [ ] **SpineSkin** - `spine_godot/SpineSkin.h` → `spine-cpp/include/spine/Skin.h`
 - [ ] **SpineSlot** - `spine_godot/SpineSlot.h` → `spine-cpp/include/spine/Slot.h`
 - [ ] **SpineSlotData** - `spine_godot/SpineSlotData.h` → `spine-cpp/include/spine/SlotData.h`
-- [ ] **SpineSlotNode** - `spine_godot/SpineSlotNode.h` → (Godot node wrapper)
-- [ ] **SpineSprite** - `spine_godot/SpineSprite.h` → (Main Godot node for Spine animations)
+- [ ] **SpineSlotNode2D** - `spine_godot/SpineSlotNode2D.h` → (Godot node wrapper)
+- [ ] **SpineSprite2D** - `spine_godot/SpineSprite2D.h` → (Main Godot node for Spine animations)
 - [ ] **SpineTimeline** - `spine_godot/SpineTimeline.h` → `spine-cpp/include/spine/Timeline.h`
 - [ ] **SpineTrackEntry** - `spine_godot/SpineTrackEntry.h` → (Part of AnimationState)
 - [ ] **SpineTransformConstraint** - `spine_godot/SpineTransformConstraint.h` → `spine-cpp/include/spine/TransformConstraint.h`
@@ -193,7 +193,7 @@ After updating documentation:
 3. **Pose Classes**: Classes ending in "Pose" that represent runtime state
 4. **Constraint Classes**: IK, Path, Transform, Physics constraints
 5. **Resource Classes**: Atlas, SkeletonData, SkeletonFile resources
-6. **Node Classes**: SpineSprite, SpineBoneNode, SpineSlotNode (Godot scene nodes)
+6. **Node Classes**: SpineSprite2D, SpineBoneNode2D, SpineSlotNode2D (Godot scene nodes)
 7. **Constants Class**: SpineConstant (enum definitions)
 
 ### Version Considerations

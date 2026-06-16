@@ -84,8 +84,15 @@ private:
 
 #ifdef TOOLS_ENABLED
 	ObjectID editor_file_system_id;
+	Callable editor_reimport_callable;
 #endif
 
+	bool update_skeleton_data_pending = false;
+	bool shutting_down = false;
+
+	void clear_native_skeleton_data();
+	bool validate_skeleton_atlas_regions(spine::SkeletonData *data) const;
+	void schedule_update_skeleton_data();
 	void update_skeleton_data();
 
 #ifdef SPINE_GODOT_EXTENSION

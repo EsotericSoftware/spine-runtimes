@@ -15,7 +15,7 @@
 			<return type="Vector2" />
 			<param index="0" name="world_position" type="Vector2" />
 			<description>
-				Transforms a point from world coordinates to the bone's local coordinates. The world coordinate space is equal to the SpineSprite coordinate space.
+				Transforms a point from world coordinates to the bone's local coordinates. The world coordinate space is equal to the SpineSprite2D coordinate space.
 			</description>
 		</method>
 		<method name="world_to_parent">
@@ -29,7 +29,7 @@
 			<return type="Vector2" />
 			<param index="0" name="local_position" type="Vector2" />
 			<description>
-				Transforms a point from the bone's local coordinates to world coordinates. The world coordinate space equals the coordinate space of the SpineSprite.
+				Transforms a point from the bone's local coordinates to world coordinates. The world coordinate space equals the coordinate space of the SpineSprite2D.
 			</description>
 		</method>
 		<method name="parent_to_world">
@@ -43,14 +43,14 @@
 			<return type="float" />
 			<param index="0" name="world_rotation" type="float" />
 			<description>
-				Transforms a world rotation to a local rotation. The world coordinate space is equal to the SpineSprite coordinate space.
+				Transforms a world rotation to a local rotation. The world coordinate space is equal to the SpineSprite2D coordinate space.
 			</description>
 		</method>
 		<method name="local_to_world_rotation">
 			<return type="float" />
 			<param index="0" name="local_rotation" type="float" />
 			<description>
-				Transforms a local rotation to a world rotation. The world coordinate space equals the coordinate space of the SpineSprite.
+				Transforms a local rotation to a world rotation. The world coordinate space equals the coordinate space of the SpineSprite2D.
 			</description>
 		</method>
 		<method name="rotate_world">
@@ -123,14 +123,14 @@
 		<method name="get_transform">
 			<return type="Transform2D" />
 			<description>
-				Returns the bone transform as a Transform2D relative to the SpineSprite node representing the skeleton. Shear is not encoded in the transform.
+				Returns the bone transform as a Transform2D relative to the SpineSprite2D node representing the skeleton. Shear is not encoded in the transform.
 			</description>
 		</method>
 		<method name="set_transform">
 			<return type="void" />
 			<param index="0" name="transform" type="Transform2D" />
 			<description>
-				Sets the bone transform to the Godot Transform2D relative to the SpineSprite.
+				Sets the bone transform to the Godot Transform2D relative to the SpineSprite2D.
 			</description>
 		</method>
 		<method name="get_global_transform">

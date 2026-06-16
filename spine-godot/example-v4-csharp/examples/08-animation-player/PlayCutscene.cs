@@ -4,7 +4,7 @@ using System;
 public partial class PlayCutscene : Node2D
 {
 	AnimationPlayer player;
-	SpineSprite spineboy;
+	SpineSprite2D spineboy;
 	float speed = 400;
 	float velocityX = 0;
 		
@@ -12,7 +12,7 @@ public partial class PlayCutscene : Node2D
 	{
 		player = GetNode<AnimationPlayer>("AnimationPlayer");
 		player.Play("cutscene");
-		spineboy = GetNode<SpineSprite>("Spineboy");
+		spineboy = GetNode<SpineSprite2D>("Spineboy");
 	}
 	
 	public override void _Process(double delta)

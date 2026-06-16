@@ -1,7 +1,7 @@
 extends Node2D
 
-@onready var spineboy: SpineSprite = $Spineboy
-@onready var crosshair_bone: SpineBoneNode = $Spineboy/CrosshairBone
+@onready var spineboy: SpineSprite2D = $Spineboy
+@onready var crosshair_bone: SpineBoneNode2D = $Spineboy/CrosshairBone
 
 func _ready():
 	spineboy.get_animation_state().set_animation("walk", true, 0)
