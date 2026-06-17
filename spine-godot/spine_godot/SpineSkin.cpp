@@ -81,7 +81,7 @@ void SpineSkin::set_attachment(int slot_index, const String &placeholder, Ref<Sp
 Ref<SpineAttachment> SpineSkin::get_attachment(int slot_index, const String &placeholder) {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto attachment = get_spine_object()->getAttachment(slot_index, SPINE_STRING(placeholder));
-	if (attachment) return nullptr;
+	if (!attachment) return nullptr;
 	Ref<SpineAttachment> attachment_ref(memnew(SpineAttachment));
 	attachment_ref->set_spine_object(get_spine_owner(), attachment);
 	return attachment_ref;
