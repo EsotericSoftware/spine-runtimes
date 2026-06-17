@@ -3,7 +3,7 @@ description: Setup python, install the pip version of scons.
 inputs:
   python-version:
     description: The python version to use.
-    default: "3.12"
+    default: "3.x"
   python-arch:
     description: The python architecture.
     default: "x64"
@@ -23,7 +23,7 @@ runs:
       shell: bash
       run: |
         python -c "import sys; print(sys.version)"
-        python -m pip install scons==4.4.0
+        python -m pip install scons==4.7.0
         scons --version
 
     - name: Setup dotnet 6
