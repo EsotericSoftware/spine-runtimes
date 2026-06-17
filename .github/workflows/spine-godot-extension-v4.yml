@@ -253,7 +253,7 @@ jobs:
           mkdir -p bin/{windows,linux,macos/macos.framework,ios,android,web}
 
           # Ensure gdextension file is in root
-          cp ../spine-godot/spine_godot_extension.gdextension bin/
+          cp ../spine-godot/spine_godot_extension.gdextension .
 
           # Move artifacts to their correct locations
           mv gdextension-windows-$GODOT_TAG/* bin/windows/
