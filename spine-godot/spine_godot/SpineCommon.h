@@ -123,6 +123,9 @@ class SpineObjectWrapper : public REFCOUNTED {
 
 	Object *spine_owner;
 	void *spine_object;
+#if VERSION_MAJOR <= 3
+	ObjectID spine_owner_id;
+#endif
 
 protected:
 	static void _bind_methods() {
@@ -141,6 +144,15 @@ protected:
 	SpineObjectWrapper() : spine_owner(nullptr), spine_object(nullptr) {
 	}
 
+#if VERSION_MAJOR <= 3
+	~SpineObjectWrapper() {
+		if (!spine_object) return;
+		auto owner = ObjectDB::get_instance(spine_owner_id);
+		if (!owner) return;
+		owner->disconnect(SNAME("_internal_spine_objects_invalidated"), this, SNAME("_internal_spine_objects_invalidated"));
+	}
+#endif
+
 	template<typename OWNER, typename OBJECT>
 	void _set_spine_object_internal(const OWNER *_owner, OBJECT *_object) {
 		if (spine_owner) {
@@ -157,6 +169,9 @@ protected:
 		}
 
 		spine_owner = (Object *) _owner;
+#if VERSION_MAJOR <= 3
+		spine_owner_id = spine_owner->get_instance_id();
+#endif
 		spine_object = _object;
 #if VERSION_MAJOR > 3
 		spine_owner->connect(SNAME("_internal_spine_objects_invalidated"), callable_mp(this, &SpineObjectWrapper::spine_objects_invalidated));
