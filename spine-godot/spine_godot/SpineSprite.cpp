@@ -1281,7 +1281,7 @@ void SpineSprite::draw() {
 #endif
 		memdelete(control);
 	}
-	Ref<Font> default_font = debug_font;
+	const Ref<Font> &default_font = debug_font;
 
 #if VERSION_MAJOR > 3
 #ifdef SPINE_GODOT_EXTENSION
