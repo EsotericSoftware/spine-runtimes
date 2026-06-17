@@ -39,6 +39,12 @@
 				Returns the skeleton.
 			</description>
 		</method>
+		<method name="get_time_scale">
+			<return type="float" />
+			<description>
+				Returns the time scale applied to animation state and skeleton updates.
+			</description>
+		</method>
 		<method name="new_skin">
 			<return type="SpineSkin" />
 			<argument index="0" name="name" type="String" />
@@ -57,6 +63,13 @@
 			<argument index="1" name="global_transform" type="Transform2D" />
 			<description>
 				Sets a bone's global transform. This must be done before the skeleton world transforms are computed.
+			</description>
+		</method>
+		<method name="set_time_scale">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+				Sets the time scale applied to animation state and skeleton updates.
 			</description>
 		</method>
 		<method name="update_skeleton">
@@ -100,9 +113,15 @@
 		</member>
 		<member name="regions_color" type="Color" setter="set_debug_regions_color" getter="get_debug_regions_color" default="Color( 0, 0, 1, 0.5 )">
 		</member>
+		<member name="root" type="bool" setter="set_debug_root" getter="get_debug_root" default="false">
+		</member>
+		<member name="root_color" type="Color" setter="set_debug_root_color" getter="get_debug_root_color" default="Color( 1, 1, 1, 0.5 )">
+		</member>
 		<member name="screen_material" type="Material" setter="set_screen_material" getter="get_screen_material">
 		</member>
 		<member name="skeleton_data_res" type="SpineSkeletonDataResource" setter="set_skeleton_data_res" getter="get_skeleton_data_res">
+		</member>
+		<member name="time_scale" type="float" setter="set_time_scale" getter="get_time_scale" default="1.0">
 		</member>
 		<member name="update_mode" type="int" setter="set_update_mode" getter="get_update_mode" enum="SpineConstant.UpdateMode" default="0">
 		</member>

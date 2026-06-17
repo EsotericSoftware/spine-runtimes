@@ -113,13 +113,6 @@
 				Updates this bone. This is called internally when the skeleton's world transform is computed and should typically not be called directly. The physics parameter determines how physics are applied. See [enum SpineConstant.Physics].
 			</description>
 		</method>
-		<method name="apply_world_transform_2d">
-			<return type="void" />
-			<param index="0" name="o" type="Variant" />
-			<description>
-				Applies a world transform to this bone from a Node2D or Bone2D object.
-			</description>
-		</method>
 		<method name="get_transform">
 			<return type="Transform2D" />
 			<description>
@@ -128,7 +121,7 @@
 		</method>
 		<method name="set_transform">
 			<return type="void" />
-			<param index="0" name="transform" type="Transform2D" />
+			<param index="0" name="local_transform" type="Transform2D" />
 			<description>
 				Sets the bone transform to the Godot Transform2D relative to the SpineSprite.
 			</description>
@@ -141,7 +134,7 @@
 		</method>
 		<method name="set_global_transform">
 			<return type="void" />
-			<param index="0" name="trans" type="Transform2D" />
+			<param index="0" name="global_transform" type="Transform2D" />
 			<description>
 				Sets the bone's transform to the global Godot Transform2D.
 			</description>

@@ -17,10 +17,12 @@
 			<argument index="3" name="loop" type="bool" />
 			<argument index="4" name="events" type="Array" />
 			<argument index="5" name="alpha" type="float" />
-			<argument index="6" name="blend" type="int" enum="SpineConstant.MixBlend" />
-			<argument index="7" name="direction" type="int" enum="SpineConstant.MixDirection" />
+			<argument index="6" name="from_setup" type="bool" />
+			<argument index="7" name="add" type="bool" />
+			<argument index="8" name="out" type="bool" />
+			<argument index="9" name="appliedPose" type="bool" />
 			<description>
-				Applies the animation's timelines to the specified skeleton.
+				Applies the animation's timelines to the specified skeleton. [code]from_setup[/code] controls whether mixing starts from the setup pose. [code]add[/code] controls whether values are added to the current pose. [code]out[/code] controls the mix direction. [code]appliedPose[/code] controls whether the applied pose is used.
 			</description>
 		</method>
 		<method name="get_duration">

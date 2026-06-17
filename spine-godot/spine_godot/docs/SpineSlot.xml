@@ -7,6 +7,12 @@
 		Stores a slot's current pose. Slots organize attachments for skeleton draw order purposes and provide a place to store state for an attachment. State cannot be stored in an attachment itself because attachments are stateless and may be shared across multiple skeletons.
 	</description>
 	<methods>
+		<method name="set_to_setup_pose">
+			<return type="void" />
+			<description>
+				Sets this slot to the setup pose.
+			</description>
+		</method>
 		<method name="get_data">
 			<return type="SpineSlotData" />
 			<description>
@@ -25,103 +31,10 @@
 				Returns the current pose for this slot, containing color, attachment, and deform data.
 			</description>
 		</method>
-		<method name="get_color">
-			<return type="Color" />
+		<method name="get_applied_pose">
+			<return type="SpineSlotPose" />
 			<description>
-				Returns the color used to tint the slot's attachment. If dark color is set, this is used as the light color for two color tinting.
-			</description>
-		</method>
-		<method name="set_color">
-			<return type="void" />
-			<param index="0" name="v" type="Color" />
-			<description>
-				Sets the color used to tint the slot's attachment. If dark color is set, this is used as the light color for two color tinting.
-			</description>
-		</method>
-		<method name="get_dark_color">
-			<return type="Color" />
-			<description>
-				Returns the dark color used to tint the slot's attachment for two color tinting, or null if two color tinting is not used. The dark color's alpha is not used.
-			</description>
-		</method>
-		<method name="set_dark_color">
-			<return type="void" />
-			<param index="0" name="v" type="Color" />
-			<description>
-				Sets the dark color used to tint the slot's attachment for two color tinting. The dark color's alpha is not used.
-			</description>
-		</method>
-		<method name="has_dark_color">
-			<return type="bool" />
-			<description>
-				Returns whether the slot has a dark color for two color tinting.
-			</description>
-		</method>
-		<method name="set_has_dark_color">
-			<return type="void" />
-			<param index="0" name="v" type="bool" />
-			<description>
-				Sets whether the slot has a dark color for two color tinting.
-			</description>
-		</method>
-		<method name="get_attachment">
-			<return type="SpineAttachment" />
-			<description>
-				Returns the current attachment for the slot, or null if the slot has no attachment.
-			</description>
-		</method>
-		<method name="set_attachment">
-			<return type="void" />
-			<param index="0" name="v" type="SpineAttachment" />
-			<description>
-				Sets the slot's attachment and, if the attachment changed, resets sequence_index and clears the deform. The deform is not cleared if the old attachment has the same timeline attachment as the specified attachment.
-			</description>
-		</method>
-		<method name="get_sequence_index">
-			<return type="int" />
-			<description>
-				Returns the index of the texture region to display when the slot's attachment has a Sequence. -1 represents the setup index.
-			</description>
-		</method>
-		<method name="set_sequence_index">
-			<return type="void" />
-			<param index="0" name="v" type="int" />
-			<description>
-				Sets the index of the texture region to display when the slot's attachment has a Sequence. -1 represents the setup index.
-			</description>
-		</method>
-		<method name="get_attachment_state">
-			<return type="int" />
-			<description>
-				Returns the attachment state for this slot.
-			</description>
-		</method>
-		<method name="set_attachment_state">
-			<return type="void" />
-			<param index="0" name="v" type="int" />
-			<description>
-				Sets the attachment state for this slot.
-			</description>
-		</method>
-		<method name="get_deform">
-			<return type="PackedFloat32Array" />
-			<description>
-				Returns values to deform the slot's attachment. For an unweighted mesh, the entries are local positions for each vertex. For a weighted mesh, the entries are an offset for each vertex which will be added to the mesh's local vertex positions.
-
-				See VertexAttachment.computeWorldVertices and DeformTimeline.
-			</description>
-		</method>
-		<method name="set_deform">
-			<return type="void" />
-			<param index="0" name="v" type="PackedFloat32Array" />
-			<description>
-				Sets values to deform the slot's attachment. For an unweighted mesh, the entries are local positions for each vertex. For a weighted mesh, the entries are an offset for each vertex which will be added to the mesh's local vertex positions.
-			</description>
-		</method>
-		<method name="set_to_setup_pose">
-			<return type="void" />
-			<description>
-				Sets this slot to the setup pose.
+				Returns the applied pose for this slot, containing color, attachment, and deform data as last applied by the animation state.
 			</description>
 		</method>
 	</methods>

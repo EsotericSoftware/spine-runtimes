@@ -78,6 +78,32 @@
 				Sets the offset value for this slider.
 			</description>
 		</method>
+		<method name="get_max">
+			<return type="float" />
+			<description>
+				Returns the maximum value for this slider.
+			</description>
+		</method>
+		<method name="set_max">
+			<return type="void" />
+			<param index="0" name="value" type="float" />
+			<description>
+				Sets the maximum value for this slider.
+			</description>
+		</method>
+		<method name="get_local">
+			<return type="bool" />
+			<description>
+				Returns whether this slider operates in local space.
+			</description>
+		</method>
+		<method name="set_local">
+			<return type="void" />
+			<param index="0" name="value" type="bool" />
+			<description>
+				Sets whether this slider operates in local space.
+			</description>
+		</method>
 		<method name="get_setup_pose">
 			<return type="SpineSliderPose" />
 			<description>

@@ -42,7 +42,7 @@
 		</method>
 		<method name="clear_track">
 			<return type="void" />
-			<argument index="0" name="arg0" type="int" />
+			<argument index="0" name="track_id" type="int" />
 			<description>
 				Removes all animations from the track, leaving skeletons in their current pose.
 				It may be desired to use [code]set_empty_animation()[/code] to mix the skeletons back to the setup pose, rather than leaving them in their current pose.
@@ -67,13 +67,6 @@
 				Resumes the emission of any animation state events.
 			</description>
 		</method>
-		<method name="get_current">
-			<return type="SpineTrackEntry" />
-			<argument index="0" name="track_id" type="int" />
-			<description>
-				Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing.
-			</description>
-		</method>
 		<method name="get_num_tracks">
 			<return type="int" />
 			<description>
@@ -84,6 +77,13 @@
 			<return type="float" />
 			<description>
 				Multiplier for the delta time when the animation state is updated, causing time for all animations and mixes to play slower or faster. Defaults to 1.
+			</description>
+		</method>
+		<method name="get_track">
+			<return type="SpineTrackEntry" />
+			<argument index="0" name="track_id" type="int" />
+			<description>
+				Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing.
 			</description>
 		</method>
 		<method name="set_animation">

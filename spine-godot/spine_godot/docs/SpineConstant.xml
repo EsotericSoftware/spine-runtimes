@@ -136,6 +136,15 @@
 		<constant name="BlendMode_Screen" value="3" enum="BlendMode">
 			Screen blending.
 		</constant>
+		<constant name="ScaleYMode_None" value="0" enum="ScaleYMode">
+			No Y-scale mode adjustment.
+		</constant>
+		<constant name="ScaleYMode_Uniform" value="1" enum="ScaleYMode">
+			Uniform Y-scale mode.
+		</constant>
+		<constant name="ScaleYMode_Volume" value="2" enum="ScaleYMode">
+			Volume-preserving Y-scale mode.
+		</constant>
 		<constant name="UpdateMode_Process" value="0" enum="UpdateMode">
 			Update during the process step.
 		</constant>
@@ -162,6 +171,21 @@
 		</constant>
 		<constant name="Physics_Pose" value="3" enum="Physics">
 			Physics are not updated but the pose from physics is applied.
+		</constant>
+		<constant name="MixInterpolation_Linear" value="0" enum="MixInterpolation">
+			Linear interpolation between mix values.
+		</constant>
+		<constant name="MixInterpolation_Smooth" value="1" enum="MixInterpolation">
+			Smooth (ease in/out) interpolation between mix values.
+		</constant>
+		<constant name="MixInterpolation_SlowFast" value="2" enum="MixInterpolation">
+			Slow-to-fast interpolation between mix values.
+		</constant>
+		<constant name="MixInterpolation_FastSlow" value="3" enum="MixInterpolation">
+			Fast-to-slow interpolation between mix values.
+		</constant>
+		<constant name="MixInterpolation_Circle" value="4" enum="MixInterpolation">
+			Circular interpolation between mix values.
 		</constant>
 	</constants>
 </class>

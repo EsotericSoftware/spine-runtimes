@@ -45,6 +45,13 @@
 				Finds a path constraint by comparing each path constraint's name. It is more efficient to cache the results of this method than to call it multiple times.
 			</description>
 		</method>
+		<method name="find_physics_constraint_data" qualifiers="const">
+			<return type="SpinePhysicsConstraintData" />
+			<argument index="0" name="constraint_name" type="String" />
+			<description>
+				Finds a physics constraint by comparing each physics constraint's name. It is more efficient to cache the results of this method than to call it multiple times.
+			</description>
+		</method>
 		<method name="find_skin" qualifiers="const">
 			<return type="SpineSkin" />
 			<argument index="0" name="skin_name" type="String" />
@@ -133,6 +140,18 @@
 				The skeleton's path constraints. Modifying the array has no effect.
 			</description>
 		</method>
+		<method name="get_physics_constraints" qualifiers="const">
+			<return type="Array" />
+			<description>
+				The skeleton's physics constraints. Returns an Array of SpinePhysicsConstraintData. Modifying the array has no effect.
+			</description>
+		</method>
+		<method name="get_reference_scale" qualifiers="const">
+			<return type="float" />
+			<description>
+				The reference scale of the skeleton data as defined in Spine.
+			</description>
+		</method>
 		<method name="get_skeleton_name" qualifiers="const">
 			<return type="String" />
 			<description>
@@ -192,6 +211,19 @@
 			<argument index="0" name="skin" type="SpineSkin" />
 			<description>
 				Sets the skeleton's default skin.
+			</description>
+		</method>
+		<method name="set_reference_scale">
+			<return type="void" />
+			<argument index="0" name="reference_scale" type="float" />
+			<description>
+				Sets the reference scale of the skeleton data.
+			</description>
+		</method>
+		<method name="update_skeleton_data">
+			<return type="void" />
+			<description>
+				Reloads the skeleton data from the assigned atlas and skeleton file resources. Call this after changing atlas_res or skeleton_file_res programmatically.
 			</description>
 		</method>
 	</methods>

@@ -10,6 +10,12 @@
 	<tutorials>
 	</tutorials>
 	<methods>
+		<method name="get_applied_pose">
+			<return type="SpinePathConstraintPose" />
+			<description>
+				The constraint's applied pose data.
+			</description>
+		</method>
 		<method name="get_bones">
 			<return type="Array" />
 			<description>
@@ -22,45 +28,16 @@
 				The path constraint's setup pose data.
 			</description>
 		</method>
-		<method name="get_mix_rotate">
-			<return type="float" />
+		<method name="get_pose">
+			<return type="SpinePathConstraintPose" />
 			<description>
-				A percentage (0-1) that controls the mix between the constrained and unconstrained rotation.
+				The constraint's pose data.
 			</description>
 		</method>
-		<method name="get_mix_x">
-			<return type="float" />
-			<description>
-				A percentage (0-1) that controls the mix between the constrained and unconstrained translation X.
-			</description>
-		</method>
-		<method name="get_mix_y">
-			<return type="float" />
-			<description>
-				A percentage (0-1) that controls the mix between the constrained and unconstrained translation Y.
-			</description>
-		</method>
-		<method name="get_order">
-			<return type="int" />
-			<description>
-			</description>
-		</method>
-		<method name="get_position">
-			<return type="float" />
-			<description>
-				The position along the path.
-			</description>
-		</method>
-		<method name="get_spacing">
-			<return type="float" />
-			<description>
-				The spacing between bones.
-			</description>
-		</method>
-		<method name="get_target">
+		<method name="get_slot">
 			<return type="SpineSlot" />
 			<description>
-				The slot whose path attachment will be used to constrained the bones.
+				The slot whose path attachment will be used to constrain the bones.
 			</description>
 		</method>
 		<method name="is_active">
@@ -74,37 +51,7 @@
 			<description>
 			</description>
 		</method>
-		<method name="set_mix_rotate">
-			<return type="void" />
-			<argument index="0" name="v" type="float" />
-			<description>
-			</description>
-		</method>
-		<method name="set_mix_x">
-			<return type="void" />
-			<argument index="0" name="v" type="float" />
-			<description>
-			</description>
-		</method>
-		<method name="set_mix_y">
-			<return type="void" />
-			<argument index="0" name="v" type="float" />
-			<description>
-			</description>
-		</method>
-		<method name="set_position">
-			<return type="void" />
-			<argument index="0" name="v" type="float" />
-			<description>
-			</description>
-		</method>
-		<method name="set_spacing">
-			<return type="void" />
-			<argument index="0" name="v" type="float" />
-			<description>
-			</description>
-		</method>
-		<method name="set_target">
+		<method name="set_slot">
 			<return type="void" />
 			<argument index="0" name="v" type="SpineSlot" />
 			<description>
@@ -112,6 +59,7 @@
 		</method>
 		<method name="update">
 			<return type="void" />
+			<argument index="0" name="skeleton" type="SpineSkeleton" />
 			<description>
 			</description>
 		</method>
