@@ -44,6 +44,7 @@ class SpineSlotNode : public Node2D {
 protected:
 	String slot_name;
 	int slot_index;
+	SpineSprite *spine_sprite;
 	Ref<Material> normal_material;
 	Ref<Material> additive_material;
 	Ref<Material> multiply_material;

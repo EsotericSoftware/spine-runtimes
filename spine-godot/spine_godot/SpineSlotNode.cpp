@@ -65,20 +65,20 @@ void SpineSlotNode::_bind_methods() {
 				 "get_screen_material");
 }
 
-SpineSlotNode::SpineSlotNode() : slot_index(-1) {
+SpineSlotNode::SpineSlotNode() : slot_index(-1), spine_sprite(nullptr) {
 }
 
 void SpineSlotNode::_notification(int what) {
 	switch (what) {
 		case NOTIFICATION_PARENTED: {
-			SpineSprite *sprite = cast_to<SpineSprite>(get_parent());
-			if (sprite) {
+			spine_sprite = cast_to<SpineSprite>(get_parent());
+			if (spine_sprite) {
 #if VERSION_MAJOR > 3
-				sprite->connect(SNAME("world_transforms_changed"), callable_mp(this, &SpineSlotNode::on_world_transforms_changed));
+				spine_sprite->connect(SNAME("world_transforms_changed"), callable_mp(this, &SpineSlotNode::on_world_transforms_changed));
 #else
-				sprite->connect(SNAME("world_transforms_changed"), this, SNAME("_on_world_transforms_changed"));
+				spine_sprite->connect(SNAME("world_transforms_changed"), this, SNAME("_on_world_transforms_changed"));
 #endif
-				update_transform(sprite);
+				update_transform(spine_sprite);
 #if VERSION_MAJOR == 3
 				_change_notify("transform/translation");
 				_change_notify("transform/rotation");
@@ -95,13 +95,13 @@ void SpineSlotNode::_notification(int what) {
 			break;
 		}
 		case NOTIFICATION_UNPARENTED: {
-			SpineSprite *sprite = cast_to<SpineSprite>(get_parent());
-			if (sprite) {
+			if (spine_sprite) {
 #if VERSION_MAJOR > 3
-				sprite->disconnect(SNAME("world_transforms_changed"), callable_mp(this, &SpineSlotNode::on_world_transforms_changed));
+				spine_sprite->disconnect(SNAME("world_transforms_changed"), callable_mp(this, &SpineSlotNode::on_world_transforms_changed));
 #else
-				sprite->disconnect(SNAME("world_transforms_changed"), this, SNAME("_on_world_transforms_changed"));
+				spine_sprite->disconnect(SNAME("world_transforms_changed"), this, SNAME("_on_world_transforms_changed"));
 #endif
+				spine_sprite = nullptr;
 			}
 			break;
 		}
