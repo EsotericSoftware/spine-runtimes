@@ -99,6 +99,8 @@ SpineSkeleton::~SpineSkeleton() {
 void SpineSkeleton::set_spine_sprite(SpineSprite *_sprite) {
 	delete skeleton;
 	skeleton = nullptr;
+	_cached_bones.clear();
+	_cached_slots.clear();
 	sprite = _sprite;
 	if (!sprite || !sprite->get_skeleton_data_res().is_valid() || !sprite->get_skeleton_data_res()->is_skeleton_data_loaded()) return;
 	skeleton = new spine::Skeleton(*sprite->get_skeleton_data_res()->get_skeleton_data());
