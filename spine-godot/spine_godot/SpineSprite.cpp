@@ -1038,7 +1038,7 @@ void createLinesFromMesh(Vector<Vector2> &scratch_points, spine::Array<unsigned 
 }
 
 void SpineSprite::draw() {
-	if (!skeleton.is_valid()) return;
+	if (!animation_state.is_valid() && !skeleton.is_valid()) return;
 	if (!Engine::get_singleton()->is_editor_hint() && !get_tree()->is_debugging_collisions_hint()) return;
 
 	auto &statics = SpineSpriteStatics::instance();
@@ -1371,7 +1371,7 @@ void SpineSprite::callback(spine::AnimationState *state, spine::EventType type, 
 }
 
 Transform2D SpineSprite::get_global_bone_transform(const String &bone_name) {
-	if (!skeleton.is_valid()) return get_global_transform();
+	if (!animation_state.is_valid() && !skeleton.is_valid()) return get_global_transform();
 	auto bone = skeleton->find_bone(bone_name);
 	if (!bone.is_valid()) {
 		return get_global_transform();
@@ -1380,7 +1380,7 @@ Transform2D SpineSprite::get_global_bone_transform(const String &bone_name) {
 }
 
 void SpineSprite::set_global_bone_transform(const String &bone_name, Transform2D transform) {
-	if (!skeleton.is_valid()) return;
+	if (!animation_state.is_valid() && !skeleton.is_valid()) return;
 	auto bone = skeleton->find_bone(bone_name);
 	if (!bone.is_valid()) return;
 	bone->set_global_transform(transform);
