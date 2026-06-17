@@ -629,6 +629,8 @@ void SpineSprite::remove_meshes() {
 }
 
 void SpineSprite::sort_slot_nodes() {
+	if (get_child_count() <= (int) mesh_instances.size()) return;
+
 	for (int i = 0; i < (int) slot_nodes.size(); i++) {
 		slot_nodes[i].setSize(0, nullptr);
 	}
@@ -638,7 +640,7 @@ void SpineSprite::sort_slot_nodes() {
 		auto child = cast_to<Node2D>(get_child(i));
 		if (!child) continue;
 		// Needed so that debug drawables are rendered in front of attachments and other nodes under the sprite.
-		child->set_draw_behind_parent(true);
+		if (!child->is_draw_behind_parent_enabled()) child->set_draw_behind_parent(true);
 		auto slot_node = Object::cast_to<SpineSlotNode>(get_child(i));
 		if (!slot_node) continue;
 		if (slot_node->get_slot_index() == -1 || slot_node->get_slot_index() >= (int) draw_order.size()) {
@@ -653,7 +655,7 @@ void SpineSprite::sort_slot_nodes() {
 		spine::Array<SpineSlotNode *> &nodes = slot_nodes[slot_index];
 		for (int j = 0; j < (int) nodes.size(); j++) {
 			auto node = nodes[j];
-			move_child(node, mesh_index + 1);
+			if (node->get_index() != mesh_index + 1) move_child(node, mesh_index + 1);
 		}
 	}
 }
