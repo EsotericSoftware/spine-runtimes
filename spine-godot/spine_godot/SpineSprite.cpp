@@ -1272,14 +1272,16 @@ void SpineSprite::draw() {
 	draw_set_transform(mouse_position + Vector2(20, 0), -get_global_rotation(),
 					   Vector2(inverse_zoom * (1 / global_scale.x), inverse_zoom * (1 / global_scale.y)));
 
-	Ref<Font> default_font;
-	auto control = memnew(Control);
+	if (!debug_font.is_valid()) {
+		auto control = memnew(Control);
 #if VERSION_MAJOR > 3
-	default_font = control->get_theme_default_font();
+		debug_font = control->get_theme_default_font();
 #else
-	default_font = control->get_font(SNAME("font"), SNAME("Label"));
+		debug_font = control->get_font(SNAME("font"), SNAME("Label"));
 #endif
-	memdelete(control);
+		memdelete(control);
+	}
+	Ref<Font> default_font = debug_font;
 
 #if VERSION_MAJOR > 3
 #ifdef SPINE_GODOT_EXTENSION

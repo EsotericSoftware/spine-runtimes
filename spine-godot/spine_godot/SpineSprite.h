@@ -161,6 +161,7 @@ protected:
 
 	spine::Array<spine::Array<SpineSlotNode *>> slot_nodes;
 	Vector<SpineMesh2D *> mesh_instances;
+	Ref<Font> debug_font;
 	Ref<Material> normal_material;
 	Ref<Material> additive_material;
 	Ref<Material> multiply_material;
