@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "prepublish": "npm run clean && npm run build",
-    "clean": "npx rimraf spine-core/dist spine-canvas/dist spine-canvaskit/dist spine-webgl/dist spine-phaser-v3/dist spine-phaser-v4/dist spine-player/dist spine-threejs/dist spine-pixi-v7/dist spine-pixi-v8/dist spine-webcomponents/dist spine-construct3/dist spine-construct3/spine-construct3-lib/dist",
+    "clean": "npx rimraf -g spine-core/dist spine-canvas/dist spine-canvaskit/dist spine-webgl/dist spine-phaser-v3/dist spine-phaser-v4/dist spine-player/dist spine-threejs/dist spine-pixi-v7/dist spine-pixi-v8/dist spine-webcomponents/dist spine-construct3/dist spine-construct3/spine-construct3-lib/dist \"spine-*/tsconfig.tsbuildinfo\" spine-construct3/spine-construct3-lib/tsconfig.tsbuildinfo",
     "build": "npm run clean && npm run build:modules && concurrently \"npm run build:core:iife\" \"npm run build:core:esm\" \"npm run build:canvas:iife\" \"npm run build:canvas:esm\" \"npm run build:canvaskit:iife\" \"npm run build:canvaskit:esm\" \"npm run build:webgl:iife\" \"npm run build:webgl:esm\" \"npm run build:phaser-v3:iife\" \"npm run build:phaser-v4:iife\" \"npm run build:phaser-v3:esm\" \"npm run build:phaser-v4:esm\" \"npm run build:player:iife\" \"npm run build:player:esm\" \"npm run build:player:css\" \"npm run build:threejs:iife\" \"npm run build:threejs:esm\" \"npm run build:pixi-v7:iife\" \"npm run build:pixi-v7:esm\" \"npm run build:pixi-v8:iife\" \"npm run build:pixi-v8:esm\" \"npm run build:webcomponents:iife\" \"npm run build:webcomponents:esm\" \"npm run build:construct3\"",
     "format": "npx -y tsx scripts/format.ts",
     "lint": "npx biome lint .",
@@ -16,7 +16,7 @@
     "build:modules": "npx tsc -b -clean && npx tsc -b",
     "build:core:iife": "npx esbuild --bundle spine-core/src/index.ts --tsconfig=spine-core/tsconfig.json --sourcemap --outfile=spine-core/dist/iife/spine-core.js --format=iife --global-name=spine",
     "build:core:esm": "npx esbuild --bundle spine-core/src/index.ts --tsconfig=spine-core/tsconfig.json --sourcemap --outfile=spine-core/dist/esm/spine-core.mjs --format=esm --global-name=spine",
-    "build:construct3": "npm run build:construct3-lib && npx tsc --project spine-construct3/tsconfig.json && npm run build:construct3:copy-assets",
+    "build:construct3": "npx tsc -b spine-construct3/tsconfig.json && npm run build:construct3-lib && npm run build:construct3:copy-assets",
     "build:construct3:copy-assets": "npx copyfiles -u 2 \"spine-construct3/src/**/*.json\" \"spine-construct3/src/**/*.svg\" spine-construct3/dist/ && npx copyfiles -u 4 spine-construct3/spine-construct3-lib/dist/iife/spine-construct3-lib.js spine-construct3/dist/c3runtime",
     "build:construct3-lib": "npx esbuild --bundle spine-construct3/spine-construct3-lib/src/index.ts --tsconfig=spine-construct3/spine-construct3-lib/tsconfig.json --sourcemap --outfile=spine-construct3/spine-construct3-lib/dist/iife/spine-construct3-lib.js --format=iife --global-name=spine --footer:js=\"if(!globalThis.spine)globalThis.spine=spine;\"",
     "build:canvas:iife": "npx esbuild --bundle spine-canvas/src/index.ts --tsconfig=spine-canvas/tsconfig.json --sourcemap --outfile=spine-canvas/dist/iife/spine-canvas.js --format=iife --global-name=spine",
