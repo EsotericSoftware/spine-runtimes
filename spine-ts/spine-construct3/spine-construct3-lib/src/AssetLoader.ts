@@ -102,7 +102,7 @@ export class AssetLoader {
 	}
 
 	public getCachedRuntimeSkeletonAndAtlas (skeletonPath: string, atlasPath: string, scale = 1) {
-		const skeletonKey = `${skeletonPath}|scale${scale}`;
+		const skeletonKey = AssetLoader.getSkeletonCacheKey(skeletonPath, atlasPath, scale);
 		const skeletonEntry = AssetLoader.CacheSkeleton.get(skeletonKey);
 		const atlasEntry = AssetLoader.CacheAtlas.get(atlasPath);
 		if (!skeletonEntry?.data || !atlasEntry?.data) return null;
@@ -115,7 +115,7 @@ export class AssetLoader {
 		};
 	}
 
-	public async loadSkeletonRuntime (path: string, textureAtlas: TextureAtlas, scale = 1, instance: IRuntime) {
+	public async loadSkeletonRuntime (path: string, atlasPath: string, textureAtlas: TextureAtlas, scale = 1, instance: IRuntime) {
 		const loadPromise = (async () => {
 			const fullPath = await instance.assets.getProjectFileUrl(path);
 			if (!fullPath) throw new Error(`Cannot find project file url for: ${path}`);
@@ -142,7 +142,7 @@ export class AssetLoader {
 			return skeletonData;
 		});
 
-		return this.loadRuntimeResource(`${path}|scale${scale}`, AssetLoader.CacheSkeleton, loadPromise);
+		return this.loadRuntimeResource(AssetLoader.getSkeletonCacheKey(path, atlasPath, scale), AssetLoader.CacheSkeleton, loadPromise);
 	}
 
 	public async loadAtlasRuntime (path: string, instance: IRuntime, renderer: IRenderer) {
@@ -187,7 +187,7 @@ export class AssetLoader {
 	}
 
 	public releaseInstanceResources (skeletonPath: string, atlasPath: string, loaderScale: number) {
-		this.releaseResource("skeleton", AssetLoader.CacheSkeleton, `${skeletonPath}|scale${loaderScale}`);
+		this.releaseResource("skeleton", AssetLoader.CacheSkeleton, AssetLoader.getSkeletonCacheKey(skeletonPath, atlasPath, loaderScale));
 
 		const atlasEntry = AssetLoader.CacheAtlas.get(atlasPath);
 		if (atlasEntry) {
@@ -204,7 +204,7 @@ export class AssetLoader {
 	}
 
 	public retainInstanceResources (skeletonPath: string, atlasPath: string, loaderScale: number, retained: boolean) {
-		const skeletonKey = `${skeletonPath}|scale${loaderScale}`;
+		const skeletonKey = AssetLoader.getSkeletonCacheKey(skeletonPath, atlasPath, loaderScale);
 		this.setRuntimeResourceRetained("skeleton", skeletonKey, retained);
 		this.setRuntimeResourceRetained("atlas", atlasPath, retained);
 
@@ -281,6 +281,10 @@ export class AssetLoader {
 
 	private static getRetainKey (type: RuntimeCacheType, key: string) {
 		return `${type}:${key}`;
+	}
+
+	private static getSkeletonCacheKey (skeletonPath: string, atlasPath: string, scale: number) {
+		return `${skeletonPath}|atlas${atlasPath}|scale${scale}`;
 	}
 
 	private async loadRuntimeResource<T> (cacheKey: string, resourceCache: ResourceCache<T>, loader: () => Promise<T>): Promise<T> {

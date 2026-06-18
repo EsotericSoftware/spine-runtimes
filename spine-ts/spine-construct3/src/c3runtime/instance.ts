@@ -539,7 +539,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			this.atlasLoaded = true;
 			this.atlasLoading = false;
 
-			const skeletonData = await this.assetLoader.loadSkeletonRuntime(propSkel, textureAtlas, propLoaderScale, this.plugin.runtime);
+			const skeletonData = await this.assetLoader.loadSkeletonRuntime(propSkel, propAtlas, textureAtlas, propLoaderScale, this.plugin.runtime);
 			if (this.renderer !== renderer) return;
 
 			this.initializeSkeleton(textureAtlas, skeletonData, true);
