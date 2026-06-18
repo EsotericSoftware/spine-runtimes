@@ -109,14 +109,15 @@ class Animation {
 	 * @param loop If true, the animation repeats after the duration.
 	 * @param events If any events are fired, they are added to this list. Can be null to ignore fired events or if no timelines
 	 *           fire events.
-	 * @param alpha 0 applies the current or setup values (depending on blend). 1 applies the timeline values. Between
+	 * @param alpha 0 applies the current or setup values (depending on from). 1 applies the timeline values. Between
 	 *           0 and 1 applies values between the current or setup values and the timeline values. By adjusting
 	 *           alpha over time, an animation can be mixed in or out. alpha can also be useful to apply
 	 *           animations on top of each other (layering).
-	 * @param blend Controls how mixing is applied when alpha < 1.
-	 * @param direction Indicates whether the timelines are mixing in or out. Used by timelines which perform instant transitions,
+	 * @param from Controls how alpha and add mix from current or setup pose values to timeline values.
+	 * @param add If true, for timelines that support it, their values are added to the setup or current values (depending on from).
+	 * @param out Indicates whether the timelines are mixing out. Used by timelines which perform instant transitions,
 	 *           such as DrawOrderTimeline or AttachmentTimeline. */
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, loop:Bool, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, loop:Bool, events:Array<Event>, alpha:Float, from:MixFrom, add:Bool, out:Bool,
 			appliedPose:Bool):Void {
 		if (skeleton == null)
 			throw new SpineException("skeleton cannot be null.");
@@ -128,7 +129,7 @@ class Animation {
 		}
 
 		for (timeline in timelines) {
-			timeline.apply(skeleton, lastTime, time, events, alpha, fromSetup, add, out, appliedPose);
+			timeline.apply(skeleton, lastTime, time, events, alpha, from, add, out, appliedPose);
 		}
 	}
 }

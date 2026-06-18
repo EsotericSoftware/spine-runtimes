@@ -130,30 +130,42 @@ float CurveTimeline1::getCurveValue(float time) {
 	return getBezierValue(time, i, CurveTimeline1::VALUE, curveType - CurveTimeline1::BEZIER);
 }
 
-float CurveTimeline1::getRelativeValue(float time, float alpha, bool fromSetup, bool add, float current, float setup) {
-	if (time < _frames[0]) return fromSetup ? setup : current;
+float CurveTimeline1::getRelativeValue(float time, float alpha, MixFrom from, bool add, float current, float setup) {
+	if (time < _frames[0]) return beforeFirstKey(from, alpha, current, setup);
 	float value = getCurveValue(time);
-	return fromSetup ? setup + value * alpha : current + (add ? value : value + setup - current) * alpha;
+	return from == MixFrom_Setup ? setup + value * alpha : current + (add ? value : value + setup - current) * alpha;
 }
 
-float CurveTimeline1::getAbsoluteValue(float time, float alpha, bool fromSetup, bool add, float current, float setup) {
-	if (time < _frames[0]) return fromSetup ? setup : current;
+float CurveTimeline1::getAbsoluteValue(float time, float alpha, MixFrom from, bool add, float current, float setup) {
+	if (time < _frames[0]) return beforeFirstKey(from, alpha, current, setup);
 	float value = getCurveValue(time);
-	return fromSetup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
+	return from == MixFrom_Setup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
 }
 
-float CurveTimeline1::getAbsoluteValue(float time, float alpha, bool fromSetup, bool add, float current, float setup, float value) {
-	if (time < _frames[0]) return fromSetup ? setup : current;
-	return fromSetup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
+float CurveTimeline1::getAbsoluteValue(float time, float alpha, MixFrom from, bool add, float current, float setup, float value) {
+	if (time < _frames[0]) return beforeFirstKey(from, alpha, current, setup);
+	return from == MixFrom_Setup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
 }
 
-float CurveTimeline1::getScaleValue(float time, float alpha, bool fromSetup, bool add, bool out, float current, float setup) {
-	if (time < _frames[0]) return fromSetup ? setup : current;
+float CurveTimeline1::getScaleValue(float time, float alpha, MixFrom from, bool add, bool out, float current, float setup) {
+	if (time < _frames[0]) return beforeFirstKey(from, alpha, current, setup);
 	float value = getCurveValue(time) * setup;
 	if (alpha == 1 && !add) return value;
-	float base = fromSetup ? setup : current;
+	float base = from == MixFrom_Setup ? setup : current;
 	if (add) return base + (value - setup) * alpha;
 	if (out) return base + (MathUtil::abs(value) * MathUtil::sign(base) - base) * alpha;
 	base = MathUtil::abs(base) * MathUtil::sign(value);
 	return base + (value - base) * alpha;
+}
+
+float CurveTimeline1::beforeFirstKey(MixFrom from, float alpha, float current, float setup) {
+	switch (from) {
+		case MixFrom_Setup:
+			return setup;
+		case MixFrom_First:
+			return current + (setup - current) * alpha;
+		case MixFrom_Current:
+			return current;
+	}
+	return current;
 }

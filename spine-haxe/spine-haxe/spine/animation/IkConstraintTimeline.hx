@@ -70,18 +70,23 @@ class IkConstraintTimeline extends CurveTimeline implements ConstraintTimeline {
 		frames[frame + STRETCH] = stretch ? 1 : 0;
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
-			appliedPose:Bool) {
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, from:MixFrom, add:Bool, out:Bool, appliedPose:Bool) {
 		var constraint = cast(skeleton.constraints[constraintIndex], IkConstraint);
 		if (!constraint.active)
 			return;
 		var pose = appliedPose ? constraint.appliedPose : constraint.pose;
 
 		if (time < frames[0]) {
-			if (fromSetup) {
-				var setup = constraint.data.setupPose;
+			var setup = constraint.data.setupPose;
+			if (from == MixFrom.setup) {
 				pose.mix = setup.mix;
 				pose.softness = setup.softness;
+				pose.bendDirection = setup.bendDirection;
+				pose.compress = setup.compress;
+				pose.stretch = setup.stretch;
+			} else if (from == MixFrom.first) {
+				pose.mix += (setup.mix - pose.mix) * alpha;
+				pose.softness += (setup.softness - pose.softness) * alpha;
 				pose.bendDirection = setup.bendDirection;
 				pose.compress = setup.compress;
 				pose.stretch = setup.stretch;
@@ -108,11 +113,11 @@ class IkConstraintTimeline extends CurveTimeline implements ConstraintTimeline {
 				softness = getBezierValue(time, i, SOFTNESS, curveType + CurveTimeline.BEZIER_SIZE - CurveTimeline.BEZIER);
 		}
 
-		var base = fromSetup ? constraint.data.setupPose : pose;
+		var base = from == MixFrom.setup ? constraint.data.setupPose : pose;
 		pose.mix = base.mix + (mix - base.mix) * alpha;
 		pose.softness = base.softness + (softness - base.softness) * alpha;
 		if (out) {
-			if (fromSetup) {
+			if (from == MixFrom.setup) {
 				pose.bendDirection = base.bendDirection;
 				pose.compress = base.compress;
 				pose.stretch = base.stretch;

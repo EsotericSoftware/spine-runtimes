@@ -366,7 +366,17 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 					if ((flags & 2) != 0) data->_x = input.readFloat();
 					if ((flags & 4) != 0) data->_y = input.readFloat();
 					if ((flags & 8) != 0) data->_rotate = input.readFloat();
-					if ((flags & 16) != 0) data->_scaleX = input.readFloat();
+					if ((flags & 16) != 0) {
+						float scaleX = input.readFloat();
+						if (scaleX < -2) {
+							data->_scaleYMode = ScaleYMode_Volume;
+							scaleX = -2 - scaleX;
+						} else if (scaleX < 0) {
+							data->_scaleYMode = ScaleYMode_Uniform;
+							scaleX = -1 - scaleX;
+						}
+						data->_scaleX = scaleX;
+					}
 					if ((flags & 32) != 0) data->_shearX = input.readFloat();
 					data->_limit = ((flags & 64) != 0 ? input.readFloat() : 5000) * _scale;
 					data->_step = 1.f / input.readUnsignedByte();
@@ -396,7 +406,13 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 					data->_loop = (flags & 2) != 0;
 					data->_additive = (flags & 4) != 0;
 					SliderPose &setup = data->_setupPose;
-					if ((flags & 8) != 0) setup._time = input.readFloat();
+					if ((flags & 8) != 0) {
+						float value = input.readFloat();
+						if (nonessential && (flags & 64) != 0)
+							data->_max = value;
+						else
+							setup._time = value;
+					}
 					if ((flags & 16) != 0) setup._mix = (flags & 32) != 0 ? input.readFloat() : 1;
 					if ((flags & 64) != 0) {
 						data->_local = (flags & 128) != 0;

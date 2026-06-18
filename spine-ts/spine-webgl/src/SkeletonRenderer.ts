@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { type BlendMode, ClippingAttachment, Color, MeshAttachment, type NumberArrayLike, RegionAttachment, type Skeleton, SkeletonClipping, Utils, Vector2 } from "@esotericsoftware/spine-core";
+import { BlendMode, ClippingAttachment, Color, MeshAttachment, type NumberArrayLike, RegionAttachment, type Skeleton, SkeletonClipping, Utils, Vector2 } from "@esotericsoftware/spine-core";
 import type { GLTexture } from "./GLTexture.js";
 import type { PolygonBatcher } from "./PolygonBatcher.js";
 import type { ManagedWebGLRenderingContext } from "./WebGL.js";
@@ -49,10 +49,13 @@ export class SkeletonRenderer {
 	private twoColorTint = false;
 	private renderable: Renderable = new Renderable([], 0, 0);
 	private clipper: SkeletonClipping = new SkeletonClipping();
-	private temp = new Vector2();
-	private temp2 = new Vector2();
-	private temp3 = new Color();
-	private temp4 = new Color();
+
+	/**
+	 * Batches additive slots together with normal slots by rendering additive slots with premultiplied alpha RGB and zero alpha,
+	 * while using normal PMA blending. This reduces draw calls for normal/additive/normal sequences with the same texture.
+	 * Disable this if rendering to a transparent target and the accumulated destination alpha from additive blending must be preserved.
+	 */
+	pmaAdditiveBatching = true;
 
 	constructor (context: ManagedWebGLRenderingContext, twoColorTint: boolean = true) {
 		this.twoColorTint = twoColorTint;
@@ -144,7 +147,11 @@ export class SkeletonRenderer {
 				finalColor.r = skeletonColor.r * slotColor.r * attachmentColor.r * alpha;
 				finalColor.g = skeletonColor.g * slotColor.g * attachmentColor.g * alpha;
 				finalColor.b = skeletonColor.b * slotColor.b * attachmentColor.b * alpha;
-				finalColor.a = alpha;
+
+				const slotBlendMode = slot.data.blendMode;
+				const additiveBlend = this.pmaAdditiveBatching && slotBlendMode === BlendMode.Additive;
+				finalColor.a = additiveBlend ? 0 : alpha;
+
 				const darkColor = this.tempColor2;
 				if (!pose.darkColor)
 					darkColor.set(0, 0, 0, 1.0);
@@ -155,9 +162,9 @@ export class SkeletonRenderer {
 					darkColor.a = 1;
 				}
 
-				const slotBlendMode = slot.data.blendMode;
-				if (slotBlendMode !== blendMode) {
-					blendMode = slotBlendMode;
+				const batchBlendMode = additiveBlend ? BlendMode.Normal : slotBlendMode;
+				if (batchBlendMode !== blendMode) {
+					blendMode = batchBlendMode;
 					batcher.setBlendMode(blendMode);
 				}
 
@@ -173,7 +180,7 @@ export class SkeletonRenderer {
 							verts[v] = finalColor.r;
 							verts[v + 1] = finalColor.g;
 							verts[v + 2] = finalColor.b;
-							verts[v + 3] = alpha;
+							verts[v + 3] = finalColor.a;
 							verts[v + 4] = uvs[u];
 							verts[v + 5] = uvs[u + 1];
 						}
@@ -182,7 +189,7 @@ export class SkeletonRenderer {
 							verts[v] = finalColor.r;
 							verts[v + 1] = finalColor.g;
 							verts[v + 2] = finalColor.b;
-							verts[v + 3] = alpha;
+							verts[v + 3] = finalColor.a;
 							verts[v + 4] = uvs[u];
 							verts[v + 5] = uvs[u + 1];
 							verts[v + 6] = darkColor.r;

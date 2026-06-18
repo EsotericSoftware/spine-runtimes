@@ -87,6 +87,10 @@ namespace spine {
 		float getOffset();
 		void setOffset(float offset);
 
+		/// When a bone is set, the maximum slider time for the bone property range, or 0 if nonessential data was not exported.
+		float getMax();
+		void setMax(float max);
+
 		/// When true and a bone is set, the bone's local transform property is read instead of its world transform.
 		bool getLocal();
 		void setLocal(bool local);
@@ -99,6 +103,7 @@ namespace spine {
 		FromProperty *_property;
 		float _offset;
 		float _scale;
+		float _max;
 		bool _local;
 	};
 }

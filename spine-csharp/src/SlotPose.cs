@@ -91,6 +91,13 @@ namespace Spine {
 			this.darkColor = darkColor;
 		}
 
+		/// <summary>Whether two color tinting is used and dark color is set.</summary>
+		public bool HasDarkColor {
+			get {
+				return darkColor.HasValue;
+			}
+		}
+
 		/// <summary>Clamps the <see cref="GetDarkColor()">dark color</see> used to tint the slot's attachment to the 0-1 range.</summary>
 		public void ClampDarkColor () {
 			if (darkColor.HasValue) darkColor = darkColor.Value.Clamp();

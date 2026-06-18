@@ -55,20 +55,23 @@
         toothContainer.name = "tooth";
         text.name = "text";
 
-        // putting logo2 on top of the hand using slot directly and remove the attachment hand
-        let frontFist;
+        // putting logo2 on top of the hand using slot directly and remove the attachment hand.
+        // followSlotColor option makes the Pixi object use the skeleton and slot tint.
+        let frontFoot;
         setTimeout(() => {
-          frontFist = spineboy.skeleton.findSlot("front-foot");
+          frontFoot = spineboy.skeleton.findSlot("front-foot");
           tooth1.x = -10;
           tooth1.y = -70;
-          spineboy.addSlotObject(frontFist, toothContainer);
-          frontFist.pose.setAttachment(null);
+          frontFoot.pose.color.g = 0;
+          frontFoot.pose.color.b = 0;
+          spineboy.addSlotObject(frontFoot, toothContainer, { followSlotColor: true });
+          frontFoot.pose.setAttachment(null);
         }, 1000);
 
         // scaling the bone, will scale the pixi object too
         setTimeout(() => {
-          frontFist.bone.scaleX = .5;
-          frontFist.bone.scaleY = .5;
+          frontFoot.bone.scaleX = .5;
+          frontFoot.bone.scaleY = .5;
         }, 2000);
 
         // adding a pixi text in a slot using slot index
@@ -80,6 +83,7 @@
         // adding one pixi object to an already "occupied" slot will remove the old one,
         // and move the given one to the slot
         setTimeout(() => {
+          tooth1.tint = 0xffffff;
           spineboy.addSlotObject("gun", toothContainer);
         }, 5000);
 
@@ -119,8 +123,8 @@
 
         // resetting the slot with the original attachment
         setTimeout(() => {
-          frontFist.setupPose();
-          frontFist.bone.setupPose();
+          frontFoot.setupPose();
+          frontFoot.bone.setupPose();
         }, 10000);
 
         // showing an animation with clipping -> Pixi masks will be created

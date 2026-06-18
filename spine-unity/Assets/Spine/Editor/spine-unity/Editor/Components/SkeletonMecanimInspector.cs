@@ -155,7 +155,7 @@ namespace Spine.Unity.Editor {
 				skeleton.SetupPose();
 				if (clip != null) {
 					Spine.Animation animation = skeletonData.FindAnimation(clip.name);
-					animation.Apply(skeleton, 0, time, false, null, 1.0f, true, false, false, false);
+					animation.Apply(skeleton, 0, time, false, null, 1.0f, MixFrom.Setup, false, false, false);
 				}
 				skeletonRenderer.LateUpdate();
 			}

@@ -29,6 +29,8 @@
 
 package com.esotericsoftware.spine;
 
+import com.esotericsoftware.spine.ConstraintData.ScaleYMode;
+
 /** Stores the setup pose for a {@link PhysicsConstraint}.
  * <p>
  * See <a href="https://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide. */
@@ -36,6 +38,7 @@ public class PhysicsConstraintData extends ConstraintData<PhysicsConstraint, Phy
 	BoneData bone;
 	float x, y, rotate, scaleX, shearX, limit, step;
 	boolean inertiaGlobal, strengthGlobal, dampingGlobal, massGlobal, windGlobal, gravityGlobal, mixGlobal;
+	ScaleYMode scaleYMode = ScaleYMode.none;
 
 	public PhysicsConstraintData (String name) {
 		super(name, new PhysicsConstraintPose());
@@ -115,6 +118,16 @@ public class PhysicsConstraintData extends ConstraintData<PhysicsConstraint, Phy
 
 	public void setLimit (float limit) {
 		this.limit = limit;
+	}
+
+	/** Determines how the {@link BonePose#scaleY} changes when {@link #scaleX} sets {@link BonePose#scaleX}. */
+	public ScaleYMode getScaleYMode () {
+		return scaleYMode;
+	}
+
+	public void setScaleYMode (ScaleYMode scaleYMode) {
+		if (scaleYMode == null) throw new IllegalArgumentException("scaleYMode cannot be null.");
+		this.scaleYMode = scaleYMode;
 	}
 
 	/** True when this constraint's inertia is controlled by global slider timelines. */

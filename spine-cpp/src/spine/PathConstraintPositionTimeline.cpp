@@ -51,7 +51,7 @@ PathConstraintPositionTimeline::PathConstraintPositionTimeline(size_t frameCount
 PathConstraintPositionTimeline::~PathConstraintPositionTimeline() {
 }
 
-void PathConstraintPositionTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup,
+void PathConstraintPositionTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixFrom from,
 										   bool add, bool out, bool appliedPose) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(events);
@@ -61,6 +61,6 @@ void PathConstraintPositionTimeline::apply(Skeleton &skeleton, float lastTime, f
 	if (constraint->isActive()) {
 		PathConstraintPose &pose = appliedPose ? *constraint->_appliedPose : constraint->_pose;
 		PathConstraintData &data = constraint->_data;
-		pose._position = getAbsoluteValue(time, alpha, fromSetup, add, pose._position, data._setupPose._position);
+		pose._position = getAbsoluteValue(time, alpha, from, add, pose._position, data._setupPose._position);
 	}
 }

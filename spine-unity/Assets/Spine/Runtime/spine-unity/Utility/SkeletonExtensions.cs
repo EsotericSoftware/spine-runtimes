@@ -42,10 +42,12 @@ namespace Spine.Unity {
 		}
 
 		public static void SetColor (this Slot slot, Color color) {
+			slot.Pose.SetColor(color);
 			slot.AppliedPose.SetColor(color);
 		}
 
 		public static void SetColor (this Slot slot, Color32 color) {
+			slot.Pose.SetColor(color);
 			slot.AppliedPose.SetColor(color);
 		}
 		#endregion

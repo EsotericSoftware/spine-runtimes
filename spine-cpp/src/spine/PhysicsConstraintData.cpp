@@ -38,8 +38,8 @@ RTTI_IMPL(PhysicsConstraintData, ConstraintData)
 
 PhysicsConstraintData::PhysicsConstraintData(const String &name)
 	: ConstraintDataGeneric<PhysicsConstraint, PhysicsConstraintPose>(name), _bone(NULL), _x(0), _y(0), _rotate(0), _scaleX(0), _shearX(0), _limit(0),
-	  _step(0), _inertiaGlobal(false), _strengthGlobal(false), _dampingGlobal(false), _massGlobal(false), _windGlobal(false), _gravityGlobal(false),
-	  _mixGlobal(false) {
+	  _step(0), _scaleYMode(ScaleYMode_None), _inertiaGlobal(false), _strengthGlobal(false), _dampingGlobal(false), _massGlobal(false),
+	  _windGlobal(false), _gravityGlobal(false), _mixGlobal(false) {
 }
 
 BoneData &PhysicsConstraintData::getBone() {
@@ -104,6 +104,14 @@ float PhysicsConstraintData::getLimit() {
 
 void PhysicsConstraintData::setLimit(float limit) {
 	_limit = limit;
+}
+
+ScaleYMode PhysicsConstraintData::getScaleYMode() {
+	return _scaleYMode;
+}
+
+void PhysicsConstraintData::setScaleYMode(ScaleYMode scaleYMode) {
+	_scaleYMode = scaleYMode;
 }
 
 bool PhysicsConstraintData::getInertiaGlobal() {

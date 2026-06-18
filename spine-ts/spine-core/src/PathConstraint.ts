@@ -46,7 +46,6 @@ import { MathUtils, Utils } from "./Utils.js";
  * See [Path constraints](http://esotericsoftware.com/spine-path-constraints) in the Spine User Guide. */
 export class PathConstraint extends Constraint<PathConstraint, PathConstraintData, PathConstraintPose> {
 	static NONE = -1; static BEFORE = -2; static AFTER = -3;
-	static epsilon = 0.00001;
 
 	/** The path constraint's setup pose data. */
 	data: PathConstraintData;
@@ -112,7 +111,7 @@ export class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 				for (let i = 0, n = spacesCount - 1; i < n;) {
 					const bone = bones[i];
 					const setupLength = bone.bone.data.length;
-					if (setupLength < PathConstraint.epsilon) {
+					if (setupLength < MathUtils.epsilon) {
 						if (scale) lengths[i] = 0;
 						spaces[++i] = spacing;
 					} else {
@@ -135,7 +134,7 @@ export class PathConstraint extends Constraint<PathConstraint, PathConstraintDat
 				for (let i = 0, n = spacesCount - 1; i < n;) {
 					const bone = bones[i];
 					const setupLength = bone.bone.data.length;
-					if (setupLength < PathConstraint.epsilon) {
+					if (setupLength < MathUtils.epsilon) {
 						if (scale) lengths[i] = 0;
 						spaces[++i] = spacing;
 					} else {

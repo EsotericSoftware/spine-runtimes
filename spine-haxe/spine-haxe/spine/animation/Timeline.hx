@@ -79,18 +79,16 @@ abstract class Timeline {
 	 *           applied.
 	 * @param events If any events are fired, they are added to this list. Can be null to ignore fired events or if the timeline
 	 *           does not fire events.
-	 * @param alpha 0 applies the current or setup value (depending on fromSetup). 1 applies the timeline value.
+	 * @param alpha 0 applies the current or setup value (depending on from). 1 applies the timeline value.
 	 *           Between 0 and 1 applies a value between the current or setup value and the timeline value. By adjusting
 	 *           alpha over time, an animation can be mixed in or out. alpha can also be useful to
 	 *           apply animations on top of each other (layering).
-	 * @param fromSetup If true, alpha transitions between setup and timeline values, setup values are used before the
-	 *           first frame (current values are not used). If false, alpha transitions between current and timeline
-	 *           values, no change is made before the first frame.
+	 * @param from Controls how alpha and add mix from current or setup pose values to timeline values.
 	 * @param add If true, for timelines that support it, their values are added to the setup or current values (depending on
-	 *           fromSetup).
+	 *           from).
 	 * @param out True when the animation is mixing out, else it is mixing in. Used by timelines which perform instant transitions.
 	 * @param appliedPose True to modify the applied pose, else the pose is modified. */
-	abstract public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
+	abstract public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, from:MixFrom, add:Bool, out:Bool,
 		appliedPose:Bool):Void;
 
 	/** Linear search using a stride of 1.

@@ -35,11 +35,14 @@ class ShearTimeline extends BoneTimeline2 {
 		super(frameCount, bezierCount, boneIndex, Property.shearX, Property.shearY);
 	}
 
-	public function apply1(pose:BonePose, setup:BonePose, time:Float, alpha:Float, fromSetup:Bool, add:Bool, out:Bool) {
+	public function apply1(pose:BonePose, setup:BonePose, time:Float, alpha:Float, from:MixFrom, add:Bool, out:Bool) {
 		if (time < frames[0]) {
-			if (fromSetup) {
+			if (from == MixFrom.setup) {
 				pose.shearX = setup.shearX;
 				pose.shearY = setup.shearY;
+			} else if (from == MixFrom.first) {
+				pose.shearX += (setup.shearX - pose.shearX) * alpha;
+				pose.shearY += (setup.shearY - pose.shearY) * alpha;
 			}
 			return;
 		}
@@ -63,7 +66,7 @@ class ShearTimeline extends BoneTimeline2 {
 				y = getBezierValue(time, i, BoneTimeline2.VALUE2, curveType + CurveTimeline.BEZIER_SIZE - CurveTimeline.BEZIER);
 		}
 
-		if (fromSetup) {
+		if (from == MixFrom.setup) {
 			pose.shearX = setup.shearX + x * alpha;
 			pose.shearY = setup.shearY + y * alpha;
 		} else if (add) {

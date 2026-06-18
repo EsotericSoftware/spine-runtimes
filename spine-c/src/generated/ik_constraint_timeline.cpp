@@ -17,9 +17,9 @@ spine_rtti spine_ik_constraint_timeline_get_rtti(spine_ik_constraint_timeline se
 }
 
 void spine_ik_constraint_timeline_apply(spine_ik_constraint_timeline self, spine_skeleton skeleton, float lastTime, float time,
-										/*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
+										/*@null*/ spine_array_event events, float alpha, spine_mix_from from, bool add, bool out, bool appliedPose) {
 	IkConstraintTimeline *_self = (IkConstraintTimeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixFrom) from, add, out, appliedPose);
 }
 
 void spine_ik_constraint_timeline_set_frame(spine_ik_constraint_timeline self, int frame, float time, float mix, float softness, int bendDirection,

@@ -47,6 +47,17 @@ fi
 test_count=0
 pass_count=0
 
+log_action "Testing map-test"
+test_count=$((test_count + 1))
+if OUTPUT=$(build/map-test 2>&1); then
+    log_ok
+    pass_count=$((pass_count + 1))
+else
+    log_fail "map-test - execution failed"
+    log_detail "$OUTPUT"
+    echo ""
+fi
+
 for exe in build/headless-test*; do
     if [ -f "$exe" ] && [ -x "$exe" ]; then
         exe_name=$(basename "$exe")

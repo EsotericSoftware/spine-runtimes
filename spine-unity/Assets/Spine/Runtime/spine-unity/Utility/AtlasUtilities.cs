@@ -1122,20 +1122,18 @@ namespace Spine.Unity.AttachmentTools {
 				h = tempW;
 			}
 
-			// Note: originalW and originalH need to be scaled according to the
+			// Note: originalW, originalH, offsetX and offsetY need to be scaled according to the
 			// repacked width and height, repacking can mess with aspect ratio, etc.
 			bool flipsWH = referenceRegion.degrees == 90;
-			float toOriginalRatioW = (float)referenceRegion.originalWidth /
-				(flipsWH ? (float)referenceRegion.height : (float)referenceRegion.width);
-			float toOriginalRatioH = (float)referenceRegion.originalHeight /
-				(flipsWH ? (float)referenceRegion.width : (float)referenceRegion.height);
-			int originalWUnflipped = Mathf.RoundToInt((float)w * toOriginalRatioW);
-			int originalHUnflipped = Mathf.RoundToInt((float)h * toOriginalRatioH);
-			int originalW = flipsWH ? originalHUnflipped : originalWUnflipped;
-			int originalH = flipsWH ? originalWUnflipped : originalHUnflipped;
+			float wToReferenceW = (float)w / (float)referenceRegion.width;
+			float hToReferenceH = (float)h / (float)referenceRegion.height;
+			float scaleOriginalW = flipsWH ? hToReferenceH : wToReferenceW;
+			float scaleOriginalH = flipsWH ? wToReferenceW : hToReferenceH;
+			int originalW = Mathf.RoundToInt((float)referenceRegion.originalWidth * scaleOriginalW);
+			int originalH = Mathf.RoundToInt((float)referenceRegion.originalHeight * scaleOriginalH);
 
-			int offsetX = Mathf.RoundToInt((float)referenceRegion.offsetX * ((float)w / (float)referenceRegion.width));
-			int offsetY = Mathf.RoundToInt((float)referenceRegion.offsetY * ((float)h / (float)referenceRegion.height));
+			int offsetX = Mathf.RoundToInt((float)referenceRegion.offsetX * scaleOriginalW);
+			int offsetY = Mathf.RoundToInt((float)referenceRegion.offsetY * scaleOriginalH);
 
 			float u = uvRect.xMin;
 			float u2 = uvRect.xMax;

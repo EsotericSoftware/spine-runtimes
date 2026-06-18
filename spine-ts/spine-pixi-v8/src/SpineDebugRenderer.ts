@@ -360,6 +360,11 @@ export class SpineDebugRenderer implements ISpineDebugRenderer {
 
 		for (let i = 0, len = slots.length; i < len; i++) {
 			const slot = slots[i];
+
+			if (!slot.bone.active) {
+				continue;
+			}
+
 			const attachment = slot.appliedPose.attachment;
 
 			if (attachment === null || !(attachment instanceof RegionAttachment)) {

@@ -98,6 +98,7 @@ void initialize_spine_godot_module(ModuleInitializationLevel level) {
 		GDREGISTER_CLASS(SpineJsonResourceImportPlugin);
 		GDREGISTER_CLASS(SpineBinaryResourceImportPlugin);
 		GDREGISTER_CLASS(SpineSkeletonDataResourceInspectorPlugin);
+		GDREGISTER_CLASS(SpineEditorPropertyAnimationMixes);
 		GDREGISTER_CLASS(SpineEditorPlugin);
 		EditorPlugins::add_plugin_class(StringName("SpineEditorPlugin"));
 #endif

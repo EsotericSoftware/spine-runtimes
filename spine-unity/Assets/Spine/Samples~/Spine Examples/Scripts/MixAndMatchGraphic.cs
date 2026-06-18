@@ -54,9 +54,7 @@ namespace Spine.Unity.Examples {
 		[Header("Runtime Repack Required!!")]
 		public bool repack = true;
 
-		[Header("Do not assign")]
-		public Texture2D runtimeAtlas;
-		public Material runtimeMaterial;
+		AtlasUtilities.RepackAttachmentsOutput repackingOutput;
 		#endregion
 
 		Skin customSkin;
@@ -72,6 +70,11 @@ namespace Spine.Unity.Examples {
 		IEnumerator Start () {
 			yield return new WaitForSeconds(1f); // Delay for 1 second. For testing.
 			Apply();
+		}
+
+		void OnDestroy () {
+			// Note: materials and textures returned by GetRepackedSkin() behave like 'new Texture2D()' and need to be destroyed
+			repackingOutput.DestroyGeneratedAssets();
 		}
 
 		[ContextMenu("Apply")]
@@ -124,12 +127,13 @@ namespace Spine.Unity.Examples {
 				Skin repackedSkin = new Skin("repacked skin");
 				repackedSkin.AddSkin(skeleton.Data.DefaultSkin);
 				repackedSkin.AddSkin(customSkin);
-				// Note: materials and textures returned by GetRepackedSkin() behave like 'new Texture2D()' and need to be destroyed
-				if (runtimeMaterial)
-					Destroy(runtimeMaterial);
-				if (runtimeAtlas)
-					Destroy(runtimeAtlas);
-				repackedSkin = repackedSkin.GetRepackedSkin("repacked skin", sourceMaterial, out runtimeMaterial, out runtimeAtlas);
+				// Note: materials and textures returned by previous GetRepackedSkin() calls behave like 'new Texture2D()'
+				// and need to be destroyed.
+				repackingOutput.DestroyGeneratedAssets();
+				AtlasUtilities.RepackAttachmentsSettings settings = AtlasUtilities.RepackAttachmentsSettings.Default;
+				settings.UseSourceMaterialsFrom(skeletonGraphic.SkeletonDataAsset);
+				settings.maxAtlasSize = 1024;
+				repackedSkin = repackedSkin.GetRepackedSkin("repacked skin", settings, ref repackingOutput); // Pack all the items in the skin.
 				skeleton.SetSkin(repackedSkin);
 			} else {
 				skeleton.SetSkin(customSkin);
@@ -138,7 +142,7 @@ namespace Spine.Unity.Examples {
 			//skeleton.SetupPoseSlots();
 			skeleton.SetupPose();
 			skeletonGraphic.Animation.Update(0);
-			skeletonGraphic.OverrideTexture = runtimeAtlas;
+			skeletonGraphic.OverrideTexture = repackingOutput.outputTexture;
 
 			// `GetRepackedSkin()` and each call to `SetRegion()` with parameter `premultiplyAlpha` set to `true`
 			// cache necessarily created Texture copies which can be cleared by calling AtlasUtilities.ClearCache().

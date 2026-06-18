@@ -48,7 +48,7 @@ namespace spine {
 
 		virtual ~TransformConstraintTimeline();
 
-		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixFrom from, bool add, bool out,
 						   bool appliedPose) override;
 
 		/// Sets the time, rotate mix, translate mix, scale mix, and shear mix for the specified frame.

@@ -101,6 +101,16 @@ void spine_physics_constraint_data_set_limit(spine_physics_constraint_data self,
 	_self->setLimit(limit);
 }
 
+spine_scale_y_mode spine_physics_constraint_data_get_scale_y_mode(spine_physics_constraint_data self) {
+	PhysicsConstraintData *_self = (PhysicsConstraintData *) self;
+	return (spine_scale_y_mode) _self->getScaleYMode();
+}
+
+void spine_physics_constraint_data_set_scale_y_mode(spine_physics_constraint_data self, spine_scale_y_mode scaleYMode) {
+	PhysicsConstraintData *_self = (PhysicsConstraintData *) self;
+	_self->setScaleYMode((ScaleYMode) scaleYMode);
+}
+
 bool spine_physics_constraint_data_get_inertia_global(spine_physics_constraint_data self) {
 	PhysicsConstraintData *_self = (PhysicsConstraintData *) self;
 	return _self->getInertiaGlobal();

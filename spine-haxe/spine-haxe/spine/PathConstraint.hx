@@ -41,7 +41,6 @@ class PathConstraint extends Constraint<PathConstraint, PathConstraintData, Path
 	private static inline var NONE = -1;
 	private static inline var BEFORE = -2;
 	private static inline var AFTER = -3;
-	private static inline var epsilon = 0.00001;
 
 	/** The bones that will be modified by this path constraint. */
 	public final bones:Array<BonePose>;
@@ -116,7 +115,7 @@ class PathConstraint extends Constraint<PathConstraint, PathConstraintData, Path
 				while (i < n) {
 					var bone = bones[i];
 					var setupLength:Float = bone.bone.data.length;
-					if (setupLength < PathConstraint.epsilon) {
+					if (setupLength < MathUtils.epsilon) {
 						if (fScale)
 							lengths[i] = 0;
 						spaces[++i] = spacing;
@@ -140,7 +139,7 @@ class PathConstraint extends Constraint<PathConstraint, PathConstraintData, Path
 				while (i < n) {
 					var bone = bones[i];
 					var setupLength = bone.bone.data.length;
-					if (setupLength < PathConstraint.epsilon) {
+					if (setupLength < MathUtils.epsilon) {
 						if (fScale)
 							lengths[i] = 0;
 						spaces[++i] = spacing;
@@ -174,7 +173,7 @@ class PathConstraint extends Constraint<PathConstraint, PathConstraintData, Path
 			var x = positions[ip], y = positions[ip + 1], dx = x - boneX, dy = y - boneY;
 			if (fScale) {
 				var length = lengths[i];
-				if (length >= epsilon) {
+				if (length >= MathUtils.epsilon) {
 					var s = (Math.sqrt(dx * dx + dy * dy) / length - 1) * mixRotate + 1;
 					bone.a *= s;
 					bone.c *= s;
@@ -186,7 +185,7 @@ class PathConstraint extends Constraint<PathConstraint, PathConstraintData, Path
 				var a = bone.a, b = bone.b, c = bone.c, d = bone.d, r:Float, cos:Float, sin:Float;
 				if (fTangents)
 					r = positions[ip - 1];
-				else if (spaces[i + 1] < epsilon)
+				else if (spaces[i + 1] < MathUtils.epsilon)
 					r = positions[ip + 2];
 				else
 					r = Math.atan2(dy, dx);

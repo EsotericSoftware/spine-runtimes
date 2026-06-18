@@ -49,6 +49,7 @@ void SpineBoneNode::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_debug_thickness"), &SpineBoneNode::get_debug_thickness);
 	ClassDB::bind_method(D_METHOD("set_debug_color"), &SpineBoneNode::set_debug_color);
 	ClassDB::bind_method(D_METHOD("get_debug_color"), &SpineBoneNode::get_debug_color);
+	ClassDB::bind_method(D_METHOD("_on_before_world_transforms_change", "spine_sprite"), &SpineBoneNode::on_before_world_transforms_change);
 	ClassDB::bind_method(D_METHOD("_on_world_transforms_changed", "spine_sprite"), &SpineBoneNode::on_world_transforms_changed);
 	ClassDB::bind_method(D_METHOD("find_bone"), &SpineBoneNode::find_bone);
 	ClassDB::bind_method(D_METHOD("find_sprite"), &SpineBoneNode::find_parent_sprite);
@@ -66,8 +67,10 @@ void SpineBoneNode::_notification(int what) {
 			SpineSprite *sprite = find_parent_sprite();
 			if (sprite) {
 #if VERSION_MAJOR > 3
+				sprite->connect(SNAME("before_world_transforms_change"), callable_mp(this, &SpineBoneNode::on_before_world_transforms_change));
 				sprite->connect(SNAME("world_transforms_changed"), callable_mp(this, &SpineBoneNode::on_world_transforms_changed));
 #else
+				sprite->connect(SNAME("before_world_transforms_change"), this, SNAME("_on_before_world_transforms_change"));
 				sprite->connect(SNAME("world_transforms_changed"), this, SNAME("_on_world_transforms_changed"));
 #endif
 				update_transform(sprite);
@@ -90,8 +93,10 @@ void SpineBoneNode::_notification(int what) {
 			SpineSprite *sprite = find_parent_sprite();
 			if (sprite) {
 #if VERSION_MAJOR > 3
+				sprite->disconnect(SNAME("before_world_transforms_change"), callable_mp(this, &SpineBoneNode::on_before_world_transforms_change));
 				sprite->disconnect(SNAME("world_transforms_changed"), callable_mp(this, &SpineBoneNode::on_world_transforms_changed));
 #else
+				sprite->disconnect(SNAME("before_world_transforms_change"), this, SNAME("_on_before_world_transforms_change"));
 				sprite->disconnect(SNAME("world_transforms_changed"), this, SNAME("_on_world_transforms_changed"));
 #endif
 			}
@@ -150,7 +155,14 @@ bool SpineBoneNode::_set(const StringName &property, const Variant &value) {
 	return false;
 }
 
+void SpineBoneNode::on_before_world_transforms_change(const Variant &_sprite) {
+	if (bone_mode != SpineConstant::BoneMode_Drive) return;
+	SpineSprite *sprite = cast_to<SpineSprite>(_sprite.operator Object *());
+	update_transform(sprite);
+}
+
 void SpineBoneNode::on_world_transforms_changed(const Variant &_sprite) {
+	if (bone_mode != SpineConstant::BoneMode_Follow) return;
 	SpineSprite *sprite = cast_to<SpineSprite>(_sprite.operator Object *());
 	update_transform(sprite);
 #if VERSION_MAJOR > 3

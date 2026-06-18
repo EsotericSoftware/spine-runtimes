@@ -42,6 +42,7 @@ import 'path_constraint.dart';
 import 'physics_constraint.dart';
 import 'physics_constraint_pose.dart';
 import 'posed_data.dart';
+import 'scale_y_mode.dart';
 import 'skeleton.dart';
 import 'slider.dart';
 import 'transform_constraint.dart';
@@ -181,6 +182,17 @@ class PhysicsConstraintData extends PosedData implements ConstraintData {
 
   set limit(double value) {
     SpineBindings.bindings.spine_physics_constraint_data_set_limit(_ptr, value);
+  }
+
+  /// Determines how BonePose::getScaleY() changes when getScaleX() sets
+  /// BonePose::getScaleX().
+  ScaleYMode get scaleYMode {
+    final result = SpineBindings.bindings.spine_physics_constraint_data_get_scale_y_mode(_ptr);
+    return ScaleYMode.fromValue(result);
+  }
+
+  set scaleYMode(ScaleYMode value) {
+    SpineBindings.bindings.spine_physics_constraint_data_set_scale_y_mode(_ptr, value.value);
   }
 
   /// True when this constraint's inertia is controlled by global slider

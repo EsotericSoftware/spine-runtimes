@@ -165,7 +165,8 @@ class TrackEntry {
   /// is cleared.
   ///
   /// It may be desired to use AnimationState::addEmptyAnimation(int, float,
-  /// float) rather than have the animation abruptly cease being applied.
+  /// float) rather than have the animation abruptly cease being applied,
+  /// leaving the current pose.
   double get trackEnd {
     final result = SpineBindings.bindings.spine_track_entry_get_track_end(_ptr);
     return result;

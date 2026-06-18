@@ -55,15 +55,19 @@ class RGBTimeline extends SlotCurveTimeline {
 		frames[frame + B] = b;
 	}
 
-	public function apply1(slot:Slot, pose:SlotPose, time:Float, alpha:Float, fromSetup:Bool, add:Bool) {
+	public function apply1(slot:Slot, pose:SlotPose, time:Float, alpha:Float, from:MixFrom, add:Bool) {
 		var color = pose.color;
 		var r:Float = 0, g:Float = 0, b:Float = 0;
 		if (time < frames[0]) {
-			if (fromSetup) {
-				var setup = slot.data.setupPose.color;
+			var setup = slot.data.setupPose.color;
+			if (from == MixFrom.setup) {
 				color.r = setup.r;
 				color.g = setup.g;
 				color.b = setup.b;
+			} else if (from == MixFrom.first) {
+				color.r += (setup.r - color.r) * alpha;
+				color.g += (setup.g - color.g) * alpha;
+				color.b += (setup.b - color.b) * alpha;
 			}
 			return;
 		}
@@ -90,7 +94,7 @@ class RGBTimeline extends SlotCurveTimeline {
 				b = getBezierValue(time, i, B, curveType + CurveTimeline.BEZIER_SIZE * 2 - CurveTimeline.BEZIER);
 		}
 		if (alpha != 1) {
-			if (fromSetup) {
+			if (from == MixFrom.setup) {
 				var setup = slot.data.setupPose.color;
 				r = setup.r + (r - setup.r) * alpha;
 				g = setup.g + (g - setup.g) * alpha;

@@ -181,6 +181,8 @@ export class Color {
 }
 
 export class MathUtils {
+	static epsilon = 0.00001;
+	static epsilon2 = MathUtils.epsilon * MathUtils.epsilon;
 	// biome-ignore lint/suspicious/noApproximativeNumericConstant: reference runtime
 	static PI = 3.1415927;
 	static PI2 = MathUtils.PI * 2;

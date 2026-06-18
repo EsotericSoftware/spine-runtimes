@@ -85,6 +85,10 @@ namespace spine {
 		float getLimit();
 		void setLimit(float limit);
 
+		/// Determines how BonePose::getScaleY() changes when getScaleX() sets BonePose::getScaleX().
+		ScaleYMode getScaleYMode();
+		void setScaleYMode(ScaleYMode scaleYMode);
+
 		/// True when this constraint's inertia is controlled by global slider timelines.
 		bool getInertiaGlobal();
 		void setInertiaGlobal(bool inertiaGlobal);
@@ -116,6 +120,7 @@ namespace spine {
 	private:
 		BoneData *_bone;
 		float _x, _y, _rotate, _scaleX, _shearX, _limit, _step;
+		ScaleYMode _scaleYMode;
 		bool _inertiaGlobal, _strengthGlobal, _dampingGlobal, _massGlobal, _windGlobal, _gravityGlobal, _mixGlobal;
 	};
 }

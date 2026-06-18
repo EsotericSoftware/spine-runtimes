@@ -88,157 +88,187 @@ void BonePose::updateWorldTransform(Skeleton &skeleton) {
 			return;
 		}
 		case Inherit_OnlyTranslation: {
+			float sx = skeleton.getScaleX(), sy = skeleton.getScaleY();
 			float rx = (_rotation + _shearX) * MathUtil::Deg_Rad;
 			float ry = (_rotation + 90 + _shearY) * MathUtil::Deg_Rad;
-			_a = MathUtil::cos(rx) * _scaleX;
-			_b = MathUtil::cos(ry) * _scaleY;
-			_c = MathUtil::sin(rx) * _scaleX;
-			_d = MathUtil::sin(ry) * _scaleY;
+			_a = MathUtil::cos(rx) * _scaleX * sx;
+			_b = MathUtil::cos(ry) * _scaleY * sx;
+			_c = MathUtil::sin(rx) * _scaleX * sy;
+			_d = MathUtil::sin(ry) * _scaleY * sy;
 			break;
 		}
 		case Inherit_NoRotationOrReflection: {
-			float sx = 1 / skeleton.getScaleX(), sy = 1 / skeleton.getScaleY();
-			pa *= sx;
-			pc *= sy;
-			float s = pa * pa + pc * pc, prx;
-			if (s > 0.0001f) {
-				s = MathUtil::abs(pa * pd * sy - pb * sx * pc) / s;
+			float sx = skeleton.getScaleX(), sy = skeleton.getScaleY(), sxi = 1 / sx, syi = 1 / sy;
+			pa *= sxi;
+			pc *= syi;
+			float s = pa * pa + pc * pc, r;
+			if (s > MathUtil::EpsilonSq) {
+				s = MathUtil::abs(pa * pd * syi - pb * sxi * pc) / s;
 				pb = pc * s;
 				pd = pa * s;
-				prx = MathUtil::atan2(pc, pa) * MathUtil::Rad_Deg;
+				r = _rotation - MathUtil::atan2Deg(pc, pa);
 			} else {
 				pa = 0;
 				pc = 0;
-				prx = 90 - MathUtil::atan2(pd, pb) * MathUtil::Rad_Deg;
+				r = _rotation - 90 + MathUtil::atan2Deg(pd, pb);
 			}
-			float rx = (_rotation + _shearX - prx) * MathUtil::Deg_Rad;
-			float ry = (_rotation + _shearY - prx + 90) * MathUtil::Deg_Rad;
+			float rx = (r + _shearX) * MathUtil::Deg_Rad;
+			float ry = (r + _shearY + 90) * MathUtil::Deg_Rad;
 			float la = MathUtil::cos(rx) * _scaleX;
 			float lb = MathUtil::cos(ry) * _scaleY;
 			float lc = MathUtil::sin(rx) * _scaleX;
 			float ld = MathUtil::sin(ry) * _scaleY;
-			_a = pa * la - pb * lc;
-			_b = pa * lb - pb * ld;
-			_c = pc * la + pd * lc;
-			_d = pc * lb + pd * ld;
+			_a = (pa * la - pb * lc) * sx;
+			_b = (pa * lb - pb * ld) * sx;
+			_c = (pc * la + pd * lc) * sy;
+			_d = (pc * lb + pd * ld) * sy;
 			break;
 		}
 		case Inherit_NoScale:
 		case Inherit_NoScaleOrReflection: {
+			float sx = skeleton.getScaleX(), sy = skeleton.getScaleY(), sxi = 1 / sx, syi = 1 / sy;
 			float r = _rotation * MathUtil::Deg_Rad, cosR = MathUtil::cos(r), sinR = MathUtil::sin(r);
-			float za = (pa * cosR + pb * sinR) / skeleton.getScaleX();
-			float zc = (pc * cosR + pd * sinR) / skeleton.getScaleY();
-			float s = MathUtil::sqrt(za * za + zc * zc);
-			if (s > 0.00001f) s = 1 / s;
+			float za = (pa * cosR + pb * sinR) * sxi;
+			float zc = (pc * cosR + pd * sinR) * syi;
+			float s = 1 / MathUtil::sqrt(za * za + zc * zc);
 			za *= s;
 			zc *= s;
-			s = MathUtil::sqrt(za * za + zc * zc);
-			if (_inherit == Inherit_NoScale && (pa * pd - pb * pc < 0) != ((skeleton.getScaleX() < 0) != (skeleton.getScaleY() < 0))) s = -s;
-			r = MathUtil::Pi / 2 + MathUtil::atan2(zc, za);
-			float zb = MathUtil::cos(r) * s;
-			float zd = MathUtil::sin(r) * s;
+			float zb = -zc, zd = za;
+			if (_inherit == Inherit_NoScale && (pa * pd - pb * pc < 0) != ((sx < 0) != (sy < 0))) {
+				zb = -zb;
+				zd = -zd;
+			}
 			float rx = _shearX * MathUtil::Deg_Rad;
 			float ry = (90 + _shearY) * MathUtil::Deg_Rad;
 			float la = MathUtil::cos(rx) * _scaleX;
 			float lb = MathUtil::cos(ry) * _scaleY;
 			float lc = MathUtil::sin(rx) * _scaleX;
 			float ld = MathUtil::sin(ry) * _scaleY;
-			_a = za * la + zb * lc;
-			_b = za * lb + zb * ld;
-			_c = zc * la + zd * lc;
-			_d = zc * lb + zd * ld;
+			_a = (za * la + zb * lc) * sx;
+			_b = (za * lb + zb * ld) * sx;
+			_c = (zc * la + zd * lc) * sy;
+			_d = (zc * lb + zd * ld) * sy;
 			break;
 		}
 	}
-	_a *= skeleton.getScaleX();
-	_b *= skeleton.getScaleX();
-	_c *= skeleton.getScaleY();
-	_d *= skeleton.getScaleY();
 }
 
 void BonePose::updateLocalTransform(Skeleton &skeleton) {
 	_local = 0;
 	_world = skeleton._update;
 
+	float sx = skeleton.getScaleX(), sy = skeleton.getScaleY();
 	if (_bone->getParent() == nullptr) {
-		_x = _worldX - skeleton.getX();
-		_y = _worldY - skeleton.getY();
-		float a = this->_a, b = this->_b, c = this->_c, d = this->_d;
-		_rotation = MathUtil::atan2(c, a) * MathUtil::Rad_Deg;
-		_scaleX = MathUtil::sqrt(a * a + c * c);
-		_scaleY = MathUtil::sqrt(b * b + d * d);
-		_shearX = 0;
-		_shearY = MathUtil::atan2(a * b + c * d, a * d - b * c) * MathUtil::Rad_Deg;
+		float sxi = 1 / sx, syi = 1 / sy;
+		_x = (_worldX - skeleton.getX()) * sxi;
+		_y = (_worldY - skeleton.getY()) * syi;
+		setLocal(_a * sxi, _b * sxi, _c * syi, _d * syi, 0);
 		return;
 	}
 
 	BonePose &parent = _bone->getParent()->getAppliedPose();
 	float pa = parent._a, pb = parent._b, pc = parent._c, pd = parent._d;
-	float pid = 1 / (pa * pd - pb * pc);
+	float pad = pa * pd - pb * pc, pid = 1 / pad;
 	float ia = pd * pid, ib = pb * pid, ic = pc * pid, id = pa * pid;
 	float dx = _worldX - parent._worldX, dy = _worldY - parent._worldY;
-	_x = (dx * ia - dy * ib);
-	_y = (dy * id - dx * ic);
+	_x = dx * ia - dy * ib;
+	_y = dy * id - dx * ic;
 
-	float ra, rb, rc, rd;
-	if (_inherit == Inherit_OnlyTranslation) {
-		ra = _a;
-		rb = _b;
-		rc = _c;
-		rd = _d;
-	} else {
-		switch (_inherit) {
-			case Inherit_NoRotationOrReflection: {
-				float s = MathUtil::abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
-				pb = -pc * skeleton.getScaleX() * s / skeleton.getScaleY();
-				pd = pa * skeleton.getScaleY() * s / skeleton.getScaleX();
-				pid = 1 / (pa * pd - pb * pc);
-				ia = pd * pid;
-				ib = pb * pid;
-				break;
-			}
-			case Inherit_NoScale:
-			case Inherit_NoScaleOrReflection: {
-				float r = _rotation * MathUtil::Deg_Rad, cosR = MathUtil::cos(r), sinR = MathUtil::sin(r);
-				pa = (pa * cosR + pb * sinR) / skeleton.getScaleX();
-				pc = (pc * cosR + pd * sinR) / skeleton.getScaleY();
-				float s = MathUtil::sqrt(pa * pa + pc * pc);
-				if (s > 0.00001f) s = 1 / s;
-				pa *= s;
-				pc *= s;
-				s = MathUtil::sqrt(pa * pa + pc * pc);
-				if (_inherit == Inherit_NoScale && (pid < 0) != ((skeleton.getScaleX() < 0) != (skeleton.getScaleY() < 0))) s = -s;
-				r = MathUtil::Pi / 2 + MathUtil::atan2(pc, pa);
-				pb = MathUtil::cos(r) * s;
-				pd = MathUtil::sin(r) * s;
-				pid = 1 / (pa * pd - pb * pc);
-				ia = pd * pid;
-				ib = pb * pid;
-				ic = pc * pid;
-				id = pa * pid;
-				break;
-			}
-			default:
-				break;
+	switch (_inherit) {
+		case Inherit_Normal:
+			setLocal(ia * _a - ib * _c, ia * _b - ib * _d, id * _c - ic * _a, id * _d - ic * _b, 0);
+			break;
+		case Inherit_OnlyTranslation: {
+			float sxi = 1 / sx, syi = 1 / sy;
+			setLocal(_a * sxi, _b * sxi, _c * syi, _d * syi, 0);
+			break;
 		}
-		ra = ia * _a - ib * _c;
-		rb = ia * _b - ib * _d;
-		rc = id * _c - ic * _a;
-		rd = id * _d - ic * _b;
+		case Inherit_NoRotationOrReflection: {
+			float sxi = 1 / sx, syi = 1 / sy;
+			pa *= sxi;
+			pc *= syi;
+			float wa = _a * sxi, wb = _b * sxi, wc = _c * syi, wd = _d * syi;
+			float s = 1 / (pa * pa + pc * pc), det = 1 / MathUtil::abs(pad * sxi * syi);
+			setLocal((pa * wa + pc * wc) * s, (pa * wb + pc * wd) * s, (pa * wc - pc * wa) * det, (pa * wd - pc * wb) * det,
+					 MathUtil::atan2Deg(pc, pa));
+			break;
+		}
+		case Inherit_NoScale:
+		case Inherit_NoScaleOrReflection: {
+			float sxi = 1 / sx, syi = 1 / sy;
+			float wa = _a * sxi, wb = _b * sxi, wc = _c * syi, wd = _d * syi;
+			float tx = pd * _a - pb * _c, ty = pa * _c - pc * _a;
+			if (pad < 0) {
+				tx = -tx;
+				ty = -ty;
+			}
+			float r = MathUtil::atan2Deg(ty, tx);
+			_rotation = r;
+			r *= MathUtil::Deg_Rad;
+			float cosR = MathUtil::cos(r), sinR = MathUtil::sin(r);
+			float za = (pa * cosR + pb * sinR) * sxi;
+			float zc = (pc * cosR + pd * sinR) * syi;
+			float s = 1 / MathUtil::sqrt(za * za + zc * zc);
+			za *= s;
+			zc *= s;
+			float si = _inherit == Inherit_NoScale && (pad < 0) != ((sx < 0) != (sy < 0)) ? -1.0f : 1.0f;
+			setLocal(za * wa + zc * wc, za * wb + zc * wd, (za * wc - zc * wa) * si, (za * wd - zc * wb) * si);
+			break;
+		}
 	}
+}
 
+void BonePose::setLocal(float ra, float rb, float rc, float rd) {
+	float x = ra * ra + rc * rc, y = rb * rb + rd * rd;
+	if (x > MathUtil::EpsilonSq) {
+		_shearX = MathUtil::atan2Deg(rc, ra);
+		_scaleX = MathUtil::sqrt(x);
+	} else {
+		_shearX = 0;
+		_scaleX = 0;
+	}
+	_scaleY = MathUtil::sqrt(y);
+	if (y > MathUtil::EpsilonSq) {
+		_shearY = MathUtil::atan2Deg(rd, rb);
+		if (ra * rd - rb * rc < 0) {
+			_scaleY = -_scaleY;
+			_shearY += 90;
+		} else
+			_shearY -= 90;
+		if (_shearY > 180)
+			_shearY -= 360;
+		else if (_shearY <= -180)//
+			_shearY += 360;
+	} else
+		_shearY = 0;
+}
+
+void BonePose::setLocal(float ra, float rb, float rc, float rd, float ro) {
 	_shearX = 0;
-	_scaleX = MathUtil::sqrt(ra * ra + rc * rc);
-	if (_scaleX > 0.0001f) {
-		float det = ra * rd - rb * rc;
-		_scaleY = det / _scaleX;
-		_shearY = -MathUtil::atan2(ra * rb + rc * rd, det) * MathUtil::Rad_Deg;
-		_rotation = MathUtil::atan2(rc, ra) * MathUtil::Rad_Deg;
+	float x = ra * ra + rc * rc, y = rb * rb + rd * rd;
+	if (x > MathUtil::EpsilonSq) {
+		float r = MathUtil::atan2Deg(rc, ra);
+		_rotation = r + ro;
+		_scaleX = MathUtil::sqrt(x);
+		_scaleY = MathUtil::sqrt(y);
+		if (y > MathUtil::EpsilonSq) {
+			_shearY = MathUtil::atan2Deg(rd, rb);
+			if (ra * rd - rb * rc < 0) {
+				_scaleY = -_scaleY;
+				_shearY += 90 - r;
+			} else
+				_shearY -= 90 + r;
+			if (_shearY > 180)
+				_shearY -= 360;
+			else if (_shearY <= -180)//
+				_shearY += 360;
+		} else
+			_shearY = 0;
 	} else {
 		_scaleX = 0;
-		_scaleY = MathUtil::sqrt(rb * rb + rd * rd);
+		_scaleY = MathUtil::sqrt(y);
 		_shearY = 0;
-		_rotation = 90 - MathUtil::atan2(rd, rb) * MathUtil::Rad_Deg;
+		_rotation = y > MathUtil::EpsilonSq ? MathUtil::atan2Deg(rd, rb) - 90 + ro : ro;
 	}
 }
 

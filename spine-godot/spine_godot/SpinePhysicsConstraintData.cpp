@@ -40,6 +40,8 @@ void SpinePhysicsConstraintData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_shear_x"), &SpinePhysicsConstraintData::get_shear_x);
 	ClassDB::bind_method(D_METHOD("get_limit"), &SpinePhysicsConstraintData::get_limit);
 	ClassDB::bind_method(D_METHOD("get_step"), &SpinePhysicsConstraintData::get_step);
+	ClassDB::bind_method(D_METHOD("get_scale_y_mode"), &SpinePhysicsConstraintData::get_scale_y_mode);
+	ClassDB::bind_method(D_METHOD("set_scale_y_mode", "v"), &SpinePhysicsConstraintData::set_scale_y_mode);
 	ClassDB::bind_method(D_METHOD("is_inertia_global"), &SpinePhysicsConstraintData::is_inertia_global);
 	ClassDB::bind_method(D_METHOD("is_strength_global"), &SpinePhysicsConstraintData::is_strength_global);
 	ClassDB::bind_method(D_METHOD("is_damping_global"), &SpinePhysicsConstraintData::is_damping_global);
@@ -83,6 +85,16 @@ float SpinePhysicsConstraintData::get_step() {
 float SpinePhysicsConstraintData::get_x() {
 	SPINE_CHECK(get_spine_constraint_data(), 0)
 	return get_spine_constraint_data()->getX();
+}
+
+SpineConstant::ScaleYMode SpinePhysicsConstraintData::get_scale_y_mode() {
+	SPINE_CHECK(get_spine_constraint_data(), SpineConstant::ScaleYMode_None)
+	return (SpineConstant::ScaleYMode) get_spine_constraint_data()->getScaleYMode();
+}
+
+void SpinePhysicsConstraintData::set_scale_y_mode(SpineConstant::ScaleYMode v) {
+	SPINE_CHECK(get_spine_constraint_data(), )
+	get_spine_constraint_data()->setScaleYMode((spine::ScaleYMode) v);
 }
 
 float SpinePhysicsConstraintData::get_y() {

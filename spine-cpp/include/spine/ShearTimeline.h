@@ -45,7 +45,7 @@ namespace spine {
 		explicit ShearTimeline(size_t frameCount, size_t bezierCount, int boneIndex);
 
 	protected:
-		virtual void _apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) override;
+		virtual void _apply(BonePose &pose, BonePose &setup, float time, float alpha, MixFrom from, bool add, bool out) override;
 	};
 
 	/// Changes a bone's local shearX.
@@ -60,7 +60,7 @@ namespace spine {
 		explicit ShearXTimeline(size_t frameCount, size_t bezierCount, int boneIndex);
 
 	protected:
-		virtual void _apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) override;
+		virtual void _apply(BonePose &pose, BonePose &setup, float time, float alpha, MixFrom from, bool add, bool out) override;
 	};
 
 	/// Changes a bone's local shearY.
@@ -75,7 +75,7 @@ namespace spine {
 		explicit ShearYTimeline(size_t frameCount, size_t bezierCount, int boneIndex);
 
 	protected:
-		virtual void _apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) override;
+		virtual void _apply(BonePose &pose, BonePose &setup, float time, float alpha, MixFrom from, bool add, bool out) override;
 	};
 }
 

@@ -55,23 +55,28 @@ open class CurveTimeline1: CurveTimeline {
         return result
     }
 
-    public func getRelativeValue(_ time: Float, _ alpha: Float, _ fromSetup: Bool, _ add: Bool, _ current: Float, _ setup: Float) -> Float {
-        let result = spine_curve_timeline1_get_relative_value(_ptr.assumingMemoryBound(to: spine_curve_timeline1_wrapper.self), time, alpha, fromSetup, add, current, setup)
+    public func getRelativeValue(_ time: Float, _ alpha: Float, _ from: MixFrom, _ add: Bool, _ current: Float, _ setup: Float) -> Float {
+        let result = spine_curve_timeline1_get_relative_value(_ptr.assumingMemoryBound(to: spine_curve_timeline1_wrapper.self), time, alpha, spine_mix_from(rawValue: UInt32(from.rawValue)), add, current, setup)
         return result
     }
 
-    public func getScaleValue(_ time: Float, _ alpha: Float, _ fromSetup: Bool, _ add: Bool, _ out: Bool, _ current: Float, _ setup: Float) -> Float {
-        let result = spine_curve_timeline1_get_scale_value(_ptr.assumingMemoryBound(to: spine_curve_timeline1_wrapper.self), time, alpha, fromSetup, add, out, current, setup)
+    public func getScaleValue(_ time: Float, _ alpha: Float, _ from: MixFrom, _ add: Bool, _ out: Bool, _ current: Float, _ setup: Float) -> Float {
+        let result = spine_curve_timeline1_get_scale_value(_ptr.assumingMemoryBound(to: spine_curve_timeline1_wrapper.self), time, alpha, spine_mix_from(rawValue: UInt32(from.rawValue)), add, out, current, setup)
         return result
     }
 
-    public func getAbsoluteValue(_ time: Float, _ alpha: Float, _ fromSetup: Bool, _ add: Bool, _ current: Float, _ setup: Float) -> Float {
-        let result = spine_curve_timeline1_get_absolute_value_1(_ptr.assumingMemoryBound(to: spine_curve_timeline1_wrapper.self), time, alpha, fromSetup, add, current, setup)
+    public static func beforeFirstKey(_ from: MixFrom, _ alpha: Float, _ current: Float, _ setup: Float) -> Float {
+        let result = spine_curve_timeline1_before_first_key(spine_mix_from(rawValue: UInt32(from.rawValue)), alpha, current, setup)
         return result
     }
 
-    public func getAbsoluteValue2(_ time: Float, _ alpha: Float, _ fromSetup: Bool, _ add: Bool, _ current: Float, _ setup: Float, _ value: Float) -> Float {
-        let result = spine_curve_timeline1_get_absolute_value_2(_ptr.assumingMemoryBound(to: spine_curve_timeline1_wrapper.self), time, alpha, fromSetup, add, current, setup, value)
+    public func getAbsoluteValue(_ time: Float, _ alpha: Float, _ from: MixFrom, _ add: Bool, _ current: Float, _ setup: Float) -> Float {
+        let result = spine_curve_timeline1_get_absolute_value_1(_ptr.assumingMemoryBound(to: spine_curve_timeline1_wrapper.self), time, alpha, spine_mix_from(rawValue: UInt32(from.rawValue)), add, current, setup)
+        return result
+    }
+
+    public func getAbsoluteValue2(_ time: Float, _ alpha: Float, _ from: MixFrom, _ add: Bool, _ current: Float, _ setup: Float, _ value: Float) -> Float {
+        let result = spine_curve_timeline1_get_absolute_value_2(_ptr.assumingMemoryBound(to: spine_curve_timeline1_wrapper.self), time, alpha, spine_mix_from(rawValue: UInt32(from.rawValue)), add, current, setup, value)
         return result
     }
 

@@ -55,4 +55,15 @@
     <Content Include="Content\shaders\SpineEffectOutline.fx" />
     <Content Include="Content\shaders\SpineEffectNormalmap.fx" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="data\**\*" />
+    <Content Include="data\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>data\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+    </Content>
+    <ExampleData Include="data\**\*" />
+  </ItemGroup>
+  <Target Name="CopyExampleData" BeforeTargets="Build">
+    <Copy SourceFiles="@(ExampleData)" DestinationFiles="@(ExampleData->'$(OutDir)data\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
 </Project>

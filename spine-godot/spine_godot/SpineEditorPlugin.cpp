@@ -36,7 +36,11 @@
 
 #if VERSION_MAJOR > 3
 #ifdef SPINE_GODOT_EXTENSION
-#include <godot_cpp/classes/editor_undo_redo_manager.hpp>
+#include <godot_cpp/classes/button.hpp>
+#include <godot_cpp/classes/h_box_container.hpp>
+#include <godot_cpp/classes/label.hpp>
+#include <godot_cpp/classes/option_button.hpp>
+#include <godot_cpp/classes/spin_box.hpp>
 #else
 #include "editor/editor_undo_redo_manager.h"
 #endif
@@ -231,7 +235,7 @@ bool SpineSkeletonDataResourceInspectorPlugin::_can_handle(Object *object) const
 #else
 bool SpineSkeletonDataResourceInspectorPlugin::can_handle(Object *object) {
 #endif
-	return object->is_class("SpineSkeletonDataResource");
+	return object && object->is_class("SpineSkeletonDataResource");
 }
 
 #if VERSION_MAJOR > 3
@@ -246,8 +250,6 @@ bool SpineSkeletonDataResourceInspectorPlugin::parse_property(Object *object, co
 bool SpineSkeletonDataResourceInspectorPlugin::parse_property(Object *object, Variant::Type type, const String &path, PropertyHint hint,
 															  const String &hint_text, int usage) {
 #endif
-// FIXME can't do this in godot-cpp
-#ifndef SPINE_GODOT_EXTENSION
 	if (path == "animation_mixes") {
 		Ref<SpineSkeletonDataResource> skeleton_data = Object::cast_to<SpineSkeletonDataResource>(object);
 		if (!skeleton_data.is_valid() || !skeleton_data->is_skeleton_data_loaded()) return true;
@@ -256,11 +258,9 @@ bool SpineSkeletonDataResourceInspectorPlugin::parse_property(Object *object, Va
 		add_property_editor(path, mixes_property);
 		return true;
 	}
-#endif
 	return false;
 }
 
-// FIXME can't do this in godot-cpp
 #ifndef SPINE_GODOT_EXTENSION
 SpineEditorPropertyAnimationMixes::SpineEditorPropertyAnimationMixes() : skeleton_data(nullptr), container(nullptr), updating(false) {
 	INSTANTIATE(array_object);
@@ -493,6 +493,192 @@ void SpineEditorPropertyAnimationMix::update_property() {
 	container->add_child(mix_float);
 
 	updating = false;
+}
+#else
+SpineEditorPropertyAnimationMixes::SpineEditorPropertyAnimationMixes() : container(nullptr), updating(false) {
+}
+
+void SpineEditorPropertyAnimationMixes::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("rebuild_ui"), &SpineEditorPropertyAnimationMixes::rebuild_ui);
+}
+
+void SpineEditorPropertyAnimationMixes::setup(const Ref<SpineSkeletonDataResource> &_skeleton_data) {
+	skeleton_data = _skeleton_data;
+	rebuild_ui();
+}
+
+void SpineEditorPropertyAnimationMixes::_update_property() {
+	if (updating) return;
+	rebuild_ui();
+}
+
+void SpineEditorPropertyAnimationMixes::rebuild_ui() {
+	updating = true;
+
+	if (container) {
+		set_bottom_editor(nullptr);
+		remove_child(container);
+		memdelete(container);
+		container = nullptr;
+	}
+
+	if (!skeleton_data.is_valid() || !skeleton_data->is_skeleton_data_loaded()) {
+		updating = false;
+		return;
+	}
+
+	PackedStringArray animation_names;
+	skeleton_data->get_animation_names(animation_names);
+
+	container = memnew(VBoxContainer);
+	add_child(container);
+	set_bottom_editor(container);
+
+	Array mixes = skeleton_data->get_animation_mixes();
+	for (int i = 0; i < mixes.size(); i++) {
+		Ref<SpineAnimationMix> mix = mixes[i];
+
+		auto hbox = memnew(HBoxContainer);
+		hbox->set_h_size_flags(SIZE_EXPAND_FILL);
+		container->add_child(hbox);
+
+		if (mix.is_null()) {
+			auto label = memnew(Label);
+			label->set_text("Invalid mix");
+			label->set_h_size_flags(SIZE_EXPAND_FILL);
+			hbox->add_child(label);
+		} else {
+			auto from_option = memnew(OptionButton);
+			from_option->set_h_size_flags(SIZE_EXPAND_FILL);
+			for (int j = 0; j < animation_names.size(); j++) {
+				from_option->add_item(animation_names[j]);
+				if (animation_names[j] == mix->get_from()) from_option->select(j);
+			}
+			from_option->connect(SNAME("item_selected"), callable_mp(this, &SpineEditorPropertyAnimationMixes::on_from_changed).bind(i),
+								 CONNECT_DEFERRED);
+			hbox->add_child(from_option);
+
+			auto to_option = memnew(OptionButton);
+			to_option->set_h_size_flags(SIZE_EXPAND_FILL);
+			for (int j = 0; j < animation_names.size(); j++) {
+				to_option->add_item(animation_names[j]);
+				if (animation_names[j] == mix->get_to()) to_option->select(j);
+			}
+			to_option->connect(SNAME("item_selected"), callable_mp(this, &SpineEditorPropertyAnimationMixes::on_to_changed).bind(i),
+							   CONNECT_DEFERRED);
+			hbox->add_child(to_option);
+
+			auto spin_box = memnew(SpinBox);
+			spin_box->set_h_size_flags(SIZE_EXPAND_FILL);
+			spin_box->set_min(0.0);
+			spin_box->set_max(9999999.0);
+			spin_box->set_step(0.001);
+			spin_box->set_value(mix->get_mix());
+			spin_box->connect(SNAME("value_changed"), callable_mp(this, &SpineEditorPropertyAnimationMixes::on_mix_value_changed).bind(i),
+							  CONNECT_DEFERRED);
+			hbox->add_child(spin_box);
+		}
+
+		auto delete_button = memnew(Button);
+		delete_button->set_text("Remove");
+		delete_button->connect(SNAME("pressed"), callable_mp(this, &SpineEditorPropertyAnimationMixes::delete_mix).bind(i), CONNECT_DEFERRED);
+		hbox->add_child(delete_button);
+	}
+
+	auto add_mix_button = memnew(Button);
+	add_mix_button->set_text("Add mix");
+	add_mix_button->set_disabled(animation_names.is_empty());
+	add_mix_button->connect(SNAME("pressed"), callable_mp(this, &SpineEditorPropertyAnimationMixes::add_mix), CONNECT_DEFERRED);
+	container->add_child(add_mix_button);
+
+	updating = false;
+}
+
+void SpineEditorPropertyAnimationMixes::add_mix() {
+	if (updating || !skeleton_data.is_valid() || !skeleton_data->is_skeleton_data_loaded()) return;
+
+	PackedStringArray animation_names;
+	skeleton_data->get_animation_names(animation_names);
+	if (animation_names.is_empty()) return;
+
+	Ref<SpineAnimationMix> mix(memnew(SpineAnimationMix));
+	mix->set_from(animation_names[0]);
+	mix->set_to(animation_names[0]);
+	mix->set_mix(0);
+
+	Array mixes = skeleton_data->get_animation_mixes().duplicate();
+	mixes.push_back(mix);
+	emit_changed(get_edited_property(), mixes);
+	call_deferred(SNAME("rebuild_ui"));
+}
+
+void SpineEditorPropertyAnimationMixes::delete_mix(int idx) {
+	if (updating || !skeleton_data.is_valid() || !skeleton_data->is_skeleton_data_loaded()) return;
+
+	Array mixes = skeleton_data->get_animation_mixes().duplicate();
+	if (idx < 0 || idx >= mixes.size()) return;
+	mixes.remove_at(idx);
+	emit_changed(get_edited_property(), mixes);
+	call_deferred(SNAME("rebuild_ui"));
+}
+
+void SpineEditorPropertyAnimationMixes::on_from_changed(int option_idx, int mix_idx) {
+	if (updating || !skeleton_data.is_valid()) return;
+
+	PackedStringArray animation_names;
+	skeleton_data->get_animation_names(animation_names);
+	if (option_idx < 0 || option_idx >= animation_names.size()) return;
+
+	Array mixes = skeleton_data->get_animation_mixes().duplicate();
+	if (mix_idx < 0 || mix_idx >= mixes.size()) return;
+	Ref<SpineAnimationMix> old_mix = mixes[mix_idx];
+	if (old_mix.is_null()) return;
+
+	Ref<SpineAnimationMix> mix(memnew(SpineAnimationMix));
+	mix->set_from(animation_names[option_idx]);
+	mix->set_to(old_mix->get_to());
+	mix->set_mix(old_mix->get_mix());
+	mixes[mix_idx] = mix;
+	emit_changed(get_edited_property(), mixes);
+	call_deferred(SNAME("rebuild_ui"));
+}
+
+void SpineEditorPropertyAnimationMixes::on_to_changed(int option_idx, int mix_idx) {
+	if (updating || !skeleton_data.is_valid()) return;
+
+	PackedStringArray animation_names;
+	skeleton_data->get_animation_names(animation_names);
+	if (option_idx < 0 || option_idx >= animation_names.size()) return;
+
+	Array mixes = skeleton_data->get_animation_mixes().duplicate();
+	if (mix_idx < 0 || mix_idx >= mixes.size()) return;
+	Ref<SpineAnimationMix> old_mix = mixes[mix_idx];
+	if (old_mix.is_null()) return;
+
+	Ref<SpineAnimationMix> mix(memnew(SpineAnimationMix));
+	mix->set_from(old_mix->get_from());
+	mix->set_to(animation_names[option_idx]);
+	mix->set_mix(old_mix->get_mix());
+	mixes[mix_idx] = mix;
+	emit_changed(get_edited_property(), mixes);
+	call_deferred(SNAME("rebuild_ui"));
+}
+
+void SpineEditorPropertyAnimationMixes::on_mix_value_changed(float value, int mix_idx) {
+	if (updating || !skeleton_data.is_valid()) return;
+
+	Array mixes = skeleton_data->get_animation_mixes().duplicate();
+	if (mix_idx < 0 || mix_idx >= mixes.size()) return;
+	Ref<SpineAnimationMix> old_mix = mixes[mix_idx];
+	if (old_mix.is_null()) return;
+
+	Ref<SpineAnimationMix> mix(memnew(SpineAnimationMix));
+	mix->set_from(old_mix->get_from());
+	mix->set_to(old_mix->get_to());
+	mix->set_mix(value);
+	mixes[mix_idx] = mix;
+	emit_changed(get_edited_property(), mixes);
+	call_deferred(SNAME("rebuild_ui"));
 }
 #endif
 

@@ -40,6 +40,12 @@ namespace spine {
 
 	class Event;
 
+	enum MixFrom {
+		MixFrom_Current = 0,
+		MixFrom_Setup = 1,
+		MixFrom_First = 2
+	};
+
 	/// The base class for all timelines.
 	///
 	/// See <a href='https://esotericsoftware.com/spine-applying-animations#Timeline-API'>Applying Animations</a> in the Spine
@@ -65,17 +71,17 @@ namespace spine {
 		///           interpolate between the frame values.
 		/// @param events If any events are fired, they are added to this list. Can be NULL to ignore fired events or if no timelines
 		///           fire events.
-		/// @param alpha 0 applies setup or current values (depending on fromSetup), 1 uses timeline values, and intermediate values
+		/// @param alpha 0 applies setup or current values (depending on from), 1 uses timeline values, and intermediate values
 		///           interpolate between them. Adjusting alpha over time can mix a timeline in or out.
-		/// @param fromSetup If true, alpha transitions between setup and timeline values, setup values are used before the first
+		/// @param from If true, alpha transitions between setup and timeline values, setup values are used before the first
 		///           frame (current values are not used). If false, alpha transitions between current and timeline values, no change
 		///           is made before the first frame.
 		/// @param add If true, for timelines that support it, their values are added to the setup or current values (depending on
-		///           fromSetup).
+		///           from).
 		/// @param out True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant
 		///           transitions.
 		/// @param appliedPose True to modify getAppliedPose(), else getPose() is modified.
-		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixFrom from, bool add, bool out,
 						   bool appliedPose) = 0;
 
 		/// True if this timeline supports additive blending.

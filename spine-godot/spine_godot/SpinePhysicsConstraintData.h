@@ -31,6 +31,7 @@
 
 #include "SpineConstraintData.h"
 #include "SpineBoneData.h"
+#include "SpineConstant.h"
 #include <spine/PhysicsConstraintData.h>
 
 class SpinePhysicsConstraintPose;
@@ -61,6 +62,9 @@ public:
 	float get_limit();
 
 	float get_step();
+
+	SpineConstant::ScaleYMode get_scale_y_mode();
+	void set_scale_y_mode(SpineConstant::ScaleYMode v);
 
 	bool is_inertia_global();
 

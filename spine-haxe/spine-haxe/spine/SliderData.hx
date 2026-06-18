@@ -45,6 +45,11 @@ class SliderData extends ConstraintData<Slider, SliderPose> {
 	public var offset = 0.;
 	public var local = false;
 
+	// Nonessential.
+
+	/** When a bone is set, the maximum slider time for the bone property range, or 0 if nonessential data was not exported. */
+	public var max = 0.;
+
 	public function new(name:String) {
 		super(name, new SliderPose());
 	}

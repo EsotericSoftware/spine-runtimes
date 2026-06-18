@@ -34,10 +34,37 @@
 #include <spine/SpineObject.h>
 #include <spine/PosedData.h>
 #include <spine/RTTI.h>
+#include <string.h>
 
 namespace spine {
 	class Skeleton;
 	class Constraint;
+
+	enum ScaleYMode {
+		ScaleYMode_None = 0,
+		ScaleYMode_Uniform,
+		ScaleYMode_Volume
+	};
+
+	inline ScaleYMode ScaleYMode_valueOf(const char *value) {
+		if (strcmp(value, "uniform") == 0)
+			return ScaleYMode_Uniform;
+		else if (strcmp(value, "volume") == 0)
+			return ScaleYMode_Volume;
+		else
+			return ScaleYMode_None;
+	}
+
+	inline const char *ScaleYMode_toString(ScaleYMode scaleYMode) {
+		switch (scaleYMode) {
+			case ScaleYMode_Uniform:
+				return "uniform";
+			case ScaleYMode_Volume:
+				return "volume";
+			default:
+				return "none";
+		}
+	}
 
 	class SP_API ConstraintData : public SpineObject {
 		RTTI_DECL_NOPARENT

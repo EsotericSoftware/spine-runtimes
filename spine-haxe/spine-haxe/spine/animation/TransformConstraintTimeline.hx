@@ -73,22 +73,28 @@ class TransformConstraintTimeline extends CurveTimeline implements ConstraintTim
 		frames[frame + SHEARY] = mixShearY;
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
-			appliedPose:Bool) {
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, from:MixFrom, add:Bool, out:Bool, appliedPose:Bool) {
 		var constraint = cast(skeleton.constraints[constraintIndex], TransformConstraint);
 		if (!constraint.active)
 			return;
 		var pose = appliedPose ? constraint.appliedPose : constraint.pose;
 
 		if (time < frames[0]) {
-			if (fromSetup) {
-				var setup = constraint.data.setupPose;
+			var setup = constraint.data.setupPose;
+			if (from == MixFrom.setup) {
 				pose.mixRotate = setup.mixRotate;
 				pose.mixX = setup.mixX;
 				pose.mixY = setup.mixY;
 				pose.mixScaleX = setup.mixScaleX;
 				pose.mixScaleY = setup.mixScaleY;
 				pose.mixShearY = setup.mixShearY;
+			} else if (from == MixFrom.first) {
+				pose.mixRotate += (setup.mixRotate - pose.mixRotate) * alpha;
+				pose.mixX += (setup.mixX - pose.mixX) * alpha;
+				pose.mixY += (setup.mixY - pose.mixY) * alpha;
+				pose.mixScaleX += (setup.mixScaleX - pose.mixScaleX) * alpha;
+				pose.mixScaleY += (setup.mixScaleY - pose.mixScaleY) * alpha;
+				pose.mixShearY += (setup.mixShearY - pose.mixShearY) * alpha;
 			}
 			return;
 		}
@@ -128,7 +134,7 @@ class TransformConstraintTimeline extends CurveTimeline implements ConstraintTim
 				shearY = getBezierValue(time, i, SHEARY, curveType + CurveTimeline.BEZIER_SIZE * 5 - CurveTimeline.BEZIER);
 		}
 
-		var base = fromSetup ? constraint.data.setupPose : pose;
+		var base = from == MixFrom.setup ? constraint.data.setupPose : pose;
 		if (add) {
 			pose.mixRotate = base.mixRotate + rotate * alpha;
 			pose.mixX = base.mixX + x * alpha;

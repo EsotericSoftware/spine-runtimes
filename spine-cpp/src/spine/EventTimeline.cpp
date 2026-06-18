@@ -56,7 +56,7 @@ EventTimeline::~EventTimeline() {
 	ArrayUtils::deleteElements(_events);
 }
 
-void EventTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *pEvents, float alpha, bool fromSetup, bool add, bool out,
+void EventTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *pEvents, float alpha, MixFrom from, bool add, bool out,
 						  bool appliedPose) {
 	SP_UNUSED(skeleton);
 	if (pEvents == NULL) return;
@@ -67,7 +67,7 @@ void EventTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<
 
 	if (lastTime > time) {
 		// Apply after lastTime for looped animations.
-		apply(skeleton, lastTime, FLT_MAX, pEvents, 0, false, false, false, false);
+		apply(skeleton, lastTime, FLT_MAX, pEvents, 0, MixFrom_Current, false, false, false);
 		lastTime = -1.0f;
 	} else if (lastTime >= _frames[frameCount - 1]) {
 		// Last time is after last frame.

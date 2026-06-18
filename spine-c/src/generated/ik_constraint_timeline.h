@@ -15,7 +15,7 @@ SPINE_C_API void spine_ik_constraint_timeline_dispose(spine_ik_constraint_timeli
 
 SPINE_C_API spine_rtti spine_ik_constraint_timeline_get_rtti(spine_ik_constraint_timeline self);
 SPINE_C_API void spine_ik_constraint_timeline_apply(spine_ik_constraint_timeline self, spine_skeleton skeleton, float lastTime, float time,
-													/*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out,
+													/*@null*/ spine_array_event events, float alpha, spine_mix_from from, bool add, bool out,
 													bool appliedPose);
 /**
  * Sets the time, mix, softness, bend direction, compress, and stretch for the

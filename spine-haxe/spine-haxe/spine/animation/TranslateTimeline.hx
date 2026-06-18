@@ -39,11 +39,14 @@ class TranslateTimeline extends BoneTimeline2 {
 		super(frameCount, bezierCount, boneIndex, Property.x, Property.y);
 	}
 
-	public function apply1(pose:BonePose, setup:BonePose, time:Float, alpha:Float, fromSetup:Bool, add:Bool, out:Bool):Void {
+	public function apply1(pose:BonePose, setup:BonePose, time:Float, alpha:Float, from:MixFrom, add:Bool, out:Bool):Void {
 		if (time < frames[0]) {
-			if (fromSetup) {
+			if (from == MixFrom.setup) {
 				pose.x = setup.x;
 				pose.y = setup.y;
+			} else if (from == MixFrom.first) {
+				pose.x += (setup.x - pose.x) * alpha;
+				pose.y += (setup.y - pose.y) * alpha;
 			}
 			return;
 		}
@@ -68,7 +71,7 @@ class TranslateTimeline extends BoneTimeline2 {
 				y = getBezierValue(time, i, BoneTimeline2.VALUE2, curveType + CurveTimeline.BEZIER_SIZE - CurveTimeline.BEZIER);
 		}
 
-		if (fromSetup) {
+		if (from == MixFrom.setup) {
 			pose.x = setup.x + x * alpha;
 			pose.y = setup.y + y * alpha;
 		} else if (add) {

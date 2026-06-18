@@ -83,6 +83,7 @@ export class SkeletonMesh extends THREE.Object3D {
 		alphaTest: 0.001,
 		vertexColors: true,
 		premultipliedAlpha: true,
+		forceSinglePass: true,
 	}
 
 	tempPos: Vector2 = new Vector2();

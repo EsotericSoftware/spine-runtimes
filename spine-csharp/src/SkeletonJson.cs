@@ -213,7 +213,7 @@ namespace Spine {
 							if (data.target == null) throw new Exception("IK target bone not found: " + targetName);
 
 							string scaleY = GetString(constraintMap, "scaleY", null);
-							if (scaleY != null) data.scaleY = (IkConstraintData.ScaleYMode)Enum.Parse(typeof(IkConstraintData.ScaleYMode), scaleY, true);
+							if (scaleY != null) data.scaleY = (ScaleYMode)Enum.Parse(typeof(ScaleYMode), scaleY, true);
 							IkConstraintPose setup = data.setupPose;
 							setup.mix = GetFloat(constraintMap, "mix", 1);
 							setup.softness = GetFloat(constraintMap, "softness", 0) * scale;
@@ -368,6 +368,10 @@ namespace Spine {
 							data.y = GetFloat(constraintMap, "y", 0);
 							data.rotate = GetFloat(constraintMap, "rotate", 0);
 							data.scaleX = GetFloat(constraintMap, "scaleX", 0);
+
+							string scaleY = GetString(constraintMap, "scaleY", null);
+							if (scaleY != null) data.scaleYMode = (ScaleYMode)Enum.Parse(typeof(ScaleYMode), scaleY, true);
+
 							data.shearX = GetFloat(constraintMap, "shearX", 0);
 							data.limit = GetFloat(constraintMap, "limit", 5000) * scale;
 							data.step = 1f / GetInt(constraintMap, "fps", 60);
@@ -396,7 +400,6 @@ namespace Spine {
 
 							data.additive = GetBoolean(constraintMap, "additive", false);
 							data.loop = GetBoolean(constraintMap, "loop", false);
-							data.setupPose.time = GetFloat(constraintMap, "time", 0);
 							data.setupPose.mix = GetFloat(constraintMap, "mix", 1);
 
 							string boneName = GetString(constraintMap, "bone", null);
@@ -409,8 +412,10 @@ namespace Spine {
 								data.property.offset = GetFloat(constraintMap, "from", 0) * propertyScale;
 								data.offset = GetFloat(constraintMap, "to", 0);
 								data.scale = GetFloat(constraintMap, "scale", 1) / propertyScale;
+								//data.max = constraintMap.getFloat("max", 0); // non-essential
 								data.local = GetBoolean(constraintMap, "local", false);
-							}
+							} else
+								data.setupPose.time = GetFloat(constraintMap, "time", 0);
 
 							skeletonData.constraints.Add(data);
 							break;

@@ -51,25 +51,26 @@ enum abstract Property(String) from String to String {
 
 	var event = "13";
 	var drawOrder = "14";
+	var drawOrderFolder = "15";
 
-	var ikConstraint = "15";
-	var transformConstraint = "16";
+	var ikConstraint = "16";
+	var transformConstraint = "17";
 
-	var pathConstraintPosition = "17";
-	var pathConstraintSpacing = "18";
-	var pathConstraintMix = "19";
+	var pathConstraintPosition = "18";
+	var pathConstraintSpacing = "19";
+	var pathConstraintMix = "20";
 
-	var physicsConstraintInertia = "20";
-	var physicsConstraintStrength = "21";
-	var physicsConstraintDamping = "22";
-	var physicsConstraintMass = "23";
-	var physicsConstraintWind = "24";
-	var physicsConstraintGravity = "25";
-	var physicsConstraintMix = "26";
-	var physicsConstraintReset = "27";
+	var physicsConstraintInertia = "21";
+	var physicsConstraintStrength = "22";
+	var physicsConstraintDamping = "23";
+	var physicsConstraintMass = "24";
+	var physicsConstraintWind = "25";
+	var physicsConstraintGravity = "26";
+	var physicsConstraintMix = "27";
+	var physicsConstraintReset = "28";
 
-	var sequence = "28";
+	var sequence = "29";
 
-	var sliderTime = "29";
-	var sliderMix = "30";
+	var sliderTime = "30";
+	var sliderMix = "31";
 }

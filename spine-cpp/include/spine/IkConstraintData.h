@@ -36,37 +36,10 @@
 #include <spine/ConstraintData.h>
 #include <spine/PosedData.h>
 #include <spine/IkConstraintPose.h>
-#include <string.h>
 
 namespace spine {
 	class BoneData;
 	class IkConstraint;
-
-	enum ScaleYMode {
-		ScaleYMode_None = 0,
-		ScaleYMode_Uniform,
-		ScaleYMode_Volume
-	};
-
-	inline ScaleYMode ScaleYMode_valueOf(const char *value) {
-		if (strcmp(value, "uniform") == 0)
-			return ScaleYMode_Uniform;
-		else if (strcmp(value, "volume") == 0)
-			return ScaleYMode_Volume;
-		else
-			return ScaleYMode_None;
-	}
-
-	inline const char *ScaleYMode_toString(ScaleYMode scaleYMode) {
-		switch (scaleYMode) {
-			case ScaleYMode_Uniform:
-				return "uniform";
-			case ScaleYMode_Volume:
-				return "volume";
-			default:
-				return "none";
-		}
-	}
 
 	class SP_API IkConstraintData : public ConstraintDataGeneric<IkConstraint, IkConstraintPose> {
 		friend class SkeletonBinary;

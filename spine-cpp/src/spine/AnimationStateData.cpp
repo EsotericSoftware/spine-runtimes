@@ -80,3 +80,8 @@ AnimationStateData::AnimationPair::AnimationPair(Animation *a1, Animation *a2) :
 bool AnimationStateData::AnimationPair::operator==(const AnimationPair &other) const {
 	return _a1->_name == other._a1->_name && _a2->_name == other._a2->_name;
 }
+
+size_t AnimationStateData::AnimationPairHash::operator()(const AnimationPair &pair) const {
+	MapHash<String> hash;
+	return hash(pair._a1->_name) * 31 + hash(pair._a2->_name);
+}

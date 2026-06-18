@@ -57,6 +57,19 @@
 				Returns the step value for the physics simulation.
 			</description>
 		</method>
+		<method name="get_scale_y_mode">
+			<return type="int" enum="SpineConstant.ScaleYMode" />
+			<description>
+				Returns how scaleY changes when the physics constraint changes scaleX.
+			</description>
+		</method>
+		<method name="set_scale_y_mode">
+			<return type="void" />
+			<argument index="0" name="v" type="int" enum="SpineConstant.ScaleYMode" />
+			<description>
+				Sets how scaleY changes when the physics constraint changes scaleX.
+			</description>
+		</method>
 		<method name="is_inertia_global">
 			<return type="bool" />
 			<description>

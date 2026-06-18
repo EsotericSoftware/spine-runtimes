@@ -13,9 +13,9 @@ spine_rtti spine_slot_curve_timeline_get_rtti(spine_slot_curve_timeline self) {
 }
 
 void spine_slot_curve_timeline_apply(spine_slot_curve_timeline self, spine_skeleton skeleton, float lastTime, float time,
-									 /*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
+									 /*@null*/ spine_array_event events, float alpha, spine_mix_from from, bool add, bool out, bool appliedPose) {
 	SlotCurveTimeline *_self = (SlotCurveTimeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixFrom) from, add, out, appliedPose);
 }
 
 int spine_slot_curve_timeline_get_slot_index(spine_slot_curve_timeline self) {

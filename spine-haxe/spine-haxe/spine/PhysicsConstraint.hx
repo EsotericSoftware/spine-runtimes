@@ -29,6 +29,8 @@
 
 package spine;
 
+import spine.ConstraintData.ScaleYMode;
+
 /** Stores the current pose for a physics constraint. A physics constraint applies physics to bones.
  *
  *
@@ -296,6 +298,17 @@ class PhysicsConstraint extends Constraint<PhysicsConstraint, PhysicsConstraintD
 			var s = 1 + (scaleOffset - scaleLag * z) * mix * data.scaleX;
 			bone.a *= s;
 			bone.c *= s;
+			switch (data.scaleYMode) {
+				case ScaleYMode.uniform:
+					bone.b *= s;
+					bone.d *= s;
+				case ScaleYMode.volume:
+					s = Math.abs(s);
+					s = s >= 0.7 ? 1 / s : 4 - 3.67347 * s;
+					bone.b *= s;
+					bone.d *= s;
+				case ScaleYMode.none:
+			}
 		}
 		if (physics != Physics.pose) {
 			tx = l * bone.a;

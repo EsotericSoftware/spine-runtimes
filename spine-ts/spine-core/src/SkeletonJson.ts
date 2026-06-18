@@ -33,9 +33,10 @@ import type { AttachmentLoader } from "./attachments/AttachmentLoader.js";
 import type { MeshAttachment } from "./attachments/MeshAttachment.js";
 import { Sequence, SequenceMode } from "./attachments/Sequence.js";
 import { BoneData, Inherit } from "./BoneData.js";
+import { ScaleYMode } from "./ConstraintData.js";
 import { Event } from "./Event.js";
 import { EventData } from "./EventData.js";
-import { IkConstraintData, ScaleYMode } from "./IkConstraintData.js";
+import { IkConstraintData } from "./IkConstraintData.js";
 import { PathConstraintData, PositionMode, RotateMode, SpacingMode } from "./PathConstraintData.js";
 import { PhysicsConstraintData } from "./PhysicsConstraintData.js";
 import { SkeletonData } from "./SkeletonData.js";
@@ -310,6 +311,10 @@ export class SkeletonJson {
 						data.y = getValue(constraintMap, "y", 0);
 						data.rotate = getValue(constraintMap, "rotate", 0);
 						data.scaleX = getValue(constraintMap, "scaleX", 0);
+
+						const scaleY = getValue(constraintMap, "scaleY", null);
+						if (scaleY != null) data.scaleYMode = Utils.enumValue(ScaleYMode, scaleY);
+
 						data.shearX = getValue(constraintMap, "shearX", 0);
 						data.limit = getValue(constraintMap, "limit", 5000) * scale;
 						data.step = 1 / getValue(constraintMap, "fps", 60);
@@ -338,7 +343,6 @@ export class SkeletonJson {
 
 						data.additive = getValue(constraintMap, "additive", false);
 						data.loop = getValue(constraintMap, "loop", false);
-						data.setupPose.time = getValue(constraintMap, "time", 0);
 						data.setupPose.mix = getValue(constraintMap, "mix", 1);
 
 						const boneName: string = constraintMap.bone;
@@ -351,8 +355,11 @@ export class SkeletonJson {
 							data.property.offset = getValue(constraintMap, "from", 0) * propertyScale;
 							data.offset = getValue(constraintMap, "to", 0);
 							data.scale = getValue(constraintMap, "scale", 1) / propertyScale;
+							data.max = getValue(constraintMap, "max", 0);
 							data.local = getValue(constraintMap, "local", false);
-						}
+						} else
+							data.setupPose.time = getValue(constraintMap, "time", 0);
+
 
 						skeletonData.constraints.push(data);
 						break;
@@ -953,7 +960,7 @@ export class SkeletonJson {
 				let mixRotate = getValue(keyMap, "mixRotate", 1);
 				let mixX = getValue(keyMap, "mixX", 1), mixY = getValue(keyMap, "mixY", mixX);
 				let mixScaleX = getValue(keyMap, "mixScaleX", 1), mixScaleY = getValue(keyMap, "mixScaleY", 1);
-				const mixShearY = getValue(keyMap, "mixShearY", 1);
+				let mixShearY = getValue(keyMap, "mixShearY", 1);
 
 				for (let frame = 0, bezier = 0; ; frame++) {
 					timeline.setFrame(frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY);
@@ -984,7 +991,7 @@ export class SkeletonJson {
 					mixY = mixY2;
 					mixScaleX = mixScaleX2;
 					mixScaleY = mixScaleY2;
-					mixScaleX = mixScaleX2;
+					mixShearY = mixShearY2;
 					keyMap = nextMap;
 				}
 				timelines.push(timeline);

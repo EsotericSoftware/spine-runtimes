@@ -50,6 +50,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+import com.esotericsoftware.spine.Animation.MixFrom;
 import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.Sequence;
@@ -84,7 +85,8 @@ public class Box2DExample extends ApplicationAdapter {
 		// This loader creates Box2dAttachments instead of RegionAttachments for an easy way to keep track of the Box2D body for
 		// each attachment.
 		AtlasAttachmentLoader atlasLoader = new AtlasAttachmentLoader(atlas) {
-			public RegionAttachment newRegionAttachment (Skin skin, String name, String path, Sequence sequence) {
+			public RegionAttachment newRegionAttachment (Skin skin, String placeholder, String name, String path,
+				Sequence sequence) {
 				findRegions(name, path, sequence);
 				return new Box2dAttachment(name, sequence);
 			}
@@ -141,7 +143,7 @@ public class Box2DExample extends ApplicationAdapter {
 		batch.setTransformMatrix(camera.view);
 		batch.begin();
 
-		animation.apply(skeleton, time, time, true, events, 1, true, false, false, false);
+		animation.apply(skeleton, time, time, true, events, 1, MixFrom.setup, false, false, false);
 		skeleton.x += 8 * delta;
 		skeleton.update(delta);
 		skeleton.updateWorldTransform(Physics.update);

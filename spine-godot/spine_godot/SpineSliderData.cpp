@@ -44,6 +44,8 @@ void SpineSliderData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_scale", "value"), &SpineSliderData::set_scale);
 	ClassDB::bind_method(D_METHOD("get_offset"), &SpineSliderData::get_offset);
 	ClassDB::bind_method(D_METHOD("set_offset", "value"), &SpineSliderData::set_offset);
+	ClassDB::bind_method(D_METHOD("get_max"), &SpineSliderData::get_max);
+	ClassDB::bind_method(D_METHOD("set_max", "value"), &SpineSliderData::set_max);
 	ClassDB::bind_method(D_METHOD("get_local"), &SpineSliderData::get_local);
 	ClassDB::bind_method(D_METHOD("set_local", "value"), &SpineSliderData::set_local);
 	ClassDB::bind_method(D_METHOD("get_setup_pose"), &SpineSliderData::get_setup_pose);
@@ -111,6 +113,16 @@ float SpineSliderData::get_offset() {
 void SpineSliderData::set_offset(float value) {
 	SPINE_CHECK(get_spine_constraint_data(), )
 	get_spine_constraint_data()->setOffset(value);
+}
+
+float SpineSliderData::get_max() {
+	SPINE_CHECK(get_spine_constraint_data(), 0)
+	return get_spine_constraint_data()->getMax();
+}
+
+void SpineSliderData::set_max(float value) {
+	SPINE_CHECK(get_spine_constraint_data(), )
+	get_spine_constraint_data()->setMax(value);
 }
 
 bool SpineSliderData::get_local() {

@@ -50,7 +50,7 @@ namespace Spine.Unity.Editor {
 			Continue = 1
 		}
 
-		const string UPGRADE_GUIDE_URL = "https://github.com/EsotericSoftware/spine-runtimes/tree/4.3-beta/spine-unity/Assets/Spine/Documentation/4.3-split-component-upgrade-guide.md";
+		const string UPGRADE_GUIDE_URL = "https://github.com/EsotericSoftware/spine-runtimes/tree/4.3/spine-unity/Assets/Spine/Documentation/4.3-split-component-upgrade-guide.md";
 
 		private static DialogResult dialogResult = DialogResult.None;
 		private static ComponentUpgradeWarningDialog currentWindow;

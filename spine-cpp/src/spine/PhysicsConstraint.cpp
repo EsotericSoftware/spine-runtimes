@@ -263,6 +263,20 @@ void PhysicsConstraint::update(Skeleton &skeleton, Physics physics) {
 		float s = 1 + (_scaleOffset - _scaleLag * z) * mix * _data._scaleX;
 		bone->_a *= s;
 		bone->_c *= s;
+		switch (_data._scaleYMode) {
+			case ScaleYMode_Uniform:
+				bone->_b *= s;
+				bone->_d *= s;
+				break;
+			case ScaleYMode_Volume:
+				s = MathUtil::abs(s);
+				s = s >= 0.7f ? 1 / s : 4 - 3.67347f * s;
+				bone->_b *= s;
+				bone->_d *= s;
+				break;
+			default:
+				break;
+		}
 	}
 	if (physics != Physics_Pose) {
 		_tx = l * bone->_a;

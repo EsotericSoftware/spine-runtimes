@@ -30,7 +30,6 @@
 using System;
 
 namespace Spine {
-
 	/// <summary>
 	/// <para>
 	/// Adjusts the rotation, translation, and scale of the constrained bones so they follow a <see cref="PathAttachment"/>.</para>
@@ -39,7 +38,6 @@ namespace Spine {
 	/// </summary>
 	public class PathConstraint : Constraint<PathConstraint, PathConstraintData, PathConstraintPose> {
 		const int NONE = -1, BEFORE = -2, AFTER = -3;
-		const float Epsilon = 0.00001f;
 
 		internal readonly ExposedList<BonePose> bones;
 		internal Slot slot;
@@ -101,7 +99,7 @@ namespace Spine {
 				for (int i = 0, n = spacesCount - 1; i < n;) {
 					BonePose bone = bonesItems[i];
 					float setupLength = bone.bone.data.length;
-					if (setupLength < Epsilon) {
+					if (setupLength < MathUtils.Epsilon) {
 						if (scale) lengths[i] = 0;
 						spaces[++i] = spacing;
 					} else {
@@ -124,7 +122,7 @@ namespace Spine {
 				for (int i = 0, n = spacesCount - 1; i < n;) {
 					BonePose bone = bonesItems[i];
 					float setupLength = bone.bone.data.length;
-					if (setupLength < PathConstraint.Epsilon) {
+					if (setupLength < MathUtils.Epsilon) {
 						if (scale) lengths[i] = 0;
 						spaces[++i] = spacing;
 					} else {
@@ -155,7 +153,7 @@ namespace Spine {
 				float x = positions[ip], y = positions[ip + 1], dx = x - boneX, dy = y - boneY;
 				if (scale) {
 					float length = lengths[i];
-					if (length >= Epsilon) {
+					if (length >= MathUtils.Epsilon) {
 						float s = ((float)Math.Sqrt(dx * dx + dy * dy) / length - 1) * mixRotate + 1;
 						bone.a *= s;
 						bone.c *= s;
@@ -167,7 +165,7 @@ namespace Spine {
 					float a = bone.a, b = bone.b, c = bone.c, d = bone.d, r, cos, sin;
 					if (tangents)
 						r = positions[ip - 1];
-					else if (spaces[i + 1] < Epsilon)
+					else if (spaces[i + 1] < MathUtils.Epsilon)
 						r = positions[ip + 2];
 					else
 						r = MathUtils.Atan2(dy, dx);
@@ -270,7 +268,7 @@ namespace Spine {
 							path.ComputeWorldVertices(skeleton, slot, curve * 6 + 2, 8, world, 0, 2);
 					}
 					AddCurvePosition(p, world[0], world[1], world[2], world[3], world[4], world[5], world[6], world[7], output, o,
-						tangents || (i > 0 && space < Epsilon));
+						tangents || (i > 0 && space < MathUtils.Epsilon));
 				}
 				return output;
 			}
@@ -428,7 +426,7 @@ namespace Spine {
 					}
 					break;
 				}
-				AddCurvePosition(p * 0.1f, x1, y1, cx1, cy1, cx2, cy2, x2, y2, output, o, tangents || (i > 0 && space < PathConstraint.Epsilon));
+				AddCurvePosition(p * 0.1f, x1, y1, cx1, cy1, cx2, cy2, x2, y2, output, o, tangents || (i > 0 && space < MathUtils.Epsilon));
 			}
 			return output;
 		}
@@ -449,7 +447,7 @@ namespace Spine {
 
 		static void AddCurvePosition (float p, float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2, float y2,
 			float[] output, int o, bool tangents) {
-			if (p < PathConstraint.Epsilon || float.IsNaN(p)) {
+			if (p < MathUtils.Epsilon || float.IsNaN(p)) {
 				output[o] = x1;
 				output[o + 1] = y1;
 				output[o + 2] = (float)Math.Atan2(cy1 - y1, cx1 - x1);

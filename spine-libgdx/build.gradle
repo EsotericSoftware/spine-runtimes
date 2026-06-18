@@ -150,6 +150,8 @@ configure(subprojects - project("spine-libgdx")) {
 
 project("spine-libgdx-tests") {
 	task fatJar(type: Jar) {
+		dependsOn configurations.runtimeClasspath
+
 		manifest {
 			attributes 'Main-Class': 'com.esotericsoftware.spine.HeadlessTest'
 		}

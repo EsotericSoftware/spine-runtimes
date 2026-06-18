@@ -13,7 +13,8 @@ SPINE_C_API void spine_bone_timeline1_dispose(spine_bone_timeline1 self);
 
 SPINE_C_API spine_rtti spine_bone_timeline1_get_rtti(spine_bone_timeline1 self);
 SPINE_C_API void spine_bone_timeline1_apply(spine_bone_timeline1 self, spine_skeleton skeleton, float lastTime, float time,
-											/*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out, bool appliedPose);
+											/*@null*/ spine_array_event events, float alpha, spine_mix_from from, bool add, bool out,
+											bool appliedPose);
 SPINE_C_API int spine_bone_timeline1_get_bone_index(spine_bone_timeline1 self);
 SPINE_C_API void spine_bone_timeline1_set_bone_index(spine_bone_timeline1 self, int inValue);
 /**
@@ -27,14 +28,15 @@ SPINE_C_API void spine_bone_timeline1_set_frame(spine_bone_timeline1 self, size_
  * Returns the interpolated value for the specified time.
  */
 SPINE_C_API float spine_bone_timeline1_get_curve_value(spine_bone_timeline1 self, float time);
-SPINE_C_API float spine_bone_timeline1_get_relative_value(spine_bone_timeline1 self, float time, float alpha, bool fromSetup, bool add, float current,
-														  float setup);
-SPINE_C_API float spine_bone_timeline1_get_absolute_value_1(spine_bone_timeline1 self, float time, float alpha, bool fromSetup, bool add,
+SPINE_C_API float spine_bone_timeline1_get_relative_value(spine_bone_timeline1 self, float time, float alpha, spine_mix_from from, bool add,
+														  float current, float setup);
+SPINE_C_API float spine_bone_timeline1_get_absolute_value_1(spine_bone_timeline1 self, float time, float alpha, spine_mix_from from, bool add,
 															float current, float setup);
-SPINE_C_API float spine_bone_timeline1_get_absolute_value_2(spine_bone_timeline1 self, float time, float alpha, bool fromSetup, bool add,
+SPINE_C_API float spine_bone_timeline1_get_absolute_value_2(spine_bone_timeline1 self, float time, float alpha, spine_mix_from from, bool add,
 															float current, float setup, float value);
-SPINE_C_API float spine_bone_timeline1_get_scale_value(spine_bone_timeline1 self, float time, float alpha, bool fromSetup, bool add, bool out,
+SPINE_C_API float spine_bone_timeline1_get_scale_value(spine_bone_timeline1 self, float time, float alpha, spine_mix_from from, bool add, bool out,
 													   float current, float setup);
+SPINE_C_API float spine_bone_timeline1_before_first_key(spine_mix_from from, float alpha, float current, float setup);
 SPINE_C_API void spine_bone_timeline1_set_linear(spine_bone_timeline1 self, size_t frame);
 SPINE_C_API void spine_bone_timeline1_set_stepped(spine_bone_timeline1 self, size_t frame);
 SPINE_C_API void spine_bone_timeline1_set_bezier(spine_bone_timeline1 self, size_t bezier, size_t frame, float value, float time1, float value1,

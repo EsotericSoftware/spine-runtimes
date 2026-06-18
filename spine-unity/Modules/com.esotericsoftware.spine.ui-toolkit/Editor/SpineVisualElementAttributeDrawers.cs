@@ -200,7 +200,7 @@ namespace Spine.Unity.Editor {
 
 			Spine.Animation animation = skeletonData.FindAnimation(animationName);
 			if (animation != null)
-				animation.Apply(skeleton, -1, 0, false, null, 1.0f, true, false, false, false);
+				animation.Apply(skeleton, -1, 0, false, null, 1.0f, MixFrom.Setup, false, false, false);
 
 			skeleton.Update(0f);
 			skeleton.UpdateWorldTransform(Physics.Update);

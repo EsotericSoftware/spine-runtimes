@@ -74,6 +74,7 @@
 #include <spine/LinkedMesh.h>
 #include <spine/Interpolation.h>
 #include <spine/MathUtil.h>
+#include <spine/Map.h>
 #include <spine/MeshAttachment.h>
 #include <spine/PathAttachment.h>
 #include <spine/PathConstraint.h>

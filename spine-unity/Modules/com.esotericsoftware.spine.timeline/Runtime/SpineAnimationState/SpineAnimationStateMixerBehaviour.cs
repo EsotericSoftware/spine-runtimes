@@ -133,7 +133,9 @@ namespace Spine.Unity.Playables {
 		public override void ProcessFrame (Playable playable, FrameData info, object playerData) {
 			SkeletonAnimation skeletonAnimation = playerData as SkeletonAnimation;
 			SkeletonGraphic skeletonGraphic = playerData as SkeletonGraphic;
-			animationStateComponent = playerData as IAnimationStateComponent;
+			animationStateComponent = skeletonGraphic != null ?
+				skeletonGraphic.Animation as IAnimationStateComponent :
+				playerData as IAnimationStateComponent;
 			ISkeletonComponent skeletonComponent = playerData as ISkeletonComponent;
 			if (animationStateComponent.IsNullOrDestroyed() || skeletonComponent == null) return;
 
@@ -351,7 +353,7 @@ namespace Spine.Unity.Playables {
 					dummyAnimationState.Event -= EditorEvent;
 				} else {
 					if (toAnimation != null) {
-						toAnimation.Apply(skeleton, 0, toClipTime, clipData.loop, editorAnimationEvents, clipData.alpha, true, false, false, false);
+						toAnimation.Apply(skeleton, 0, toClipTime, clipData.loop, editorAnimationEvents, clipData.alpha, MixFrom.Setup, false, false, false);
 						if (EditorEvent != null) {
 							foreach (Spine.Event e in editorAnimationEvents) {
 								EditorEvent(null, e);

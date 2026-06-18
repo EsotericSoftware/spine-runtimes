@@ -23,14 +23,15 @@ SPINE_C_API void spine_curve_timeline1_set_frame(spine_curve_timeline1 self, siz
  * Returns the interpolated value for the specified time.
  */
 SPINE_C_API float spine_curve_timeline1_get_curve_value(spine_curve_timeline1 self, float time);
-SPINE_C_API float spine_curve_timeline1_get_relative_value(spine_curve_timeline1 self, float time, float alpha, bool fromSetup, bool add,
+SPINE_C_API float spine_curve_timeline1_get_relative_value(spine_curve_timeline1 self, float time, float alpha, spine_mix_from from, bool add,
 														   float current, float setup);
-SPINE_C_API float spine_curve_timeline1_get_absolute_value_1(spine_curve_timeline1 self, float time, float alpha, bool fromSetup, bool add,
+SPINE_C_API float spine_curve_timeline1_get_absolute_value_1(spine_curve_timeline1 self, float time, float alpha, spine_mix_from from, bool add,
 															 float current, float setup);
-SPINE_C_API float spine_curve_timeline1_get_absolute_value_2(spine_curve_timeline1 self, float time, float alpha, bool fromSetup, bool add,
+SPINE_C_API float spine_curve_timeline1_get_absolute_value_2(spine_curve_timeline1 self, float time, float alpha, spine_mix_from from, bool add,
 															 float current, float setup, float value);
-SPINE_C_API float spine_curve_timeline1_get_scale_value(spine_curve_timeline1 self, float time, float alpha, bool fromSetup, bool add, bool out,
+SPINE_C_API float spine_curve_timeline1_get_scale_value(spine_curve_timeline1 self, float time, float alpha, spine_mix_from from, bool add, bool out,
 														float current, float setup);
+SPINE_C_API float spine_curve_timeline1_before_first_key(spine_mix_from from, float alpha, float current, float setup);
 SPINE_C_API void spine_curve_timeline1_set_linear(spine_curve_timeline1 self, size_t frame);
 SPINE_C_API void spine_curve_timeline1_set_stepped(spine_curve_timeline1 self, size_t frame);
 SPINE_C_API void spine_curve_timeline1_set_bezier(spine_curve_timeline1 self, size_t bezier, size_t frame, float value, float time1, float value1,
@@ -46,14 +47,15 @@ SPINE_C_API spine_array_float spine_curve_timeline1_get_curves(spine_curve_timel
  * @param lastTime The last time in seconds this timeline was applied. Some timelines trigger only at discrete times, in which case all keys are triggered between lastTime (exclusive) and time (inclusive). Pass -1 the first time a timeline is applied to ensure frame 0 is triggered.
  * @param time The time in seconds the skeleton is being posed for. Timelines find the frame before and after this time and interpolate between the frame values.
  * @param events If any events are fired, they are added to this list. Can be NULL to ignore fired events or if no timelines fire events.
- * @param alpha 0 applies setup or current values (depending on fromSetup), 1 uses timeline values, and intermediate values interpolate between them. Adjusting alpha over time can mix a timeline in or out.
- * @param fromSetup If true, alpha transitions between setup and timeline values, setup values are used before the first frame (current values are not used). If false, alpha transitions between current and timeline values, no change is made before the first frame.
- * @param add If true, for timelines that support it, their values are added to the setup or current values (depending on fromSetup).
+ * @param alpha 0 applies setup or current values (depending on from), 1 uses timeline values, and intermediate values interpolate between them. Adjusting alpha over time can mix a timeline in or out.
+ * @param from If true, alpha transitions between setup and timeline values, setup values are used before the first frame (current values are not used). If false, alpha transitions between current and timeline values, no change is made before the first frame.
+ * @param add If true, for timelines that support it, their values are added to the setup or current values (depending on from).
  * @param out True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant transitions.
  * @param appliedPose True to modify getAppliedPose(), else getPose() is modified.
  */
 SPINE_C_API void spine_curve_timeline1_apply(spine_curve_timeline1 self, spine_skeleton skeleton, float lastTime, float time,
-											 /*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out, bool appliedPose);
+											 /*@null*/ spine_array_event events, float alpha, spine_mix_from from, bool add, bool out,
+											 bool appliedPose);
 /**
  * True if this timeline supports additive blending.
  */

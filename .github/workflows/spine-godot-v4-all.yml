@@ -2,6 +2,8 @@ name: Build spine-godot (All Godot 4.x versions)
 
 on:
   push:
+    branches:
+      - '**'
     paths:
       - ".github/workflows/spine-godot.yml"
       - 'spine-godot/**'
@@ -14,8 +16,8 @@ jobs:
       matrix:
         version:
           [
-            {"tag": "4.6.1-stable", "version": "4.6.1.stable", "mono": false},
-            {"tag": "4.6.1-stable", "version": "4.6.1.stable", "mono": true},
+            {"tag": "4.6.2-stable", "version": "4.6.2.stable", "mono": false},
+            {"tag": "4.6.2-stable", "version": "4.6.2.stable", "mono": true},
           ]
     uses: ./.github/workflows/spine-godot-v4.yml
     with:

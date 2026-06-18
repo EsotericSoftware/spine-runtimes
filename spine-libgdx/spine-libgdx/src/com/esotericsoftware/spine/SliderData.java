@@ -42,6 +42,9 @@ public class SliderData extends ConstraintData<Slider, SliderPose> {
 	float offset, scale;
 	boolean local;
 
+	// Nonessential.
+	float max;
+
 	public SliderData (String name) {
 		super(name, new SliderPose());
 	}
@@ -111,6 +114,15 @@ public class SliderData extends ConstraintData<Slider, SliderPose> {
 
 	public void setScale (float scale) {
 		this.scale = scale;
+	}
+
+	/** When a bone is set, the maximum slider time for the bone property range, or 0 if nonessential data was not exported. */
+	public float getMax () {
+		return max;
+	}
+
+	public void setMax (float max) {
+		this.max = max;
 	}
 
 	/** When true and a bone is set, the bone's local transform property is read instead of its world transform. */

@@ -154,6 +154,18 @@ public class SliderData: PosedData, ConstraintData {
         }
     }
 
+    /// When a bone is set, the maximum slider time for the bone property range, or 0 if
+    /// nonessential data was not exported.
+    public var max: Float {
+        get {
+            let result = spine_slider_data_get_max(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self))
+        return result
+        }
+        set {
+            spine_slider_data_set_max(_ptr.assumingMemoryBound(to: spine_slider_data_wrapper.self), newValue)
+        }
+    }
+
     /// When true and a bone is set, the bone's local transform property is read instead of its
     /// world transform.
     public var local: Bool {

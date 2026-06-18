@@ -61,20 +61,27 @@ class RGB2Timeline extends SlotCurveTimeline {
 		frames[frame + B2] = b2;
 	}
 
-	public function apply1(slot:Slot, pose:SlotPose, time:Float, alpha:Float, fromSetup:Bool, add:Bool) {
+	public function apply1(slot:Slot, pose:SlotPose, time:Float, alpha:Float, from:MixFrom, add:Bool) {
 		var light:Color = pose.color, dark:Color = pose.darkColor;
 		var r:Float = 0, g:Float = 0, b:Float = 0, r2:Float = 0, g2:Float = 0, b2:Float = 0;
 		if (time < frames[0]) {
-			if (fromSetup) {
-				var setupPose = slot.data.setupPose;
-				var setupLight:Color = setupPose.color,
-					setupDark:Color = setupPose.darkColor;
+			var setupPose = slot.data.setupPose;
+			var setupLight:Color = setupPose.color,
+				setupDark:Color = setupPose.darkColor;
+			if (from == MixFrom.setup) {
 				light.r = setupLight.r;
 				light.g = setupLight.g;
 				light.b = setupLight.b;
 				dark.r = setupDark.r;
 				dark.g = setupDark.g;
 				dark.b = setupDark.b;
+			} else if (from == MixFrom.first) {
+				light.r += (setupLight.r - light.r) * alpha;
+				light.g += (setupLight.g - light.g) * alpha;
+				light.b += (setupLight.b - light.b) * alpha;
+				dark.r += (setupDark.r - dark.r) * alpha;
+				dark.g += (setupDark.g - dark.g) * alpha;
+				dark.b += (setupDark.b - dark.b) * alpha;
 			}
 			return;
 		}
@@ -114,7 +121,7 @@ class RGB2Timeline extends SlotCurveTimeline {
 			}
 
 			if (alpha != 1) {
-				if (fromSetup) {
+				if (from == MixFrom.setup) {
 					var setupPose = slot.data.setupPose;
 					var setup = setupPose.color;
 					r = setup.r + (r - setup.r) * alpha;

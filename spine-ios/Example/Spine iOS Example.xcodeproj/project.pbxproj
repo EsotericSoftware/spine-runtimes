@@ -26,6 +26,7 @@
 		920BD12A2BEBDCD80050A5A9 /* dragon_3.png in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1232BEBDCD80050A5A9 /* dragon_3.png */; };
 		920BD12B2BEBDCD80050A5A9 /* dragon.png in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1242BEBDCD80050A5A9 /* dragon.png */; };
 		920BD12C2BEBDCD80050A5A9 /* dragon.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1252BEBDCD80050A5A9 /* dragon.atlas */; };
+		920BD12D2BEBDCD80050A5A9 /* dragon_6.png in Resources */ = {isa = PBXBuildFile; fileRef = 920BD12E2BEBDCD80050A5A9 /* dragon_6.png */; };
 		921C1EAF2BF609F60001A0BA /* DressUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921C1EAE2BF609F60001A0BA /* DressUp.swift */; };
 		921C1EBA2BF60AE90001A0BA /* mix-and-match-pro.skel in Resources */ = {isa = PBXBuildFile; fileRef = 921C1EB72BF60AE90001A0BA /* mix-and-match-pro.skel */; };
 		922839DF2BF4F7D8006DA9F6 /* AnimationStateEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922839DE2BF4F7D8006DA9F6 /* AnimationStateEvents.swift */; };
@@ -59,6 +60,7 @@
 		920BD1232BEBDCD80050A5A9 /* dragon_3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dragon_3.png; sourceTree = "<group>"; };
 		920BD1242BEBDCD80050A5A9 /* dragon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dragon.png; sourceTree = "<group>"; };
 		920BD1252BEBDCD80050A5A9 /* dragon.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dragon.atlas; sourceTree = "<group>"; };
+		920BD12E2BEBDCD80050A5A9 /* dragon_6.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dragon_6.png; sourceTree = "<group>"; };
 		921C1EAE2BF609F60001A0BA /* DressUp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DressUp.swift; sourceTree = "<group>"; };
 		921C1EB72BF60AE90001A0BA /* mix-and-match-pro.skel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "mix-and-match-pro.skel"; sourceTree = "<group>"; };
 		922839DE2BF4F7D8006DA9F6 /* AnimationStateEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationStateEvents.swift; sourceTree = "<group>"; };
@@ -110,6 +112,7 @@
 				920BD1232BEBDCD80050A5A9 /* dragon_3.png */,
 				920BD1242BEBDCD80050A5A9 /* dragon.png */,
 				920BD1252BEBDCD80050A5A9 /* dragon.atlas */,
+				920BD12E2BEBDCD80050A5A9 /* dragon_6.png */,
 			);
 			path = dragon;
 			sourceTree = "<group>";
@@ -271,6 +274,7 @@
 				920BD1162BEBC52D0050A5A9 /* spineboy-pro.skel in Resources */,
 				920BD12B2BEBDCD80050A5A9 /* dragon.png in Resources */,
 				920BD1272BEBDCD80050A5A9 /* dragon_5.png in Resources */,
+				920BD12D2BEBDCD80050A5A9 /* dragon_6.png in Resources */,
 				76381FDF2C2EF53A0087712B /* mix-and-match-pma.atlas in Resources */,
 				920BD1262BEBDCD80050A5A9 /* dragon_4.png in Resources */,
 				76381FD72C2EF4F10087712B /* spineboy-pma.png in Resources */,

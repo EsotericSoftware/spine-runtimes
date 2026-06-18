@@ -95,7 +95,7 @@ namespace Spine.Unity {
 		}
 
 		public void RenderParts (SkeletonRenderer skeletonRenderer, ExposedList<SubmeshInstruction> instructions,
-			int startSubmesh, int endSubmesh) {
+			int startSubmesh, int endSubmesh, bool materialsNeedUpdate = false) {
 
 			LazyIntialize();
 
@@ -128,7 +128,7 @@ namespace Spine.Unity {
 				if (updateTriangles) {
 					meshGenerator.FillTriangles(mesh);
 				}
-				if (updateTriangles || materialsChanged) {
+				if (updateTriangles || materialsChanged || materialsNeedUpdate) {
 					Material[] materials = buffers.UpdateSharedMaterialsArray();
 					if (skeletonRenderer)
 						skeletonRenderer.ConfigureMaterials(materials, currentInstructions.submeshInstructions);

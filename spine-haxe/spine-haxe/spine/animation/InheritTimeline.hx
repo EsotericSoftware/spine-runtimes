@@ -63,7 +63,7 @@ class InheritTimeline extends Timeline implements BoneTimeline {
 		frames[frame + INHERIT] = inherit.ordinal;
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, from:MixFrom, add:Bool, out:Bool,
 			appliedPose:Bool):Void {
 		var bone:Bone = skeleton.bones[boneIndex];
 		if (!bone.active)
@@ -71,12 +71,12 @@ class InheritTimeline extends Timeline implements BoneTimeline {
 		var pose = appliedPose ? bone.appliedPose : bone.pose;
 
 		if (out) {
-			if (fromSetup)
+			if (from != MixFrom.current)
 				pose.inherit = bone.data.setupPose.inherit;
 		} else {
 			var frames:Array<Float> = frames;
 			if (time < frames[0]) {
-				if (fromSetup)
+				if (from != MixFrom.current)
 					pose.inherit = bone.data.setupPose.inherit;
 			} else
 				pose.inherit = Inherit.values[Std.int(frames[Timeline.search(frames, time, ENTRIES) + INHERIT])];

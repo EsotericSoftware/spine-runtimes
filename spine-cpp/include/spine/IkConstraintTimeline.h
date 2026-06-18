@@ -48,7 +48,7 @@ namespace spine {
 
 		virtual ~IkConstraintTimeline();
 
-		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixFrom from, bool add, bool out,
 						   bool appliedPose) override;
 
 		/// Sets the time, mix, softness, bend direction, compress, and stretch for the specified frame.

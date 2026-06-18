@@ -36,6 +36,7 @@ import {
 	type Disposable,
 	type LoadingScreen,
 	MeshAttachment,
+	MixFrom,
 	type NumberArrayLike,
 	Physics,
 	RegionAttachment,
@@ -1279,7 +1280,7 @@ export class SpineWebComponentSkeleton extends HTMLElement implements Disposable
 		let steps = 100, stepTime = animation.duration ? animation.duration / steps : 0, time = 0;
 		let minX = 100000000, maxX = -100000000, minY = 100000000, maxY = -100000000;
 		for (let i = 0; i < steps; i++, time += stepTime) {
-			animation.apply(skeleton, time, time, false, [], 1, true, false, false, false);
+			animation.apply(skeleton, time, time, false, [], 1, MixFrom.setup, false, false, false);
 			skeleton.updateWorldTransform(Physics.update);
 			skeleton.getBounds(offset, size, tempArray, renderer.skeletonRenderer.getSkeletonClipping());
 

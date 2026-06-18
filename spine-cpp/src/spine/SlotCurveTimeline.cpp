@@ -53,12 +53,12 @@ void SlotCurveTimeline::setSlotIndex(int inValue) {
 	_slotIndex = inValue;
 }
 
-void SlotCurveTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+void SlotCurveTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixFrom from, bool add, bool out,
 							  bool appliedPose) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(events);
 	SP_UNUSED(out);
 
 	Slot *slot = skeleton._slots[_slotIndex];
-	if (slot->_bone.isActive()) _apply(*slot, appliedPose ? *slot->_appliedPose : slot->_pose, time, alpha, fromSetup, add);
+	if (slot->_bone.isActive()) _apply(*slot, appliedPose ? *slot->_appliedPose : slot->_pose, time, alpha, from, add);
 }

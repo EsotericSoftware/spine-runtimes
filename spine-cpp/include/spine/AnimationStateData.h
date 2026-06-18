@@ -30,7 +30,7 @@
 #ifndef Spine_AnimationStateData_h
 #define Spine_AnimationStateData_h
 
-#include <spine/HashMap.h>
+#include <spine/Map.h>
 #include <spine/SpineObject.h>
 #include <spine/SpineString.h>
 
@@ -81,9 +81,14 @@ namespace spine {
 			bool operator==(const AnimationPair &other) const;
 		};
 
+		class AnimationPairHash {
+		public:
+			size_t operator()(const AnimationPair &pair) const;
+		};
+
 		SkeletonData *_skeletonData;
 		float _defaultMix;
-		HashMap<AnimationPair, float> _animationToMixTime;
+		Map<AnimationPair, float, AnimationPairHash> _animationToMixTime;
 	};
 }
 

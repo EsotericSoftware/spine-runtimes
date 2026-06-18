@@ -35,20 +35,63 @@
 #include <spine/Animation.h>
 #include <spine/Timeline.h>
 #include <spine/SlotTimeline.h>
+#include <spine/SlotCurveTimeline.h>
+#include <spine/AttachmentTimeline.h>
+#include <spine/SequenceTimeline.h>
+#include <spine/ColorTimeline.h>
 #include <spine/ConstraintTimeline.h>
+#include <spine/ConstraintTimeline1.h>
 #include <spine/PhysicsConstraintTimeline.h>
+#include <spine/IkConstraintTimeline.h>
+#include <spine/PathConstraintMixTimeline.h>
+#include <spine/TransformConstraintTimeline.h>
 #include <spine/DrawOrderTimeline.h>
 #include <spine/DrawOrderFolderTimeline.h>
 #include <spine/SliderData.h>
 #include <spine/SliderPose.h>
 #include <spine/Slot.h>
+#include <spine/IkConstraint.h>
+#include <spine/PathConstraint.h>
 #include <spine/PhysicsConstraint.h>
-#include <spine/TransformConstraintData.h>
+#include <spine/TransformConstraint.h>
 #include <spine/MathUtil.h>
 
 using namespace spine;
 
 RTTI_IMPL(Slider, Constraint)
+
+namespace {
+	SlotTimeline *asSlotTimeline(Timeline *timeline) {
+		if (timeline->getRTTI().isExactly(AlphaTimeline::rtti)) return static_cast<AlphaTimeline *>(timeline);
+		if (timeline->getRTTI().instanceOf(SlotCurveTimeline::rtti)) return static_cast<SlotCurveTimeline *>(timeline);
+		if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti)) return static_cast<AttachmentTimeline *>(timeline);
+		if (timeline->getRTTI().isExactly(SequenceTimeline::rtti)) return static_cast<SequenceTimeline *>(timeline);
+		return NULL;
+	}
+
+	ConstraintTimeline *asConstraintTimeline(Timeline *timeline) {
+		if (timeline->getRTTI().instanceOf(ConstraintTimeline1::rtti)) return static_cast<ConstraintTimeline1 *>(timeline);
+		if (timeline->getRTTI().instanceOf(PhysicsConstraintTimeline::rtti)) return static_cast<PhysicsConstraintTimeline *>(timeline);
+		if (timeline->getRTTI().isExactly(PhysicsConstraintResetTimeline::rtti)) return static_cast<PhysicsConstraintResetTimeline *>(timeline);
+		if (timeline->getRTTI().isExactly(IkConstraintTimeline::rtti)) return static_cast<IkConstraintTimeline *>(timeline);
+		if (timeline->getRTTI().isExactly(PathConstraintMixTimeline::rtti)) return static_cast<PathConstraintMixTimeline *>(timeline);
+		if (timeline->getRTTI().isExactly(TransformConstraintTimeline::rtti)) return static_cast<TransformConstraintTimeline *>(timeline);
+		return NULL;
+	}
+
+	void constrain(Skeleton &skeleton, Constraint *constraint) {
+		if (constraint->getRTTI().instanceOf(IkConstraint::rtti))
+			skeleton.constrained(*static_cast<IkConstraint *>(constraint));
+		else if (constraint->getRTTI().instanceOf(PathConstraint::rtti))
+			skeleton.constrained(*static_cast<PathConstraint *>(constraint));
+		else if (constraint->getRTTI().instanceOf(PhysicsConstraint::rtti))
+			skeleton.constrained(*static_cast<PhysicsConstraint *>(constraint));
+		else if (constraint->getRTTI().instanceOf(Slider::rtti))
+			skeleton.constrained(*static_cast<Slider *>(constraint));
+		else if (constraint->getRTTI().instanceOf(TransformConstraint::rtti))
+			skeleton.constrained(*static_cast<TransformConstraint *>(constraint));
+	}
+}
 
 float Slider::_offsets[6];
 
@@ -84,7 +127,7 @@ void Slider::update(Skeleton &skeleton, Physics physics) {
 	const Array<int> &indices = animation->getBones();
 	for (size_t i = 0, n = indices.size(); i < n; i++) bones[indices[i]]->_appliedPose->modifyLocal(skeleton);
 
-	animation->apply(skeleton, p._time, p._time, _data._loop, NULL, p._mix, false, _data._additive, false, true);
+	animation->apply(skeleton, p._time, p._time, _data._loop, NULL, p._mix, MixFrom_Current, _data._additive, false, true);
 }
 
 void Slider::sort(Skeleton &skeleton) {
@@ -108,21 +151,20 @@ void Slider::sort(Skeleton &skeleton) {
 	for (size_t i = 0, n = timelines.size(); i < n; i++) {
 		Timeline *t = timelines[i];
 
-		if (t->getRTTI().instanceOf(SlotTimeline::rtti)) {
-			SlotTimeline *timeline = (SlotTimeline *) t;
-			skeleton.constrained(*slots[timeline->getSlotIndex()]);
+		SlotTimeline *slotTimeline = asSlotTimeline(t);
+		if (slotTimeline) {
+			skeleton.constrained(*slots[slotTimeline->getSlotIndex()]);
 		} else if (t->getRTTI().instanceOf(DrawOrderTimeline::rtti) || t->getRTTI().instanceOf(DrawOrderFolderTimeline::rtti)) {
 			skeleton.getDrawOrder().constrained();
-		} else if (t->getRTTI().instanceOf(PhysicsConstraintTimeline::rtti)) {
-			PhysicsConstraintTimeline *timeline = (PhysicsConstraintTimeline *) t;
-			if (timeline->getConstraintIndex() == -1) {
+		} else {
+			ConstraintTimeline *constraintTimeline = asConstraintTimeline(t);
+			if (!constraintTimeline) continue;
+			if (t->getRTTI().instanceOf(PhysicsConstraintTimeline::rtti) && constraintTimeline->getConstraintIndex() == -1) {
 				for (size_t ii = 0; ii < physicsCount; ii++) skeleton.constrained(*physics[ii]);
-			} else
-				skeleton.constrained((Posed &) *constraints[timeline->getConstraintIndex()]);
-		} else if (t->getRTTI().instanceOf(ConstraintTimeline::rtti)) {
-			ConstraintTimeline *timeline = (ConstraintTimeline *) t;
-			int index = timeline->getConstraintIndex();
-			if (index != -1) skeleton.constrained((Posed &) *constraints[timeline->getConstraintIndex()]);
+			} else {
+				int index = constraintTimeline->getConstraintIndex();
+				if (index != -1) constrain(skeleton, constraints[index]);
+			}
 		}
 	}
 }

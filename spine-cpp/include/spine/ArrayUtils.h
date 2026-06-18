@@ -32,7 +32,6 @@
 
 #include <spine/Extension.h>
 #include <spine/Array.h>
-#include <spine/HashMap.h>
 #include <spine/SpineObject.h>
 #include <spine/SpineString.h>
 

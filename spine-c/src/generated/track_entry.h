@@ -81,7 +81,8 @@ SPINE_C_API void spine_track_entry_set_track_time(spine_track_entry self, float 
  * animation are set to the setup pose and the track is cleared.
  *
  * It may be desired to use AnimationState::addEmptyAnimation(int, float, float)
- * rather than have the animation abruptly cease being applied.
+ * rather than have the animation abruptly cease being applied, leaving the
+ * current pose.
  */
 SPINE_C_API float spine_track_entry_get_track_end(spine_track_entry self);
 SPINE_C_API void spine_track_entry_set_track_end(spine_track_entry self, float inValue);

@@ -31,6 +31,12 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     add_executable(headless-test ${CMAKE_CURRENT_SOURCE_DIR}/tests/HeadlessTest.cpp)
     target_link_libraries(headless-test spine-cpp)
 
+    add_executable(map-test ${CMAKE_CURRENT_SOURCE_DIR}/tests/MapTest.cpp)
+    target_link_libraries(map-test spine-cpp)
+
+    enable_testing()
+    add_test(NAME map-test COMMAND map-test)
+
     if(SPINE_NO_FILE_IO)
         target_compile_definitions(headless-test PRIVATE SPINE_NO_FILE_IO)
     endif()

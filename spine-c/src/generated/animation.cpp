@@ -37,9 +37,9 @@ void spine_animation_set_duration(spine_animation self, float inValue) {
 }
 
 void spine_animation_apply(spine_animation self, spine_skeleton skeleton, float lastTime, float time, bool loop, /*@null*/ spine_array_event events,
-						   float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
+						   float alpha, spine_mix_from from, bool add, bool out, bool appliedPose) {
 	Animation *_self = (Animation *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, loop, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, loop, (Array<Event *> *) events, alpha, (MixFrom) from, add, out, appliedPose);
 }
 
 const char *spine_animation_get_name(spine_animation self) {

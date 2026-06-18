@@ -37,6 +37,7 @@ namespace Spine {
 		internal BoneData bone;
 		internal float x, y, rotate, scaleX, shearX, limit, step;
 		internal bool inertiaGlobal, strengthGlobal, dampingGlobal, massGlobal, windGlobal, gravityGlobal, mixGlobal;
+		internal ScaleYMode scaleYMode = ScaleYMode.None;
 
 		public PhysicsConstraintData (string name)
 			: base(name, new PhysicsConstraintPose()) {
@@ -63,6 +64,16 @@ namespace Spine {
 		public float ShearX { get { return shearX; } set { shearX = value; } }
 		/// <summary>Movement greater than the limit will not have a greater effect on physics.</summary>
 		public float Limit { get { return limit; } set { limit = value; } }
+
+		/// <summary>
+		/// Determines how the <see cref="BonePose.scaleY"/> changes when <see cref="PhysicsConstraintData.scaleX"/> sets
+		/// <see cref="BonePose.scaleX"/>
+		/// </summary>
+		public ScaleYMode ScaleYMode {
+			get { return scaleYMode; }
+			set { scaleYMode = value; }
+		}
+
 		/// <summary>True when this constraint's inertia is controlled by global slider timelines.</summary>
 		public bool InertiaGlobal { get { return inertiaGlobal; } set { inertiaGlobal = value; } }
 		/// <summary>True when this constraint's strength is controlled by global slider timelines.</summary>

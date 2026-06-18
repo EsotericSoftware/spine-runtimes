@@ -1,3 +1,24 @@
+# 4.3.4
+
+## Flutter
+
+- **Bug fixes**
+  - Fixed automated release publishing so native source files are included in the pub.dev package.
+
+# 4.3.3
+
+## Flutter
+
+- **Additions**
+  - Added GitHub Actions release automation for spine-flutter.
+
+# 4.3.2
+
+## Flutter
+
+- **Bug fixes**
+  - Updated bundled spine-c/spine-cpp sources and WebAssembly assets for the 4.3 release.
+
 # 4.3.1
 
 ## Flutter

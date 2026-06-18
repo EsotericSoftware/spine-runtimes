@@ -59,6 +59,12 @@ SPINE_C_API void spine_slider_data_set_scale(spine_slider_data self, float scale
 SPINE_C_API float spine_slider_data_get_offset(spine_slider_data self);
 SPINE_C_API void spine_slider_data_set_offset(spine_slider_data self, float offset);
 /**
+ * When a bone is set, the maximum slider time for the bone property range, or 0
+ * if nonessential data was not exported.
+ */
+SPINE_C_API float spine_slider_data_get_max(spine_slider_data self);
+SPINE_C_API void spine_slider_data_set_max(spine_slider_data self, float max);
+/**
  * When true and a bone is set, the bone's local transform property is read
  * instead of its world transform.
  */

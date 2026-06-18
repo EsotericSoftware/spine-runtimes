@@ -75,15 +75,14 @@ class SequenceTimeline extends Timeline implements SlotTimeline {
 		frames[frame + SequenceTimeline.DELAY] = delay;
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
-			appliedPose:Bool) {
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, from:MixFrom, add:Bool, out:Bool, appliedPose:Bool) {
 		var slots = skeleton.slots;
 		if (!attachment.isTimelineActive(slots, slotIndex, appliedPose))
 			return;
 		var timelineSlots = attachment.timelineSlots;
 
 		if (out || time < frames[0]) {
-			if (fromSetup) {
+			if (from != MixFrom.current) {
 				setupPose(slots[slotIndex], appliedPose);
 				for (i in 0...timelineSlots.length)
 					setupPose(slots[timelineSlots[i]], appliedPose);

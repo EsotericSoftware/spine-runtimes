@@ -2,6 +2,8 @@ name: Check Dart Formatting
 
 on:
   push:
+    branches:
+      - '**'
     paths:
       - 'spine-flutter/**/*.dart'
       - 'formatters/format-dart.sh'

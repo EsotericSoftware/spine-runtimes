@@ -34,6 +34,7 @@
 #if VERSION_MAJOR > 3
 #ifdef SPINE_GODOT_EXTENSION
 #include <godot_cpp/classes/editor_import_plugin.hpp>
+#include <godot_cpp/classes/v_box_container.hpp>
 #else
 #include "editor/import/editor_import_plugin.h"
 #endif
@@ -518,6 +519,27 @@ public:
 	SpineEditorPropertyAnimationMix();
 	void setup(SpineEditorPropertyAnimationMixes *mixes_property, const Ref<SpineSkeletonDataResource> &skeleton_data, int index);
 	void update_property() override;
+};
+#else
+class SpineEditorPropertyAnimationMixes : public EditorProperty {
+	GDCLASS(SpineEditorPropertyAnimationMixes, EditorProperty)
+
+	Ref<SpineSkeletonDataResource> skeleton_data;
+	VBoxContainer *container;
+	bool updating;
+
+	static void _bind_methods();
+	void rebuild_ui();
+	void add_mix();
+	void delete_mix(int idx);
+	void on_from_changed(int option_idx, int mix_idx);
+	void on_to_changed(int option_idx, int mix_idx);
+	void on_mix_value_changed(float value, int mix_idx);
+
+public:
+	SpineEditorPropertyAnimationMixes();
+	void setup(const Ref<SpineSkeletonDataResource> &_skeleton_data);
+	void _update_property() override;
 };
 #endif
 

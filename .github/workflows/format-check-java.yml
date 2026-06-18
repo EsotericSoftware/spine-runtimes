@@ -2,6 +2,8 @@ name: Check Java Formatting
 
 on:
   push:
+    branches:
+      - '**'
     paths:
       - 'spine-libgdx/**'
       - 'spine-android/**'

@@ -57,6 +57,12 @@ SPINE_C_API void spine_physics_constraint_data_set_shear_x(spine_physics_constra
 SPINE_C_API float spine_physics_constraint_data_get_limit(spine_physics_constraint_data self);
 SPINE_C_API void spine_physics_constraint_data_set_limit(spine_physics_constraint_data self, float limit);
 /**
+ * Determines how BonePose::getScaleY() changes when getScaleX() sets
+ * BonePose::getScaleX().
+ */
+SPINE_C_API spine_scale_y_mode spine_physics_constraint_data_get_scale_y_mode(spine_physics_constraint_data self);
+SPINE_C_API void spine_physics_constraint_data_set_scale_y_mode(spine_physics_constraint_data self, spine_scale_y_mode scaleYMode);
+/**
  * True when this constraint's inertia is controlled by global slider timelines.
  */
 SPINE_C_API bool spine_physics_constraint_data_get_inertia_global(spine_physics_constraint_data self);

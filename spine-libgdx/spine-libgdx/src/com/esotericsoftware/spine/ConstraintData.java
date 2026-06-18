@@ -18,4 +18,16 @@ abstract public class ConstraintData< //
 	}
 
 	abstract public T create (Skeleton skeleton);
+
+	/** Determines how the {@link BonePose#scaleY} changes when {@link BonePose#scaleX} is set. */
+	static public enum ScaleYMode {
+		/** scaleY is not changed. */
+		none,
+		/** scaleY is multiplied by the scaleX factor, preserving the bone's aspect ratio. */
+		uniform,
+		/** scaleY is divided by the scaleX factor, preserving the bone's area. */
+		volume;
+
+		static public final ScaleYMode[] values = ScaleYMode.values();
+	}
 }

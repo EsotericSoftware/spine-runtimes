@@ -29,6 +29,7 @@
 
 package com.esotericsoftware.spine;
 
+import com.esotericsoftware.spine.Animation.MixFrom;
 import com.esotericsoftware.spine.Animation.ConstraintTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderFolderTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
@@ -78,7 +79,7 @@ public class Slider extends Constraint<Slider, SliderData, SliderPose> {
 		for (int i = 0, n = animation.bones.size; i < n; i++)
 			bones[indices[i]].appliedPose.modifyLocal(skeleton);
 
-		animation.apply(skeleton, p.time, p.time, data.loop, null, p.mix, false, data.additive, false, true);
+		animation.apply(skeleton, p.time, p.time, data.loop, null, p.mix, MixFrom.current, data.additive, false, true);
 	}
 
 	void sort (Skeleton skeleton) {

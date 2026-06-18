@@ -22,7 +22,8 @@ SPINE_C_API spine_rtti spine_rgba_timeline_get_rtti(spine_rgba_timeline self);
  */
 SPINE_C_API void spine_rgba_timeline_set_frame(spine_rgba_timeline self, int frame, float time, float r, float g, float b, float a);
 SPINE_C_API void spine_rgba_timeline_apply(spine_rgba_timeline self, spine_skeleton skeleton, float lastTime, float time,
-										   /*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out, bool appliedPose);
+										   /*@null*/ spine_array_event events, float alpha, spine_mix_from from, bool add, bool out,
+										   bool appliedPose);
 SPINE_C_API int spine_rgba_timeline_get_slot_index(spine_rgba_timeline self);
 SPINE_C_API void spine_rgba_timeline_set_slot_index(spine_rgba_timeline self, int inValue);
 SPINE_C_API void spine_rgba_timeline_set_linear(spine_rgba_timeline self, size_t frame);

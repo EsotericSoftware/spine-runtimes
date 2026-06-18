@@ -3444,6 +3444,9 @@ public class SkeletonSerializer {
 		json.writeName("scale");
 		json.writeValue(obj.getScale());
 
+		json.writeName("max");
+		json.writeValue(obj.getMax());
+
 		json.writeName("local");
 		json.writeValue(obj.getLocal());
 

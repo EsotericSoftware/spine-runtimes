@@ -32,6 +32,7 @@ package spine;
 import spine.animation.ConstraintTimeline;
 import spine.animation.DrawOrderFolderTimeline;
 import spine.animation.DrawOrderTimeline;
+import spine.animation.MixFrom;
 import spine.animation.PhysicsConstraintTimeline;
 import spine.animation.SlotTimeline;
 
@@ -82,7 +83,7 @@ class Slider extends Constraint<Slider, SliderData, SliderPose> {
 		while (i < n)
 			bones[indices[i++]].appliedPose.modifyLocal(skeleton);
 
-		animation.apply(skeleton, p.time, p.time, data.loop, null, p.mix, false, data.additive, false, true);
+		animation.apply(skeleton, p.time, p.time, data.loop, null, p.mix, MixFrom.current, data.additive, false, true);
 	}
 
 	function sort(skeleton:Skeleton) {

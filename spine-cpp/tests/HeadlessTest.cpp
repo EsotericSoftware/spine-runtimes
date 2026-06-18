@@ -28,6 +28,7 @@
  *****************************************************************************/
 
 #include <spine/spine.h>
+#include <spine/InheritTimeline.h>
 #include "SkeletonSerializer.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -125,10 +126,20 @@ public:
 	}
 };
 
+static bool testInheritTimelineBoneIndex() {
+	InheritTimeline timeline(1, 123);
+	if (timeline.getBoneIndex() != 123) {
+		fprintf(stderr, "InheritTimeline bone index was not initialized correctly\n");
+		return false;
+	}
+	return true;
+}
 
 int main(int argc, char *argv[]) {
 	// Set locale to ensure consistent number formatting
 	setlocale(LC_ALL, "C");
+
+	if (!testInheritTimelineBoneIndex()) return 1;
 
 	if (argc < 3) {
 		fprintf(stderr, "Usage: HeadlessTest <skeleton-path> <atlas-path> [animation-name] [animation-name-2]\n");

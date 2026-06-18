@@ -538,6 +538,7 @@ namespace Spine.Unity.Editor {
 			if (go == null) return;
 
 			EditorApplication.delayCall += () => {
+				if (go == null) return;
 				EditorUtility.SetDirty(go);
 				EditorSceneManager.MarkSceneDirty(go.scene);
 			};

@@ -31,6 +31,8 @@ package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.utils.Array;
 
+import com.esotericsoftware.spine.ConstraintData.ScaleYMode;
+
 /** Stores the setup pose for an {@link IkConstraint}.
  * <p>
  * See <a href="https://esotericsoftware.com/spine-ik-constraints">IK constraints</a> in the Spine User Guide. */
@@ -71,18 +73,5 @@ public class IkConstraintData extends ConstraintData<IkConstraint, IkConstraintP
 	public void setScaleYMode (ScaleYMode scaleYMode) {
 		if (scaleYMode == null) throw new IllegalArgumentException("scaleYMode cannot be null.");
 		this.scaleYMode = scaleYMode;
-	}
-
-	/** Determines how the {@link BonePose#scaleY} changes when {@link IkConstraintPose#compress} or
-	 * {@link IkConstraintPose#stretch} set {@link BonePose#scaleX}. */
-	static public enum ScaleYMode {
-		/** scaleY is not changed. */
-		none,
-		/** scaleY is multiplied by the scaleX factor, preserving the bone's aspect ratio. */
-		uniform,
-		/** scaleY is divided by the scaleX factor, preserving the bone's area. */
-		volume;
-
-		static public final ScaleYMode[] values = ScaleYMode.values();
 	}
 }

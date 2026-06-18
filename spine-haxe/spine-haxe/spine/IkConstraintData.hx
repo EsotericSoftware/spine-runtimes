@@ -29,6 +29,8 @@
 
 package spine;
 
+import spine.ConstraintData.ScaleYMode;
+
 /** Stores the setup pose for a spine.IkConstraint.
  *
  * @see https://esotericsoftware.com/spine-ik-constraints IK constraints in the Spine User Guide */
@@ -55,38 +57,5 @@ class IkConstraintData extends ConstraintData<IkConstraint, IkConstraintPose> {
 			throw new SpineException("target cannot be null.");
 		this.target = target;
 		return target;
-	}
-}
-
-/** Determines how BonePose.scaleY changes when IkConstraintPose.compress or IkConstraintPose.stretch set BonePose.scaleX. */
-class ScaleYMode {
-	/** scaleY is not changed. */
-	public static var none(default, never):ScaleYMode = new ScaleYMode(0, "none");
-
-	/** scaleY is multiplied by the scaleX factor, preserving the bone's aspect ratio. */
-	public static var uniform(default, never):ScaleYMode = new ScaleYMode(1, "uniform");
-
-	/** scaleY is divided by the scaleX factor, preserving the bone's area. */
-	public static var volume(default, never):ScaleYMode = new ScaleYMode(2, "volume");
-
-	public static var values:Array<ScaleYMode> = [none, uniform, volume];
-
-	public final ordinal:Int;
-	public final name:String;
-
-	private function new(ordinal:Int, name:String) {
-		this.ordinal = ordinal;
-		this.name = name;
-	}
-
-	public function toString():String {
-		return name;
-	}
-
-	public static function fromName(name:String):ScaleYMode {
-		for (scaleYMode in values)
-			if (scaleYMode.name == name)
-				return scaleYMode;
-		return none;
 	}
 }

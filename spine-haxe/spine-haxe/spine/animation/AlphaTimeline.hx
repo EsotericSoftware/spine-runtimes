@@ -55,8 +55,7 @@ class AlphaTimeline extends CurveTimeline1 implements SlotTimeline {
 		return slotIndex;
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
-			appliedPose:Bool) {
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, from:MixFrom, add:Bool, out:Bool, appliedPose:Bool) {
 		var slot = skeleton.slots[slotIndex];
 		if (!slot.bone.active)
 			return;
@@ -64,14 +63,17 @@ class AlphaTimeline extends CurveTimeline1 implements SlotTimeline {
 		var color = (appliedPose ? slot.appliedPose : slot.pose).color;
 		var a:Float = 0;
 		if (time < frames[0]) {
-			if (fromSetup)
-				color.a = slot.data.setupPose.color.a;
+			var setup = slot.data.setupPose.color.a;
+			if (from == MixFrom.setup)
+				color.a = setup;
+			else if (from == MixFrom.first)
+				color.a += (setup - color.a) * alpha;
 			return;
 		}
 
 		a = getCurveValue(time);
 		if (alpha != 1) {
-			if (fromSetup) {
+			if (from == MixFrom.setup) {
 				var setup = slot.data.setupPose.color;
 				a = setup.a + (a - setup.a) * alpha;
 			} else

@@ -496,7 +496,7 @@ namespace Spine {
 			}
 		}
 
-		private bool MakeClockwise (ExposedList<float> polygon) {
+		public static bool MakeClockwise (ExposedList<float> polygon) {
 			float[] v = polygon.Items;
 			int n = polygon.Count;
 			bool noCW = true, noCCW = true;

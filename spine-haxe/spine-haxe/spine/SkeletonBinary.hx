@@ -32,7 +32,7 @@ package spine;
 import spine.animation.SliderMixTimeline;
 import spine.animation.SliderTimeline;
 import spine.TransformConstraintData;
-import spine.IkConstraintData.ScaleYMode;
+import spine.ConstraintData.ScaleYMode;
 import haxe.io.Bytes;
 import StringTools;
 import spine.animation.AlphaTimeline;
@@ -381,8 +381,17 @@ class SkeletonBinary {
 						data.y = input.readFloat();
 					if ((flags & 8) != 0)
 						data.rotate = input.readFloat();
-					if ((flags & 16) != 0)
-						data.scaleX = input.readFloat();
+					if ((flags & 16) != 0) {
+						var scaleX = input.readFloat();
+						if (scaleX < -2) {
+							data.scaleYMode = ScaleYMode.volume;
+							scaleX = -2 - scaleX;
+						} else if (scaleX < 0) {
+							data.scaleYMode = ScaleYMode.uniform;
+							scaleX = -1 - scaleX;
+						}
+						data.scaleX = scaleX;
+					}
 					if ((flags & 32) != 0)
 						data.shearX = input.readFloat();
 					data.limit = ((flags & 64) != 0 ? input.readFloat() : 5000) * scale;
@@ -417,8 +426,13 @@ class SkeletonBinary {
 					data.skinRequired = (flags & 1) != 0;
 					data.loop = (flags & 2) != 0;
 					data.additive = (flags & 4) != 0;
-					if ((flags & 8) != 0)
-						data.setupPose.time = input.readFloat();
+					if ((flags & 8) != 0) {
+						var value = input.readFloat();
+						if (nonessential && (flags & 64) != 0)
+							data.max = value;
+						else
+							data.setupPose.time = value;
+					}
 					if ((flags & 16) != 0)
 						data.setupPose.mix = (flags & 32) != 0 ? input.readFloat() : 1;
 					if ((flags & 64) != 0) {

@@ -466,6 +466,7 @@ export class SpineGameObject extends DepthMixin(
 
 			if (this.plugin.gl && this.plugin.phaserRenderer instanceof Phaser.Renderer.WebGL.WebGLRenderer && sceneRenderer.batcher.isDrawing) {
 				sceneRenderer.end();
+				this.plugin.currentWebGLDrawingContext = null;
 				this.plugin.phaserRenderer.renderNodes.getNode("RebindContext")?.run();
 			}
 		}
@@ -487,6 +488,31 @@ export class SpineGameObject extends DepthMixin(
 		sceneRenderer.camera.update();
 	}
 
+	private isRenderableInDisplayList (gameObject: Phaser.GameObjects.GameObject | undefined, camera: Phaser.Cameras.Scene2D.Camera) {
+		if (!gameObject) return false;
+
+		const GameObjectRenderMask = 0xf;
+		return GameObjectRenderMask === gameObject.renderFlags &&
+			(gameObject.cameraFilter === 0 || !(gameObject.cameraFilter & camera.id)) &&
+			(gameObject as Phaser.GameObjects.GameObject & { visible?: boolean }).visible !== false;
+	}
+
+	private isAdjacentRenderableSpineGameObject (
+		src: SpineGameObject,
+		camera: Phaser.Cameras.Scene2D.Camera,
+		displayList: Phaser.GameObjects.GameObject[],
+		displayListIndex: number,
+		direction: -1 | 1
+	) {
+		for (let i = displayListIndex + direction; i >= 0 && i < displayList.length; i += direction) {
+			const gameObject = displayList[i];
+			if (!this.isRenderableInDisplayList(gameObject, camera)) continue;
+			return gameObject.type === src.type;
+		}
+
+		return false;
+	}
+
 	renderWebGL (
 		renderer: Phaser.Renderer.WebGL.WebGLRenderer,
 		src: SpineGameObject,
@@ -502,17 +528,21 @@ export class SpineGameObject extends DepthMixin(
 
 		const sceneRenderer = src.plugin.webGLRenderer;
 
-		// Determine object type in context.
-		const previousGameObject = displayList[displayListIndex - 1];
-		const nextGameObject = displayList[displayListIndex + 1];
-		const newType = !previousGameObject || previousGameObject.type !== src.type;
-		const nextTypeMatch = nextGameObject && nextGameObject.type === src.type;
-		const drawingContextChanged = drawingContext.renderer.renderNodes.currentBatchDrawingContext !== drawingContext;
-		if (newType || drawingContextChanged) {
+		// Determine object type in context. Some display lists (containers/layers) contain
+		// invisible or otherwise skipped children, so scan for the adjacent renderable object.
+		const newType = !src.isAdjacentRenderableSpineGameObject(src, camera, displayList, displayListIndex, -1);
+		const nextTypeMatch = src.isAdjacentRenderableSpineGameObject(src, camera, displayList, displayListIndex, 1);
+		// Phaser's currentBatchDrawingContext is null while an external renderer owns the GL context.
+		// Track the drawing context ourselves so consecutive Spine objects can share one Spine batch.
+		const drawingContextChanged = src.plugin.currentWebGLDrawingContext !== drawingContext;
+		const shouldBeginSpineRenderer = newType || drawingContextChanged || !sceneRenderer.batcher.isDrawing;
+		if (shouldBeginSpineRenderer) {
+			if (sceneRenderer.batcher.isDrawing) {
+				sceneRenderer.end();
+				src.plugin.currentWebGLDrawingContext = null;
+			}
+
 			if (drawingContextChanged) {
-				if (sceneRenderer.batcher.isDrawing) {
-					sceneRenderer.end();
-				}
 				drawingContext.renderer.renderNodes.finishBatch();
 				drawingContext.beginDraw();
 			}
@@ -524,6 +554,7 @@ export class SpineGameObject extends DepthMixin(
 
 			// Enter Spine renderer.
 			sceneRenderer.begin();
+			src.plugin.currentWebGLDrawingContext = drawingContext;
 		}
 
 		camera.addToRenderList(src);
@@ -560,6 +591,7 @@ export class SpineGameObject extends DepthMixin(
 		if (!nextTypeMatch) {
 			// Exit Spine renderer.
 			sceneRenderer.end();
+			src.plugin.currentWebGLDrawingContext = null;
 
 			// Rebind Phaser state.
 			renderer.renderNodes.getNode('RebindContext')?.run(drawingContext);

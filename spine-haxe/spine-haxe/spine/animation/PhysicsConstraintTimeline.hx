@@ -42,8 +42,7 @@ abstract class PhysicsConstraintTimeline extends ConstraintTimeline1 {
 		super(frameCount, bezierCount, constraintIndex, property);
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
-			appliedPose:Bool) {
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, from:MixFrom, add:Bool, out:Bool, appliedPose:Bool) {
 		if (add && !this.additive)
 			add = false;
 		if (constraintIndex == -1) {
@@ -51,14 +50,14 @@ abstract class PhysicsConstraintTimeline extends ConstraintTimeline1 {
 			for (constraint in skeleton.physics) {
 				if (constraint.active && global(constraint.data)) {
 					var pose = appliedPose ? constraint.appliedPose : constraint.pose;
-					set(pose, getAbsoluteValue2(time, alpha, fromSetup, add, get(pose), get(constraint.data.setupPose), value));
+					set(pose, getAbsoluteValue2(time, alpha, from, add, get(pose), get(constraint.data.setupPose), value));
 				}
 			}
 		} else {
 			var constraint = cast(skeleton.constraints[constraintIndex], PhysicsConstraint);
 			if (constraint.active) {
 				var pose = appliedPose ? constraint.appliedPose : constraint.pose;
-				set(pose, getAbsoluteValue(time, alpha, fromSetup, add, get(pose), get(constraint.data.setupPose)));
+				set(pose, getAbsoluteValue(time, alpha, from, add, get(pose), get(constraint.data.setupPose)));
 			}
 		}
 	}

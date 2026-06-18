@@ -64,6 +64,9 @@ public:
 	float get_offset();
 	void set_offset(float value);
 
+	float get_max();
+	void set_max(float value);
+
 	bool get_local();
 	void set_local(bool value);
 

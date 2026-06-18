@@ -35,6 +35,8 @@ import spine.Slot;
 
 /** Changes a subset of a skeleton's spine.Skeleton.drawOrder. */
 class DrawOrderFolderTimeline extends Timeline {
+	public static final propertyID = Property.drawOrderFolder;
+
 	private var slots:Array<Int>;
 	private var inFolder:Array<Bool>;
 	private var drawOrders:Array<Array<Int>>;
@@ -59,7 +61,7 @@ class DrawOrderFolderTimeline extends Timeline {
 		var n = slots.length;
 		var ids = new Array();
 		for (i in 0...n)
-			ids[i] = "d" + slots[i];
+			ids[i] = propertyID + "|" + slots[i];
 		return ids;
 	}
 
@@ -88,13 +90,12 @@ class DrawOrderFolderTimeline extends Timeline {
 		drawOrders[frame] = drawOrder;
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
-			appliedPose:Bool) {
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, from:MixFrom, add:Bool, out:Bool, appliedPose:Bool) {
 		if (out) {
-			if (fromSetup)
+			if (from != MixFrom.current)
 				setupApply(skeleton, appliedPose);
 		} else if (time < frames[0]) {
-			if (fromSetup)
+			if (from != MixFrom.current)
 				setupApply(skeleton, appliedPose);
 		} else {
 			var order = drawOrders[Timeline.search1(frames, time)];

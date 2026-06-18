@@ -54,7 +54,7 @@ TransformConstraintTimeline::TransformConstraintTimeline(size_t frameCount, size
 TransformConstraintTimeline::~TransformConstraintTimeline() {
 }
 
-void TransformConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add,
+void TransformConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixFrom from, bool add,
 										bool out, bool appliedPose) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(events);
@@ -65,14 +65,26 @@ void TransformConstraintTimeline::apply(Skeleton &skeleton, float lastTime, floa
 	TransformConstraintPose &pose = appliedPose ? *constraint->_appliedPose : constraint->_pose;
 
 	if (time < _frames[0]) {
-		if (fromSetup) {
-			TransformConstraintPose &setup = constraint->_data._setupPose;
-			pose._mixRotate = setup._mixRotate;
-			pose._mixX = setup._mixX;
-			pose._mixY = setup._mixY;
-			pose._mixScaleX = setup._mixScaleX;
-			pose._mixScaleY = setup._mixScaleY;
-			pose._mixShearY = setup._mixShearY;
+		TransformConstraintPose &setup = constraint->_data._setupPose;
+		switch (from) {
+			case MixFrom_Setup:
+				pose._mixRotate = setup._mixRotate;
+				pose._mixX = setup._mixX;
+				pose._mixY = setup._mixY;
+				pose._mixScaleX = setup._mixScaleX;
+				pose._mixScaleY = setup._mixScaleY;
+				pose._mixShearY = setup._mixShearY;
+				break;
+			case MixFrom_First:
+				pose._mixRotate += (setup._mixRotate - pose._mixRotate) * alpha;
+				pose._mixX += (setup._mixX - pose._mixX) * alpha;
+				pose._mixY += (setup._mixY - pose._mixY) * alpha;
+				pose._mixScaleX += (setup._mixScaleX - pose._mixScaleX) * alpha;
+				pose._mixScaleY += (setup._mixScaleY - pose._mixScaleY) * alpha;
+				pose._mixShearY += (setup._mixShearY - pose._mixShearY) * alpha;
+				break;
+			case MixFrom_Current:
+				break;
 		}
 		return;
 	}
@@ -117,7 +129,7 @@ void TransformConstraintTimeline::apply(Skeleton &skeleton, float lastTime, floa
 		}
 	}
 
-	TransformConstraintPose &base = fromSetup ? constraint->_data._setupPose : pose;
+	TransformConstraintPose &base = from == MixFrom_Setup ? constraint->_data._setupPose : pose;
 	if (add) {
 		pose._mixRotate = base._mixRotate + rotate * alpha;
 		pose._mixX = base._mixX + x * alpha;

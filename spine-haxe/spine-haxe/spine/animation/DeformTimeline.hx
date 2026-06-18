@@ -146,7 +146,7 @@ class DeformTimeline extends CurveTimeline implements SlotTimeline {
 		return y + (1 - y) * (time - x) / (frames[frame + getFrameEntries()] - x);
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, from:MixFrom, add:Bool, out:Bool,
 			appliedPose:Bool):Void {
 		var slots = skeleton.slots;
 		if (!attachment.isTimelineActive(slots, slotIndex, appliedPose))
@@ -154,9 +154,9 @@ class DeformTimeline extends CurveTimeline implements SlotTimeline {
 		var timelineSlots = attachment.timelineSlots;
 
 		if (time < frames[0]) {
-			applyBeforeFirst(slots[slotIndex], appliedPose, fromSetup);
+			applyBeforeFirst(slots[slotIndex], appliedPose, alpha, from);
 			for (i in 0...timelineSlots.length)
-				applyBeforeFirst(slots[timelineSlots[i]], appliedPose, fromSetup);
+				applyBeforeFirst(slots[timelineSlots[i]], appliedPose, alpha, from);
 			return;
 		}
 
@@ -174,24 +174,43 @@ class DeformTimeline extends CurveTimeline implements SlotTimeline {
 		}
 
 		var vertexCount = vertices[0].length;
-		applyToSlot(slots[slotIndex], appliedPose, v1, v2, percent, vertexCount, alpha, fromSetup, add);
+		applyToSlot(slots[slotIndex], appliedPose, v1, v2, percent, vertexCount, alpha, from, add);
 		for (i in 0...timelineSlots.length)
-			applyToSlot(slots[timelineSlots[i]], appliedPose, v1, v2, percent, vertexCount, alpha, fromSetup, add);
+			applyToSlot(slots[timelineSlots[i]], appliedPose, v1, v2, percent, vertexCount, alpha, from, add);
 	}
 
-	private function applyBeforeFirst(slot:Slot, appliedPose:Bool, fromSetup:Bool):Void {
+	private function applyBeforeFirst(slot:Slot, appliedPose:Bool, alpha:Float, from:MixFrom):Void {
 		if (!slot.bone.active)
 			return;
 		var pose = appliedPose ? slot.appliedPose : slot.pose;
 		if (pose.attachment == null || pose.attachment.timelineAttachment != attachment)
 			return;
-		if (pose.deform.length == 0)
-			fromSetup = true;
-		if (fromSetup)
-			pose.deform.resize(0);
+		var deform = pose.deform;
+		if (deform.length == 0)
+			from = MixFrom.setup;
+		if (from == MixFrom.setup)
+			deform.resize(0);
+		else if (from == MixFrom.first) {
+			if (alpha == 1) {
+				deform.resize(0);
+				return;
+			}
+			var vertexCount = vertices[0].length;
+			ArrayUtils.resize(deform, vertexCount, 0);
+			var vertexAttachment = cast(pose.attachment, VertexAttachment);
+			if (vertexAttachment.bones == null) {
+				var setupVertices = vertexAttachment.vertices;
+				for (i in 0...vertexCount)
+					deform[i] += (setupVertices[i] - deform[i]) * alpha;
+			} else {
+				alpha = 1 - alpha;
+				for (i in 0...vertexCount)
+					deform[i] *= alpha;
+			}
+		}
 	}
 
-	private function applyToSlot(slot:Slot, appliedPose:Bool, v1:Array<Float>, v2:Array<Float>, percent:Float, vertexCount:Int, alpha:Float, fromSetup:Bool,
+	private function applyToSlot(slot:Slot, appliedPose:Bool, v1:Array<Float>, v2:Array<Float>, percent:Float, vertexCount:Int, alpha:Float, from:MixFrom,
 			add:Bool):Void {
 		if (!slot.bone.active)
 			return;
@@ -202,7 +221,8 @@ class DeformTimeline extends CurveTimeline implements SlotTimeline {
 		var vertexAttachment = cast(pose.attachment, VertexAttachment);
 		var deform = pose.deform;
 		if (deform.length == 0)
-			fromSetup = true;
+			from = MixFrom.setup;
+		var fromSetup = from == MixFrom.setup;
 		ArrayUtils.resize(deform, vertexCount, 0);
 
 		if (v2 == null) { // Time is after last frame.

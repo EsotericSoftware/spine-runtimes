@@ -2,6 +2,8 @@ name: Check Haxe Formatting
 
 on:
   push:
+    branches:
+      - '**'
     paths:
       - 'spine-haxe/**'
       - 'formatters/format-haxe.sh'

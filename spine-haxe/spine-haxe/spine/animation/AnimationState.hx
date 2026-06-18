@@ -44,13 +44,14 @@ import spine.Skeleton;
  * @see https://esotericsoftware.com/spine-applying-animations/ Applying Animations in the Spine Runtimes Guide
  */
 class AnimationState {
-	public static inline var SUBSEQUENT:Int = 0;
-	public static inline var FIRST:Int = 1;
-	public static inline var HOLD:Int = 2;
-	public static inline var HOLD_FIRST:Int = 3;
-
+	public static inline var CURRENT:Int = 0;
 	public static inline var SETUP:Int = 1;
-	public static inline var RETAIN:Int = 2;
+	public static inline var FIRST:Int = 2;
+	public static inline var MODE:Int = 3;
+	public static inline var HOLD:Int = 4;
+
+	public static inline var ATTACH_SETUP:Int = 1;
+	public static inline var ATTACH_RETAIN:Int = 2;
 
 	private static var emptyAnimation:Animation = new Animation("<empty>", new Array<Timeline>(), 0);
 
@@ -67,7 +68,7 @@ class AnimationState {
 	public var onEvent:EventListeners = new EventListeners();
 
 	private var queue:EventQueue;
-	private var propertyIDs:StringSet = new StringSet();
+	private var propertyIDs:StringMap<TrackEntry> = new StringMap<TrackEntry>();
 
 	public var animationsChanged:Bool = false;
 	public var timeScale:Float = 1;
@@ -229,9 +230,9 @@ class AnimationState {
 			if (i == 0 && alpha == 1) {
 				for (timeline in timelines) {
 					if (Std.isOfType(timeline, AttachmentTimeline))
-						applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, true, true);
+						applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, MixFrom.setup, true);
 					else
-						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, true, false, false, false);
+						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, MixFrom.setup, false, false, false);
 				}
 			} else {
 				var timelineMode:Array<Int> = current.timelineMode;
@@ -244,14 +245,13 @@ class AnimationState {
 
 				for (ii in 0...timelineCount) {
 					var timeline:Timeline = timelines[ii];
-					var fromSetup = (timelineMode[ii] & FIRST) != 0;
+					var from:MixFrom = timelineMode[ii] & MODE;
 					if (!shortestRotation && Std.isOfType(timeline, RotateTimeline)) {
-						applyRotateTimeline(cast(timeline, RotateTimeline), skeleton, applyTime, alpha, fromSetup, current.timelinesRotation, ii << 1,
-							firstFrame);
+						applyRotateTimeline(cast(timeline, RotateTimeline), skeleton, applyTime, alpha, from, current.timelinesRotation, ii << 1, firstFrame);
 					} else if (Std.isOfType(timeline, AttachmentTimeline)) {
-						applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, fromSetup, retainAttachments);
+						applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime, from, retainAttachments);
 					} else {
-						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, fromSetup, add, false, false);
+						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, from, add, false, false);
 					}
 				}
 			}
@@ -264,7 +264,7 @@ class AnimationState {
 		}
 
 		// Set slot attachments to the setup pose if they were set temporarily to apply deform timelines.
-		var setupState:Int = unkeyedState + SETUP;
+		var setupState:Int = unkeyedState + ATTACH_SETUP;
 		for (slot in skeleton.slots) {
 			if (slot.attachmentState == setupState) {
 				var attachmentName:String = slot.data.attachmentName;
@@ -314,25 +314,25 @@ class AnimationState {
 		for (i in 0...timelineCount) {
 			var timeline:Timeline = timelines[i];
 			var mode = timelineMode[i];
+			var mixFrom:MixFrom = mode & MODE;
 			var alpha:Float = 0;
 			if ((mode & HOLD) != 0) {
 				var holdMix:TrackEntry = timelineHoldMix[i];
 				alpha = holdMix == null ? alphaHold : alphaHold * (1 - holdMix.mix());
 			} else {
-				if (!drawOrder && Std.isOfType(timeline, DrawOrderTimeline))
+				if (!drawOrder && Std.isOfType(timeline, DrawOrderTimeline) && mixFrom == MixFrom.current)
 					continue;
 				alpha = alphaMix;
 			}
 			from.totalAlpha += alpha;
-			var fromSetup = (mode & FIRST) != 0;
 			if (!shortestRotation && Std.isOfType(timeline, RotateTimeline)) {
-				applyRotateTimeline(cast(timeline, RotateTimeline), skeleton, applyTime, alpha, fromSetup, timelinesRotation, i << 1, firstFrame);
+				applyRotateTimeline(cast(timeline, RotateTimeline), skeleton, applyTime, alpha, mixFrom, timelinesRotation, i << 1, firstFrame);
 			} else if (Std.isOfType(timeline, AttachmentTimeline)) {
 				applyAttachmentTimeline(cast(timeline, AttachmentTimeline), skeleton, applyTime,
-					fromSetup, retainAttachments && alpha >= from.alphaAttachmentThreshold);
+					mixFrom, retainAttachments && alpha >= from.alphaAttachmentThreshold);
 			} else {
-				var out = !drawOrder || !Std.isOfType(timeline, DrawOrderTimeline) || !fromSetup;
-				timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, fromSetup, add, out, false);
+				var out = !drawOrder || !Std.isOfType(timeline, DrawOrderTimeline) || mixFrom == MixFrom.current;
+				timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, mixFrom, add, out, false);
 			}
 		}
 
@@ -351,11 +351,11 @@ class AnimationState {
 	 * Applies the attachment timeline and sets spine.Slot.attachmentState.
 	 * @param retain True if the attachment remains after apply, false if temporary for deform timelines.
 	 */
-	public function applyAttachmentTimeline(timeline:AttachmentTimeline, skeleton:Skeleton, time:Float, fromSetup:Bool, retain:Bool) {
+	public function applyAttachmentTimeline(timeline:AttachmentTimeline, skeleton:Skeleton, time:Float, from:MixFrom, retain:Bool) {
 		var slot = skeleton.slots[timeline.slotIndex];
 		if (!slot.bone.active)
 			return;
-		if (!retain && slot.attachmentState == this.unkeyedState + RETAIN)
+		if (!retain && slot.attachmentState == this.unkeyedState + ATTACH_RETAIN)
 			return;
 
 		var setup:Bool = time < timeline.frames[0];
@@ -365,28 +365,28 @@ class AnimationState {
 			setup = !retain && name == null;
 		}
 		if (setup) {
-			if (!fromSetup)
+			if (from == MixFrom.current)
 				return;
 			name = slot.data.attachmentName;
 		}
 		slot.pose.attachment = name == null ? null : skeleton.getAttachmentForSlotIndex(slot.data.index, name);
 		if (retain)
-			slot.attachmentState = this.unkeyedState + RETAIN;
+			slot.attachmentState = this.unkeyedState + ATTACH_RETAIN;
 		else if (!setup)
-			slot.attachmentState = this.unkeyedState + SETUP;
+			slot.attachmentState = this.unkeyedState + ATTACH_SETUP;
 	}
 
 	/**
 	 * Applies the rotate timeline, mixing with the current pose while keeping the same rotation direction chosen as the shortest
 	 * the first time the mixing was applied.
 	 */
-	public function applyRotateTimeline(timeline:RotateTimeline, skeleton:Skeleton, time:Float, alpha:Float, fromSetup:Bool, timelinesRotation:Array<Float>,
+	public function applyRotateTimeline(timeline:RotateTimeline, skeleton:Skeleton, time:Float, alpha:Float, from:MixFrom, timelinesRotation:Array<Float>,
 			i:Int, firstFrame:Bool) {
 		if (firstFrame)
 			timelinesRotation[i] = 0;
 
 		if (alpha == 1) {
-			timeline.apply(skeleton, 0, time, null, 1, fromSetup, false, false, false);
+			timeline.apply(skeleton, 0, time, null, 1, from, false, false, false);
 			return;
 		}
 
@@ -395,13 +395,20 @@ class AnimationState {
 			return;
 		var pose = bone.pose, setup = bone.data.setupPose;
 		var frames = timeline.frames;
+		var r1:Float, r2:Float;
 		if (time < frames[0]) {
-			if (fromSetup)
+			if (from == MixFrom.setup) {
 				pose.rotation = setup.rotation;
-			return;
+				return;
+			}
+			if (from == MixFrom.current)
+				return;
+			r1 = pose.rotation;
+			r2 = setup.rotation;
+		} else {
+			r1 = from == MixFrom.setup ? setup.rotation : pose.rotation;
+			r2 = setup.rotation + timeline.getCurveValue(time);
 		}
-		var r1:Float = fromSetup ? setup.rotation : pose.rotation;
-		var r2:Float = setup.rotation + timeline.getCurveValue(time);
 
 		// Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.
 		var total:Float = 0, diff:Float = r2 - r1;
@@ -824,20 +831,21 @@ class AnimationState {
 
 		var entry:TrackEntry = null;
 		for (i in 0...tracks.length) {
-			entry = tracks[i];
-			if (entry == null)
+			var track = tracks[i];
+			if (track == null)
 				continue;
+			entry = track;
 			while (entry.mixingFrom != null)
 				entry = entry.mixingFrom;
 			do {
-				computeHold(entry);
+				computeHold(entry, track);
 				entry = entry.mixingTo;
 			} while (entry != null);
 		}
 		propertyIDs.clear();
 	}
 
-	private function computeHold(entry:TrackEntry):Void {
+	private function computeHold(entry:TrackEntry, track:TrackEntry):Void {
 		var to:TrackEntry = entry.mixingTo;
 		var timelines:Array<Timeline> = entry.animation.timelines;
 		var timelinesCount:Int = entry.animation.timelines.length;
@@ -846,38 +854,23 @@ class AnimationState {
 		entry.timelineHoldMix.resize(0);
 		var timelineHoldMix:Array<TrackEntry> = entry.timelineHoldMix;
 		timelineHoldMix.resize(timelinesCount);
-		var propertyIDs = this.propertyIDs;
 		var add = entry.additive, keepHold = entry.keepHold;
 
 		for (i in 0...timelinesCount) {
 			var timeline:Timeline = timelines[i];
 			var ids:Array<String> = timeline.propertyIds;
-			var first = propertyIDs.addAll(ids)
-				&& !(Std.isOfType(timeline, DrawOrderFolderTimeline) && propertyIDs.contains(DrawOrderTimeline.propertyID));
+			var from = getFrom(track, timeline, ids);
 
 			if (add && timeline.additive) {
-				timelineMode[i] = first ? FIRST : SUBSEQUENT;
+				timelineMode[i] = from;
 				continue;
 			}
-
-			var continueOuter = false;
-			var from = entry.mixingFrom;
-			while (from != null) {
-				if (from.animation.hasTimeline(ids)) {
-					timelineMode[i] = SUBSEQUENT;
-					continueOuter = true;
-					break;
-				}
-				from = from.mixingFrom;
-			}
-			if (continueOuter)
-				continue;
 
 			var mode:Int;
 			if (to == null || timeline.instant || (to.additive && timeline.additive) || !to.animation.hasTimeline(ids))
-				mode = first ? FIRST : SUBSEQUENT;
+				mode = from;
 			else {
-				mode = first ? HOLD_FIRST : HOLD;
+				mode = from | HOLD;
 				var next:TrackEntry = to.mixingTo;
 				while (next != null) {
 					if ((next.additive && timeline.additive) || !next.animation.hasTimeline(ids)) {
@@ -892,6 +885,32 @@ class AnimationState {
 				mode = (mode & ~HOLD) | (timelineMode[i] & HOLD);
 			timelineMode[i] = mode;
 		}
+	}
+
+	private function getFrom(track:TrackEntry, timeline:Timeline, ids:Array<String>):Int {
+		var from = SETUP;
+		var i = 0, n = ids.length;
+		while (i < n) {
+			var owner = propertyIDs.get(ids[i]);
+			if (owner == null) {
+				propertyIDs.set(ids[i], track);
+			} else {
+				if (owner != track) {
+					while (++i < n)
+						if (!propertyIDs.exists(ids[i]))
+							propertyIDs.set(ids[i], track);
+					return CURRENT;
+				}
+				from = FIRST;
+			}
+			i++;
+		}
+		if (Std.isOfType(timeline, DrawOrderFolderTimeline)) {
+			var first = propertyIDs.get(DrawOrderTimeline.propertyID);
+			if (first != null)
+				return first != track ? CURRENT : FIRST;
+		}
+		return from;
 	}
 
 	/**

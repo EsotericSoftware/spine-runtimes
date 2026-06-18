@@ -207,6 +207,17 @@ class SliderData extends PosedData implements ConstraintData {
     SpineBindings.bindings.spine_slider_data_set_offset(_ptr, value);
   }
 
+  /// When a bone is set, the maximum slider time for the bone property range,
+  /// or 0 if nonessential data was not exported.
+  double get max {
+    final result = SpineBindings.bindings.spine_slider_data_get_max(_ptr);
+    return result;
+  }
+
+  set max(double value) {
+    SpineBindings.bindings.spine_slider_data_set_max(_ptr, value);
+  }
+
   /// When true and a bone is set, the bone's local transform property is read
   /// instead of its world transform.
   bool get local {

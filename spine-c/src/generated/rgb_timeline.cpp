@@ -22,9 +22,9 @@ void spine_rgb_timeline_set_frame(spine_rgb_timeline self, int frame, float time
 }
 
 void spine_rgb_timeline_apply(spine_rgb_timeline self, spine_skeleton skeleton, float lastTime, float time, /*@null*/ spine_array_event events,
-							  float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
+							  float alpha, spine_mix_from from, bool add, bool out, bool appliedPose) {
 	RGBTimeline *_self = (RGBTimeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixFrom) from, add, out, appliedPose);
 }
 
 int spine_rgb_timeline_get_slot_index(spine_rgb_timeline self) {

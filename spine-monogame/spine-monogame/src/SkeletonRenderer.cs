@@ -142,12 +142,14 @@ namespace Spine {
 				if (attachment is RegionAttachment) {
 					RegionAttachment regionAttachment = (RegionAttachment)attachment;
 					attachmentColor = regionAttachment.GetColor();
-					regionAttachment.ComputeWorldVertices(slot, vertices, 0, 2);
+					Sequence sequence = regionAttachment.Sequence;
+					int sequenceIndex = sequence.ResolveIndex(slotPose);
+					regionAttachment.ComputeWorldVertices(slot, sequence.GetOffsets(sequenceIndex), vertices, 0, 2);
 					verticesCount = 4;
 					indicesCount = 6;
 					indices = quadTriangles;
-					uvs = regionAttachment.UVs;
-					AtlasRegion region = (AtlasRegion)regionAttachment.Region;
+					uvs = sequence.GetUVs(sequenceIndex);
+					AtlasRegion region = (AtlasRegion)sequence.GetRegion(sequenceIndex);
 					textureObject = region.page.rendererObject;
 				} else if (attachment is MeshAttachment) {
 					MeshAttachment mesh = (MeshAttachment)attachment;
@@ -158,8 +160,10 @@ namespace Spine {
 					mesh.ComputeWorldVertices(skeleton, slot, vertices);
 					indicesCount = mesh.Triangles.Length;
 					indices = mesh.Triangles;
-					uvs = mesh.UVs;
-					AtlasRegion region = (AtlasRegion)mesh.Region;
+					Sequence sequence = mesh.Sequence;
+					int sequenceIndex = sequence.ResolveIndex(slotPose);
+					uvs = sequence.GetUVs(sequenceIndex);
+					AtlasRegion region = (AtlasRegion)sequence.GetRegion(sequenceIndex);
 					textureObject = region.page.rendererObject;
 				} else if (attachment is ClippingAttachment) {
 					ClippingAttachment clip = (ClippingAttachment)attachment;

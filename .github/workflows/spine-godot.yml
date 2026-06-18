@@ -1,6 +1,8 @@
 name: Build spine-godot (Godot 3.6)
 on:
   push:
+    branches:
+      - '**'
     paths:
       - ".github/workflows/spine-godot.yml"
       - 'spine-godot/**'

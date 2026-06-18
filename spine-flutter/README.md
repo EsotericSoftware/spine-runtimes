@@ -60,6 +60,37 @@ If all you modify are the Dart sources of the plugin, then the development setup
 
 If you need to update or modify the bindings generated from spine-c, run `./generate-bindings.sh`. If you regenerate the bindings, you must also compile the WASM binaries via `./compile-wasm.sh`.
 
-Run `./publish.sh` to publish spine-flutter to pub.dev.
-
 The `./tests` folder contains headless tests that exercise the bindings to [spine-c](../spine-c).
+
+## Releasing
+
+`spine-flutter` is released to [pub.dev](https://pub.dev/packages/spine_flutter) using GitHub Actions and pub.dev automated publishing. The pub.dev package is configured to trust tags from `EsotericSoftware/spine-runtimes` matching `spine-flutter-{{version}}`.
+
+1. Set the release version in `spine-flutter/pubspec.yaml`:
+
+```yaml
+version: 4.3.4
+```
+
+2. Add a matching entry to `spine-flutter/CHANGELOG.md`.
+
+3. Commit and push the release version:
+
+```bash
+git add spine-flutter/pubspec.yaml spine-flutter/CHANGELOG.md
+git commit -m "[flutter] Release spine-flutter 4.3.4"
+git push origin 4.3
+```
+
+4. Tag that commit and push the tag:
+
+```bash
+git tag spine-flutter-4.3.4
+git push origin spine-flutter-4.3.4
+```
+
+The tag triggers the GitHub Actions release workflow. It verifies the tag version, runs `./generate-bindings.sh` to copy native sources and compile WebAssembly, runs the spine-flutter tests, verifies generated source files are committed, then publishes to pub.dev from the same workspace so the copied native sources are included in the package.
+
+5. Check the workflow result and pub.dev.
+
+If publishing fails before upload, fix the issue and push a new release version. Versions uploaded to pub.dev cannot be overwritten.

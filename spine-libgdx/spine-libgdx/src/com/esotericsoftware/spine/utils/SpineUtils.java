@@ -30,13 +30,10 @@
 package com.esotericsoftware.spine.utils;
 
 public class SpineUtils {
-	static public final float PI = 3.1415927f;
-	static public final float PI2 = PI * 2;
-	static public final float invPI2 = 1 / PI2;
-	static public final float radiansToDegrees = 180f / PI;
-	static public final float radDeg = radiansToDegrees;
-	static public final float degreesToRadians = PI / 180;
-	static public final float degRad = degreesToRadians;
+	static public final float epsilon = 0.00001f, epsilonSq = epsilon * epsilon;
+	static public final float PI = 3.1415927f, PI2 = PI * 2, invPI2 = 1 / PI2;
+	static public final float radiansToDegrees = 180f / PI, radDeg = radiansToDegrees;
+	static public final float degreesToRadians = PI / 180, degRad = degreesToRadians;
 
 	static public float cosDeg (float degrees) {
 		return (float)Math.cos(degrees * degRad);

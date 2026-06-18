@@ -46,7 +46,7 @@ namespace spine {
 	public:
 		explicit DeformTimeline(size_t frameCount, size_t bezierCount, int slotIndex, VertexAttachment &attachment);
 
-		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixFrom from, bool add, bool out,
 						   bool appliedPose) override;
 
 		/// Sets the time and vertices for the specified frame.
@@ -70,14 +70,13 @@ namespace spine {
 		}
 
 	protected:
-		void _apply(Slot &slot, SlotPose &pose, float time, float alpha, bool fromSetup, bool add) override;
+		void _apply(Slot &slot, SlotPose &pose, float time, float alpha, MixFrom from, bool add) override;
 
 	private:
-		void applyBeforeFirst(Slot &slot, bool appliedPose, bool fromSetup);
-		void applyToPose(SlotPose &pose, Array<float> &v1, Array<float> *v2, float percent, size_t vertexCount, float alpha, bool fromSetup,
-						 bool add);
+		void applyBeforeFirst(Slot &slot, bool appliedPose, float alpha, MixFrom from);
+		void applyToPose(SlotPose &pose, Array<float> &v1, Array<float> *v2, float percent, size_t vertexCount, float alpha, MixFrom from, bool add);
 		void applyToSlot(Slot &slot, bool appliedPose, Array<float> &v1, Array<float> *v2, float percent, size_t vertexCount, float alpha,
-						 bool fromSetup, bool add);
+						 MixFrom from, bool add);
 
 		Array<Array<float>> _vertices;
 

@@ -46,12 +46,20 @@ TranslateTimeline::TranslateTimeline(size_t frameCount, size_t bezierCount, int 
 	: BoneTimeline2(frameCount, bezierCount, boneIndex, Property_X, Property_Y) {
 }
 
-void TranslateTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
+void TranslateTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, MixFrom from, bool add, bool out) {
 	SP_UNUSED(out);
 	if (time < _frames[0]) {
-		if (fromSetup) {
-			pose._x = setup._x;
-			pose._y = setup._y;
+		switch (from) {
+			case MixFrom_Setup:
+				pose._x = setup._x;
+				pose._y = setup._y;
+				break;
+			case MixFrom_First:
+				pose._x += (setup._x - pose._x) * alpha;
+				pose._y += (setup._y - pose._y) * alpha;
+				break;
+			case MixFrom_Current:
+				break;
 		}
 		return;
 	}
@@ -80,7 +88,7 @@ void TranslateTimeline::_apply(BonePose &pose, BonePose &setup, float time, floa
 		}
 	}
 
-	if (fromSetup) {
+	if (from == MixFrom_Setup) {
 		pose._x = setup._x + x * alpha;
 		pose._y = setup._y + y * alpha;
 	} else if (add) {
@@ -98,9 +106,9 @@ TranslateXTimeline::TranslateXTimeline(size_t frameCount, size_t bezierCount, in
 	: BoneTimeline1(frameCount, bezierCount, boneIndex, Property_X) {
 }
 
-void TranslateXTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
+void TranslateXTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, MixFrom from, bool add, bool out) {
 	SP_UNUSED(out);
-	pose._x = getRelativeValue(time, alpha, fromSetup, add, pose._x, setup._x);
+	pose._x = getRelativeValue(time, alpha, from, add, pose._x, setup._x);
 }
 
 RTTI_IMPL(TranslateYTimeline, BoneTimeline1)
@@ -109,7 +117,7 @@ TranslateYTimeline::TranslateYTimeline(size_t frameCount, size_t bezierCount, in
 	: BoneTimeline1(frameCount, bezierCount, boneIndex, Property_Y) {
 }
 
-void TranslateYTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
+void TranslateYTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, MixFrom from, bool add, bool out) {
 	SP_UNUSED(out);
-	pose._y = getRelativeValue(time, alpha, fromSetup, add, pose._y, setup._y);
+	pose._y = getRelativeValue(time, alpha, from, add, pose._y, setup._y);
 }

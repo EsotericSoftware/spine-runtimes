@@ -2,6 +2,8 @@ name: Build spine-libgdx
 
 on:
   push:
+    branches:
+      - '**'
     paths:
       - 'spine-libgdx/**'
   workflow_dispatch:

@@ -17,9 +17,10 @@ spine_rtti spine_draw_order_folder_timeline_get_rtti(spine_draw_order_folder_tim
 }
 
 void spine_draw_order_folder_timeline_apply(spine_draw_order_folder_timeline self, spine_skeleton skeleton, float lastTime, float time,
-											/*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
+											/*@null*/ spine_array_event events, float alpha, spine_mix_from from, bool add, bool out,
+											bool appliedPose) {
 	DrawOrderFolderTimeline *_self = (DrawOrderFolderTimeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixFrom) from, add, out, appliedPose);
 }
 
 size_t spine_draw_order_folder_timeline_get_frame_count(spine_draw_order_folder_timeline self) {

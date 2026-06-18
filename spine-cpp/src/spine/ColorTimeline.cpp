@@ -59,11 +59,21 @@ void RGBATimeline::setFrame(int frame, float time, float r, float g, float b, fl
 	_frames[frame + A] = a;
 }
 
-void RGBATimeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, bool fromSetup, bool add) {
+void RGBATimeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, MixFrom from, bool add) {
 	SP_UNUSED(add);
 	Color &color = pose._color;
 	if (time < _frames[0]) {
-		if (fromSetup) color.set(slot._data._setupPose._color);
+		Color &setup = slot._data._setupPose._color;
+		switch (from) {
+			case MixFrom_Setup:
+				color.set(setup);
+				break;
+			case MixFrom_First:
+				color.add((setup.r - color.r) * alpha, (setup.g - color.g) * alpha, (setup.b - color.b) * alpha, (setup.a - color.a) * alpha);
+				break;
+			case MixFrom_Current:
+				break;
+		}
 		return;
 	}
 
@@ -103,7 +113,7 @@ void RGBATimeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, b
 	if (alpha == 1)
 		color.set(r, g, b, a);
 	else {
-		if (fromSetup) {
+		if (from == MixFrom_Setup) {
 			Color &setup = slot._data._setupPose._color;
 			color.set(setup.r + (r - setup.r) * alpha, setup.g + (g - setup.g) * alpha, setup.b + (b - setup.b) * alpha,
 					  setup.a + (a - setup.a) * alpha);
@@ -130,16 +140,25 @@ void RGBTimeline::setFrame(int frame, float time, float r, float g, float b) {
 	_frames[frame + B] = b;
 }
 
-void RGBTimeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, bool fromSetup, bool add) {
+void RGBTimeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, MixFrom from, bool add) {
 	SP_UNUSED(add);
 	Color &color = pose._color;
 	float r, g, b;
 	if (time < _frames[0]) {
-		if (fromSetup) {
-			Color &setup = slot._data._setupPose._color;
-			color.r = setup.r;
-			color.g = setup.g;
-			color.b = setup.b;
+		Color &setup = slot._data._setupPose._color;
+		switch (from) {
+			case MixFrom_Setup:
+				color.r = setup.r;
+				color.g = setup.g;
+				color.b = setup.b;
+				break;
+			case MixFrom_First:
+				color.r += (setup.r - color.r) * alpha;
+				color.g += (setup.g - color.g) * alpha;
+				color.b += (setup.b - color.b) * alpha;
+				break;
+			case MixFrom_Current:
+				break;
 		}
 		return;
 	}
@@ -173,7 +192,7 @@ void RGBTimeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, bo
 	}
 
 	if (alpha != 1) {
-		if (fromSetup) {
+		if (from == MixFrom_Setup) {
 			Color &setup = slot._data._setupPose._color;
 			r = setup.r + (r - setup.r) * alpha;
 			g = setup.g + (g - setup.g) * alpha;
@@ -189,7 +208,7 @@ void RGBTimeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, bo
 	color.b = b < 0 ? 0 : (b > 1 ? 1 : b);
 }
 
-RTTI_IMPL(AlphaTimeline, SlotCurveTimeline)
+RTTI_IMPL_MULTI(AlphaTimeline, CurveTimeline1, SlotTimeline)
 
 AlphaTimeline::AlphaTimeline(size_t frameCount, size_t bezierCount, int slotIndex)
 	: CurveTimeline1(frameCount, bezierCount), SlotTimeline(), _slotIndex(slotIndex) {
@@ -208,7 +227,7 @@ void AlphaTimeline::setSlotIndex(int inValue) {
 	_slotIndex = inValue;
 }
 
-void AlphaTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+void AlphaTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixFrom from, bool add, bool out,
 						  bool appliedPose) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(events);
@@ -220,13 +239,23 @@ void AlphaTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<
 
 	Color &color = (appliedPose ? *slot->_appliedPose : slot->_pose)._color;
 	if (time < _frames[0]) {
-		if (fromSetup) color.a = slot->_data._setupPose._color.a;
+		float setup = slot->_data._setupPose._color.a;
+		switch (from) {
+			case MixFrom_Setup:
+				color.a = setup;
+				break;
+			case MixFrom_First:
+				color.a += (setup - color.a) * alpha;
+				break;
+			case MixFrom_Current:
+				break;
+		}
 		return;
 	}
 
 	float a = getCurveValue(time);
 	if (alpha != 1) {
-		if (fromSetup) {
+		if (from == MixFrom_Setup) {
 			Color &setup = slot->_data._setupPose._color;
 			a = setup.a + (a - setup.a) * alpha;
 		} else
@@ -258,19 +287,31 @@ void RGBA2Timeline::setFrame(int frame, float time, float r, float g, float b, f
 	_frames[frame + B2] = b2;
 }
 
-void RGBA2Timeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, bool fromSetup, bool add) {
+void RGBA2Timeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, MixFrom from, bool add) {
 	SP_UNUSED(add);
 	Color &light = pose._color;
 	Color &dark = pose._darkColor;
 	float r2, g2, b2;
 	if (time < _frames[0]) {
-		if (fromSetup) {
-			SlotPose &setup = slot._data._setupPose;
-			light.set(setup._color);
-			Color &setupDark = setup._darkColor;
-			dark.r = setupDark.r;
-			dark.g = setupDark.g;
-			dark.b = setupDark.b;
+		SlotPose &setup = slot._data._setupPose;
+		Color &setupLight = setup._color;
+		Color &setupDark = setup._darkColor;
+		switch (from) {
+			case MixFrom_Setup:
+				light.set(setupLight);
+				dark.r = setupDark.r;
+				dark.g = setupDark.g;
+				dark.b = setupDark.b;
+				break;
+			case MixFrom_First:
+				light.add((setupLight.r - light.r) * alpha, (setupLight.g - light.g) * alpha, (setupLight.b - light.b) * alpha,
+						  (setupLight.a - light.a) * alpha);
+				dark.r += (setupDark.r - dark.r) * alpha;
+				dark.g += (setupDark.g - dark.g) * alpha;
+				dark.b += (setupDark.b - dark.b) * alpha;
+				break;
+			case MixFrom_Current:
+				break;
 		}
 		return;
 	}
@@ -322,7 +363,7 @@ void RGBA2Timeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, 
 
 	if (alpha == 1)
 		light.set(r, g, b, a);
-	else if (fromSetup) {
+	else if (from == MixFrom_Setup) {
 		SlotPose &setup = slot._data._setupPose;
 		Color &setupLight = setup._color;
 		light.set(setupLight.r + (r - setupLight.r) * alpha, setupLight.g + (g - setupLight.g) * alpha, setupLight.b + (b - setupLight.b) * alpha,
@@ -364,22 +405,34 @@ void RGB2Timeline::setFrame(int frame, float time, float r, float g, float b, fl
 	_frames[frame + B2] = b2;
 }
 
-void RGB2Timeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, bool fromSetup, bool add) {
+void RGB2Timeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, MixFrom from, bool add) {
 	SP_UNUSED(add);
 	Color &light = pose._color;
 	Color &dark = pose._darkColor;
 	float r, g, b, r2, g2, b2;
 	if (time < _frames[0]) {
-		if (fromSetup) {
-			SlotPose &setup = slot._data._setupPose;
-			Color &setupLight = setup._color;
-			Color &setupDark = setup._darkColor;
-			light.r = setupLight.r;
-			light.g = setupLight.g;
-			light.b = setupLight.b;
-			dark.r = setupDark.r;
-			dark.g = setupDark.g;
-			dark.b = setupDark.b;
+		SlotPose &setup = slot._data._setupPose;
+		Color &setupLight = setup._color;
+		Color &setupDark = setup._darkColor;
+		switch (from) {
+			case MixFrom_Setup:
+				light.r = setupLight.r;
+				light.g = setupLight.g;
+				light.b = setupLight.b;
+				dark.r = setupDark.r;
+				dark.g = setupDark.g;
+				dark.b = setupDark.b;
+				break;
+			case MixFrom_First:
+				light.r += (setupLight.r - light.r) * alpha;
+				light.g += (setupLight.g - light.g) * alpha;
+				light.b += (setupLight.b - light.b) * alpha;
+				dark.r += (setupDark.r - dark.r) * alpha;
+				dark.g += (setupDark.g - dark.g) * alpha;
+				dark.b += (setupDark.b - dark.b) * alpha;
+				break;
+			case MixFrom_Current:
+				break;
 		}
 		return;
 	}
@@ -425,7 +478,7 @@ void RGB2Timeline::_apply(Slot &slot, SlotPose &pose, float time, float alpha, b
 	}
 
 	if (alpha != 1) {
-		if (fromSetup) {
+		if (from == MixFrom_Setup) {
 			SlotPose &setup = slot._data._setupPose;
 			Color &setupLight = setup._color;
 			r = setupLight.r + (r - setupLight.r) * alpha;

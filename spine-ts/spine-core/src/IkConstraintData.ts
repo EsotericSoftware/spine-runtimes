@@ -29,7 +29,7 @@
 
 import type { BoneData } from "./BoneData.js";
 import type { BonePose } from "./BonePose.js";
-import { ConstraintData } from "./ConstraintData.js";
+import { ConstraintData, ScaleYMode } from "./ConstraintData.js";
 import { IkConstraint } from "./IkConstraint.js";
 import { IkConstraintPose } from "./IkConstraintPose.js";
 import type { Skeleton } from "./Skeleton.js";
@@ -65,15 +65,4 @@ export class IkConstraintData extends ConstraintData<IkConstraint, IkConstraintP
 	public create (skeleton: Skeleton) {
 		return new IkConstraint(this, skeleton);
 	}
-}
-
-/** Determines how the {@link BonePose.scaleY} changes when {@link IkConstraintPose.compress} or
- * {@link IkConstraintPose.stretch} set {@link BonePose.scaleX}. */
-export enum ScaleYMode {
-	/** scaleY is not changed. */
-	None,
-	/** scaleY is multiplied by the scaleX factor, preserving the bone's aspect ratio. */
-	Uniform,
-	/** scaleY is divided by the scaleX factor, preserving the bone's area. */
-	Volume
 }

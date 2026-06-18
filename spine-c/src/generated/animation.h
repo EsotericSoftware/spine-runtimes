@@ -50,14 +50,14 @@ SPINE_C_API void spine_animation_set_duration(spine_animation self, float inValu
  * @param time The time in seconds the skeleton is being posed for. Timelines find the frame before and after this time and interpolate between the frame values.
  * @param loop True if time beyond the animation duration repeats the animation, else the last frame is used.
  * @param events If any events are fired, they are added to this list. Can be NULL to ignore fired events or if no timelines fire events.
- * @param alpha 0 applies setup or current values (depending on fromSetup), 1 uses timeline values, and intermediate values interpolate between them. Adjusting alpha over time can mix an animation in or out.
- * @param fromSetup If true, alpha transitions between setup and timeline values, setup values are used before the first frame (current values are not used). If false, alpha transitions between current and timeline values, no change is made before the first frame.
- * @param add If true, for timelines that support it, their values are added to the setup or current values (depending on fromSetup).
+ * @param alpha 0 applies setup or current values (depending on from), 1 uses timeline values, and intermediate values interpolate between them. Adjusting alpha over time can mix an animation in or out.
+ * @param from If true, alpha transitions between setup and timeline values, setup values are used before the first frame (current values are not used). If false, alpha transitions between current and timeline values, no change is made before the first frame.
+ * @param add If true, for timelines that support it, their values are added to the setup or current values (depending on from).
  * @param out True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant transitions.
  * @param appliedPose True to modify getAppliedPose(), else the unconstrained pose is modified.
  */
 SPINE_C_API void spine_animation_apply(spine_animation self, spine_skeleton skeleton, float lastTime, float time, bool loop,
-									   /*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out, bool appliedPose);
+									   /*@null*/ spine_array_event events, float alpha, spine_mix_from from, bool add, bool out, bool appliedPose);
 /**
  * The animation's name, which is unique across all animations in the skeleton.
  */

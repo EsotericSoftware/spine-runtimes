@@ -1,0 +1,159 @@
+name: Release spine-libgdx and spine-android
+
+on:
+  push:
+    tags:
+      - 'spine-libgdx-*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version, matching spine-libgdx/gradle.properties (for example: 4.3.2)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  publish-spine-libgdx:
+    name: Publish spine-libgdx
+    runs-on: ubuntu-latest
+    env:
+      MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+      MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+      GPG_KEYID: ${{ secrets.GPG_KEYID }}
+      GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Gradle packages
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec # v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Verify release version
+        id: version
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            TAG="${GITHUB_REF_NAME}"
+            VERSION="${TAG#spine-libgdx-}"
+            if [[ "$VERSION" == "$TAG" || -z "$VERSION" ]]; then
+              echo "Tag must use the form spine-libgdx-<version>." >&2
+              exit 1
+            fi
+          else
+            VERSION="${{ inputs.version }}"
+          fi
+
+          FILE_VERSION=$(grep '^version=' spine-libgdx/gradle.properties | cut -d= -f2-)
+          if [[ "$FILE_VERSION" != "$VERSION" ]]; then
+            echo "Tag/input version ($VERSION) does not match spine-libgdx/gradle.properties ($FILE_VERSION)." >&2
+            exit 1
+          fi
+          if [[ "$FILE_VERSION" == *-SNAPSHOT ]]; then
+            echo "Release version must not end in -SNAPSHOT: $FILE_VERSION" >&2
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Publish spine-libgdx release
+        working-directory: spine-libgdx
+        run: |
+          ./gradlew build :spine-libgdx:publishReleasePublicationToSonaTypeRepository -PRELEASE \
+            -PMAVEN_USERNAME="$MAVEN_USERNAME" \
+            -PMAVEN_PASSWORD="$MAVEN_PASSWORD" \
+            -Psigning.gnupg.keyId="$GPG_KEYID" \
+            -Psigning.gnupg.passphrase="$GPG_PASSPHRASE" \
+            -Psigning.gnupg.keyName="$GPG_KEYID"
+          ./gradlew jreleaserDeploy -PRELEASE \
+            -PMAVEN_USERNAME="$MAVEN_USERNAME" \
+            -PMAVEN_PASSWORD="$MAVEN_PASSWORD"
+
+  publish-spine-android:
+    name: Publish spine-android
+    runs-on: ubuntu-latest
+    needs: publish-spine-libgdx
+    env:
+      MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+      MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+      GPG_KEYID: ${{ secrets.GPG_KEYID }}
+      GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
+        with:
+          api-level: 34
+          build-tools: 35.0.0
+
+      - name: Cache Gradle packages
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec # v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Verify release version
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            TAG="${GITHUB_REF_NAME}"
+            VERSION="${TAG#spine-libgdx-}"
+            if [[ "$VERSION" == "$TAG" || -z "$VERSION" ]]; then
+              echo "Tag must use the form spine-libgdx-<version>." >&2
+              exit 1
+            fi
+          else
+            VERSION="${{ inputs.version }}"
+          fi
+
+          FILE_VERSION=$(grep '^version=' spine-libgdx/gradle.properties | cut -d= -f2-)
+          if [[ "$FILE_VERSION" != "$VERSION" ]]; then
+            echo "Tag/input version ($VERSION) does not match spine-libgdx/gradle.properties ($FILE_VERSION)." >&2
+            exit 1
+          fi
+          if [[ "$FILE_VERSION" == *-SNAPSHOT ]]; then
+            echo "Release version must not end in -SNAPSHOT: $FILE_VERSION" >&2
+            exit 1
+          fi
+
+      - name: Publish spine-android release
+        working-directory: spine-android
+        run: |
+          ./gradlew :spine-android:assembleRelease :spine-android:publishReleasePublicationToSonaTypeRepository -PRELEASE \
+            -PMAVEN_USERNAME="$MAVEN_USERNAME" \
+            -PMAVEN_PASSWORD="$MAVEN_PASSWORD" \
+            -Psigning.gnupg.keyId="$GPG_KEYID" \
+            -Psigning.gnupg.passphrase="$GPG_PASSPHRASE" \
+            -Psigning.gnupg.keyName="$GPG_KEYID"
+          ./gradlew :spine-android:jreleaserDeploy -PRELEASE \
+            -PMAVEN_USERNAME="$MAVEN_USERNAME" \
+            -PMAVEN_PASSWORD="$MAVEN_PASSWORD"

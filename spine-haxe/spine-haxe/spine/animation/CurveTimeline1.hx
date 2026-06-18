@@ -78,38 +78,46 @@ abstract class CurveTimeline1 extends CurveTimeline {
 		}
 	}
 
-	public function getRelativeValue(time:Float, alpha:Float, fromSetup:Bool, add:Bool, current:Float, setup:Float):Float {
+	public function getRelativeValue(time:Float, alpha:Float, from:MixFrom, add:Bool, current:Float, setup:Float):Float {
 		if (time < frames[0])
-			return fromSetup ? setup : current;
+			return beforeFirstKey(from, alpha, current, setup);
 		var value:Float = getCurveValue(time);
-		return fromSetup ? setup + value * alpha : current + (add ? value : value + setup - current) * alpha;
+		return from == MixFrom.setup ? setup + value * alpha : current + (add ? value : value + setup - current) * alpha;
 	}
 
-	public function getAbsoluteValue(time:Float, alpha:Float, fromSetup:Bool, add:Bool, current:Float, setup:Float):Float {
+	public function getAbsoluteValue(time:Float, alpha:Float, from:MixFrom, add:Bool, current:Float, setup:Float):Float {
 		if (time < frames[0])
-			return fromSetup ? setup : current;
+			return beforeFirstKey(from, alpha, current, setup);
 		var value:Float = getCurveValue(time);
-		return fromSetup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
+		return from == MixFrom.setup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
 	}
 
-	public function getAbsoluteValue2(time:Float, alpha:Float, fromSetup:Bool, add:Bool, current:Float, setup:Float, value:Float):Float {
+	public function getAbsoluteValue2(time:Float, alpha:Float, from:MixFrom, add:Bool, current:Float, setup:Float, value:Float):Float {
 		if (time < frames[0])
-			return fromSetup ? setup : current;
-		return fromSetup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
+			return beforeFirstKey(from, alpha, current, setup);
+		return from == MixFrom.setup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
 	}
 
-	public function getScaleValue(time:Float, alpha:Float, fromSetup:Bool, add:Bool, out:Bool, current:Float, setup:Float):Float {
+	public function getScaleValue(time:Float, alpha:Float, from:MixFrom, add:Bool, out:Bool, current:Float, setup:Float):Float {
 		if (time < frames[0])
-			return fromSetup ? setup : current;
+			return beforeFirstKey(from, alpha, current, setup);
 		var value:Float = getCurveValue(time) * setup;
 		if (alpha == 1 && !add)
 			return value;
-		var base:Float = fromSetup ? setup : current;
+		var base:Float = from == MixFrom.setup ? setup : current;
 		if (add)
 			return base + (value - setup) * alpha;
 		if (out)
 			return base + (Math.abs(value) * MathUtils.signum(base) - base) * alpha;
 		base = Math.abs(base) * MathUtils.signum(value);
 		return base + (value - base) * alpha;
+	}
+
+	private static function beforeFirstKey(from:MixFrom, alpha:Float, current:Float, setup:Float):Float {
+		return switch (from) {
+			case MixFrom.setup: setup;
+			case MixFrom.first: current + (setup - current) * alpha;
+			case MixFrom.current: current;
+		}
 	}
 }

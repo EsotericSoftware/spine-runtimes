@@ -57,7 +57,7 @@ PhysicsConstraintTimeline::PhysicsConstraintTimeline(size_t frameCount, size_t b
 	setPropertyIds(ids, 1);
 }
 
-void PhysicsConstraintTimeline::apply(Skeleton &skeleton, float, float time, Array<Event *> *, float alpha, bool fromSetup, bool add, bool out,
+void PhysicsConstraintTimeline::apply(Skeleton &skeleton, float, float time, Array<Event *> *, float alpha, MixFrom from, bool add, bool out,
 									  bool appliedPose) {
 	SP_UNUSED(out);
 	if (add && !_additive) add = false;
@@ -69,19 +69,19 @@ void PhysicsConstraintTimeline::apply(Skeleton &skeleton, float, float time, Arr
 			PhysicsConstraint *constraint = physicsConstraints[i];
 			if (constraint->isActive() && global(constraint->_data)) {
 				PhysicsConstraintPose &pose = appliedPose ? *constraint->_appliedPose : constraint->_pose;
-				set(pose, getAbsoluteValue(time, alpha, fromSetup, add, get(pose), get(constraint->_data._setupPose), value));
+				set(pose, getAbsoluteValue(time, alpha, from, add, get(pose), get(constraint->_data._setupPose), value));
 			}
 		}
 	} else {
 		PhysicsConstraint *constraint = static_cast<PhysicsConstraint *>(skeleton.getConstraints()[_constraintIndex]);
 		if (constraint->isActive()) {
 			PhysicsConstraintPose &pose = appliedPose ? *constraint->_appliedPose : constraint->_pose;
-			set(pose, getAbsoluteValue(time, alpha, fromSetup, add, get(pose), get(constraint->_data._setupPose)));
+			set(pose, getAbsoluteValue(time, alpha, from, add, get(pose), get(constraint->_data._setupPose)));
 		}
 	}
 }
 
-void PhysicsConstraintResetTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *, float alpha, bool fromSetup, bool add,
+void PhysicsConstraintResetTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *, float alpha, MixFrom from, bool add,
 										   bool out, bool appliedPose) {
 	PhysicsConstraint *constraint = nullptr;
 	if (_constraintIndex != -1) {
@@ -90,7 +90,7 @@ void PhysicsConstraintResetTimeline::apply(Skeleton &skeleton, float lastTime, f
 	}
 
 	if (lastTime > time) {// Apply after lastTime for looped animations.
-		apply(skeleton, lastTime, FLT_MAX, nullptr, alpha, false, false, false, false);
+		apply(skeleton, lastTime, FLT_MAX, nullptr, alpha, MixFrom_Current, false, false, false);
 		lastTime = -1;
 	} else if (lastTime >= _frames[_frames.size() - 1])// Last time is after last frame.
 		return;

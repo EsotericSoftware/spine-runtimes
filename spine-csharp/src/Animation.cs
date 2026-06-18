@@ -123,7 +123,7 @@ namespace Spine {
 		}
 
 		/// <summary>Applies the animation's timelines to the specified skeleton.</summary>
-		/// <seealso cref="Timeline.Apply(Skeleton, float, float, ExposedList, float, bool, bool, bool, bool)"/>
+		/// <seealso cref="Timeline.Apply(Skeleton, float, float, ExposedList, float, MixFrom, bool, bool, bool)"/>
 		/// <seealso href='https://esotericsoftware.com/spine-applying-animations#Timeline-API'>Applying Animations in the Spine
 		/// Runtimes Guide.</seealso>
 		/// <param name="skeleton">The skeleton the animation is applied to. This provides access to the bones, slots, and other skeleton
@@ -136,18 +136,15 @@ namespace Spine {
 		/// <param name="loop">True if <c>time</c> beyond the <see cref="Duration"/> repeats the animation, else the last frame is used.</param>
 		/// <param name="events">If any events are fired, they are added to this list. Pass null to ignore fired events or if no timelines fire
 		/// 				events.</param>
-		/// <param name="alpha">0 applies setup or current values (depending on <c>fromSetup</c>), 1 uses timeline values, and
-		/// 				intermediate values interpolate between them.Adjusting<c> alpha</c> over time can mix an animation in or
-		/// 				out.</param>
-		/// <param name="fromSetup">If true, <c>alpha</c> transitions between setup and timeline values, setup values are used before the
-		/// 				first frame (current values are not used). If false, <c>alpha</c> transitions between current and timeline
-		/// 				values, no change is made before the first frame.</param>
+		/// <param name="alpha">0 applies setup or current values (depending on <c>from</c>), 1 uses timeline values, and intermediate
+		/// 				values interpolate between them.Adjusting<c>alpha</c> over time can mix an animation in or out.</param>
+		/// <param name="from">Controls how <c>alpha</c> and <c>add</c> mix from current or setup pose values to timeline values.</param>
 		/// <param name="add">If true, for timelines that support it, their values are added to the setup or current values (depending on
-		/// 				<c>fromSetup</c>).</param>
+		/// 				<c>from</c>).</param>
 		/// <param name="mixOut">True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant transitions.</param>
 		/// <param name="appliedPose">True to modify <see cref="Posed.AppliedPose"/>, else <see cref="Posed.Pose"/> is modified.</param>
 		public void Apply (Skeleton skeleton, float lastTime, float time, bool loop, ExposedList<Event> events, float alpha,
-							bool fromSetup, bool add, bool mixOut, bool appliedPose) {
+							MixFrom from, bool add, bool mixOut, bool appliedPose) {
 			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
 
 			if (loop && duration != 0) {
@@ -157,7 +154,7 @@ namespace Spine {
 
 			Timeline[] timelines = this.timelines.Items;
 			for (int i = 0, n = this.timelines.Count; i < n; i++)
-				timelines[i].Apply(skeleton, lastTime, time, events, alpha, fromSetup, add, mixOut, appliedPose);
+				timelines[i].Apply(skeleton, lastTime, time, events, alpha, from, add, mixOut, appliedPose);
 		}
 
 		/// <summary>The animation's name, unique across all animations in the skeleton.
@@ -169,11 +166,25 @@ namespace Spine {
 		}
 	}
 
+	/// <summary>
+	/// Controls whether <c>alpha</c> and <c>add</c> mix from current or setup pose values and what happens before the
+	/// first key.
+	/// </summary>
+	/// <seealso cref="Timeline.Apply(Skeleton, float, float, ExposedList{Event}, float, MixFrom, bool, bool, bool)"/>
+	public enum MixFrom {
+		/// <summary>Alpha mixes from the current pose. Before the first key, no change is made.</summary>
+		Current,
+		/// <summary>Alpha mixes from the setup pose. Before the first key, the setup pose is used.</summary>
+		Setup,
+		/// <summary>Alpha mixes from the current pose. Before the first key, alpha mixes from the current pose to the setup pose.</summary>
+		First
+	}
+
 	public enum Property {
 		Rotate = 0, X, Y, ScaleX, ScaleY, ShearX, ShearY, Inherit, //
 		RGB, Alpha, RGB2, //
 		Attachment, Deform, //
-		Event, DrawOrder, //
+		Event, DrawOrder, DrawOrderFolder, //
 		IkConstraint, TransformConstraint, //
 		PathConstraintPosition, PathConstraintSpacing, PathConstraintMix, //
 		PhysicsConstraintInertia, PhysicsConstraintStrength, PhysicsConstraintDamping, PhysicsConstraintMass, //
@@ -226,7 +237,10 @@ namespace Spine {
 			}
 		}
 
-		/// <summary>True if this timeline supports additive blending.</summary>
+		/// <summary>True if this timeline supports being applied additively.
+		/// <para> See the <c>add</c> parameter in
+		/// <see cref="Timeline.Apply(Skeleton, float, float, ExposedList{Event}, float, MixFrom, bool, bool, bool)"/>
+		/// </para></summary>
 		public bool Additive {
 			get {
 				return additive;
@@ -252,22 +266,20 @@ namespace Spine {
 		/// 				interpolate between the frame values.</param>
 		/// <param name="events">If any events are fired, they are added to this list. Pass null to ignore fired events or if no timelines
 		/// 				fire events.</param>
-		/// <param name="alpha">0 applies setup or current values (depending on <c>fromSetup</c>), 1 uses timeline values, and
-		/// 				intermediate values interpolate between them.Adjusting<c> alpha</c> over time can mix a timeline in or
-		/// 				out.</param>
+		/// <param name="alpha">0 applies setup or current values (depending on <c>from</c>), 1 uses timeline values, and intermediate
+		///					values interpolate between them. Adjusting<c>alpha</c> over time can mix a timeline in or out.</param>
 		/// <param name="blend">Controls how mixing is applied when <c>alpha</c> &lt; 1.</param>
 		/// <param name="direction">Indicates whether the timeline is mixing in or out. Used by timelines which perform instant transitions,
-		///                   such as <see cref="DrawOrderTimeline"/> or <see cref="AttachmentTimeline"/>, and other such as <see cref="ScaleTimeline"/>.</param>
-		/// <param name="fromSetup">If true, <c>alpha</c> transitions between setup and timeline values, setup values are used before
-		///                   the first frame (current values are not used). If false, <c>alpha</c> transitions between current and
-		///                   timeline values, no change is made before the first frame.</param>
+		///                 such as <see cref="DrawOrderTimeline"/> or <see cref="AttachmentTimeline"/>, and other such as <see cref="ScaleTimeline"/>.</param>
+		/// <param name="from">Controls how <c>alpha</c> and <c>add</c> mix from current or setup pose values to timeline
+		///					values.</param>
 		/// <param name="add">If true, for timelines that support it, their values are added to the setup or current values (depending on
-		///                   <c>fromSetup</c>).</param>
+		///                   <c>from</c>).</param>
 		/// <param name="mixOut">True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant
 		///                   transitions.</param>
 		/// <param name="appliedPose">True to modify <see cref="Posed.AppliedPose"/>, else <see cref="Posed.Pose"/> is modified.</param>
 		public abstract void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha,
-			bool fromSetup, bool add, bool mixOut, bool appliedPose);
+			MixFrom from, bool add, bool mixOut, bool appliedPose);
 
 		/// <summary>Linear search using a stride of 1.</summary>
 		/// <param name="time">Must be >= the first value in <c>frames</c>.</param>
@@ -455,52 +467,63 @@ namespace Spine {
 
 		/// <summary>Returns the interpolated value for properties relative to the setup value. The timeline value is added to the setup
 		/// value, rather than replacing it.</summary>
-		/// <seealso cref="Timeline.Apply(Skeleton, float, float, ExposedList{Event}, float, bool, bool, bool, bool)"/>
+		/// <seealso cref="Timeline.Apply(Skeleton, float, float, ExposedList{Event}, float, MixFrom, bool, bool, bool)"/>
 		/// <param name="current">The current value for the property.</param>
 		/// <param name="setup">The setup value for the property.</param>
-		public float GetRelativeValue (float time, float alpha, bool fromSetup, bool add, float current, float setup) {
-			if (time < frames[0]) return fromSetup ? setup : current;
+		public float GetRelativeValue (float time, float alpha, MixFrom from, bool add, float current, float setup) {
+			if (time < frames[0]) return BeforeFirstKey(from, alpha, current, setup);
 			float value = GetCurveValue(time);
-			return fromSetup ? setup + value * alpha : current + (add ? value : value + setup - current) * alpha;
+			return from == MixFrom.Setup ? setup + value * alpha : current + (add ? value : value + setup - current) * alpha;
 		}
 
 		/// <summary>Returns the interpolated value for properties set as absolute values. The timeline value replaces the setup value,
 		/// rather than being relative to it.</summary>
-		/// <seealso cref="Timeline.Apply(Skeleton, float, float, ExposedList{Event}, float, bool, bool, bool, bool)"/>
+		/// <seealso cref="Timeline.Apply(Skeleton, float, float, ExposedList{Event}, float, MixFrom, bool, bool, bool)"/>
 		/// <param name="current">The current value for the property.</param>
 		/// <param name="setup">The setup value for the property.</param>
-		public float GetAbsoluteValue (float time, float alpha, bool fromSetup, bool add, float current, float setup) {
-			if (time < frames[0]) return fromSetup ? setup : current;
+		public float GetAbsoluteValue (float time, float alpha, MixFrom from, bool add, float current, float setup) {
+			if (time < frames[0]) return BeforeFirstKey(from, alpha, current, setup);
 			float value = GetCurveValue(time);
-			return fromSetup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
+			return from == MixFrom.Setup ? setup + (add ? value : value - setup) * alpha
+				: current + (add ? value : value - current) * alpha;
 		}
 
 		/// <summary>Returns the interpolated value for properties set as absolute values, using the specified timeline value rather than
 		/// calling <see cref="GetCurveValue(float)"/>.</summary>
-		/// <seealso cref="Timeline.Apply(Skeleton, float, float, ExposedList{Event}, float, bool, bool, bool, bool)"/>
+		/// <seealso cref="Timeline.Apply(Skeleton, float, float, ExposedList{Event}, float, MixFrom, bool, bool, bool)"/>
 		/// <param name="current">The current value for the property.</param>
 		/// <param name="setup">The setup value for the property.</param>
 		/// <param name="value">The timeline value to apply.</param>
-		public float GetAbsoluteValue (float time, float alpha, bool fromSetup, bool add, float current, float setup,
+		public float GetAbsoluteValue (float time, float alpha, MixFrom from, bool add, float current, float setup,
 			float value) {
-			if (time < frames[0]) return fromSetup ? setup : current;
-			return fromSetup ? setup + (add ? value : value - setup) * alpha : current + (add ? value : value - current) * alpha;
+			if (time < frames[0]) return BeforeFirstKey(from, alpha, current, setup);
+			return from == MixFrom.Setup ? setup + (add ? value : value - setup) * alpha
+				: current + (add ? value : value - current) * alpha;
 		}
 
 		/// <summary>Returns the interpolated value for scale properties. The timeline and setup values are multiplied and sign adjusted.</summary>
-		/// <seealso cref="Timeline.Apply(Skeleton, float, float, ExposedList{Event}, float, bool, bool, bool, bool)"/>
+		/// <seealso cref="Timeline.Apply(Skeleton, float, float, ExposedList{Event}, float, MixFrom, bool, bool, bool)"/>
 		/// <param name="current">The current value for the property.</param>
 		/// <param name="setup">The setup value for the property.</param>
-		public float GetScaleValue (float time, float alpha, bool fromSetup, bool add, bool mixOut, float current,
+		public float GetScaleValue (float time, float alpha, MixFrom from, bool add, bool mixOut, float current,
 			float setup) {
-			if (time < frames[0]) return fromSetup ? setup : current;
+			if (time < frames[0]) return BeforeFirstKey(from, alpha, current, setup);
 			float value = GetCurveValue(time) * setup;
 			if (alpha == 1 && !add) return value;
-			float baseValue = fromSetup ? setup : current;
+			float baseValue = from == MixFrom.Setup ? setup : current;
 			if (add) return baseValue + (value - setup) * alpha;
 			if (mixOut) return baseValue + (Math.Abs(value) * Math.Sign(baseValue) - baseValue) * alpha;
 			baseValue = Math.Abs(baseValue) * Math.Sign(value);
 			return baseValue + (value - baseValue) * alpha;
+		}
+
+		static private float BeforeFirstKey (MixFrom from, float alpha, float current, float setup) {
+			switch (from) {
+			default:
+			case MixFrom.Setup: return setup;
+			case MixFrom.First: return current + (setup - current) * alpha;
+			case MixFrom.Current: return current;
+			}
 		}
 	}
 
@@ -527,14 +550,14 @@ namespace Spine {
 		}
 
 		/// <param name="events">May be null.</param>
-		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, bool fromSetup,
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixFrom from,
 			bool add, bool mixOut, bool appliedPose) {
 
 			Bone bone = skeleton.bones.Items[boneIndex];
-			if (bone.active) Apply(appliedPose ? bone.appliedPose : bone.pose, bone.data.setupPose, time, alpha, fromSetup, add, mixOut);
+			if (bone.active) Apply(appliedPose ? bone.appliedPose : bone.pose, bone.data.setupPose, time, alpha, from, add, mixOut);
 		}
 
-		abstract protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add,
+		abstract protected void Apply (BonePose pose, BonePose setup, float time, float alpha, MixFrom from, bool add,
 			bool mixOut);
 	}
 
@@ -573,14 +596,14 @@ namespace Spine {
 		}
 
 		/// <param name="events">May be null.</param>
-		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, bool fromSetup, bool add,
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixFrom from, bool add,
 			bool mixOut, bool appliedPose) {
 
 			Bone bone = skeleton.bones.Items[boneIndex];
-			if (bone.active) Apply(appliedPose ? bone.appliedPose : bone.pose, bone.data.setupPose, time, alpha, fromSetup, add, mixOut);
+			if (bone.active) Apply(appliedPose ? bone.appliedPose : bone.pose, bone.data.setupPose, time, alpha, from, add, mixOut);
 		}
 
-		abstract protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add,
+		abstract protected void Apply (BonePose pose, BonePose setup, float time, float alpha, MixFrom from, bool add,
 			bool mixOut);
 	}
 
@@ -590,9 +613,9 @@ namespace Spine {
 			: base(frameCount, bezierCount, boneIndex, (ulong)Property.Rotate) {
 		}
 
-		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add,
+		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, MixFrom from, bool add,
 			bool mixOut) {
-			pose.rotation = GetRelativeValue(time, alpha, fromSetup, add, pose.rotation, setup.rotation);
+			pose.rotation = GetRelativeValue(time, alpha, from, add, pose.rotation, setup.rotation);
 		}
 	}
 
@@ -602,12 +625,20 @@ namespace Spine {
 			: base(frameCount, bezierCount, boneIndex, (ulong)Property.X, (ulong)Property.Y) {
 		}
 
-		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add, bool mixOut) {
+		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, MixFrom from, bool add, bool mixOut) {
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				if (fromSetup) {
+				switch (from) {
+				case MixFrom.Setup: {
 					pose.x = setup.x;
 					pose.y = setup.y;
+					break;
+				}
+				case MixFrom.First: {
+					pose.x += (setup.x - pose.x) * alpha;
+					pose.y += (setup.y - pose.y) * alpha;
+					break;
+				}
 				}
 				return;
 			}
@@ -616,7 +647,7 @@ namespace Spine {
 			// note: reference implementation has code inlined, we re-use GetCurveValue code for root motion.
 			GetCurveValue(out x, out y, time);
 
-			if (fromSetup) {
+			if (from == MixFrom.Setup) {
 				pose.x = setup.x + x * alpha;
 				pose.y = setup.y + y * alpha;
 			} else if (add) {
@@ -657,8 +688,8 @@ namespace Spine {
 			: base(frameCount, bezierCount, boneIndex, (ulong)Property.X) {
 		}
 
-		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add, bool mixOut) {
-			pose.x = GetRelativeValue(time, alpha, fromSetup, add, pose.x, setup.x);
+		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, MixFrom from, bool add, bool mixOut) {
+			pose.x = GetRelativeValue(time, alpha, from, add, pose.x, setup.x);
 		}
 	}
 
@@ -668,8 +699,8 @@ namespace Spine {
 			: base(frameCount, bezierCount, boneIndex, (ulong)Property.Y) {
 		}
 
-		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add, bool mixOut) {
-			pose.y = GetRelativeValue(time, alpha, fromSetup, add, pose.y, setup.y);
+		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, MixFrom from, bool add, bool mixOut) {
+			pose.y = GetRelativeValue(time, alpha, from, add, pose.y, setup.y);
 		}
 	}
 
@@ -680,12 +711,20 @@ namespace Spine {
 			: base(frameCount, bezierCount, boneIndex, (ulong)Property.ScaleX, (ulong)Property.ScaleY) {
 		}
 
-		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add, bool mixOut) {
+		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, MixFrom from, bool add, bool mixOut) {
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				if (fromSetup) {
+				switch (from) {
+				case MixFrom.Setup: {
 					pose.scaleX = setup.scaleX;
 					pose.scaleY = setup.scaleY;
+					break;
+				}
+				case MixFrom.First: {
+					pose.scaleX += (setup.scaleX - pose.scaleX) * alpha;
+					pose.scaleY += (setup.scaleY - pose.scaleY) * alpha;
+					break;
+				}
 				}
 				return;
 			}
@@ -718,7 +757,7 @@ namespace Spine {
 				pose.scaleY = y;
 			} else {
 				float bx, by;
-				if (fromSetup) {
+				if (from == MixFrom.Setup) {
 					bx = setup.scaleX;
 					by = setup.scaleY;
 				} else {
@@ -747,9 +786,9 @@ namespace Spine {
 			: base(frameCount, bezierCount, boneIndex, (ulong)Property.ScaleX) {
 		}
 
-		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add,
+		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, MixFrom from, bool add,
 			bool mixOut) {
-			pose.scaleX = GetScaleValue(time, alpha, fromSetup, add, mixOut, pose.scaleX, setup.scaleX);
+			pose.scaleX = GetScaleValue(time, alpha, from, add, mixOut, pose.scaleX, setup.scaleX);
 		}
 	}
 
@@ -759,9 +798,9 @@ namespace Spine {
 			: base(frameCount, bezierCount, boneIndex, (ulong)Property.ScaleY) {
 		}
 
-		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add,
+		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, MixFrom from, bool add,
 			bool mixOut) {
-			pose.scaleY = GetScaleValue(time, alpha, fromSetup, add, mixOut, pose.scaleY, setup.scaleY);
+			pose.scaleY = GetScaleValue(time, alpha, from, add, mixOut, pose.scaleY, setup.scaleY);
 		}
 	}
 
@@ -771,12 +810,20 @@ namespace Spine {
 			: base(frameCount, bezierCount, boneIndex, (ulong)Property.ShearX, (ulong)Property.ShearY) {
 		}
 
-		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add, bool mixOut) {
+		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, MixFrom from, bool add, bool mixOut) {
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				if (fromSetup) {
+				switch (from) {
+				case MixFrom.Setup: {
 					pose.shearX = setup.shearX;
 					pose.shearY = setup.shearY;
+					break;
+				}
+				case MixFrom.First: {
+					pose.shearX += (setup.shearX - pose.shearX) * alpha;
+					pose.shearY += (setup.shearY - pose.shearY) * alpha;
+					break;
+				}
 				}
 				return;
 			}
@@ -802,7 +849,7 @@ namespace Spine {
 				break;
 			}
 
-			if (fromSetup) {
+			if (from == MixFrom.Setup) {
 				pose.shearX = setup.shearX + x * alpha;
 				pose.shearY = setup.shearY + y * alpha;
 			} else if (add) {
@@ -821,9 +868,9 @@ namespace Spine {
 			: base(frameCount, bezierCount, boneIndex, (ulong)Property.ShearX) {
 		}
 
-		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add,
+		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, MixFrom from, bool add,
 			bool mixOut) {
-			pose.shearX = GetRelativeValue(time, alpha, fromSetup, add, pose.shearX, setup.shearX);
+			pose.shearX = GetRelativeValue(time, alpha, from, add, pose.shearX, setup.shearX);
 		}
 	}
 
@@ -833,9 +880,9 @@ namespace Spine {
 			: base(frameCount, bezierCount, boneIndex, (ulong)Property.ShearY) {
 		}
 
-		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, bool fromSetup, bool add,
+		override protected void Apply (BonePose pose, BonePose setup, float time, float alpha, MixFrom from, bool add,
 			bool mixOut) {
-			pose.shearY = GetRelativeValue(time, alpha, fromSetup, add, pose.shearY, setup.shearY);
+			pose.shearY = GetRelativeValue(time, alpha, from, add, pose.shearY, setup.shearY);
 		}
 	}
 
@@ -872,7 +919,7 @@ namespace Spine {
 		}
 
 		/// <param name="events">May be null.</param>
-		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, bool fromSetup, bool add,
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixFrom from, bool add,
 									bool mixOut, bool appliedPose) {
 
 			Bone bone = skeleton.bones.Items[boneIndex];
@@ -880,11 +927,11 @@ namespace Spine {
 			BonePose pose = appliedPose ? bone.appliedPose : bone.pose;
 
 			if (mixOut) {
-				if (fromSetup) pose.inherit = bone.data.setupPose.inherit;
+				if (from != MixFrom.Current) pose.inherit = bone.data.setupPose.inherit;
 			} else {
 				float[] frames = this.frames;
 				if (time < frames[0]) {
-					if (fromSetup) pose.inherit = bone.data.setupPose.inherit;
+					if (from != MixFrom.Current) pose.inherit = bone.data.setupPose.inherit;
 				} else
 					pose.inherit = InheritEnum.Values[(int)frames[Search(frames, time, ENTRIES) + INHERIT]];
 			}
@@ -907,14 +954,14 @@ namespace Spine {
 		}
 
 		/// <param name="events">May be null.</param>
-		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, bool fromSetup, bool add,
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixFrom from, bool add,
 			bool mixOut, bool appliedPose) {
 
 			Slot slot = skeleton.slots.Items[slotIndex];
-			if (slot.bone.active) Apply(slot, appliedPose ? slot.appliedPose : slot.pose, time, alpha, fromSetup, add);
+			if (slot.bone.active) Apply(slot, appliedPose ? slot.appliedPose : slot.pose, time, alpha, from, add);
 		}
 
-		abstract protected void Apply (Slot slot, SlotPose pose, float time, float alpha, bool fromSetup, bool add);
+		abstract protected void Apply (Slot slot, SlotPose pose, float time, float alpha, MixFrom from, bool add);
 	}
 
 	/// <summary>Changes a slot's <see cref="SlotPose.GetColor()">color</see>.</summary>
@@ -943,13 +990,23 @@ namespace Spine {
 			frames[frame + A] = a;
 		}
 
-		override protected void Apply (Slot slot, SlotPose pose, float time, float alpha, bool fromSetup, bool add) {
+		override protected void Apply (Slot slot, SlotPose pose, float time, float alpha, MixFrom from, bool add) {
 			Color32F color = pose.GetColor();
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				if (fromSetup) {
-					color = slot.data.setupPose.GetColor();
+				Color32F setup = slot.data.setupPose.GetColor();
+				switch (from) {
+				case MixFrom.Setup: {
+					color = setup;
 					pose.SetColor(color); // required due to Color being a struct
+					break;
+				}
+				case MixFrom.First: {
+					color += new Color32F((setup.r - color.r) * alpha, (setup.g - color.g) * alpha, (setup.b - color.b) * alpha,
+						(setup.a - color.a) * alpha); // note: no need to clamp
+					pose.SetColor(color); // see above
+					break;
+				}
 				}
 				return;
 			}
@@ -986,7 +1043,7 @@ namespace Spine {
 			if (alpha == 1) {
 				color = new Color32F(r, g, b, a);
 			} else {
-				if (fromSetup) {
+				if (from == MixFrom.Setup) {
 					Color32F setup = slot.data.setupPose.GetColor();
 					color = new Color32F(setup.r + (r - setup.r) * alpha, setup.g + (g - setup.g) * alpha, setup.b + (b - setup.b) * alpha,
 						setup.a + (a - setup.a) * alpha);
@@ -1022,17 +1079,27 @@ namespace Spine {
 			frames[frame + B] = b;
 		}
 
-		override protected void Apply (Slot slot, SlotPose pose, float time, float alpha, bool fromSetup, bool add) {
+		override protected void Apply (Slot slot, SlotPose pose, float time, float alpha, MixFrom from, bool add) {
 			Color32F color = pose.GetColor();
 			float r, g, b;
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				if (fromSetup) {
-					Color32F setup = slot.data.setupPose.GetColor();
+				Color32F setup = slot.data.setupPose.GetColor();
+				switch (from) {
+				case MixFrom.Setup: {
 					color.r = setup.r;
 					color.g = setup.g;
 					color.b = setup.b;
 					pose.SetColor(color); // required due to Color being a struct
+					break;
+				}
+				case MixFrom.First: {
+					color.r += (setup.r - color.r) * alpha;
+					color.g += (setup.g - color.g) * alpha;
+					color.b += (setup.b - color.b) * alpha;
+					pose.SetColor(color); // see above
+					break;
+				}
 				}
 				return;
 			}
@@ -1062,7 +1129,7 @@ namespace Spine {
 			}
 
 			if (alpha != 1) {
-				if (fromSetup) {
+				if (from == MixFrom.Setup) {
 					Color32F setup = slot.data.setupPose.GetColor();
 					r = setup.r + (r - setup.r) * alpha;
 					g = setup.g + (g - setup.g) * alpha;
@@ -1099,7 +1166,7 @@ namespace Spine {
 		}
 
 		/// <param name="events">May be null.</param>
-		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, bool fromSetup,
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixFrom from,
 			bool add, bool mixOut, bool appliedPose) {
 			Slot slot = skeleton.slots.Items[slotIndex];
 			if (!slot.bone.active) return;
@@ -1109,17 +1176,25 @@ namespace Spine {
 			float a;
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				Color32F setup = slot.data.setupPose.GetColor();
-				if (fromSetup) {
-					color.a = setup.a;
+				float setup = slot.data.setupPose.GetColor().a;
+				switch (from) {
+				case MixFrom.Setup: {
+					color.a = setup;
 					pose.SetColor(color); // required due to Color being a struct
+					break;
+				}
+				case MixFrom.First: {
+					color.a += (setup - color.a) * alpha;
+					pose.SetColor(color); // see above
+					break;
+				}
 				}
 				return;
 			}
 
 			a = GetCurveValue(time);
 			if (alpha != 1) {
-				if (fromSetup) {
+				if (from == MixFrom.Setup) {
 					Color32F setup = slot.data.setupPose.GetColor();
 					a = setup.a + (a - setup.a) * alpha;
 				} else
@@ -1164,18 +1239,33 @@ namespace Spine {
 			frames[frame + B2] = b2;
 		}
 
-		override protected void Apply (Slot slot, SlotPose pose, float time, float alpha, bool fromSetup, bool add) {
+		override protected void Apply (Slot slot, SlotPose pose, float time, float alpha, MixFrom from, bool add) {
 			Color32F light = pose.GetColor();
 			Color32F? darkOptional = pose.GetDarkColor();
+			Color32F dark = darkOptional.Value;
 			float r2, g2, b2;
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				if (fromSetup) {
-					SlotPose setup = slot.data.setupPose;
-					Color32F setupLight = setup.GetColor();
-					Color32F? setupDarkOptional = setup.GetDarkColor();
+				SlotPose setup = slot.data.setupPose;
+				Color32F setupLight = setup.GetColor();
+				Color32F? setupDarkOptional = setup.GetDarkColor();
+				switch (from) {
+				case MixFrom.Setup: {
 					pose.SetColor(setupLight); // required due to Color being a struct
 					pose.SetDarkColor(setupDarkOptional);
+					break;
+				}
+				case MixFrom.First: {
+					Color32F setupDark = setupDarkOptional.Value;
+					light += new Color32F((setupLight.r - light.r) * alpha, (setupLight.g - light.g) * alpha, (setupLight.b - light.b) * alpha,
+						(setupLight.a - light.a) * alpha);
+					dark.r += (setupDark.r - dark.r) * alpha;
+					dark.g += (setupDark.g - dark.g) * alpha;
+					dark.b += (setupDark.b - dark.b) * alpha;
+					pose.SetColor(light); // see above
+					pose.SetDarkColor(dark);
+					break;
+				}
 				}
 				return;
 			}
@@ -1225,7 +1315,7 @@ namespace Spine {
 				light = new Color32F(r, g, b, a);
 				light.Clamp();
 				pose.SetColor(light); // required due to Color being a struct
-			} else if (fromSetup) {
+			} else if (from == MixFrom.Setup) {
 				SlotPose setupPose = slot.data.setupPose;
 				Color32F setup = setupPose.GetColor();
 				light = new Color32F(setup.r + (r - setup.r) * alpha, setup.g + (g - setup.g) * alpha, setup.b + (b - setup.b) * alpha,
@@ -1242,7 +1332,6 @@ namespace Spine {
 				light += new Color32F((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha, (a - light.a) * alpha);
 				light.Clamp();
 				pose.SetColor(light); // see above
-				Color32F dark = darkOptional.Value;
 				r2 = dark.r + (r2 - dark.r) * alpha;
 				g2 = dark.g + (g2 - dark.g) * alpha;
 				b2 = dark.b + (b2 - dark.b) * alpha;
@@ -1285,19 +1374,19 @@ namespace Spine {
 			frames[frame + B2] = b2;
 		}
 
-		override protected void Apply (Slot slot, SlotPose pose, float time, float alpha, bool fromSetup, bool add) {
+		override protected void Apply (Slot slot, SlotPose pose, float time, float alpha, MixFrom from, bool add) {
 			Color32F light = pose.GetColor();
 			Color32F? darkOptional = pose.GetDarkColor();
+			Color32F dark = darkOptional.Value;
 			float r, g, b, r2, g2, b2;
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				if (fromSetup) {
-					SlotPose setup = slot.data.setupPose;
-					Color32F setupLight = setup.GetColor();
-					Color32F? setupDarkOptional = setup.GetDarkColor();
-					Color32F dark = darkOptional.Value;
-					Color32F setupDark = setupDarkOptional.Value;
-
+				SlotPose setup = slot.data.setupPose;
+				Color32F setupLight = setup.GetColor();
+				Color32F? setupDarkOptional = setup.GetDarkColor();
+				Color32F setupDark = setupDarkOptional.Value;
+				switch (from) {
+				case MixFrom.Setup: {
 					light.r = setupLight.r;
 					light.g = setupLight.g;
 					light.b = setupLight.b;
@@ -1307,6 +1396,19 @@ namespace Spine {
 
 					pose.SetColor(light); // required due to Color being a struct
 					pose.SetDarkColor(dark);
+					break;
+				}
+				case MixFrom.First: {
+					light.r += (setupLight.r - light.r) * alpha;
+					light.g += (setupLight.g - light.g) * alpha;
+					light.b += (setupLight.b - light.b) * alpha;
+					dark.r += (setupDark.r - dark.r) * alpha;
+					dark.g += (setupDark.g - dark.g) * alpha;
+					dark.b += (setupDark.b - dark.b) * alpha;
+					pose.SetColor(light); // required due to Color being a struct
+					pose.SetDarkColor(dark);
+					break;
+				}
 				}
 				return;
 			}
@@ -1348,8 +1450,7 @@ namespace Spine {
 			}
 
 			if (alpha != 1) {
-				Color32F dark = darkOptional.Value;
-				if (fromSetup) {
+				if (from == MixFrom.Setup) {
 					SlotPose setupPose = slot.data.setupPose;
 					Color32F setup = setupPose.GetColor();
 					r = setup.r + (r - setup.r) * alpha;
@@ -1419,14 +1520,14 @@ namespace Spine {
 			attachmentNames[frame] = attachmentName;
 		}
 
-		public override void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, bool fromSetup, bool add,
+		public override void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixFrom from, bool add,
 							bool mixOut, bool appliedPose) {
 			Slot slot = skeleton.slots.Items[slotIndex];
 			if (!slot.bone.active) return;
 			SlotPose pose = appliedPose ? slot.appliedPose : slot.pose;
 
 			if (mixOut || time < this.frames[0]) {
-				if (fromSetup) SetAttachment(skeleton, pose, slot.data.attachmentName);
+				if (from != MixFrom.Current) SetAttachment(skeleton, pose, slot.data.attachmentName);
 			} else
 				SetAttachment(skeleton, pose, attachmentNames[Search(this.frames, time)]);
 		}
@@ -1537,7 +1638,7 @@ namespace Spine {
 			}
 		}
 
-		public override void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, bool fromSetup,
+		public override void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixFrom from,
 			bool add, bool mixOut, bool appliedPose) {
 			Slot[] slots = skeleton.slots.Items;
 			if (!attachment.IsTimelineActive(slots, slotIndex, appliedPose)) return;
@@ -1545,9 +1646,9 @@ namespace Spine {
 
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				ApplyBeforeFirst(slots[slotIndex], appliedPose, fromSetup);
+				ApplyBeforeFirst(slots[slotIndex], appliedPose, alpha, from);
 				foreach (int slotIndex in timelineSlots)
-					ApplyBeforeFirst(slots[slotIndex], appliedPose, fromSetup);
+					ApplyBeforeFirst(slots[slotIndex], appliedPose, alpha, from);
 				return;
 			}
 
@@ -1565,28 +1666,51 @@ namespace Spine {
 			}
 
 			int vertexCount = vertices[0].Length;
-			ApplyToSlot(slots[slotIndex], appliedPose, v1, v2, percent, vertexCount, alpha, fromSetup, add);
+			ApplyToSlot(slots[slotIndex], appliedPose, v1, v2, percent, vertexCount, alpha, from, add);
 			foreach (int slotIndex in timelineSlots)
-				ApplyToSlot(slots[slotIndex], appliedPose, v1, v2, percent, vertexCount, alpha, fromSetup, add);
+				ApplyToSlot(slots[slotIndex], appliedPose, v1, v2, percent, vertexCount, alpha, from, add);
 		}
 
-		private void ApplyBeforeFirst (Slot slot, bool appliedPose, bool fromSetup) {
+		private void ApplyBeforeFirst (Slot slot, bool appliedPose, float alpha, MixFrom from) {
 			if (!slot.bone.active) return;
 			SlotPose pose = appliedPose ? slot.appliedPose : slot.pose;
 			if (pose.attachment == null || pose.attachment.TimelineAttachment != attachment) return;
-			if (pose.deform.Count == 0) fromSetup = true;
-			if (fromSetup) pose.deform.Clear();
+			ExposedList<float> deformArray = pose.deform;
+			if (deformArray.Count == 0) from = MixFrom.Setup;
+			switch (from) {
+			case MixFrom.Setup: { deformArray.Clear(); break; }
+			case MixFrom.First: {
+				if (alpha == 1) {
+					deformArray.Clear();
+					return;
+				}
+				int vertexCount = vertices[0].Length;
+				float[] deform = deformArray.Resize(vertexCount).Items;
+				var vertexAttachment = (VertexAttachment)pose.attachment;
+				if (vertexAttachment.Bones == null) {
+					float[] setupVertices = vertexAttachment.Vertices;
+					for (int i = 0; i < vertexCount; i++)
+						deform[i] += (setupVertices[i] - deform[i]) * alpha;
+				} else {
+					alpha = 1 - alpha;
+					for (int i = 0; i < vertexCount; i++)
+						deform[i] *= alpha;
+				}
+				break;
+			}
+			}
 		}
 
 		private void ApplyToSlot (Slot slot, bool appliedPose, float[] v1, float[] v2, float percent, int vertexCount,
-			float alpha, bool fromSetup, bool add) {
+			float alpha, MixFrom from, bool add) {
 			if (!slot.bone.active) return;
 			SlotPose pose = appliedPose ? slot.appliedPose : slot.pose;
 			if (pose.attachment == null || pose.attachment.TimelineAttachment != attachment) return;
 
 			var vertexAttachment = (VertexAttachment)pose.attachment;
 			ExposedList<float> deformArray = pose.deform;
-			if (deformArray.Count == 0) fromSetup = true;
+			if (deformArray.Count == 0) from = MixFrom.Setup;
+			bool fromSetup = from == MixFrom.Setup;
 			float[] deform = deformArray.EnsureSize(vertexCount).Items;
 
 			if (v2 == null) { // Time is after last frame.
@@ -1729,7 +1853,7 @@ namespace Spine {
 			frames[frame + DELAY] = delay;
 		}
 
-		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, bool fromSetup,
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixFrom from,
 			bool add, bool mixOut, bool appliedPose) {
 
 			Slot[] slots = skeleton.slots.Items;
@@ -1738,7 +1862,7 @@ namespace Spine {
 
 			float[] frames = this.frames;
 			if (mixOut || time < frames[0]) {
-				if (fromSetup) {
+				if (from != MixFrom.Current) {
 					SetupPose(slots[slotIndex], appliedPose);
 					foreach (int slotIndex in timelineSlots)
 						SetupPose(slots[slotIndex], appliedPose);
@@ -1834,7 +1958,7 @@ namespace Spine {
 
 		/// <summary>Fires events for frames &gt; <c>lastTime</c> and &lt;= <c>time</c>.</summary>
 		public override void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha,
-			bool fromSetup, bool add, bool mixOut, bool appliedPose) {
+			MixFrom from, bool add, bool mixOut, bool appliedPose) {
 
 			if (firedEvents == null) return;
 
@@ -1842,7 +1966,7 @@ namespace Spine {
 			int frameCount = frames.Length;
 
 			if (lastTime > time) { // Apply after lastTime for looped animations.
-				Apply(null, lastTime, int.MaxValue, firedEvents, 0, false, false, false, false);
+				Apply(null, lastTime, int.MaxValue, firedEvents, 0, (MixFrom)0, false, false, false);
 				lastTime = -1f;
 			} else if (lastTime >= frames[frameCount - 1]) // Last time is after last frame.
 				return;
@@ -1866,7 +1990,7 @@ namespace Spine {
 
 	/// <summary>Changes the <see cref="Skeleton.DrawOrder"/>.</summary>
 	public class DrawOrderTimeline : Timeline {
-		internal static readonly ulong propertyID = (ulong)Property.DrawOrder;
+		internal static readonly ulong propertyID = (ulong)Property.DrawOrder << 53;
 		new internal static readonly ulong[] propertyIds = { propertyID };
 
 		readonly int[][] drawOrders;
@@ -1897,13 +2021,13 @@ namespace Spine {
 		}
 
 		/// <param name="events">May be null.</param>
-		public override void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, bool fromSetup,
+		public override void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixFrom from,
 			bool add, bool mixOut, bool appliedPose) {
 			Slot[] pose = (appliedPose ? skeleton.drawOrder.appliedPose : skeleton.drawOrder.pose).Items;
 			Slot[] setup = skeleton.slots.Items;
 
 			if (mixOut || time < frames[0]) {
-				if (fromSetup) Array.Copy(setup, 0, pose, 0, skeleton.slots.Count);
+				if (from != MixFrom.Current) Array.Copy(setup, 0, pose, 0, skeleton.slots.Count);
 				return;
 			}
 
@@ -1920,6 +2044,8 @@ namespace Spine {
 
 	/// <summary>Changes a subset of the <see cref="Skeleton.DrawOrder">draw order</see>.</summary>
 	public class DrawOrderFolderTimeline : Timeline {
+		internal static readonly ulong propertyID = (ulong)Property.DrawOrderFolder << 53;
+
 		private readonly int[] slots;
 		private readonly bool[] inFolder;
 		private readonly int[][] drawOrders;
@@ -1940,7 +2066,7 @@ namespace Spine {
 			int n = slots.Length;
 			var ids = new ulong[n];
 			for (int i = 0; i < n; i++)
-				ids[i] = (ulong)(uint)slots[i];
+				ids[i] = propertyID | (ulong)(uint)slots[i];
 			return ids;
 		}
 
@@ -1968,13 +2094,13 @@ namespace Spine {
 			drawOrders[frame] = drawOrder;
 		}
 
-		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, bool fromSetup,
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixFrom from,
 			bool add, bool mixOut, bool appliedPose) {
 			Slot[] pose = (appliedPose ? skeleton.drawOrder.appliedPose : skeleton.drawOrder.pose).Items;
 			Slot[] setup = skeleton.slots.Items;
 
 			if (mixOut || time < frames[0]) {
-				if (fromSetup) Setup(pose, setup);
+				if (from != MixFrom.Current) Setup(pose, setup);
 			} else {
 				int[] order = drawOrders[Search(frames, time)];
 				if (order == null)
@@ -2053,7 +2179,7 @@ namespace Spine {
 		}
 
 		/// <param name="events">May be null.</param>
-		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, bool fromSetup, bool add,
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixFrom from, bool add,
 									bool mixOut, bool appliedPose) {
 			var constraint = (IkConstraint)skeleton.constraints.Items[constraintIndex];
 			if (!constraint.active) return;
@@ -2061,13 +2187,24 @@ namespace Spine {
 
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				if (fromSetup) {
-					IkConstraintPose setup = constraint.data.setupPose;
+				IkConstraintPose setup = constraint.data.setupPose;
+				switch (from) {
+				case MixFrom.Setup: {
 					pose.mix = setup.mix;
 					pose.softness = setup.softness;
 					pose.bendDirection = setup.bendDirection;
 					pose.compress = setup.compress;
 					pose.stretch = setup.stretch;
+					break;
+				}
+				case MixFrom.First: {
+					pose.mix += (setup.mix - pose.mix) * alpha;
+					pose.softness += (setup.softness - pose.softness) * alpha;
+					pose.bendDirection = setup.bendDirection;
+					pose.compress = setup.compress;
+					pose.stretch = setup.stretch;
+					break;
+				}
 				}
 				return;
 			}
@@ -2093,11 +2230,11 @@ namespace Spine {
 				break;
 			}
 
-			IkConstraintPose basePose = fromSetup ? constraint.data.setupPose : pose;
+			IkConstraintPose basePose = from == MixFrom.Setup ? constraint.data.setupPose : pose;
 			pose.mix = basePose.mix + (mix - basePose.mix) * alpha;
 			pose.softness = basePose.softness + (softness - basePose.softness) * alpha;
 			if (mixOut) {
-				if (fromSetup) {
+				if (from == MixFrom.Setup) {
 					pose.bendDirection = basePose.bendDirection;
 					pose.compress = basePose.compress;
 					pose.stretch = basePose.stretch;
@@ -2154,7 +2291,7 @@ namespace Spine {
 		}
 
 		/// <param name="events">May be null.</param>
-		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, bool fromSetup, bool add,
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixFrom from, bool add,
 									bool mixOut, bool appliedPose) {
 			var constraint = (TransformConstraint)skeleton.constraints.Items[constraintIndex];
 			if (!constraint.active) return;
@@ -2162,14 +2299,26 @@ namespace Spine {
 
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				if (fromSetup) {
-					TransformConstraintPose setup = constraint.data.setupPose;
+				TransformConstraintPose setup = constraint.data.setupPose;
+				switch (from) {
+				case MixFrom.Setup: {
 					pose.mixRotate = setup.mixRotate;
 					pose.mixX = setup.mixX;
 					pose.mixY = setup.mixY;
 					pose.mixScaleX = setup.mixScaleX;
 					pose.mixScaleY = setup.mixScaleY;
 					pose.mixShearY = setup.mixShearY;
+					break;
+				}
+				case MixFrom.First: {
+					pose.mixRotate += (setup.mixRotate - pose.mixRotate) * alpha;
+					pose.mixX += (setup.mixX - pose.mixX) * alpha;
+					pose.mixY += (setup.mixY - pose.mixY) * alpha;
+					pose.mixScaleX += (setup.mixScaleX - pose.mixScaleX) * alpha;
+					pose.mixScaleY += (setup.mixScaleY - pose.mixScaleY) * alpha;
+					pose.mixShearY += (setup.mixShearY - pose.mixShearY) * alpha;
+					break;
+				}
 				}
 				return;
 			}
@@ -2178,7 +2327,7 @@ namespace Spine {
 			float rotate, x, y, scaleX, scaleY, shearY;
 			GetCurveValue(out rotate, out x, out y, out scaleX, out scaleY, out shearY, time);
 
-			TransformConstraintPose basePose = fromSetup ? constraint.data.setupPose : pose;
+			TransformConstraintPose basePose = from == MixFrom.Setup ? constraint.data.setupPose : pose;
 			if (add) {
 				pose.mixRotate = basePose.mixRotate + rotate * alpha;
 				pose.mixX = basePose.mixX + x * alpha;
@@ -2263,12 +2412,12 @@ namespace Spine {
 		}
 
 		/// <param name="events">May be null.</param>
-		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, bool fromSetup,
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixFrom from,
 			bool add, bool mixOut, bool appliedPose) {
 			var constraint = (PathConstraint)skeleton.constraints.Items[constraintIndex];
 			if (constraint.active) {
 				PathConstraintPose pose = appliedPose ? constraint.appliedPose : constraint.pose;
-				pose.position = GetAbsoluteValue(time, alpha, fromSetup, add, pose.position, constraint.data.setupPose.position);
+				pose.position = GetAbsoluteValue(time, alpha, from, add, pose.position, constraint.data.setupPose.position);
 			}
 		}
 	}
@@ -2281,13 +2430,13 @@ namespace Spine {
 		}
 
 		/// <param name="events">May be null.</param>
-		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, bool fromSetup, bool add,
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixFrom from, bool add,
 									bool mixOut, bool appliedPose) {
 
 			var constraint = (PathConstraint)skeleton.constraints.Items[constraintIndex];
 			if (constraint.active) {
 				PathConstraintPose pose = appliedPose ? constraint.appliedPose : constraint.pose;
-				pose.spacing = GetAbsoluteValue(time, alpha, fromSetup, false, pose.spacing, constraint.data.setupPose.spacing);
+				pose.spacing = GetAbsoluteValue(time, alpha, from, false, pose.spacing, constraint.data.setupPose.spacing);
 			}
 		}
 	}
@@ -2327,7 +2476,7 @@ namespace Spine {
 		}
 
 		/// <param name="events">May be null.</param>
-		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, bool fromSetup,
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixFrom from,
 			bool add, bool mixOut, bool appliedPose) {
 			var constraint = (PathConstraint)skeleton.constraints.Items[constraintIndex];
 			if (!constraint.active) return;
@@ -2335,11 +2484,20 @@ namespace Spine {
 
 			float[] frames = this.frames;
 			if (time < frames[0]) {
-				if (fromSetup) {
-					PathConstraintPose setup = constraint.data.setupPose;
+				PathConstraintPose setup = constraint.data.setupPose;
+				switch (from) {
+				case MixFrom.Setup: {
 					pose.mixRotate = setup.mixRotate;
 					pose.mixX = setup.mixX;
 					pose.mixY = setup.mixY;
+					break;
+				}
+				case MixFrom.First: {
+					pose.mixRotate += (setup.mixRotate - pose.mixRotate) * alpha;
+					pose.mixX += (setup.mixX - pose.mixX) * alpha;
+					pose.mixY += (setup.mixY - pose.mixY) * alpha;
+					break;
+				}
 				}
 				return;
 			}
@@ -2369,7 +2527,7 @@ namespace Spine {
 				break;
 			}
 
-			PathConstraintPose basePose = fromSetup ? constraint.data.setupPose : pose;
+			PathConstraintPose basePose = from == MixFrom.Setup ? constraint.data.setupPose : pose;
 			if (add) {
 				pose.mixRotate = basePose.mixRotate + rotate * alpha;
 				pose.mixX = basePose.mixX + x * alpha;
@@ -2390,7 +2548,7 @@ namespace Spine {
 		}
 
 		/// <param name="events">May be null.</param>
-		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, bool fromSetup, bool add,
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixFrom from, bool add,
 			bool mixOut, bool appliedPose) {
 			if (add && !additive) add = false;
 			if (constraintIndex == -1) {
@@ -2400,14 +2558,14 @@ namespace Spine {
 					PhysicsConstraint constraint = constraints[i];
 					if (constraint.active && Global(constraint.data)) {
 						PhysicsConstraintPose pose = appliedPose ? constraint.appliedPose : constraint.pose;
-						Set(pose, GetAbsoluteValue(time, alpha, fromSetup, add, Get(pose), Get(constraint.data.setupPose), value));
+						Set(pose, GetAbsoluteValue(time, alpha, from, add, Get(pose), Get(constraint.data.setupPose), value));
 					}
 				}
 			} else {
 				var constraint = (PhysicsConstraint)skeleton.constraints.Items[constraintIndex];
 				if (constraint.active) {
 					PhysicsConstraintPose pose = appliedPose ? constraint.appliedPose : constraint.pose;
-					Set(pose, GetAbsoluteValue(time, alpha, fromSetup, add, Get(pose), Get(constraint.data.setupPose)));
+					Set(pose, GetAbsoluteValue(time, alpha, from, add, Get(pose), Get(constraint.data.setupPose)));
 				}
 			}
 		}
@@ -2586,7 +2744,7 @@ namespace Spine {
 		}
 
 		/// <summary>Resets the physics constraint when frames > <c>lastTime</c> and <= <c>time</c>.</summary>
-		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, bool fromSetup, bool add,
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixFrom from, bool add,
 									bool mixOut, bool appliedPose) {
 
 			PhysicsConstraint constraint = null;
@@ -2598,7 +2756,7 @@ namespace Spine {
 			float[] frames = this.frames;
 
 			if (lastTime > time) { // Apply after lastTime for looped animations.
-				Apply(skeleton, lastTime, int.MaxValue, null, alpha, false, false, false, false);
+				Apply(skeleton, lastTime, int.MaxValue, null, alpha, (MixFrom)0, false, false, false);
 				lastTime = -1f;
 			} else if (lastTime >= frames[frames.Length - 1]) // Last time is after last frame.
 				return;
@@ -2627,13 +2785,13 @@ namespace Spine {
 		}
 
 		/// <param name="events">May be null.</param>
-		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, bool fromSetup,
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixFrom from,
 			bool add, bool mixOut, bool appliedPose) {
 
 			var constraint = (Slider)skeleton.constraints.Items[constraintIndex];
 			if (constraint.active) {
 				SliderPose pose = appliedPose ? constraint.appliedPose : constraint.pose;
-				pose.time = GetAbsoluteValue(time, alpha, fromSetup, add, pose.time, constraint.data.setupPose.time);
+				pose.time = GetAbsoluteValue(time, alpha, from, add, pose.time, constraint.data.setupPose.time);
 			}
 		}
 	}
@@ -2648,13 +2806,13 @@ namespace Spine {
 		}
 
 		/// <param name="events">May be null.</param>
-		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, bool fromSetup,
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixFrom from,
 			bool add, bool mixOut, bool appliedPose) {
 
 			var constraint = (Slider)skeleton.constraints.Items[constraintIndex];
 			if (constraint.active) {
 				SliderPose pose = appliedPose ? constraint.appliedPose : constraint.pose;
-				pose.mix = GetAbsoluteValue(time, alpha, fromSetup, add, pose.mix, constraint.data.setupPose.mix);
+				pose.mix = GetAbsoluteValue(time, alpha, from, add, pose.mix, constraint.data.setupPose.mix);
 			}
 		}
 	}

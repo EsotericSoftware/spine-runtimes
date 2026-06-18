@@ -82,6 +82,7 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 	}
 	canvasRenderer: SkeletonRenderer | null;
 	phaserRenderer: Phaser.Renderer.Canvas.CanvasRenderer | Phaser.Renderer.WebGL.WebGLRenderer;
+	currentWebGLDrawingContext: Phaser.Renderer.WebGL.DrawingContext | null = null;
 	private skeletonDataCache: Phaser.Cache.BaseCache;
 	private atlasCache: Phaser.Cache.BaseCache;
 
@@ -198,6 +199,7 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 		this.pluginManager.removeGameObject(window.SPINE_GAME_OBJECT_TYPE ?? SPINE_GAME_OBJECT_TYPE, true, true);
 		if (this.webGLRenderer) this.webGLRenderer.dispose();
 		this.gameWebGLRenderer = null;
+		this.currentWebGLDrawingContext = null;
 	}
 
 	/** Returns the TextureAtlas instance for the given key */

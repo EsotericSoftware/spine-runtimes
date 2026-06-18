@@ -3593,6 +3593,9 @@ namespace spine {
 			_json.writeName("scale");
 			_json.writeValue(obj->getScale());
 
+			_json.writeName("max");
+			_json.writeValue(obj->getMax());
+
 			_json.writeName("local");
 			_json.writeValue(obj->getLocal());
 

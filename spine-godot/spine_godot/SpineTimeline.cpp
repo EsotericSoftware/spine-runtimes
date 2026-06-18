@@ -54,7 +54,8 @@ void SpineTimeline::apply(Ref<SpineSkeleton> skeleton, float last_time, float ti
 	for (int i = 0; i < events.size(); ++i) {
 		events[i] = ((Ref<SpineEvent>) spine_events[i])->get_spine_object();
 	}
-	get_spine_object()->apply(*(skeleton->get_spine_object()), last_time, time, &spine_events, alpha, from_setup, add, out, applied_pose);
+	get_spine_object()->apply(*(skeleton->get_spine_object()), last_time, time, &spine_events, alpha,
+							  from_setup ? spine::MixFrom_Setup : spine::MixFrom_Current, add, out, applied_pose);
 }
 
 int SpineTimeline::get_frame_entries() {

@@ -33,6 +33,8 @@ package spine;
  * Various math utility functions.
  */
 class MathUtils {
+	static public var epsilon = 0.00001;
+	static public var epsilon2 = MathUtils.epsilon * MathUtils.epsilon;
 	static public var PI:Float = Math.PI;
 	static public var PI2:Float = Math.PI * 2;
 	static public var invPI2 = 1 / MathUtils.PI2;

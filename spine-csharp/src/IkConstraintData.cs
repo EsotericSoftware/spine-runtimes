@@ -64,18 +64,5 @@ namespace Spine {
 			get { return scaleY; }
 			set { scaleY = value; }
 		}
-
-		/// <summary>
-		/// Determines how the <see cref="BonePose.scaleY"/> changes when <see cref="IkConstraintPose.Compress"/> or
-		/// <see cref="IkConstraintPose.Stretch"/> set <see cref="BonePose.ScaleX"/>.
-		/// </summary>
-		public enum ScaleYMode {
-			/// <summary>scaleY is not changed.</summary>
-			None,
-			/// <summary>scaleY is multiplied by the scaleX factor, preserving the bone's aspect ratio.</summary>
-			Uniform,
-			/// <summary>scaleY is divided by the scaleX factor, preserving the bone's area.</summary>
-			Volume
-		}
 	}
 }

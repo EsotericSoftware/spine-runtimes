@@ -53,7 +53,7 @@ namespace spine {
 		void setFrame(int frame, float time, float r, float g, float b, float a);
 
 	protected:
-		virtual void _apply(Slot &slot, SlotPose &pose, float time, float alpha, bool fromSetup, bool add) override;
+		virtual void _apply(Slot &slot, SlotPose &pose, float time, float alpha, MixFrom from, bool add) override;
 
 		static const int ENTRIES = 5;
 		static const int R = 1;
@@ -81,7 +81,7 @@ namespace spine {
 		void setFrame(int frame, float time, float r, float g, float b);
 
 	protected:
-		virtual void _apply(Slot &slot, SlotPose &pose, float time, float alpha, bool fromSetup, bool add) override;
+		virtual void _apply(Slot &slot, SlotPose &pose, float time, float alpha, MixFrom from, bool add) override;
 
 		static const int ENTRIES = 4;
 		static const int R = 1;
@@ -101,7 +101,7 @@ namespace spine {
 
 		virtual ~AlphaTimeline();
 
-		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixFrom from, bool add, bool out,
 						   bool appliedPose) override;
 
 		virtual int getSlotIndex() override;
@@ -131,7 +131,7 @@ namespace spine {
 		void setFrame(int frame, float time, float r, float g, float b, float a, float r2, float g2, float b2);
 
 	protected:
-		virtual void _apply(Slot &slot, SlotPose &pose, float time, float alpha, bool fromSetup, bool add) override;
+		virtual void _apply(Slot &slot, SlotPose &pose, float time, float alpha, MixFrom from, bool add) override;
 
 		static const int ENTRIES = 8;
 		static const int R = 1;
@@ -162,7 +162,7 @@ namespace spine {
 		void setFrame(int frame, float time, float r, float g, float b, float r2, float g2, float b2);
 
 	protected:
-		virtual void _apply(Slot &slot, SlotPose &pose, float time, float alpha, bool fromSetup, bool add) override;
+		virtual void _apply(Slot &slot, SlotPose &pose, float time, float alpha, MixFrom from, bool add) override;
 
 		static const int ENTRIES = 7;
 		static const int R = 1;

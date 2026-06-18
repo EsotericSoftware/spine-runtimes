@@ -161,7 +161,7 @@ public class TrackEntry: NSObject {
     /// cleared.
     ///
     /// It may be desired to use AnimationState::addEmptyAnimation(int, float, float) rather than
-    /// have the animation abruptly cease being applied.
+    /// have the animation abruptly cease being applied, leaving the current pose.
     public var trackEnd: Float {
         get {
             let result = spine_track_entry_get_track_end(_ptr.assumingMemoryBound(to: spine_track_entry_wrapper.self))

@@ -37,6 +37,7 @@ export 'blend_mode.dart';
 export 'event_type.dart';
 export 'format.dart';
 export 'inherit.dart';
+export 'mix_from.dart';
 export 'physics.dart';
 export 'position_mode.dart';
 export 'property.dart';

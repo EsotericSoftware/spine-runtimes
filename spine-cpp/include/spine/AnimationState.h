@@ -31,10 +31,12 @@
 #define Spine_AnimationState_h
 
 #include <spine/Array.h>
+#include <spine/Map.h>
 #include <spine/Pool.h>
 #include <spine/Property.h>
 #include <spine/SpineObject.h>
 #include <spine/SpineString.h>
+#include <spine/Timeline.h>
 #include <spine/HasRendererObject.h>
 #include <spine/Interpolation.h>
 #include "Slot.h"
@@ -159,7 +161,7 @@ namespace spine {
 		/// properties keyed by the animation are set to the setup pose and the track is cleared.
 		///
 		/// It may be desired to use AnimationState::addEmptyAnimation(int, float, float) rather than have the animation
-		/// abruptly cease being applied.
+		/// abruptly cease being applied, leaving the current pose.
 		float getTrackEnd();
 
 		void setTrackEnd(float inValue);
@@ -543,13 +545,14 @@ namespace spine {
 		void disposeTrackEntry(TrackEntry *entry);
 
 	private:
-		static const int Subsequent = 0;
-		static const int First = 1;
-		static const int Hold = 2;
-		static const int HoldFirst = 3;
-
+		static const int Current = 0;
 		static const int Setup = 1;
-		static const int Retain = 2;
+		static const int First = 2;
+		static const int Mode = 3;
+		static const int Hold = 4;
+
+		static const int AttachSetup = 1;
+		static const int AttachRetain = 2;
 
 		AnimationStateData *_data;
 
@@ -558,7 +561,7 @@ namespace spine {
 		Array<Event *> _events;
 		EventQueue *_queue;
 
-		HashMap<PropertyId, bool> _propertyIDs;
+		Map<PropertyId, TrackEntry *> _propertyIDs;
 		bool _animationsChanged;
 
 		AnimationStateListener _listener;
@@ -577,12 +580,12 @@ namespace spine {
 
 		/// Applies the rotate timeline, mixing with the current pose while keeping the same rotation direction chosen as the shortest
 		/// the first time the mixing was applied.
-		static void applyRotateTimeline(RotateTimeline *rotateTimeline, Skeleton &skeleton, float time, float alpha, bool fromSetup,
+		static void applyRotateTimeline(RotateTimeline *rotateTimeline, Skeleton &skeleton, float time, float alpha, MixFrom from,
 										Array<float> &timelinesRotation, size_t i, bool firstFrame);
 
 		/// Applies the attachment timeline and sets Slot::attachmentState.
 		/// @param retain True if the attachment remains after apply, false if temporary for deform timelines.
-		void applyAttachmentTimeline(AttachmentTimeline *attachmentTimeline, Skeleton &skeleton, float animationTime, bool fromSetup, bool retain);
+		void applyAttachmentTimeline(AttachmentTimeline *attachmentTimeline, Skeleton &skeleton, float animationTime, MixFrom from, bool retain);
 
 		/// Returns true when all mixing from entries are complete.
 		bool updateMixingFrom(TrackEntry *to, float delta);
@@ -607,7 +610,9 @@ namespace spine {
 
 		void animationsChanged();
 
-		void computeHold(TrackEntry *entry);
+		void computeHold(TrackEntry *entry, TrackEntry *track);
+
+		int from(TrackEntry *track, Timeline *timeline, Array<PropertyId> &ids);
 	};
 }
 

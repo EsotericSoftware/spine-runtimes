@@ -158,6 +158,8 @@ namespace spine {
 		void rotateWorld(float degrees);
 
 	private:
+		void setLocal(float ra, float rb, float rc, float rd);
+		void setLocal(float ra, float rb, float rc, float rd, float ro);
 		void resetWorld(int update);
 
 	protected:

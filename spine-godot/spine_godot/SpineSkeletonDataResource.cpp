@@ -435,7 +435,7 @@ float SpineSkeletonDataResource::get_default_mix() {
 
 void SpineSkeletonDataResource::set_animation_mixes(Array _animation_mixes) {
 	for (int i = 0; i < _animation_mixes.size(); i++) {
-		auto objectId = Object::cast_to<EncodedObjectAsID>(_animation_mixes[0]);
+		auto objectId = Object::cast_to<EncodedObjectAsID>(_animation_mixes[i]);
 		if (objectId) {
 			ERR_PRINT("Live-editing of animation mixes is not supported.");
 			return;
@@ -456,6 +456,7 @@ void SpineSkeletonDataResource::update_mixes() {
 	animation_state_data->setDefaultMix(default_mix);
 	for (int i = 0; i < animation_mixes.size(); i++) {
 		Ref<SpineAnimationMix> mix = animation_mixes[i];
+		if (mix.is_null()) continue;
 		spine::Animation *from = skeleton_data->findAnimation(mix->get_from().utf8().ptr());
 		spine::Animation *to = skeleton_data->findAnimation(mix->get_to().utf8().ptr());
 		if (!from) {

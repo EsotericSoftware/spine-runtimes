@@ -15,7 +15,7 @@ SPINE_C_API void spine_path_constraint_mix_timeline_dispose(spine_path_constrain
 
 SPINE_C_API spine_rtti spine_path_constraint_mix_timeline_get_rtti(spine_path_constraint_mix_timeline self);
 SPINE_C_API void spine_path_constraint_mix_timeline_apply(spine_path_constraint_mix_timeline self, spine_skeleton skeleton, float lastTime,
-														  float time, /*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add,
+														  float time, /*@null*/ spine_array_event events, float alpha, spine_mix_from from, bool add,
 														  bool out, bool appliedPose);
 /**
  * Sets the time and color for the specified frame.

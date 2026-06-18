@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { DrawOrderFolderTimeline, DrawOrderTimeline, isConstraintTimeline, isSlotTimeline, PhysicsConstraintTimeline } from "./Animation.js";
+import { DrawOrderFolderTimeline, DrawOrderTimeline, isConstraintTimeline, isSlotTimeline, MixFrom, PhysicsConstraintTimeline } from "./Animation.js";
 import type { Bone } from "./Bone.js";
 import { Constraint } from "./Constraint.js";
 import type { Physics } from "./Physics.js";
@@ -78,7 +78,7 @@ export class Slider extends Constraint<Slider, SliderData, SliderPose> {
 		for (let i = 0, n = animation.bones.length; i < n; i++)
 			bones[indices[i]].appliedPose.modifyLocal(skeleton);
 
-		animation.apply(skeleton, p.time, p.time, data.loop, null, p.mix, false, data.additive, false, true);
+		animation.apply(skeleton, p.time, p.time, data.loop, null, p.mix, MixFrom.current, data.additive, false, true);
 	}
 
 	sort (skeleton: Skeleton) {

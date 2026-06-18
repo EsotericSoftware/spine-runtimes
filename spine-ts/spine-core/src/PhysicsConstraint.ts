@@ -29,6 +29,7 @@
 
 import type { BonePose } from "./BonePose.js";
 import { Constraint } from "./Constraint.js";
+import { ScaleYMode } from "./ConstraintData.js";
 import { Physics } from "./Physics.js";
 import type { PhysicsConstraintData } from "./PhysicsConstraintData.js";
 import { PhysicsConstraintPose } from "./PhysicsConstraintPose.js";
@@ -287,9 +288,20 @@ export class PhysicsConstraint extends Constraint<PhysicsConstraint, PhysicsCons
 			}
 		}
 		if (scaleX) {
-			const s = 1 + (this.scaleOffset - this.scaleLag * z) * mix * this.data.scaleX;
+			let s = 1 + (this.scaleOffset - this.scaleLag * z) * mix * this.data.scaleX;
 			bone.a *= s;
 			bone.c *= s;
+			switch (this.data.scaleYMode) {
+				case ScaleYMode.Uniform:
+					bone.b *= s;
+					bone.d *= s;
+					break;
+				case ScaleYMode.Volume:
+					s = Math.abs(s);
+					s = s >= 0.7 ? 1 / s : 4 - 3.67347 * s;
+					bone.b *= s;
+					bone.d *= s;
+			}
 		}
 		if (physics !== Physics.pose) {
 			this.tx = l * bone.a;

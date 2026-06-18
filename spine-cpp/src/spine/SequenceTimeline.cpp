@@ -72,7 +72,7 @@ void SequenceTimeline::setSlotIndex(int inValue) {
 	_slotIndex = inValue;
 }
 
-void SequenceTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+void SequenceTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixFrom from, bool add, bool out,
 							 bool appliedPose) {
 	SP_UNUSED(alpha);
 	SP_UNUSED(lastTime);
@@ -90,7 +90,7 @@ void SequenceTimeline::apply(Skeleton &skeleton, float lastTime, float time, Arr
 
 	Array<float> &frames = this->_frames;
 	if (out || time < frames[0]) {
-		if (fromSetup) {
+		if (from != MixFrom_Current) {
 			setupPose(*slots[getSlotIndex()], appliedPose);
 			for (size_t i = 0; i < timelineSlots.size(); ++i) setupPose(*slots[timelineSlots[i]], appliedPose);
 		}

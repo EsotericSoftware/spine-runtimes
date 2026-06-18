@@ -303,7 +303,7 @@ namespace Spine.Unity {
 			if (skeletonRenderer == null)
 				skeletonRenderer = this.GetComponent<ISkeletonRenderer>();
 #if UNITY_EDITOR
-			if (!ApplicationIsPlaying && skeletonRenderer != null && skeletonRenderer.Skeleton != null)
+			if (requiresEditorUpdate && skeletonRenderer != null && skeletonRenderer.Skeleton != null)
 				skeletonRenderer.Skeleton.SetupPose();
 			requiresEditorUpdate = false;
 #endif

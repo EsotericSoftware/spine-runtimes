@@ -31,7 +31,7 @@ using System;
 
 namespace Spine {
 	/// <summary>Fired by <see cref="EventTimeline"/> when specific animation times are reached.
-	/// <para>See <see cref="Timeline.Apply(Skeleton, float, float, ExposedList{Event}, float, bool, bool, bool, bool)"/> and
+	/// <para>See <see cref="Timeline.Apply(Skeleton, float, float, ExposedList{Event}, float, MixFrom, bool, bool, bool)"/> and
 	/// <a href="https://esotericsoftware.com/spine-events">Events</a> in the Spine User Guide.</para></summary>
 	public class Event {
 		internal readonly float time;

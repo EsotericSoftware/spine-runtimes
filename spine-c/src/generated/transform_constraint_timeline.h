@@ -16,7 +16,7 @@ SPINE_C_API void spine_transform_constraint_timeline_dispose(spine_transform_con
 
 SPINE_C_API spine_rtti spine_transform_constraint_timeline_get_rtti(spine_transform_constraint_timeline self);
 SPINE_C_API void spine_transform_constraint_timeline_apply(spine_transform_constraint_timeline self, spine_skeleton skeleton, float lastTime,
-														   float time, /*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add,
+														   float time, /*@null*/ spine_array_event events, float alpha, spine_mix_from from, bool add,
 														   bool out, bool appliedPose);
 /**
  * Sets the time, rotate mix, translate mix, scale mix, and shear mix for the

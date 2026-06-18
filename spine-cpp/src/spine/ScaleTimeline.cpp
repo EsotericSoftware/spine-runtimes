@@ -46,11 +46,19 @@ ScaleTimeline::ScaleTimeline(size_t frameCount, size_t bezierCount, int boneInde
 	: BoneTimeline2(frameCount, bezierCount, boneIndex, Property_ScaleX, Property_ScaleY) {
 }
 
-void ScaleTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
+void ScaleTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, MixFrom from, bool add, bool out) {
 	if (time < _frames[0]) {
-		if (fromSetup) {
-			pose._scaleX = setup._scaleX;
-			pose._scaleY = setup._scaleY;
+		switch (from) {
+			case MixFrom_Setup:
+				pose._scaleX = setup._scaleX;
+				pose._scaleY = setup._scaleY;
+				break;
+			case MixFrom_First:
+				pose._scaleX += (setup._scaleX - pose._scaleX) * alpha;
+				pose._scaleY += (setup._scaleY - pose._scaleY) * alpha;
+				break;
+			case MixFrom_Current:
+				break;
 		}
 		return;
 	}
@@ -86,7 +94,7 @@ void ScaleTimeline::_apply(BonePose &pose, BonePose &setup, float time, float al
 		pose._scaleY = y;
 	} else {
 		float bx, by;
-		if (fromSetup) {
+		if (from == MixFrom_Setup) {
 			bx = setup._scaleX;
 			by = setup._scaleY;
 		} else {
@@ -114,8 +122,8 @@ ScaleXTimeline::ScaleXTimeline(size_t frameCount, size_t bezierCount, int boneIn
 	: BoneTimeline1(frameCount, bezierCount, boneIndex, Property_ScaleX) {
 }
 
-void ScaleXTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
-	pose._scaleX = getScaleValue(time, alpha, fromSetup, add, out, pose._scaleX, setup._scaleX);
+void ScaleXTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, MixFrom from, bool add, bool out) {
+	pose._scaleX = getScaleValue(time, alpha, from, add, out, pose._scaleX, setup._scaleX);
 }
 
 RTTI_IMPL(ScaleYTimeline, BoneTimeline1)
@@ -124,6 +132,6 @@ ScaleYTimeline::ScaleYTimeline(size_t frameCount, size_t bezierCount, int boneIn
 	: BoneTimeline1(frameCount, bezierCount, boneIndex, Property_ScaleY) {
 }
 
-void ScaleYTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, bool fromSetup, bool add, bool out) {
-	pose._scaleY = getScaleValue(time, alpha, fromSetup, add, out, pose._scaleY, setup._scaleY);
+void ScaleYTimeline::_apply(BonePose &pose, BonePose &setup, float time, float alpha, MixFrom from, bool add, bool out) {
+	pose._scaleY = getScaleValue(time, alpha, from, add, out, pose._scaleY, setup._scaleY);
 }

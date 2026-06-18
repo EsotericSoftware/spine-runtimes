@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="//cdn.jsdelivr.net/npm/phaser@4.0.0/dist/phaser.js"></script>
+    <script src="../dist/iife/spine-phaser-v4.js"></script>
+    <link rel="stylesheet" href="../../index.css" />
+    <title>Spine Phaser Batching Context Test</title>
+  </head>
+
+  <body class="p-4 flex flex-col items-center">
+    <h1>Batching context test</h1>
+  </body>
+  <script>
+    class BatchingContextTest extends Phaser.Scene {
+      preload() {
+        this.load.spineBinary("spineboy-data", "/assets/spineboy-pro.skel");
+        this.load.spineAtlas("spineboy-atlas", "/assets/spineboy-pma.atlas");
+      }
+
+      create() {
+        const camera = this.cameras.main;
+        camera.setForceComposite(true); // Forces rendering through a framebuffer.
+        camera.filters.internal.addVignette(0.5, 0.5, 0.8, 0.25);
+        camera.filters.external.addPixelate(1);
+        camera.flash(300, 255, 255, 255, false);
+        camera.shake(500, 0.002);
+
+        this.expectedSpineDrawCalls = 5;
+
+        this.debugText = document.createElement("pre");
+        this.debugText.style.position = "absolute";
+        this.debugText.style.left = "8px";
+        this.debugText.style.top = "8px";
+        this.debugText.style.margin = "0";
+        this.debugText.style.padding = "4px 6px";
+        this.debugText.style.color = "#ffffff";
+        this.debugText.style.background = "rgba(0, 0, 0, 0.75)";
+        this.debugText.style.font = "12px monospace";
+        this.debugText.style.pointerEvents = "none";
+        document.body.appendChild(this.debugText);
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.debugText.remove());
+
+        const makeSpineboy = (x, y, scale = 0.25) => {
+          const spineboy = this.add.spine(
+            x,
+            y,
+            "spineboy-data",
+            "spineboy-atlas"
+          );
+          spineboy.scale = scale;
+          spineboy.animationState.setAnimation(0, "portal", true);
+          return spineboy;
+        };
+
+        // Top-level adjacent Spine objects, with skipped objects between them.
+        // The invisible objects should not break the Spine batch.
+        for (let i = 0; i < 5; i++) {
+          makeSpineboy(100 + i * 120, 520, 0.25);
+          this.add.rectangle(100 + i * 120 + 45, 520, 20, 20, 0xff00ff).setVisible(false);
+        }
+
+        // A visible Phaser object intentionally breaks the Spine batch.
+        this.add.rectangle(395, 520, 30, 220, 0x00ffff, 0.35);
+
+        // Container children: skipped children inside containers/layers should not break batching.
+        const container = this.add.container(120, 250);
+        for (let i = 0; i < 4; i++) {
+          const spineboy = makeSpineboy(i * 120, 0, 0.22);
+          const hiddenBlock = this.add.rectangle(i * 120 + 45, 0, 24, 24, 0xff0000).setVisible(false);
+          container.add([spineboy, hiddenBlock]);
+        }
+        container.setRotation(0.12);
+
+        // Filtered Spine objects render through object framebuffers.
+        // These exercise the filtered drawing context and matrix path.
+        for (let i = 0; i < 3; i++) {
+          const filtered = makeSpineboy(220 + i * 140, 120, 0.2).enableFilters();
+          filtered.filters.internal.addGlow(0xffff00, 2, 0, 1);
+        }
+      }
+
+      update(time) {
+        if (this.debugText) {
+          this.debugText.textContent =
+            (() => {
+              const drawCalls = spine.PolygonBatcher.getAndResetGlobalDrawCalls();
+              const expectedDrawCalls = this.expectedSpineDrawCalls;
+              const status = drawCalls <= expectedDrawCalls ? "OK" : "TOO MANY";
+              this.debugText.style.color = drawCalls <= expectedDrawCalls ? "#80ff80" : "#ff8080";
+              return "Spine draw calls: " + drawCalls + " / expected <= " + expectedDrawCalls + " (" + status + ")" +
+                "\nPortal animation tests normal/additive PMA batching" +
+                "\nCamera forceComposite + internal/external filters" +
+                "\nContainer + invisible skipped children";
+            })();
+        }
+      }
+    }
+
+    new Phaser.Game({
+      type: Phaser.AUTO,
+      width: 800,
+      height: 600,
+      type: Phaser.WEBGL,
+      scene: [BatchingContextTest],
+      plugins: {
+        scene: [
+          {
+            key: "spine.SpinePlugin",
+            plugin: spine.SpinePlugin,
+            mapping: "spine",
+          },
+        ],
+      },
+    });
+  </script>
+</html>

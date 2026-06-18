@@ -196,6 +196,7 @@ namespace Spine.Unity {
 
 		// Overrides Properties
 		public bool HasGenerateMeshOverride { get { return generateMeshOverride != null; } }
+		public bool MaterialsNeedUpdate { get { return materialsNeedUpdate; } set { materialsNeedUpdate = value; } }
 
 		/// <summary>Allows separate code to take over rendering for this SkeletonRenderer component. The subscriber is passed a SkeletonRendererInstruction argument to determine how to render a skeleton.</summary>
 		public event InstructionDelegate GenerateMeshOverride {
@@ -622,7 +623,14 @@ namespace Spine.Unity {
 			if (canPrepareInstructions)
 				PrepareInstructionsAndRenderers();
 
+			bool hasGenerateMeshOverride = generateMeshOverride != null;
 			updateTriangles = UpdateBuffersToInstructions(calledFromMainThread);
+			if (hasGenerateMeshOverride && disableRenderingOnOverride) {
+#if USE_THREADED_SKELETON_UPDATE
+				requiresMeshBufferAssignmentMainThread = false;
+#endif
+				return;
+			}
 
 #if USE_THREADED_SKELETON_UPDATE
 			if (calledFromMainThread) {

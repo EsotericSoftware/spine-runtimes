@@ -91,6 +91,16 @@ void spine_slider_data_set_offset(spine_slider_data self, float offset) {
 	_self->setOffset(offset);
 }
 
+float spine_slider_data_get_max(spine_slider_data self) {
+	SliderData *_self = (SliderData *) self;
+	return _self->getMax();
+}
+
+void spine_slider_data_set_max(spine_slider_data self, float max) {
+	SliderData *_self = (SliderData *) self;
+	_self->setMax(max);
+}
+
 bool spine_slider_data_get_local(spine_slider_data self) {
 	SliderData *_self = (SliderData *) self;
 	return _self->getLocal();

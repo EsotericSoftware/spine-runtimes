@@ -431,6 +431,8 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 				data->_y = Json::getFloat(constraintMap, "y", 0);
 				data->_rotate = Json::getFloat(constraintMap, "rotate", 0);
 				data->_scaleX = Json::getFloat(constraintMap, "scaleX", 0);
+				const char *scaleY = Json::getString(constraintMap, "scaleY", NULL);
+				if (scaleY) data->_scaleYMode = ScaleYMode_valueOf(scaleY);
 				data->_shearX = Json::getFloat(constraintMap, "shearX", 0);
 				data->_limit = Json::getFloat(constraintMap, "limit", 5000) * _scale;
 				data->_step = 1.0f / Json::getInt(constraintMap, "fps", 60);
@@ -456,7 +458,6 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 				data->setSkinRequired(skinRequired);
 				data->_additive = Json::getBoolean(constraintMap, "additive", false);
 				data->_loop = Json::getBoolean(constraintMap, "loop", false);
-				data->_setupPose._time = Json::getFloat(constraintMap, "time", 0);
 				data->_setupPose._mix = Json::getFloat(constraintMap, "mix", 1);
 
 				const char *boneName = Json::getString(constraintMap, "bone", NULL);
@@ -470,9 +471,11 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 						data->_property->_offset = Json::getFloat(constraintMap, "from", 0) * propertyScaleValue;
 						data->_offset = Json::getFloat(constraintMap, "to", 0);
 						data->_scale = Json::getFloat(constraintMap, "scale", 1) / propertyScaleValue;
+						data->_max = Json::getFloat(constraintMap, "max", 0);
 						data->_local = Json::getBoolean(constraintMap, "local", false);
 					}
-				}
+				} else
+					data->_setupPose._time = Json::getFloat(constraintMap, "time", 0);
 
 				skeletonData->_constraints.add(data);
 			}

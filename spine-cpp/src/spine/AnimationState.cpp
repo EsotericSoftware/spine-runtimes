@@ -597,9 +597,9 @@ bool AnimationState::apply(Skeleton &skeleton) {
 			for (size_t ii = 0; ii < timelineCount; ++ii) {
 				Timeline *timeline = timelines[ii];
 				if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti))
-					applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, true, true);
+					applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, MixFrom_Setup, true);
 				else
-					timeline->apply(skeleton, animationLast, applyTime, applyEvents, alpha, true, false, false, false);
+					timeline->apply(skeleton, animationLast, applyTime, applyEvents, alpha, MixFrom_Setup, false, false, false);
 			}
 		} else {
 			Array<int> &timelineMode = current._timelineMode;
@@ -613,15 +613,15 @@ bool AnimationState::apply(Skeleton &skeleton) {
 				Timeline *timeline = timelines[ii];
 				assert(timeline);
 
-				bool fromSetup = (timelineMode[ii] & First) != 0;
+				MixFrom mixFrom = (MixFrom) (timelineMode[ii] & Mode);
 
 				if (!shortestRotation && timeline->getRTTI().isExactly(RotateTimeline::rtti))
-					applyRotateTimeline(static_cast<RotateTimeline *>(timeline), skeleton, applyTime, alpha, fromSetup, timelinesRotation, ii << 1,
+					applyRotateTimeline(static_cast<RotateTimeline *>(timeline), skeleton, applyTime, alpha, mixFrom, timelinesRotation, ii << 1,
 										firstFrame);
 				else if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti))
-					applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, fromSetup, retainAttachments);
+					applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, mixFrom, retainAttachments);
 				else
-					timeline->apply(skeleton, animationLast, applyTime, applyEvents, alpha, fromSetup, add, false, false);
+					timeline->apply(skeleton, animationLast, applyTime, applyEvents, alpha, mixFrom, add, false, false);
 			}
 		}
 
@@ -632,7 +632,7 @@ bool AnimationState::apply(Skeleton &skeleton) {
 		current._nextTrackLast = current._trackTime;
 	}
 
-	int setupState = _unkeyedState + Setup;
+	int setupState = _unkeyedState + AttachSetup;
 	Array<Slot *> &slots = skeleton.getSlots();
 	for (int i = 0, n = (int) slots.size(); i < n; i++) {
 		Slot *slot = slots[i];
@@ -840,10 +840,10 @@ Animation *AnimationState::getEmptyAnimation() {
 	return &ret;
 }
 
-void AnimationState::applyAttachmentTimeline(AttachmentTimeline *attachmentTimeline, Skeleton &skeleton, float time, bool fromSetup, bool retain) {
+void AnimationState::applyAttachmentTimeline(AttachmentTimeline *attachmentTimeline, Skeleton &skeleton, float time, MixFrom from, bool retain) {
 	Slot *slot = skeleton.getSlots()[attachmentTimeline->getSlotIndex()];
 	if (!slot->getBone().isActive()) return;
-	if (!retain && slot->_attachmentState == _unkeyedState + Retain) return;
+	if (!retain && slot->_attachmentState == _unkeyedState + AttachRetain) return;
 
 	bool setup = time < attachmentTimeline->getFrames()[0];
 	const String *name = NULL;
@@ -852,23 +852,23 @@ void AnimationState::applyAttachmentTimeline(AttachmentTimeline *attachmentTimel
 		setup = !retain && name->isEmpty();
 	}
 	if (setup) {
-		if (!fromSetup) return;
+		if (from == MixFrom_Current) return;
 		name = &slot->getData().getAttachmentName();
 	}
 	slot->_pose.setAttachment(name->isEmpty() ? NULL : skeleton.getAttachment(slot->getData().getIndex(), *name));
 	if (retain)
-		slot->_attachmentState = _unkeyedState + Retain;
+		slot->_attachmentState = _unkeyedState + AttachRetain;
 	else if (!setup)
-		slot->_attachmentState = _unkeyedState + Setup;
+		slot->_attachmentState = _unkeyedState + AttachSetup;
 }
 
 
-void AnimationState::applyRotateTimeline(RotateTimeline *rotateTimeline, Skeleton &skeleton, float time, float alpha, bool fromSetup,
+void AnimationState::applyRotateTimeline(RotateTimeline *rotateTimeline, Skeleton &skeleton, float time, float alpha, MixFrom from,
 										 Array<float> &timelinesRotation, size_t i, bool firstFrame) {
 	if (firstFrame) timelinesRotation[i] = 0;
 
 	if (alpha == 1) {
-		static_cast<Timeline *>(rotateTimeline)->apply(skeleton, 0, time, NULL, 1, fromSetup, false, false, false);
+		static_cast<Timeline *>(rotateTimeline)->apply(skeleton, 0, time, NULL, 1, from, false, false, false);
 		return;
 	}
 
@@ -877,12 +877,23 @@ void AnimationState::applyRotateTimeline(RotateTimeline *rotateTimeline, Skeleto
 	BonePose &pose = bone->_pose;
 	BonePose &setup = bone->_data._setupPose;
 	Array<float> &frames = rotateTimeline->_frames;
+	float r1, r2;
 	if (time < frames[0]) {
-		if (fromSetup) pose._rotation = setup._rotation;
-		return;
+		switch (from) {
+			case MixFrom_Setup:
+				pose._rotation = setup._rotation;
+				return;
+			case MixFrom_Current:
+				return;
+			case MixFrom_First:
+				break;
+		}
+		r1 = pose._rotation;
+		r2 = setup._rotation;
+	} else {
+		r1 = from == MixFrom_Setup ? setup._rotation : pose._rotation;
+		r2 = setup._rotation + rotateTimeline->getCurveValue(time);
 	}
-	float r1 = fromSetup ? setup._rotation : pose._rotation;
-	float r2 = setup._rotation + rotateTimeline->getCurveValue(time);
 
 	// Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.
 	float total, diff = r2 - r1;
@@ -981,24 +992,24 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton) {
 	for (size_t i = 0; i < timelineCount; i++) {
 		Timeline *timeline = timelines[i];
 		int mode = timelineMode[i];
+		MixFrom mixFrom = (MixFrom) (mode & Mode);
 		float alpha;
 		if ((mode & Hold) != 0) {
 			TrackEntry *holdMix = timelineHoldMix[i];
 			alpha = holdMix == NULL ? alphaHold : alphaHold * (1 - holdMix->mix());
 		} else {
-			if (!drawOrder && timeline->getRTTI().isExactly(DrawOrderTimeline::rtti)) continue;
+			if (!drawOrder && timeline->getRTTI().isExactly(DrawOrderTimeline::rtti) && mixFrom == MixFrom_Current) continue;
 			alpha = alphaMix;
 		}
 		from->_totalAlpha += alpha;
-		bool fromSetup = (mode & First) != 0;
 		if (!shortestRotation && timeline->getRTTI().isExactly(RotateTimeline::rtti)) {
-			applyRotateTimeline((RotateTimeline *) timeline, skeleton, applyTime, alpha, fromSetup, timelinesRotation, i << 1, firstFrame);
+			applyRotateTimeline((RotateTimeline *) timeline, skeleton, applyTime, alpha, mixFrom, timelinesRotation, i << 1, firstFrame);
 		} else if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti)) {
-			applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, fromSetup,
+			applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, mixFrom,
 									retainAttachments && alpha >= from->_alphaAttachmentThreshold);
 		} else {
-			bool out = !drawOrder || !timeline->getRTTI().isExactly(DrawOrderTimeline::rtti) || !fromSetup;
-			timeline->apply(skeleton, animationLast, applyTime, events, alpha, fromSetup, add, out, false);
+			bool out = !drawOrder || !timeline->getRTTI().isExactly(DrawOrderTimeline::rtti) || mixFrom == MixFrom_Current;
+			timeline->apply(skeleton, animationLast, applyTime, events, alpha, mixFrom, add, out, false);
 		}
 	}
 
@@ -1154,20 +1165,21 @@ void AnimationState::animationsChanged() {
 	_animationsChanged = false;
 
 	for (size_t i = 0, n = _tracks.size(); i < n; ++i) {
-		TrackEntry *entry = _tracks[i];
-		if (!entry) continue;
+		TrackEntry *track = _tracks[i];
+		if (!track) continue;
+		TrackEntry *entry = track;
 
 		while (entry->_mixingFrom != NULL) entry = entry->_mixingFrom;
 
 		do {
-			computeHold(entry);
+			computeHold(entry, track);
 			entry = entry->_mixingTo;
 		} while (entry != NULL);
 	}
 	_propertyIDs.clear();
 }
 
-void AnimationState::computeHold(TrackEntry *entry) {
+void AnimationState::computeHold(TrackEntry *entry, TrackEntry *track) {
 	Array<Timeline *> &timelines = entry->_animation->_timelines;
 	size_t timelinesCount = timelines.size();
 	Array<int> &timelineMode = entry->_timelineMode;
@@ -1175,38 +1187,25 @@ void AnimationState::computeHold(TrackEntry *entry) {
 	entry->_timelineHoldMix.clear();
 	Array<TrackEntry *> &timelineHoldMix = entry->_timelineHoldMix;
 	timelineHoldMix.setSize(timelinesCount, NULL);
-	PropertyId drawOrderPropertyId = DrawOrderTimeline::getPropertyId();
 	bool add = entry->_additive, keepHold = entry->_keepHold;
 	TrackEntry *to = entry->_mixingTo;
 
 	for (size_t i = 0; i < timelinesCount; ++i) {
 		Timeline *timeline = timelines[i];
 		Array<PropertyId> &ids = timeline->getPropertyIds();
-		bool first = _propertyIDs.addAll(ids, true) &&
-			!(timeline->getRTTI().isExactly(DrawOrderFolderTimeline::rtti) && _propertyIDs.containsKey(drawOrderPropertyId));
+		int mixFrom = from(track, timeline, ids);
 
 		if (add && timeline->getAdditive()) {
-			timelineMode[i] = first ? First : Subsequent;
+			timelineMode[i] = mixFrom;
 			continue;
 		}
-
-		// Check if an earlier entry on this track keys this property.
-		bool found = false;
-		for (TrackEntry *from = entry->_mixingFrom; from != NULL; from = from->_mixingFrom) {
-			if (from->_animation->hasTimeline(ids)) {
-				timelineMode[i] = Subsequent;
-				found = true;
-				break;
-			}
-		}
-		if (found) continue;
 
 		// Hold if the next entry will overwrite this property.
 		int mode;
 		if (to == NULL || timeline->getInstant() || (to->_additive && timeline->getAdditive()) || !to->_animation->hasTimeline(ids))
-			mode = first ? First : Subsequent;
+			mode = mixFrom;
 		else {
-			mode = first ? HoldFirst : Hold;
+			mode = mixFrom | Hold;
 			// Find next entry that doesn't overwrite this property. Its mix fades out the hold.
 			for (TrackEntry *next = to->_mixingTo; next != NULL; next = next->_mixingTo) {
 				if ((next->_additive && timeline->getAdditive()) || !next->_animation->hasTimeline(ids)) {
@@ -1218,4 +1217,23 @@ void AnimationState::computeHold(TrackEntry *entry) {
 		if (keepHold) mode = (mode & ~Hold) | (timelineMode[i] & Hold);
 		timelineMode[i] = mode;
 	}
+}
+
+int AnimationState::from(TrackEntry *track, Timeline *timeline, Array<PropertyId> &ids) {
+	int mixFrom = Setup;
+	for (size_t i = 0, n = ids.size(); i < n; i++) {
+		TrackEntry *owner = _propertyIDs.putMissing(ids[i], track);
+		if (owner != NULL) {
+			if (owner != track) {
+				while (++i < n) _propertyIDs.putMissing(ids[i], track);
+				return Current;
+			}
+			mixFrom = First;
+		}
+	}
+	if (timeline->getRTTI().isExactly(DrawOrderFolderTimeline::rtti)) {
+		TrackEntry **first = _propertyIDs.get(DrawOrderTimeline::getPropertyId());
+		if (first != NULL) return *first != track ? Current : First;
+	}
+	return mixFrom;
 }

@@ -62,14 +62,13 @@ class DrawOrderTimeline extends Timeline {
 		drawOrders[frame] = drawOrder;
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
-			appliedPose:Bool) {
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, from:MixFrom, add:Bool, out:Bool, appliedPose:Bool) {
 		var drawOrder = appliedPose ? skeleton.drawOrder.appliedPose : skeleton.drawOrder.pose;
 		var slots:Array<Slot> = skeleton.slots;
 		var i:Int = 0, n:Int = slots.length;
 
 		if (out) {
-			if (fromSetup) {
+			if (from != MixFrom.current) {
 				for (i in 0...n)
 					drawOrder[i] = slots[i];
 			}
@@ -77,7 +76,7 @@ class DrawOrderTimeline extends Timeline {
 		}
 
 		if (time < frames[0]) {
-			if (fromSetup) {
+			if (from != MixFrom.current) {
 				for (i in 0...n)
 					drawOrder[i] = slots[i];
 			}

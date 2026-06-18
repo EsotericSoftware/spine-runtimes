@@ -41,12 +41,11 @@ abstract class SlotCurveTimeline extends CurveTimeline implements SlotTimeline {
 		return slotIndex;
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
-			appliedPose:Bool) {
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, from:MixFrom, add:Bool, out:Bool, appliedPose:Bool) {
 		var slot = skeleton.slots[slotIndex];
 		if (slot.bone.active)
-			apply1(slot, appliedPose ? slot.appliedPose : slot.pose, time, alpha, fromSetup, add);
+			apply1(slot, appliedPose ? slot.appliedPose : slot.pose, time, alpha, from, add);
 	}
 
-	abstract function apply1(slot:Slot, pose:SlotPose, time:Float, alpha:Float, fromSetup:Bool, add:Bool):Void;
+	abstract function apply1(slot:Slot, pose:SlotPose, time:Float, alpha:Float, from:MixFrom, add:Bool):Void;
 }

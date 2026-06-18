@@ -194,7 +194,7 @@ namespace Spine.Unity {
 				return overrideTexture;
 			}
 			set {
-				customTextureOverride.Add(Texture2D.whiteTexture, value);
+				customTextureOverride[Texture2D.whiteTexture] = value;
 				SetMainRendererTexture(value);
 				materialsNeedUpdate = true;
 			}
@@ -437,6 +437,10 @@ namespace Spine.Unity {
 		protected void OnBecameVisible () {
 			UpdateMode previousUpdateMode = updateMode;
 			updateMode = UpdateMode.FullUpdate;
+
+			// onCullStateChanged(culled: false) may be called when the GameObject is still disabled
+			if (!this.isActiveAndEnabled) return;
+
 			// OnBecameVisible is called after Update and LateUpdate()
 			if (previousUpdateMode != UpdateMode.FullUpdate) {
 				if (skeletonAnimation != null)
@@ -643,6 +647,7 @@ namespace Spine.Unity {
 		}
 
 		public void PrepareInstructionsAndRenderers (bool isInRebuild = false) {
+			skeleton.SetColor(this.color);
 			if (UsesSingleSubmesh) {
 				MeshGenerator.GenerateSingleSubmeshInstruction(currentInstructions, skeleton, skeletonDataAsset.atlasAssets[0].PrimaryMaterial);
 				if (canvasRenderers.Count > 0)
@@ -773,7 +778,9 @@ namespace Spine.Unity {
 					if (canvasRenderer.transform.parent != parent.transform && !isInRebuild)
 						canvasRenderer.transform.SetParent(parent.transform, false);
 
-					canvasRenderer.transform.SetSiblingIndex(targetSiblingIndex++);
+					int s = targetSiblingIndex++;
+					if (canvasRenderer.transform.GetSiblingIndex() != s)
+						canvasRenderer.transform.SetSiblingIndex(s);
 				}
 
 				SkeletonSubmeshGraphic submeshGraphic = submeshGraphics[i];
@@ -872,7 +879,7 @@ namespace Spine.Unity {
 			meshGenerator.settings = meshSettings;
 			meshGenerator.Begin();
 
-			if (!currentInstructions.hasActiveClipping)
+			if (!currentInstructions.hasActiveClipping || workingSubmeshInstructions.Count == 0)
 				meshGenerator.BuildMeshWithArrays(currentInstructions, updateTriangles);
 			else // if (UsesSingleSubmesh) is always true here in SkeletonGraphic, ensured by caller
 				meshGenerator.AddSubmesh(workingSubmeshInstructions.Items[0], updateTriangles);
@@ -901,6 +908,10 @@ namespace Spine.Unity {
 				for (int i = 0; i < submeshCount; i++) {
 					MeshGenerator meshGenerator = meshGenerators.Items[i];
 					Mesh targetMesh = meshesItems[i];
+					if (meshGenerator.VertexCount <= 0) {
+						targetMesh.Clear();
+						continue;
+					}
 					meshGenerator.FillVertexData(targetMesh);
 					meshGenerator.FillTriangles(targetMesh);
 					meshGenerator.FillLateVertexData(targetMesh);
@@ -1009,6 +1020,10 @@ namespace Spine.Unity {
 
 			for (int i = 0; i < numMeshes; i++) {
 				CanvasRenderer currentRenderer = canvasRenderers[i];
+				if (usedMaterials[i] == null) {
+					currentRenderer.Clear();
+					continue;
+				}
 				if (assignMeshOverrideSingle == null || !disableMeshAssignmentOnOverride)
 					currentRenderer.SetMesh(meshes[i]);
 				else
@@ -1173,6 +1188,11 @@ namespace Spine.Unity {
 			bool hasSlotOverrides = customSlotMaterials.Count > 0;
 			for (int i = 0, count = sharedMaterials.Length; i < count; ++i) {
 				Material instructionMaterial = instructionItems[i].material;
+				if (instructionMaterial == null) {
+					usedTextureItems[i] = null;
+					sharedMaterials[i] = null;
+					continue;
+				}
 				usedTextureItems[i] = instructionMaterial.mainTexture;
 				bool isExplicitSlotOverride = hasSlotOverrides && customSlotMaterials.ContainsValue(instructionMaterial);
 				sharedMaterials[i] = isExplicitSlotOverride ? instructionMaterial : modifiedRenderingMaterial;
@@ -1190,6 +1210,8 @@ namespace Spine.Unity {
 			if (hasMaterialOrTextureOverride || hasBlendModeMaterials || hasPMAAdditiveSlots) {
 				for (int i = 0, count = sharedMaterials.Length; i < count; ++i) {
 					Material instructionMaterial = instructionItems[i].material;
+					if (instructionMaterial == null) continue;
+
 					Texture originalTexture = instructionMaterial.mainTexture;
 
 					bool isSlotOverride = hasSlotOverrides && customSlotMaterials.ContainsValue(instructionMaterial);
@@ -1219,10 +1241,11 @@ namespace Spine.Unity {
 
 			if (!UsesSingleSubmesh) {
 				for (int i = 0, count = sharedMaterials.Length; i < count; ++i) {
-					sharedMaterials[i] = submeshGraphics[i].UpdateModifiedMaterial(sharedMaterials[i]);
+					if (sharedMaterials[i] != null)
+						sharedMaterials[i] = submeshGraphics[i].UpdateModifiedMaterial(sharedMaterials[i]);
 				}
 			} else {
-				canvasRenderer.SetMaterial(sharedMaterials[0], usedTextures.Items[0]);
+				canvasRenderer.SetMaterial(sharedMaterials.Length > 0 ? sharedMaterials[0] : material, usedTextures.Items[0]);
 			}
 		}
 

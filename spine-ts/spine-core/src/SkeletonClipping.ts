@@ -470,6 +470,9 @@ export class SkeletonClipping {
 					offset += polygonSize;
 				}
 			}
+			this.clippedVerticesTyped = this._clippedVerticesTyped.subarray(0, this.clippedVerticesLength);
+			this.clippedUVsTyped = this._clippedUVsTyped.subarray(0, this.clippedUVsLength);
+			this.clippedTrianglesTyped = this._clippedTrianglesTyped.subarray(0, this.clippedTrianglesLength);
 			return true;
 		}
 

@@ -176,6 +176,7 @@ SPINE_OPAQUE_TYPE(spine_vertex_attachment)
 #include "event_type.h"
 #include "format.h"
 #include "inherit.h"
+#include "mix_from.h"
 #include "physics.h"
 #include "position_mode.h"
 #include "property.h"

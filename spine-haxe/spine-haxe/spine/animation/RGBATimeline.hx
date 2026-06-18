@@ -57,11 +57,14 @@ class RGBATimeline extends SlotCurveTimeline {
 		frames[frame + A] = a;
 	}
 
-	public function apply1(slot:Slot, pose:SlotPose, time:Float, alpha:Float, fromSetup:Bool, add:Bool) {
+	public function apply1(slot:Slot, pose:SlotPose, time:Float, alpha:Float, from:MixFrom, add:Bool) {
 		var color = pose.color;
 		if (time < frames[0]) {
-			if (fromSetup)
-				color.setFromColor(slot.data.setupPose.color);
+			var setup = slot.data.setupPose.color;
+			if (from == MixFrom.setup)
+				color.setFromColor(setup);
+			else if (from == MixFrom.first)
+				color.add((setup.r - color.r) * alpha, (setup.g - color.g) * alpha, (setup.b - color.b) * alpha, (setup.a - color.a) * alpha);
 			return;
 		}
 
@@ -95,7 +98,7 @@ class RGBATimeline extends SlotCurveTimeline {
 		if (alpha == 1)
 			color.set(r, g, b, a);
 		else {
-			if (fromSetup) {
+			if (from == MixFrom.setup) {
 				var setup = slot.data.setupPose.color;
 				color.set(setup.r
 					+ (r - setup.r) * alpha, setup.g

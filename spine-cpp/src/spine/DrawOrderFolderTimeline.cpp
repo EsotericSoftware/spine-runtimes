@@ -56,7 +56,7 @@ DrawOrderFolderTimeline::DrawOrderFolderTimeline(size_t frameCount, Array<int> &
 	}
 }
 
-void DrawOrderFolderTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add,
+void DrawOrderFolderTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixFrom from, bool add,
 									bool out, bool appliedPose) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(events);
@@ -66,7 +66,7 @@ void DrawOrderFolderTimeline::apply(Skeleton &skeleton, float lastTime, float ti
 	Array<Slot *> &setupPose = skeleton._slots;
 
 	if (out || time < _frames[0]) {
-		if (fromSetup) setup(pose, setupPose);
+		if (from != MixFrom_Current) setup(pose, setupPose);
 	} else {
 		Array<int> &drawOrder = _drawOrders[Animation::search(_frames, time)];
 		if (drawOrder.size() == 0)

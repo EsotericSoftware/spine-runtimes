@@ -33,7 +33,7 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.LongSet;
+import com.badlogic.gdx.utils.LongMap;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
@@ -43,6 +43,7 @@ import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderFolderTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.EventTimeline;
+import com.esotericsoftware.spine.Animation.MixFrom;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 
@@ -52,7 +53,7 @@ import com.esotericsoftware.spine.Animation.Timeline;
  * See <a href='https://esotericsoftware.com/spine-applying-animations#AnimationState-API'>Applying Animations</a> in the Spine
  * Runtimes Guide. */
 public class AnimationState {
-	static private final int SUBSEQUENT = 0, FIRST = 1, HOLD = 2, HOLD_FIRST = 3, SETUP = 1, RETAIN = 2;
+	static private final int CURRENT = 0, SETUP = 1, FIRST = 2, MODE = 3, HOLD = 4, ATTACH_SETUP = 1, ATTACH_RETAIN = 2;
 
 	static final Animation emptyAnimation = new Animation("<empty>");
 	static {
@@ -64,7 +65,7 @@ public class AnimationState {
 	private final Array<Event> events = new Array(true, 4, Event[]::new);
 	final SnapshotArray<AnimationStateListener> listeners = new SnapshotArray(true, 16, AnimationStateListener[]::new);
 	private final EventQueue queue = new EventQueue();
-	private final LongSet propertyIds = new LongSet();
+	private final LongMap<TrackEntry> propertyIds = new LongMap();
 	boolean animationsChanged;
 	private float timeScale = 1;
 	private int unkeyedState;
@@ -208,9 +209,9 @@ public class AnimationState {
 				for (int ii = 0; ii < timelineCount; ii++) {
 					Timeline timeline = timelines[ii];
 					if (timeline instanceof AttachmentTimeline attachmentTimeline)
-						applyAttachmentTimeline(attachmentTimeline, skeleton, applyTime, true, true);
+						applyAttachmentTimeline(attachmentTimeline, skeleton, applyTime, MixFrom.setup, true);
 					else
-						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, true, false, false, false);
+						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, MixFrom.setup, false, false, false);
 				}
 			} else {
 				int[] timelineMode = current.timelineMode.items;
@@ -221,14 +222,13 @@ public class AnimationState {
 					: current.timelinesRotation.items;
 				for (int ii = 0; ii < timelineCount; ii++) {
 					Timeline timeline = timelines[ii];
-					boolean fromSetup = (timelineMode[ii] & FIRST) != 0;
-					if (!shortestRotation && timeline instanceof RotateTimeline rotateTimeline) {
-						applyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, fromSetup, timelinesRotation, ii << 1,
-							firstFrame);
-					} else if (timeline instanceof AttachmentTimeline attachmentTimeline)
-						applyAttachmentTimeline(attachmentTimeline, skeleton, applyTime, fromSetup, retainAttachments);
+					MixFrom from = MixFrom.values[timelineMode[ii] & MODE];
+					if (!shortestRotation && timeline instanceof RotateTimeline rotateTimeline)
+						applyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, from, timelinesRotation, ii << 1, firstFrame);
+					else if (timeline instanceof AttachmentTimeline attachmentTimeline)
+						applyAttachmentTimeline(attachmentTimeline, skeleton, applyTime, from, retainAttachments);
 					else
-						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, fromSetup, add, false, false);
+						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, from, add, false, false);
 				}
 			}
 			if (current.reverse) eventsReverse(current, animationLast, animationTime);
@@ -239,7 +239,7 @@ public class AnimationState {
 		}
 
 		// Set slot attachments to the setup pose if they were set temporarily to apply deform timelines.
-		int setupState = unkeyedState + SETUP;
+		int setupState = unkeyedState + ATTACH_SETUP;
 		Slot[] slots = skeleton.slots.items;
 		for (int i = 0, n = skeleton.slots.size; i < n; i++) {
 			var slot = slots[i];
@@ -283,24 +283,24 @@ public class AnimationState {
 		for (int i = 0; i < timelineCount; i++) {
 			Timeline timeline = timelines[i];
 			int mode = timelineMode[i];
+			MixFrom mixFrom = MixFrom.values[mode & MODE];
 			float alpha;
 			if ((mode & HOLD) != 0) {
 				TrackEntry holdMix = timelineHoldMix[i];
 				alpha = holdMix == null ? alphaHold : alphaHold * (1 - holdMix.mix());
 			} else {
-				if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
+				if (!drawOrder && timeline instanceof DrawOrderTimeline && mixFrom == MixFrom.current) continue;
 				alpha = alphaMix;
 			}
 			from.totalAlpha += alpha;
-			boolean fromSetup = (mode & FIRST) != 0;
 			if (!shortestRotation && timeline instanceof RotateTimeline rotateTimeline) {
-				applyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, fromSetup, timelinesRotation, i << 1, firstFrame);
+				applyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, mixFrom, timelinesRotation, i << 1, firstFrame);
 			} else if (timeline instanceof AttachmentTimeline attachmentTimeline)
-				applyAttachmentTimeline(attachmentTimeline, skeleton, applyTime, fromSetup,
+				applyAttachmentTimeline(attachmentTimeline, skeleton, applyTime, mixFrom,
 					retainAttachments && alpha >= from.alphaAttachmentThreshold);
 			else {
-				boolean out = !drawOrder || !(timeline instanceof DrawOrderTimeline) || !fromSetup;
-				timeline.apply(skeleton, animationLast, applyTime, events, alpha, fromSetup, add, out, false);
+				boolean out = !drawOrder || !(timeline instanceof DrawOrderTimeline) || mixFrom == MixFrom.current;
+				timeline.apply(skeleton, animationLast, applyTime, events, alpha, mixFrom, add, out, false);
 			}
 		}
 
@@ -315,12 +315,12 @@ public class AnimationState {
 
 	/** Applies the attachment timeline and sets {@link Slot#attachmentState}.
 	 * @param retain True if the attachment remains after apply, false if temporary for deform timelines. */
-	private void applyAttachmentTimeline (AttachmentTimeline timeline, Skeleton skeleton, float time, boolean fromSetup,
+	private void applyAttachmentTimeline (AttachmentTimeline timeline, Skeleton skeleton, float time, MixFrom from,
 		boolean retain) {
 
 		Slot slot = skeleton.slots.items[timeline.slotIndex];
 		if (!slot.bone.active) return;
-		if (!retain && slot.attachmentState == unkeyedState + RETAIN) return;
+		if (!retain && slot.attachmentState == unkeyedState + ATTACH_RETAIN) return;
 
 		boolean setup = time < timeline.frames[0];
 		String name = null;
@@ -329,25 +329,25 @@ public class AnimationState {
 			setup = !retain && name == null;
 		}
 		if (setup) {
-			if (!fromSetup) return;
+			if (from == MixFrom.current) return;
 			name = slot.data.attachmentName;
 		}
 		slot.pose.setAttachment(name == null ? null : skeleton.getAttachment(slot.data.index, name));
 		if (retain)
-			slot.attachmentState = unkeyedState + RETAIN;
+			slot.attachmentState = unkeyedState + ATTACH_RETAIN;
 		else if (!setup) //
-			slot.attachmentState = unkeyedState + SETUP;
+			slot.attachmentState = unkeyedState + ATTACH_SETUP;
 	}
 
 	/** Applies the rotate timeline, mixing with the current pose while keeping the same rotation direction chosen as the shortest
 	 * the first time the mixing was applied. */
-	private void applyRotateTimeline (RotateTimeline timeline, Skeleton skeleton, float time, float alpha, boolean fromSetup,
+	private void applyRotateTimeline (RotateTimeline timeline, Skeleton skeleton, float time, float alpha, MixFrom from,
 		float[] timelinesRotation, int i, boolean firstFrame) {
 
 		if (firstFrame) timelinesRotation[i] = 0;
 
 		if (alpha == 1) {
-			timeline.apply(skeleton, 0, time, null, 1, fromSetup, false, false, false);
+			timeline.apply(skeleton, 0, time, null, 1, from, false, false, false);
 			return;
 		}
 
@@ -355,12 +355,23 @@ public class AnimationState {
 		if (!bone.active) return;
 		BonePose pose = bone.pose, setup = bone.data.setupPose;
 		float[] frames = timeline.frames;
-		if (time < frames[0]) { // Time is before first frame.
-			if (fromSetup) pose.rotation = setup.rotation;
-			return;
+		float r1, r2;
+		if (time < frames[0]) {
+			switch (from) {
+			case setup -> {
+				pose.rotation = setup.rotation;
+				return;
+			}
+			case current -> {
+				return;
+			}
+			}
+			r1 = pose.rotation;
+			r2 = setup.rotation;
+		} else {
+			r1 = from == MixFrom.setup ? setup.rotation : pose.rotation;
+			r2 = setup.rotation + timeline.getCurveValue(time);
 		}
-		float r1 = fromSetup ? setup.rotation : pose.rotation;
-		float r2 = setup.rotation + timeline.getCurveValue(time);
 
 		// Mix between rotations using the direction of the shortest route on the first frame.
 		float total, diff = r2 - r1;
@@ -722,54 +733,44 @@ public class AnimationState {
 		int n = tracks.size;
 		TrackEntry[] tracks = this.tracks.items;
 		for (int i = 0; i < n; i++) {
-			TrackEntry entry = tracks[i];
-			if (entry == null) continue;
+			TrackEntry track = tracks[i];
+			if (track == null) continue;
+			TrackEntry entry = track;
 			while (entry.mixingFrom != null) // Move to last entry, then iterate in reverse.
 				entry = entry.mixingFrom;
 			do {
-				computeHold(entry);
+				computeHold(entry, track);
 				entry = entry.mixingTo;
 			} while (entry != null);
 		}
 		propertyIds.clear(2048);
 	}
 
-	private void computeHold (TrackEntry entry) {
+	private void computeHold (TrackEntry entry, TrackEntry track) {
 		Timeline[] timelines = entry.animation.timelines.items;
 		int timelinesCount = entry.animation.timelines.size;
 		int[] timelineMode = entry.timelineMode.setSize(timelinesCount);
 		entry.timelineHoldMix.clear();
 		TrackEntry[] timelineHoldMix = entry.timelineHoldMix.setSize(timelinesCount);
-		LongSet propertyIds = this.propertyIds;
 		boolean add = entry.additive, keepHold = entry.keepHold;
 		TrackEntry to = entry.mixingTo;
 
-		outer:
 		for (int i = 0; i < timelinesCount; i++) {
 			Timeline timeline = timelines[i];
 			long[] ids = timeline.propertyIds;
-			boolean first = propertyIds.addAll(ids)
-				&& !(timeline instanceof DrawOrderFolderTimeline && propertyIds.contains(DrawOrderTimeline.propertyID));
+			int from = from(track, timeline, ids);
 
 			if (add && timeline.additive) {
-				timelineMode[i] = first ? FIRST : SUBSEQUENT;
+				timelineMode[i] = from;
 				continue;
-			}
-
-			for (TrackEntry from = entry.mixingFrom; from != null; from = from.mixingFrom) {
-				if (from.animation.hasTimeline(ids)) {
-					// An earlier entry on this track keys this property, isolating it from lower tracks.
-					timelineMode[i] = SUBSEQUENT;
-					continue outer;
-				}
 			}
 
 			// Hold if the next entry will overwrite this property.
 			int mode;
 			if (to == null || timeline.instant || (to.additive && timeline.additive) || !to.animation.hasTimeline(ids))
-				mode = first ? FIRST : SUBSEQUENT;
+				mode = from;
 			else {
-				mode = first ? HOLD_FIRST : HOLD;
+				mode = from | HOLD;
 				// Find next entry that doesn't overwrite this property. Its mix fades out the hold, instead of it ending abruptly.
 				for (TrackEntry next = to.mixingTo; next != null; next = next.mixingTo) {
 					if ((next.additive && timeline.additive) || !next.animation.hasTimeline(ids)) {
@@ -781,6 +782,27 @@ public class AnimationState {
 			if (keepHold) mode = (mode & ~HOLD) | (timelineMode[i] & HOLD);
 			timelineMode[i] = mode;
 		}
+	}
+
+	private int from (TrackEntry track, Timeline timeline, long[] ids) {
+		LongMap<TrackEntry> propertyIds = this.propertyIds;
+		int from = SETUP;
+		for (int i = 0, n = ids.length; i < n; i++) {
+			TrackEntry owner = propertyIds.putMissing(ids[i], track);
+			if (owner != null) {
+				if (owner != track) {
+					while (++i < n)
+						propertyIds.putMissing(ids[i], track);
+					return CURRENT;
+				}
+				from = FIRST;
+			}
+		}
+		if (timeline instanceof DrawOrderFolderTimeline) {
+			TrackEntry first = propertyIds.get(DrawOrderTimeline.propertyID);
+			if (first != null) return first != track ? CURRENT : FIRST;
+		}
+		return from;
 	}
 
 	/** Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing. */
@@ -869,8 +891,8 @@ public class AnimationState {
 		Interpolation mixInterpolation = Interpolation.linear;
 
 		/** For each timeline:
-		 * <li>Bit 0, FIRST: 0 = mix from current pose, 1 = mix from setup pose. Timeline is first to set the property.
-		 * <li>Bit 1, HOLD: 0 = mix out using alphaMix, 1 = apply full alpha to prevent dipping. Timeline is first on its track to
+		 * <li>Bits 0-1: MixFrom.
+		 * <li>Bit 2, HOLD: 0 = mix out using alphaMix, 1 = apply full alpha to prevent dipping. Timeline is first on its track to
 		 * set the property and the next entry (mixingTo) also sets it. When held, timelineHoldMix's mix controls how the hold fades
 		 * out (for 3+ entry chains where the chain eventually stops setting the property). */
 		final IntArray timelineMode = new IntArray();
@@ -957,7 +979,7 @@ public class AnimationState {
 		 * properties keyed by the animation are set to the setup pose and the track is cleared.
 		 * <p>
 		 * Usually you want to use {@link AnimationState#addEmptyAnimation(int, float, float)} rather than have the animation
-		 * abruptly cease being applied. */
+		 * abruptly cease being applied, leaving the current pose. */
 		public float getTrackEnd () {
 			return trackEnd;
 		}

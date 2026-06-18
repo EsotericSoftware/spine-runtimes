@@ -50,8 +50,8 @@ PathConstraintSpacingTimeline::PathConstraintSpacingTimeline(size_t frameCount, 
 PathConstraintSpacingTimeline::~PathConstraintSpacingTimeline() {
 }
 
-void PathConstraintSpacingTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup,
-										  bool add, bool out, bool appliedPose) {
+void PathConstraintSpacingTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixFrom from, bool add,
+										  bool out, bool appliedPose) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(events);
 	SP_UNUSED(out);
@@ -60,6 +60,6 @@ void PathConstraintSpacingTimeline::apply(Skeleton &skeleton, float lastTime, fl
 	if (constraint->isActive()) {
 		PathConstraintPose &pose = appliedPose ? *constraint->_appliedPose : constraint->_pose;
 		PathConstraintData &data = constraint->_data;
-		pose._spacing = getAbsoluteValue(time, alpha, fromSetup, false, pose._spacing, data._setupPose._spacing);
+		pose._spacing = getAbsoluteValue(time, alpha, from, false, pose._spacing, data._setupPose._spacing);
 	}
 }

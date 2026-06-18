@@ -1,10 +1,18 @@
-name: Build spine-haxe
+name: Release spine-haxe
 
 on:
   push:
-    paths:
-      - 'spine-haxe/**'
+    tags:
+      - 'spine-haxe-*'
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version, matching spine-haxe/haxelib.json (for example: 4.3.2)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -15,4 +23,5 @@ jobs:
       working-directory: spine-haxe
       env:
         HAXE_UPDATE_URL: ${{secrets.HAXE_UPDATE_URL}}
+        HAXE_RELEASE_VERSION: ${{ inputs.version }}
       run: ./build.sh

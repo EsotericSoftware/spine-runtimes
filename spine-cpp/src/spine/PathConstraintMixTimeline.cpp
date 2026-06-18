@@ -53,7 +53,7 @@ PathConstraintMixTimeline::PathConstraintMixTimeline(size_t frameCount, size_t b
 PathConstraintMixTimeline::~PathConstraintMixTimeline() {
 }
 
-void PathConstraintMixTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add,
+void PathConstraintMixTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixFrom from, bool add,
 									  bool out, bool appliedPose) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(events);
@@ -64,11 +64,20 @@ void PathConstraintMixTimeline::apply(Skeleton &skeleton, float lastTime, float 
 	PathConstraintPose &pose = appliedPose ? *constraint->_appliedPose : constraint->_pose;
 
 	if (time < _frames[0]) {
-		if (fromSetup) {
-			PathConstraintPose &setup = constraint->_data._setupPose;
-			pose._mixRotate = setup._mixRotate;
-			pose._mixX = setup._mixX;
-			pose._mixY = setup._mixY;
+		PathConstraintPose &setup = constraint->_data._setupPose;
+		switch (from) {
+			case MixFrom_Setup:
+				pose._mixRotate = setup._mixRotate;
+				pose._mixX = setup._mixX;
+				pose._mixY = setup._mixY;
+				break;
+			case MixFrom_First:
+				pose._mixRotate += (setup._mixRotate - pose._mixRotate) * alpha;
+				pose._mixX += (setup._mixX - pose._mixX) * alpha;
+				pose._mixY += (setup._mixY - pose._mixY) * alpha;
+				break;
+			case MixFrom_Current:
+				break;
 		}
 		return;
 	}
@@ -101,7 +110,7 @@ void PathConstraintMixTimeline::apply(Skeleton &skeleton, float lastTime, float 
 		}
 	}
 
-	PathConstraintPose &base = fromSetup ? constraint->_data._setupPose : pose;
+	PathConstraintPose &base = from == MixFrom_Setup ? constraint->_data._setupPose : pose;
 	if (add) {
 		pose._mixRotate = base._mixRotate + rotate * alpha;
 		pose._mixX = base._mixX + x * alpha;

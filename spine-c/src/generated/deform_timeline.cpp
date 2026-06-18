@@ -17,9 +17,9 @@ spine_rtti spine_deform_timeline_get_rtti(spine_deform_timeline self) {
 }
 
 void spine_deform_timeline_apply(spine_deform_timeline self, spine_skeleton skeleton, float lastTime, float time, /*@null*/ spine_array_event events,
-								 float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
+								 float alpha, spine_mix_from from, bool add, bool out, bool appliedPose) {
 	DeformTimeline *_self = (DeformTimeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixFrom) from, add, out, appliedPose);
 }
 
 void spine_deform_timeline_set_frame(spine_deform_timeline self, int frameIndex, float time, spine_array_float vertices) {

@@ -255,7 +255,7 @@ namespace Spine {
 						data.target = bones[input.ReadInt(true)];
 						int flags = input.Read();
 						data.skinRequired = (flags & 1) != 0;
-						if ((flags & 2) != 0) data.scaleY = (IkConstraintData.ScaleYMode)input.Read();
+						if ((flags & 2) != 0) data.scaleY = (ScaleYMode)input.Read();
 						IkConstraintPose setup = data.setupPose;
 						setup.bendDirection = (flags & 4) != 0 ? -1 : 1;
 						setup.compress = (flags & 8) != 0;
@@ -376,7 +376,17 @@ namespace Spine {
 						if ((flags & 2) != 0) data.x = input.ReadFloat();
 						if ((flags & 4) != 0) data.y = input.ReadFloat();
 						if ((flags & 8) != 0) data.rotate = input.ReadFloat();
-						if ((flags & 16) != 0) data.scaleX = input.ReadFloat();
+						if ((flags & 16) != 0) {
+							float scaleX = input.ReadFloat();
+							if (scaleX < -2) {
+								data.scaleYMode = ScaleYMode.Volume;
+								scaleX = -2 - scaleX;
+							} else if (scaleX < 0) {
+								data.scaleYMode = ScaleYMode.Uniform;
+								scaleX = -1 - scaleX;
+							}
+							data.scaleX = scaleX;
+						}
 						if ((flags & 32) != 0) data.shearX = input.ReadFloat();
 						data.limit = ((flags & 64) != 0 ? input.ReadFloat() : 5000) * scale;
 						data.step = 1f / input.ReadUByte();
@@ -405,7 +415,11 @@ namespace Spine {
 						data.skinRequired = (flags & 1) != 0;
 						data.loop = (flags & 2) != 0;
 						data.additive = (flags & 4) != 0;
-						if ((flags & 8) != 0) data.setupPose.time = input.ReadFloat();
+						if ((flags & 8) != 0) {
+							float value = input.ReadFloat();
+							if (!(nonessential && (flags & 64) != 0)) // skipped non-essential data.max = value;
+								data.setupPose.time = value;
+						}
 						if ((flags & 16) != 0) data.setupPose.mix = (flags & 32) != 0 ? input.ReadFloat() : 1;
 						if ((flags & 64) != 0) {
 							data.local = (flags & 128) != 0;

@@ -179,73 +179,70 @@ export class BonePose implements Pose<BonePose>, Update {
 				return;
 			}
 			case Inherit.OnlyTranslation: {
+				const sx = skeleton.scaleX, sy = skeleton.scaleY;
 				const rx = (rotation + shearX) * MathUtils.degRad;
 				const ry = (rotation + 90 + shearY) * MathUtils.degRad;
-				this.a = Math.cos(rx) * scaleX;
-				this.b = Math.cos(ry) * scaleY;
-				this.c = Math.sin(rx) * scaleX;
-				this.d = Math.sin(ry) * scaleY;
+				this.a = Math.cos(rx) * scaleX * sx;
+				this.b = Math.cos(ry) * scaleY * sx;
+				this.c = Math.sin(rx) * scaleX * sy;
+				this.d = Math.sin(ry) * scaleY * sy;
 				break;
 			}
 			case Inherit.NoRotationOrReflection: {
-				const sx = 1 / skeleton.scaleX, sy = 1 / skeleton.scaleY;
-				pa *= sx;
-				pc *= sy;
+				const sx = skeleton.scaleX, sy = skeleton.scaleY, sxi = 1 / sx, syi = 1 / sy;
+				pa *= sxi;
+				pc *= syi;
 				let s = pa * pa + pc * pc;
-				let prx = 0;
-				if (s > 0.0001) {
-					s = Math.abs(pa * pd * sy - pb * sx * pc) / s;
+				let r = 0;
+				if (s > MathUtils.epsilon2) {
+					s = Math.abs(pa * pd * syi - pb * sxi * pc) / s;
 					pb = pc * s;
 					pd = pa * s;
-					prx = MathUtils.atan2Deg(pc, pa);
+					r = rotation - MathUtils.atan2Deg(pc, pa);
 				} else {
 					pa = 0;
 					pc = 0;
-					prx = 90 - MathUtils.atan2Deg(pd, pb);
+					r = rotation - 90 + MathUtils.atan2Deg(pd, pb);
 				}
-				const rx = (rotation + shearX - prx) * MathUtils.degRad;
-				const ry = (rotation + shearY - prx + 90) * MathUtils.degRad;
+				const rx = (r + shearX) * MathUtils.degRad;
+				const ry = (r + shearY + 90) * MathUtils.degRad;
 				const la = Math.cos(rx) * scaleX;
 				const lb = Math.cos(ry) * scaleY;
 				const lc = Math.sin(rx) * scaleX;
 				const ld = Math.sin(ry) * scaleY;
-				this.a = pa * la - pb * lc;
-				this.b = pa * lb - pb * ld;
-				this.c = pc * la + pd * lc;
-				this.d = pc * lb + pd * ld;
+				this.a = (pa * la - pb * lc) * sx;
+				this.b = (pa * lb - pb * ld) * sx;
+				this.c = (pc * la + pd * lc) * sy;
+				this.d = (pc * lb + pd * ld) * sy;
 				break;
 			}
 			case Inherit.NoScale:
 			case Inherit.NoScaleOrReflection: {
-				let r = rotation * MathUtils.degRad, cos = Math.cos(r), sin = Math.sin(r);
-				let za = (pa * cos + pb * sin) / skeleton.scaleX;
-				let zc = (pc * cos + pd * sin) / skeleton.scaleY;
-				let s = Math.sqrt(za * za + zc * zc);
-				if (s > 0.00001) s = 1 / s;
+				const sx = skeleton.scaleX, sy = skeleton.scaleY, sxi = 1 / sx, syi = 1 / sy;
+				const r = rotation * MathUtils.degRad, cos = Math.cos(r), sin = Math.sin(r);
+				let za = (pa * cos + pb * sin) * sxi;
+				let zc = (pc * cos + pd * sin) * syi;
+				const s = 1 / Math.sqrt(za * za + zc * zc);
 				za *= s;
 				zc *= s;
-				s = Math.sqrt(za * za + zc * zc);
-				if (this.inherit === Inherit.NoScale && (pa * pd - pb * pc < 0) !== (skeleton.scaleX < 0 !== skeleton.scaleY < 0)) s = -s;
-				r = Math.PI / 2 + Math.atan2(zc, za);
-				const zb = Math.cos(r) * s;
-				const zd = Math.sin(r) * s;
+				let zb = -zc, zd = za;
+				if (this.inherit === Inherit.NoScale && pa * pd - pb * pc < 0 !== (sx < 0 !== sy < 0)) {
+					zb = -zb;
+					zd = -zd;
+				}
 				const rx = shearX * MathUtils.degRad;
 				const ry = (90 + shearY) * MathUtils.degRad;
 				const la = Math.cos(rx) * scaleX;
 				const lb = Math.cos(ry) * scaleY;
 				const lc = Math.sin(rx) * scaleX;
 				const ld = Math.sin(ry) * scaleY;
-				this.a = za * la + zb * lc;
-				this.b = za * lb + zb * ld;
-				this.c = zc * la + zd * lc;
-				this.d = zc * lb + zd * ld;
+				this.a = (za * la + zb * lc) * sx;
+				this.b = (za * lb + zb * ld) * sx;
+				this.c = (zc * la + zd * lc) * sy;
+				this.d = (zc * lb + zd * ld) * sy;
 				break;
 			}
 		}
-		this.a *= skeleton.scaleX;
-		this.b *= skeleton.scaleX;
-		this.c *= skeleton.scaleY;
-		this.d *= skeleton.scaleY;
 	}
 
 	/** Computes the local transform values from the world transform.
@@ -260,82 +257,115 @@ export class BonePose implements Pose<BonePose>, Update {
 		this.local = 0;
 		this.world = skeleton._update;
 
+		const sx = skeleton.scaleX, sy = skeleton.scaleY;
 		if (!this.bone.parent) {
-			this.x = this.worldX - skeleton.x;
-			this.y = this.worldY - skeleton.y;
-			const a = this.a, b = this.b, c = this.c, d = this.d;
-			this.rotation = MathUtils.atan2Deg(c, a);
-			this.scaleX = Math.sqrt(a * a + c * c);
-			this.scaleY = Math.sqrt(b * b + d * d);
-			this.shearX = 0;
-			this.shearY = MathUtils.atan2Deg(a * b + c * d, a * d - b * c);
+			const sxi = 1 / sx, syi = 1 / sy;
+			this.x = (this.worldX - skeleton.x) * sxi;
+			this.y = (this.worldY - skeleton.y) * syi;
+			this.set5(this.a * sxi, this.b * sxi, this.c * syi, this.d * syi, 0);
 			return;
 		}
 
 		const parent = this.bone.parent.appliedPose;
 		let pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
-		let pid = 1 / (pa * pd - pb * pc);
-		let ia = pd * pid, ib = pb * pid, ic = pc * pid, id = pa * pid;
+		const pad = pa * pd - pb * pc, pid = 1 / (pa * pd - pb * pc);
+		const ia = pd * pid, ib = pb * pid, ic = pc * pid, id = pa * pid;
 		const dx = this.worldX - parent.worldX, dy = this.worldY - parent.worldY;
-		this.x = (dx * ia - dy * ib);
-		this.y = (dy * id - dx * ic);
+		this.x = dx * ia - dy * ib;
+		this.y = dy * id - dx * ic;
 
-		let ra: number, rb: number, rc: number, rd: number;
-		if (this.inherit === Inherit.OnlyTranslation) {
-			ra = this.a;
-			rb = this.b;
-			rc = this.c;
-			rd = this.d;
-		} else {
-			switch (this.inherit) {
-				case Inherit.NoRotationOrReflection: {
-					const s = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
-					pb = -pc * skeleton.scaleX * s / skeleton.scaleY;
-					pd = pa * skeleton.scaleY * s / skeleton.scaleX;
-					pid = 1 / (pa * pd - pb * pc);
-					ia = pd * pid;
-					ib = pb * pid;
-					break;
-				}
-				case Inherit.NoScale:
-				case Inherit.NoScaleOrReflection: {
-					let r = this.rotation * MathUtils.degRad, cos = Math.cos(r), sin = Math.sin(r);
-					pa = (pa * cos + pb * sin) / skeleton.scaleX;
-					pc = (pc * cos + pd * sin) / skeleton.scaleY;
-					let s = Math.sqrt(pa * pa + pc * pc);
-					if (s > 0.00001) s = 1 / s;
-					pa *= s;
-					pc *= s;
-					s = Math.sqrt(pa * pa + pc * pc);
-					if (this.inherit === Inherit.NoScale && pid < 0 !== (skeleton.scaleX < 0 !== skeleton.scaleY < 0)) s = -s;
-					r = MathUtils.PI / 2 + Math.atan2(pc, pa);
-					pb = Math.cos(r) * s;
-					pd = Math.sin(r) * s;
-					pid = 1 / (pa * pd - pb * pc);
-					ia = pd * pid;
-					ib = pb * pid;
-					ic = pc * pid;
-					id = pa * pid;
-				}
+		switch (this.inherit) {
+			case Inherit.Normal: this.set5(ia * this.a - ib * this.c, ia * this.b - ib * this.d, id * this.c - ic * this.a, id * this.d - ic * this.b, 0); break;
+			case Inherit.OnlyTranslation: {
+				const sxi = 1 / sx, syi = 1 / sy;
+				this.set5(this.a * sxi, this.b * sxi, this.c * syi, this.d * syi, 0);
+				break;
 			}
-			ra = ia * this.a - ib * this.c;
-			rb = ia * this.b - ib * this.d;
-			rc = id * this.c - ic * this.a;
-			rd = id * this.d - ic * this.b;
+			case Inherit.NoRotationOrReflection: {
+				const sxi = 1 / sx, syi = 1 / sy;
+				pa *= sxi;
+				pc *= syi;
+				const wa = this.a * sxi, wb = this.b * sxi, wc = this.c * syi, wd = this.d * syi;
+				const s = 1 / (pa * pa + pc * pc), det = 1 / Math.abs(pad * sxi * syi);
+				this.set5((pa * wa + pc * wc) * s, (pa * wb + pc * wd) * s, (pa * wc - pc * wa) * det, (pa * wd - pc * wb) * det,
+					MathUtils.atan2Deg(pc, pa));
+				break;
+			}
+			case Inherit.NoScale:
+			case Inherit.NoScaleOrReflection: {
+				const sxi = 1 / sx, syi = 1 / sy;
+				const wa = this.a * sxi, wb = this.b * sxi, wc = this.c * syi, wd = this.d * syi;
+				let tx = pd * this.a - pb * this.c, ty = pa * this.c - pc * this.a;
+				if (pad < 0) {
+					tx = -tx;
+					ty = -ty;
+				}
+				let r = MathUtils.atan2Deg(ty, tx);
+				this.rotation = r;
+				r *= MathUtils.degRad;
+				const cos = Math.cos(r), sin = Math.sin(r);
+				let za = (pa * cos + pb * sin) * sxi;
+				let zc = (pc * cos + pd * sin) * syi;
+				const s = 1 / Math.sqrt(za * za + zc * zc);
+				za *= s;
+				zc *= s;
+				const si = this.inherit === Inherit.NoScale && pad < 0 !== (sx < 0 !== sy < 0) ? -1 : 1;
+				this.set4(za * wa + zc * wc, za * wb + zc * wd, (za * wc - zc * wa) * si, (za * wd - zc * wb) * si);
+			}
 		}
+	}
 
+	private set4 (ra: number, rb: number, rc: number, rd: number): void {
+		const x = ra * ra + rc * rc, y = rb * rb + rd * rd;
+		if (x > MathUtils.epsilon2) {
+			this.shearX = MathUtils.atan2Deg(rc, ra);
+			this.scaleX = Math.sqrt(x);
+		} else {
+			this.shearX = 0;
+			this.scaleX = 0;
+		}
+		this.scaleY = Math.sqrt(y);
+		if (y > MathUtils.epsilon2) {
+			this.shearY = MathUtils.atan2Deg(rd, rb);
+			if (ra * rd - rb * rc < 0) {
+				this.scaleY = -this.scaleY;
+				this.shearY += 90;
+			} else
+				this.shearY -= 90;
+			if (this.shearY > 180)
+				this.shearY -= 360;
+			else if (this.shearY <= -180) //
+				this.shearY += 360;
+		} else
+			this.shearY = 0;
+	}
+
+	private set5 (ra: number, rb: number, rc: number, rd: number, ro: number): void {
 		this.shearX = 0;
-		this.scaleX = Math.sqrt(ra * ra + rc * rc);
-		if (this.scaleX > 0.0001) {
-			const det = ra * rd - rb * rc;
-			this.scaleY = det / this.scaleX;
-			this.shearY = -MathUtils.atan2Deg(ra * rb + rc * rd, det);
-			this.rotation = MathUtils.atan2Deg(rc, ra);
+		const x = ra * ra + rc * rc, y = rb * rb + rd * rd;
+		if (x > MathUtils.epsilon2) {
+			const r = MathUtils.atan2Deg(rc, ra);
+			this.rotation = r + ro;
+			this.scaleX = Math.sqrt(x);
+			this.scaleY = Math.sqrt(y);
+			if (y > MathUtils.epsilon2) {
+				this.shearY = MathUtils.atan2Deg(rd, rb);
+				if (ra * rd - rb * rc < 0) {
+					this.scaleY = -this.scaleY;
+					this.shearY += 90 - r;
+				} else
+					this.shearY -= 90 + r;
+				if (this.shearY > 180)
+					this.shearY -= 360;
+				else if (this.shearY <= -180) //
+					this.shearY += 360;
+			} else
+				this.shearY = 0;
 		} else {
 			this.scaleX = 0;
-			this.scaleY = Math.sqrt(rb * rb + rd * rd);
+			this.scaleY = Math.sqrt(y);
 			this.shearY = 0;
-			this.rotation = 90 - MathUtils.atan2Deg(rd, rb);
+			this.rotation = y > MathUtils.epsilon2 ? MathUtils.atan2Deg(rd, rb) - 90 + ro : ro;
 		}
 	}
 

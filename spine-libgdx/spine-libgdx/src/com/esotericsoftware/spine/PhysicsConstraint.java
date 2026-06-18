@@ -270,6 +270,18 @@ public class PhysicsConstraint extends Constraint<PhysicsConstraint, PhysicsCons
 			float s = 1 + (scaleOffset - scaleLag * z) * mix * data.scaleX;
 			bone.a *= s;
 			bone.c *= s;
+			switch (data.scaleYMode) {
+			case uniform -> {
+				bone.b *= s;
+				bone.d *= s;
+			}
+			case volume -> {
+				s = Math.abs(s);
+				s = s >= 0.7f ? 1 / s : 4 - 3.67347f * s;
+				bone.b *= s;
+				bone.d *= s;
+			}
+			}
 		}
 		if (physics != Physics.pose) {
 			tx = l * bone.a;

@@ -296,6 +296,14 @@ interface SlotsToClipping {
 	vertices: Array<number>,
 };
 
+export interface SpineSlotObject {
+	slot: Slot,
+	container: Container,
+	followAttachmentTimeline: boolean,
+	followSlotColor: boolean,
+	wasRenderable: boolean,
+}
+
 const maskPool = new Pool<Graphics>(() => new Graphics);
 
 /**
@@ -323,7 +331,7 @@ export class Spine extends ViewContainer {
 	private darkTint = false;
 	private _debug?: ISpineDebugRenderer | undefined = undefined;
 
-	readonly _slotsObject: Record<string, { slot: Slot, container: Container, followAttachmentTimeline: boolean } | null> = Object.create(null);
+	readonly _slotsObject: Record<string, SpineSlotObject | null> = Object.create(null);
 	private clippingSlotToPixiMasks: Record<string, SlotsToClipping> = Object.create(null);
 
 	private getSlotFromRef (slotRef: number | string | Slot): Slot {
@@ -342,6 +350,8 @@ export class Spine extends ViewContainer {
 	public spineTexturesDirty = true;
 
 	private _lastAttachments: Attachment[] = [];
+	private _lastRenderableCacheIds: string[] = [];
+	private _lastClippingAttachmentIds: string[] = [];
 
 	private _stateChanged = true;
 	private attachmentCacheData: Record<string, AttachmentCacheData>[] = [];
@@ -609,8 +619,7 @@ export class Spine extends ViewContainer {
 
 			applied.x = aux.x;
 			applied.y = -aux.y;
-		}
-		else {
+		} else {
 			applied.x = vectorAux.x;
 			applied.y = vectorAux.y;
 		}
@@ -692,91 +701,130 @@ export class Spine extends ViewContainer {
 		const currentDrawOrder = this.skeleton.drawOrder.appliedPose;
 
 		const lastAttachments = this._lastAttachments;
+		const lastRenderableCacheIds = this._lastRenderableCacheIds;
+		const lastClippingAttachmentIds = this._lastClippingAttachmentIds;
 
-		let index = 0;
+		let attachmentIndex = 0;
+		let renderableIndex = 0;
+		let clippingIndex = 0;
 
 		let spineAttachmentsDirty = false;
 
 		for (let i = 0; i < currentDrawOrder.length; i++) {
 			const slot = currentDrawOrder[i];
+			if (!slot.bone.active) continue;
+
 			const attachment = slot.appliedPose.attachment;
 
 			if (attachment) {
-				if (attachment !== lastAttachments[index]) {
+				if (attachment !== lastAttachments[attachmentIndex]) {
 					spineAttachmentsDirty = true;
-					lastAttachments[index] = attachment;
+					lastAttachments[attachmentIndex] = attachment;
 				}
 
-				index++;
+				attachmentIndex++;
+			}
+
+			if (attachment instanceof RegionAttachment || attachment instanceof MeshAttachment) {
+				const cacheId = this.getRenderableCacheId(slot, attachment);
+				if (cacheId !== lastRenderableCacheIds[renderableIndex]) {
+					spineAttachmentsDirty = true;
+					lastRenderableCacheIds[renderableIndex] = cacheId;
+				}
+				renderableIndex++;
+			}
+			else if (attachment instanceof ClippingAttachment) {
+				const clippingId = `${slot.data.index}-${attachment.name}-${attachment.endSlot?.index ?? -1}`;
+				if (clippingId !== lastClippingAttachmentIds[clippingIndex]) {
+					spineAttachmentsDirty = true;
+					lastClippingAttachmentIds[clippingIndex] = clippingId;
+				}
+				clippingIndex++;
 			}
 		}
 
-		if (index !== lastAttachments.length) {
+		if (attachmentIndex !== lastAttachments.length) {
 			spineAttachmentsDirty = true;
-			lastAttachments.length = index;
+			lastAttachments.length = attachmentIndex;
+		}
+		if (renderableIndex !== lastRenderableCacheIds.length) {
+			spineAttachmentsDirty = true;
+			lastRenderableCacheIds.length = renderableIndex;
+		}
+		if (clippingIndex !== lastClippingAttachmentIds.length) {
+			spineAttachmentsDirty = true;
+			lastClippingAttachmentIds.length = clippingIndex;
 		}
 
 		this.spineAttachmentsDirty ||= spineAttachmentsDirty;
 	}
 
 	private currentClippingSlot: SlotsToClipping | undefined;
-	private updateAndSetPixiMask (slot: Slot, last: boolean) {
-		// assign/create the currentClippingSlot
+	private updateAndSetPixiMask (slot: Slot) {
 		const pose = slot.appliedPose;
 		const attachment = pose.attachment;
-		if (attachment && attachment instanceof ClippingAttachment) {
-			const clip = (this.clippingSlotToPixiMasks[slot.data.name] ||= { slot, vertices: [] as number[] });
-			clip.maskComputed = false;
-			this.currentClippingSlot = this.clippingSlotToPixiMasks[slot.data.name];
-			return;
-		}
-
-		// assign the currentClippingSlot mask to the slot object
-		const currentClippingSlot = this.currentClippingSlot;
 		const slotObject = this._slotsObject[slot.data.name];
-		if (currentClippingSlot && slotObject) {
+		const currentClippingSlot = this.currentClippingSlot;
+
+		if (currentClippingSlot && slot.bone.active && slotObject?.wasRenderable) {
 			const slotClipping = currentClippingSlot.slot;
-			const clippingAttachment = slotClipping.pose.attachment as ClippingAttachment;
+			const clippingAttachment = slotClipping.appliedPose.attachment as ClippingAttachment;
 
-			// create the pixi mask, only the first time and if the clipped slot is the first one clipped by this currentClippingSlot
-			let mask = currentClippingSlot.mask;
-			if (!mask) {
-				mask = maskPool.obtain();
-				currentClippingSlot.mask = mask;
-				this.addChild(mask);
-			}
+			if (slotClipping.bone.active && clippingAttachment instanceof ClippingAttachment) {
+				let mask = currentClippingSlot.mask;
+				if (!mask) {
+					mask = maskPool.obtain();
+					currentClippingSlot.mask = mask;
+					this.addChild(mask);
+				}
 
-			// compute the pixi mask polygon, if the clipped slot is the first one clipped by this currentClippingSlot
-			if (!currentClippingSlot.maskComputed) {
-				currentClippingSlot.maskComputed = true;
-				const worldVerticesLength = clippingAttachment.worldVerticesLength;
-				const vertices = currentClippingSlot.vertices;
-				clippingAttachment.computeWorldVertices(this.skeleton, slotClipping, 0, worldVerticesLength, vertices, 0, 2);
-				mask.clear().poly(vertices).stroke({ width: 0 }).fill({ alpha: .25 });
+				if (!currentClippingSlot.maskComputed) {
+					currentClippingSlot.maskComputed = true;
+					const worldVerticesLength = clippingAttachment.worldVerticesLength;
+					const vertices = currentClippingSlot.vertices;
+					clippingAttachment.computeWorldVertices(this.skeleton, slotClipping, 0, worldVerticesLength, vertices, 0, 2);
+					mask.clear().poly(vertices).stroke({ width: 0 }).fill({ alpha: .25 });
+				}
+				slotObject.container.mask = mask;
 			}
-			slotObject.container.mask = mask;
 		} else if (slotObject?.container.mask) {
-			// remove the mask, if slot object has a mask, but currentClippingSlot is undefined
 			slotObject.container.mask = null;
 		}
 
-		// if current slot is the ending one of the currentClippingSlot mask, set currentClippingSlot to undefined
-		if (currentClippingSlot && (currentClippingSlot.slot.appliedPose.attachment as ClippingAttachment).endSlot === slot.data) {
-			this.currentClippingSlot = undefined;
-		}
+		this.closeCurrentPixiMaskIfEndingAt(slot);
 
-		// clean up unused masks
-		if (last) {
-			for (const key in this.clippingSlotToPixiMasks) {
-				const clippingSlotToPixiMask = this.clippingSlotToPixiMasks[key];
-				if ((!(clippingSlotToPixiMask.slot.appliedPose.attachment instanceof ClippingAttachment) || !clippingSlotToPixiMask.maskComputed) && clippingSlotToPixiMask.mask) {
-					this.removeChild(clippingSlotToPixiMask.mask);
-					maskPool.free(clippingSlotToPixiMask.mask);
-					clippingSlotToPixiMask.mask = undefined;
-				}
-			}
+		if (!slot.bone.active) return;
+
+		if (attachment instanceof ClippingAttachment) {
+			const clip = (this.clippingSlotToPixiMasks[slot.data.name] ||= { slot, vertices: [] as number[] });
+			clip.slot = slot;
+			clip.maskComputed = false;
+			this.currentClippingSlot = clip;
+		}
+	}
+
+	private closeCurrentPixiMaskIfEndingAt (slot: Slot) {
+		const currentClippingSlot = this.currentClippingSlot;
+		const clippingAttachment = currentClippingSlot?.slot.appliedPose.attachment;
+		if (currentClippingSlot && clippingAttachment instanceof ClippingAttachment && clippingAttachment.endSlot === slot.data) {
 			this.currentClippingSlot = undefined;
 		}
+	}
+
+	private cleanupPixiMasks () {
+		for (const key in this.clippingSlotToPixiMasks) {
+			const clippingSlotToPixiMask = this.clippingSlotToPixiMasks[key];
+			if ((
+				!clippingSlotToPixiMask.slot.bone.active
+				|| !(clippingSlotToPixiMask.slot.appliedPose.attachment instanceof ClippingAttachment)
+				|| !clippingSlotToPixiMask.maskComputed
+			) && clippingSlotToPixiMask.mask) {
+				this.removeChild(clippingSlotToPixiMask.mask);
+				maskPool.free(clippingSlotToPixiMask.mask);
+				clippingSlotToPixiMask.mask = undefined;
+			}
+		}
+		this.currentClippingSlot = undefined;
 	}
 
 	private transformAttachments () {
@@ -785,11 +833,16 @@ export class Spine extends ViewContainer {
 
 		for (let i = 0; i < currentDrawOrder.length; i++) {
 			const slot = currentDrawOrder[i];
-
-			this.updateAndSetPixiMask(slot, i === currentDrawOrder.length - 1);
-
 			const pose = slot.appliedPose;
 			const attachment = pose.attachment;
+
+			this.updateAndSetPixiMask(slot);
+
+			if (!slot.bone.active) {
+				this.markSlotAttachmentSkipped(slot, attachment);
+				clipper.clipEnd(slot);
+				continue;
+			}
 
 			if (attachment) {
 				if (attachment instanceof MeshAttachment || attachment instanceof RegionAttachment) {
@@ -823,6 +876,7 @@ export class Spine extends ViewContainer {
 					if (this.alpha === 0 || alpha === 0) {
 						if (!cacheData.skipRender) this.spineAttachmentsDirty = true;
 						cacheData.skipRender = true;
+						cacheData.clipped = false;
 					} else {
 						if (cacheData.skipRender) this.spineAttachmentsDirty = true;
 						cacheData.skipRender = cacheData.clipped = false;
@@ -859,6 +913,7 @@ export class Spine extends ViewContainer {
 			clipper.clipEnd(slot);
 		}
 		clipper.clipEnd();
+		this.cleanupPixiMasks();
 	}
 
 	private updateClippingData (cacheData: AttachmentCacheData) {
@@ -912,7 +967,14 @@ export class Spine extends ViewContainer {
 		const { vertices, uvs, indices } = clippedData;
 		vertices.set(clippedVerticesTyped);
 		uvs.set(clippedUVsTyped);
-		indices.set(clippedTrianglesTyped);
+
+		for (let i = 0; i < indicesCount; i++) {
+			const index = clippedTrianglesTyped[i];
+			// Pixi's Batcher.updateElement() repacks vertex attributes (positions, UVs, colors),
+			// but it does not repack the index buffer. So we need to check indices differences.
+			if (indices[i] !== index) this.spineAttachmentsDirty = true;
+			indices[i] = index;
+		}
 		clippedData.vertexCount = verticesCount;
 		clippedData.indicesCount = indicesCount;
 	}
@@ -931,17 +993,21 @@ export class Spine extends ViewContainer {
 		}
 	}
 
-	private updateSlotObject (slotAttachment: { slot: Slot, container: Container, followAttachmentTimeline: boolean }) {
+	private updateSlotObject (slotAttachment: SpineSlotObject) {
 		const { slot, container } = slotAttachment;
 
 		const pose = slot.appliedPose;
-		const followAttachmentValue = slotAttachment.followAttachmentTimeline ? Boolean(pose.attachment) : true;
 		const slotAlpha = this.skeleton.color.a * pose.color.a;
+		const renderable = this.isSlotObjectRenderable(slotAttachment, slotAlpha);
 
-		container.visible = this.skeleton.drawOrder.appliedPose.includes(slot) && followAttachmentValue
-			&& this.alpha > 0 && slotAlpha > 0;
+		if (slotAttachment.wasRenderable !== renderable) {
+			this.spineAttachmentsDirty = true;
+			slotAttachment.wasRenderable = renderable;
+		}
 
-		if (container.visible) {
+		container.visible = renderable;
+
+		if (renderable) {
 			const applied = slot.bone.appliedPose;
 
 			const matrix = container.localTransform;
@@ -954,23 +1020,64 @@ export class Spine extends ViewContainer {
 			container.setFromMatrix(matrix);
 
 			container.alpha = slotAlpha;
+
+			if (slotAttachment.followSlotColor) {
+				container.tint =
+					((255 * this.skeleton.color.r * pose.color.r) << 16) |
+					((255 * this.skeleton.color.g * pose.color.g) << 8) |
+					(255 * this.skeleton.color.b * pose.color.b);
+			}
+		} else if (container.mask) {
+			container.mask = null;
 		}
+	}
+
+	private isSlotObjectRenderable (slotAttachment: SpineSlotObject, slotAlpha = this.skeleton.color.a * slotAttachment.slot.appliedPose.color.a) {
+		const { slot } = slotAttachment;
+		const followAttachmentValue = slotAttachment.followAttachmentTimeline ? Boolean(slot.appliedPose.attachment) : true;
+
+		return this.skeleton.drawOrder.appliedPose.includes(slot)
+			&& slot.bone.active
+			&& followAttachmentValue
+			&& this.alpha > 0
+			&& slotAlpha > 0;
+	}
+
+	private getRenderableCacheId (slot: Slot, attachment: RegionAttachment | MeshAttachment): string {
+		return `${slot.data.index}-${attachment.name}`;
+	}
+
+	private getExistingCachedData (slot: Slot, attachment: RegionAttachment | MeshAttachment): AttachmentCacheData | undefined {
+		return this.attachmentCacheData[slot.data.index]?.[attachment.name];
+	}
+
+	private markSlotAttachmentSkipped (slot: Slot, attachment: Attachment | null | undefined) {
+		if (!(attachment instanceof RegionAttachment || attachment instanceof MeshAttachment)) return;
+
+		const cacheData = this.getExistingCachedData(slot, attachment);
+		if (!cacheData) return;
+
+		if (!cacheData.skipRender) this.spineAttachmentsDirty = true;
+		cacheData.skipRender = true;
+		cacheData.clipped = false;
 	}
 
 	/** @internal */
 	_getCachedData (slot: Slot, attachment: RegionAttachment | MeshAttachment): AttachmentCacheData {
-		return this.attachmentCacheData[slot.data.index][attachment.name] || this.initCachedData(slot, attachment);
+		return this.getExistingCachedData(slot, attachment) || this.initCachedData(slot, attachment);
 	}
 
 	private initCachedData (slot: Slot, attachment: RegionAttachment | MeshAttachment): AttachmentCacheData {
 		let vertices: Float32Array;
+
+		this.spineAttachmentsDirty = true;
 
 		if (attachment instanceof RegionAttachment) {
 			vertices = new Float32Array(8);
 
 			const sequence = attachment.sequence;
 			this.attachmentCacheData[slot.data.index][attachment.name] = {
-				id: `${slot.data.index}-${attachment.name}`,
+				id: this.getRenderableCacheId(slot, attachment),
 				vertices,
 				clipped: false,
 				indices: [0, 1, 2, 0, 2, 3],
@@ -981,13 +1088,12 @@ export class Spine extends ViewContainer {
 				skipRender: false,
 				texture: (sequence.regions[0]?.texture as SpineTexture)?.texture,
 			};
-		}
-		else {
+		} else {
 			vertices = new Float32Array(attachment.worldVerticesLength);
 
 			const sequence = attachment.sequence;
 			this.attachmentCacheData[slot.data.index][attachment.name] = {
-				id: `${slot.data.index}-${attachment.name}`,
+				id: this.getRenderableCacheId(slot, attachment),
 				vertices,
 				clipped: false,
 				indices: attachment.triangles,
@@ -1030,8 +1136,9 @@ export class Spine extends ViewContainer {
 	 * @param slotRef - The slot id or  slot to attach to
 	 * @param options - Optional settings for the attachment.
 	 * @param options.followAttachmentTimeline - If true, the attachment will follow the slot's attachment timeline.
+	 * @param options.followSlotColor - If true, the container tint will follow the skeleton and slot colors.
 	 */
-	public addSlotObject (slot: number | string | Slot, container: Container, options?: { followAttachmentTimeline?: boolean }) {
+	public addSlotObject (slot: number | string | Slot, container: Container, options?: { followAttachmentTimeline?: boolean, followSlotColor?: boolean }) {
 		slot = this.getSlotFromRef(slot);
 
 		// need to check in on the container too...
@@ -1043,18 +1150,22 @@ export class Spine extends ViewContainer {
 
 		this.removeSlotObject(slot);
 
+		container.mask = null;
 		container.includeInBuild = false;
 
 		// TODO only add once??
 		this.addChild(container);
 
-		const slotObject = {
+		const slotObject: SpineSlotObject = {
 			container,
 			slot,
 			followAttachmentTimeline: options?.followAttachmentTimeline || false,
+			followSlotColor: options?.followSlotColor || false,
+			wasRenderable: false,
 		};
 		this._slotsObject[slot.data.name] = slotObject;
 
+		this.spineAttachmentsDirty = true;
 		this.updateSlotObject(slotObject);
 	}
 
@@ -1076,8 +1187,7 @@ export class Spine extends ViewContainer {
 					break;
 				}
 			}
-		}
-		else {
+		} else {
 			const slot = this.getSlotFromRef(slotOrContainer);
 
 			containerToRemove = this._slotsObject[slot.data.name]?.container;
@@ -1087,7 +1197,9 @@ export class Spine extends ViewContainer {
 		if (containerToRemove) {
 			this.removeChild(containerToRemove);
 
+			containerToRemove.mask = null;
 			containerToRemove.includeInBuild = true;
+			this.spineAttachmentsDirty = true;
 		}
 	}
 
@@ -1096,9 +1208,14 @@ export class Spine extends ViewContainer {
 	 */
 	public removeSlotObjects () {
 		Object.entries(this._slotsObject).forEach(([slotName, slotObject]) => {
-			if (slotObject) slotObject.container.removeFromParent();
+			if (slotObject) {
+				slotObject.container.removeFromParent();
+				slotObject.container.mask = null;
+				slotObject.container.includeInBuild = true;
+			}
 			delete this._slotsObject[slotName];
 		});
+		this.spineAttachmentsDirty = true;
 	}
 
 	/**
@@ -1147,6 +1264,7 @@ export class Spine extends ViewContainer {
 
 			for (let i = 0; i < drawOrder.length; i++) {
 				const slot = drawOrder[i];
+				if (!slot.bone.active) continue;
 
 				const attachment = slot.appliedPose.attachment;
 
@@ -1156,8 +1274,7 @@ export class Spine extends ViewContainer {
 					bounds.addVertexData(cacheData.vertices, 0, cacheData.vertices.length);
 				}
 			}
-		}
-		else {
+		} else {
 			this._bounds.minX = skeletonBounds.minX;
 			this._bounds.minY = skeletonBounds.minY;
 			this._bounds.maxX = skeletonBounds.maxX;
@@ -1189,6 +1306,8 @@ export class Spine extends ViewContainer {
 		(this._slotsObject as unknown) = null;
 		(this.attachmentCacheData as unknown) = null;
 		this._lastAttachments.length = 0;
+		this._lastRenderableCacheIds.length = 0;
+		this._lastClippingAttachmentIds.length = 0;
 	}
 
 	/** Converts a point from the skeleton coordinate system to the Pixi world coordinate system. */
@@ -1206,8 +1325,7 @@ export class Spine extends ViewContainer {
 		this.pixiWorldCoordinatesToSkeleton(point);
 		if (bone.parent) {
 			bone.parent.appliedPose.worldToLocal(point as Vector2);
-		}
-		else {
+		} else {
 			bone.appliedPose.worldToLocal(point as Vector2);
 		}
 	}

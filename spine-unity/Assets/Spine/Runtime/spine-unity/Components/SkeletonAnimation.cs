@@ -187,7 +187,7 @@ namespace Spine.Unity {
 			UpdateMode updateMode = skeletonRenderer.UpdateMode;
 			if (updateMode != UpdateMode.FullUpdate &&
 				updateMode != UpdateMode.EverythingExceptMesh) {
-				entry.Animation.Apply(skeleton, 0, 0, false, null, 0f, true, false, true, false);
+				entry.Animation.Apply(skeleton, 0, 0, false, null, 0f, MixFrom.Setup, false, true, false);
 			}
 		}
 

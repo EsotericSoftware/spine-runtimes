@@ -35,7 +35,7 @@ class ScaleYTimeline extends BoneTimeline1 {
 		super(frameCount, bezierCount, boneIndex, Property.scaleY);
 	}
 
-	public function apply1(pose:BonePose, setup:BonePose, time:Float, alpha:Float, fromSetup:Bool, add:Bool, out:Bool) {
-		pose.scaleY = getScaleValue(time, alpha, fromSetup, add, out, pose.scaleY, setup.scaleY);
+	public function apply1(pose:BonePose, setup:BonePose, time:Float, alpha:Float, from:MixFrom, add:Bool, out:Bool) {
+		pose.scaleY = getScaleValue(time, alpha, from, add, out, pose.scaleY, setup.scaleY);
 	}
 }

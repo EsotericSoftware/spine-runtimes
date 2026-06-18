@@ -35,6 +35,7 @@ import 'spine_dart_bindings_generated.dart';
 import '../spine_bindings.dart';
 import 'arrays.dart';
 import 'color.dart';
+import 'mix_from.dart';
 import 'skeleton.dart';
 
 /// Stores a list of timelines to animate a skeleton's pose over time.
@@ -101,15 +102,15 @@ class Animation {
   /// [time] The time in seconds the skeleton is being posed for. Timelines find the frame before and after this time and interpolate between the frame values.
   /// [loop] True if time beyond the animation duration repeats the animation, else the last frame is used.
   /// [events] If any events are fired, they are added to this list. Can be NULL to ignore fired events or if no timelines fire events.
-  /// [alpha] 0 applies setup or current values (depending on fromSetup), 1 uses timeline values, and intermediate values interpolate between them. Adjusting alpha over time can mix an animation in or out.
-  /// [fromSetup] If true, alpha transitions between setup and timeline values, setup values are used before the first frame (current values are not used). If false, alpha transitions between current and timeline values, no change is made before the first frame.
-  /// [add] If true, for timelines that support it, their values are added to the setup or current values (depending on fromSetup).
+  /// [alpha] 0 applies setup or current values (depending on from), 1 uses timeline values, and intermediate values interpolate between them. Adjusting alpha over time can mix an animation in or out.
+  /// [from] If true, alpha transitions between setup and timeline values, setup values are used before the first frame (current values are not used). If false, alpha transitions between current and timeline values, no change is made before the first frame.
+  /// [add] If true, for timelines that support it, their values are added to the setup or current values (depending on from).
   /// [out] True when the animation is mixing out, else it is mixing in. Used by timelines that perform instant transitions.
   /// [appliedPose] True to modify getAppliedPose(), else the unconstrained pose is modified.
-  void apply(Skeleton skeleton, double lastTime, double time, bool loop, ArrayEvent? events, double alpha,
-      bool fromSetup, bool add, bool out, bool appliedPose) {
+  void apply(Skeleton skeleton, double lastTime, double time, bool loop, ArrayEvent? events, double alpha, MixFrom from,
+      bool add, bool out, bool appliedPose) {
     SpineBindings.bindings.spine_animation_apply(_ptr, skeleton.nativePtr.cast(), lastTime, time, loop,
-        events?.nativePtr.cast() ?? Pointer.fromAddress(0), alpha, fromSetup, add, out, appliedPose);
+        events?.nativePtr.cast() ?? Pointer.fromAddress(0), alpha, from.value, add, out, appliedPose);
   }
 
   /// The animation's name, which is unique across all animations in the

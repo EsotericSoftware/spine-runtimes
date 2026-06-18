@@ -29,12 +29,12 @@
 
 /** biome-ignore-all lint/style/noNonNullAssertion: reference runtime expects some nullable to not be null */
 
-import { Animation, AttachmentTimeline, DrawOrderFolderTimeline, DrawOrderTimeline, EventTimeline, RotateTimeline, Timeline } from "./Animation.js";
+import { Animation, AttachmentTimeline, DrawOrderFolderTimeline, DrawOrderTimeline, EventTimeline, MixFrom, RotateTimeline, Timeline } from "./Animation.js";
 import type { AnimationStateData } from "./AnimationStateData.js";
 import type { Event } from "./Event.js";
 import type { Skeleton } from "./Skeleton.js";
 import type { Slot } from "./Slot.js";
-import { Interpolation, MathUtils, Pool, StringSet, Utils } from "./Utils.js";
+import { Interpolation, MathUtils, Pool, Utils } from "./Utils.js";
 
 
 /** Applies animations over time, queues animations for later playback, mixes (crossfading) between animations, and applies
@@ -60,7 +60,7 @@ export class AnimationState {
 	readonly events = [] as Event[];
 	readonly listeners = [] as AnimationStateListener[];
 	queue = new EventQueue(this);
-	propertyIds = new StringSet();
+	propertyIds = new Map<string, TrackEntry>();
 	animationsChanged = false;
 
 	trackEntryPool = new Pool<TrackEntry>(() => new TrackEntry());
@@ -197,9 +197,9 @@ export class AnimationState {
 					Utils.webkit602BugfixHelper(alpha);
 					const timeline = timelines[ii];
 					if (timeline instanceof AttachmentTimeline)
-						this.applyAttachmentTimeline(timeline, skeleton, applyTime, true, true);
+						this.applyAttachmentTimeline(timeline, skeleton, applyTime, MixFrom.setup, true);
 					else
-						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, true, false, false, false);
+						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, MixFrom.setup, false, false, false);
 				}
 			} else {
 				const timelineMode = current.timelineMode;
@@ -210,15 +210,15 @@ export class AnimationState {
 
 				for (let ii = 0; ii < timelineCount; ii++) {
 					const timeline = timelines[ii];
-					const fromSetup = (timelineMode[ii] & FIRST) !== 0;
+					const from = timelineMode[ii] & MODE;
 					if (!shortestRotation && timeline instanceof RotateTimeline) {
-						this.applyRotateTimeline(timeline, skeleton, applyTime, alpha, fromSetup, current.timelinesRotation, ii << 1, firstFrame);
+						this.applyRotateTimeline(timeline, skeleton, applyTime, alpha, from, current.timelinesRotation, ii << 1, firstFrame);
 					} else if (timeline instanceof AttachmentTimeline) {
-						this.applyAttachmentTimeline(timeline, skeleton, applyTime, fromSetup, retainAttachments);
+						this.applyAttachmentTimeline(timeline, skeleton, applyTime, from, retainAttachments);
 					} else {
 						// This fixes the WebKit 602 specific issue described at https://esotericsoftware.com/forum/d/10109-ios-10-disappearing-graphics
 						Utils.webkit602BugfixHelper(alpha);
-						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, fromSetup, add, false, false);
+						timeline.apply(skeleton, animationLast, applyTime, applyEvents, alpha, from, add, false, false);
 					}
 				}
 			}
@@ -230,7 +230,7 @@ export class AnimationState {
 		}
 
 		// Set slot attachments to the setup pose if they were set temporarily to apply deform timelines.
-		const setupState = this.unkeyedState + SETUP;
+		const setupState = this.unkeyedState + ATTACH_SETUP;
 		const slots = skeleton.slots;
 		for (let i = 0, n = skeleton.slots.length; i < n; i++) {
 			const slot = slots[i];
@@ -276,24 +276,24 @@ export class AnimationState {
 		for (let i = 0; i < timelineCount; i++) {
 			const timeline = timelines[i];
 			const mode = timelineMode[i];
+			const mixFrom = mode & MODE;
 			let alpha = 0;
 			if ((mode & HOLD) !== 0) {
 				const holdMix = timelineHoldMix[i];
 				alpha = holdMix == null ? alphaHold : alphaHold * (1 - holdMix.mix());
 			} else {
-				if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
+				if (!drawOrder && timeline instanceof DrawOrderTimeline && mixFrom === MixFrom.current) continue;
 				alpha = alphaMix;
 			}
 			from.totalAlpha += alpha;
-			const fromSetup = (mode & FIRST) !== 0;
 			if (!shortestRotation && timeline instanceof RotateTimeline) {
-				this.applyRotateTimeline(timeline, skeleton, applyTime, alpha, fromSetup, timelinesRotation, i << 1, firstFrame);
+				this.applyRotateTimeline(timeline, skeleton, applyTime, alpha, mixFrom, timelinesRotation, i << 1, firstFrame);
 			} else if (timeline instanceof AttachmentTimeline)
-				this.applyAttachmentTimeline(timeline, skeleton, applyTime, fromSetup,
+				this.applyAttachmentTimeline(timeline, skeleton, applyTime, mixFrom,
 					retainAttachments && alpha >= from.alphaAttachmentThreshold);
 			else {
-				const out = !drawOrder || !(timeline instanceof DrawOrderTimeline) || !fromSetup;
-				timeline.apply(skeleton, animationLast, applyTime, events, alpha, fromSetup, add, out, false);
+				const out = !drawOrder || !(timeline instanceof DrawOrderTimeline) || mixFrom === MixFrom.current;
+				timeline.apply(skeleton, animationLast, applyTime, events, alpha, mixFrom, add, out, false);
 			}
 		}
 
@@ -308,10 +308,10 @@ export class AnimationState {
 
 	/** Applies the attachment timeline and sets {@link Slot.attachmentState}.
 	 * @param retain True if the attachment remains after apply, false if temporary for deform timelines. */
-	applyAttachmentTimeline (timeline: AttachmentTimeline, skeleton: Skeleton, time: number, fromSetup: boolean, retain: boolean) {
+	applyAttachmentTimeline (timeline: AttachmentTimeline, skeleton: Skeleton, time: number, from: MixFrom, retain: boolean) {
 		const slot = skeleton.slots[timeline.slotIndex];
 		if (!slot.bone.active) return;
-		if (!retain && slot.attachmentState === this.unkeyedState + RETAIN) return;
+		if (!retain && slot.attachmentState === this.unkeyedState + ATTACH_RETAIN) return;
 
 		let setup = time < timeline.frames[0];
 		let name = null;
@@ -320,25 +320,25 @@ export class AnimationState {
 			setup = !retain && name == null;
 		}
 		if (setup) {
-			if (!fromSetup) return;
+			if (from === MixFrom.current) return;
 			name = slot.data.attachmentName;
 		}
 		slot.pose.setAttachment(name == null ? null : skeleton.getAttachment(slot.data.index, name));
 		if (retain)
-			slot.attachmentState = this.unkeyedState + RETAIN;
+			slot.attachmentState = this.unkeyedState + ATTACH_RETAIN;
 		else if (!setup) //
-			slot.attachmentState = this.unkeyedState + SETUP;
+			slot.attachmentState = this.unkeyedState + ATTACH_SETUP;
 	}
 
 	/** Applies the rotate timeline, mixing with the current pose while keeping the same rotation direction chosen as the shortest
 	 * the first time the mixing was applied. */
-	applyRotateTimeline (timeline: RotateTimeline, skeleton: Skeleton, time: number, alpha: number, fromSetup: boolean,
+	applyRotateTimeline (timeline: RotateTimeline, skeleton: Skeleton, time: number, alpha: number, from: MixFrom,
 		timelinesRotation: Array<number>, i: number, firstFrame: boolean) {
 
 		if (firstFrame) timelinesRotation[i] = 0;
 
 		if (alpha === 1) {
-			timeline.apply(skeleton, 0, time, null, 1, fromSetup, false, false, false);
+			timeline.apply(skeleton, 0, time, null, 1, from, false, false, false);
 			return;
 		}
 
@@ -346,12 +346,23 @@ export class AnimationState {
 		if (!bone.active) return;
 		const pose = bone.pose, setup = bone.data.setupPose;
 		const frames = timeline.frames;
-		if (time < frames[0]) { // Time is before first frame.
-			if (fromSetup) pose.rotation = setup.rotation;
-			return;
+		let r1: number, r2: number;
+		if (time < frames[0]) {
+			switch (from) {
+				case MixFrom.setup: {
+					pose.rotation = setup.rotation;
+					return;
+				}
+				case MixFrom.current: {
+					return;
+				}
+			}
+			r1 = pose.rotation;
+			r2 = setup.rotation;
+		} else {
+			r1 = from === MixFrom.setup ? setup.rotation : pose.rotation;
+			r2 = setup.rotation + timeline.getCurveValue(time);
 		}
-		const r1 = fromSetup ? setup.rotation : pose.rotation;
-		const r2 = setup.rotation + timeline.getCurveValue(time);
 
 		// Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.
 		let total = 0, diff = r2 - r1;
@@ -741,55 +752,45 @@ export class AnimationState {
 
 		const tracks = this.tracks;
 		for (let i = 0, n = tracks.length; i < n; i++) {
-			let entry = tracks[i];
-			if (!entry) continue;
+			const track = tracks[i];
+			if (!track) continue;
+			let entry: TrackEntry | null = track;
 			while (entry.mixingFrom)
 				entry = entry.mixingFrom;
 			do {
-				this.computeHold(entry);
+				this.computeHold(entry, track);
 				entry = entry.mixingTo;
 			} while (entry);
 		}
 		this.propertyIds.clear();
 	}
 
-	computeHold (entry: TrackEntry) {
+	computeHold (entry: TrackEntry, track: TrackEntry) {
 		const timelines = entry.animation!.timelines;
 		const timelinesCount = entry.animation!.timelines.length;
 		const timelineMode = entry.timelineMode;
 		timelineMode.length = timelinesCount;
 		const timelineHoldMix = entry.timelineHoldMix;
 		timelineHoldMix.length = 0;
-		const propertyIds = this.propertyIds;
 		const add = entry.additive, keepHold = entry.keepHold;
 		const to = entry.mixingTo;
 
-		outer:
 		for (let i = 0; i < timelinesCount; i++) {
 			const timeline = timelines[i];
 			const ids = timeline.propertyIds;
-			const first = propertyIds.addAll(ids)
-				&& !(timeline instanceof DrawOrderFolderTimeline && propertyIds.contains(DrawOrderTimeline.propertyID));
+			const from = this.from(track, timeline, ids);
 
 			if (add && timeline.additive) {
-				timelineMode[i] = first ? FIRST : SUBSEQUENT;
+				timelineMode[i] = from;
 				continue;
-			}
-
-			for (let from = entry.mixingFrom; from != null; from = from.mixingFrom) {
-				if (from.animation!.hasTimeline(ids)) {
-					// An earlier entry on this track keys this property, isolating it from lower tracks.
-					timelineMode[i] = SUBSEQUENT;
-					continue outer;
-				}
 			}
 
 			// Hold if the next entry will overwrite this property.
 			let mode: number;
 			if (to === null || timeline.instant || (to.additive && timeline.additive) || !to.animation?.hasTimeline(ids))
-				mode = first ? FIRST : SUBSEQUENT;
+				mode = from;
 			else {
-				mode = first ? HOLD_FIRST : HOLD;
+				mode = from | HOLD;
 				// Find next entry that doesn't overwrite this property. Its mix fades out the hold, instead of it ending abruptly.
 				for (let next = to.mixingTo; next != null; next = next.mixingTo) {
 					if ((next.additive && timeline.additive) || !next.animation?.hasTimeline(ids)) {
@@ -801,6 +802,30 @@ export class AnimationState {
 			if (keepHold) mode = (mode & ~HOLD) | (timelineMode[i] & HOLD);
 			timelineMode[i] = mode;
 		}
+	}
+
+	private from (track: TrackEntry, timeline: Timeline, ids: string[]): number {
+		const propertyIds = this.propertyIds;
+		let from = SETUP;
+		// Reference runtime uses LongMap.putMissing. Map has no equivalent, so get/set preserves those semantics here.
+		for (let i = 0, n = ids.length; i < n; i++) {
+			const owner = propertyIds.get(ids[i]);
+			if (owner === undefined) {
+				propertyIds.set(ids[i], track);
+			} else {
+				if (owner !== track) {
+					while (++i < n)
+						if (!propertyIds.has(ids[i])) propertyIds.set(ids[i], track);
+					return CURRENT;
+				}
+				from = FIRST;
+			}
+		}
+		if (timeline instanceof DrawOrderFolderTimeline) {
+			const first = propertyIds.get(DrawOrderTimeline.propertyID);
+			if (first != null) return first !== track ? CURRENT : FIRST;
+		}
+		return from;
 	}
 
 	/** Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing. */
@@ -958,7 +983,7 @@ export class TrackEntry {
 	 * properties keyed by the animation are set to the setup pose and the track is cleared.
 	 *
 	 * Usually you want to use {@link AnimationState.addEmptyAnimation} rather than have the animation
-	 * abruptly cease being applied. */
+	 * abruptly cease being applied, leaving the current pose. */
 	trackEnd = 0;
 
 	/** Multiplier for the delta time when this track entry is updated, causing time for this animation to pass slower or
@@ -1052,8 +1077,8 @@ export class TrackEntry {
 	}
 
 	/** For each timeline:
-	 * - Bit 0, FIRST: 0 = mix from current pose, 1 = mix from setup pose. Timeline is first to set the property.
-	 * - Bit 1, HOLD: 0 = mix out using alphaMix, 1 = apply full alpha to prevent dipping. Timeline is first on its track to
+	 * - Bits 0-1: MixFrom.
+	 * - Bit 2, HOLD: 0 = mix out using alphaMix, 1 = apply full alpha to prevent dipping. Timeline is first on its track to
 	 * set the property and the next entry (mixingTo) also sets it. When held, timelineHoldMix's mix controls how the hold fades
 	 * out (for 3+ entry chains where the chain eventually stops setting the property). */
 	timelineMode = [] as number[];
@@ -1310,10 +1335,11 @@ export abstract class AnimationStateAdapter implements AnimationStateListener {
 	}
 }
 
-export const SUBSEQUENT = 0;
-export const FIRST = 1;
-export const HOLD = 2;
-export const HOLD_FIRST = 3;
-
+export const CURRENT = 0;
 export const SETUP = 1;
-export const RETAIN = 2;
+export const FIRST = 2;
+export const MODE = 3;
+export const HOLD = 4;
+
+export const ATTACH_SETUP = 1;
+export const ATTACH_RETAIN = 2;

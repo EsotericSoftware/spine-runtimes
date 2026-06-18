@@ -31,6 +31,17 @@ using System;
 using System.Collections.Generic;
 
 namespace Spine {
+	/// <summary>
+	/// Determines how the <see cref="BonePose.scaleY"/> changes when <see cref="BonePose.ScaleX"/> is set.
+	/// </summary>
+	public enum ScaleYMode {
+		/// <summary>scaleY is not changed.</summary>
+		None,
+		/// <summary>scaleY is multiplied by the scaleX factor, preserving the bone's aspect ratio.</summary>
+		Uniform,
+		/// <summary>scaleY is divided by the scaleX factor, preserving the bone's area.</summary>
+		Volume
+	}
 
 	public interface IConstraintData : IPosedData {
 		string Name { get; }

@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { type Animation, AnimationState, AnimationStateData, AtlasAttachmentLoader, type Bone, Color, type Disposable, type Downloader, MathUtils, Physics, Skeleton, SkeletonBinary, type SkeletonData, SkeletonJson, Skin, type StringMap, type TextureAtlas, TextureFilter, TimeKeeper, type TrackEntry, Vector2 } from "@esotericsoftware/spine-core"
+import { type Animation, AnimationState, AnimationStateData, AtlasAttachmentLoader, type Bone, Color, type Disposable, type Downloader, MathUtils, MixFrom, Physics, Skeleton, SkeletonBinary, type SkeletonData, SkeletonJson, Skin, type StringMap, type TextureAtlas, TextureFilter, TimeKeeper, type TrackEntry, Vector2 } from "@esotericsoftware/spine-core"
 import { AssetManager, type GLTexture, Input, LoadingScreen, ManagedWebGLRenderingContext, ResizeMode, SceneRenderer, Vector3 } from "@esotericsoftware/spine-webgl"
 
 export interface SpinePlayerConfig {
@@ -808,7 +808,7 @@ export class SpinePlayer implements Disposable {
 
 		const tempArray = [0, 0];
 		for (let i = 0; i < steps; i++, time += stepTime) {
-			animation.apply(this.skeleton!, time, time, false, [], 1, true, false, false, false);
+			animation.apply(this.skeleton!, time, time, false, [], 1, MixFrom.setup, false, false, false);
 			this.skeleton!.updateWorldTransform(Physics.update);
 			this.skeleton!.getBounds(offset, size, tempArray, this.sceneRenderer!.skeletonRenderer.getSkeletonClipping());
 

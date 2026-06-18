@@ -29,7 +29,7 @@
 
 package spine;
 
-import spine.IkConstraintData.ScaleYMode;
+import spine.ConstraintData.ScaleYMode;
 
 /** Stores the current pose for an IK constraint. An IK constraint adjusts the rotation of 1 or 2 constrained bones so the tip of
  * the last bone is as close to the target bone as possible.
@@ -109,7 +109,7 @@ class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkConstrai
 		function switchDefault() {
 			var x = targetX - p.worldX, y = targetY - p.worldY;
 			var d = pa * pd - pb * pc;
-			if (Math.abs(d) <= 0.0001) {
+			if (Math.abs(d) <= MathUtils.epsilon) {
 				tx = 0;
 				ty = 0;
 			} else {
@@ -123,7 +123,7 @@ class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkConstrai
 				tx = (targetX - bone.worldX) * MathUtils.signum(skeleton.scaleX);
 				ty = (targetY - bone.worldY) * MathUtils.signum(skeleton.scaleY);
 			case Inherit.noRotationOrReflection:
-				var s = Math.abs(pa * pd - pb * pc) / Math.max(0.0001, pa * pa + pc * pc);
+				var s = Math.abs(pa * pd - pb * pc) / Math.max(MathUtils.epsilon, pa * pa + pc * pc);
 				var sa:Float = pa / skeleton.scaleX;
 				var sc:Float = pc / skeleton.scaleY;
 				pb = -sc * s * skeleton.scaleX;
@@ -138,7 +138,7 @@ class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkConstrai
 			rotationIK += 180;
 		if (rotationIK > 180)
 			rotationIK -= 360;
-		else if (rotationIK < -180) //
+		else if (rotationIK <= -180) //
 			rotationIK += 360;
 		bone.rotation += rotationIK * mix;
 		if (compress || stretch) {
@@ -148,7 +148,7 @@ class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkConstrai
 					ty = targetY - bone.worldY;
 			}
 			var b = bone.bone.data.length * bone.scaleX;
-			if (b > 0.0001) {
+			if (b > MathUtils.epsilon) {
 				var dd = tx * tx + ty * ty;
 				if ((compress && dd < b * b) || (stretch && dd > b * b)) {
 					var s = (Math.sqrt(dd) / b - 1) * mix + 1;
@@ -157,7 +157,7 @@ class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkConstrai
 						case ScaleYMode.uniform:
 							bone.scaleY *= s;
 						case ScaleYMode.volume:
-							bone.scaleY /= s;
+							bone.scaleY /= s < 0.7 ? 0.25 + 0.642857 * s : s;
 						case ScaleYMode.none:
 					}
 				}
@@ -197,7 +197,7 @@ class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkConstrai
 		} else
 			os2 = 0;
 		var cwx = 0., cwy = 0., a = parent.a, b = parent.b, c = parent.c, d = parent.d;
-		var u = Math.abs(psx - psy) <= 0.0001;
+		var u = Math.abs(psx - psy) <= MathUtils.epsilon;
 		if (!u || stretch) {
 			child.y = 0;
 			cwx = a * child.x + parent.worldX;
@@ -212,10 +212,10 @@ class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkConstrai
 		c = pp.c;
 		d = pp.d;
 		var id = a * d - b * c, x = cwx - pp.worldX, y = cwy - pp.worldY;
-		id = Math.abs(id) <= 0.0001 ? 0 : 1 / id;
+		id = Math.abs(id) <= MathUtils.epsilon ? 0 : 1 / id;
 		var dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
 		var l1 = Math.sqrt(dx * dx + dy * dy), l2 = child.bone.data.length * csx, a1 = 0., a2 = 0.;
-		if (l1 < 0.0001) {
+		if (l1 < MathUtils.epsilon) {
 			apply1(skeleton, parent, targetX, targetY, false, stretch, ScaleYMode.none, mix);
 			child.rotation = 0;
 			return;
@@ -253,7 +253,7 @@ class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkConstrai
 						case ScaleYMode.uniform:
 							parent.scaleY *= a;
 						case ScaleYMode.volume:
-							parent.scaleY /= a;
+							parent.scaleY /= a < 0.7 ? 0.25 + 0.642857 * a : a;
 						case ScaleYMode.none:
 					}
 				}
@@ -329,13 +329,13 @@ class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkConstrai
 		a1 = (a1 - os) * MathUtils.radDeg + os1 - parent.rotation;
 		if (a1 > 180)
 			a1 -= 360;
-		else if (a1 < -180) //
+		else if (a1 <= -180) //
 			a1 += 360;
 		parent.rotation += a1 * mix;
 		a2 = ((a2 + os) * MathUtils.radDeg - child.shearX) * s2 + os2 - child.rotation;
 		if (a2 > 180)
 			a2 -= 360;
-		else if (a2 < -180) //
+		else if (a2 <= -180) //
 			a2 += 360;
 		child.rotation += a2 * mix;
 	}

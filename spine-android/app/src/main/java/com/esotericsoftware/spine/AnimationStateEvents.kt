@@ -134,7 +134,7 @@ fun AnimationState(nav: NavHostController) {
                     }
                 }
             })
-            Log.d(TAG, "Current: ${controller.animationState.getCurrent(0)?.getAnimation()?.getName()}");
+            Log.d(TAG, "Current: ${controller.animationState.getTrack(0)?.getAnimation()?.getName()}");
         }
     }
 

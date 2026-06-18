@@ -244,6 +244,7 @@ namespace Spine.Unity {
 		void HandleRender (SkeletonRendererInstruction instruction) {
 			int rendererCount = partsRenderers.Count;
 			if (rendererCount <= 0) return;
+			bool materialsNeedUpdate = skeletonRenderer.MaterialsNeedUpdate;
 
 #if HAS_PROPERTY_BLOCK_QUERY
 			bool assignPropertyBlock = this.copyPropertyBlock && mainMeshRenderer.HasPropertyBlock();
@@ -281,7 +282,8 @@ namespace Spine.Unity {
 					if (assignPropertyBlock)
 						currentRenderer.SetPropertyBlock(copiedBlock);
 					// Render
-					currentRenderer.RenderParts(skeletonRenderer, instruction.submeshInstructions, start, si + 1);
+					currentRenderer.RenderParts(skeletonRenderer, instruction.submeshInstructions,
+						start, si + 1, materialsNeedUpdate);
 
 					start = si + 1;
 					rendererIndex++;
@@ -293,6 +295,9 @@ namespace Spine.Unity {
 					}
 				}
 			}
+
+			if (materialsNeedUpdate)
+				skeletonRenderer.MaterialsNeedUpdate = false;
 
 			if (OnMeshAndMaterialsUpdated != null)
 				OnMeshAndMaterialsUpdated(this.skeletonRenderer);

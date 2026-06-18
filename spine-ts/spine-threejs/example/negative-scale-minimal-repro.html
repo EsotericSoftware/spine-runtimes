@@ -1,0 +1,242 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>spine-threejs minimal negative-scale sorting repro</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body, html { height: 100%; overflow: hidden; background: #202020; color: #fff; font-family: sans-serif; }
+      canvas { position: absolute; width: 100%; height: 100%; }
+      #ui {
+        position: absolute;
+        z-index: 1;
+        top: 12px;
+        left: 12px;
+        max-width: 640px;
+        padding: 12px;
+        background: rgba(0, 0, 0, 0.72);
+        border-radius: 6px;
+        line-height: 1.4;
+      }
+      #ui code { color: #ffd479; }
+      #ui label { display: block; margin-top: 8px; }
+      #labels {
+        position: absolute;
+        z-index: 1;
+        bottom: 18px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-around;
+        pointer-events: none;
+        font-weight: bold;
+        text-shadow: 0 1px 3px #000;
+      }
+    </style>
+
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/",
+        "spine-threejs": "../dist/esm/spine-threejs.mjs"
+      }
+    }
+    </script>
+  </head>
+
+  <body>
+    <div id="ui">
+      <b>Minimal negative-scale sorting repro</b><br />
+      Draw order is <code>blue bottom</code>, <code>red middle</code>, <code>green top</code>.
+      The red rectangle is attached to a child bone. When that bone has <code>scaleX = -1</code>,
+      red is mirrored, but green should still draw on top of red.
+      <label><input id="negativeScale" type="checkbox" checked /> negative scale on red bone</label>
+      <label><input id="depth" type="checkbox" /> depth test/write</label>
+    </div>
+    <div id="labels">
+      <div>default: two-pass transparent DoubleSide</div>
+      <div>forceSinglePass: true</div>
+    </div>
+
+    <script type="module">
+      import * as THREE from "three";
+      import * as spine from "spine-threejs";
+      import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+      let scene, camera, renderer, controls, canvas;
+      let defaultMesh, singlePassMesh;
+      const negativeScaleCheckbox = document.getElementById("negativeScale");
+      const depthCheckbox = document.getElementById("depth");
+
+      function makeWhiteTexture() {
+        const canvas = document.createElement("canvas");
+        canvas.width = 2;
+        canvas.height = 2;
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, 2, 2);
+        return new spine.ThreeJsTexture(canvas, true);
+      }
+
+      function makeRegion(texture) {
+        const region = new spine.TextureRegion();
+        region.texture = texture;
+        region.u = 0;
+        region.v = 0;
+        region.u2 = 1;
+        region.v2 = 1;
+        region.width = 2;
+        region.height = 2;
+        region.originalWidth = 2;
+        region.originalHeight = 2;
+        return region;
+      }
+
+      function makeAttachment(name, region, width, height, rgba) {
+        const sequence = new spine.Sequence(1, false);
+        sequence.regions[0] = region;
+        const attachment = new spine.RegionAttachment(name, sequence);
+        attachment.width = width;
+        attachment.height = height;
+        attachment.color.set(rgba[0], rgba[1], rgba[2], rgba[3]);
+        attachment.updateSequence();
+        return attachment;
+      }
+
+      function makeSkeletonData() {
+        const texture = makeWhiteTexture();
+        const region = makeRegion(texture);
+
+        const attachmentLoader = {
+          newRegionAttachment(skin, placeholder, name, path, sequence) {
+            sequence.regions[0] = region;
+            return new spine.RegionAttachment(name, sequence);
+          },
+          newMeshAttachment() { return null; },
+          newBoundingBoxAttachment() { return null; },
+          newPathAttachment() { return null; },
+          newPointAttachment() { return null; },
+          newClippingAttachment() { return null; },
+        };
+
+        const json = new spine.SkeletonJson(attachmentLoader);
+        return json.readSkeletonData({
+          skeleton: { spine: "4.3.8" },
+          bones: [
+            { name: "root" },
+            { name: "red-bone", parent: "root" },
+          ],
+          slots: [
+            { name: "blue-bottom", bone: "root", attachment: "blue" },
+            { name: "red-middle", bone: "red-bone", attachment: "red" },
+            { name: "green-top", bone: "root", attachment: "green" },
+          ],
+          skins: [{
+            name: "default",
+            attachments: {
+              "blue-bottom": {
+                blue: { type: "region", width: 260, height: 160, color: "0d40ffb8" },
+              },
+              "red-middle": {
+                red: { type: "region", width: 230, height: 80, color: "ff0d05b8" },
+              },
+              "green-top": {
+                green: { type: "region", width: 190, height: 120, color: "00ff26b8" },
+              },
+            },
+          }],
+        });
+      }
+
+      function createSkeletonMesh(skeletonData, forceSinglePass) {
+        const mesh = new spine.SkeletonMesh({
+          skeletonData,
+          materialFactory: (parameters) => {
+            const material = new THREE.MeshBasicMaterial({
+              ...parameters,
+              depthTest: depthCheckbox.checked,
+              depthWrite: depthCheckbox.checked,
+            });
+            material.forceSinglePass = forceSinglePass;
+            return material;
+          },
+        });
+        mesh.skeleton.setupPose();
+        return mesh;
+      }
+
+      function updateSpineMesh(mesh) {
+        const redBone = mesh.skeleton.findBone("red-bone");
+        redBone.pose.scaleX = negativeScaleCheckbox.checked ? -1 : 1;
+        redBone.pose.scaleY = 1;
+        mesh.skeleton.updateWorldTransform(spine.Physics.update);
+        mesh["updateGeometry"]();
+      }
+
+      function rebuild() {
+        if (defaultMesh) scene.remove(defaultMesh);
+        if (singlePassMesh) scene.remove(singlePassMesh);
+
+        const skeletonData = makeSkeletonData();
+
+        defaultMesh = createSkeletonMesh(skeletonData, false);
+        defaultMesh.position.x = -180;
+        scene.add(defaultMesh);
+
+        singlePassMesh = createSkeletonMesh(skeletonData, true);
+        singlePassMesh.position.x = 180;
+        scene.add(singlePassMesh);
+      }
+
+      function init() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        camera = new THREE.PerspectiveCamera(75, width / height, 1, 3000);
+        camera.position.set(0, 0, 520);
+
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x202020);
+
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(width, height);
+        document.body.appendChild(renderer.domElement);
+        canvas = renderer.domElement;
+
+        controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.enablePan = true;
+        controls.target.set(0, 0, 0);
+        controls.update();
+
+        depthCheckbox.addEventListener("change", rebuild);
+        rebuild();
+        requestAnimationFrame(render);
+      }
+
+      function render() {
+        resize();
+        controls.update();
+        updateSpineMesh(defaultMesh);
+        updateSpineMesh(singlePassMesh);
+        renderer.render(scene, camera);
+        requestAnimationFrame(render);
+      }
+
+      function resize() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        if (canvas.width !== w || canvas.height !== h) {
+          canvas.width = w;
+          canvas.height = h;
+        }
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      }
+
+      init();
+    </script>
+  </body>
+</html>

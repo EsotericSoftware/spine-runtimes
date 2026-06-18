@@ -162,14 +162,14 @@ namespace Spine {
 
 		class Pow2InInverseInterpolation : Interpolation {
 			public override float Apply (float a) {
-				if (a < MathUtils.FLOAT_ROUNDING_ERROR) return 0;
+				if (a < MathUtils.FloatRoundingError) return 0;
 				return (float)Math.Sqrt(a);
 			}
 		}
 
 		class Pow2OutInverseInterpolation : Interpolation {
 			public override float Apply (float a) {
-				if (a < MathUtils.FLOAT_ROUNDING_ERROR) return 0;
+				if (a < MathUtils.FloatRoundingError) return 0;
 				if (a > 1) return 1;
 				return 1 - (float)Math.Sqrt(-(a - 1));
 			}
@@ -195,13 +195,13 @@ namespace Spine {
 
 		class SineInInterpolation : Interpolation {
 			public override float Apply (float a) {
-				return 1 - MathUtils.Cos(a * MathUtils.HALF_PI);
+				return 1 - MathUtils.Cos(a * MathUtils.HalfPi);
 			}
 		}
 
 		class SineOutInterpolation : Interpolation {
 			public override float Apply (float a) {
-				return MathUtils.Sin(a * MathUtils.HALF_PI);
+				return MathUtils.Sin(a * MathUtils.HalfPi);
 			}
 		}
 

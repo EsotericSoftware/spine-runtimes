@@ -242,7 +242,7 @@ namespace Spine {
 		public void UpdateWorldTransform (Physics physics) {
 			update++;
 
-			drawOrder.ResetConstrained();
+			if (drawOrder.appliedPose == drawOrder.constrainedPose) drawOrder.ResetConstrained();
 			IPosedInternal[] resetCache = this.resetCache.Items;
 			for (int i = 0, n = this.resetCache.Count; i < n; i++) {
 				resetCache[i].ResetConstrained();

@@ -49,7 +49,7 @@ namespace spine {
 
 		virtual ~SlotCurveTimeline();
 
-		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+		virtual void apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixFrom from, bool add, bool out,
 						   bool appliedPose) override;
 
 		virtual int getSlotIndex() override;
@@ -58,7 +58,7 @@ namespace spine {
 
 	protected:
 		/// Applies the timeline to the slot pose.
-		virtual void _apply(Slot &slot, SlotPose &pose, float time, float alpha, bool fromSetup, bool add) = 0;
+		virtual void _apply(Slot &slot, SlotPose &pose, float time, float alpha, MixFrom from, bool add) = 0;
 
 		int _slotIndex;
 	};

@@ -30,7 +30,7 @@
 package spine;
 
 import haxe.DynamicAccess;
-import spine.IkConstraintData.ScaleYMode;
+import spine.ConstraintData.ScaleYMode;
 import spine.animation.BoneTimeline2;
 import spine.animation.SliderMixTimeline;
 import spine.animation.SliderTimeline;
@@ -355,6 +355,9 @@ class SkeletonJson {
 						data.y = getFloat(constraintMap, "y");
 						data.rotate = getFloat(constraintMap, "rotate");
 						data.scaleX = getFloat(constraintMap, "scaleX");
+						var scaleY:String = Reflect.getProperty(constraintMap, "scaleY");
+						if (scaleY != null)
+							data.scaleYMode = ScaleYMode.fromName(scaleY);
 						data.shearX = getFloat(constraintMap, "shearX");
 						data.limit = getFloat(constraintMap, "limit", 5000) * scale;
 						data.step = 1 / getFloat(constraintMap, "fps", 60);
@@ -385,7 +388,6 @@ class SkeletonJson {
 						data.skinRequired = skinRequired;
 						data.additive = getBoolean(constraintMap, "additive", false);
 						data.loop = getBoolean(constraintMap, "loop", false);
-						data.setupPose.time = getFloat(constraintMap, "time", 0);
 						data.setupPose.mix = getFloat(constraintMap, "mix", 1);
 
 						var boneName = getString(constraintMap, "bone", null);
@@ -399,8 +401,10 @@ class SkeletonJson {
 							data.property.offset = getFloat(constraintMap, "from", 0) * propertyScale;
 							data.offset = getFloat(constraintMap, "to", 0);
 							data.scale = getFloat(constraintMap, "scale", 1) / propertyScale;
+							data.max = getFloat(constraintMap, "max", 0);
 							data.local = getBoolean(constraintMap, "local", false);
-						}
+						} else
+							data.setupPose.time = getFloat(constraintMap, "time", 0);
 
 						skeletonData.constraints.push(data);
 				}

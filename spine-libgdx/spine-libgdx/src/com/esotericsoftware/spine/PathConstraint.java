@@ -48,7 +48,6 @@ import com.esotericsoftware.spine.attachments.PathAttachment;
  * See <a href="https://esotericsoftware.com/spine-path-constraints">Path constraints</a> in the Spine User Guide. */
 public class PathConstraint extends Constraint<PathConstraint, PathConstraintData, PathConstraintPose> {
 	static final int NONE = -1, BEFORE = -2, AFTER = -3;
-	static final float epsilon = 0.00001f;
 
 	final Array<BonePose> bones;
 	Slot slot;

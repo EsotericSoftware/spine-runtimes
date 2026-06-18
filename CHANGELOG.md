@@ -3,6 +3,8 @@
 ## C
 
 - **Additions**
+  - Added generated slider data `max` APIs.
+  - Added generated physics constraint `ScaleYMode` APIs.
   - Added generated `Interpolation` and `TrackEntry` mix interpolation APIs for non-linear animation mixing.
   - Added `spine_slider` and `spine_slider_data` types for slider constraints
   - Regenerated C bindings for the AnimationState additive/hold rework and Skin placeholder name rename in spine-cpp.
@@ -12,6 +14,11 @@
   - Added generated animation color and bone icon size/rotation APIs.
 
 - **Bug fixes**
+  - Fixed draw order timelines not mixing out to the setup pose.
+  - Fixed slider sorting crashes when slider animations key slot or constraint timelines.
+  - Fixed bones that don't inherit rotation when parent scale is near zero.
+  - Fixed `BonePose::updateLocalTransform()` for `noScale` and `noScaleOrReflection` inheritance.
+  - Fixed `ScaleYMode_Volume` to avoid extreme scaleY values for very small scaleX factors.
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
   - Fixed `Skeleton::updateWorldTransform()` to avoid copying draw order unless it is constrained.
 
@@ -93,6 +100,8 @@
 ## C++
 
 - **Additions**
+  - Added `SliderData::getMax()` / `setMax()` for nonessential bone-driven slider metadata.
+  - Added `PhysicsConstraintData::getScaleYMode()` / `setScaleYMode()` to control how physics scaleX affects scaleY.
   - Added `Interpolation` and `TrackEntry::getMixInterpolation()` / `setMixInterpolation()` for non-linear animation mixing.
   - Added `Slider` and `SliderData` classes for slider constraints
   - Linked meshes can now inherit deform and sequence timelines from source meshes in different slots.
@@ -118,10 +127,17 @@
   - Added `Animation::getColor()` and `BoneData` icon size/rotation accessors for nonessential editor data.
 
 - **Bug fixes**
+  - Fixed draw order timelines not mixing out to the setup pose.
+  - Fixed slider sorting crashes when slider animations key slot or constraint timelines.
+  - Fixed bones that don't inherit rotation when parent scale is near zero.
+  - Fixed `BonePose::updateLocalTransform()` for `noScale` and `noScaleOrReflection` inheritance, plus related IK epsilon handling.
+  - Fixed `ScaleYMode_Volume` to avoid extreme scaleY values for very small scaleX factors.
+  - Fixed `InheritTimeline` so inherit keys are applied to the keyed bone instead of an uninitialized bone index.
   - Fixed `AnimationState` attachment timeline handling so deforms are applied correctly when an attachment is hidden in the setup pose.
   - Fixed `Skeleton::updateWorldTransform()` to avoid copying draw order unless it is constrained.
 
 - **Breaking changes**
+  - `MathUtil::Epsilon2` renamed to `MathUtil::EpsilonSq`.
   - `BonePose::resetWorld()` is now private.
   - `AttachmentLoader` methods now receive both the skin `placeholder` and resolved attachment `name`. `Skin::AttachmentMap::Entry::_placeholderName` renamed to `_placeholder`.
   - `AnimationState::getCurrent()` renamed to `AnimationState::getTrack()`.
@@ -281,15 +297,24 @@
 ### Godot
 
 - **Additions**
+  - Added `SpineSliderData.get_max()` / `set_max()` for nonessential bone-driven slider metadata.
+  - Added `SpinePhysicsConstraintData.get_scale_y_mode()` / `set_scale_y_mode()`.
   - Added `SpineTrackEntry` mix interpolation APIs and `SpineConstant.MixInterpolation`.
   - Added convex and inverse clipping support through the updated spine-cpp clipping runtime.
   - Added `SpineSlider` and `SpineSliderData` classes for slider constraints
   - Added `SpineTrackEntry.get_additive()` / `set_additive()` for additive blending per track entry.
 
 - **Bug fixes**
+  - Fixed draw order timelines not mixing out to the setup pose.
+  - Fixed editor crashes when assigning skeleton data with slider animations that key slots or constraints.
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
+  - Fixed `SpineAnimationTrack` editor preview paths for nested `AnimationPlayer` roots, and prevented inactive tracks from clearing `SpineSprite` preview animations.
+  - Fixed GDExtension animation mix editing in the Godot inspector.
+  - Fixed `SpineBoneNode` and `SpineSlotNode` transforms when bones use negative scale or shear, and applied `SpineBoneNode` Drive mode before world transforms are computed.
+  - Updated Godot 4.x CI builds to Godot 4.6.2.
   - Fixed Godot 4.6 Windows editor CI builds by installing Direct3D 12 SDK dependencies before building Godot.
   - Fixed Godot 4.6 GDExtension builds with the latest `godot-cpp` by including the required `Ref` support header in `SpineCommon.h`, updated `SpineEventData` for the `EventData.setupPose` API change, and refreshed vendored `spine-cpp` sources during clean setup.
+  - Fixed Godot 3.x builds by avoiding the Godot 4-only `Transform2D(Vector2, Vector2, Vector2)` constructor.
 
 - **Breaking changes (since previous 4.3 beta)**
   - `SpineSkin` attachment method argument names now use `placeholder` instead of `name`.
@@ -367,7 +392,7 @@
     | Slot.Attachment       |→| Slot.AppliedPose.Attachment |
     | Slot.R .G .B .A       |→| Slot.AppliedPose.GetColor() and Slot.AppliedPose.SetColor() |
     | Slot.R2 .G2 .B2       |→| Slot.AppliedPose.GetDarkColor() and Slot.AppliedPose.SetDarkColor() |
-    | Slot.HasSecondColor   |→| Slot.AppliedPose.HasSecondColor |
+    | Slot.HasSecondColor   |→| Slot.AppliedPose.HasDarkColor |
     | Slot.Deform           |→| Slot.AppliedPose.Deform |
     | Slot.SequenceIndex    |→| Slot.AppliedPose.SequenceIndex |
   - `Constraint` properties moved to `Constraint.Pose`:
@@ -462,6 +487,8 @@
     |-----|-|-----|
     | `AnimationState.SetCurrent()`     |→| `AnimationState.SetTrack()` |
     | `AnimationState.GetCurrent()`     |→| `AnimationState.GetTrack()` |
+  - Ported the AnimationState additive/hold rework from spine-libgdx. `MixBlend`, `MixDirection`, `holdPrevious`, and `interruptAlpha` are no longer used. Timeline mixing now uses `MixFrom`, `add`, and `mixOut` parameters, with hold state calculated automatically.
+  - `Animation.Apply()` and `Timeline.Apply()` now take a `MixFrom` value instead of the previous boolean `fromSetup` argument. Replace `true` with `MixFrom.Setup` and `false` with `MixFrom.Current`. If you upgraded to an intermediate 4.3 runtime that still used `fromSetup`, update those call sites again.
 
 ### Unity
 
@@ -530,10 +557,15 @@
 ## iOS
 
 - **Additions**
+  - Added generated slider data `max` APIs.
+  - Added generated physics constraint `scaleYMode` APIs.
   - Added generated `Interpolation` and `TrackEntry` mix interpolation APIs.
   - Added convex and inverse clipping support through the updated spine-cpp clipping runtime.
 
 - **Bug fixes**
+  - Fixed draw order timelines not mixing out to the setup pose.
+  - Fixed bones that don't inherit rotation when parent scale is near zero.
+  - Fixed `BonePose.updateLocalTransform(_:)` for `noScale` and `noScaleOrReflection` inheritance.
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
 
 - **Breaking changes**
@@ -548,6 +580,8 @@
 ## Dart
 
 - **Additions**
+  - Added generated slider data `max` APIs.
+  - Added generated physics constraint `scaleYMode` APIs.
   - Added generated `Interpolation` and `TrackEntry` mix interpolation APIs.
   - Added `Slider` and `SliderData` classes for slider constraints
   - Added `SliderTimeline` and `SliderMixTimeline` for animating sliders
@@ -555,6 +589,9 @@
   - Added `Pose`, `Posed`, and `PosedActive` base classes for unified pose management
 
 - **Bug fixes**
+  - Fixed draw order timelines not mixing out to the setup pose.
+  - Fixed bones that don't inherit rotation when parent scale is near zero.
+  - Fixed `BonePose.updateLocalTransform()` for `noScale` and `noScaleOrReflection` inheritance.
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
 
 - **Breaking changes**
@@ -581,12 +618,17 @@
 ### Flutter
 
 - **Additions**
+  - Added generated slider data `max` APIs.
+  - Added generated physics constraint `scaleYMode` APIs.
   - Added generated `Interpolation` and `TrackEntry` mix interpolation APIs.
   - Added convex and inverse clipping support through the updated spine-cpp clipping runtime.
   - Added `fromMemory` methods to `AtlasFlutter`, `SkeletonDataFlutter`, `SkeletonDrawableFlutter`, and `SpineWidget` for loading Spine data from custom sources (memory, encrypted storage, databases, custom caching, etc.)
   - Added example `load_from_memory.dart` demonstrating how to load all assets into memory and use the `fromMemory` API
 
 - **Bug fixes**
+  - Fixed draw order timelines not mixing out to the setup pose.
+  - Fixed bones that don't inherit rotation when parent scale is near zero.
+  - Fixed `BonePose.updateLocalTransform()` for `noScale` and `noScaleOrReflection` inheritance.
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
 
 - **Breaking changes**
@@ -956,12 +998,19 @@
   - Updated to use new pose system from Java runtime
 
 - **Bug fixes**
+  - Updated the Gradle wrapper and fixed the headless test fat jar task to build included libgdx runtime classpath artifacts before packaging.
   - Gradle builds now delete stale Eclipse `bin/` output before compiling so removed classes don't linger on Java headless test classpaths.
+  - Updated the libGDX dependency from `1.14.1-SNAPSHOT` to the released `1.14.1`.
 
 ### Android
 
 - **Breaking changes**
   - Updated to use new Java runtime with all breaking changes above
+
+- **Bug fixes**
+  - Updated the Android atlas attachment loader to match the current `AttachmentLoader` method signatures.
+  - Updated the Android examples to use `AnimationState.getTrack()` instead of the removed `getCurrent()` API.
+  - Updated the libGDX dependency from `1.14.1-SNAPSHOT` to the released `1.14.1`.
 
 ## Swift
 
@@ -1370,7 +1419,7 @@
 - **Breaking changes**
   - Renamed `TrackEntry` `AttachmentThreshold` to `MixAttachmentThreshold`, renamed `DrawOrderThreshold` to `MixDrawOrderThreshold`.
   - Changed signature of `Skeleton.UpdateWorldTransform()` to `UpdateWorldTransform(Skeleton.Physics physics)`. The default replacement for `skeleton.UpdateWorldTransform()` calls is `skeleton.UpdateWorldTransform(Skeleton.Physics.Update)`. If you are certain that a subsequent call to `skeleton.UpdateWorldTransform(Skeleton.Physics.Update)` follows in the same frame, you can pass `Skeleton.Physics.Pose` as argument instead of `Skeleton.Physics.Update`.
-
+  
 ### Unity
 
 - **Officially supported Unity versions are 2017.1-6000.1**.

@@ -13,9 +13,9 @@ spine_rtti spine_timeline_get_rtti(spine_timeline self) {
 }
 
 void spine_timeline_apply(spine_timeline self, spine_skeleton skeleton, float lastTime, float time, /*@null*/ spine_array_event events, float alpha,
-						  bool fromSetup, bool add, bool out, bool appliedPose) {
+						  spine_mix_from from, bool add, bool out, bool appliedPose) {
 	Timeline *_self = (Timeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixFrom) from, add, out, appliedPose);
 }
 
 bool spine_timeline_get_additive(spine_timeline self) {

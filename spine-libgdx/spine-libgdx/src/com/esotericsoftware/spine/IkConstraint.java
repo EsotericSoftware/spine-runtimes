@@ -34,7 +34,7 @@ import static com.esotericsoftware.spine.utils.SpineUtils.*;
 import com.badlogic.gdx.utils.Array;
 
 import com.esotericsoftware.spine.BoneData.Inherit;
-import com.esotericsoftware.spine.IkConstraintData.ScaleYMode;
+import com.esotericsoftware.spine.ConstraintData.ScaleYMode;
 
 /** Adjusts the local rotation of 1 or 2 constrained bones so the world position of the tip of the last bone is as close to the
  * target bone as possible.
@@ -118,7 +118,7 @@ public class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 			ty = (targetY - bone.worldY) * Math.signum(skeleton.scaleY);
 			break;
 		case noRotationOrReflection:
-			float s = Math.abs(pa * pd - pb * pc) / Math.max(0.0001f, pa * pa + pc * pc);
+			float s = Math.abs(pa * pd - pb * pc) / Math.max(epsilon, pa * pa + pc * pc);
 			float sa = pa / skeleton.scaleX;
 			float sc = pc / skeleton.scaleY;
 			pb = -sc * s * skeleton.scaleX;
@@ -128,7 +128,7 @@ public class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 		default:
 			float x = targetX - p.worldX, y = targetY - p.worldY;
 			float d = pa * pd - pb * pc;
-			if (Math.abs(d) <= 0.0001f) {
+			if (Math.abs(d) <= epsilon) {
 				tx = 0;
 				ty = 0;
 			} else {
@@ -140,7 +140,7 @@ public class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 		if (bone.scaleX < 0) rotationIK += 180;
 		if (rotationIK > 180)
 			rotationIK -= 360;
-		else if (rotationIK < -180) //
+		else if (rotationIK <= -180) //
 			rotationIK += 360;
 		bone.rotation += rotationIK * mix;
 		if (compress || stretch) {
@@ -151,14 +151,14 @@ public class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 			}
 			}
 			float b = bone.bone.data.length * bone.scaleX;
-			if (b > 0.0001f) {
+			if (b > epsilon) {
 				float dd = tx * tx + ty * ty;
 				if ((compress && dd < b * b) || (stretch && dd > b * b)) {
 					float s = ((float)Math.sqrt(dd) / b - 1) * mix + 1;
 					bone.scaleX *= s;
 					switch (scaleYMode) {
 					case uniform -> bone.scaleY *= s;
-					case volume -> bone.scaleY /= s;
+					case volume -> bone.scaleY /= s < 0.7f ? 0.25f + 0.642857f * s : s;
 					}
 				}
 			}
@@ -194,7 +194,7 @@ public class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 		} else
 			os2 = 0;
 		float cwx, cwy, a = parent.a, b = parent.b, c = parent.c, d = parent.d;
-		boolean u = Math.abs(psx - psy) <= 0.0001f;
+		boolean u = Math.abs(psx - psy) <= epsilon;
 		if (!u || stretch) {
 			child.y = 0;
 			cwx = a * child.x + parent.worldX;
@@ -209,10 +209,10 @@ public class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 		c = pp.c;
 		d = pp.d;
 		float id = a * d - b * c, x = cwx - pp.worldX, y = cwy - pp.worldY;
-		id = Math.abs(id) <= 0.0001f ? 0 : 1 / id;
+		id = Math.abs(id) <= epsilon ? 0 : 1 / id;
 		float dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
 		float l1 = (float)Math.sqrt(dx * dx + dy * dy), l2 = child.bone.data.length * csx, a1, a2;
-		if (l1 < 0.0001f) {
+		if (l1 < epsilon) {
 			apply(skeleton, parent, targetX, targetY, false, stretch, ScaleYMode.none, mix);
 			child.rotation = 0;
 			return;
@@ -247,7 +247,7 @@ public class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 					parent.scaleX *= a;
 					switch (scaleYMode) {
 					case uniform -> parent.scaleY *= a;
-					case volume -> parent.scaleY /= a;
+					case volume -> parent.scaleY /= a < 0.7f ? 0.25f + 0.642857f * a : a;
 					}
 				}
 			} else
@@ -309,13 +309,13 @@ public class IkConstraint extends Constraint<IkConstraint, IkConstraintData, IkC
 		a1 = (a1 - os) * radDeg + os1 - parent.rotation;
 		if (a1 > 180)
 			a1 -= 360;
-		else if (a1 < -180) //
+		else if (a1 <= -180) //
 			a1 += 360;
 		parent.rotation += a1 * mix;
 		a2 = ((a2 + os) * radDeg - child.shearX) * s2 + os2 - child.rotation;
 		if (a2 > 180)
 			a2 -= 360;
-		else if (a2 < -180) //
+		else if (a2 <= -180) //
 			a2 += 360;
 		child.rotation += a2 * mix;
 	}

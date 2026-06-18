@@ -16,7 +16,8 @@ SPINE_C_API void spine_deform_timeline_dispose(spine_deform_timeline self);
 
 SPINE_C_API spine_rtti spine_deform_timeline_get_rtti(spine_deform_timeline self);
 SPINE_C_API void spine_deform_timeline_apply(spine_deform_timeline self, spine_skeleton skeleton, float lastTime, float time,
-											 /*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out, bool appliedPose);
+											 /*@null*/ spine_array_event events, float alpha, spine_mix_from from, bool add, bool out,
+											 bool appliedPose);
 /**
  * Sets the time and vertices for the specified frame.
  */

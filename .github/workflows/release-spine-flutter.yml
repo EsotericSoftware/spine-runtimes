@@ -1,0 +1,83 @@
+name: Release spine-flutter
+
+on:
+  push:
+    tags:
+      - 'spine-flutter-[0-9]+.[0-9]+.[0-9]+*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version, matching spine-flutter/pubspec.yaml (for example: 4.3.2)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  validate-spine-flutter:
+    name: Validate spine-flutter
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Set up Dart for pub.dev OIDC
+        uses: dart-lang/setup-dart@e51d8e571e22473a2ddebf0ef8a2123f0ab2c02c # v1
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 4.0.6
+          actions-cache-folder: emsdk-cache
+
+      - name: Verify release version
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            TAG="${GITHUB_REF_NAME}"
+            VERSION="${TAG#spine-flutter-}"
+            if [[ "$VERSION" == "$TAG" || -z "$VERSION" ]]; then
+              echo "Tag must use the form spine-flutter-<version>." >&2
+              exit 1
+            fi
+          else
+            VERSION="${{ inputs.version }}"
+          fi
+
+          FILE_VERSION=$(grep '^version:' spine-flutter/pubspec.yaml | awk '{print $2}')
+          if [[ "$FILE_VERSION" != "$VERSION" ]]; then
+            echo "Tag/input version ($VERSION) does not match spine-flutter/pubspec.yaml ($FILE_VERSION)." >&2
+            exit 1
+          fi
+          if [[ "$FILE_VERSION" == *-SNAPSHOT ]]; then
+            echo "Release version must not end in -SNAPSHOT: $FILE_VERSION" >&2
+            exit 1
+          fi
+
+      - name: Generate bindings and WebAssembly
+        working-directory: spine-flutter
+        run: ./generate-bindings.sh
+
+      - name: Run spine-flutter tests
+        working-directory: spine-flutter/test
+        run: |
+          dart run headless_test.dart
+          dart run skeleton_drawable_test.dart
+
+      - name: Verify generated spine-flutter source files are committed
+        run: git diff --exit-code -- spine-flutter ':!spine-flutter/lib/assets/libspine_flutter.wasm'
+
+      - name: Publish spine-flutter release
+        working-directory: spine-flutter
+        run: dart pub publish --force

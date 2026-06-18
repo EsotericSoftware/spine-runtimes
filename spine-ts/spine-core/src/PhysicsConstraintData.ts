@@ -28,7 +28,8 @@
  *****************************************************************************/
 
 import type { BoneData } from "./BoneData.js";
-import { ConstraintData } from "./ConstraintData.js";
+import type { BonePose } from "./BonePose.js";
+import { ConstraintData, ScaleYMode } from "./ConstraintData.js";
 import { PhysicsConstraint } from "./PhysicsConstraint.js";
 import { PhysicsConstraintPose } from "./PhysicsConstraintPose.js";
 import type { Skeleton } from "./Skeleton.js";
@@ -87,6 +88,17 @@ export class PhysicsConstraintData extends ConstraintData<PhysicsConstraint, Phy
 
 	/** True when this constraint's mix is controlled by global slider timelines. */
 	mixGlobal = false;
+
+	/** Determines how the {@link BonePose.scaleY} changes when {@link BonePose.scaleX} sets
+	 * {@link BonePose.scaleX}. */
+	private _scaleYMode = ScaleYMode.None;
+	get scaleYMode (): ScaleYMode {
+		return this._scaleYMode;
+	}
+	set scaleYMode (scaleYMode: ScaleYMode) {
+		if (scaleYMode == null) throw new Error("scaleYMode cannot be null.");
+		this._scaleYMode = scaleYMode;
+	}
 
 	constructor (name: string) {
 		super(name, new PhysicsConstraintPose());

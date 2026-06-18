@@ -61,8 +61,8 @@ void AttachmentTimeline::setAttachment(Skeleton &skeleton, SlotPose &pose, Strin
 	pose.setAttachment(attachmentName == NULL || attachmentName->isEmpty() ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName));
 }
 
-void AttachmentTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add,
-							   bool out, bool appliedPose) {
+void AttachmentTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixFrom from, bool add, bool out,
+							   bool appliedPose) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(events);
 	SP_UNUSED(alpha);
@@ -73,7 +73,7 @@ void AttachmentTimeline::apply(Skeleton &skeleton, float lastTime, float time, A
 	SlotPose &pose = appliedPose ? *slot->_appliedPose : slot->_pose;
 
 	if (out || time < _frames[0]) {
-		if (fromSetup) setAttachment(skeleton, pose, &slot->_data._attachmentName);
+		if (from != MixFrom_Current) setAttachment(skeleton, pose, &slot->_data._attachmentName);
 	} else {
 		setAttachment(skeleton, pose, &_attachmentNames[Animation::search(_frames, time)]);
 	}

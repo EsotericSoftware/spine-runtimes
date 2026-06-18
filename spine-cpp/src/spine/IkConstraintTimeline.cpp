@@ -53,7 +53,7 @@ IkConstraintTimeline::IkConstraintTimeline(size_t frameCount, size_t bezierCount
 IkConstraintTimeline::~IkConstraintTimeline() {
 }
 
-void IkConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add,
+void IkConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixFrom from, bool add,
 								 bool out, bool appliedPose) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(events);
@@ -64,13 +64,24 @@ void IkConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time,
 	IkConstraintPose &pose = appliedPose ? *constraint->_appliedPose : constraint->_pose;
 
 	if (time < _frames[0]) {
-		if (fromSetup) {
-			IkConstraintPose &setup = constraint->_data._setupPose;
-			pose._mix = setup._mix;
-			pose._softness = setup._softness;
-			pose._bendDirection = setup._bendDirection;
-			pose._compress = setup._compress;
-			pose._stretch = setup._stretch;
+		IkConstraintPose &setup = constraint->_data._setupPose;
+		switch (from) {
+			case MixFrom_Setup:
+				pose._mix = setup._mix;
+				pose._softness = setup._softness;
+				pose._bendDirection = setup._bendDirection;
+				pose._compress = setup._compress;
+				pose._stretch = setup._stretch;
+				break;
+			case MixFrom_First:
+				pose._mix += (setup._mix - pose._mix) * alpha;
+				pose._softness += (setup._softness - pose._softness) * alpha;
+				pose._bendDirection = setup._bendDirection;
+				pose._compress = setup._compress;
+				pose._stretch = setup._stretch;
+				break;
+			case MixFrom_Current:
+				break;
 		}
 		return;
 	}
@@ -99,11 +110,11 @@ void IkConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time,
 		}
 	}
 
-	IkConstraintPose &base = fromSetup ? constraint->_data._setupPose : pose;
+	IkConstraintPose &base = from == MixFrom_Setup ? constraint->_data._setupPose : pose;
 	pose._mix = base._mix + (mix - base._mix) * alpha;
 	pose._softness = base._softness + (softness - base._softness) * alpha;
 	if (out) {
-		if (fromSetup) {
+		if (from == MixFrom_Setup) {
 			pose._bendDirection = base._bendDirection;
 			pose._compress = base._compress;
 			pose._stretch = base._stretch;

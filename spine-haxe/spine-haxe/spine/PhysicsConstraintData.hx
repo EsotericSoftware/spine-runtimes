@@ -29,6 +29,8 @@
 
 package spine;
 
+import spine.ConstraintData.ScaleYMode;
+
 /** Stores the setup pose for a PhysicsConstraint.
  *
  * @see https://esotericsoftware.com/spine-physics-constraints Physics constraints in the Spine User Guide */
@@ -55,11 +57,21 @@ class PhysicsConstraintData extends ConstraintData<PhysicsConstraint, PhysicsCon
 	public var gravityGlobal = false;
 	public var mixGlobal = false;
 
+	/** Determines how BonePose.scaleY changes when PhysicsConstraintData.scaleX sets BonePose.scaleX. */
+	public var scaleYMode(default, set):ScaleYMode = ScaleYMode.none;
+
 	public function new(name:String) {
 		super(name, new PhysicsConstraintPose());
 	}
 
 	public function create(skeleton:Skeleton) {
 		return new PhysicsConstraint(this, skeleton);
+	}
+
+	public function set_scaleYMode(scaleYMode:ScaleYMode) {
+		if (scaleYMode == null)
+			throw new SpineException("scaleYMode cannot be null.");
+		this.scaleYMode = scaleYMode;
+		return scaleYMode;
 	}
 }

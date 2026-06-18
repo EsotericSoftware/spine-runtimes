@@ -110,7 +110,7 @@ void IkConstraint::apply(Skeleton &skeleton, BonePose &bone, float targetX, floa
 			ty = (targetY - bone._worldY) * MathUtil::sign(skeleton._scaleY);
 			break;
 		case Inherit_NoRotationOrReflection: {
-			float s = MathUtil::abs(pa * pd - pb * pc) / MathUtil::max(0.0001f, pa * pa + pc * pc);
+			float s = MathUtil::abs(pa * pd - pb * pc) / MathUtil::max(MathUtil::Epsilon, pa * pa + pc * pc);
 			float sa = pa / skeleton._scaleX;
 			float sc = pc / skeleton._scaleY;
 			pb = -sc * s * skeleton._scaleX;
@@ -121,7 +121,7 @@ void IkConstraint::apply(Skeleton &skeleton, BonePose &bone, float targetX, floa
 		default:
 			float x = targetX - p._worldX, y = targetY - p._worldY;
 			float d = pa * pd - pb * pc;
-			if (MathUtil::abs(d) <= 0.0001f) {
+			if (MathUtil::abs(d) <= MathUtil::Epsilon) {
 				tx = 0;
 				ty = 0;
 			} else {
@@ -133,7 +133,7 @@ void IkConstraint::apply(Skeleton &skeleton, BonePose &bone, float targetX, floa
 	if (bone._scaleX < 0) rotationIK += 180;
 	if (rotationIK > 180)
 		rotationIK -= 360;
-	else if (rotationIK < -180)//
+	else if (rotationIK <= -180)//
 		rotationIK += 360;
 	bone._rotation += rotationIK * mix;
 	if (compress || stretch) {
@@ -147,7 +147,7 @@ void IkConstraint::apply(Skeleton &skeleton, BonePose &bone, float targetX, floa
 				break;
 		}
 		float b = bone._bone->_data.getLength() * bone._scaleX;
-		if (b > 0.0001f) {
+		if (b > MathUtil::Epsilon) {
 			float dd = tx * tx + ty * ty;
 			if ((compress && dd < b * b) || (stretch && dd > b * b)) {
 				float s = (MathUtil::sqrt(dd) / b - 1) * mix + 1;
@@ -157,7 +157,7 @@ void IkConstraint::apply(Skeleton &skeleton, BonePose &bone, float targetX, floa
 						bone._scaleY *= s;
 						break;
 					case ScaleYMode_Volume:
-						bone._scaleY /= s;
+						bone._scaleY /= s < 0.7f ? 0.25f + 0.642857f * s : s;
 						break;
 					default:
 						break;
@@ -192,7 +192,7 @@ void IkConstraint::apply(Skeleton &skeleton, BonePose &parent, BonePose &child, 
 	} else
 		os2 = 0;
 	float cwx, cwy, a = parent._a, b = parent._b, c = parent._c, d = parent._d;
-	bool u = MathUtil::abs(psx - psy) <= 0.0001f;
+	bool u = MathUtil::abs(psx - psy) <= MathUtil::Epsilon;
 	if (!u || stretch) {
 		child._y = 0;
 		cwx = a * child._x + parent._worldX;
@@ -207,10 +207,10 @@ void IkConstraint::apply(Skeleton &skeleton, BonePose &parent, BonePose &child, 
 	c = pp._c;
 	d = pp._d;
 	float id = a * d - b * c, x = cwx - pp._worldX, y = cwy - pp._worldY;
-	id = MathUtil::abs(id) <= 0.0001f ? 0 : 1 / id;
+	id = MathUtil::abs(id) <= MathUtil::Epsilon ? 0 : 1 / id;
 	float dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
 	float l1 = MathUtil::sqrt(dx * dx + dy * dy), l2 = child._bone->_data.getLength() * csx, a1, a2;
-	if (l1 < 0.0001f) {
+	if (l1 < MathUtil::Epsilon) {
 		apply(skeleton, parent, targetX, targetY, false, stretch, ScaleYMode_None, mix);
 		child._rotation = 0;
 		return;
@@ -248,7 +248,7 @@ void IkConstraint::apply(Skeleton &skeleton, BonePose &parent, BonePose &child, 
 						parent._scaleY *= a;
 						break;
 					case ScaleYMode_Volume:
-						parent._scaleY /= a;
+						parent._scaleY /= a < 0.7f ? 0.25f + 0.642857f * a : a;
 						break;
 					default:
 						break;
@@ -314,13 +314,13 @@ outer_break:
 	a1 = (a1 - os) * MathUtil::Rad_Deg + os1 - parent._rotation;
 	if (a1 > 180)
 		a1 -= 360;
-	else if (a1 < -180)//
+	else if (a1 <= -180)//
 		a1 += 360;
 	parent._rotation += a1 * mix;
 	a2 = ((a2 + os) * MathUtil::Rad_Deg - child._shearX) * s2 + os2 - child._rotation;
 	if (a2 > 180)
 		a2 -= 360;
-	else if (a2 < -180)//
+	else if (a2 <= -180)//
 		a2 += 360;
 	child._rotation += a2 * mix;
 }

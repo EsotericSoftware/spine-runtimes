@@ -142,6 +142,17 @@ public class PhysicsConstraintData: PosedData, ConstraintData {
         }
     }
 
+    /// Determines how BonePose::getScaleY() changes when getScaleX() sets BonePose::getScaleX().
+    public var scaleYMode: ScaleYMode {
+        get {
+            let result = spine_physics_constraint_data_get_scale_y_mode(_ptr.assumingMemoryBound(to: spine_physics_constraint_data_wrapper.self))
+        return ScaleYMode(rawValue: Int32(result.rawValue))!
+        }
+        set {
+            spine_physics_constraint_data_set_scale_y_mode(_ptr.assumingMemoryBound(to: spine_physics_constraint_data_wrapper.self), spine_scale_y_mode(rawValue: UInt32(newValue.rawValue)))
+        }
+    }
+
     /// True when this constraint's inertia is controlled by global slider timelines.
     public var inertiaGlobal: Bool {
         get {

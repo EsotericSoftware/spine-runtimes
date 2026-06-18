@@ -33,15 +33,13 @@ using System;
 
 namespace Spine {
 	public static class MathUtils {
-		public const float PI = 3.1415927f;
-		public const float PI2 = PI * 2;
-		public const float HALF_PI = PI / 2;
+		public const float Epsilon = 0.00001f, EpsilonSq = Epsilon * Epsilon;
+		public const float PI = 3.1415927f, PI2 = PI * 2, InvPI2 = 1 / PI2;
+		public const float RadiansToDegrees = 180f / PI, RadDeg = RadiansToDegrees;
+		public const float DegreesToRadians = PI / 180, DegRad = DegreesToRadians;
 
-		public const float FLOAT_ROUNDING_ERROR = 0.000001f;
-
-		public const float InvPI2 = 1 / PI2;
-		public const float RadDeg = 180f / PI;
-		public const float DegRad = PI / 180;
+		public const float FloatRoundingError = 0.000001f;
+		public const float HalfPi = PI / 2;
 
 		static Random random = new Random();
 

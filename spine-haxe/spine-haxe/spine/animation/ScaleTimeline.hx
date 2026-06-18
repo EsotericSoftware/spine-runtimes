@@ -40,11 +40,14 @@ class ScaleTimeline extends BoneTimeline2 {
 		super(frameCount, bezierCount, boneIndex, Property.scaleX, Property.scaleY);
 	}
 
-	public function apply1(pose:BonePose, setup:BonePose, time:Float, alpha:Float, fromSetup:Bool, add:Bool, out:Bool) {
+	public function apply1(pose:BonePose, setup:BonePose, time:Float, alpha:Float, from:MixFrom, add:Bool, out:Bool) {
 		if (time < frames[0]) {
-			if (fromSetup) {
+			if (from == MixFrom.setup) {
 				pose.scaleX = setup.scaleX;
 				pose.scaleY = setup.scaleY;
+			} else if (from == MixFrom.first) {
+				pose.scaleX += (setup.scaleX - pose.scaleX) * alpha;
+				pose.scaleY += (setup.scaleY - pose.scaleY) * alpha;
 			}
 			return;
 		}
@@ -74,8 +77,8 @@ class ScaleTimeline extends BoneTimeline2 {
 			pose.scaleX = x;
 			pose.scaleY = y;
 		} else {
-			var bx:Float = fromSetup ? setup.scaleX : pose.scaleX;
-			var by:Float = fromSetup ? setup.scaleY : pose.scaleY;
+			var bx:Float = from == MixFrom.setup ? setup.scaleX : pose.scaleX;
+			var by:Float = from == MixFrom.setup ? setup.scaleY : pose.scaleY;
 			if (add) {
 				pose.scaleX = bx + (x - setup.scaleX) * alpha;
 				pose.scaleY = by + (y - setup.scaleY) * alpha;

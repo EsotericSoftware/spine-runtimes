@@ -17,9 +17,9 @@ spine_rtti spine_shear_y_timeline_get_rtti(spine_shear_y_timeline self) {
 }
 
 void spine_shear_y_timeline_apply(spine_shear_y_timeline self, spine_skeleton skeleton, float lastTime, float time,
-								  /*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out, bool appliedPose) {
+								  /*@null*/ spine_array_event events, float alpha, spine_mix_from from, bool add, bool out, bool appliedPose) {
 	ShearYTimeline *_self = (ShearYTimeline *) self;
-	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, fromSetup, add, out, appliedPose);
+	_self->apply(*((Skeleton *) skeleton), lastTime, time, (Array<Event *> *) events, alpha, (MixFrom) from, add, out, appliedPose);
 }
 
 int spine_shear_y_timeline_get_bone_index(spine_shear_y_timeline self) {
@@ -42,28 +42,32 @@ float spine_shear_y_timeline_get_curve_value(spine_shear_y_timeline self, float 
 	return _self->getCurveValue(time);
 }
 
-float spine_shear_y_timeline_get_relative_value(spine_shear_y_timeline self, float time, float alpha, bool fromSetup, bool add, float current,
+float spine_shear_y_timeline_get_relative_value(spine_shear_y_timeline self, float time, float alpha, spine_mix_from from, bool add, float current,
 												float setup) {
 	ShearYTimeline *_self = (ShearYTimeline *) self;
-	return _self->getRelativeValue(time, alpha, fromSetup, add, current, setup);
+	return _self->getRelativeValue(time, alpha, (MixFrom) from, add, current, setup);
 }
 
-float spine_shear_y_timeline_get_absolute_value_1(spine_shear_y_timeline self, float time, float alpha, bool fromSetup, bool add, float current,
+float spine_shear_y_timeline_get_absolute_value_1(spine_shear_y_timeline self, float time, float alpha, spine_mix_from from, bool add, float current,
 												  float setup) {
 	ShearYTimeline *_self = (ShearYTimeline *) self;
-	return _self->getAbsoluteValue(time, alpha, fromSetup, add, current, setup);
+	return _self->getAbsoluteValue(time, alpha, (MixFrom) from, add, current, setup);
 }
 
-float spine_shear_y_timeline_get_absolute_value_2(spine_shear_y_timeline self, float time, float alpha, bool fromSetup, bool add, float current,
+float spine_shear_y_timeline_get_absolute_value_2(spine_shear_y_timeline self, float time, float alpha, spine_mix_from from, bool add, float current,
 												  float setup, float value) {
 	ShearYTimeline *_self = (ShearYTimeline *) self;
-	return _self->getAbsoluteValue(time, alpha, fromSetup, add, current, setup, value);
+	return _self->getAbsoluteValue(time, alpha, (MixFrom) from, add, current, setup, value);
 }
 
-float spine_shear_y_timeline_get_scale_value(spine_shear_y_timeline self, float time, float alpha, bool fromSetup, bool add, bool out, float current,
-											 float setup) {
+float spine_shear_y_timeline_get_scale_value(spine_shear_y_timeline self, float time, float alpha, spine_mix_from from, bool add, bool out,
+											 float current, float setup) {
 	ShearYTimeline *_self = (ShearYTimeline *) self;
-	return _self->getScaleValue(time, alpha, fromSetup, add, out, current, setup);
+	return _self->getScaleValue(time, alpha, (MixFrom) from, add, out, current, setup);
+}
+
+float spine_shear_y_timeline_before_first_key(spine_mix_from from, float alpha, float current, float setup) {
+	return ShearYTimeline::beforeFirstKey((MixFrom) from, alpha, current, setup);
 }
 
 void spine_shear_y_timeline_set_linear(spine_shear_y_timeline self, size_t frame) {

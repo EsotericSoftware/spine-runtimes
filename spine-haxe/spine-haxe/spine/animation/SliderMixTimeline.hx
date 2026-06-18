@@ -38,12 +38,11 @@ class SliderMixTimeline extends ConstraintTimeline1 {
 		this.additive = true;
 	}
 
-	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, fromSetup:Bool, add:Bool, out:Bool,
-			appliedPose:Bool) {
+	public function apply(skeleton:Skeleton, lastTime:Float, time:Float, events:Array<Event>, alpha:Float, from:MixFrom, add:Bool, out:Bool, appliedPose:Bool) {
 		var constraint = cast(skeleton.constraints[constraintIndex], Slider);
 		if (constraint.active) {
 			var pose = appliedPose ? constraint.appliedPose : constraint.pose;
-			pose.mix = getAbsoluteValue(time, alpha, fromSetup, add, pose.mix, constraint.data.setupPose.mix);
+			pose.mix = getAbsoluteValue(time, alpha, from, add, pose.mix, constraint.data.setupPose.mix);
 		}
 	}
 }

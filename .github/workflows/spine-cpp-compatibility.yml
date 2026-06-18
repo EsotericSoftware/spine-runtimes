@@ -2,6 +2,8 @@ name: C++ Runtime Compatibility Test
 
 on:
   push:
+    branches:
+      - '**'
   workflow_dispatch:
 
 jobs:

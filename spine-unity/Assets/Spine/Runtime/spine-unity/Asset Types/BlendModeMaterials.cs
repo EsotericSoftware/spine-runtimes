@@ -57,11 +57,14 @@ namespace Spine.Unity {
 
 		public BlendMode BlendModeForMaterial (Material material) {
 			foreach (ReplacementMaterial pair in multiplyMaterials)
-				if (pair.material == material) return BlendMode.Multiply;
+				if (pair.material == material || (pair.material != null && pair.material.shader == material.shader))
+					return BlendMode.Multiply;
 			foreach (ReplacementMaterial pair in additiveMaterials)
-				if (pair.material == material) return BlendMode.Additive;
+				if (pair.material == material || (pair.material != null && pair.material.shader == material.shader))
+					return BlendMode.Additive;
 			foreach (ReplacementMaterial pair in screenMaterials)
-				if (pair.material == material) return BlendMode.Screen;
+				if (pair.material == material || (pair.material != null && pair.material.shader == material.shader))
+					return BlendMode.Screen;
 			return BlendMode.Normal;
 		}
 

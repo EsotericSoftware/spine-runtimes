@@ -35,7 +35,7 @@ class TranslateYTimeline extends BoneTimeline1 {
 		super(frameCount, bezierCount, boneIndex, Property.y);
 	}
 
-	public function apply1(pose:BonePose, setup:BonePose, time:Float, alpha:Float, fromSetup:Bool, add:Bool, out:Bool) {
-		pose.y = getRelativeValue(time, alpha, fromSetup, add, pose.y, setup.y);
+	public function apply1(pose:BonePose, setup:BonePose, time:Float, alpha:Float, from:MixFrom, add:Bool, out:Bool) {
+		pose.y = getRelativeValue(time, alpha, from, add, pose.y, setup.y);
 	}
 }

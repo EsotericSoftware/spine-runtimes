@@ -59,6 +59,7 @@
 
 #if NET_STANDARD_2_0 || NET_STANDARD_2_1 || NET_4_6
 #define HAS_MANUAL_RESET_EVENT_SLIM
+#define HAS_SYSTEM_THREADING_VOLATILE
 #endif
 
 #if USE_THREADED_SKELETON_UPDATE
@@ -237,6 +238,14 @@ namespace Spine.Unity {
 			set {
 				usedThreadCount = value;
 			}
+		}
+
+		static int VolatileRead (ref int location) {
+#if HAS_SYSTEM_THREADING_VOLATILE
+			return Volatile.Read(ref location);
+#else
+			return Thread.VolatileRead(ref location);
+#endif
 		}
 
 		/// <summary>
@@ -645,6 +654,12 @@ namespace Spine.Unity {
 				skeletonsLateUpdatedAtTask[t] = 0;
 			}
 #endif
+			if (exceptions == null) {
+				exceptions = new Exception[numThreads];
+				exceptionObjects = new UnityEngine.Object[numThreads];
+			}
+			numExceptionsSet = 0;
+
 			isProcessingRenderers = true;
 			MainThreadPrepareLateUpdate(endIndexThreaded);
 
@@ -702,11 +717,11 @@ namespace Spine.Unity {
 					int rendererStartIndex = partition.rangeStart;
 					int countAtTask = partition.rangeEndExclusive - rendererStartIndex;
 #if READ_VOLATILE_ONCE
-					int updatedAtWorkerThread = skeletonsLateUpdatedAtTask[t];
+					int updatedAtWorkerThread = VolatileRead(ref skeletonsLateUpdatedAtTask[t]);
 
 					while (mainThreadProcessedAtTask[t] < updatedAtWorkerThread) {
 #else
-					while (mainThreadProcessed[t] < skeletonsLateUpdatedAtThread[t]) {
+					while (mainThreadProcessedAtTask[t] < VolatileRead(ref skeletonsLateUpdatedAtTask[t])) {
 #endif
 						wasWorkAvailable = true;
 						int r = mainThreadProcessedAtTask[t] + rendererStartIndex;
@@ -719,7 +734,7 @@ namespace Spine.Unity {
 #if READ_VOLATILE_ONCE
 					if (updatedAtWorkerThread < countAtTask) {
 #else
-					if (skeletonsLateUpdatedAtThread[t] < countAtTask) {
+					if (VolatileRead(ref skeletonsLateUpdatedAtTask[t]) < countAtTask) {
 #endif
 						anySkeletonsLeft = true;
 					}

@@ -177,71 +177,67 @@ public class BonePose implements Pose<BonePose>, Update {
 			b = pa * lb + pb * ld;
 			c = pc * la + pd * lc;
 			d = pc * lb + pd * ld;
-			return;
 		}
 		case onlyTranslation -> {
+			float sx = skeleton.scaleX, sy = skeleton.scaleY;
 			float rx = (rotation + shearX) * degRad;
 			float ry = (rotation + 90 + shearY) * degRad;
-			a = cos(rx) * scaleX;
-			b = cos(ry) * scaleY;
-			c = sin(rx) * scaleX;
-			d = sin(ry) * scaleY;
+			a = cos(rx) * scaleX * sx;
+			b = cos(ry) * scaleY * sx;
+			c = sin(rx) * scaleX * sy;
+			d = sin(ry) * scaleY * sy;
 		}
 		case noRotationOrReflection -> {
-			float sx = 1 / skeleton.scaleX, sy = 1 / skeleton.scaleY;
-			pa *= sx;
-			pc *= sy;
-			float s = pa * pa + pc * pc, prx;
-			if (s > 0.0001f) {
-				s = Math.abs(pa * pd * sy - pb * sx * pc) / s;
+			float sx = skeleton.scaleX, sy = skeleton.scaleY, sxi = 1 / sx, syi = 1 / sy;
+			pa *= sxi;
+			pc *= syi;
+			float s = pa * pa + pc * pc, r;
+			if (s > epsilonSq) {
+				s = Math.abs(pa * pd * syi - pb * sxi * pc) / s;
 				pb = pc * s;
 				pd = pa * s;
-				prx = atan2Deg(pc, pa);
+				r = rotation - atan2Deg(pc, pa);
 			} else {
 				pa = 0;
 				pc = 0;
-				prx = 90 - atan2Deg(pd, pb);
+				r = rotation - 90 + atan2Deg(pd, pb);
 			}
-			float rx = (rotation + shearX - prx) * degRad;
-			float ry = (rotation + shearY - prx + 90) * degRad;
+			float rx = (r + shearX) * degRad;
+			float ry = (r + shearY + 90) * degRad;
 			float la = cos(rx) * scaleX;
 			float lb = cos(ry) * scaleY;
 			float lc = sin(rx) * scaleX;
 			float ld = sin(ry) * scaleY;
-			a = pa * la - pb * lc;
-			b = pa * lb - pb * ld;
-			c = pc * la + pd * lc;
-			d = pc * lb + pd * ld;
+			a = (pa * la - pb * lc) * sx;
+			b = (pa * lb - pb * ld) * sx;
+			c = (pc * la + pd * lc) * sy;
+			d = (pc * lb + pd * ld) * sy;
 		}
 		case noScale, noScaleOrReflection -> {
+			float sx = skeleton.scaleX, sy = skeleton.scaleY, sxi = 1 / sx, syi = 1 / sy;
 			float r = rotation * degRad, cos = cos(r), sin = sin(r);
-			float za = (pa * cos + pb * sin) / skeleton.scaleX;
-			float zc = (pc * cos + pd * sin) / skeleton.scaleY;
-			float s = (float)Math.sqrt(za * za + zc * zc);
-			if (s > 0.00001f) s = 1 / s;
+			float za = (pa * cos + pb * sin) * sxi;
+			float zc = (pc * cos + pd * sin) * syi;
+			float s = 1 / (float)Math.sqrt(za * za + zc * zc);
 			za *= s;
 			zc *= s;
-			s = (float)Math.sqrt(za * za + zc * zc);
-			if (inherit == Inherit.noScale && (pa * pd - pb * pc < 0) != (skeleton.scaleX < 0 != skeleton.scaleY < 0)) s = -s;
-			r = PI / 2 + atan2(zc, za);
-			float zb = cos(r) * s;
-			float zd = sin(r) * s;
+			float zb = -zc, zd = za;
+			if (inherit == Inherit.noScale && pa * pd - pb * pc < 0 != (sx < 0 != sy < 0)) {
+				zb = -zb;
+				zd = -zd;
+			}
 			float rx = shearX * degRad;
 			float ry = (90 + shearY) * degRad;
 			float la = cos(rx) * scaleX;
 			float lb = cos(ry) * scaleY;
 			float lc = sin(rx) * scaleX;
 			float ld = sin(ry) * scaleY;
-			a = za * la + zb * lc;
-			b = za * lb + zb * ld;
-			c = zc * la + zd * lc;
-			d = zc * lb + zd * ld;
+			a = (za * la + zb * lc) * sx;
+			b = (za * lb + zb * ld) * sx;
+			c = (zc * la + zd * lc) * sy;
+			d = (zc * lb + zd * ld) * sy;
 		}
 		}
-		a *= skeleton.scaleX;
-		b *= skeleton.scaleX;
-		c *= skeleton.scaleY;
-		d *= skeleton.scaleY;
 	}
 
 	/** Computes the local transform values from the world transform.
@@ -252,80 +248,112 @@ public class BonePose implements Pose<BonePose>, Update {
 		local = 0;
 		world = skeleton.update;
 
+		float sx = skeleton.scaleX, sy = skeleton.scaleY;
 		if (bone.parent == null) {
-			x = worldX - skeleton.x;
-			y = worldY - skeleton.y;
-			float a = this.a, b = this.b, c = this.c, d = this.d;
-			rotation = atan2Deg(c, a);
-			scaleX = (float)Math.sqrt(a * a + c * c);
-			scaleY = (float)Math.sqrt(b * b + d * d);
-			shearX = 0;
-			shearY = atan2Deg(a * b + c * d, a * d - b * c);
+			float sxi = 1 / sx, syi = 1 / sy;
+			x = (worldX - skeleton.x) * sxi;
+			y = (worldY - skeleton.y) * syi;
+			set(a * sxi, b * sxi, c * syi, d * syi, 0);
 			return;
 		}
 
 		BonePose parent = bone.parent.appliedPose;
 		float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
-		float pid = 1 / (pa * pd - pb * pc);
+		float pad = pa * pd - pb * pc, pid = 1 / pad;
 		float ia = pd * pid, ib = pb * pid, ic = pc * pid, id = pa * pid;
 		float dx = worldX - parent.worldX, dy = worldY - parent.worldY;
-		x = (dx * ia - dy * ib);
-		y = (dy * id - dx * ic);
+		x = dx * ia - dy * ib;
+		y = dy * id - dx * ic;
 
-		float ra, rb, rc, rd;
-		if (inherit == Inherit.onlyTranslation) {
-			ra = a;
-			rb = b;
-			rc = c;
-			rd = d;
-		} else {
-			switch (inherit) {
-			case noRotationOrReflection -> {
-				float s = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
-				pb = -pc * skeleton.scaleX * s / skeleton.scaleY;
-				pd = pa * skeleton.scaleY * s / skeleton.scaleX;
-				pid = 1 / (pa * pd - pb * pc);
-				ia = pd * pid;
-				ib = pb * pid;
-			}
-			case noScale, noScaleOrReflection -> {
-				float r = rotation * degRad, cos = cos(r), sin = sin(r);
-				pa = (pa * cos + pb * sin) / skeleton.scaleX;
-				pc = (pc * cos + pd * sin) / skeleton.scaleY;
-				float s = (float)Math.sqrt(pa * pa + pc * pc);
-				if (s > 0.00001f) s = 1 / s;
-				pa *= s;
-				pc *= s;
-				s = (float)Math.sqrt(pa * pa + pc * pc);
-				if (inherit == Inherit.noScale && pid < 0 != (skeleton.scaleX < 0 != skeleton.scaleY < 0)) s = -s;
-				r = PI / 2 + atan2(pc, pa);
-				pb = cos(r) * s;
-				pd = sin(r) * s;
-				pid = 1 / (pa * pd - pb * pc);
-				ia = pd * pid;
-				ib = pb * pid;
-				ic = pc * pid;
-				id = pa * pid;
-			}
-			}
-			ra = ia * a - ib * c;
-			rb = ia * b - ib * d;
-			rc = id * c - ic * a;
-			rd = id * d - ic * b;
+		switch (inherit) {
+		case normal -> set(ia * a - ib * c, ia * b - ib * d, id * c - ic * a, id * d - ic * b, 0);
+		case onlyTranslation -> {
+			float sxi = 1 / sx, syi = 1 / sy;
+			set(a * sxi, b * sxi, c * syi, d * syi, 0);
 		}
+		case noRotationOrReflection -> {
+			float sxi = 1 / sx, syi = 1 / sy;
+			pa *= sxi;
+			pc *= syi;
+			float wa = a * sxi, wb = b * sxi, wc = c * syi, wd = d * syi;
+			float s = 1 / (pa * pa + pc * pc), det = 1 / Math.abs(pad * sxi * syi);
+			set((pa * wa + pc * wc) * s, (pa * wb + pc * wd) * s, (pa * wc - pc * wa) * det, (pa * wd - pc * wb) * det,
+				atan2Deg(pc, pa));
+		}
+		case noScale, noScaleOrReflection -> {
+			float sxi = 1 / sx, syi = 1 / sy;
+			float wa = a * sxi, wb = b * sxi, wc = c * syi, wd = d * syi;
+			float tx = pd * a - pb * c, ty = pa * c - pc * a;
+			if (pad < 0) {
+				tx = -tx;
+				ty = -ty;
+			}
+			float r = atan2Deg(ty, tx);
+			rotation = r;
+			r *= degRad;
+			float cos = cos(r), sin = sin(r);
+			float za = (pa * cos + pb * sin) * sxi;
+			float zc = (pc * cos + pd * sin) * syi;
+			float s = 1 / (float)Math.sqrt(za * za + zc * zc);
+			za *= s;
+			zc *= s;
+			float si = inherit == Inherit.noScale && pad < 0 != (sx < 0 != sy < 0) ? -1 : 1;
+			set(za * wa + zc * wc, za * wb + zc * wd, (za * wc - zc * wa) * si, (za * wd - zc * wb) * si);
+		}
+		}
+	}
 
+	private void set (float ra, float rb, float rc, float rd) {
+		float x = ra * ra + rc * rc, y = rb * rb + rd * rd;
+		if (x > epsilonSq) {
+			shearX = atan2Deg(rc, ra);
+			scaleX = (float)Math.sqrt(x);
+		} else {
+			shearX = 0;
+			scaleX = 0;
+		}
+		scaleY = (float)Math.sqrt(y);
+		if (y > epsilonSq) {
+			shearY = atan2Deg(rd, rb);
+			if (ra * rd - rb * rc < 0) {
+				scaleY = -scaleY;
+				shearY += 90;
+			} else
+				shearY -= 90;
+			if (shearY > 180)
+				shearY -= 360;
+			else if (shearY <= -180) //
+				shearY += 360;
+		} else
+			shearY = 0;
+	}
+
+	private void set (float ra, float rb, float rc, float rd, float ro) {
 		shearX = 0;
-		scaleX = (float)Math.sqrt(ra * ra + rc * rc);
-		if (scaleX > 0.0001f) {
-			float det = ra * rd - rb * rc;
-			scaleY = det / scaleX;
-			shearY = -atan2Deg(ra * rb + rc * rd, det);
-			rotation = atan2Deg(rc, ra);
+		float x = ra * ra + rc * rc, y = rb * rb + rd * rd;
+		if (x > epsilonSq) {
+			float r = atan2Deg(rc, ra);
+			rotation = r + ro;
+			scaleX = (float)Math.sqrt(x);
+			scaleY = (float)Math.sqrt(y);
+			if (y > epsilonSq) {
+				shearY = atan2Deg(rd, rb);
+				if (ra * rd - rb * rc < 0) {
+					scaleY = -scaleY;
+					shearY += 90 - r;
+				} else
+					shearY -= 90 + r;
+				if (shearY > 180)
+					shearY -= 360;
+				else if (shearY <= -180) //
+					shearY += 360;
+			} else
+				shearY = 0;
 		} else {
 			scaleX = 0;
-			scaleY = (float)Math.sqrt(rb * rb + rd * rd);
+			scaleY = (float)Math.sqrt(y);
 			shearY = 0;
-			rotation = 90 - atan2Deg(rd, rb);
+			rotation = y > epsilonSq ? atan2Deg(rd, rb) - 90 + ro : ro;
 		}
 	}
 

@@ -349,7 +349,7 @@ export class ToShearY extends ToProperty {
 			if (additive)
 				value -= MathUtils.PI / 2;
 			else {
-				value -= by - Math.atan2(bone.c / sx, bone.a / sy);
+				value -= by - Math.atan2(bone.c / sy, bone.a / sx);
 				if (value > MathUtils.PI)
 					value -= MathUtils.PI2;
 				else if (value < -MathUtils.PI)
@@ -357,8 +357,8 @@ export class ToShearY extends ToProperty {
 			}
 			value = by + value * pose.mixShearY;
 			const s = Math.sqrt(b * b + d * d);
-			bone.b = Math.cos(value) * s * sy;
-			bone.d = Math.sin(value) * s * sx;
+			bone.b = Math.cos(value) * s * sx;
+			bone.d = Math.sin(value) * s * sy;
 		}
 	}
 }

@@ -54,14 +54,14 @@ BoneTimeline1::BoneTimeline1(size_t frameCount, size_t bezierCount, int boneInde
 	_additive = true;
 }
 
-void BoneTimeline1::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+void BoneTimeline1::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixFrom from, bool add, bool out,
 						  bool appliedPose) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(events);
 
 	Bone *bone = skeleton._bones[_boneIndex];
 	if (bone->isActive()) {
-		_apply(appliedPose ? *bone->_appliedPose : bone->_pose, bone->_data._setupPose, time, alpha, fromSetup, add, out);
+		_apply(appliedPose ? *bone->_appliedPose : bone->_pose, bone->_data._setupPose, time, alpha, from, add, out);
 	}
 }
 
@@ -74,14 +74,14 @@ BoneTimeline2::BoneTimeline2(size_t frameCount, size_t bezierCount, int boneInde
 	_additive = true;
 }
 
-void BoneTimeline2::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+void BoneTimeline2::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixFrom from, bool add, bool out,
 						  bool appliedPose) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(events);
 
 	Bone *bone = skeleton._bones[_boneIndex];
 	if (bone->isActive()) {
-		_apply(appliedPose ? *bone->_appliedPose : bone->_pose, bone->_data._setupPose, time, alpha, fromSetup, add, out);
+		_apply(appliedPose ? *bone->_appliedPose : bone->_pose, bone->_data._setupPose, time, alpha, from, add, out);
 	}
 }
 

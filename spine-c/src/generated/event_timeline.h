@@ -18,7 +18,8 @@ SPINE_C_API spine_rtti spine_event_timeline_get_rtti(spine_event_timeline self);
  * Fires events for frames > lastTime and < = time.
  */
 SPINE_C_API void spine_event_timeline_apply(spine_event_timeline self, spine_skeleton skeleton, float lastTime, float time,
-											/*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out, bool appliedPose);
+											/*@null*/ spine_array_event events, float alpha, spine_mix_from from, bool add, bool out,
+											bool appliedPose);
 SPINE_C_API size_t spine_event_timeline_get_frame_count(spine_event_timeline self);
 /**
  * The event for each frame.

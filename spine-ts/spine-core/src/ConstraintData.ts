@@ -27,6 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+import type { BonePose } from "./BonePose.js";
 import type { Constraint } from "./Constraint.js";
 import type { Pose } from "./Pose.js";
 import { PosedData } from "./PosedData.js";
@@ -43,4 +44,14 @@ export abstract class ConstraintData<
 	}
 
 	abstract create (skeleton: Skeleton): T;
+}
+
+/** Determines how the {@link BonePose.scaleY} changes when {@link BonePose.scaleX} is set. */
+export enum ScaleYMode {
+	/** scaleY is not changed. */
+	None,
+	/** scaleY is multiplied by the scaleX factor, preserving the bone's aspect ratio. */
+	Uniform,
+	/** scaleY is divided by the scaleX factor, preserving the bone's area. */
+	Volume
 }

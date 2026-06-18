@@ -48,7 +48,7 @@ namespace Spine {
 			return empty;
 		}
 
-		internal const int Subsequent = 0, First = 1, Hold = 2, HoldFirst = 3, Setup = 1, Retain = 2;
+		internal const int Current = 0, Setup = 1, First = 2, Mode = 3, Hold = 4, AttachSetup = 1, AttachRetain = 2;
 
 		protected AnimationStateData data;
 		private readonly ExposedList<TrackEntry> tracks = new ExposedList<TrackEntry>();
@@ -91,7 +91,7 @@ namespace Spine {
 
 		// end of difference
 		private readonly EventQueue queue; // Initialized by constructor.
-		private readonly HashSet<ulong> propertyIds = new HashSet<ulong>();
+		private readonly Dictionary<ulong, TrackEntry> propertyIds = new Dictionary<ulong, TrackEntry>();
 		private bool animationsChanged;
 		private float timeScale = 1;
 		private int unkeyedState;
@@ -236,9 +236,9 @@ namespace Spine {
 					for (int ii = 0; ii < timelineCount; ii++) {
 						Timeline timeline = timelines[ii];
 						if (timeline is AttachmentTimeline)
-							ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, true, true);
+							ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, MixFrom.Setup, true);
 						else {
-							timeline.Apply(skeleton, animationLast, applyTime, applyEvents, alpha, true, false, false, false);
+							timeline.Apply(skeleton, animationLast, applyTime, applyEvents, alpha, MixFrom.Setup, false, false, false);
 						}
 					}
 				} else {
@@ -252,15 +252,14 @@ namespace Spine {
 
 					for (int ii = 0; ii < timelineCount; ii++) {
 						Timeline timeline = timelines[ii];
-						bool fromSetup = (timelineMode[ii] & AnimationState.First) != 0;
+						MixFrom from = (MixFrom)(timelineMode[ii] & Mode);
 						RotateTimeline rotateTimeline = timeline as RotateTimeline;
 						if (!shortestRotation && rotateTimeline != null)
-							ApplyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, fromSetup, timelinesRotation,
-												ii << 1, firstFrame);
+							ApplyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, from, timelinesRotation, ii << 1, firstFrame);
 						else if (timeline is AttachmentTimeline)
-							ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, fromSetup, retainAttachments);
+							ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, from, retainAttachments);
 						else
-							timeline.Apply(skeleton, animationLast, applyTime, applyEvents, alpha, fromSetup, add, false, false);
+							timeline.Apply(skeleton, animationLast, applyTime, applyEvents, alpha, from, add, false, false);
 					}
 				}
 				if (current.reverse) EventsReverse(current, animationLast, animationTime);
@@ -271,7 +270,7 @@ namespace Spine {
 			}
 
 			// Set slot attachments to the setup pose if they were set temporarily to apply deform timelines.
-			int setupState = unkeyedState + Setup;
+			int setupState = unkeyedState + AttachSetup;
 			Slot[] slots = skeleton.slots.Items;
 			for (int i = 0, n = skeleton.slots.Count; i < n; i++) {
 				Slot slot = slots[i];
@@ -318,7 +317,7 @@ namespace Spine {
 					for (int ii = 0; ii < timelineCount; ii++) {
 						Timeline timeline = timelines[ii];
 						if (timeline is EventTimeline)
-							timeline.Apply(skeleton, animationLast, applyTime, applyEvents, 1.0f, true, false, false, false);
+							timeline.Apply(skeleton, animationLast, applyTime, applyEvents, 1.0f, (MixFrom)0, false, false, false);
 					}
 					if (current.reverse) EventsReverse(current, animationLast, animationTime);
 					QueueEvents(current, animationTime);
@@ -363,27 +362,27 @@ namespace Spine {
 			for (int i = 0; i < timelineCount; i++) {
 				Timeline timeline = timelines[i];
 				int mode = timelineMode[i];
+				MixFrom mixFrom = (MixFrom)(mode & Mode);
 				float alpha;
 				if ((mode & AnimationState.Hold) != 0) {
 					TrackEntry holdMix = timelineHoldMix[i];
 					alpha = holdMix == null ? alphaHold : alphaHold * (1 - holdMix.Mix());
 				} else {
-					if (!drawOrder && timeline is DrawOrderTimeline) continue;
+					if (!drawOrder && timeline is DrawOrderTimeline && mixFrom == MixFrom.Current) continue;
 					alpha = alphaMix;
 				}
 
 				from.totalAlpha += alpha;
-				bool fromSetup = (mode & AnimationState.First) != 0;
 				RotateTimeline rotateTimeline = timeline as RotateTimeline;
 				if (!shortestRotation && rotateTimeline != null) {
-					ApplyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, fromSetup, timelinesRotation, i << 1,
+					ApplyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, mixFrom, timelinesRotation, i << 1,
 						firstFrame);
 				} else if (timeline is AttachmentTimeline) {
-					ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, fromSetup,
+					ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, mixFrom,
 						retainAttachments && alpha >= from.alphaAttachmentThreshold);
 				} else {
-					bool mixOut = !drawOrder || !(timeline is DrawOrderTimeline) || !fromSetup;
-					timeline.Apply(skeleton, animationLast, applyTime, events, alpha, fromSetup, add, mixOut, false);
+					bool mixOut = !drawOrder || !(timeline is DrawOrderTimeline) || mixFrom == MixFrom.Current;
+					timeline.Apply(skeleton, animationLast, applyTime, events, alpha, mixFrom, add, mixOut, false);
 				}
 			}
 
@@ -420,7 +419,7 @@ namespace Spine {
 					for (int i = 0; i < timelineCount; i++) {
 						Timeline timeline = timelines[i];
 						if (timeline is EventTimeline)
-							timeline.Apply(skeleton, animationLast, applyTime, events, 0, true, false, true, false);
+							timeline.Apply(skeleton, animationLast, applyTime, events, 0, (MixFrom)0, false, true, false);
 					}
 					if (from.reverse) EventsReverse(from, animationLast, animationTime);
 				}
@@ -435,12 +434,12 @@ namespace Spine {
 
 		/// <summary> Applies the attachment timeline and sets <see cref="Slot.attachmentState"/>.</summary>
 		/// <param name="retain">True if the attachment remains after apply, false if temporary for deform timelines.</param>
-		private void ApplyAttachmentTimeline (AttachmentTimeline timeline, Skeleton skeleton, float time, bool fromSetup,
+		private void ApplyAttachmentTimeline (AttachmentTimeline timeline, Skeleton skeleton, float time, MixFrom from,
 			bool retain) {
 
 			Slot slot = skeleton.slots.Items[timeline.SlotIndex];
 			if (!slot.bone.active) return;
-			if (!retain && slot.attachmentState == unkeyedState + Retain) return;
+			if (!retain && slot.attachmentState == unkeyedState + AttachRetain) return;
 
 			bool setup = time < timeline.frames[0];
 			string name = null;
@@ -449,26 +448,26 @@ namespace Spine {
 				setup = !retain && name == null;
 			}
 			if (setup) {
-				if (!fromSetup) return;
+				if (from == MixFrom.Current) return;
 				name = slot.data.attachmentName;
 			}
 			slot.pose.Attachment = name == null ? null : skeleton.GetAttachment(slot.data.index, name);
 			if (retain)
-				slot.attachmentState = unkeyedState + Retain;
+				slot.attachmentState = unkeyedState + AttachRetain;
 			else if (!setup) //
-				slot.attachmentState = unkeyedState + Setup;
+				slot.attachmentState = unkeyedState + AttachSetup;
 		}
 
 		/// <summary>
 		/// Applies the rotate timeline, mixing with the current pose while keeping the same rotation direction chosen as the shortest
 		/// the first time the mixing was applied.</summary>
-		static private void ApplyRotateTimeline (RotateTimeline timeline, Skeleton skeleton, float time, float alpha, bool fromSetup,
+		static private void ApplyRotateTimeline (RotateTimeline timeline, Skeleton skeleton, float time, float alpha, MixFrom from,
 			float[] timelinesRotation, int i, bool firstFrame) {
 
 			if (firstFrame) timelinesRotation[i] = 0;
 
 			if (alpha == 1) {
-				timeline.Apply(skeleton, 0, time, null, 1, fromSetup, false, false, false);
+				timeline.Apply(skeleton, 0, time, null, 1, from, false, false, false);
 				return;
 			}
 
@@ -476,12 +475,23 @@ namespace Spine {
 			if (!bone.active) return;
 			BonePose pose = bone.pose, setup = bone.data.setupPose;
 			float[] frames = timeline.frames;
-			if (time < frames[0]) { // Time is before first frame.
-				if (fromSetup) pose.rotation = setup.rotation;
-				return;
+			float r1, r2;
+			if (time < frames[0]) {
+				switch (from) {
+				case MixFrom.Setup: {
+					pose.rotation = setup.rotation;
+					return;
+				}
+				case MixFrom.Current: {
+					return;
+				}
+				}
+				r1 = pose.rotation;
+				r2 = setup.rotation;
+			} else {
+				r1 = from == MixFrom.Setup ? setup.rotation : pose.rotation;
+				r2 = setup.rotation + timeline.GetCurveValue(time);
 			}
-			float r1 = fromSetup ? setup.rotation : pose.rotation;
-			float r2 = setup.rotation + timeline.GetCurveValue(time);
 
 			// Mix between rotations using the direction of the shortest route on the first frame.
 			float total, diff = r2 - r1;
@@ -854,25 +864,25 @@ namespace Spine {
 			int n = tracks.Count;
 			TrackEntry[] tracksItems = tracks.Items;
 			for (int i = 0; i < n; i++) {
-				TrackEntry entry = tracksItems[i];
-				if (entry == null) continue;
+				TrackEntry track = tracksItems[i];
+				if (track == null) continue;
+				TrackEntry entry = track;
 				while (entry.mixingFrom != null) // Move to last entry, then iterate in reverse.
 					entry = entry.mixingFrom;
 				do {
-					ComputeHold(entry);
+					ComputeHold(entry, track);
 					entry = entry.mixingTo;
 				} while (entry != null);
 			}
 			propertyIds.Clear();
 		}
 
-		private void ComputeHold (TrackEntry entry) {
+		private void ComputeHold (TrackEntry entry, TrackEntry track) {
 			Timeline[] timelines = entry.animation.timelines.Items;
 			int timelinesCount = entry.animation.timelines.Count;
 			int[] timelineMode = entry.timelineMode.EnsureSize(timelinesCount).Items;
 			entry.timelineHoldMix.Clear();
 			TrackEntry[] timelineHoldMix = entry.timelineHoldMix.Resize(timelinesCount).Items;
-			HashSet<ulong> propertyIds = this.propertyIds;
 
 			bool add = entry.additive, keepHold = entry.keepHold;
 			TrackEntry to = entry.mixingTo;
@@ -881,27 +891,18 @@ namespace Spine {
 			for (int i = 0; i < timelinesCount; i++) {
 				Timeline timeline = timelines[i];
 				ulong[] ids = timeline.propertyIds;
-				bool first = propertyIds.AddAll(ids)
-						&& !(timeline is DrawOrderFolderTimeline && propertyIds.Contains(DrawOrderTimeline.propertyID));
+				int from = From(track, timeline, ids);
 				if (add && timeline.additive) {
-					timelineMode[i] = first ? AnimationState.First : AnimationState.Subsequent;
+					timelineMode[i] = from;
 					continue;
-				}
-
-				for (TrackEntry from = entry.mixingFrom; from != null; from = from.mixingFrom) {
-					if (from.animation.HasTimeline(ids)) {
-						// An earlier entry on this track keys this property, isolating it from lower tracks.
-						timelineMode[i] = AnimationState.Subsequent;
-						goto continue_outer; // continue outer;
-					}
 				}
 
 				// Hold if the next entry will overwrite this property.
 				int mode;
 				if (to == null || timeline.instant || (to.additive && timeline.additive) || !to.animation.HasTimeline(ids))
-					mode = first ? AnimationState.First : AnimationState.Subsequent;
+					mode = from;
 				else {
-					mode = first ? AnimationState.HoldFirst : AnimationState.Hold;
+					mode = from | AnimationState.Hold;
 					// Find next entry that doesn't overwrite this property. Its mix fades out the hold, instead of it ending abruptly.
 					for (TrackEntry next = to.mixingTo; next != null; next = next.mixingTo) {
 						if ((next.additive && timeline.additive) || !next.animation.HasTimeline(ids)) {
@@ -912,8 +913,38 @@ namespace Spine {
 				}
 				if (keepHold) mode = (mode & ~AnimationState.Hold) | (timelineMode[i] & AnimationState.Hold);
 				timelineMode[i] = mode;
-				continue_outer: { }
 			}
+		}
+
+		private int From (TrackEntry track, Timeline timeline, ulong[] ids) {
+			Dictionary<ulong, TrackEntry> propertyIds = this.propertyIds;
+			int from = AnimationState.Setup;
+			for (int i = 0, n = ids.Length; i < n; i++) {
+				TrackEntry owner = PutMissing(propertyIds, ids[i], track);
+				if (owner != null) {
+					if (owner != track) {
+						while (++i < n)
+							PutMissing(propertyIds, ids[i], track);
+						return AnimationState.Current;
+					}
+					from = AnimationState.First;
+				}
+			}
+			if (timeline is DrawOrderFolderTimeline) {
+				TrackEntry first;
+				bool found = propertyIds.TryGetValue(DrawOrderTimeline.propertyID, out first);
+				if (found) return first != track ? AnimationState.Current : AnimationState.First;
+			}
+			return from;
+		}
+
+		private static TValue PutMissing<TKey, TValue> (Dictionary<TKey, TValue> map, TKey key, TValue value) {
+			TValue existing;
+			if (!map.TryGetValue(key, out existing)) {
+				map.Add(key, value);
+				return default(TValue);
+			}
+			return existing;
 		}
 
 		/// <summary>Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing.</summary>
@@ -1014,8 +1045,8 @@ namespace Spine {
 		/// <summary>
 		/// For each timeline:
 		/// <list type="bullet">
-		/// <item>Bit 0, First: 0 = mix from current pose, 1 = mix from setup pose. Timeline is first to set the property.</item>
-		/// <item>Bit 1, Hold: 0 = mix out using alphaMix, 1 = apply full alpha to prevent dipping. Timeline is first on its track to
+		/// <item>Bits 0-1: MixFrom.</item>
+		/// <item>Bit 2, HOLD: 0 = mix out using alphaMix, 1 = apply full alpha to prevent dipping. Timeline is first on its track to
 		/// set the property and the next entry (mixingTo) also sets it. When held, timelineHoldMix's mix controls how the hold fades
 		/// out (for 3+ entry chains where the chain eventually stops setting the property).</item>
 		/// </list>

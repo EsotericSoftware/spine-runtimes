@@ -147,71 +147,65 @@ class BonePose implements Pose<BonePose> implements Update {
 				b = pa * lb + pb * ld;
 				c = pc * la + pd * lc;
 				d = pc * lb + pd * ld;
-				return;
 			case Inherit.onlyTranslation:
+				var sx = skeleton.scaleX, sy = skeleton.scaleY;
 				var rx = (rotation + shearX) * MathUtils.degRad;
 				var ry = (rotation + 90 + shearY) * MathUtils.degRad;
-				a = Math.cos(rx) * scaleX;
-				b = Math.cos(ry) * scaleY;
-				c = Math.sin(rx) * scaleX;
-				d = Math.sin(ry) * scaleY;
+				a = Math.cos(rx) * scaleX * sx;
+				b = Math.cos(ry) * scaleY * sx;
+				c = Math.sin(rx) * scaleX * sy;
+				d = Math.sin(ry) * scaleY * sy;
 			case Inherit.noRotationOrReflection:
-				var sx = 1 / skeleton.scaleX, sy = 1 / skeleton.scaleY;
-				pa *= sx;
-				pc *= sy;
-				var s = pa * pa + pc * pc, prx:Float;
-				if (s > 0.0001) {
-					s = Math.abs(pa * pd * sy - pb * sx * pc) / s;
+				var sx = skeleton.scaleX, sy = skeleton.scaleY, sxi = 1 / sx, syi = 1 / sy;
+				pa *= sxi;
+				pc *= syi;
+				var s = pa * pa + pc * pc, r:Float;
+				if (s > MathUtils.epsilon2) {
+					s = Math.abs(pa * pd * syi - pb * sxi * pc) / s;
 					pb = pc * s;
 					pd = pa * s;
-					prx = MathUtils.atan2Deg(pc, pa);
+					r = rotation - MathUtils.atan2Deg(pc, pa);
 				} else {
 					pa = 0;
 					pc = 0;
-					prx = 90 - MathUtils.atan2Deg(pd, pb);
+					r = rotation - 90 + MathUtils.atan2Deg(pd, pb);
 				}
-				var rx = (rotation + shearX - prx) * MathUtils.degRad;
-				var ry = (rotation + shearY - prx + 90) * MathUtils.degRad;
+				var rx = (r + shearX) * MathUtils.degRad;
+				var ry = (r + shearY + 90) * MathUtils.degRad;
 				var la = Math.cos(rx) * scaleX;
 				var lb = Math.cos(ry) * scaleY;
 				var lc = Math.sin(rx) * scaleX;
 				var ld = Math.sin(ry) * scaleY;
-				a = pa * la - pb * lc;
-				b = pa * lb - pb * ld;
-				c = pc * la + pd * lc;
-				d = pc * lb + pd * ld;
+				a = (pa * la - pb * lc) * sx;
+				b = (pa * lb - pb * ld) * sx;
+				c = (pc * la + pd * lc) * sy;
+				d = (pc * lb + pd * ld) * sy;
 			case Inherit.noScale, Inherit.noScaleOrReflection:
+				var sx = skeleton.scaleX, sy = skeleton.scaleY, sxi = 1 / sx, syi = 1 / sy;
 				var r = rotation * MathUtils.degRad,
 					cos = Math.cos(r),
 					sin = Math.sin(r);
-				var za = (pa * cos + pb * sin) / skeleton.scaleX;
-				var zc = (pc * cos + pd * sin) / skeleton.scaleY;
-				var s = Math.sqrt(za * za + zc * zc);
-				if (s > 0.00001)
-					s = 1 / s;
+				var za = (pa * cos + pb * sin) * sxi;
+				var zc = (pc * cos + pd * sin) * syi;
+				var s = 1 / Math.sqrt(za * za + zc * zc);
 				za *= s;
 				zc *= s;
-				s = Math.sqrt(za * za + zc * zc);
-				if (inherit == Inherit.noScale && ((pa * pd - pb * pc < 0) != ((skeleton.scaleX < 0) != (skeleton.scaleY < 0))))
-					s = -s;
-				r = Math.PI / 2 + Math.atan2(zc, za);
-				var zb:Float = Math.cos(r) * s;
-				var zd:Float = Math.sin(r) * s;
+				var zb = -zc, zd = za;
+				if (inherit == Inherit.noScale && ((pa * pd - pb * pc < 0) != ((sx < 0) != (sy < 0)))) {
+					zb = -zb;
+					zd = -zd;
+				}
 				var rx = shearX * MathUtils.degRad;
 				var ry = (90 + shearY) * MathUtils.degRad;
 				var la = Math.cos(rx) * scaleX;
 				var lb = Math.cos(ry) * scaleY;
 				var lc = Math.sin(rx) * scaleX;
 				var ld = Math.sin(ry) * scaleY;
-				a = za * la + zb * lc;
-				b = za * lb + zb * ld;
-				c = zc * la + zd * lc;
-				d = zc * lb + zd * ld;
+				a = (za * la + zb * lc) * sx;
+				b = (za * lb + zb * ld) * sx;
+				c = (zc * la + zd * lc) * sy;
+				d = (zc * lb + zd * ld) * sy;
 		}
-		a *= skeleton.scaleX;
-		b *= skeleton.scaleX;
-		c *= skeleton.scaleY;
-		d *= skeleton.scaleY;
 	}
 
 	/** Computes the applied transform values from the world transform.
@@ -226,81 +220,110 @@ class BonePose implements Pose<BonePose> implements Update {
 		local = 0;
 		world = skeleton._update;
 
+		var sx = skeleton.scaleX, sy = skeleton.scaleY;
 		if (bone.parent == null) {
-			x = worldX - skeleton.x;
-			y = worldY - skeleton.y;
-			rotation = MathUtils.atan2Deg(c, a);
-			scaleX = Math.sqrt(a * a + c * c);
-			scaleY = Math.sqrt(b * b + d * d);
-			shearX = 0;
-			shearY = MathUtils.atan2Deg(a * b + c * d, a * d - b * c);
+			var sxi = 1 / sx, syi = 1 / sy;
+			x = (worldX - skeleton.x) * sxi;
+			y = (worldY - skeleton.y) * syi;
+			set5(a * sxi, b * sxi, c * syi, d * syi, 0);
 			return;
 		}
 
 		var parent = bone.parent.appliedPose;
 		var pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
-		var pid:Float = 1 / (pa * pd - pb * pc);
+		var pad = pa * pd - pb * pc, pid = 1 / pad;
 		var ia = pd * pid, ib = pb * pid, ic = pc * pid, id = pa * pid;
 		var dx = worldX - parent.worldX, dy = worldY - parent.worldY;
-		x = (dx * ia - dy * ib);
-		y = (dy * id - dx * ic);
+		x = dx * ia - dy * ib;
+		y = dy * id - dx * ic;
 
-		var ra:Float, rb:Float, rc:Float, rd:Float;
-		if (inherit == Inherit.onlyTranslation) {
-			ra = a;
-			rb = b;
-			rc = c;
-			rd = d;
-		} else {
-			switch (inherit) {
-				case Inherit.noRotationOrReflection:
-					var s = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
-					pb = -pc * skeleton.scaleX * s / skeleton.scaleY;
-					pd = pa * skeleton.scaleY * s / skeleton.scaleX;
-					pid = 1 / (pa * pd - pb * pc);
-					ia = pd * pid;
-					ib = pb * pid;
-				case Inherit.noScale, Inherit.noScaleOrReflection:
-					var r = rotation * MathUtils.degRad,
-						cos = Math.cos(r),
-						sin = Math.sin(r);
-					pa = (pa * cos + pb * sin) / skeleton.scaleX;
-					pc = (pc * cos + pd * sin) / skeleton.scaleY;
-					var s = Math.sqrt(pa * pa + pc * pc);
-					if (s > 0.00001)
-						s = 1 / s;
-					pa *= s;
-					pc *= s;
-					s = Math.sqrt(pa * pa + pc * pc);
-					if (inherit == Inherit.noScale && (pid < 0 != ((skeleton.scaleX < 0) != (skeleton.scaleY < 0))))
-						s = -s;
-					r = MathUtils.PI / 2 + Math.atan2(pc, pa);
-					pb = Math.cos(r) * s;
-					pd = Math.sin(r) * s;
-					pid = 1 / (pa * pd - pb * pc);
-					ia = pd * pid;
-					ib = pb * pid;
-					ic = pc * pid;
-					id = pa * pid;
-			}
-			ra = ia * a - ib * c;
-			rb = ia * b - ib * d;
-			rc = id * c - ic * a;
-			rd = id * d - ic * b;
+		switch (inherit) {
+			case Inherit.normal:
+				set5(ia * a - ib * c, ia * b - ib * d, id * c - ic * a, id * d - ic * b, 0);
+			case Inherit.onlyTranslation:
+				var sxi = 1 / sx, syi = 1 / sy;
+				set5(a * sxi, b * sxi, c * syi, d * syi, 0);
+			case Inherit.noRotationOrReflection:
+				var sxi = 1 / sx, syi = 1 / sy;
+				pa *= sxi;
+				pc *= syi;
+				var wa = a * sxi, wb = b * sxi, wc = c * syi, wd = d * syi;
+				var s = 1 / (pa * pa + pc * pc),
+					det = 1 / Math.abs(pad * sxi * syi);
+				set5((pa * wa + pc * wc) * s, (pa * wb + pc * wd) * s, (pa * wc - pc * wa) * det, (pa * wd - pc * wb) * det, MathUtils.atan2Deg(pc, pa));
+			case Inherit.noScale, Inherit.noScaleOrReflection:
+				var sxi = 1 / sx, syi = 1 / sy;
+				var wa = a * sxi, wb = b * sxi, wc = c * syi, wd = d * syi;
+				var tx = pd * a - pb * c, ty = pa * c - pc * a;
+				if (pad < 0) {
+					tx = -tx;
+					ty = -ty;
+				}
+				var r = MathUtils.atan2Deg(ty, tx);
+				rotation = r;
+				r *= MathUtils.degRad;
+				var cos = Math.cos(r), sin = Math.sin(r);
+				var za = (pa * cos + pb * sin) * sxi;
+				var zc = (pc * cos + pd * sin) * syi;
+				var s = 1 / Math.sqrt(za * za + zc * zc);
+				za *= s;
+				zc *= s;
+				var si = inherit == Inherit.noScale && ((pad < 0) != ((sx < 0) != (sy < 0))) ? -1 : 1;
+				set4(za * wa + zc * wc, za * wb + zc * wd, (za * wc - zc * wa) * si, (za * wd - zc * wb) * si);
 		}
+	}
 
+	private function set4(ra:Float, rb:Float, rc:Float, rd:Float):Void {
+		var x = ra * ra + rc * rc, y = rb * rb + rd * rd;
+		if (x > MathUtils.epsilon2) {
+			shearX = MathUtils.atan2Deg(rc, ra);
+			scaleX = Math.sqrt(x);
+		} else {
+			shearX = 0;
+			scaleX = 0;
+		}
+		scaleY = Math.sqrt(y);
+		if (y > MathUtils.epsilon2) {
+			shearY = MathUtils.atan2Deg(rd, rb);
+			if (ra * rd - rb * rc < 0) {
+				scaleY = -scaleY;
+				shearY += 90;
+			} else
+				shearY -= 90;
+			if (shearY > 180)
+				shearY -= 360;
+			else if (shearY <= -180) //
+				shearY += 360;
+		} else
+			shearY = 0;
+	}
+
+	private function set5(ra:Float, rb:Float, rc:Float, rd:Float, ro:Float):Void {
 		shearX = 0;
-		scaleX = Math.sqrt(ra * ra + rc * rc);
-		if (scaleX > 0.0001) {
-			var det = ra * rd - rb * rc;
-			scaleY = det / scaleX;
-			shearY = -MathUtils.atan2Deg(ra * rb + rc * rd, det);
-			rotation = MathUtils.atan2Deg(rc, ra);
+		var x = ra * ra + rc * rc, y = rb * rb + rd * rd;
+		if (x > MathUtils.epsilon2) {
+			var r = MathUtils.atan2Deg(rc, ra);
+			rotation = r + ro;
+			scaleX = Math.sqrt(x);
+			scaleY = Math.sqrt(y);
+			if (y > MathUtils.epsilon2) {
+				shearY = MathUtils.atan2Deg(rd, rb);
+				if (ra * rd - rb * rc < 0) {
+					scaleY = -scaleY;
+					shearY += 90 - r;
+				} else
+					shearY -= 90 + r;
+				if (shearY > 180)
+					shearY -= 360;
+				else if (shearY <= -180) //
+					shearY += 360;
+			} else
+				shearY = 0;
 		} else {
 			scaleX = 0;
-			scaleY = Math.sqrt(rb * rb + rd * rd);
+			scaleY = Math.sqrt(y);
 			shearY = 0;
-			rotation = 90 - MathUtils.atan2Deg(rd, rb);
+			rotation = y > MathUtils.epsilon2 ? MathUtils.atan2Deg(rd, rb) - 90 + ro : ro;
 		}
 	}
 

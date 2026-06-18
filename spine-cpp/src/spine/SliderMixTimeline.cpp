@@ -52,7 +52,7 @@ SliderMixTimeline::SliderMixTimeline(size_t frameCount, size_t bezierCount, int 
 SliderMixTimeline::~SliderMixTimeline() {
 }
 
-void SliderMixTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+void SliderMixTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixFrom from, bool add, bool out,
 							  bool appliedPose) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(events);
@@ -62,6 +62,6 @@ void SliderMixTimeline::apply(Skeleton &skeleton, float lastTime, float time, Ar
 	if (constraint->isActive()) {
 		SliderPose &pose = appliedPose ? *constraint->_appliedPose : constraint->_pose;
 		SliderData &data = constraint->_data;
-		pose._mix = getAbsoluteValue(time, alpha, fromSetup, add, pose._mix, data._setupPose._mix);
+		pose._mix = getAbsoluteValue(time, alpha, from, add, pose._mix, data._setupPose._mix);
 	}
 }

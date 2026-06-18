@@ -120,6 +120,10 @@ namespace Spine.Unity.Editor {
 			return type.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
 		}
 
+		public static FieldInfo GetPublicField (System.Type type, string fieldName) {
+			return type.GetField(fieldName, BindingFlags.Public | BindingFlags.Instance);
+		}
+
 		#region SerializedProperty Helpers
 		public static SerializedProperty FindBaseOrSiblingProperty (this SerializedProperty property, string propertyName) {
 			if (string.IsNullOrEmpty(propertyName)) return null;

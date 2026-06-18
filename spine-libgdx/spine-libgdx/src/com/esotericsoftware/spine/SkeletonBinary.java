@@ -85,6 +85,7 @@ import com.esotericsoftware.spine.Animation.TranslateTimeline;
 import com.esotericsoftware.spine.Animation.TranslateXTimeline;
 import com.esotericsoftware.spine.Animation.TranslateYTimeline;
 import com.esotericsoftware.spine.BoneData.Inherit;
+import com.esotericsoftware.spine.ConstraintData.ScaleYMode;
 import com.esotericsoftware.spine.PathConstraintData.PositionMode;
 import com.esotericsoftware.spine.PathConstraintData.RotateMode;
 import com.esotericsoftware.spine.PathConstraintData.SpacingMode;
@@ -284,7 +285,7 @@ public class SkeletonBinary extends SkeletonLoader {
 					data.target = bones[input.readInt(true)];
 					int flags = input.read();
 					data.skinRequired = (flags & 1) != 0;
-					if ((flags & 2) != 0) data.scaleYMode = IkConstraintData.ScaleYMode.values[input.read()];
+					if ((flags & 2) != 0) data.scaleYMode = ScaleYMode.values[input.read()];
 					IkConstraintPose setup = data.setupPose;
 					setup.bendDirection = (flags & 4) != 0 ? -1 : 1;
 					setup.compress = (flags & 8) != 0;
@@ -396,7 +397,17 @@ public class SkeletonBinary extends SkeletonLoader {
 					if ((flags & 2) != 0) data.x = input.readFloat();
 					if ((flags & 4) != 0) data.y = input.readFloat();
 					if ((flags & 8) != 0) data.rotate = input.readFloat();
-					if ((flags & 16) != 0) data.scaleX = input.readFloat();
+					if ((flags & 16) != 0) {
+						float scaleX = input.readFloat();
+						if (scaleX < -2) {
+							data.scaleYMode = ScaleYMode.volume;
+							scaleX = -2 - scaleX;
+						} else if (scaleX < 0) {
+							data.scaleYMode = ScaleYMode.uniform;
+							scaleX = -1 - scaleX;
+						}
+						data.scaleX = scaleX;
+					}
 					if ((flags & 32) != 0) data.shearX = input.readFloat();
 					data.limit = ((flags & 64) != 0 ? input.readFloat() : 5000) * scale;
 					data.step = 1f / input.readUnsignedByte();
@@ -424,7 +435,13 @@ public class SkeletonBinary extends SkeletonLoader {
 					data.skinRequired = (flags & 1) != 0;
 					data.loop = (flags & 2) != 0;
 					data.additive = (flags & 4) != 0;
-					if ((flags & 8) != 0) data.setupPose.time = input.readFloat();
+					if ((flags & 8) != 0) {
+						float value = input.readFloat();
+						if (nonessential && (flags & 64) != 0)
+							data.max = value;
+						else
+							data.setupPose.time = value;
+					}
 					if ((flags & 16) != 0) data.setupPose.mix = (flags & 32) != 0 ? input.readFloat() : 1;
 					if ((flags & 64) != 0) {
 						data.local = (flags & 128) != 0;

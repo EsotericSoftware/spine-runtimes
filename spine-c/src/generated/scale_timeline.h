@@ -15,7 +15,8 @@ SPINE_C_API void spine_scale_timeline_dispose(spine_scale_timeline self);
 
 SPINE_C_API spine_rtti spine_scale_timeline_get_rtti(spine_scale_timeline self);
 SPINE_C_API void spine_scale_timeline_apply(spine_scale_timeline self, spine_skeleton skeleton, float lastTime, float time,
-											/*@null*/ spine_array_event events, float alpha, bool fromSetup, bool add, bool out, bool appliedPose);
+											/*@null*/ spine_array_event events, float alpha, spine_mix_from from, bool add, bool out,
+											bool appliedPose);
 SPINE_C_API int spine_scale_timeline_get_bone_index(spine_scale_timeline self);
 SPINE_C_API void spine_scale_timeline_set_bone_index(spine_scale_timeline self, int inValue);
 SPINE_C_API void spine_scale_timeline_set_frame(spine_scale_timeline self, size_t frame, float time, float value1, float value2);

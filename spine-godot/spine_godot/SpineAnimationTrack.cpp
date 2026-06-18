@@ -39,7 +39,6 @@
 #include "scene/resources/animation.h"
 
 #ifdef TOOLS_ENABLED
-#include "editor/editor_node.h"
 #if (VERSION_MAJOR >= 4 && VERSION_MINOR >= 5)
 #include "editor/animation/animation_player_editor_plugin.h"
 #include "editor/animation/animation_tree_editor_plugin.h"
@@ -285,17 +284,20 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 	spine::Skeleton *skeleton = sprite->get_skeleton()->get_spine_object();
 	if (!skeleton) return;
 	AnimationPlayer *animation_player = find_animation_player();
-	if (!animation_player) return;
+	if (!animation_player) {
+		setup_animation_player();
+		animation_player = find_animation_player();
+		if (!animation_player) return;
+	}
 
 	if (Engine::get_singleton()->is_editor_hint()) {
 #ifdef TOOLS_ENABLED
 		if (blend_tree_mode) {
 			AnimationTreeEditor *tree_editor = AnimationTreeEditor::get_singleton();
-			// When the animation tree dock is no longer visible, bail.
-			if (!tree_editor->is_visible_in_tree()) {
-				skeleton->setupPose();
-				animation_state->clearTracks();
-				animation_state->setTimeScale(1);
+			// When the animation tree dock is no longer visible, leave the animation
+			// state alone so the SpineSprite preview animation can drive it.
+			if (!tree_editor || !tree_editor->is_visible_in_tree()) {
+				if (track_index == 0) animation_state->setTimeScale(1);
 				return;
 			}
 			auto current_entry = animation_state->getTrack(track_index);
@@ -349,10 +351,8 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 #else
 		auto player_editor = AnimationPlayerEditor::singleton;
 #endif
-		if (!player_editor->is_visible_in_tree()) {
-			skeleton->setupPose();
-			animation_state->clearTracks();
-			animation_state->setTimeScale(1);
+		if (!player_editor || !player_editor->is_visible_in_tree()) {
+			if (track_index == 0) animation_state->setTimeScale(1);
 			return;
 		}
 
@@ -360,21 +360,37 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 		// for us.
 		Ref<Animation> edited_animation = player_editor->get_track_editor()->get_current_animation();
 		if (!edited_animation.is_valid()) {
-			skeleton->setupPose();
-			animation_state->clearTracks();
-			animation_state->setTimeScale(1);
+			if (track_index == 0) animation_state->setTimeScale(1);
 			return;
 		}
 
 		int found_track_index = -1;
-		auto scene_path = EditorNode::get_singleton()->get_edited_scene()->get_path();
-		auto animation_player_path = scene_path.rel_path_to(animation_player->get_path());
+		auto editing_player = player_editor->get_player();
+		if (!editing_player) {
+			if (track_index == 0) animation_state->setTimeScale(1);
+			return;
+		}
+#if VERSION_MAJOR > 3
+		auto root_node = editing_player->get_node(editing_player->get_root_node());
+#else
+		auto root_node = editing_player->get_node(editing_player->get_root());
+#endif
+		if (!root_node) {
+			if (track_index == 0) animation_state->setTimeScale(1);
+			return;
+		}
+		auto animation_player_path = root_node->get_path().rel_path_to(animation_player->get_path());
 		for (int i = 0; i < edited_animation->get_track_count(); i++) {
 			auto path = edited_animation->track_get_path(i);
 			if (path == animation_player_path) {
 				found_track_index = i;
 				break;
 			}
+		}
+
+		if (found_track_index == -1) {
+			if (track_index == 0) animation_state->setTimeScale(1);
+			return;
 		}
 
 		// if we are track 0, set the skeleton to the setup pose
@@ -386,7 +402,6 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 			animation_state->setTimeScale(0);
 		}
 		animation_state->clearTrack(track_index);
-		if (found_track_index == -1) return;
 
 		// If no animation is set or it's set to "[stop]", we are done.
 		if (EMPTY(animation_name) || animation_name == "[stop]") return;

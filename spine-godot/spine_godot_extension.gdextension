@@ -34,7 +34,7 @@ android.release.x86_64 = "android/libspine_godot.android.template_release.x86_64
 android.debug.arm64 = "android/libspine_godot.android.template_debug.arm64.so"
 android.release.arm64 = "android/libspine_godot.android.template_release.arm64.so"
 
-web.debug.threads.wasm32 = "web/libgdexample.web.template_debug.wasm32.wasm"
-web.release.threads.wasm32 = "web/libgdexample.web.template_release.wasm32.wasm"
-web.debug.wasm32 = "web/libgdexample.web.template_debug.wasm32.nothreads.wasm"
-web.release.wasm32 = "web/libgdexample.web.template_release.wasm32.nothreads.wasm"
+web.debug.threads.wasm32 = "web/libspine_godot.web.template_debug.wasm32.wasm"
+web.release.threads.wasm32 = "web/libspine_godot.web.template_release.wasm32.wasm"
+web.debug.wasm32 = "web/libspine_godot.web.template_debug.wasm32.nothreads.wasm"
+web.release.wasm32 = "web/libspine_godot.web.template_release.wasm32.nothreads.wasm"

@@ -64,6 +64,10 @@ export class SliderData extends ConstraintData<Slider, SliderPose> {
 	/** When true and a bone is set, the bone's local transform property is read instead of its world transform. */
 	local = false;
 
+	// Nonessential.
+	/** When a bone is set, the maximum slider time for the bone property range, or 0 if nonessential data was not exported. */
+	max = 0;
+
 	constructor (name: string) {
 		super(name, new SliderPose());
 	}

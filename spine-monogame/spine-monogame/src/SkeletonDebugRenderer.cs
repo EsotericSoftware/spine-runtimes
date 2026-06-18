@@ -120,11 +120,14 @@ namespace Spine {
 				var slots = skeleton.Slots;
 				for (int i = 0, n = slots.Count; i < n; i++) {
 					var slot = slots.Items[i];
-					var attachment = slot.AppliedPose.Attachment;
+					var slotPose = slot.AppliedPose;
+					var attachment = slotPose.Attachment;
 					if (attachment is RegionAttachment) {
 						var regionAttachment = (RegionAttachment)attachment;
 						var vertices = this.vertices;
-						regionAttachment.ComputeWorldVertices(slot, vertices, 0, 2);
+						Sequence sequence = regionAttachment.Sequence;
+						int sequenceIndex = sequence.ResolveIndex(slotPose);
+						regionAttachment.ComputeWorldVertices(slot, sequence.GetOffsets(sequenceIndex), vertices, 0, 2);
 						renderer.Line(vertices[0], vertices[1], vertices[2], vertices[3], z);
 						renderer.Line(vertices[2], vertices[3], vertices[4], vertices[5], z);
 						renderer.Line(vertices[4], vertices[5], vertices[6], vertices[7], z);

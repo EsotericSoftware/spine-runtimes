@@ -51,7 +51,7 @@ SliderTimeline::SliderTimeline(size_t frameCount, size_t bezierCount, int slider
 SliderTimeline::~SliderTimeline() {
 }
 
-void SliderTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, bool fromSetup, bool add, bool out,
+void SliderTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array<Event *> *events, float alpha, MixFrom from, bool add, bool out,
 						   bool appliedPose) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(events);
@@ -61,6 +61,6 @@ void SliderTimeline::apply(Skeleton &skeleton, float lastTime, float time, Array
 	if (constraint->isActive()) {
 		SliderPose &pose = appliedPose ? *constraint->_appliedPose : constraint->_pose;
 		SliderData &data = constraint->_data;
-		pose._time = getAbsoluteValue(time, alpha, fromSetup, add, pose._time, data._setupPose._time);
+		pose._time = getAbsoluteValue(time, alpha, from, add, pose._time, data._setupPose._time);
 	}
 }

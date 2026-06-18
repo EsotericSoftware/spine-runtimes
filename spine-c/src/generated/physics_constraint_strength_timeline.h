@@ -17,7 +17,7 @@ SPINE_C_API void spine_physics_constraint_strength_timeline_dispose(spine_physic
 SPINE_C_API spine_rtti spine_physics_constraint_strength_timeline_get_rtti(spine_physics_constraint_strength_timeline self);
 SPINE_C_API void spine_physics_constraint_strength_timeline_apply(spine_physics_constraint_strength_timeline self, spine_skeleton skeleton,
 																  float lastTime, float time, /*@null*/ spine_array_event events, float alpha,
-																  bool fromSetup, bool add, bool out, bool appliedPose);
+																  spine_mix_from from, bool add, bool out, bool appliedPose);
 SPINE_C_API int spine_physics_constraint_strength_timeline_get_constraint_index(spine_physics_constraint_strength_timeline self);
 SPINE_C_API void spine_physics_constraint_strength_timeline_set_constraint_index(spine_physics_constraint_strength_timeline self, int inValue);
 /**
@@ -33,14 +33,17 @@ SPINE_C_API void spine_physics_constraint_strength_timeline_set_frame(spine_phys
  */
 SPINE_C_API float spine_physics_constraint_strength_timeline_get_curve_value(spine_physics_constraint_strength_timeline self, float time);
 SPINE_C_API float spine_physics_constraint_strength_timeline_get_relative_value(spine_physics_constraint_strength_timeline self, float time,
-																				float alpha, bool fromSetup, bool add, float current, float setup);
+																				float alpha, spine_mix_from from, bool add, float current,
+																				float setup);
 SPINE_C_API float spine_physics_constraint_strength_timeline_get_absolute_value_1(spine_physics_constraint_strength_timeline self, float time,
-																				  float alpha, bool fromSetup, bool add, float current, float setup);
+																				  float alpha, spine_mix_from from, bool add, float current,
+																				  float setup);
 SPINE_C_API float spine_physics_constraint_strength_timeline_get_absolute_value_2(spine_physics_constraint_strength_timeline self, float time,
-																				  float alpha, bool fromSetup, bool add, float current, float setup,
-																				  float value);
+																				  float alpha, spine_mix_from from, bool add, float current,
+																				  float setup, float value);
 SPINE_C_API float spine_physics_constraint_strength_timeline_get_scale_value(spine_physics_constraint_strength_timeline self, float time, float alpha,
-																			 bool fromSetup, bool add, bool out, float current, float setup);
+																			 spine_mix_from from, bool add, bool out, float current, float setup);
+SPINE_C_API float spine_physics_constraint_strength_timeline_before_first_key(spine_mix_from from, float alpha, float current, float setup);
 SPINE_C_API void spine_physics_constraint_strength_timeline_set_linear(spine_physics_constraint_strength_timeline self, size_t frame);
 SPINE_C_API void spine_physics_constraint_strength_timeline_set_stepped(spine_physics_constraint_strength_timeline self, size_t frame);
 SPINE_C_API void spine_physics_constraint_strength_timeline_set_bezier(spine_physics_constraint_strength_timeline self, size_t bezier, size_t frame,
