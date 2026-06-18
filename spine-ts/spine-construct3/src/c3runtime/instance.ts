@@ -522,33 +522,36 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	}
 
 	private async loadSpine () {
-		const { renderer } = this;
+		const { renderer, propAtlas, propSkel, propLoaderScale } = this;
 		if (this.skeletonLoading || this.skeletonLoaded || !renderer) return;
+		if (!propAtlas || !propSkel) return;
 
 		if (this.initializeCachedSpine(true)) return;
 
 		this.skeletonLoading = true;
 		this.atlasLoading = true;
 
-		const textureAtlas = await this.assetLoader.loadAtlasRuntime(this.propAtlas, this.plugin.runtime, renderer);
-		if (!textureAtlas) {
-			this.skeletonLoading = false;
+		try {
+			const textureAtlas = await this.assetLoader.loadAtlasRuntime(propAtlas, this.plugin.runtime, renderer);
+			if (this.renderer !== renderer) return;
+
+			this.textureAtlas = textureAtlas;
+			this.atlasLoaded = true;
 			this.atlasLoading = false;
-			return;
+
+			const skeletonData = await this.assetLoader.loadSkeletonRuntime(propSkel, textureAtlas, propLoaderScale, this.plugin.runtime);
+			if (this.renderer !== renderer) return;
+
+			this.initializeSkeleton(textureAtlas, skeletonData, true);
+		} catch (error) {
+			if (this.renderer === renderer)
+				console.error("[Spine] Failed to load skeleton:", error);
+		} finally {
+			if (this.renderer === renderer && !this.skeletonLoaded) {
+				this.skeletonLoading = false;
+				this.atlasLoading = false;
+			}
 		}
-
-		this.textureAtlas = textureAtlas;
-		this.atlasLoaded = true;
-		this.atlasLoading = false;
-
-		const propValue = this.propSkel;
-		const skeletonData = await this.assetLoader.loadSkeletonRuntime(propValue, textureAtlas, this.propLoaderScale, this.plugin.runtime);
-		if (!skeletonData) {
-			this.skeletonLoading = false;
-			return;
-		}
-
-		this.initializeSkeleton(textureAtlas, skeletonData, true);
 	}
 
 	private initializeSkeleton (textureAtlas: TextureAtlas, skeletonData: SkeletonData, triggerLoaded: boolean) {

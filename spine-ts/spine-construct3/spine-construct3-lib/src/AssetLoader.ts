@@ -291,10 +291,17 @@ export class AssetLoader {
 		return result;
 	}
 
-	private async addToCache<T> (cache: ResourceCache<T>, cacheKey: string, promise: Promise<T>) {
+	private addToCache<T> (cache: ResourceCache<T>, cacheKey: string, promise: Promise<T>) {
 		const cacheEntry: CacheEntry<T> = { promise, refCount: 1 };
 		cache.set(cacheKey, cacheEntry);
-		cacheEntry.data = await promise;
+		promise.then(
+			data => {
+				if (cache.get(cacheKey) === cacheEntry) cacheEntry.data = data;
+			},
+			() => {
+				if (cache.get(cacheKey) === cacheEntry) cache.delete(cacheKey);
+			}
+		);
 	}
 
 	private getFromCache<T> (cache: ResourceCache<T>, cacheKey: string) {
