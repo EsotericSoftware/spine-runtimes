@@ -52,7 +52,7 @@ spine-ts THREE.JS does not support two color tinting. The THREE.JS backend provi
 
 ## Usage
 
-All spine-ts modules are published to [npm](http://npmjs.com) for consumption via vanilla JavaScript as well as
+All spine-ts modules except the Construct 3 plugin are published to [npm](http://npmjs.com) for consumption via vanilla JavaScript as well as via NPM or Yarn. The Construct 3 plugin is packaged as a `.c3addon` and distributed separately from the Esoteric Software servers.
 
 ## Usage in vanilla JavaScript
 
@@ -155,7 +155,9 @@ To build the artifacts as they are published to NPM, run `npm run build`.
 
 ## Releasing
 
-`spine-ts` is released to [npm](https://www.npmjs.com/search?q=%40esotericsoftware) and as a web artifacts zip using GitHub Actions. The release workflow is triggered by tags from `EsotericSoftware/spine-runtimes` matching `spine-ts-x.y.z`, for example `spine-ts-4.3.8`.
+`spine-ts` is released using GitHub Actions. Public JavaScript runtimes are published to [npm](https://www.npmjs.com/search?q=%40esotericsoftware) and uploaded as a web artifacts zip. The Construct 3 plugin is a private workspace: it is not published to npm, and is instead packaged as `EsotericSoftware_SpineConstruct3.c3addon` and uploaded to the Esoteric Software servers as `spine-construct3.zip` and, for release builds, `spine-construct3-x.y.z.zip`.
+
+The release workflow is triggered by tags from `EsotericSoftware/spine-runtimes` matching `spine-ts-x.y.z`, for example `spine-ts-4.3.8`. The same tag releases both the npm packages and the Construct 3 plugin.
 
 ### One-time npm trusted publishing setup
 
@@ -186,9 +188,9 @@ Trusted publishing lets the workflow publish using GitHub OIDC instead of a long
 
 ### Release process
 
-The manual process is shown below for reference, but it is normally performed automatically by running `./publish.sh` from the `spine-ts/` folder on a release branch such as `4.3`. The script increments the patch version, optionally updates `CHANGELOG.md`, updates all workspace package versions and internal dependencies, refreshes `package-lock.json`, commits the changes, creates the matching `spine-ts-x.y.z` tag, and pushes the branch and tag.
+The manual process is shown below for reference, but it is normally performed automatically by running `./publish.sh` from the `spine-ts/` folder on a release branch such as `4.3`. The script increments the patch version, optionally updates `CHANGELOG.md`, updates public workspace package versions, updates the private Construct 3 package/addon versions, refreshes `package-lock.json`, commits the changes, creates the matching `spine-ts-x.y.z` tag, and pushes the branch and tag.
 
-1. Set the release version in the root `spine-ts/package.json` and every workspace `package.json`. Internal `@esotericsoftware/spine-*` dependencies must use the same version:
+1. Set the release version in the root `spine-ts/package.json`, public workspace `package.json` files, private Construct 3 workspace `package.json` files, and `spine-construct3/src/addon.json`. Public internal `@esotericsoftware/spine-*` dependencies must use the same version:
 
 ```json
 "version": "4.3.8"
@@ -216,7 +218,7 @@ npm install --workspaces
 4. Commit and push the release version:
 
 ```bash
-git add spine-ts/package.json spine-ts/package-lock.json spine-ts/spine-*/package.json spine-ts/CHANGELOG.md
+git add spine-ts/package.json spine-ts/package-lock.json spine-ts/spine-*/package.json spine-ts/spine-construct3/spine-construct3-lib/package.json spine-ts/spine-construct3/src/addon.json spine-ts/CHANGELOG.md
 git commit -m "[ts] Release 4.3.8"
 git push origin 4.3
 ```
@@ -228,6 +230,6 @@ git tag spine-ts-4.3.8
 git push origin spine-ts-4.3.8
 ```
 
-The tag triggers the GitHub Actions release workflow. It verifies the tag version matches every package, builds all packages, uploads `spine-ts.zip` to the Esoteric Software server for the matching release line, for example `4.3`, and publishes all npm workspaces using trusted publishing.
+The tag triggers the GitHub Actions release workflow. It verifies the tag version matches the public packages and the Construct 3 package/addon versions, builds all packages, uploads `spine-ts.zip` to the Esoteric Software server for the matching release line, for example `4.3`, deploys the Construct 3 plugin zip artifacts to the Construct 3 update server for the same release line, and publishes the public npm workspaces using trusted publishing.
 
-6. Check the workflow result, the uploaded zip archive, and the npm package pages.
+6. Check the workflow result, the uploaded `spine-ts.zip`, the uploaded Construct 3 zip artifacts, and the npm package pages.

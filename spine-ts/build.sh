@@ -50,7 +50,7 @@ log_action "Validating package versions"
 if VALIDATION_OUTPUT=$(RELEASE_VERSION="$VERSION" node <<'NODE' 2>&1
 const fs = require("fs");
 const version = process.env.RELEASE_VERSION;
-const packages = [
+const publicPackages = [
 	"package.json",
 	"spine-canvas/package.json",
 	"spine-canvaskit/package.json",
@@ -64,13 +64,27 @@ const packages = [
 	"spine-webcomponents/package.json",
 	"spine-webgl/package.json",
 ];
+const construct3Packages = [
+	"spine-construct3/package.json",
+	"spine-construct3/spine-construct3-lib/package.json",
+];
+const construct3Addon = "spine-construct3/src/addon.json";
+
+function readJson (file) {
+	let text = fs.readFileSync(file, "utf8");
+	if (text.charCodeAt(0) === 0xfeff) text = text.slice(1);
+	return JSON.parse(text);
+}
+
 let ok = true;
-for (const file of packages) {
-	const pkg = JSON.parse(fs.readFileSync(file, "utf8"));
+function validatePackage (file, validateInternalDependencyVersions) {
+	const pkg = readJson(file);
 	if (pkg.version !== version) {
 		console.error(`${file}: version ${pkg.version} does not match release version ${version}`);
 		ok = false;
 	}
+	if (!validateInternalDependencyVersions) return;
+
 	for (const section of ["dependencies", "peerDependencies", "devDependencies", "optionalDependencies"]) {
 		const deps = pkg[section] || {};
 		for (const [name, range] of Object.entries(deps)) {
@@ -81,6 +95,16 @@ for (const file of packages) {
 		}
 	}
 }
+
+for (const file of publicPackages) validatePackage(file, true);
+for (const file of construct3Packages) validatePackage(file, false);
+
+const addon = readJson(construct3Addon);
+if (addon.version !== version) {
+	console.error(`${construct3Addon}: version ${addon.version} does not match release version ${version}`);
+	ok = false;
+}
+
 process.exit(ok ? 0 : 1);
 NODE
 ); then
