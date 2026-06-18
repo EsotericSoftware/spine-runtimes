@@ -40,10 +40,22 @@ type BoneFollower = {
 	offsetX: number,
 	offsetY: number,
 	offsetAngle: number,
+	offsetScaleX: number,
+	offsetScaleY: number,
 	originalWidth: number,
 	originalHeight: number,
-	refSkeletonWidth: number,
-	refSkeletonHeight: number,
+	refGameScaleX: number,
+	refGameScaleY: number,
+};
+
+type BoneGameTransform = {
+	x: number,
+	y: number,
+	xAxisX: number,
+	xAxisY: number,
+	yAxisX: number,
+	yAxisY: number,
+	reflectionSign: number,
 };
 
 class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
@@ -165,6 +177,16 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		this.isPlaying = false;
 	}
 
+	private updateMatrix () {
+		this.matrix.update(
+			this.x + this.propOffsetX,
+			this.y + this.propOffsetY,
+			this.totalZ,
+			this.angle + this.propOffsetAngle,
+			this.width / this.spineBounds.width * this.propScaleX,
+			this.height / this.spineBounds.height * this.propScaleY);
+	}
+
 	_tick (): void {
 		this.renderer ||= this.runtime.renderer;
 		if (!this.renderer) return;
@@ -182,13 +204,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			this._trigger(C3.Plugins.EsotericSoftware_SpineConstruct3.Cnds.OnSkeletonLoaded);
 		}
 
-		this.matrix.update(
-			this.x + this.propOffsetX,
-			this.y + this.propOffsetY,
-			this.totalZ,
-			this.angle + this.propOffsetAngle,
-			this.width / this.spineBounds.width * this.propScaleX,
-			this.height / this.spineBounds.height * this.propScaleY);
+		this.updateMatrix();
 
 		this.updateCollisionSprite();
 
@@ -836,13 +852,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		if (dx === 0 && dy === 0) return;
 
 		this.offsetPosition(dx, dy);
-		this.matrix.update(
-			this.x + this.propOffsetX,
-			this.y + this.propOffsetY,
-			this.totalZ,
-			this.angle + this.propOffsetAngle,
-			this.width / this.spineBounds.width * this.propScaleX,
-			this.height / this.spineBounds.height * this.propScaleY);
+		this.updateMatrix();
 	}
 
 	private calculateBounds () {
@@ -1147,8 +1157,12 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	*  Bone follower
 	*/
 
-	public attachInstanceToBone (uid: number, boneName: string, offsetX = 0, offsetY = 0, offsetAngle = 0) {
+	public attachInstanceToBone (uid: number, boneName: string, offsetX = 0, offsetY = 0, offsetAngle = 0, offsetScaleX = 1, offsetScaleY = 1) {
 		if (!this.skeleton) return;
+
+		this.updateMatrix();
+		this.updateBonesOverride();
+		this.skeleton.updateWorldTransform(this.physicsMode === spine.Physics.none ? spine.Physics.none : spine.Physics.pose);
 
 		const bone = this.skeleton.findBone(boneName);
 		if (!bone) {
@@ -1159,12 +1173,13 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		const instance = this.runtime.getInstanceByUid(uid) as IWorldInstance;
 		if (!instance) return;
 
+		const refGameScale = this.getSkeletonGameScale(this.matrix);
 		const follower: BoneFollower = {
-			uid, offsetX, offsetY, offsetAngle,
+			uid, offsetX, offsetY, offsetAngle, offsetScaleX, offsetScaleY,
 			originalWidth: Math.abs(instance.width),
 			originalHeight: Math.abs(instance.height),
-			refSkeletonWidth: Math.abs(this.width),
-			refSkeletonHeight: Math.abs(this.height),
+			refGameScaleX: refGameScale.scaleX,
+			refGameScaleY: refGameScale.scaleY,
 		};
 		const followers = this.boneFollowers.get(boneName);
 		if (!followers) {
@@ -1173,9 +1188,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			followers.push(follower);
 		}
 
-		if (this.width < 0) this.mirrorFollower(instance);
-		if (this.height < 0) this.flipFollower(instance);
-
+		this.updateBoneFollowers(this.matrix);
 		this.isPlaying = true;
 	}
 
@@ -1196,63 +1209,69 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		this.boneFollowers.delete(boneName);
 	}
 
-	setSize (w: number, h: number): void {
-		const prevW = this.width;
-		const prevH = this.height;
-		super.setSize(w, h);
+	private getSkeletonGameScale (matrix: C3Matrix) {
+		return {
+			scaleX: Math.hypot(matrix.a, matrix.b),
+			scaleY: Math.hypot(matrix.c, matrix.d),
+		};
+	}
 
-		if (prevW === 0 || prevH === 0) return;
+	private getBoneGameTransform (matrix: C3Matrix, bone: Bone): BoneGameTransform {
+		const { appliedPose } = bone;
 
-		const mirrorChanged = (prevW > 0) !== (this.width > 0);
-		const flipChanged = (prevH > 0) !== (this.height > 0);
+		const xAxisX = matrix.a * appliedPose.a + matrix.c * appliedPose.c;
+		const xAxisY = matrix.b * appliedPose.a + matrix.d * appliedPose.c;
+		const yAxisX = matrix.a * appliedPose.b + matrix.c * appliedPose.d;
+		const yAxisY = matrix.b * appliedPose.b + matrix.d * appliedPose.d;
+		const determinant = xAxisX * yAxisY - yAxisX * xAxisY;
+		const reflectionSign = determinant > 0 ? -1 : 1;
 
-		if (this.boneFollowers.size === 0) return;
-		if (!mirrorChanged && !flipChanged) return;
+		return {
+			x: matrix.a * appliedPose.worldX + matrix.c * appliedPose.worldY + matrix.tx,
+			y: matrix.b * appliedPose.worldX + matrix.d * appliedPose.worldY + matrix.ty,
+			xAxisX,
+			xAxisY,
+			yAxisX,
+			yAxisY,
+			reflectionSign,
+		};
+	}
 
-		for (const [, followers] of this.boneFollowers) {
-			for (const follower of followers) {
-				const instance = this.runtime.getInstanceByUid(follower.uid) as IWorldInstance;
-				if (!instance) continue;
-				if (mirrorChanged) this.mirrorFollower(instance);
-				if (flipChanged) this.flipFollower(instance);
-			}
+	private getBoneFollowerScaleRatio (scale: number, referenceScale: number) {
+		return referenceScale === 0 ? 0 : scale / referenceScale;
+	}
+
+	private normalizeDegrees (degrees: number) {
+		return ((degrees + 180) % 360 + 360) % 360 - 180;
+	}
+
+	private getBoneGameAngleDegrees (transform: BoneGameTransform) {
+		if (transform.xAxisX !== 0 || transform.xAxisY !== 0) {
+			return Math.atan2(transform.xAxisY, transform.xAxisX) * spine.MathUtils.radDeg;
 		}
-	}
 
-	private mirrorFollower (instance: IWorldInstance) {
-		instance.setSize(-instance.width, instance.height);
-	}
+		if (transform.yAxisX !== 0 || transform.yAxisY !== 0) {
+			return Math.atan2(transform.yAxisY, transform.yAxisX) * spine.MathUtils.radDeg + transform.reflectionSign * 90;
+		}
 
-	private flipFollower (instance: IWorldInstance) {
-		instance.setSize(instance.width, -instance.height);
+		return 0;
 	}
 
 	private updateBoneFollowers (matrix: C3Matrix) {
 		if (this.boneFollowers.size === 0) return;
 
+		const skeletonGameScale = this.getSkeletonGameScale(matrix);
 		const staleFollowers: { uid: number, boneName: string }[] = [];
 
 		for (const [boneName, followers] of this.boneFollowers) {
 			const bone = this.skeleton?.findBone(boneName);
 			if (!bone) continue;
 
-			const { x, y } = matrix.boneToGame(bone);
-			const boneRotation = bone.appliedPose.getWorldRotationX();
-
-			const boneRad = boneRotation * spine.MathUtils.degRad;
-			const boneCos = Math.cos(boneRad);
-			const boneSin = Math.sin(boneRad);
-			const gameDirX = matrix.a * boneCos + matrix.c * boneSin;
-			const gameDirY = matrix.b * boneCos + matrix.d * boneSin;
-			const boneGameAngleRad = Math.atan2(gameDirY, gameDirX);
-
-			const cos = Math.cos(boneGameAngleRad);
-			const sin = Math.sin(boneGameAngleRad);
-
-			const isMirrored = this.width < 0;
-			const isFlipped = this.height < 0;
-			const negateAngle = isMirrored !== isFlipped;
-			const gameObjectAngleDeg = (this.angle + this.propOffsetAngle) * spine.MathUtils.radDeg;
+			const transform = this.getBoneGameTransform(matrix, bone);
+			const boneGameAngleDegrees = this.getBoneGameAngleDegrees(transform);
+			const offsetAngleSign = transform.reflectionSign;
+			const boneWorldScaleX = bone.appliedPose.getWorldScaleX();
+			const boneWorldScaleY = bone.appliedPose.getWorldScaleY();
 
 			for (const follower of followers) {
 				const instance = this.runtime.getInstanceByUid(follower.uid) as IWorldInstance;
@@ -1261,24 +1280,21 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 					continue;
 				}
 
-				const offsetY = negateAngle ? -follower.offsetY : follower.offsetY;
-				const rotatedOffsetX = follower.offsetX * cos - offsetY * sin;
-				const rotatedOffsetY = follower.offsetX * sin + offsetY * cos;
+				const sx = this.getBoneFollowerScaleRatio(skeletonGameScale.scaleX, follower.refGameScaleX) * boneWorldScaleX;
+				const sy = this.getBoneFollowerScaleRatio(skeletonGameScale.scaleY, follower.refGameScaleY) * boneWorldScaleY * transform.reflectionSign;
+				const followerAngleDegrees = this.normalizeDegrees(boneGameAngleDegrees + follower.offsetAngle * offsetAngleSign);
+				const followerAngleRad = followerAngleDegrees * spine.MathUtils.degRad;
+				const followerAngleCos = Math.cos(followerAngleRad);
+				const followerAngleSin = Math.sin(followerAngleRad);
 
-				instance.x = x + rotatedOffsetX;
-				instance.y = y + rotatedOffsetY;
+				instance.x = transform.x + follower.offsetX * followerAngleCos - follower.offsetY * followerAngleSin * offsetAngleSign;
+				instance.y = transform.y + follower.offsetX * followerAngleSin + follower.offsetY * followerAngleCos * offsetAngleSign;
 
-				const angle = boneRotation + follower.offsetAngle;
-				instance.angleDegrees = gameObjectAngleDeg + (negateAngle ? -angle : angle);
+				instance.angleDegrees = followerAngleDegrees;
 
-				const sx = Math.abs(this.width) / follower.refSkeletonWidth;
-				const sy = Math.abs(this.height) / follower.refSkeletonHeight;
-				const mirrorSign = isMirrored ? -1 : 1;
-				const flipSign = isFlipped ? -1 : 1;
-				instance.setSize(
-					follower.originalWidth * sx * mirrorSign,
-					follower.originalHeight * sy * flipSign
-				);
+				const width = follower.originalWidth * sx * follower.offsetScaleX;
+				const height = follower.originalHeight * sy * follower.offsetScaleY;
+				instance.setSize(width, height);
 			}
 		}
 
@@ -1554,28 +1570,16 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	public mirror (isMirrored: boolean) {
 		if ((this.width < 0) !== isMirrored) {
 			this.width = -this.width;
-
-			for (const [, followers] of this.boneFollowers) {
-				for (const follower of followers) {
-					const instance = this.runtime.getInstanceByUid(follower.uid) as IWorldInstance;
-					if (instance) this.mirrorFollower(instance);
-				}
-			}
-
+			this.updateMatrix();
+			this.updateBoneFollowers(this.matrix);
 		}
 	}
 
 	public flip (isFlipped: boolean) {
 		if ((this.height < 0) !== isFlipped) {
 			this.height = -this.height;
-
-			for (const [, followers] of this.boneFollowers) {
-				for (const follower of followers) {
-					const instance = this.runtime.getInstanceByUid(follower.uid) as IWorldInstance;
-					if (instance) this.flipFollower(instance);
-				}
-			}
-
+			this.updateMatrix();
+			this.updateBoneFollowers(this.matrix);
 		}
 	}
 

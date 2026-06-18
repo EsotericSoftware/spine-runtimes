@@ -151,14 +151,14 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 		this.setupBoneSlotPose(type === 0 ? "bone" : "slot", name);
 	},
 
-	AttachInstanceToBone (this: SDKInstanceClass, uid: number, boneName: string, offsetX: number, offsetY: number, offsetAngle: number) {
-		this.attachInstanceToBone(uid, boneName, offsetX, offsetY, offsetAngle);
+	AttachInstanceToBone (this: SDKInstanceClass, uid: number, boneName: string, offsetX: number, offsetY: number, offsetAngle: number, offsetScaleX = 1, offsetScaleY = 1) {
+		this.attachInstanceToBone(uid, boneName, offsetX, offsetY, offsetAngle, offsetScaleX, offsetScaleY);
 	},
 
-	AttachObjectToBone (this: SDKInstanceClass, objectClass: IObjectType, boneName: string, offsetX: number, offsetY: number, offsetAngle: number) {
+	AttachObjectToBone (this: SDKInstanceClass, objectClass: IObjectType, boneName: string, offsetX: number, offsetY: number, offsetAngle: number, offsetScaleX = 1, offsetScaleY = 1) {
 		const pickedInstances = objectClass.getPickedInstances();
 		for (const instance of pickedInstances) {
-			this.attachInstanceToBone(instance.uid, boneName, offsetX, offsetY, offsetAngle);
+			this.attachInstanceToBone(instance.uid, boneName, offsetX, offsetY, offsetAngle, offsetScaleX, offsetScaleY);
 		}
 	},
 

@@ -635,8 +635,8 @@
           },
           "attach-instance-to-bone": {
             "list-name": "Attach instance to bone",
-            "display-text": "Attach instance UID {0} to bone {1} with offset ({2}, {3}, {4}°)",
-            "description": "Make an object instance follow a skeleton bone's position and rotation. The instance will automatically update its position and angle to match the bone every frame. Offsets are applied in the bone's local space (rotated with the bone).",
+            "display-text": "Attach instance UID {0} to bone {1} with offset ({2}, {3}, {4}°) and scale ({5}, {6})",
+            "description": "Make an object instance follow a skeleton bone's position, rotation, and scale. Offset X/Y move the follower origin from the bone origin along the follower axes after Offset angle. Offset angle rotates the instance and those offset axes relative to the bone. Offset Scale X/Y multiply the final size after inherited bone scale and do not affect the offset position.",
             "params": {
               "uid": {
                 "name": "UID",
@@ -648,22 +648,30 @@
               },
               "offset-x": {
                 "name": "Offset X",
-                "desc": "X offset from bone position (in bone's local space)"
+                "desc": "Move the follower origin along its X axis after Offset angle. This is not multiplied by bone scale or Offset Scale."
               },
               "offset-y": {
                 "name": "Offset Y",
-                "desc": "Y offset from bone position (in bone's local space)"
+                "desc": "Move the follower origin along its Y axis after Offset angle. This is not multiplied by bone scale or Offset Scale."
               },
               "offset-angle": {
                 "name": "Offset angle",
-                "desc": "Angle offset in degrees from bone rotation"
+                "desc": "Angle in degrees relative to bone rotation. Rotates the instance and the Offset X/Y axes; non-uniform scale does not change this angle."
+              },
+              "offset-scale-x": {
+                "name": "Offset Scale X",
+                "desc": "Additional multiplier for the final width after inherited bone scale. Does not affect Offset X/Y."
+              },
+              "offset-scale-y": {
+                "name": "Offset Scale Y",
+                "desc": "Additional multiplier for the final height after inherited bone scale. Does not affect Offset X/Y."
               }
             }
           },
           "attach-object-to-bone": {
             "list-name": "Attach object to bone",
-            "display-text": "Attach {0} to bone {1} with offset ({2}, {3}, {4}°)",
-            "description": "Make picked object instances follow a skeleton bone's position and rotation. The instances will automatically update their position and angle to match the bone every frame. Offsets are applied in the bone's local space (rotated with the bone).",
+            "display-text": "Attach {0} to bone {1} with offset ({2}, {3}, {4}°) and scale ({5}, {6})",
+            "description": "Make picked object instances follow a skeleton bone's position, rotation, and scale. Offset X/Y move each follower origin from the bone origin along the follower axes after Offset angle. Offset angle rotates each instance and those offset axes relative to the bone. Offset Scale X/Y multiply the final size after inherited bone scale and do not affect the offset position.",
             "params": {
               "object": {
                 "name": "Object",
@@ -675,15 +683,23 @@
               },
               "offset-x": {
                 "name": "Offset X",
-                "desc": "X offset from bone position (in bone's local space)"
+                "desc": "Move each follower origin along its X axis after Offset angle. This is not multiplied by bone scale or Offset Scale."
               },
               "offset-y": {
                 "name": "Offset Y",
-                "desc": "Y offset from bone position (in bone's local space)"
+                "desc": "Move each follower origin along its Y axis after Offset angle. This is not multiplied by bone scale or Offset Scale."
               },
               "offset-angle": {
                 "name": "Offset angle",
-                "desc": "Angle offset in degrees from bone rotation"
+                "desc": "Angle in degrees relative to bone rotation. Rotates each instance and the Offset X/Y axes; non-uniform scale does not change this angle."
+              },
+              "offset-scale-x": {
+                "name": "Offset Scale X",
+                "desc": "Additional multiplier for the final width after inherited bone scale. Does not affect Offset X/Y."
+              },
+              "offset-scale-y": {
+                "name": "Offset Scale Y",
+                "desc": "Additional multiplier for the final height after inherited bone scale. Does not affect Offset X/Y."
               }
             }
           },

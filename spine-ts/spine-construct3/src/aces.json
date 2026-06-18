@@ -586,6 +586,16 @@
           {
             "id": "offset-angle",
             "type": "number"
+          },
+          {
+            "id": "offset-scale-x",
+            "type": "number",
+            "initialValue": "1"
+          },
+          {
+            "id": "offset-scale-y",
+            "type": "number",
+            "initialValue": "1"
           }
         ]
       },
@@ -613,6 +623,16 @@
           {
             "id": "offset-angle",
             "type": "number"
+          },
+          {
+            "id": "offset-scale-x",
+            "type": "number",
+            "initialValue": "1"
+          },
+          {
+            "id": "offset-scale-y",
+            "type": "number",
+            "initialValue": "1"
           }
         ]
       },
