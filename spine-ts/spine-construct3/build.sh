@@ -69,6 +69,13 @@ if [ -n "$C3_UPDATE_PATH" ]; then
 fi
 
 if [ -z "$C3_UPDATE_URL" ] || [ -z "$C3_UPDATE_PATH" ]; then
+	if [ "$C3_RELEASE" = true ]; then
+		log_action "Validating Construct3 deployment configuration"
+		log_fail
+		log_error_output "C3 release deployment requires C3_UPDATE_URL and C3_UPDATE_PATH. Refusing to continue so npm packages are not published without Construct3 artifacts."
+		exit 1
+	fi
+
 	log_skip "Deployment skipped (C3_UPDATE_URL and/or C3_UPDATE_PATH not set)"
 	log_summary "✓ Deploy skipped"
 	exit 0
