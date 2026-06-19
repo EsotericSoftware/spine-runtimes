@@ -1,7 +1,4 @@
 ﻿
-/** Represents the File System object.
- * @see {@link https://www.construct.net/make-games/manuals/construct-3/scripting/scripting-reference/plugin-interfaces/file-system | IFileSystemObjectType documentation } */
-
 interface FSAcceptType {
 	description: string,
 	accept: {
@@ -67,6 +64,8 @@ interface FSObjectTypeEventMap<InstanceType = IInstance> extends ObjectClassEven
 	"drop": FSDropEvent
 }
 
+/** Represents the File System object.
+ * @see {@link https://www.construct.net/make-games/manuals/construct-3/scripting/scripting-reference/plugin-interfaces/file-system | IFileSystemObjectType documentation } */
 declare class IFileSystemObjectType<InstType extends IInstance = IInstance> extends IObjectType<InstType>
 {
 	addEventListener<K extends keyof FSObjectTypeEventMap<InstType>>(type: K, listener: (ev: FSObjectTypeEventMap<InstType>[K]) => any): void;

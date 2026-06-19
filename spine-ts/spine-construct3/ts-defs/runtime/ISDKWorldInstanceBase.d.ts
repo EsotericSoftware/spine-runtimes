@@ -11,6 +11,7 @@ declare class ISDKWorldInstanceBase_ extends IWorldInstanceSDKBase
     _draw(renderer: IRenderer): void;
 
     _rendersToOwnZPlane(): boolean;
+    _setMustMitigateZFighting(): void;
     _mustPreDraw(): boolean;
 }
 

@@ -57,9 +57,9 @@ declare class IRenderer
 	quad3D2(tlx: number, tly: number, tlz: number, trx: number, try_: number, trz: number, brx: number, bry: number, brz: number, blx: number, bly: number, blz: number, texQuad: DOMQuad): void;
 	quad3D3(tlx: number, tly: number, tlz: number, trx: number, try_: number, trz: number, brx: number, bry: number, brz: number, blx: number, bly: number, blz: number, texQuad: DOMQuad, colorArr: Float32Array): void;
 
+	drawMesh(posArr: Float32Array, uvArr: Float32Array, indexArr: Uint16Array, colorArr?: Float32Array): void;
 	createMeshData(vertexCount: number, indexCount: number, opts?: CreateMeshDataOptions): IMeshData;
 	drawMeshData(meshData: IMeshData, indexOffset?: number, indexCount?: number): void;
-	drawMesh(posArr: Float32Array, uvArr: Float32Array, indexArr: Uint16Array, colorArr?: Float32Array): void;
 
 	convexPoly(pointsArray: number[]): void;
 	line(x1: number, y1: number, x2: number, y2: number): void;

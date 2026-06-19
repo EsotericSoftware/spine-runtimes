@@ -123,7 +123,7 @@ declare class IWorldInstance extends IInstance
 	removeFromParent(): void;
 	getHierarchyOpts(): SceneGraphHierarchyOpts;
 
-	createMesh(hsize: number, vsize: number): void;
+	createMesh(hsize: number, vsize: number, copyFromOldMesh?: boolean): void;
 	releaseMesh(): void;
 	setMeshPoint(col: number, row: number, opts: SetMeshPointOpts): void;
 	getMeshPoint(col: number, row: number): GetMeshPointOpts;

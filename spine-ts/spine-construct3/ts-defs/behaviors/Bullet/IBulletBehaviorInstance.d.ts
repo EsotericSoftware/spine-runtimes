@@ -10,4 +10,10 @@ declare class IBulletBehaviorInstance<InstType> extends IBehaviorInstance<InstTy
 	bounceOffSolids: boolean;
 	distanceTravelled: number;
 	isEnabled: boolean;
+
+	setVector(dx: number, dy: number, dz?: number): void;
+	getVector(): Vec3Arr;
+
+	setGravityVector(gx: number, gy: number, gz?: number): void;
+	getGravityVector(): Vec3Arr;
 }

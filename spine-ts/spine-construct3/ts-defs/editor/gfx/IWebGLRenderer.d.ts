@@ -1,6 +1,10 @@
 // Note types like TextureCreateOptions are taken from the runtime type
 // definitions as they match the same types used by the editor
 
+interface CreateMeshDataOptions {
+	debugLabel?: string;
+}
+
 declare namespace SDK.Gfx {
 	class IWebGLRenderer {
 		SetAlphaBlend(): void;
@@ -18,9 +22,13 @@ declare namespace SDK.Gfx {
 		SetCurrentZ(z: number): void;
 		GetCurrentZ(): number;
 
+		SetCullFaceMode(m: RendererCullFaceMode): void;
+		GetCullFaceMode(): RendererCullFaceMode;
+		SetFrontFaceWinding(m: RendererFrontFaceWinding): void;
+		GetFrontFaceWinding(): RendererFrontFaceWinding;
+
 		Rect(r: SDK.Rect): void;
 		Rect2(left: number, top: number, right: number, bottom: number): void;
-
 
 		Quad(q: SDK.Quad): void;
 		Quad2(tlx: number, tly: number, trx: number, try_: number, brx: number, bry: number, blx: number, bly: number): void;
@@ -30,6 +38,8 @@ declare namespace SDK.Gfx {
 		Quad3D2(tlx: number, tly: number, tlz: number, trx: number, try_: number, trz: number, brx: number, bry: number, brz: number, blx: number, bly: number, blz: number, uv: SDK.Quad): void;
 
 		DrawMesh(posArr: Float32Array, uvArr: Float32Array, indexArr: Uint16Array, colorArr?: Float32Array): void;
+		CreateMeshData(vertexCount: number, indexCount: number, opts?: CreateMeshDataOptions): SDK.Gfx.IMeshData;
+		DrawMeshData(meshData: SDK.Gfx.IMeshData, indexOffset?: number, indexCount?: number): void;
 
 		ConvexPoly(pts: number[]): void;
 		Line(x1: number, y1: number, x2: number, y2: number): void;

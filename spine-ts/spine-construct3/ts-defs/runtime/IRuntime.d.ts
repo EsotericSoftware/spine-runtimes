@@ -77,6 +77,14 @@ interface ConstructSaveEvent extends ConstructEvent {
 	saveData: any;
 }
 
+interface ConstructSaveCompleteEvent extends ConstructEvent {
+	jsonString: string;
+}
+
+interface ConstructLoadCompleteEvent extends ConstructEvent {
+	jsonString: string;
+}
+
 interface ConstructDrawEvent extends ConstructEvent {
 	renderer: IRenderer;
 }
@@ -111,6 +119,8 @@ interface RuntimeEventMap {
 	"devicemotion": DeviceMotionEvent;
 	"save": ConstructSaveEvent;
 	"load": ConstructSaveEvent;
+	"savecomplete": ConstructSaveCompleteEvent;
+	"loadcomplete": ConstructLoadCompleteEvent;
 	"afterload": ConstructEvent;
 	"instancecreate": InstanceEvent;
 	"hierarchyready": InstanceEvent<IWorldInstance>;
@@ -211,6 +221,11 @@ declare class IRuntime extends ConstructEventTarget<RuntimeEventMap>
 
 	/** Invoke a browser download of the content at the given URL, using the provided filename. */
 	invokeDownload(url: string, filename: string): void;
+
+	saveToSlot(slotName: string): Promise<string>;
+	saveToJSONString(): Promise<string>;
+	loadFromSlot(slotName: string): Promise<string>;
+	loadFromJSONString(jsonStr: string): Promise<string>;
 
 	/** Runtime wrapper for alert() method which can be used in worker mode. */
 	alert(message: string): Promise<void>;
