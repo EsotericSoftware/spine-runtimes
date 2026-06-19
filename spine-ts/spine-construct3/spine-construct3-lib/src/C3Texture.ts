@@ -101,6 +101,7 @@ function toC3TextureWrap (wrap: TextureWrap): TextureWrapMode {
 function toC3MipMap (filter: TextureFilter): boolean {
 	switch (filter) {
 		case TextureFilter.MipMap:
+		case TextureFilter.MipMapLinearLinear:
 		case TextureFilter.MipMapLinearNearest:
 		case TextureFilter.MipMapNearestLinear:
 		case TextureFilter.MipMapNearestNearest:
