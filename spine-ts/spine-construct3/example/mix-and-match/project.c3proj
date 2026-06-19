@@ -1,0 +1,236 @@
+{
+	"projectFormatVersion": 1,
+	"savedWithRelease": 48703,
+	"name": "mix-and-match",
+	"runtime": "c3",
+	"useWorker": "auto",
+	"bundleAddons": false,
+	"usedAddons": [
+		{
+			"type": "plugin",
+			"id": "EsotericSoftware_SpineConstruct3",
+			"name": "Spine",
+			"author": "Esoteric Software",
+			"bundled": false,
+			"version": "4.3.7",
+			"sdkVersion": 2
+		}
+	],
+	"uniqueId": "9givu3u9pes",
+	"objectTypes": {
+		"items": [
+			"Spine"
+		],
+		"subfolders": []
+	},
+	"functionsName": "Functions",
+	"autosaveData": null,
+	"containers": [],
+	"families": {
+		"items": [],
+		"subfolders": []
+	},
+	"layouts": {
+		"items": [
+			"Layout 1"
+		],
+		"subfolders": []
+	},
+	"eventSheets": {
+		"items": [
+			"Event sheet 1"
+		],
+		"subfolders": []
+	},
+	"rootFileFolders": {
+		"script": {
+			"items": [],
+			"subfolders": []
+		},
+		"sound": {
+			"items": [],
+			"subfolders": []
+		},
+		"music": {
+			"items": [],
+			"subfolders": []
+		},
+		"video": {
+			"items": [],
+			"subfolders": []
+		},
+		"font": {
+			"items": [],
+			"subfolders": []
+		},
+		"icon": {
+			"items": [
+				{
+					"name": "icon-32.png",
+					"type": "image/png",
+					"sid": 526407189309349,
+					"icon-info": {
+						"purpose": "app-icon"
+					}
+				},
+				{
+					"name": "icon-256.png",
+					"type": "image/png",
+					"sid": 395978934796399,
+					"icon-info": {
+						"purpose": "app-icon"
+					}
+				},
+				{
+					"name": "icon-16.png",
+					"type": "image/png",
+					"sid": 891930046364353,
+					"icon-info": {
+						"purpose": "app-icon"
+					}
+				},
+				{
+					"name": "icon-64.png",
+					"type": "image/png",
+					"sid": 639291248996347,
+					"icon-info": {
+						"purpose": "app-icon"
+					}
+				},
+				{
+					"name": "icon-128.png",
+					"type": "image/png",
+					"sid": 105264718221305,
+					"icon-info": {
+						"purpose": "app-icon"
+					}
+				},
+				{
+					"name": "icon-512.png",
+					"type": "image/png",
+					"sid": 421766190226274,
+					"icon-info": {
+						"purpose": "app-icon"
+					}
+				},
+				{
+					"name": "loading-logo.png",
+					"type": "image/png",
+					"sid": 688719930746526,
+					"icon-info": {
+						"purpose": "loading-logo"
+					}
+				}
+			],
+			"subfolders": []
+		},
+		"general": {
+			"items": [
+				{
+					"name": "mix-and-match-pma.atlas",
+					"type": "application/octet-stream",
+					"sid": 803103244061719,
+					"file-info": {
+						"purpose": "none"
+					}
+				},
+				{
+					"name": "mix-and-match-pma.png",
+					"type": "image/png",
+					"sid": 814099291012519,
+					"file-info": {
+						"purpose": "none"
+					}
+				},
+				{
+					"name": "mix-and-match-pro.skel",
+					"type": "application/octet-stream",
+					"sid": 370505620835051,
+					"file-info": {
+						"purpose": "none"
+					}
+				}
+			],
+			"subfolders": []
+		}
+	},
+	"timelines": {
+		"items": [
+			"Timeline 1"
+		],
+		"subfolders": [
+			{
+				"items": [],
+				"subfolders": []
+			}
+		]
+	},
+	"flowcharts": {
+		"items": [
+			"Flowchart 1"
+		],
+		"subfolders": []
+	},
+	"models3d": {
+		"items": [],
+		"subfolders": []
+	},
+	"properties": {
+		"description": "",
+		"version": "1.0.0.0",
+		"autoIncrementVersion": false,
+		"author": "",
+		"authorEmail": "",
+		"authorWebsite": "",
+		"appId": "",
+		"pixelRounding": false,
+		"zAxisScale": "regular",
+		"fov": 0.7853981633974483,
+		"useLoaderLayout": false,
+		"fullscreenMode": "letterbox-scale",
+		"fullscreenQuality": "high",
+		"viewportFit": "auto",
+		"backgroundColor": [
+			0,
+			0,
+			0,
+			0
+		],
+		"splashColor": [
+			1,
+			1,
+			1,
+			0
+		],
+		"useThemeColor": false,
+		"themeColor": [
+			1,
+			1,
+			1,
+			0
+		],
+		"orientations": "landscape",
+		"webgpu": "auto",
+		"multitexturing": "auto",
+		"gpuPreference": "high-performance",
+		"framerateMode": "vsync",
+		"fixedFramerate": 30,
+		"sampling": "trilinear",
+		"downscaling": "medium",
+		"renderingMode": "auto",
+		"anisotropicFiltering": "auto",
+		"zNear": 1,
+		"zFar": 10000,
+		"maxSpriteSheetSize": 2048,
+		"loaderStyle": "splash",
+		"preloadSounds": true,
+		"uidAllocationMode": "increment",
+		"cordovaiOSScheme": "app",
+		"cordovaAndroidScheme": "https",
+		"exportFileStructure": "folders",
+		"scriptsType": "module"
+	},
+	"viewportWidth": 854,
+	"viewportHeight": 480,
+	"firstLayout": null
+}

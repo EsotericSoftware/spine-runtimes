@@ -1,0 +1,16 @@
+{
+	"name": "Coin",
+	"plugin-id": "EsotericSoftware_SpineConstruct3",
+	"sid": 665411824247504,
+	"isGlobal": false,
+	"editorNewInstanceIsReplica": true,
+	"instanceVariables": [],
+	"behaviorTypes": [
+		{
+			"behaviorId": "Fade",
+			"name": "Fade",
+			"sid": 977735454474172
+		}
+	],
+	"effectTypes": []
+}

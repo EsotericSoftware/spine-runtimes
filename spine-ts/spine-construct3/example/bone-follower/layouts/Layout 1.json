@@ -1,0 +1,338 @@
+{
+	"name": "Layout 1",
+	"layers": [
+		{
+			"name": "Templates",
+			"overriden": 0,
+			"subLayers": [],
+			"instances": [],
+			"sid": 643980374564226,
+			"effectTypes": [],
+			"isInitiallyVisible": true,
+			"isInitiallyInteractive": true,
+			"isHTMLElementsLayer": false,
+			"color": [
+				1,
+				1,
+				1,
+				1
+			],
+			"backgroundColor": [
+				0.5019607843137255,
+				0.5019607843137255,
+				0.5019607843137255,
+				1
+			],
+			"isTransparent": true,
+			"sampling": "auto",
+			"parallaxX": 1,
+			"parallaxY": 1,
+			"scaleRate": 1,
+			"forceOwnTexture": false,
+			"renderingMode": "3d",
+			"drawOrder": "z-order",
+			"useRenderCells": false,
+			"blendMode": "normal",
+			"zElevation": 0,
+			"global": false
+		},
+		{
+			"name": "Layer 0",
+			"overriden": 0,
+			"subLayers": [],
+			"instances": [
+				{
+					"type": "Sprite",
+					"properties": {
+						"initially-visible": true,
+						"initial-animation": "Animation 1",
+						"initial-frame": 0,
+						"enable-collisions": true,
+						"live-preview": false
+					},
+					"uid": 2,
+					"sid": 807697368127853,
+					"tags": "",
+					"instanceVariables": {},
+					"behaviors": {
+						"Solid": {
+							"properties": {
+								"enabled": true,
+								"use-instance-tags": true,
+								"tags": ""
+							}
+						}
+					},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 426.7714189055818,
+						"y": 461.37937163631415,
+						"width": 852.0048003897646,
+						"height": 33.91105043550397,
+						"originX": 0.5,
+						"originY": 0.5,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						],
+						"z": 0,
+						"angle": 0
+					}
+				},
+				{
+					"type": "Spineboy",
+					"properties": {
+						"spine-atlas-file": 606221401824367,
+						"spine-skeleton-file": 802374378842749,
+						"spine-loader-scale": 1,
+						"spine-skin": "",
+						"spine-animation": "",
+						"spine-debug-skeleton": false,
+						"spine-enable-collision": true,
+						"spine-bounds-provider": "setup",
+						"spine-bounds-provider-move": false,
+						"spine-bounds-offset-x": 0,
+						"spine-bounds-offset-y": 0,
+						"spine-bounds-offset-angle": 0,
+						"spine-offset-scale-x": 1,
+						"spine-offset-scale-y": 1
+					},
+					"uid": 3,
+					"sid": 328146017705426,
+					"tags": "",
+					"instanceVariables": {},
+					"behaviors": {
+						"Platform": {
+							"properties": {
+								"max-speed": 200,
+								"acceleration": 100000,
+								"deceleration": 1500,
+								"jump-strength": 500,
+								"gravity": 700,
+								"max-fall-speed": 1000,
+								"double-jump": false,
+								"jump-sustain": 0,
+								"default-controls": true,
+								"enabled": true
+							}
+						}
+					},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 173.0995641887975,
+						"y": 433.14803235585686,
+						"width": 66.59924722086598,
+						"height": 109.21264671003094,
+						"originX": 0.450794741084345,
+						"originY": 0.9884347397067462,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						],
+						"z": 0,
+						"angle": 0
+					}
+				},
+				{
+					"type": "Coin",
+					"properties": {
+						"spine-atlas-file": 257351313932475,
+						"spine-skeleton-file": 371926819099305,
+						"spine-loader-scale": 1,
+						"spine-skin": "",
+						"spine-animation": "animation",
+						"spine-debug-skeleton": false,
+						"spine-enable-collision": false,
+						"spine-bounds-provider": "setup",
+						"spine-bounds-provider-move": false,
+						"spine-bounds-offset-x": 9.499046623325796,
+						"spine-bounds-offset-y": 0.583703138841166,
+						"spine-bounds-offset-angle": 0,
+						"spine-offset-scale-x": 1.5531339108545998,
+						"spine-offset-scale-y": 1.329053455090401
+					},
+					"uid": 5,
+					"sid": 609437511171162,
+					"tags": "",
+					"instanceVariables": {},
+					"behaviors": {
+						"Fade": {
+							"properties": {
+								"fade-in-time": 0,
+								"wait-time": 0,
+								"fade-out-time": 1,
+								"destroy": true,
+								"enabled": false,
+								"live-preview": false
+							}
+						}
+					},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 363.6998637237007,
+						"y": -42.59522687123697,
+						"width": 59.9829514442153,
+						"height": 60.638366824426626,
+						"originX": 0.33645234188753015,
+						"originY": 0.5012751769917101,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						],
+						"z": 0,
+						"angle": 0
+					}
+				},
+				{
+					"type": "Text",
+					"properties": {
+						"text": "Move around with ←, ↑, → and catch the coins!\n\nSpineboy has collision enabled, which creates a new object type called \"Spineboy_CollisionBody\" that allows you to use the built-in collision ACEs.",
+						"enable-bbcode": true,
+						"font": "Arial",
+						"size": 14,
+						"line-height": 0,
+						"bold": false,
+						"italic": false,
+						"color": [
+							0,
+							0,
+							0,
+							1
+						],
+						"horizontal-alignment": "left",
+						"vertical-alignment": "top",
+						"wrapping": "word",
+						"text-direction": "ltr",
+						"icon-set": -1,
+						"initially-visible": true,
+						"origin": "top-left",
+						"read-aloud": false
+					},
+					"uid": 6,
+					"sid": 170262509848291,
+					"tags": "",
+					"instanceVariables": {},
+					"behaviors": {},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 25.509092688939262,
+						"y": 26.288694736078895,
+						"width": 477.66731834878436,
+						"height": 165.68939932383978,
+						"originX": 0,
+						"originY": 0,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						],
+						"z": 0,
+						"angle": 0
+					}
+				},
+				{
+					"type": "Text2",
+					"properties": {
+						"text": "Coins caught: 0",
+						"enable-bbcode": true,
+						"font": "Arial",
+						"size": 15,
+						"line-height": 0,
+						"bold": false,
+						"italic": false,
+						"color": [
+							0,
+							0,
+							0,
+							1
+						],
+						"horizontal-alignment": "left",
+						"vertical-alignment": "top",
+						"wrapping": "word",
+						"text-direction": "ltr",
+						"icon-set": -1,
+						"initially-visible": true,
+						"origin": "top-left",
+						"read-aloud": false
+					},
+					"uid": 7,
+					"sid": 802958420899699,
+					"tags": "",
+					"instanceVariables": {
+						"coins": 0
+					},
+					"behaviors": {},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 536.4536789746219,
+						"y": 26.471402843319623,
+						"width": 200,
+						"height": 30,
+						"originX": 0,
+						"originY": 0,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						],
+						"z": 0,
+						"angle": 0
+					}
+				}
+			],
+			"sid": 598589980649730,
+			"effectTypes": [],
+			"isInitiallyVisible": true,
+			"isInitiallyInteractive": true,
+			"isHTMLElementsLayer": false,
+			"color": [
+				1,
+				1,
+				1,
+				1
+			],
+			"backgroundColor": [
+				0.5019607843137255,
+				0.5019607843137255,
+				0.5019607843137255,
+				1
+			],
+			"isTransparent": false,
+			"sampling": "auto",
+			"parallaxX": 1,
+			"parallaxY": 1,
+			"scaleRate": 1,
+			"forceOwnTexture": false,
+			"renderingMode": "3d",
+			"drawOrder": "z-order",
+			"useRenderCells": false,
+			"blendMode": "normal",
+			"zElevation": 0,
+			"global": false
+		}
+	],
+	"sid": 614198982703548,
+	"nonworld-instances": [],
+	"effectTypes": [],
+	"width": 1708,
+	"height": 960,
+	"unboundedScrolling": false,
+	"sampling": "auto",
+	"vpX": 0.5,
+	"vpY": 0.5,
+	"projection": "perspective",
+	"eventSheet": "Event sheet 1"
+}

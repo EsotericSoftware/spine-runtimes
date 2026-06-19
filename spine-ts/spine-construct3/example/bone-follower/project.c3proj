@@ -1,0 +1,324 @@
+{
+	"projectFormatVersion": 1,
+	"savedWithRelease": 48703,
+	"name": "Bone Follower",
+	"runtime": "c3",
+	"useWorker": "auto",
+	"bundleAddons": false,
+	"usedAddons": [
+		{
+			"type": "plugin",
+			"id": "Browser",
+			"name": "Browser",
+			"author": "Scirra",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "EsotericSoftware_SpineConstruct3",
+			"name": "Spine",
+			"author": "Esoteric Software",
+			"bundled": false,
+			"version": "4.3.7",
+			"sdkVersion": 2
+		},
+		{
+			"type": "plugin",
+			"id": "Keyboard",
+			"name": "Keyboard",
+			"author": "Scirra",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "Sprite",
+			"name": "Sprite",
+			"author": "Scirra",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "Text",
+			"name": "Text",
+			"author": "Scirra",
+			"bundled": false
+		},
+		{
+			"type": "behavior",
+			"id": "Fade",
+			"name": "Fade",
+			"author": "Scirra",
+			"bundled": false
+		},
+		{
+			"type": "behavior",
+			"id": "Platform",
+			"name": "Platform",
+			"author": "Scirra",
+			"bundled": false
+		},
+		{
+			"type": "behavior",
+			"id": "solid",
+			"name": "Solid",
+			"author": "Scirra",
+			"bundled": false
+		}
+	],
+	"uniqueId": "9tcwmms59d4",
+	"objectTypes": {
+		"items": [
+			"Sprite",
+			"Spineboy",
+			"Keyboard",
+			"Coin",
+			"Spineboy_CollisionBody",
+			"Browser",
+			"Text",
+			"Text2"
+		],
+		"subfolders": []
+	},
+	"functionsName": "Functions",
+	"autosaveData": null,
+	"containers": [],
+	"families": {
+		"items": [],
+		"subfolders": []
+	},
+	"layouts": {
+		"items": [
+			"Layout 1"
+		],
+		"subfolders": []
+	},
+	"eventSheets": {
+		"items": [
+			"Event sheet 1"
+		],
+		"subfolders": []
+	},
+	"rootFileFolders": {
+		"script": {
+			"items": [],
+			"subfolders": []
+		},
+		"sound": {
+			"items": [],
+			"subfolders": []
+		},
+		"music": {
+			"items": [],
+			"subfolders": []
+		},
+		"video": {
+			"items": [],
+			"subfolders": []
+		},
+		"font": {
+			"items": [],
+			"subfolders": []
+		},
+		"icon": {
+			"items": [
+				{
+					"name": "icon-16.png",
+					"type": "image/png",
+					"sid": 788846233901690,
+					"icon-info": {
+						"purpose": "app-icon"
+					}
+				},
+				{
+					"name": "icon-32.png",
+					"type": "image/png",
+					"sid": 708715074054290,
+					"icon-info": {
+						"purpose": "app-icon"
+					}
+				},
+				{
+					"name": "icon-512.png",
+					"type": "image/png",
+					"sid": 421155312045542,
+					"icon-info": {
+						"purpose": "app-icon"
+					}
+				},
+				{
+					"name": "icon-64.png",
+					"type": "image/png",
+					"sid": 176861502200830,
+					"icon-info": {
+						"purpose": "app-icon"
+					}
+				},
+				{
+					"name": "icon-128.png",
+					"type": "image/png",
+					"sid": 842564113109427,
+					"icon-info": {
+						"purpose": "app-icon"
+					}
+				},
+				{
+					"name": "icon-256.png",
+					"type": "image/png",
+					"sid": 962903440333095,
+					"icon-info": {
+						"purpose": "app-icon"
+					}
+				},
+				{
+					"name": "loading-logo.png",
+					"type": "image/png",
+					"sid": 128636841648347,
+					"icon-info": {
+						"purpose": "loading-logo"
+					}
+				}
+			],
+			"subfolders": []
+		},
+		"general": {
+			"items": [
+				{
+					"name": "spineboy-pma.atlas",
+					"type": "application/octet-stream",
+					"sid": 606221401824367,
+					"file-info": {
+						"purpose": "none"
+					}
+				},
+				{
+					"name": "spineboy-pro.skel",
+					"type": "application/octet-stream",
+					"sid": 260791029021781,
+					"file-info": {
+						"purpose": "none"
+					}
+				},
+				{
+					"name": "spineboy-pma.png",
+					"type": "image/png",
+					"sid": 653956709121397,
+					"file-info": {
+						"purpose": "none"
+					}
+				},
+				{
+					"name": "spineboy-pro.json",
+					"type": "application/json",
+					"sid": 802374378842749,
+					"file-info": {
+						"purpose": "none"
+					}
+				},
+				{
+					"name": "coin-pma.atlas",
+					"type": "application/octet-stream",
+					"sid": 257351313932475,
+					"file-info": {
+						"purpose": "none"
+					}
+				},
+				{
+					"name": "coin-pma.png",
+					"type": "image/png",
+					"sid": 525723090812635,
+					"file-info": {
+						"purpose": "none"
+					}
+				},
+				{
+					"name": "coin-pro.skel",
+					"type": "application/octet-stream",
+					"sid": 371926819099305,
+					"file-info": {
+						"purpose": "none"
+					}
+				}
+			],
+			"subfolders": []
+		}
+	},
+	"timelines": {
+		"items": [
+			"Timeline 1"
+		],
+		"subfolders": [
+			{
+				"items": [],
+				"subfolders": []
+			}
+		]
+	},
+	"flowcharts": {
+		"items": [
+			"Flowchart 1"
+		],
+		"subfolders": []
+	},
+	"models3d": {
+		"items": [],
+		"subfolders": []
+	},
+	"properties": {
+		"description": "",
+		"version": "1.0.0.0",
+		"autoIncrementVersion": false,
+		"author": "",
+		"authorEmail": "",
+		"authorWebsite": "",
+		"appId": "",
+		"pixelRounding": false,
+		"zAxisScale": "regular",
+		"fov": 0.7853981633974483,
+		"useLoaderLayout": false,
+		"fullscreenMode": "letterbox-scale",
+		"fullscreenQuality": "high",
+		"viewportFit": "auto",
+		"backgroundColor": [
+			0,
+			0,
+			0,
+			0
+		],
+		"splashColor": [
+			1,
+			1,
+			1,
+			0
+		],
+		"useThemeColor": false,
+		"themeColor": [
+			1,
+			1,
+			1,
+			0
+		],
+		"orientations": "landscape",
+		"webgpu": "auto",
+		"multitexturing": "auto",
+		"gpuPreference": "high-performance",
+		"framerateMode": "vsync",
+		"fixedFramerate": 30,
+		"sampling": "trilinear",
+		"downscaling": "medium",
+		"renderingMode": "auto",
+		"anisotropicFiltering": "auto",
+		"zNear": 1,
+		"zFar": 10000,
+		"maxSpriteSheetSize": 2048,
+		"loaderStyle": "splash",
+		"preloadSounds": true,
+		"uidAllocationMode": "increment",
+		"cordovaiOSScheme": "app",
+		"cordovaAndroidScheme": "https",
+		"exportFileStructure": "folders",
+		"scriptsType": "module"
+	},
+	"viewportWidth": 854,
+	"viewportHeight": 480,
+	"firstLayout": null
+}

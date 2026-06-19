@@ -1,0 +1,529 @@
+{
+	"name": "Event sheet 1",
+	"events": [
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "on-skeleton-loaded",
+					"objectClass": "Spine",
+					"sid": 650778807024449
+				},
+				{
+					"id": "has-tags",
+					"objectClass": "Spine",
+					"sid": 593746101179708,
+					"parameters": {
+						"tags": "\"action\""
+					}
+				}
+			],
+			"actions": [
+				{
+					"id": "add-handle",
+					"objectClass": "Spine",
+					"sid": 938834360064096,
+					"parameters": {
+						"type": "bone",
+						"name": "\"back-arm-ik-target\"",
+						"radius": "6",
+						"debug": true
+					}
+				},
+				{
+					"id": "add-handle",
+					"objectClass": "Spine",
+					"sid": 176390186647157,
+					"parameters": {
+						"type": "bone",
+						"name": "\"back-leg-ik-target\"",
+						"radius": "6",
+						"debug": true
+					}
+				},
+				{
+					"id": "add-handle",
+					"objectClass": "Spine",
+					"sid": 985352719921845,
+					"parameters": {
+						"type": "bone",
+						"name": "\"front-arm-ik-target\"",
+						"radius": "6",
+						"debug": true
+					}
+				},
+				{
+					"id": "add-handle",
+					"objectClass": "Spine",
+					"sid": 358072438908675,
+					"parameters": {
+						"type": "bone",
+						"name": "\"front-leg-ik-target\"",
+						"radius": "6",
+						"debug": true
+					}
+				}
+			],
+			"sid": 918015753004425
+		},
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "has-tags",
+					"objectClass": "Spine",
+					"sid": 496515538239340,
+					"parameters": {
+						"tags": "\"manual\""
+					}
+				}
+			],
+			"actions": [],
+			"sid": 836657614130788,
+			"children": [
+				{
+					"eventType": "block",
+					"conditions": [
+						{
+							"id": "on-skeleton-loaded",
+							"objectClass": "Spine",
+							"sid": 551832887306997
+						}
+					],
+					"actions": [
+						{
+							"id": "create-object",
+							"objectClass": "System",
+							"sid": 997580709615311,
+							"parameters": {
+								"object-to-create": "Sprite",
+								"layer": "0",
+								"x": "0",
+								"y": "0",
+								"create-hierarchy": false,
+								"template-name": "\"\""
+							}
+						},
+						{
+							"id": "attach-object-to-bone",
+							"objectClass": "Spine",
+							"sid": 203455648726734,
+							"parameters": {
+								"object": "Sprite",
+								"bone-name": "\"back-arm-ik-target\"",
+								"offset-x": "0",
+								"offset-y": "0",
+								"offset-angle": "0",
+								"offset-scale-x": "1",
+								"offset-scale-y": "1"
+							}
+						},
+						{
+							"id": "create-object",
+							"objectClass": "System",
+							"sid": 786672980974701,
+							"parameters": {
+								"object-to-create": "Sprite",
+								"layer": "0",
+								"x": "0",
+								"y": "0",
+								"create-hierarchy": false,
+								"template-name": "\"\""
+							}
+						},
+						{
+							"id": "attach-object-to-bone",
+							"objectClass": "Spine",
+							"sid": 481262079262374,
+							"parameters": {
+								"object": "Sprite",
+								"bone-name": "\"front-arm-ik-target\"",
+								"offset-x": "0",
+								"offset-y": "0",
+								"offset-angle": "0",
+								"offset-scale-x": "1",
+								"offset-scale-y": "1"
+							}
+						},
+						{
+							"id": "create-object",
+							"objectClass": "System",
+							"sid": 575038551084295,
+							"parameters": {
+								"object-to-create": "Sprite",
+								"layer": "0",
+								"x": "0",
+								"y": "0",
+								"create-hierarchy": false,
+								"template-name": "\"\""
+							}
+						},
+						{
+							"id": "attach-object-to-bone",
+							"objectClass": "Spine",
+							"sid": 498857276248671,
+							"parameters": {
+								"object": "Sprite",
+								"bone-name": "\"front-leg-ik-target\"",
+								"offset-x": "0",
+								"offset-y": "0",
+								"offset-angle": "0",
+								"offset-scale-x": "1",
+								"offset-scale-y": "1"
+							}
+						},
+						{
+							"id": "create-object",
+							"objectClass": "System",
+							"sid": 409689692987668,
+							"parameters": {
+								"object-to-create": "Sprite",
+								"layer": "0",
+								"x": "0",
+								"y": "0",
+								"create-hierarchy": false,
+								"template-name": "\"\""
+							}
+						},
+						{
+							"id": "attach-object-to-bone",
+							"objectClass": "Spine",
+							"sid": 885313450965473,
+							"parameters": {
+								"object": "Sprite",
+								"bone-name": "\"back-leg-ik-target\"",
+								"offset-x": "0",
+								"offset-y": "0",
+								"offset-angle": "0",
+								"offset-scale-x": "1",
+								"offset-scale-y": "1"
+							}
+						}
+					],
+					"sid": 160352337941889
+				},
+				{
+					"eventType": "block",
+					"conditions": [
+						{
+							"id": "on-click",
+							"objectClass": "Mouse",
+							"sid": 427088796595626,
+							"parameters": {
+								"mouse-button": "left",
+								"click-type": "clicked"
+							}
+						}
+					],
+					"actions": [],
+					"sid": 865531440693572,
+					"children": [
+						{
+							"eventType": "block",
+							"conditions": [
+								{
+									"id": "is-inside-bone-radius",
+									"objectClass": "Spine",
+									"sid": 910879700108995,
+									"parameters": {
+										"x": "Mouse.X(\"Layer 0\")",
+										"y": "Mouse.Y(\"Layer 0\")",
+										"bone-name": "\"back-arm-ik-target\"",
+										"radius": "6"
+									}
+								}
+							],
+							"actions": [
+								{
+									"id": "change-tags",
+									"objectClass": "Spine",
+									"sid": 604392504157102,
+									"parameters": {
+										"action": "add",
+										"tags": "\"back-arm-ik-target\""
+									}
+								}
+							],
+							"sid": 636013181580971
+						},
+						{
+							"eventType": "block",
+							"conditions": [
+								{
+									"id": "is-inside-bone-radius",
+									"objectClass": "Spine",
+									"sid": 388693218738167,
+									"parameters": {
+										"x": "Mouse.X(\"Layer 0\")",
+										"y": "Mouse.Y(\"Layer 0\")",
+										"bone-name": "\"front-arm-ik-target\"",
+										"radius": "6"
+									}
+								}
+							],
+							"actions": [
+								{
+									"id": "change-tags",
+									"objectClass": "Spine",
+									"sid": 112767422708853,
+									"parameters": {
+										"action": "add",
+										"tags": "\"front-arm-ik-target\""
+									}
+								}
+							],
+							"sid": 429551700403567
+						},
+						{
+							"eventType": "block",
+							"conditions": [
+								{
+									"id": "is-inside-bone-radius",
+									"objectClass": "Spine",
+									"sid": 285600757261171,
+									"parameters": {
+										"x": "Mouse.X(\"Layer 0\")",
+										"y": "Mouse.Y(\"Layer 0\")",
+										"bone-name": "\"back-leg-ik-target\"",
+										"radius": "6"
+									}
+								}
+							],
+							"actions": [
+								{
+									"id": "change-tags",
+									"objectClass": "Spine",
+									"sid": 333176082887653,
+									"parameters": {
+										"action": "add",
+										"tags": "\"back-leg-ik-target\""
+									}
+								}
+							],
+							"sid": 878314182831445
+						},
+						{
+							"eventType": "block",
+							"conditions": [
+								{
+									"id": "is-inside-bone-radius",
+									"objectClass": "Spine",
+									"sid": 444908877766388,
+									"parameters": {
+										"x": "Mouse.X(\"Layer 0\")",
+										"y": "Mouse.Y(\"Layer 0\")",
+										"bone-name": "\"front-leg-ik-target\"",
+										"radius": "6"
+									}
+								}
+							],
+							"actions": [
+								{
+									"id": "change-tags",
+									"objectClass": "Spine",
+									"sid": 844627869218163,
+									"parameters": {
+										"action": "add",
+										"tags": "\"front-leg-ik-target\""
+									}
+								}
+							],
+							"sid": 665185514818944
+						}
+					]
+				},
+				{
+					"eventType": "block",
+					"conditions": [
+						{
+							"id": "on-movement",
+							"objectClass": "Mouse",
+							"sid": 822965127773183
+						}
+					],
+					"actions": [],
+					"sid": 205106707436626,
+					"children": [
+						{
+							"eventType": "block",
+							"conditions": [
+								{
+									"id": "has-tags",
+									"objectClass": "Spine",
+									"sid": 945548069761351,
+									"parameters": {
+										"tags": "\"back-arm-ik-target\""
+									}
+								}
+							],
+							"actions": [
+								{
+									"id": "set-bone-pose",
+									"objectClass": "Spine",
+									"sid": 888884929262890,
+									"parameters": {
+										"bone-name": "\"back-arm-ik-target\"",
+										"mode": "game",
+										"apply-mode": "once",
+										"x": "Mouse.X(\"Layer 0\")",
+										"y": "Mouse.Y(\"Layer 0\")",
+										"rotation": "0",
+										"scaleX": "1",
+										"scaleY": "1"
+									}
+								}
+							],
+							"sid": 105324541265417
+						},
+						{
+							"eventType": "block",
+							"conditions": [
+								{
+									"id": "has-tags",
+									"objectClass": "Spine",
+									"sid": 377618382514825,
+									"parameters": {
+										"tags": "\"front-arm-ik-target\""
+									}
+								}
+							],
+							"actions": [
+								{
+									"id": "set-bone-pose",
+									"objectClass": "Spine",
+									"sid": 545583451814410,
+									"parameters": {
+										"bone-name": "\"front-arm-ik-target\"",
+										"mode": "game",
+										"apply-mode": "once",
+										"x": "Mouse.X(\"Layer 0\")",
+										"y": "Mouse.Y(\"Layer 0\")",
+										"rotation": "0",
+										"scaleX": "1",
+										"scaleY": "1"
+									}
+								}
+							],
+							"sid": 889483541845662
+						},
+						{
+							"eventType": "block",
+							"conditions": [
+								{
+									"id": "has-tags",
+									"objectClass": "Spine",
+									"sid": 677538538588516,
+									"parameters": {
+										"tags": "\"front-leg-ik-target\""
+									}
+								}
+							],
+							"actions": [
+								{
+									"id": "set-bone-pose",
+									"objectClass": "Spine",
+									"sid": 827214067780601,
+									"parameters": {
+										"bone-name": "\"front-leg-ik-target\"",
+										"mode": "game",
+										"apply-mode": "once",
+										"x": "Mouse.X(\"Layer 0\")",
+										"y": "Mouse.Y(\"Layer 0\")",
+										"rotation": "0",
+										"scaleX": "1",
+										"scaleY": "1"
+									}
+								}
+							],
+							"sid": 656281259369569
+						},
+						{
+							"eventType": "block",
+							"conditions": [
+								{
+									"id": "has-tags",
+									"objectClass": "Spine",
+									"sid": 188093645895159,
+									"parameters": {
+										"tags": "\"back-leg-ik-target\""
+									}
+								}
+							],
+							"actions": [
+								{
+									"id": "set-bone-pose",
+									"objectClass": "Spine",
+									"sid": 986670111114174,
+									"parameters": {
+										"bone-name": "\"back-leg-ik-target\"",
+										"mode": "game",
+										"apply-mode": "once",
+										"x": "Mouse.X(\"Layer 0\")",
+										"y": "Mouse.Y(\"Layer 0\")",
+										"rotation": "0",
+										"scaleX": "1",
+										"scaleY": "1"
+									}
+								}
+							],
+							"sid": 559999450817257
+						}
+					]
+				},
+				{
+					"eventType": "block",
+					"conditions": [
+						{
+							"id": "on-button-released",
+							"objectClass": "Mouse",
+							"sid": 230813807724169,
+							"parameters": {
+								"mouse-button": "left"
+							}
+						}
+					],
+					"actions": [
+						{
+							"id": "change-tags",
+							"objectClass": "Spine",
+							"sid": 362559071739279,
+							"parameters": {
+								"action": "remove",
+								"tags": "\"back-arm-ik-target\""
+							}
+						},
+						{
+							"id": "change-tags",
+							"objectClass": "Spine",
+							"sid": 932359071825030,
+							"parameters": {
+								"action": "remove",
+								"tags": "\"front-arm-ik-target\""
+							}
+						},
+						{
+							"id": "change-tags",
+							"objectClass": "Spine",
+							"sid": 313314857180394,
+							"parameters": {
+								"action": "remove",
+								"tags": "\"back-leg-ik-target\""
+							}
+						},
+						{
+							"id": "change-tags",
+							"objectClass": "Spine",
+							"sid": 247218116551684,
+							"parameters": {
+								"action": "remove",
+								"tags": "\"front-leg-ik-target\""
+							}
+						}
+					],
+					"sid": 412159874045846
+				}
+			]
+		}
+	],
+	"sid": 742722522530736
+}

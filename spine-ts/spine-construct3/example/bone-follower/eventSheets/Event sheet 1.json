@@ -1,0 +1,399 @@
+{
+	"name": "Event sheet 1",
+	"events": [
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "on-skeleton-loaded",
+					"objectClass": "Spineboy",
+					"sid": 896161107000321
+				}
+			],
+			"actions": [
+				{
+					"id": "set-animation",
+					"objectClass": "Spineboy",
+					"sid": 320472661873466,
+					"parameters": {
+						"track-index": "0",
+						"animation": "\"idle\"",
+						"loop": true,
+						"additive": "disabled"
+					}
+				}
+			],
+			"sid": 510917642170679
+		},
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "on-stopped",
+					"objectClass": "Spineboy",
+					"sid": 233458383348808,
+					"behaviorType": "Platform"
+				}
+			],
+			"actions": [
+				{
+					"id": "set-animation",
+					"objectClass": "Spineboy",
+					"sid": 367772878846959,
+					"parameters": {
+						"track-index": "0",
+						"animation": "\"idle\"",
+						"loop": true,
+						"additive": "disabled"
+					}
+				}
+			],
+			"sid": 112256495519261
+		},
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "on-moved",
+					"objectClass": "Spineboy",
+					"sid": 971313752390938,
+					"behaviorType": "Platform"
+				}
+			],
+			"actions": [
+				{
+					"id": "set-animation",
+					"objectClass": "Spineboy",
+					"sid": 413402664805530,
+					"parameters": {
+						"track-index": "0",
+						"animation": "\"run\"",
+						"loop": true,
+						"additive": "disabled"
+					}
+				}
+			],
+			"sid": 490910531048565,
+			"isOrBlock": true
+		},
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "on-key-pressed",
+					"objectClass": "Keyboard",
+					"sid": 194357244982317,
+					"parameters": {
+						"key": 37
+					}
+				}
+			],
+			"actions": [],
+			"sid": 198484257298837,
+			"children": [
+				{
+					"eventType": "block",
+					"conditions": [
+						{
+							"id": "is-mirrored",
+							"objectClass": "Spineboy",
+							"sid": 933263979696852,
+							"isInverted": true
+						}
+					],
+					"actions": [
+						{
+							"id": "mirror",
+							"objectClass": "Spineboy",
+							"sid": 579093600598998,
+							"parameters": {
+								"is-mirrored": true
+							}
+						}
+					],
+					"sid": 537879144087859
+				}
+			]
+		},
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "on-key-pressed",
+					"objectClass": "Keyboard",
+					"sid": 149393647354554,
+					"parameters": {
+						"key": 39
+					}
+				}
+			],
+			"actions": [],
+			"sid": 869105720301079,
+			"children": [
+				{
+					"eventType": "block",
+					"conditions": [
+						{
+							"id": "is-mirrored",
+							"objectClass": "Spineboy",
+							"sid": 479688034853410
+						}
+					],
+					"actions": [
+						{
+							"id": "mirror",
+							"objectClass": "Spineboy",
+							"sid": 551053242008328,
+							"parameters": {
+								"is-mirrored": false
+							}
+						}
+					],
+					"sid": 321167216167616
+				}
+			]
+		},
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "on-jump",
+					"objectClass": "Spineboy",
+					"sid": 463344135698595,
+					"behaviorType": "Platform"
+				}
+			],
+			"actions": [
+				{
+					"id": "set-animation",
+					"objectClass": "Spineboy",
+					"sid": 611316925975988,
+					"parameters": {
+						"track-index": "0",
+						"animation": "\"jump2\"",
+						"loop": false,
+						"additive": "disabled"
+					}
+				}
+			],
+			"sid": 316336720264716
+		},
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "on-landed",
+					"objectClass": "Spineboy",
+					"sid": 519270553400685,
+					"behaviorType": "Platform"
+				}
+			],
+			"actions": [],
+			"sid": 184142727496384,
+			"children": [
+				{
+					"eventType": "block",
+					"conditions": [
+						{
+							"id": "is-moving",
+							"objectClass": "Spineboy",
+							"sid": 536566085931922,
+							"behaviorType": "Platform"
+						}
+					],
+					"actions": [
+						{
+							"id": "set-animation",
+							"objectClass": "Spineboy",
+							"sid": 134507105668446,
+							"parameters": {
+								"track-index": "0",
+								"animation": "\"run\"",
+								"loop": true,
+								"additive": "disabled"
+							}
+						}
+					],
+					"sid": 895058163713621
+				},
+				{
+					"eventType": "block",
+					"conditions": [
+						{
+							"id": "else",
+							"objectClass": "System",
+							"sid": 407057285878169
+						}
+					],
+					"actions": [
+						{
+							"id": "set-animation",
+							"objectClass": "Spineboy",
+							"sid": 303158490876246,
+							"parameters": {
+								"track-index": "0",
+								"animation": "\"idle\"",
+								"loop": true,
+								"additive": "disabled"
+							}
+						}
+					],
+					"sid": 233777732991256
+				}
+			]
+		},
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "on-collision-with-another-object",
+					"objectClass": "Spineboy_CollisionBody",
+					"sid": 849611153795124,
+					"parameters": {
+						"object": "Coin"
+					}
+				},
+				{
+					"id": "has-tags",
+					"objectClass": "Coin",
+					"sid": 128468342014028,
+					"parameters": {
+						"tags": "\"picked\""
+					},
+					"isInverted": true
+				}
+			],
+			"actions": [
+				{
+					"id": "start-fade",
+					"objectClass": "Coin",
+					"sid": 209863346486046,
+					"behaviorType": "Fade"
+				},
+				{
+					"id": "change-tags",
+					"objectClass": "Coin",
+					"sid": 253285052926471,
+					"parameters": {
+						"action": "add",
+						"tags": "\"picked\""
+					}
+				},
+				{
+					"id": "attach-object-to-bone",
+					"objectClass": "Spineboy",
+					"sid": 397011412115255,
+					"parameters": {
+						"object": "Coin",
+						"bone-name": "\"head\"",
+						"offset-x": "75",
+						"offset-y": "0",
+						"offset-angle": "75",
+						"offset-scale-x": "1",
+						"offset-scale-y": "1"
+					}
+				},
+				{
+					"id": "add-to-instvar",
+					"objectClass": "Text2",
+					"sid": 137590086228839,
+					"parameters": {
+						"instance-variable": "coins",
+						"value": "1"
+					}
+				},
+				{
+					"id": "set-text",
+					"objectClass": "Text2",
+					"sid": 947406465152243,
+					"parameters": {
+						"text": "\"Coins caught: \" & Text2.coins"
+					}
+				},
+				{
+					"id": "wait",
+					"objectClass": "System",
+					"sid": 137019280358413,
+					"parameters": {
+						"seconds": "3",
+						"use-timescale": true
+					}
+				},
+				{
+					"id": "detach-object-from-bone",
+					"objectClass": "Spineboy",
+					"sid": 878765127342242,
+					"parameters": {
+						"object": "Coin",
+						"bone-name": "\"head\""
+					}
+				}
+			],
+			"sid": 714814804879233
+		},
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "every-x-seconds",
+					"objectClass": "System",
+					"sid": 323896486246378,
+					"parameters": {
+						"interval-seconds": "2"
+					}
+				},
+				{
+					"id": "compare-two-values",
+					"objectClass": "System",
+					"sid": 161043142368872,
+					"parameters": {
+						"first-value": "Coin.Count",
+						"comparison": 2,
+						"second-value": "5"
+					}
+				}
+			],
+			"actions": [
+				{
+					"id": "create-object",
+					"objectClass": "System",
+					"sid": 566416084923591,
+					"parameters": {
+						"object-to-create": "Coin",
+						"layer": "\"Layer 0\"",
+						"x": "random(ViewportWidth(\"Layer 0\") * 0.1, ViewportWidth(\"Layer 0\") * 0.9)",
+						"y": "random(ViewportHeight(\"Layer 0\") * 0.7, ViewportHeight(\"Layer 0\") * 0.85)",
+						"create-hierarchy": false,
+						"template-name": "\"\""
+					}
+				}
+			],
+			"sid": 204065806203491
+		},
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "on-skeleton-loaded",
+					"objectClass": "Coin",
+					"sid": 599236806461110
+				}
+			],
+			"actions": [
+				{
+					"id": "set-animation",
+					"objectClass": "Coin",
+					"sid": 690589922593591,
+					"parameters": {
+						"track-index": "0",
+						"animation": "\"animation\"",
+						"loop": true,
+						"additive": "disabled"
+					}
+				}
+			],
+			"sid": 780011005063143
+		}
+	],
+	"sid": 598781588539967
+}

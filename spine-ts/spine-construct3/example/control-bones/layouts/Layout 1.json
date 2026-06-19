@@ -1,0 +1,267 @@
+{
+	"name": "Layout 1",
+	"layers": [
+		{
+			"name": "Layer 0",
+			"overriden": 0,
+			"subLayers": [],
+			"instances": [
+				{
+					"type": "Spine",
+					"properties": {
+						"spine-atlas-file": 218860951970219,
+						"spine-skeleton-file": 218772187982069,
+						"spine-loader-scale": 1,
+						"spine-skin": "",
+						"spine-animation": "idle",
+						"spine-debug-skeleton": false,
+						"spine-enable-collision": false,
+						"spine-bounds-provider": "setup",
+						"spine-bounds-provider-move": false,
+						"spine-bounds-offset-x": 0,
+						"spine-bounds-offset-y": 0,
+						"spine-bounds-offset-angle": 0,
+						"spine-offset-scale-x": 1,
+						"spine-offset-scale-y": 1
+					},
+					"uid": 2,
+					"sid": 141825442102556,
+					"tags": "action",
+					"instanceVariables": {},
+					"behaviors": {},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 183,
+						"y": 378,
+						"width": 162.1126349070086,
+						"height": 356.5715469772883,
+						"originX": 0.3854402674083498,
+						"originY": 0.9839294634079059,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						],
+						"z": 0,
+						"angle": 0
+					}
+				},
+				{
+					"type": "Spine",
+					"properties": {
+						"spine-atlas-file": 218860951970219,
+						"spine-skeleton-file": 218772187982069,
+						"spine-loader-scale": 1,
+						"spine-skin": "",
+						"spine-animation": "idle",
+						"spine-debug-skeleton": false,
+						"spine-enable-collision": false,
+						"spine-bounds-provider": "setup",
+						"spine-bounds-provider-move": false,
+						"spine-bounds-offset-x": 0,
+						"spine-bounds-offset-y": 0,
+						"spine-bounds-offset-angle": 0,
+						"spine-offset-scale-x": 1,
+						"spine-offset-scale-y": 1
+					},
+					"uid": 3,
+					"sid": 431101044191896,
+					"tags": "manual",
+					"instanceVariables": {},
+					"behaviors": {},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 598,
+						"y": 382,
+						"width": 168.6435552033583,
+						"height": 370.93649980524395,
+						"originX": 0.3854402674083498,
+						"originY": 0.9839294634079059,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						],
+						"z": 0,
+						"angle": 0
+					}
+				},
+				{
+					"type": "Sprite",
+					"properties": {
+						"initially-visible": true,
+						"initial-animation": "Animation 1",
+						"initial-frame": 0,
+						"enable-collisions": true,
+						"live-preview": false
+					},
+					"uid": 5,
+					"sid": 285102971348855,
+					"tags": "",
+					"instanceVariables": {},
+					"behaviors": {},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 50,
+						"y": 533,
+						"width": 57.384666941614284,
+						"height": 57.384666941614284,
+						"originX": 0.5,
+						"originY": 0.5,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						],
+						"z": 0,
+						"angle": 0
+					}
+				},
+				{
+					"type": "Text",
+					"properties": {
+						"text": "Using \"Add handle\" action",
+						"enable-bbcode": true,
+						"font": "Arial",
+						"size": 12,
+						"line-height": 0,
+						"bold": false,
+						"italic": false,
+						"color": [
+							0,
+							0,
+							0,
+							1
+						],
+						"horizontal-alignment": "left",
+						"vertical-alignment": "top",
+						"wrapping": "word",
+						"text-direction": "ltr",
+						"icon-set": -1,
+						"initially-visible": true,
+						"origin": "top-left",
+						"read-aloud": false
+					},
+					"uid": 6,
+					"sid": 853264082259374,
+					"tags": "",
+					"instanceVariables": {},
+					"behaviors": {},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 101,
+						"y": 400,
+						"width": 205,
+						"height": 33,
+						"originX": 0,
+						"originY": 0,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						],
+						"z": 0,
+						"angle": 0
+					}
+				},
+				{
+					"type": "Text2",
+					"properties": {
+						"text": "Using a combination of lower level actions and conditions.",
+						"enable-bbcode": true,
+						"font": "Arial",
+						"size": 12,
+						"line-height": 0,
+						"bold": false,
+						"italic": false,
+						"color": [
+							0,
+							0,
+							0,
+							1
+						],
+						"horizontal-alignment": "left",
+						"vertical-alignment": "top",
+						"wrapping": "word",
+						"text-direction": "ltr",
+						"icon-set": -1,
+						"initially-visible": true,
+						"origin": "top-left",
+						"read-aloud": false
+					},
+					"uid": 7,
+					"sid": 431497761969643,
+					"tags": "",
+					"instanceVariables": {},
+					"behaviors": {},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 517,
+						"y": 408,
+						"width": 234,
+						"height": 61,
+						"originX": 0,
+						"originY": 0,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						],
+						"z": 0,
+						"angle": 0
+					}
+				}
+			],
+			"sid": 240915717817466,
+			"effectTypes": [],
+			"isInitiallyVisible": true,
+			"isInitiallyInteractive": true,
+			"isHTMLElementsLayer": false,
+			"color": [
+				1,
+				1,
+				1,
+				1
+			],
+			"backgroundColor": [
+				0.5019607843137255,
+				0.5019607843137255,
+				0.5019607843137255,
+				1
+			],
+			"isTransparent": false,
+			"sampling": "auto",
+			"parallaxX": 1,
+			"parallaxY": 1,
+			"scaleRate": 1,
+			"forceOwnTexture": false,
+			"renderingMode": "3d",
+			"drawOrder": "z-order",
+			"useRenderCells": false,
+			"blendMode": "normal",
+			"zElevation": 0,
+			"global": false
+		}
+	],
+	"sid": 506633221166259,
+	"nonworld-instances": [],
+	"effectTypes": [],
+	"width": 1708,
+	"height": 960,
+	"unboundedScrolling": false,
+	"sampling": "auto",
+	"vpX": 0.5,
+	"vpY": 0.5,
+	"projection": "perspective",
+	"eventSheet": "Event sheet 1"
+}

@@ -1,0 +1,86 @@
+{
+	"name": "Event sheet 1",
+	"events": [
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "on-skeleton-loaded",
+					"objectClass": "Spine",
+					"sid": 180021555044429
+				}
+			],
+			"actions": [
+				{
+					"id": "set-animation",
+					"objectClass": "Spine",
+					"sid": 522460130549206,
+					"parameters": {
+						"track-index": "1",
+						"animation": "\"aim\"",
+						"loop": true,
+						"additive": "disabled"
+					}
+				}
+			],
+			"sid": 916560772753171
+		},
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "on-movement",
+					"objectClass": "Mouse",
+					"sid": 452833417629627
+				}
+			],
+			"actions": [
+				{
+					"id": "set-bone-pose",
+					"objectClass": "Spine",
+					"sid": 500667542743928,
+					"parameters": {
+						"bone-name": "\"crosshair\"",
+						"mode": "game",
+						"apply-mode": "once",
+						"x": "Mouse.X(\"Layer 0\")",
+						"y": "Mouse.Y(\"Layer 0\")",
+						"rotation": "0",
+						"scaleX": "1",
+						"scaleY": "1"
+					}
+				}
+			],
+			"sid": 967851156940243
+		},
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "on-click",
+					"objectClass": "Mouse",
+					"sid": 296440674063503,
+					"parameters": {
+						"mouse-button": "left",
+						"click-type": "clicked"
+					}
+				}
+			],
+			"actions": [
+				{
+					"id": "set-animation",
+					"objectClass": "Spine",
+					"sid": 155512383901594,
+					"parameters": {
+						"track-index": "2",
+						"animation": "\"shoot\"",
+						"loop": false,
+						"additive": "disabled"
+					}
+				}
+			],
+			"sid": 272985453789146
+		}
+	],
+	"sid": 627831599531113
+}

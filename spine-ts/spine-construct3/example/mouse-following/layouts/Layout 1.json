@@ -1,0 +1,94 @@
+{
+	"name": "Layout 1",
+	"layers": [
+		{
+			"name": "Layer 0",
+			"overriden": 0,
+			"subLayers": [],
+			"instances": [
+				{
+					"type": "Spine",
+					"properties": {
+						"spine-atlas-file": 652853537055164,
+						"spine-skeleton-file": 186429278682095,
+						"spine-loader-scale": 1,
+						"spine-skin": "",
+						"spine-animation": "idle",
+						"spine-debug-skeleton": false,
+						"spine-enable-collision": false,
+						"spine-bounds-provider": "setup",
+						"spine-bounds-provider-move": false,
+						"spine-bounds-offset-x": 0,
+						"spine-bounds-offset-y": 0,
+						"spine-bounds-offset-angle": 0,
+						"spine-offset-scale-x": 1,
+						"spine-offset-scale-y": 1
+					},
+					"uid": 2,
+					"sid": 768835933841904,
+					"tags": "",
+					"instanceVariables": {},
+					"behaviors": {},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 414,
+						"y": 375,
+						"width": 158.99148912685388,
+						"height": 260.7249109356797,
+						"originX": 0.45079181070923513,
+						"originY": 0.988429733131996,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						],
+						"z": 0,
+						"angle": 0
+					}
+				}
+			],
+			"sid": 563768273396141,
+			"effectTypes": [],
+			"isInitiallyVisible": true,
+			"isInitiallyInteractive": true,
+			"isHTMLElementsLayer": false,
+			"color": [
+				1,
+				1,
+				1,
+				1
+			],
+			"backgroundColor": [
+				0.5019607843137255,
+				0.5019607843137255,
+				0.5019607843137255,
+				1
+			],
+			"isTransparent": false,
+			"sampling": "auto",
+			"parallaxX": 1,
+			"parallaxY": 1,
+			"scaleRate": 1,
+			"forceOwnTexture": false,
+			"renderingMode": "3d",
+			"drawOrder": "z-order",
+			"useRenderCells": false,
+			"blendMode": "normal",
+			"zElevation": 0,
+			"global": false
+		}
+	],
+	"sid": 224985969139628,
+	"nonworld-instances": [],
+	"effectTypes": [],
+	"width": 1708,
+	"height": 960,
+	"unboundedScrolling": false,
+	"sampling": "auto",
+	"vpX": 0.5,
+	"vpY": 0.5,
+	"projection": "perspective",
+	"eventSheet": "Event sheet 1"
+}

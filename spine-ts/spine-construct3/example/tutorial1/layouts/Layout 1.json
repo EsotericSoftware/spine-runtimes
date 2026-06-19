@@ -1,0 +1,306 @@
+{
+	"name": "Layout 1",
+	"layers": [
+		{
+			"name": "Layer 0",
+			"overriden": 0,
+			"subLayers": [],
+			"instances": [
+				{
+					"type": "Sprite",
+					"properties": {
+						"initially-visible": true,
+						"initial-animation": "Animation 1",
+						"initial-frame": 0,
+						"enable-collisions": true,
+						"live-preview": false
+					},
+					"uid": 6,
+					"sid": 534282670270495,
+					"tags": "",
+					"instanceVariables": {},
+					"behaviors": {},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 631,
+						"y": 490,
+						"width": 250,
+						"height": 250,
+						"originX": 0.5,
+						"originY": 0.5,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						],
+						"z": 0,
+						"angle": 0
+					}
+				},
+				{
+					"type": "Text",
+					"properties": {
+						"text": "1. This tutorial explains how to create a Spine game object and assign an animation to it. It assumes that the Spine plugin is already installed. If you have not installed the plugin yet, follow this link. This project already contains all required assets. See the Files node in the Project tab.\n\n2. In the Project tree, right-click the Object types folder and select Add new object type. The Create new object type window opens.\n\n3. Search for Spine and double-click it. The window closes and the cursor becomes a crosshair. Click anywhere in the layout. A 200x200 placeholder with the Spine logo appears.\n\n4. Select the placeholder. In the Properties panel, locate the Properties section.\n   For Atlas, select spineboy-pma.atlas.\n   For Skeleton, select spineboy.skel.\n   Spineboy is now rendered in the layout.\n\n5. Click the Preview layout button. Spineboy is rendered correctly at runtime.\nIf you did not resized spineboy, you will see on the top right a text saying: \"Spineboy is NOT inside the yellow rectangle.\"\n\n6. Close the preview. You can resize Spineboy using the handles around its bounds. Spineboy scales accordingly. Hold Shift to preserve the aspect ratio.\nResize Spineboy so that its bounds are within the yellow rectangle.",
+						"enable-bbcode": true,
+						"font": "Arial",
+						"size": 10,
+						"line-height": 0,
+						"bold": false,
+						"italic": false,
+						"color": [
+							0,
+							0,
+							0,
+							1
+						],
+						"horizontal-alignment": "left",
+						"vertical-alignment": "top",
+						"wrapping": "word",
+						"text-direction": "ltr",
+						"icon-set": -1,
+						"initially-visible": true,
+						"origin": "top-left",
+						"read-aloud": false
+					},
+					"uid": 2,
+					"sid": 153623868017564,
+					"tags": "",
+					"instanceVariables": {},
+					"behaviors": {},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 53,
+						"y": 83,
+						"width": 322,
+						"height": 620,
+						"originX": 0,
+						"originY": 0,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						],
+						"z": 0,
+						"angle": 0
+					}
+				},
+				{
+					"type": "Text",
+					"properties": {
+						"text": "7. Click the Preview layout button. If you did correctly the previous step, the text is now saying: \"Spineboy is inside the yellow rectangle.\"\n\n6. Close the preview and click the Select animation button in the Properties section.\n   Select the walk animation. Animations do not play in the editor.\n\n7. Click the Preview layout button again. Spineboy’s walk animation is rendered correctly at runtime. The bottom white rectangle displays: \"Spineboy is playing the 'walk' animation\"\n\n8. Congratulations! You completed the first tutorial. Go the the next one.",
+						"enable-bbcode": true,
+						"font": "Arial",
+						"size": 10,
+						"line-height": 0,
+						"bold": false,
+						"italic": false,
+						"color": [
+							0,
+							0,
+							0,
+							1
+						],
+						"horizontal-alignment": "left",
+						"vertical-alignment": "top",
+						"wrapping": "word",
+						"text-direction": "ltr",
+						"icon-set": -1,
+						"initially-visible": true,
+						"origin": "top-left",
+						"read-aloud": false
+					},
+					"uid": 5,
+					"sid": 810837088917084,
+					"tags": "",
+					"instanceVariables": {},
+					"behaviors": {},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 486,
+						"y": 50,
+						"width": 322,
+						"height": 292,
+						"originX": 0,
+						"originY": 0,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						],
+						"z": 0,
+						"angle": 0
+					}
+				},
+				{
+					"type": "TextInput",
+					"properties": {
+						"text": "",
+						"placeholder": "",
+						"tooltip": "",
+						"initially-visible": true,
+						"enabled": true,
+						"read-only": false,
+						"spell-check": false,
+						"type": "text",
+						"auto-font-size": true,
+						"id": "",
+						"class": ""
+					},
+					"uid": 7,
+					"sid": 701859399429385,
+					"tags": "",
+					"instanceVariables": {},
+					"behaviors": {},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 436,
+						"y": 636,
+						"width": 398,
+						"height": 22,
+						"originX": 0,
+						"originY": 0,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						]
+					}
+				},
+				{
+					"type": "TextInput2",
+					"properties": {
+						"text": "",
+						"placeholder": "",
+						"tooltip": "",
+						"initially-visible": true,
+						"enabled": true,
+						"read-only": false,
+						"spell-check": false,
+						"type": "text",
+						"auto-font-size": true,
+						"id": "",
+						"class": ""
+					},
+					"uid": 8,
+					"sid": 924610232745364,
+					"tags": "",
+					"instanceVariables": {},
+					"behaviors": {},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 436,
+						"y": 664,
+						"width": 398,
+						"height": 22,
+						"originX": 0,
+						"originY": 0,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						]
+					}
+				},
+				{
+					"type": "Text",
+					"properties": {
+						"text": "Tutorial 1",
+						"enable-bbcode": true,
+						"font": "Arial",
+						"size": 25,
+						"line-height": 0,
+						"bold": true,
+						"italic": false,
+						"color": [
+							0,
+							0,
+							0,
+							1
+						],
+						"horizontal-alignment": "center",
+						"vertical-alignment": "top",
+						"wrapping": "word",
+						"text-direction": "ltr",
+						"icon-set": -1,
+						"initially-visible": true,
+						"origin": "top-left",
+						"read-aloud": false
+					},
+					"uid": 9,
+					"sid": 335580591804446,
+					"tags": "",
+					"instanceVariables": {},
+					"behaviors": {},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 117,
+						"y": 14,
+						"width": 176.29884508480833,
+						"height": 43.308154438509064,
+						"originX": 0,
+						"originY": 0,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						],
+						"z": 0,
+						"angle": 0
+					}
+				}
+			],
+			"sid": 261889039476920,
+			"effectTypes": [],
+			"isInitiallyVisible": true,
+			"isInitiallyInteractive": true,
+			"isHTMLElementsLayer": false,
+			"color": [
+				1,
+				1,
+				1,
+				1
+			],
+			"backgroundColor": [
+				0.5019607843137255,
+				0.5019607843137255,
+				0.5019607843137255,
+				1
+			],
+			"isTransparent": false,
+			"sampling": "auto",
+			"parallaxX": 1,
+			"parallaxY": 1,
+			"scaleRate": 1,
+			"forceOwnTexture": false,
+			"renderingMode": "3d",
+			"drawOrder": "z-order",
+			"useRenderCells": false,
+			"blendMode": "normal",
+			"zElevation": 0,
+			"global": false
+		}
+	],
+	"sid": 796766061360103,
+	"nonworld-instances": [],
+	"effectTypes": [],
+	"width": 1708,
+	"height": 960,
+	"unboundedScrolling": false,
+	"sampling": "auto",
+	"vpX": 0.5,
+	"vpY": 0.5,
+	"projection": "perspective",
+	"eventSheet": "Event sheet 1"
+}

@@ -1,0 +1,18 @@
+{
+	"name": "Text2",
+	"plugin-id": "Text",
+	"sid": 184698562565416,
+	"isGlobal": false,
+	"editorNewInstanceIsReplica": true,
+	"instanceVariables": [
+		{
+			"name": "coins",
+			"type": "number",
+			"desc": "",
+			"show": true,
+			"sid": 402412650803073
+		}
+	],
+	"behaviorTypes": [],
+	"effectTypes": []
+}

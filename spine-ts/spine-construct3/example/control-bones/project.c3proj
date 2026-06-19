@@ -1,0 +1,261 @@
+{
+	"projectFormatVersion": 1,
+	"savedWithRelease": 48703,
+	"name": "control-bones",
+	"runtime": "c3",
+	"useWorker": "auto",
+	"bundleAddons": false,
+	"usedAddons": [
+		{
+			"type": "plugin",
+			"id": "EsotericSoftware_SpineConstruct3",
+			"name": "Spine",
+			"author": "Esoteric Software",
+			"bundled": false,
+			"version": "4.3.7",
+			"sdkVersion": 2
+		},
+		{
+			"type": "plugin",
+			"id": "Mouse",
+			"name": "Mouse",
+			"author": "Scirra",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "Sprite",
+			"name": "Sprite",
+			"author": "Scirra",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "Text",
+			"name": "Text",
+			"author": "Scirra",
+			"bundled": false
+		}
+	],
+	"uniqueId": "id748usc9jb",
+	"objectTypes": {
+		"items": [
+			"Spine",
+			"Mouse",
+			"Sprite",
+			"Text",
+			"Text2"
+		],
+		"subfolders": []
+	},
+	"functionsName": "Functions",
+	"autosaveData": null,
+	"containers": [],
+	"families": {
+		"items": [],
+		"subfolders": []
+	},
+	"layouts": {
+		"items": [
+			"Layout 1"
+		],
+		"subfolders": []
+	},
+	"eventSheets": {
+		"items": [
+			"Event sheet 1"
+		],
+		"subfolders": []
+	},
+	"rootFileFolders": {
+		"script": {
+			"items": [],
+			"subfolders": []
+		},
+		"sound": {
+			"items": [],
+			"subfolders": []
+		},
+		"music": {
+			"items": [],
+			"subfolders": []
+		},
+		"video": {
+			"items": [],
+			"subfolders": []
+		},
+		"font": {
+			"items": [],
+			"subfolders": []
+		},
+		"icon": {
+			"items": [
+				{
+					"name": "icon-16.png",
+					"type": "image/png",
+					"sid": 285663433517148,
+					"icon-info": {
+						"purpose": "app-icon"
+					}
+				},
+				{
+					"name": "icon-32.png",
+					"type": "image/png",
+					"sid": 908040937388322,
+					"icon-info": {
+						"purpose": "app-icon"
+					}
+				},
+				{
+					"name": "icon-64.png",
+					"type": "image/png",
+					"sid": 893255961950755,
+					"icon-info": {
+						"purpose": "app-icon"
+					}
+				},
+				{
+					"name": "icon-128.png",
+					"type": "image/png",
+					"sid": 559936109448564,
+					"icon-info": {
+						"purpose": "app-icon"
+					}
+				},
+				{
+					"name": "icon-256.png",
+					"type": "image/png",
+					"sid": 762102824463843,
+					"icon-info": {
+						"purpose": "app-icon"
+					}
+				},
+				{
+					"name": "icon-512.png",
+					"type": "image/png",
+					"sid": 860995828316909,
+					"icon-info": {
+						"purpose": "app-icon"
+					}
+				},
+				{
+					"name": "loading-logo.png",
+					"type": "image/png",
+					"sid": 587692077421120,
+					"icon-info": {
+						"purpose": "loading-logo"
+					}
+				}
+			],
+			"subfolders": []
+		},
+		"general": {
+			"items": [
+				{
+					"name": "stretchyman-pma.atlas",
+					"type": "application/octet-stream",
+					"sid": 218860951970219,
+					"file-info": {
+						"purpose": "none"
+					}
+				},
+				{
+					"name": "stretchyman-pma.png",
+					"type": "image/png",
+					"sid": 369514137940756,
+					"file-info": {
+						"purpose": "none"
+					}
+				},
+				{
+					"name": "stretchyman-pro.skel",
+					"type": "application/octet-stream",
+					"sid": 218772187982069,
+					"file-info": {
+						"purpose": "none"
+					}
+				}
+			],
+			"subfolders": []
+		}
+	},
+	"timelines": {
+		"items": [
+			"Timeline 1"
+		],
+		"subfolders": [
+			{
+				"items": [],
+				"subfolders": []
+			}
+		]
+	},
+	"flowcharts": {
+		"items": [
+			"Flowchart 1"
+		],
+		"subfolders": []
+	},
+	"models3d": {
+		"items": [],
+		"subfolders": []
+	},
+	"properties": {
+		"description": "",
+		"version": "1.0.0.0",
+		"autoIncrementVersion": false,
+		"author": "",
+		"authorEmail": "",
+		"authorWebsite": "",
+		"appId": "",
+		"pixelRounding": false,
+		"zAxisScale": "regular",
+		"fov": 0.7853981633974483,
+		"useLoaderLayout": false,
+		"fullscreenMode": "letterbox-scale",
+		"fullscreenQuality": "high",
+		"viewportFit": "auto",
+		"backgroundColor": [
+			0,
+			0,
+			0,
+			0
+		],
+		"splashColor": [
+			1,
+			1,
+			1,
+			0
+		],
+		"useThemeColor": false,
+		"themeColor": [
+			1,
+			1,
+			1,
+			0
+		],
+		"orientations": "landscape",
+		"webgpu": "auto",
+		"multitexturing": "auto",
+		"gpuPreference": "high-performance",
+		"framerateMode": "vsync",
+		"fixedFramerate": 30,
+		"sampling": "trilinear",
+		"downscaling": "medium",
+		"renderingMode": "auto",
+		"anisotropicFiltering": "auto",
+		"zNear": 1,
+		"zFar": 10000,
+		"maxSpriteSheetSize": 2048,
+		"loaderStyle": "splash",
+		"preloadSounds": true,
+		"uidAllocationMode": "increment",
+		"cordovaiOSScheme": "app",
+		"cordovaAndroidScheme": "https",
+		"exportFileStructure": "folders",
+		"scriptsType": "module"
+	},
+	"viewportWidth": 854,
+	"viewportHeight": 480,
+	"firstLayout": null
+}

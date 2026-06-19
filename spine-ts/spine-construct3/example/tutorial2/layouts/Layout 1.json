@@ -1,0 +1,405 @@
+{
+	"name": "Layout 1",
+	"layers": [
+		{
+			"name": "Layer 0",
+			"overriden": 0,
+			"subLayers": [],
+			"instances": [
+				{
+					"type": "Sprite",
+					"properties": {
+						"initially-visible": true,
+						"initial-animation": "Animation 1",
+						"initial-frame": 0,
+						"enable-collisions": true,
+						"live-preview": false
+					},
+					"uid": 2,
+					"sid": 176916404210241,
+					"tags": "",
+					"instanceVariables": {},
+					"behaviors": {
+						"Solid": {
+							"properties": {
+								"enabled": true,
+								"use-instance-tags": true,
+								"tags": ""
+							}
+						}
+					},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 879,
+						"y": 624,
+						"width": 34.833001326703766,
+						"height": 250,
+						"originX": 0.5,
+						"originY": 0.5,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						],
+						"z": 0,
+						"angle": 0
+					}
+				},
+				{
+					"type": "Sprite",
+					"properties": {
+						"initially-visible": true,
+						"initial-animation": "Animation 1",
+						"initial-frame": 0,
+						"enable-collisions": true,
+						"live-preview": false
+					},
+					"uid": 3,
+					"sid": 155423985332035,
+					"tags": "",
+					"instanceVariables": {},
+					"behaviors": {
+						"Solid": {
+							"properties": {
+								"enabled": true,
+								"use-instance-tags": true,
+								"tags": ""
+							}
+						}
+					},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 664,
+						"y": 623,
+						"width": 34.833001326703766,
+						"height": 250,
+						"originX": 0.5,
+						"originY": 0.5,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						],
+						"z": 0,
+						"angle": 0
+					}
+				},
+				{
+					"type": "Sprite",
+					"properties": {
+						"initially-visible": true,
+						"initial-animation": "Animation 1",
+						"initial-frame": 0,
+						"enable-collisions": true,
+						"live-preview": false
+					},
+					"uid": 4,
+					"sid": 620089822903204,
+					"tags": "",
+					"instanceVariables": {},
+					"behaviors": {
+						"Solid": {
+							"properties": {
+								"enabled": true,
+								"use-instance-tags": true,
+								"tags": ""
+							}
+						}
+					},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 772,
+						"y": 765,
+						"width": 34.833001326703766,
+						"height": 250,
+						"originX": 0.5,
+						"originY": 0.5,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						],
+						"z": 0,
+						"angle": 1.5707963267948966
+					}
+				},
+				{
+					"type": "Sprite",
+					"properties": {
+						"initially-visible": true,
+						"initial-animation": "Animation 1",
+						"initial-frame": 0,
+						"enable-collisions": true,
+						"live-preview": false
+					},
+					"uid": 6,
+					"sid": 139355147947767,
+					"tags": "",
+					"instanceVariables": {},
+					"behaviors": {
+						"Solid": {
+							"properties": {
+								"enabled": true,
+								"use-instance-tags": true,
+								"tags": ""
+							}
+						}
+					},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 771,
+						"y": 482,
+						"width": 34.833001326703766,
+						"height": 250,
+						"originX": 0.5,
+						"originY": 0.5,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						],
+						"z": 0,
+						"angle": 1.5707963267948966
+					}
+				},
+				{
+					"type": "Text",
+					"properties": {
+						"text": "1. This tutorial explains how bounds work in the Spine plugin. You will learn how bounds affect both the visual size of the game object and its collision body. This project contains a Spine object already configured and some solid platforms.\n\n2. Click the Preview layout button. Spineboy is rendered but nothing happens - it just stays in place. Close the preview.\n\n3. Select Spineboy in the layout. In the Properties panel, click Behaviors, then click the Add button. Search for \"Platform\" and add it. The Platform behavior requires a collision body to detect solid objects.\n\n4. In the Properties panel, enable Debug skeleton. This displays the bounds as a red rectangle at runtime, making it easier to visualize the collision area. It also shows bones and meshes - ignore those for now.\n\n5. Click the Preview layout button. Spineboy now falls and lands on the platform. The red rectangle shows the bounds, which determine the collision body used by the Platform behavior. Close the preview.\n\n6. Select Spineboy and look at the blue rectangle around it - these are the bounds in the editor. Currently, the Bounds provider property is set to \"Setup pose bounds\", which calculates the bounds from the skeleton's setup pose.\n\n7. Resize Spineboy using the handles around its bounds. Hold Shift to preserve the aspect ratio. Make Spineboy smaller.\n\n8. Click the Preview layout button. Spineboy falls and lands on the platform. The red rectangle shows that the collision body matches the new smaller bounds. Close the preview.\n\n9. Select Spineboy. Click the Select animation button and choose the walk animation. This is required for the next step.\n\n10. Change Bounds provider to \"Animation/Skin bounds\". The bounds now update to encompass all frames of the walk animation. Notice how the bounds size changed compared to the setup pose bounds.\n\n11. Click the Preview layout button. The red rectangle shows the collision body now matches the new bounds. Close the preview.",
+						"enable-bbcode": true,
+						"font": "Arial",
+						"size": 10,
+						"line-height": 0,
+						"bold": false,
+						"italic": false,
+						"color": [
+							0,
+							0,
+							0,
+							1
+						],
+						"horizontal-alignment": "left",
+						"vertical-alignment": "top",
+						"wrapping": "word",
+						"text-direction": "ltr",
+						"icon-set": -1,
+						"initially-visible": true,
+						"origin": "top-left",
+						"read-aloud": false
+					},
+					"uid": 7,
+					"sid": 550589405129172,
+					"tags": "",
+					"instanceVariables": {},
+					"behaviors": {},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 19,
+						"y": 92,
+						"width": 511,
+						"height": 695,
+						"originX": 0,
+						"originY": 0,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						],
+						"z": 0,
+						"angle": 0
+					}
+				},
+				{
+					"type": "Text",
+					"properties": {
+						"text": "Tutorial 2",
+						"enable-bbcode": true,
+						"font": "Arial",
+						"size": 25,
+						"line-height": 0,
+						"bold": true,
+						"italic": false,
+						"color": [
+							0,
+							0,
+							0,
+							1
+						],
+						"horizontal-alignment": "center",
+						"vertical-alignment": "top",
+						"wrapping": "word",
+						"text-direction": "ltr",
+						"icon-set": -1,
+						"initially-visible": true,
+						"origin": "top-left",
+						"read-aloud": false
+					},
+					"uid": 8,
+					"sid": 445797535375307,
+					"tags": "",
+					"instanceVariables": {},
+					"behaviors": {},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 145,
+						"y": 33,
+						"width": 224,
+						"height": 53,
+						"originX": 0,
+						"originY": 0,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						],
+						"z": 0,
+						"angle": 0
+					}
+				},
+				{
+					"type": "Text",
+					"properties": {
+						"text": "12. Sometimes neither bounds provider gives you the exact bounds you need. Enable the Position bounds checkbox. This allows you to manually adjust the bounds while keeping the skeleton fixed in place.\n\n13. With Position bounds enabled, drag the bounds handles to resize and reposition the collision area. Notice that Spineboy does not move - only the bounds change. Try making the bounds smaller, covering only Spineboy's feet.\n\n14. Click the Preview layout button. The red rectangle shows the custom bounds you defined. Spineboy collides with the platform using this smaller area. If you jump (up arrow), the head goes out now. Close the preview.\n\n15. Click the Reset bounds button. The bounds return to the calculated size based on the current Bounds provider setting.\n\n16. Congratulations! You completed the second tutorial. You learned how bounds determine the collision body used by behaviors, and how to customize them using different bounds providers and manual positioning. Go to the next one.",
+						"enable-bbcode": true,
+						"font": "Arial",
+						"size": 10,
+						"line-height": 0,
+						"bold": false,
+						"italic": false,
+						"color": [
+							0,
+							0,
+							0,
+							1
+						],
+						"horizontal-alignment": "left",
+						"vertical-alignment": "top",
+						"wrapping": "word",
+						"text-direction": "ltr",
+						"icon-set": -1,
+						"initially-visible": true,
+						"origin": "top-left",
+						"read-aloud": false
+					},
+					"uid": 9,
+					"sid": 783453473885749,
+					"tags": "",
+					"instanceVariables": {},
+					"behaviors": {},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 570,
+						"y": 89,
+						"width": 409,
+						"height": 317,
+						"originX": 0,
+						"originY": 0,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						],
+						"z": 0,
+						"angle": 0
+					}
+				},
+				{
+					"type": "Spine",
+					"properties": {
+						"spine-atlas-file": 133642824965453,
+						"spine-skeleton-file": 681291108735331,
+						"spine-loader-scale": 1,
+						"spine-skin": "",
+						"spine-animation": "",
+						"spine-debug-skeleton": false,
+						"spine-enable-collision": false,
+						"spine-bounds-provider": "setup",
+						"spine-bounds-provider-move": false,
+						"spine-bounds-offset-x": 0,
+						"spine-bounds-offset-y": 0,
+						"spine-bounds-offset-angle": 0,
+						"spine-offset-scale-x": 1,
+						"spine-offset-scale-y": 1
+					},
+					"uid": 5,
+					"sid": 243193500633509,
+					"tags": "",
+					"instanceVariables": {},
+					"behaviors": {},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 762,
+						"y": 725,
+						"width": 122.95975704152757,
+						"height": 201.63765921927177,
+						"originX": 0.45079181070923513,
+						"originY": 0.988429733131996,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						],
+						"z": 0,
+						"angle": 0
+					}
+				}
+			],
+			"sid": 137335097373905,
+			"effectTypes": [],
+			"isInitiallyVisible": true,
+			"isInitiallyInteractive": true,
+			"isHTMLElementsLayer": false,
+			"color": [
+				1,
+				1,
+				1,
+				1
+			],
+			"backgroundColor": [
+				0.5019607843137255,
+				0.5019607843137255,
+				0.5019607843137255,
+				1
+			],
+			"isTransparent": false,
+			"sampling": "auto",
+			"parallaxX": 1,
+			"parallaxY": 1,
+			"scaleRate": 1,
+			"forceOwnTexture": false,
+			"renderingMode": "3d",
+			"drawOrder": "z-order",
+			"useRenderCells": false,
+			"blendMode": "normal",
+			"zElevation": 0,
+			"global": false
+		}
+	],
+	"sid": 933594632436838,
+	"nonworld-instances": [],
+	"effectTypes": [],
+	"width": 1708,
+	"height": 960,
+	"unboundedScrolling": false,
+	"sampling": "auto",
+	"vpX": 0.5,
+	"vpY": 0.5,
+	"projection": "perspective",
+	"eventSheet": "Event sheet 1"
+}

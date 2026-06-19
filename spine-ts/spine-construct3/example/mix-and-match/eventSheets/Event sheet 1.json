@@ -1,0 +1,159 @@
+{
+	"name": "Event sheet 1",
+	"events": [
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "on-skeleton-loaded",
+					"objectClass": "Spine",
+					"sid": 442064590365962
+				}
+			],
+			"actions": [
+				{
+					"id": "set-default-mix",
+					"objectClass": "Spine",
+					"sid": 934081175615801,
+					"parameters": {
+						"duration": ".2"
+					}
+				},
+				{
+					"id": "create-custom-skin",
+					"objectClass": "Spine",
+					"sid": 324987025434084,
+					"parameters": {
+						"skin-name": "\"custom\""
+					}
+				},
+				{
+					"id": "add-custom-skin",
+					"objectClass": "Spine",
+					"sid": 792820992102350,
+					"parameters": {
+						"custom-skin-name": "\"custom\"",
+						"skin-to-add-name": "\"eyelids/girly\""
+					}
+				},
+				{
+					"id": "add-custom-skin",
+					"objectClass": "Spine",
+					"sid": 218312330857839,
+					"parameters": {
+						"custom-skin-name": "\"custom\"",
+						"skin-to-add-name": "\"accessories/hat-red-yellow\""
+					}
+				},
+				{
+					"id": "add-custom-skin",
+					"objectClass": "Spine",
+					"sid": 267611237989950,
+					"parameters": {
+						"custom-skin-name": "\"custom\"",
+						"skin-to-add-name": "\"accessories/bag\""
+					}
+				},
+				{
+					"id": "add-custom-skin",
+					"objectClass": "Spine",
+					"sid": 788540424885502,
+					"parameters": {
+						"custom-skin-name": "\"custom\"",
+						"skin-to-add-name": "\"legs/pants-jeans\""
+					}
+				},
+				{
+					"id": "add-custom-skin",
+					"objectClass": "Spine",
+					"sid": 105316537512257,
+					"parameters": {
+						"custom-skin-name": "\"custom\"",
+						"skin-to-add-name": "\"clothes/hoodie-orange\""
+					}
+				},
+				{
+					"id": "add-custom-skin",
+					"objectClass": "Spine",
+					"sid": 178850320280495,
+					"parameters": {
+						"custom-skin-name": "\"custom\"",
+						"skin-to-add-name": "\"hair/brown\""
+					}
+				},
+				{
+					"id": "add-custom-skin",
+					"objectClass": "Spine",
+					"sid": 919732647480034,
+					"parameters": {
+						"custom-skin-name": "\"custom\"",
+						"skin-to-add-name": "\"skin-base\""
+					}
+				},
+				{
+					"id": "add-custom-skin",
+					"objectClass": "Spine",
+					"sid": 699308490050679,
+					"parameters": {
+						"custom-skin-name": "\"custom\"",
+						"skin-to-add-name": "\"nose/short\""
+					}
+				},
+				{
+					"id": "add-custom-skin",
+					"objectClass": "Spine",
+					"sid": 786161088258564,
+					"parameters": {
+						"custom-skin-name": "\"custom\"",
+						"skin-to-add-name": "\"eyes/violet\""
+					}
+				},
+				{
+					"id": "set-custom-skin",
+					"objectClass": "Spine",
+					"sid": 292061854414560,
+					"parameters": {
+						"skin-name": "\"custom\""
+					}
+				},
+				{
+					"id": "set-animation",
+					"objectClass": "Spine",
+					"sid": 843561633651145,
+					"parameters": {
+						"track-index": "0",
+						"animation": "\"walk\"",
+						"loop": true,
+						"additive": "disabled"
+					}
+				},
+				{
+					"id": "add-animation",
+					"objectClass": "Spine",
+					"sid": 594863228759233,
+					"parameters": {
+						"track-index": "0",
+						"animation": "\"dance\"",
+						"loop": true,
+						"delay": "1",
+						"additive": "disabled"
+					}
+				},
+				{
+					"id": "add-animation",
+					"objectClass": "Spine",
+					"sid": 573010894981727,
+					"parameters": {
+						"track-index": "0",
+						"animation": "\"walk\"",
+						"loop": true,
+						"delay": "1",
+						"additive": "disabled"
+					}
+				}
+			],
+			"sid": 994173624246118
+		}
+	],
+	"sid": 298694062973914
+}

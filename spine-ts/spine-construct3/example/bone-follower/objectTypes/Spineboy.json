@@ -1,0 +1,16 @@
+{
+	"name": "Spineboy",
+	"plugin-id": "EsotericSoftware_SpineConstruct3",
+	"sid": 196700342123939,
+	"isGlobal": false,
+	"editorNewInstanceIsReplica": true,
+	"instanceVariables": [],
+	"behaviorTypes": [
+		{
+			"behaviorId": "Platform",
+			"name": "Platform",
+			"sid": 276912143902061
+		}
+	],
+	"effectTypes": []
+}

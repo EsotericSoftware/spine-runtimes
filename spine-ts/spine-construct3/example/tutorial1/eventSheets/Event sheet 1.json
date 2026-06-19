@@ -1,0 +1,75 @@
+{
+	"name": "Event sheet 1",
+	"events": [
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "every-tick",
+					"objectClass": "System",
+					"sid": 245526253117079
+				}
+			],
+			"actions": [
+				{
+					"type": "script",
+					"language": "typescript",
+					"script": [
+						"const spine = runtime.objects.Spine.getFirstInstance() as any;",
+						"const sprite = runtime.objects.Sprite.getFirstInstance();",
+						"const textInput = runtime.objects.TextInput.getFirstInstance();",
+						"",
+						"if (spine && sprite && textInput) {",
+						"  if (",
+						"    spine.skeletonLoaded &&",
+						"    sprite.getBoundingBox().left <= spine.getBoundingBox().left &&",
+						"    sprite.getBoundingBox().top <= spine.getBoundingBox().top &&",
+						"    sprite.getBoundingBox().bottom >= spine.getBoundingBox().bottom &&",
+						"    sprite.getBoundingBox().right >= spine.getBoundingBox().right",
+						"  ) {",
+						"    textInput.text = \"Spineboy is inside the yellow rectangle\";",
+						"  } else {",
+						"    textInput.text = \"Spineboy is not inside the yellow rectangle\";",
+						"  }",
+						"}"
+					]
+				}
+			],
+			"sid": 738069846728658
+		},
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "every-tick",
+					"objectClass": "System",
+					"sid": 944417009886153
+				}
+			],
+			"actions": [
+				{
+					"type": "script",
+					"language": "typescript",
+					"script": [
+						"const spine = runtime.objects.Spine.getFirstInstance() as any;",
+						"const sprite = runtime.objects.Sprite.getFirstInstance();",
+						"const textInput = runtime.objects.TextInput2.getFirstInstance();",
+						"",
+						"if (spine && sprite && textInput) {",
+						"  if (",
+						"    spine.skeletonLoaded &&",
+						"    spine.isAnimationPlaying(\"walk\", 0)",
+						"  ) {",
+						"    textInput.text = \"Spineboy is playing the 'walk' animation\";",
+						"  } else {",
+						"    textInput.text = \"\";",
+						"  }",
+						"}"
+					]
+				}
+			],
+			"sid": 872275274152908
+		}
+	],
+	"sid": 676533386886754
+}

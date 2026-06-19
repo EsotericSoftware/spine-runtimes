@@ -1,0 +1,94 @@
+{
+	"name": "Layout 1",
+	"layers": [
+		{
+			"name": "Layer 0",
+			"overriden": 0,
+			"subLayers": [],
+			"instances": [
+				{
+					"type": "Spine",
+					"properties": {
+						"spine-atlas-file": 803103244061719,
+						"spine-skeleton-file": 370505620835051,
+						"spine-loader-scale": 1,
+						"spine-skin": "full-skins/girl",
+						"spine-animation": "",
+						"spine-debug-skeleton": false,
+						"spine-enable-collision": false,
+						"spine-bounds-provider": "animation-skin",
+						"spine-bounds-provider-move": false,
+						"spine-bounds-offset-x": 0,
+						"spine-bounds-offset-y": 0,
+						"spine-bounds-offset-angle": 0,
+						"spine-offset-scale-x": 1,
+						"spine-offset-scale-y": 1
+					},
+					"uid": 2,
+					"sid": 674493107336421,
+					"tags": "",
+					"instanceVariables": {},
+					"behaviors": {},
+					"showing": true,
+					"locked": false,
+					"world": {
+						"x": 428,
+						"y": 410,
+						"width": 166.11022201769188,
+						"height": 326.5798060028862,
+						"originX": 0.586273392246844,
+						"originY": 0.9958099490561872,
+						"color": [
+							1,
+							1,
+							1,
+							1
+						],
+						"z": 0,
+						"angle": 0
+					}
+				}
+			],
+			"sid": 609929269820451,
+			"effectTypes": [],
+			"isInitiallyVisible": true,
+			"isInitiallyInteractive": true,
+			"isHTMLElementsLayer": false,
+			"color": [
+				1,
+				1,
+				1,
+				1
+			],
+			"backgroundColor": [
+				0.5019607843137255,
+				0.5019607843137255,
+				0.5019607843137255,
+				1
+			],
+			"isTransparent": false,
+			"sampling": "auto",
+			"parallaxX": 1,
+			"parallaxY": 1,
+			"scaleRate": 1,
+			"forceOwnTexture": false,
+			"renderingMode": "3d",
+			"drawOrder": "z-order",
+			"useRenderCells": false,
+			"blendMode": "normal",
+			"zElevation": 0,
+			"global": false
+		}
+	],
+	"sid": 698650058823696,
+	"nonworld-instances": [],
+	"effectTypes": [],
+	"width": 1708,
+	"height": 960,
+	"unboundedScrolling": false,
+	"sampling": "auto",
+	"vpX": 0.5,
+	"vpY": 0.5,
+	"projection": "perspective",
+	"eventSheet": "Event sheet 1"
+}
