@@ -4,6 +4,7 @@
   },
   "linter": {
     "enabled": true,
+    "includes": ["**", "!spine-construct3/ts-defs/**"],
     "rules": {
       "recommended": true,
       "complexity": {
