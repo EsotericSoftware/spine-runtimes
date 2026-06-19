@@ -1,13 +1,13 @@
 #!/bin/bash
 set -e
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 
 # Source logging utilities
 source ../formatters/logging/logging.sh
 
 BRANCH=$(git symbolic-ref --short -q HEAD)
 if ! echo "$BRANCH" | grep -qE '^[0-9]+\.[0-9]+$'; then
-    echo "Error: publish.sh can only be run from release branches named number.number, e.g. 4.3. Current branch: $BRANCH"
+    echo "Error: scripts/publish.sh can only be run from release branches named number.number, e.g. 4.3. Current branch: $BRANCH"
     exit 1
 fi
 
@@ -129,15 +129,6 @@ NODE
     fi
 done
 
-log_action "Removing package-lock.json"
-if RM_OUTPUT=$(rm -f package-lock.json 2>&1); then
-    log_ok
-else
-    log_fail
-    log_error_output "$RM_OUTPUT"
-    exit 1
-fi
-
 log_action "Cleaning @esotericsoftware modules"
 if RM_OUTPUT=$(rm -rf node_modules/@esotericsoftware 2>&1); then
     log_ok
@@ -157,7 +148,7 @@ else
 fi
 
 echo "Write Y if you want to commit, tag, and push the new version $newVersion."
-echo "This will create and push tag $tag, which triggers the CI pipeline that publishes the npm packages and uploads the web artifacts."
+echo "This will create and push tag $tag, which triggers the CI pipeline that uploads the web and Construct 3 artifacts, then publishes the npm packages."
 echo "Do you want to proceed [y/n]?"
 
 read answer

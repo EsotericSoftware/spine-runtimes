@@ -25,13 +25,28 @@ jobs:
       with:
         node-version: '24'
         registry-url: 'https://registry.npmjs.org'
-    - name: Build and deploy spine-ts
+    - name: Set release version
+      env:
+        MANUAL_VERSION: ${{ inputs.version }}
+      run: |
+        VERSION="$MANUAL_VERSION"
+        if [ -z "$VERSION" ]; then
+          VERSION="${GITHUB_REF_NAME#spine-ts-}"
+        fi
+        echo "TS_RELEASE_VERSION=$VERSION" >> "$GITHUB_ENV"
+    - name: Build spine-ts
+      working-directory: spine-ts
+      run: ./scripts/build.sh
+    - name: Deploy spine-ts artifacts
       working-directory: spine-ts
       env:
         TS_UPDATE_URL: ${{secrets.TS_UPDATE_URL}}
+      run: ./scripts/deploy.sh
+    - name: Deploy spine-construct3
+      working-directory: spine-ts
+      env:
         C3_UPDATE_URL: ${{secrets.C3_UPDATE_URL}}
-        TS_RELEASE_VERSION: ${{ inputs.version }}
-      run: ./build.sh
+      run: ./scripts/deploy-construct3.sh
     - name: Publish npm packages
       working-directory: spine-ts
       run: |

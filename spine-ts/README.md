@@ -159,6 +159,21 @@ To build the artifacts as they are published to NPM, run `npm run build`.
 
 The release workflow is triggered by tags from `EsotericSoftware/spine-runtimes` matching `spine-ts-x.y.z`, for example `spine-ts-4.3.8`. The same tag releases both the npm packages and the Construct 3 plugin.
 
+The workflow runs the release helper scripts in this order:
+
+1. `./scripts/build.sh` validates `TS_RELEASE_VERSION`, validates package/addon versions, installs dependencies with `npm ci`, and runs `npm run build`. This build includes `spine-construct3`.
+2. `./scripts/deploy.sh` packages and uploads `spine-ts.zip` to the Esoteric Software server. It requires `TS_RELEASE_VERSION` and `TS_UPDATE_URL`; `TS_UPDATE_PATH` is optional and defaults to the major/minor release line, for example `4.3`.
+3. `./scripts/deploy-construct3.sh` packages and uploads the Construct 3 artifacts. It requires `TS_RELEASE_VERSION` or `C3_RELEASE_VERSION`, and `C3_UPDATE_URL`; `C3_UPDATE_PATH` is optional and defaults to the same major/minor release line. This script expects `./scripts/build.sh` to have run first and intentionally does not rebuild before npm publishing.
+4. The workflow publishes only the explicit public npm workspaces.
+
+For a manual deploy, run the same scripts from the `spine-ts/` folder, for example:
+
+```bash
+TS_RELEASE_VERSION=4.3.8 ./scripts/build.sh
+TS_RELEASE_VERSION=4.3.8 TS_UPDATE_URL=... ./scripts/deploy.sh
+TS_RELEASE_VERSION=4.3.8 C3_UPDATE_URL=... ./scripts/deploy-construct3.sh
+```
+
 ### One-time npm trusted publishing setup
 
 Before the GitHub Actions workflow can publish to npm, each published package must be configured on npmjs.com to trust this repository workflow. For each `@esotericsoftware` spine-ts package, open the package settings on npmjs.com and configure **Trusted Publisher**:
@@ -188,7 +203,16 @@ Trusted publishing lets the workflow publish using GitHub OIDC instead of a long
 
 ### Release process
 
-The manual process is shown below for reference, but it is normally performed automatically by running `./publish.sh` from the `spine-ts/` folder on a release branch such as `4.3`. The script increments the patch version, optionally updates `CHANGELOG.md`, updates public workspace package versions, updates the private Construct 3 package/addon versions, refreshes `package-lock.json`, commits the changes, creates the matching `spine-ts-x.y.z` tag, and pushes the branch and tag.
+The normal release process is performed by running `./scripts/publish.sh` from the `spine-ts/` folder on a release branch such as `4.3`:
+
+```bash
+cd spine-ts
+./scripts/publish.sh
+```
+
+The script increments the patch version, optionally updates `CHANGELOG.md`, updates public workspace package versions, updates the private Construct 3 package/addon versions, refreshes `package-lock.json` in place with `npm install --workspaces`, commits the changes, creates the matching `spine-ts-x.y.z` tag, and pushes the branch and tag.
+
+If doing the same steps manually, from the repository root:
 
 1. Set the release version in the root `spine-ts/package.json`, public workspace `package.json` files, private Construct 3 workspace `package.json` files, and `spine-construct3/src/addon.json`. Public internal `@esotericsoftware/spine-*` dependencies must use the same version:
 
@@ -201,6 +225,7 @@ The manual process is shown below for reference, but it is normally performed au
 ```bash
 cd spine-ts
 npm install --workspaces
+cd ..
 ```
 
 3. Add a matching entry to `spine-ts/CHANGELOG.md`. If previous commits already documented the changes under `## Unreleased`, usually all you need to do is add the release heading below `## Unreleased` and move those entries under it:
