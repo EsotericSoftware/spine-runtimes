@@ -481,13 +481,12 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	*/
 
 	_saveToJson () {
-		return {
-			// data to be saved for savegames
-		};
+		// Save/load support is deferred; Spine-specific mutable runtime state is not persisted yet.
+		return {};
 	}
 
 	_loadFromJson (o: JSONValue) {
-		// load state for savegames
+		// Save/load support is deferred; Spine-specific mutable runtime state is not persisted yet.
 	}
 
 	_release () {
