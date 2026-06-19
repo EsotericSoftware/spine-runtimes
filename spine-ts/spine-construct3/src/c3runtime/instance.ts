@@ -1014,7 +1014,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		this.triggeredEventTrack = track;
 		this.triggeredEventAnimation = animation;
 		this.triggeredEventName = eventName;
-		if (event) this.triggeredEventData = { ...event, track, animation };
+		this.triggeredEventData = event ? { ...event, track, animation } : undefined;
 		this._trigger(C3.Plugins.EsotericSoftware_SpineConstruct3.Cnds.OnAnimationEvent);
 	}
 
