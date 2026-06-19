@@ -15,17 +15,17 @@
           {
             "id": "event",
             "type": "string",
-            "initial-value": ""
+            "initialValue": "\"\""
           },
           {
             "id": "track",
             "type": "number",
-            "initial-value": -1
+            "initialValue": "-1"
           },
           {
             "id": "animation",
             "type": "string",
-            "initial-value": ""
+            "initialValue": "\"\""
           }
         ]
       },
@@ -93,7 +93,7 @@
           {
             "id": "radius",
             "type": "number",
-            "initial-value": 10
+            "initialValue": "10"
           }
         ]
       },
@@ -105,12 +105,12 @@
           {
             "id": "animation-name",
             "type": "string",
-            "initial-value": ""
+            "initialValue": "\"\""
           },
           {
             "id": "track-index",
             "type": "number",
-            "initial-value": -1
+            "initialValue": "-1"
           }
         ]
       }
@@ -157,7 +157,7 @@
           {
             "id": "track-index",
             "type": "number",
-            "initial-value": 0
+            "initialValue": "0"
           },
           {
             "id": "animation",
@@ -185,7 +185,7 @@
           {
             "id": "track-index",
             "type": "number",
-            "initial-value": 0
+            "initialValue": "0"
           },
           {
             "id": "animation",
@@ -227,12 +227,12 @@
           {
             "id": "track-index",
             "type": "number",
-            "initial-value": 0
+            "initialValue": "0"
           },
           {
             "id": "mix-duration",
             "type": "number",
-            "initial-value": 0.25
+            "initialValue": "0.25"
           }
         ]
       },
@@ -244,12 +244,12 @@
           {
             "id": "track-index",
             "type": "number",
-            "initial-value": 0
+            "initialValue": "0"
           },
           {
             "id": "mix-duration",
             "type": "number",
-            "initial-value": 0.25
+            "initialValue": "0.25"
           },
           {
             "id": "delay",
@@ -317,7 +317,7 @@
           {
             "id": "track-index",
             "type": "number",
-            "initial-value": -1
+            "initialValue": "-1"
           },
           {
             "id": "time-scale",
@@ -333,7 +333,7 @@
           {
             "id": "track-index",
             "type": "number",
-            "initial-value": 0
+            "initialValue": "0"
           },
           {
             "id": "time",
@@ -376,7 +376,7 @@
           {
             "id": "duration",
             "type": "number",
-            "initial-value": 0
+            "initialValue": "0"
           }
         ]
       },
@@ -787,22 +787,22 @@
           {
             "id": "x",
             "type": "number",
-            "initial-value": 0
+            "initialValue": "0"
           },
           {
             "id": "y",
             "type": "number",
-            "initial-value": 0
+            "initialValue": "0"
           },
           {
             "id": "width",
             "type": "number",
-            "initial-value": 200
+            "initialValue": "200"
           },
           {
             "id": "height",
             "type": "number",
-            "initial-value": 200
+            "initialValue": "200"
           }
         ]
       },
@@ -814,12 +814,12 @@
           {
             "id": "skins",
             "type": "string",
-            "initial-value": ""
+            "initialValue": "\"\""
           },
           {
             "id": "animation",
             "type": "string",
-            "initial-value": ""
+            "initialValue": "\"\""
           }
         ]
       },
@@ -1038,7 +1038,7 @@
           {
             "id": "track-index",
             "type": "number",
-            "initial-value": -1
+            "initialValue": "-1"
           }
         ]
       },
@@ -1051,7 +1051,7 @@
           {
             "id": "track-index",
             "type": "number",
-            "initial-value": 0
+            "initialValue": "0"
           }
         ]
       },
