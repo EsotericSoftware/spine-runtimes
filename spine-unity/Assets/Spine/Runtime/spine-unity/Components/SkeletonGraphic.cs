@@ -425,6 +425,8 @@ namespace Spine.Unity {
 			ClearSkeletonState();
 			rendererBuffers.Dispose();
 			valid = false;
+
+			base.OnDestroy();
 		}
 
 		protected void OnCullStateChanged (bool culled) {
