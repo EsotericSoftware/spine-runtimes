@@ -177,11 +177,26 @@ if [ -n "${TS_UPDATE_URL:-}" ]; then
 		log_error_output "$CURL_OUTPUT"
 		exit 1
 	fi
-
-	log_summary "✓ Build and deployment successful"
 else
-	log_action "Deployment"
+	log_action "spine-ts deployment"
 	log_skip
 	log_detail "Deployment skipped (TS_UPDATE_URL not set)"
+fi
+
+if [ -n "${C3_UPDATE_URL:-}" ] || [ -n "${GITHUB_ACTIONS:-}" ]; then
+	C3_REQUIRE_UPLOAD=false
+	if [ -n "${GITHUB_ACTIONS:-}" ]; then
+		C3_REQUIRE_UPLOAD=true
+	fi
+	C3_RELEASE_VERSION="$VERSION" C3_UPDATE_PATH="$RELEASE_LINE" C3_REQUIRE_UPLOAD="$C3_REQUIRE_UPLOAD" ./spine-construct3/build.sh
+else
+	log_action "Construct3 deployment"
+	log_skip
+	log_detail "Deployment skipped (C3_UPDATE_URL not set)"
+fi
+
+if [ -n "${TS_UPDATE_URL:-}" ] || [ -n "${C3_UPDATE_URL:-}" ]; then
+	log_summary "✓ Build and deployment successful"
+else
 	log_summary "✓ Build successful"
 fi

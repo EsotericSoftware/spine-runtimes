@@ -25,18 +25,13 @@ jobs:
       with:
         node-version: '24'
         registry-url: 'https://registry.npmjs.org'
-    - name: Build spine-ts
+    - name: Build and deploy spine-ts
       working-directory: spine-ts
       env:
         TS_UPDATE_URL: ${{secrets.TS_UPDATE_URL}}
-        TS_RELEASE_VERSION: ${{ inputs.version }}
-      run: ./build.sh
-    - name: Deploy spine-construct3
-      working-directory: spine-ts
-      env:
         C3_UPDATE_URL: ${{secrets.C3_UPDATE_URL}}
         TS_RELEASE_VERSION: ${{ inputs.version }}
-      run: ./spine-construct3/build.sh
+      run: ./build.sh
     - name: Publish npm packages
       working-directory: spine-ts
       run: |
