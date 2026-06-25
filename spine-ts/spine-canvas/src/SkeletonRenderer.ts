@@ -27,10 +27,23 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { type BlendMode, Color, MeshAttachment, type NumberArrayLike, RegionAttachment, type Skeleton, type Slot, type TextureRegion, Utils } from "@esotericsoftware/spine-core";
+import { BlendMode, Color, MeshAttachment, type NumberArrayLike, RegionAttachment, type Skeleton, type Slot, type TextureRegion, Utils } from "@esotericsoftware/spine-core";
 import type { CanvasTexture } from "./CanvasTexture.js";
 
 const worldVertices = Utils.newFloatArray(8);
+
+// Use Canvas2D's closest native compositing equivalents. These may not be pixel-identical to WebGL on transparent destinations.
+function blendModeToCompositeOperation (blendMode: BlendMode): GlobalCompositeOperation {
+	switch (blendMode) {
+		case BlendMode.Additive:
+			return "lighter";
+		case BlendMode.Multiply:
+			return "multiply";
+		case BlendMode.Screen:
+			return "screen";
+	}
+	return "source-over";
+}
 
 export class SkeletonRenderer {
 	static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
@@ -57,58 +70,70 @@ export class SkeletonRenderer {
 		const color = this.tempColor;
 		const skeletonColor = skeleton.color;
 		const drawOrder = skeleton.drawOrder.appliedPose;
+		const oldAlpha = ctx.globalAlpha;
+		const oldCompositeOperation = ctx.globalCompositeOperation;
 
-		if (this.debugRendering) ctx.strokeStyle = "green";
+		try {
+			if (this.debugRendering) ctx.strokeStyle = "green";
 
-		for (let i = 0, n = drawOrder.length; i < n; i++) {
-			const slot = drawOrder[i];
-			const bone = slot.bone;
-			if (!bone.active) continue;
+			for (let i = 0, n = drawOrder.length; i < n; i++) {
+				const slot = drawOrder[i];
+				const bone = slot.bone;
+				if (!bone.active) continue;
 
-			const pose = slot.appliedPose;
-			const attachment = pose.attachment;
-			if (!(attachment instanceof RegionAttachment)) continue;
+				const pose = slot.appliedPose;
+				const attachment = pose.attachment;
+				if (!(attachment instanceof RegionAttachment)) continue;
 
-			const sequence = attachment.sequence;
-			const sequenceIndex = sequence.resolveIndex(pose);
-			attachment.computeWorldVertices(slot, attachment.getOffsets(pose), worldVertices, 0, 2);
+				const sequence = attachment.sequence;
+				const sequenceIndex = sequence.resolveIndex(pose);
+				attachment.computeWorldVertices(slot, attachment.getOffsets(pose), worldVertices, 0, 2);
 
-			const region = sequence.regions[sequenceIndex] as TextureRegion;
+				const region = sequence.regions[sequenceIndex] as TextureRegion;
 
-			const image: HTMLImageElement = region.texture.getImage() as HTMLImageElement;
+				const image: HTMLImageElement = region.texture.getImage() as HTMLImageElement;
 
-			const slotColor = pose.color;
-			const regionColor = attachment.color;
-			color.set(skeletonColor.r * slotColor.r * regionColor.r,
-				skeletonColor.g * slotColor.g * regionColor.g,
-				skeletonColor.b * slotColor.b * regionColor.b,
-				skeletonColor.a * slotColor.a * regionColor.a);
+				const slotColor = pose.color;
+				const regionColor = attachment.color;
+				color.set(skeletonColor.r * slotColor.r * regionColor.r,
+					skeletonColor.g * slotColor.g * regionColor.g,
+					skeletonColor.b * slotColor.b * regionColor.b,
+					skeletonColor.a * slotColor.a * regionColor.a);
 
-			ctx.save();
-			const boneApplied = bone.appliedPose;
-			ctx.transform(boneApplied.a, boneApplied.c, boneApplied.b, boneApplied.d, boneApplied.worldX, boneApplied.worldY);
-			const offsets = attachment.getOffsets(pose);
-			ctx.translate(offsets[0], offsets[1]);
-			ctx.rotate(attachment.rotation * Math.PI / 180);
+				ctx.save();
+				try {
+					ctx.globalCompositeOperation = blendModeToCompositeOperation(slot.data.blendMode);
 
-			const atlasScale = attachment.width / region.originalWidth;
-			ctx.scale(atlasScale * attachment.scaleX, atlasScale * attachment.scaleY);
+					const boneApplied = bone.appliedPose;
+					ctx.transform(boneApplied.a, boneApplied.c, boneApplied.b, boneApplied.d, boneApplied.worldX, boneApplied.worldY);
+					const offsets = attachment.getOffsets(pose);
+					ctx.translate(offsets[0], offsets[1]);
+					ctx.rotate(attachment.rotation * Math.PI / 180);
 
-			let w = region.width, h = region.height;
-			ctx.translate(w / 2, h / 2);
-			if (region.degrees === 90) {
-				const t = w;
-				w = h;
-				h = t;
-				ctx.rotate(-Math.PI / 2);
+					const atlasScale = attachment.width / region.originalWidth;
+					ctx.scale(atlasScale * attachment.scaleX, atlasScale * attachment.scaleY);
+
+					let w = region.width, h = region.height;
+					ctx.translate(w / 2, h / 2);
+					if (region.degrees === 90) {
+						const t = w;
+						w = h;
+						h = t;
+						ctx.rotate(-Math.PI / 2);
+					}
+					ctx.scale(1, -1);
+					ctx.translate(-w / 2, -h / 2);
+
+					ctx.globalAlpha = color.a;
+					ctx.drawImage(image, image.width * region.u, image.height * region.v, w, h, 0, 0, w, h);
+					if (this.debugRendering) ctx.strokeRect(0, 0, w, h);
+				} finally {
+					ctx.restore();
+				}
 			}
-			ctx.scale(1, -1);
-			ctx.translate(-w / 2, -h / 2);
-
-			ctx.globalAlpha = color.a;
-			ctx.drawImage(image, image.width * region.u, image.height * region.v, w, h, 0, 0, w, h);
-			if (this.debugRendering) ctx.strokeRect(0, 0, w, h);
-			ctx.restore();
+		} finally {
+			ctx.globalAlpha = oldAlpha;
+			ctx.globalCompositeOperation = oldCompositeOperation;
 		}
 	}
 
@@ -117,75 +142,78 @@ export class SkeletonRenderer {
 		const color = this.tempColor;
 		const skeletonColor = skeleton.color;
 		const drawOrder = skeleton.drawOrder.appliedPose;
+		const oldAlpha = ctx.globalAlpha;
+		const oldCompositeOperation = ctx.globalCompositeOperation;
 
-		let blendMode: BlendMode | null = null;
 		let vertices: ArrayLike<number> = this.vertices;
 		let triangles: Array<number> | null = null;
 
-		for (let i = 0, n = drawOrder.length; i < n; i++) {
-			const slot = drawOrder[i];
-			const pose = slot.appliedPose;
-			const attachment = pose.attachment;
+		try {
+			for (let i = 0, n = drawOrder.length; i < n; i++) {
+				const slot = drawOrder[i];
+				const pose = slot.appliedPose;
+				const attachment = pose.attachment;
 
-			let texture: HTMLImageElement;
-			if (attachment instanceof RegionAttachment) {
-				const sequence = attachment.sequence;
-				const sequenceIndex = sequence.resolveIndex(pose);
+				let texture: HTMLImageElement;
+				if (attachment instanceof RegionAttachment) {
+					const sequence = attachment.sequence;
+					const sequenceIndex = sequence.resolveIndex(pose);
 
-				const uvs = sequence.getUVs(sequenceIndex);
-				const offsets = attachment.getOffsets(pose);
+					const uvs = sequence.getUVs(sequenceIndex);
+					const offsets = attachment.getOffsets(pose);
 
-				vertices = this.computeRegionVertices(slot, attachment, offsets, uvs, false);
-				triangles = SkeletonRenderer.QUAD_TRIANGLES;
+					vertices = this.computeRegionVertices(slot, attachment, offsets, uvs, false);
+					triangles = SkeletonRenderer.QUAD_TRIANGLES;
 
-				texture = (sequence.regions[sequenceIndex]?.texture as CanvasTexture).getImage();
-			} else if (attachment instanceof MeshAttachment) {
-				const sequence = attachment.sequence;
-				const sequenceIndex = sequence.resolveIndex(pose);
+					texture = (sequence.regions[sequenceIndex]?.texture as CanvasTexture).getImage();
+				} else if (attachment instanceof MeshAttachment) {
+					const sequence = attachment.sequence;
+					const sequenceIndex = sequence.resolveIndex(pose);
 
-				const uvs = sequence.getUVs(sequenceIndex);
-				vertices = this.computeMeshVertices(slot, attachment, uvs, false);
-				triangles = attachment.triangles;
+					const uvs = sequence.getUVs(sequenceIndex);
+					vertices = this.computeMeshVertices(slot, attachment, uvs, false);
+					triangles = attachment.triangles;
 
-				texture = (sequence.regions[sequenceIndex]?.texture as CanvasTexture).getImage();
-			} else
-				continue;
+					texture = (sequence.regions[sequenceIndex]?.texture as CanvasTexture).getImage();
+				} else
+					continue;
 
-			if (texture) {
-				if (slot.data.blendMode !== blendMode) blendMode = slot.data.blendMode;
+				if (texture) {
+					const slotColor = pose.color;
+					const attachmentColor = attachment.color;
+					color.set(skeletonColor.r * slotColor.r * attachmentColor.r,
+						skeletonColor.g * slotColor.g * attachmentColor.g,
+						skeletonColor.b * slotColor.b * attachmentColor.b,
+						skeletonColor.a * slotColor.a * attachmentColor.a);
 
-				const slotColor = pose.color;
-				const attachmentColor = attachment.color;
-				color.set(skeletonColor.r * slotColor.r * attachmentColor.r,
-					skeletonColor.g * slotColor.g * attachmentColor.g,
-					skeletonColor.b * slotColor.b * attachmentColor.b,
-					skeletonColor.a * slotColor.a * attachmentColor.a);
+					ctx.globalCompositeOperation = blendModeToCompositeOperation(slot.data.blendMode);
+					ctx.globalAlpha = color.a;
 
-				ctx.globalAlpha = color.a;
+					for (let j = 0; j < triangles.length; j += 3) {
+						const t1 = triangles[j] * 8, t2 = triangles[j + 1] * 8, t3 = triangles[j + 2] * 8;
 
-				for (let j = 0; j < triangles.length; j += 3) {
-					const t1 = triangles[j] * 8, t2 = triangles[j + 1] * 8, t3 = triangles[j + 2] * 8;
+						const x0 = vertices[t1], y0 = vertices[t1 + 1], u0 = vertices[t1 + 6], v0 = vertices[t1 + 7];
+						const x1 = vertices[t2], y1 = vertices[t2 + 1], u1 = vertices[t2 + 6], v1 = vertices[t2 + 7];
+						const x2 = vertices[t3], y2 = vertices[t3 + 1], u2 = vertices[t3 + 6], v2 = vertices[t3 + 7];
 
-					const x0 = vertices[t1], y0 = vertices[t1 + 1], u0 = vertices[t1 + 6], v0 = vertices[t1 + 7];
-					const x1 = vertices[t2], y1 = vertices[t2 + 1], u1 = vertices[t2 + 6], v1 = vertices[t2 + 7];
-					const x2 = vertices[t3], y2 = vertices[t3 + 1], u2 = vertices[t3 + 6], v2 = vertices[t3 + 7];
+						this.drawTriangle(texture, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2);
 
-					this.drawTriangle(texture, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2);
-
-					if (this.debugRendering) {
-						ctx.strokeStyle = "green";
-						ctx.beginPath();
-						ctx.moveTo(x0, y0);
-						ctx.lineTo(x1, y1);
-						ctx.lineTo(x2, y2);
-						ctx.lineTo(x0, y0);
-						ctx.stroke();
+						if (this.debugRendering) {
+							ctx.strokeStyle = "green";
+							ctx.beginPath();
+							ctx.moveTo(x0, y0);
+							ctx.lineTo(x1, y1);
+							ctx.lineTo(x2, y2);
+							ctx.lineTo(x0, y0);
+							ctx.stroke();
+						}
 					}
 				}
 			}
+		} finally {
+			ctx.globalAlpha = oldAlpha;
+			ctx.globalCompositeOperation = oldCompositeOperation;
 		}
-
-		this.ctx.globalAlpha = 1;
 	}
 
 	// Adapted from http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
