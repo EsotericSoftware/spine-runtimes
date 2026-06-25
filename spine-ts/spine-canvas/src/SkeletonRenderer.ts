@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { BlendMode, Color, MeshAttachment, type NumberArrayLike, RegionAttachment, type Skeleton, type Slot, type TextureRegion, Utils } from "@esotericsoftware/spine-core";
+import { BlendMode, ClippingAttachment, Color, MeshAttachment, type NumberArrayLike, RegionAttachment, type Skeleton, SkeletonClipping, type Slot, type TextureRegion, Utils } from "@esotericsoftware/spine-core";
 import type { CanvasTexture } from "./CanvasTexture.js";
 
 const worldVertices = Utils.newFloatArray(8);
@@ -55,6 +55,8 @@ export class SkeletonRenderer {
 	public debugRendering = false;
 	private vertices = Utils.newFloatArray(8 * 1024);
 	private tempColor = new Color();
+	private tempColor2 = new Color();
+	private clipper = new SkeletonClipping();
 
 	constructor (context: CanvasRenderingContext2D) {
 		this.ctx = context;
@@ -140,17 +142,25 @@ export class SkeletonRenderer {
 	private drawTriangles (skeleton: Skeleton) {
 		const ctx = this.ctx;
 		const color = this.tempColor;
+		const darkColor = this.tempColor2.set(0, 0, 0, 1);
+		const clipper = this.clipper;
 		const skeletonColor = skeleton.color;
 		const drawOrder = skeleton.drawOrder.appliedPose;
 		const oldAlpha = ctx.globalAlpha;
 		const oldCompositeOperation = ctx.globalCompositeOperation;
 
-		let vertices: ArrayLike<number> = this.vertices;
-		let triangles: Array<number> | null = null;
+		let vertices: NumberArrayLike = this.vertices;
+		let triangles: Array<number>;
+		let uvs: NumberArrayLike;
 
 		try {
 			for (let i = 0, n = drawOrder.length; i < n; i++) {
 				const slot = drawOrder[i];
+				if (!slot.bone.active) {
+					clipper.clipEnd(slot);
+					continue;
+				}
+
 				const pose = slot.appliedPose;
 				const attachment = pose.attachment;
 
@@ -159,7 +169,7 @@ export class SkeletonRenderer {
 					const sequence = attachment.sequence;
 					const sequenceIndex = sequence.resolveIndex(pose);
 
-					const uvs = sequence.getUVs(sequenceIndex);
+					uvs = sequence.getUVs(sequenceIndex);
 					const offsets = attachment.getOffsets(pose);
 
 					vertices = this.computeRegionVertices(slot, attachment, offsets, uvs, false);
@@ -170,13 +180,19 @@ export class SkeletonRenderer {
 					const sequence = attachment.sequence;
 					const sequenceIndex = sequence.resolveIndex(pose);
 
-					const uvs = sequence.getUVs(sequenceIndex);
+					uvs = sequence.getUVs(sequenceIndex);
 					vertices = this.computeMeshVertices(slot, attachment, uvs, false);
 					triangles = attachment.triangles;
 
 					texture = (sequence.regions[sequenceIndex]?.texture as CanvasTexture).getImage();
-				} else
+				} else if (attachment instanceof ClippingAttachment) {
+					clipper.clipEnd(slot);
+					clipper.clipStart(skeleton, slot, attachment);
 					continue;
+				} else {
+					clipper.clipEnd(slot);
+					continue;
+				}
 
 				if (texture) {
 					const slotColor = pose.color;
@@ -189,12 +205,19 @@ export class SkeletonRenderer {
 					ctx.globalCompositeOperation = blendModeToCompositeOperation(slot.data.blendMode);
 					ctx.globalAlpha = color.a;
 
-					for (let j = 0; j < triangles.length; j += 3) {
-						const t1 = triangles[j] * 8, t2 = triangles[j + 1] * 8, t3 = triangles[j + 2] * 8;
+					let finalVertices = vertices;
+					let finalTriangles = triangles;
+					if (clipper.isClipping() && clipper.clipTriangles(vertices, triangles, triangles.length, uvs, color, darkColor, false, SkeletonRenderer.VERTEX_SIZE)) {
+						finalVertices = clipper.clippedVertices;
+						finalTriangles = clipper.clippedTriangles;
+					}
 
-						const x0 = vertices[t1], y0 = vertices[t1 + 1], u0 = vertices[t1 + 6], v0 = vertices[t1 + 7];
-						const x1 = vertices[t2], y1 = vertices[t2 + 1], u1 = vertices[t2 + 6], v1 = vertices[t2 + 7];
-						const x2 = vertices[t3], y2 = vertices[t3 + 1], u2 = vertices[t3 + 6], v2 = vertices[t3 + 7];
+					for (let j = 0; j < finalTriangles.length; j += 3) {
+						const t1 = finalTriangles[j] * 8, t2 = finalTriangles[j + 1] * 8, t3 = finalTriangles[j + 2] * 8;
+
+						const x0 = finalVertices[t1], y0 = finalVertices[t1 + 1], u0 = finalVertices[t1 + 6], v0 = finalVertices[t1 + 7];
+						const x1 = finalVertices[t2], y1 = finalVertices[t2 + 1], u1 = finalVertices[t2 + 6], v1 = finalVertices[t2 + 7];
+						const x2 = finalVertices[t3], y2 = finalVertices[t3 + 1], u2 = finalVertices[t3 + 6], v2 = finalVertices[t3 + 7];
 
 						this.drawTriangle(texture, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2);
 
@@ -209,8 +232,11 @@ export class SkeletonRenderer {
 						}
 					}
 				}
+
+				clipper.clipEnd(slot);
 			}
 		} finally {
+			clipper.clipEnd();
 			ctx.globalAlpha = oldAlpha;
 			ctx.globalCompositeOperation = oldCompositeOperation;
 		}
@@ -331,7 +357,8 @@ export class SkeletonRenderer {
 
 		const vertexCount = mesh.worldVerticesLength / 2;
 		let vertices = this.vertices;
-		if (vertices.length < mesh.worldVerticesLength) this.vertices = vertices = Utils.newFloatArray(mesh.worldVerticesLength);
+		const verticesLength = vertexCount * SkeletonRenderer.VERTEX_SIZE;
+		if (vertices.length < verticesLength) this.vertices = vertices = Utils.newFloatArray(verticesLength);
 		mesh.computeWorldVertices(skeleton, slot, 0, mesh.worldVerticesLength, vertices, 0, SkeletonRenderer.VERTEX_SIZE);
 
 
