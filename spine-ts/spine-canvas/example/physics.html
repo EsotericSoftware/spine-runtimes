@@ -45,7 +45,7 @@
 
 		skeleton = new spine.Skeleton(skeletonData);
 		skeleton.setupPose();
-		skeleton.updateWorldTransform(spine.Physics.update);
+		skeleton.updateWorldTransform(spine.Physics.pose);
 		bounds = skeleton.getBoundsRect();
 		resizeCanvas();
 		fitScale = Math.min(canvas.width / bounds.width, canvas.height / bounds.height) * fitPadding;
@@ -74,6 +74,7 @@
 		});
 		canvas.addEventListener("pointercancel", () => dragging = false);
 
+		lastFrameTime = Date.now() / 1000;
 		requestAnimationFrame(render);
 	}
 
