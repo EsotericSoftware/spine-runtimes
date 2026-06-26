@@ -74,6 +74,11 @@
 - Port of 92be332e: Clipping performance improvements.
 - Relax `findConstraint` constructor type.
 
+### spine-canvas
+
+- Added slot blend mode support and explicit triangle rendering support for meshes and clipping attachments, backed by `SkeletonRendererCore`.
+- Added blend/clipping examples and improved canvas example fitting.
+
 ## 4.3.9 - 2026-06-24
 
 ### spine-pixi-v8
