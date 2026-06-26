@@ -16,6 +16,8 @@
 	let assetManager;
 	let skeleton, animationState, bounds;
 	let skeletonRenderer;
+	let fitScale = 1;
+	const fitPadding = 0.25;
 
 	async function load() {
 		canvas = document.getElementById("canvas");
@@ -40,6 +42,8 @@
 		skeleton.setupPose();
 		skeleton.updateWorldTransform(spine.Physics.update);
 		bounds = skeleton.getBoundsRect();
+		resizeCanvas();
+		fitScale = Math.min(canvas.width / bounds.width, canvas.height / bounds.height) * fitPadding;
 
 		// Spineboy's head bounding box attachment is not attached by default. Attach it.
 		skeleton.setAttachment("head-bb", "head");
@@ -73,6 +77,21 @@
 		requestAnimationFrame(render);
 	}
 
+	function resizeCanvas() {
+		if (canvas.width != canvas.clientWidth || canvas.height != canvas.clientHeight) {
+			canvas.width = canvas.clientWidth;
+			canvas.height = canvas.clientHeight;
+		}
+	}
+
+	function fitSkeleton() {
+		const scale = Math.min(fitScale, Math.min(canvas.width / bounds.width, canvas.height / bounds.height) * fitPadding);
+		skeleton.scaleX = scale;
+		skeleton.scaleY = -scale;
+		skeleton.x = canvas.width / 2 - (bounds.x + bounds.width / 2) * scale;
+		skeleton.y = canvas.height / 2 + (bounds.y + bounds.height / 2) * scale;
+	}
+
 	function render() {
 		// Calculate the delta time between this and the last frame in seconds.
 		const now = Date.now() / 1000;
@@ -81,18 +100,11 @@
 
 		// Resize the canvas drawing buffer if the canvas CSS width and height changed
 		// and clear the canvas.
-		if (canvas.width != canvas.clientWidth || canvas.height != canvas.clientHeight) {
-			canvas.width = canvas.clientWidth;
-			canvas.height = canvas.clientHeight;
-		}
+		resizeCanvas();
 		context.clearRect(0, 0, canvas.width, canvas.height);
 
 		// Center the skeleton and resize it so it fits inside the canvas.
-		skeleton.x = canvas.width / 2;
-		skeleton.y = canvas.height - canvas.height * 0.1;
-		const scale = canvas.height / bounds.height * 0.8;
-		skeleton.scaleX = scale;
-		skeleton.scaleY = -scale;
+		fitSkeleton();
 
 		// Update and apply the animation state, update the skeleton's
 		// world transforms and render the skeleton.
