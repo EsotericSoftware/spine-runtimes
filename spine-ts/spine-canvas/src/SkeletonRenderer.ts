@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { BlendMode, ClippingAttachment, Color, MeshAttachment, type NumberArrayLike, RegionAttachment, type Skeleton, SkeletonClipping, type TextureRegion, Utils } from "@esotericsoftware/spine-core";
+import { BlendMode, Color, RegionAttachment, type Skeleton, SkeletonRendererCore, type TextureRegion } from "@esotericsoftware/spine-core";
 import type { CanvasTexture } from "./CanvasTexture.js";
 
 // Use Canvas2D's closest native compositing equivalents. These may not be pixel-identical to WebGL on transparent destinations.
@@ -44,7 +44,6 @@ function blendModeToCompositeOperation (blendMode: BlendMode): GlobalCompositeOp
 }
 
 export class SkeletonRenderer {
-	static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
 	// Positions-only stride for triangle rendering and clipping.
 	static VERTEX_SIZE = 2;
 
@@ -52,9 +51,8 @@ export class SkeletonRenderer {
 
 	public triangleRendering = false;
 	public debugRendering = false;
-	private vertices = Utils.newFloatArray(2 * 1024);
 	private tempColor = new Color();
-	private clipper = new SkeletonClipping();
+	private rendererCore = new SkeletonRendererCore();
 
 	constructor (context: CanvasRenderingContext2D) {
 		this.ctx = context;
@@ -133,88 +131,19 @@ export class SkeletonRenderer {
 
 	private drawTriangles (skeleton: Skeleton) {
 		const ctx = this.ctx;
-		const color = this.tempColor;
-		const clipper = this.clipper;
-		const skeletonColor = skeleton.color;
-		const drawOrder = skeleton.drawOrder.appliedPose;
 		const oldAlpha = ctx.globalAlpha;
 		const oldCompositeOperation = ctx.globalCompositeOperation;
 
-		let vertices: NumberArrayLike = this.vertices;
-		let triangles: NumberArrayLike | Uint16Array;
-		let uvs: NumberArrayLike;
+		for (let command = this.rendererCore.render(skeleton, false, undefined, SkeletonRenderer.VERTEX_SIZE); command; command = command.next) {
+			if (command.numVertices === 0 || command.numIndices === 0) continue;
 
-		for (let i = 0, n = drawOrder.length; i < n; i++) {
-			const slot = drawOrder[i];
-			if (!slot.bone.active) {
-				clipper.clipEnd(slot);
-				continue;
-			}
-
-			const pose = slot.appliedPose;
-			const attachment = pose.attachment;
-
-			let texture: HTMLImageElement;
-			if (attachment instanceof RegionAttachment) {
-				const sequence = attachment.sequence;
-				const sequenceIndex = sequence.resolveIndex(pose);
-
-				attachment.computeWorldVertices(slot, attachment.getOffsets(pose), this.vertices, 0, SkeletonRenderer.VERTEX_SIZE);
-				vertices = this.vertices;
-				uvs = sequence.getUVs(sequenceIndex);
-				triangles = SkeletonRenderer.QUAD_TRIANGLES;
-
-				texture = (sequence.regions[sequenceIndex]?.texture as CanvasTexture).getImage();
-			} else if (attachment instanceof MeshAttachment) {
-				const sequence = attachment.sequence;
-				const sequenceIndex = sequence.resolveIndex(pose);
-
-				if (this.vertices.length < attachment.worldVerticesLength) {
-					this.vertices = Utils.newFloatArray(attachment.worldVerticesLength);
-				}
-				attachment.computeWorldVertices(skeleton, slot, 0, attachment.worldVerticesLength, this.vertices, 0, SkeletonRenderer.VERTEX_SIZE);
-				vertices = this.vertices;
-				uvs = sequence.getUVs(sequenceIndex);
-				triangles = attachment.triangles;
-
-				texture = (sequence.regions[sequenceIndex]?.texture as CanvasTexture).getImage();
-			} else if (attachment instanceof ClippingAttachment) {
-				clipper.clipEnd(slot);
-				clipper.clipStart(skeleton, slot, attachment);
-				continue;
-			} else {
-				clipper.clipEnd(slot);
-				continue;
-			}
-
-			if (texture) {
-				const slotColor = pose.color;
-				const attachmentColor = attachment.color;
-				color.set(skeletonColor.r * slotColor.r * attachmentColor.r,
-					skeletonColor.g * slotColor.g * attachmentColor.g,
-					skeletonColor.b * slotColor.b * attachmentColor.b,
-					skeletonColor.a * slotColor.a * attachmentColor.a);
-
-				ctx.globalCompositeOperation = blendModeToCompositeOperation(slot.data.blendMode);
-				ctx.globalAlpha = color.a;
-
-				let finalVertices: ArrayLike<number> = vertices;
-				let finalUvs: ArrayLike<number> = uvs;
-				let finalTriangles: ArrayLike<number> = triangles;
-				if (clipper.isClipping()) {
-					clipper.clipTrianglesUnpacked(vertices, 0, triangles, triangles.length, uvs, SkeletonRenderer.VERTEX_SIZE);
-					finalVertices = clipper.clippedVerticesTyped;
-					finalUvs = clipper.clippedUVsTyped;
-					finalTriangles = clipper.clippedTrianglesTyped;
-				}
-
-				this.drawTriangleList(texture, finalVertices, finalUvs, finalTriangles);
-			}
-
-			clipper.clipEnd(slot);
+			const texture = (command.texture as CanvasTexture).getImage();
+			ctx.globalCompositeOperation = blendModeToCompositeOperation(command.blendMode);
+			ctx.globalAlpha = (command.colors[0] >>> 24) / 255;
+			this.drawTriangleList(texture, command.positions.subarray(0, command.numVertices * SkeletonRenderer.VERTEX_SIZE),
+				command.uvs.subarray(0, command.numVertices << 1), command.indices.subarray(0, command.numIndices));
 		}
 
-		clipper.clipEnd();
 		ctx.globalAlpha = oldAlpha;
 		ctx.globalCompositeOperation = oldCompositeOperation;
 	}
