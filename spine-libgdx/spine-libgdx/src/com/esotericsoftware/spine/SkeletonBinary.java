@@ -253,6 +253,18 @@ public class SkeletonBinary extends SkeletonLoader {
 				bones[i] = data;
 			}
 
+			// Groups.
+			GroupData[] groups = skeletonData.groups.setSize(n = input.readInt(true));
+			for (int i = 0; i < n; i++) {
+				var data = new GroupData(input.readString());
+				int flags = input.readByte();
+				if ((flags & 1) != 0) Color.rgba8888ToColor(data.setupPose.color = new Color(), input.readInt());
+				if ((flags & 2) != 0) Color.rgb888ToColor(data.setupPose.darkColor = new Color(), input.readInt());
+				data.clipInverse = (flags & 4) != 0;
+				data.visible = (flags & 8) == 0;
+				groups[i] = data;
+			}
+
 			// Slots.
 			SlotData[] slots = skeletonData.slots.setSize(n = input.readInt(true));
 			for (int i = 0; i < n; i++) {
@@ -267,7 +279,18 @@ public class SkeletonBinary extends SkeletonLoader {
 				data.attachmentName = input.readStringRef();
 				data.blendMode = BlendMode.values[input.readInt(true)];
 				if (nonessential) data.visible = input.readBoolean();
+
+				GroupData[] slotGroups = data.groups.setSize(input.readInt(true));
+				for (int ii = 0, nn = slotGroups.length; ii < nn; ii++)
+					slotGroups[ii] = groups[input.readInt(true)];
+
 				slots[i] = data;
+			}
+
+			// Group clip slots.
+			for (int i = 0, nn = groups.length; i < nn; i++) {
+				int slotIndex = input.readInt(true);
+				if (slotIndex != 0) groups[i].clipSlot = slots[slotIndex - 1];
 			}
 
 			// Constraints.
@@ -580,7 +603,7 @@ public class SkeletonBinary extends SkeletonLoader {
 
 		int flags = input.readByte();
 		String name = (flags & 8) != 0 ? input.readStringRef() : placeholder;
-		return switch (AttachmentType.values[flags & 0b111]) {
+		Attachment attachment = switch (AttachmentType.values[flags & 0b111]) {
 		case region -> {
 			String path = (flags & 16) != 0 ? input.readStringRef() : null;
 			int color = (flags & 32) != 0 ? input.readInt() : 0xffffffff;
@@ -740,6 +763,21 @@ public class SkeletonBinary extends SkeletonLoader {
 		}
 		default -> null;
 		};
+
+		int n = input.readInt(true);
+		if (n != 0) {
+			n--;
+			if (attachment != null) {
+				var groups = new GroupData[n];
+				for (int i = 0; i < n; i++)
+					groups[i] = skeletonData.groups.items[input.readInt(true)];
+				attachment.setGroups(new Array(groups));
+			} else {
+				for (int i = 0; i < n; i++)
+					input.readInt(true);
+			}
+		}
+		return attachment;
 	}
 
 	private Sequence readSequence (SkeletonInput input, boolean hasPathSuffix) throws IOException {

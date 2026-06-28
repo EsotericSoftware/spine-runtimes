@@ -212,6 +212,23 @@ public class SkeletonJson extends SkeletonLoader {
 				skeletonData.bones.add(data);
 			}
 
+			// Groups.
+			var clipSlots = new Array<String>();
+			for (JsonValue groupMap = root.getChild("groups"); groupMap != null; groupMap = groupMap.next) {
+				var data = new GroupData(groupMap.getString("name"));
+				clipSlots.add(groupMap.getString("clipSlot", null));
+				data.clipInverse = groupMap.getBoolean("clipInverse", false);
+				data.visible = groupMap.getBoolean("visible", true);
+
+				String color = groupMap.getString("color", null);
+				if (color != null) Color.valueOf(color, data.setupPose.color = new Color());
+
+				String dark = groupMap.getString("dark", null);
+				if (dark != null) Color.valueOf(dark, data.setupPose.darkColor = new Color());
+
+				skeletonData.groups.add(data);
+			}
+
 			// Slots.
 			for (JsonValue slotMap = root.getChild("slots"); slotMap != null; slotMap = slotMap.next) {
 				String slotName = slotMap.getString("name");
@@ -230,7 +247,23 @@ public class SkeletonJson extends SkeletonLoader {
 				data.attachmentName = slotMap.getString("attachment", null);
 				data.blendMode = BlendMode.valueOf(slotMap.getString("blend", BlendMode.normal.name()));
 				data.visible = slotMap.getBoolean("visible", true);
+
+				for (JsonValue entry = slotMap.getChild("groups"); entry != null; entry = entry.next) {
+					GroupData group = skeletonData.findGroup(entry.asString());
+					if (group == null) throw new SerializationException("Slot group not found: " + entry + ", slot: " + slotName);
+					data.groups.add(group);
+				}
+
 				skeletonData.slots.add(data);
+			}
+
+			// Group clip slots.
+			for (int i = 0, n = skeletonData.groups.size; i < n; i++) {
+				String name = clipSlots.get(i);
+				if (name == null) continue;
+				GroupData group = skeletonData.groups.get(i);
+				group.clipSlot = skeletonData.findSlot(name);
+				if (group.clipSlot == null) throw new SerializationException("Group clip slot not found: " + name);
 			}
 
 			// Constraints.
@@ -588,7 +621,7 @@ public class SkeletonJson extends SkeletonLoader {
 		float scale = this.scale;
 		String name = map.getString("name", placeholder);
 
-		return switch (AttachmentType.valueOf(map.getString("type", AttachmentType.region.name()))) {
+		Attachment attachment = switch (AttachmentType.valueOf(map.getString("type", AttachmentType.region.name()))) {
 		case region -> {
 			String path = map.getString("path", name);
 			Sequence sequence = readSequence(map.get("sequence"));
@@ -708,6 +741,21 @@ public class SkeletonJson extends SkeletonLoader {
 		}
 		default -> null;
 		};
+
+		if (attachment != null) {
+			JsonValue entry = map.getChild("groups");
+			if (entry != null) {
+				var groups = new Array<GroupData>();
+				for (; entry != null; entry = entry.next) {
+					GroupData group = skeletonData.findGroup(entry.asString());
+					if (group == null)
+						throw new SerializationException("Attachment group not found: " + entry + ", attachment: " + name);
+					groups.add(group);
+				}
+				attachment.setGroups(groups);
+			}
+		}
+		return attachment;
 	}
 
 	private Sequence readSequence (@Null JsonValue map) {

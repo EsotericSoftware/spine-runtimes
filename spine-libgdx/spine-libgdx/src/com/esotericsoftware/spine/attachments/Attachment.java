@@ -29,8 +29,10 @@
 
 package com.esotericsoftware.spine.attachments;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
 
+import com.esotericsoftware.spine.GroupData;
 import com.esotericsoftware.spine.Skeleton;
 import com.esotericsoftware.spine.Slot;
 
@@ -39,6 +41,7 @@ abstract public class Attachment {
 	static private final int[] empty = new int[0];
 
 	final String name;
+	@Null Array<GroupData> groups;
 	@Null Attachment timelineAttachment;
 	int[] timelineSlots = empty;
 
@@ -51,8 +54,19 @@ abstract public class Attachment {
 	/** Copy constructor. */
 	protected Attachment (Attachment other) {
 		name = other.name;
+		groups = other.groups == null ? null : new Array(other.groups);
 		timelineAttachment = other.timelineAttachment;
 		timelineSlots = other.timelineSlots;
+	}
+
+	/** Ordered group memberships, outer to inner. Null means the attachment inherits its slot's groups. */
+	public @Null Array<GroupData> getGroups () {
+		return groups;
+	}
+
+	/** @param groups May be null to inherit the slot's groups. */
+	public void setGroups (@Null Array<GroupData> groups) {
+		this.groups = groups;
 	}
 
 	/** Timelines for the timeline attachment are also applied to this attachment.

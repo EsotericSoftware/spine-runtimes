@@ -39,6 +39,7 @@ import com.badlogic.gdx.utils.Null;
 public class SkeletonData {
 	@Null String name;
 	final Array<BoneData> bones = new Array(true, 0, BoneData[]::new); // Ordered parents first.
+	final Array<GroupData> groups = new Array(true, 0, GroupData[]::new);
 	final Array<SlotData> slots = new Array(true, 0, SlotData[]::new); // Setup pose draw order.
 	final Array<Skin> skins = new Array(true, 0, Skin[]::new);
 	@Null Skin defaultSkin;
@@ -70,6 +71,23 @@ public class SkeletonData {
 		BoneData[] bones = this.bones.items;
 		for (int i = 0, n = this.bones.size; i < n; i++)
 			if (bones[i].name.equals(boneName)) return bones[i];
+		return null;
+	}
+
+	// --- Groups.
+
+	/** The skeleton's groups. */
+	public Array<GroupData> getGroups () {
+		return groups;
+	}
+
+	/** Finds a group by comparing each group's name. It is more efficient to cache the results of this method than to call it
+	 * multiple times. */
+	public @Null GroupData findGroup (String groupName) {
+		if (groupName == null) throw new IllegalArgumentException("groupName cannot be null.");
+		GroupData[] groups = this.groups.items;
+		for (int i = 0, n = this.groups.size; i < n; i++)
+			if (groups[i].name.equals(groupName)) return groups[i];
 		return null;
 	}
 

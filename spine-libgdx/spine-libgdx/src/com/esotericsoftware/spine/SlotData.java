@@ -29,12 +29,14 @@
 
 package com.esotericsoftware.spine;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
 
 /** Stores the setup pose for a {@link Slot}. */
 public class SlotData extends PosedData<SlotPose> {
 	final int index;
 	final BoneData boneData;
+	final Array<GroupData> groups = new Array(true, 0, GroupData[]::new);
 	@Null String attachmentName;
 	BlendMode blendMode;
 
@@ -64,6 +66,11 @@ public class SlotData extends PosedData<SlotPose> {
 	/** The bone this slot belongs to. */
 	public BoneData getBoneData () {
 		return boneData;
+	}
+
+	/** Ordered group memberships, outer to inner. */
+	public Array<GroupData> getGroups () {
+		return groups;
 	}
 
 	public void setAttachmentName (@Null String attachmentName) {

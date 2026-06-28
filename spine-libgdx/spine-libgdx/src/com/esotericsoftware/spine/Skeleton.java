@@ -55,6 +55,7 @@ public class Skeleton {
 
 	final SkeletonData data;
 	final Array<Bone> bones;
+	final Array<Group> groups;
 	final Array<Slot> slots;
 	final DrawOrder drawOrder;
 	final Array<Constraint> constraints;
@@ -83,6 +84,10 @@ public class Skeleton {
 			}
 			this.bones.add(bone);
 		}
+
+		groups = new Array(true, data.groups.size, Group[]::new);
+		for (GroupData groupData : data.groups)
+			groups.add(new Group(groupData));
 
 		slots = new Array(true, data.slots.size, Slot[]::new);
 		for (SlotData slotData : data.slots)
@@ -121,6 +126,10 @@ public class Skeleton {
 			bones.add(newBone);
 		}
 
+		groups = new Array(true, skeleton.groups.size, Group[]::new);
+		for (Group group : skeleton.groups)
+			groups.add(new Group(group));
+
 		slots = new Array(true, skeleton.slots.size, Slot[]::new);
 		for (Slot slot : skeleton.slots)
 			slots.add(new Slot(slot, bones.items[slot.bone.data.index], this));
@@ -155,7 +164,12 @@ public class Skeleton {
 		updateCache.clear();
 		resetCache.clear();
 
+		Group[] groups = this.groups.items;
+		for (int i = 0, n = this.groups.size; i < n; i++)
+			groups[i].unconstrained();
+
 		drawOrder.unconstrained();
+
 		Slot[] slots = this.slots.items;
 		for (int i = 0, n = this.slots.size; i < n; i++)
 			slots[i].unconstrained();
@@ -283,9 +297,10 @@ public class Skeleton {
 		}
 	}
 
-	/** Sets the bones, constraints, slots, and draw order to their setup pose values. */
+	/** Sets bones, groups, constraints, slots, and draw order to their setup pose values. */
 	public void setupPose () {
 		setupPoseBones();
+		setupPoseGroups();
 		setupPoseSlots();
 	}
 
@@ -298,6 +313,13 @@ public class Skeleton {
 		Constraint[] constraints = this.constraints.items;
 		for (int i = 0, n = this.constraints.size; i < n; i++)
 			constraints[i].setupPose();
+	}
+
+	/** Sets the groups to their setup pose values. */
+	public void setupPoseGroups () {
+		Group[] groups = this.groups.items;
+		for (int i = 0, n = this.groups.size; i < n; i++)
+			groups[i].setupPose();
 	}
 
 	/** Sets the slots and draw order to their setup pose values. */
@@ -335,6 +357,21 @@ public class Skeleton {
 		Bone[] bones = this.bones.items;
 		for (int i = 0, n = this.bones.size; i < n; i++)
 			if (bones[i].data.name.equals(boneName)) return bones[i];
+		return null;
+	}
+
+	/** The skeleton's groups. */
+	public Array<Group> getGroups () {
+		return groups;
+	}
+
+	/** Finds a group by comparing each group's name. It is more efficient to cache the results of this method than to call it
+	 * repeatedly. */
+	public @Null Group findGroup (String groupName) {
+		if (groupName == null) throw new IllegalArgumentException("groupName cannot be null.");
+		Group[] groups = this.groups.items;
+		for (int i = 0, n = this.groups.size; i < n; i++)
+			if (groups[i].data.name.equals(groupName)) return groups[i];
 		return null;
 	}
 
