@@ -47,6 +47,7 @@ public struct SpineView: UIViewRepresentable {
     private let alignment: SpineAlignment
     private let boundsProvider: BoundsProvider
     private let backgroundColor: UIColor  // Not using `SwiftUI.Color`, as briging to `UIColor` prior iOS 14 might not always work.
+    private let linearTextureFilter: Bool
 
     @Binding
     private var isRendering: Bool?
@@ -65,6 +66,7 @@ public struct SpineView: UIViewRepresentable {
     ///     - alignment: How the skeleton is alignment inside ``SpineUIView``. Per default, it is `.center`
     ///     - boundsProvider: The skeleton bounds must be computed via a ``BoundsProvider``. Per default, ``SetupPoseBounds`` is used.
     ///     - backgroundColor: The background color of the view. Per defaut, `UIColor.clear` is used
+    ///     - linearTextureFilter: Use linear texture filter when `true`. Per default, `false` (nearest).
     ///     - isRendering: Bindgin to disable or enable rendering. Disable it when the spine view is out of bounds and you want to preserve CPU/GPU resources.
     ///
     /// - Returns: A new instance of ``SpineView``.
@@ -75,6 +77,7 @@ public struct SpineView: UIViewRepresentable {
         alignment: SpineAlignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
         backgroundColor: UIColor = .clear,
+        linearTextureFilter: Bool = false,
         isRendering: Binding<Bool?> = .constant(nil)
     ) {
         self.source = source
@@ -83,6 +86,7 @@ public struct SpineView: UIViewRepresentable {
         self.alignment = alignment
         self.boundsProvider = boundsProvider
         self.backgroundColor = backgroundColor
+        self.linearTextureFilter = linearTextureFilter
         _isRendering = isRendering
     }
 
@@ -93,7 +97,8 @@ public struct SpineView: UIViewRepresentable {
             mode: mode,
             alignment: alignment,
             boundsProvider: boundsProvider,
-            backgroundColor: backgroundColor
+            backgroundColor: backgroundColor,
+            linearTextureFilter: linearTextureFilter
         )
     }
 

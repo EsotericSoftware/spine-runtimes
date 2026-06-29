@@ -46,6 +46,7 @@ public final class SpineUIView: MTKView {
     let mode: SpineContentMode
     let alignment: SpineAlignment
     let boundsProvider: BoundsProvider
+    public let linearTextureFilter: Bool
 
     internal var computedBounds: CGRect = .zero
     internal var renderer: SpineRenderer?
@@ -55,12 +56,14 @@ public final class SpineUIView: MTKView {
         mode: SpineContentMode = .fit,
         alignment: SpineAlignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .clear
+        backgroundColor: UIColor = .clear,
+        linearTextureFilter: Bool = false
     ) {
         self.controller = controller
         self.mode = mode
         self.alignment = alignment
         self.boundsProvider = boundsProvider
+        self.linearTextureFilter = linearTextureFilter
 
         super.init(frame: .zero, device: SpineObjects.shared.device)
         clearColor = MTLClearColor(backgroundColor)
@@ -87,9 +90,10 @@ public final class SpineUIView: MTKView {
         mode: SpineContentMode = .fit,
         alignment: SpineAlignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .clear
+        backgroundColor: UIColor = .clear,
+        linearTextureFilter: Bool = false
     ) {
-        self.init(controller: controller, mode: mode, alignment: alignment, boundsProvider: boundsProvider, backgroundColor: backgroundColor)
+        self.init(controller: controller, mode: mode, alignment: alignment, boundsProvider: boundsProvider, backgroundColor: backgroundColor, linearTextureFilter: linearTextureFilter)
         Task.detached(priority: .high) {
             do {
                 let drawable = try await source.loadDrawable()
@@ -153,11 +157,12 @@ public final class SpineUIView: MTKView {
         mode: SpineContentMode = .fit,
         alignment: SpineAlignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .clear
+        backgroundColor: UIColor = .clear,
+        linearTextureFilter: Bool = false
     ) {
         self.init(
             from: .file(atlasFile: atlasFile, skeletonFile: skeletonFile), controller: controller, mode: mode, alignment: alignment,
-            boundsProvider: boundsProvider, backgroundColor: backgroundColor)
+            boundsProvider: boundsProvider, backgroundColor: backgroundColor, linearTextureFilter: linearTextureFilter)
     }
 
     /// A convenience initializer that constructs a new ``SpineUIView`` from HTTP.
@@ -255,7 +260,8 @@ extension SpineUIView {
             commandQueue: SpineObjects.shared.commandQueue,
             pixelFormat: colorPixelFormat,
             atlasPages: atlasPages,
-            pma: pmaFlag
+            pma: pmaFlag,
+            textureFilter: linearTextureFilter ? .linear : .nearest
         )
         renderer?.delegate = controller
         renderer?.dataSource = controller

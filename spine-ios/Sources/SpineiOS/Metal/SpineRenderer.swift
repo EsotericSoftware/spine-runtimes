@@ -81,7 +81,8 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
         commandQueue: MTLCommandQueue,
         pixelFormat: MTLPixelFormat,
         atlasPages: [UIImage],
-        pma: Bool
+        pma: Bool,
+        textureFilter: TextureFilter = .nearest
     ) throws {
         self.device = device
         self.commandQueue = commandQueue
@@ -95,6 +96,7 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
         #endif
 
         let defaultLibrary = try device.makeDefaultLibrary(bundle: bundle)
+        let fragmentFunctionName = Self.fragmentFunctionName(for: textureFilter)
         let textureLoader = MTKTextureLoader(device: device)
         textures =
             try atlasPages
@@ -118,7 +120,7 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
         for blendMode in blendModes {
             let descriptor = MTLRenderPipelineDescriptor()
             descriptor.vertexFunction = defaultLibrary.makeFunction(name: "vertexShader")
-            descriptor.fragmentFunction = defaultLibrary.makeFunction(name: "fragmentShader")
+            descriptor.fragmentFunction = defaultLibrary.makeFunction(name: fragmentFunctionName)
             descriptor.colorAttachments[0].pixelFormat = pixelFormat
             descriptor.colorAttachments[0].apply(
                 blendMode: blendMode,
@@ -307,6 +309,10 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
             )
             vertexStart += vertices.count
         }
+    }
+
+    private static func fragmentFunctionName(for textureFilter: TextureFilter) -> String {
+        textureFilter == .linear ? "fragmentShaderLinear" : "fragmentShader"
     }
 
     private func getPipelineState(blendMode: BlendMode) -> MTLRenderPipelineState? {
