@@ -1,7 +1,7 @@
-import java.util.Properties
-
 plugins {
     alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias(libs.plugins.kotlinComposeCompiler)
     `maven-publish`
     signing
 }
@@ -24,7 +24,7 @@ fun readSpineLibgdxProperty(propertyName: String): String {
 
 android {
     namespace = "com.esotericsoftware.spine"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 23
@@ -46,12 +46,26 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    kotlinOptions {
+        jvmTarget = "1.8"
+        // Restrict available standard library calls to 2.0 features
+        apiVersion = "2.0"
+        // Ensures the generated metadata is readable by 2.0 consumers
+        languageVersion = "2.0"
+    }
+    buildFeatures {
+        compose = true
+    }
 }
 
 dependencies {
     implementation(libs.androidx.appcompat)
     api("com.badlogicgames.gdx:gdx:${readSpineLibgdxProperty("libgdx_version")}")
     api("com.esotericsoftware.spine:spine-libgdx:${readSpineLibgdxProperty("version")}")
+    api(libs.androidx.compose.runtime)
+    api(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.kotlinx.coroutines.android)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

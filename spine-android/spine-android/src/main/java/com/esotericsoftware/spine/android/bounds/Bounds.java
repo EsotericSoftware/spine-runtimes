@@ -98,4 +98,30 @@ public class Bounds {
 	public void setHeight (double height) {
 		this.height = height;
 	}
+
+	@Override
+	public boolean equals (Object obj) {
+		if (this == obj) return true;
+		if (obj == null || getClass() != obj.getClass()) return false;
+		Bounds other = (Bounds) obj;
+		return Double.compare(other.x, x) == 0 &&
+			Double.compare(other.y, y) == 0 &&
+			Double.compare(other.width, width) == 0 &&
+			Double.compare(other.height, height) == 0;
+	}
+
+	@Override
+	public int hashCode () {
+		int result = 17;
+		result = 31 * result + Double.hashCode(x);
+		result = 31 * result + Double.hashCode(y);
+		result = 31 * result + Double.hashCode(width);
+		result = 31 * result + Double.hashCode(height);
+		return result;
+	}
+
+	/** Returns a copy of this Bounds. */
+	public Bounds copy () {
+		return new Bounds(x, y, width, height);
+	}
 }
