@@ -27,13 +27,33 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { CanvasTexture, SkeletonRenderer } from "@esotericsoftware/spine-canvas";
-import { AtlasAttachmentLoader, GLTexture, SceneRenderer, Skeleton, SkeletonBinary, type SkeletonData, SkeletonJson, TextureAtlas } from "@esotericsoftware/spine-webgl"
+import { SkeletonRenderer } from "@esotericsoftware/spine-canvas";
+import { AtlasAttachmentLoader, SceneRenderer, Skeleton, SkeletonBinary, type SkeletonData, SkeletonJson, TextureAtlas } from "@esotericsoftware/spine-webgl"
 import * as Phaser from "phaser";
 import { SPINE_ATLAS_CACHE_KEY, SPINE_ATLAS_FILE_TYPE, SPINE_GAME_OBJECT_TYPE, SPINE_SKELETON_FILE_CACHE_KEY as SPINE_SKELETON_DATA_CACHE_KEY, SPINE_SKELETON_DATA_FILE_TYPE } from "./keys.js";
-import { SpineGameObject, type SpineGameObjectBoundsProvider } from "./SpineGameObject.js";
+import { PhaserTexture } from "./PhaserTexture.js";
+import { SpineGameObject, type SpineGameObjectFactoryOptions, type SpineGameObjectRendererType } from "./SpineGameObject.js";
+import { SetupPoseBoundsProvider, type SpineGameObjectBoundsProvider } from "./SpineGameObjectBounds.js";
 
 Skeleton.yDown = true;
+
+const spineAdditiveBlendModes = new WeakMap<Phaser.Renderer.WebGL.WebGLRenderer, number>();
+
+function getSpineAdditiveBlendMode (renderer: Phaser.Renderer.WebGL.WebGLRenderer): number {
+	let blendMode = spineAdditiveBlendModes.get(renderer);
+	if (blendMode !== undefined) return blendMode;
+
+	const gl = renderer.gl;
+	blendMode = renderer.blendModes.length;
+	renderer.blendModes.push({
+		enabled: true,
+		color: [0, 0, 0, 0],
+		equation: [gl.FUNC_ADD, gl.FUNC_ADD],
+		func: [gl.ONE, gl.ONE, gl.ONE, gl.ONE],
+	});
+	spineAdditiveBlendModes.set(renderer, blendMode);
+	return blendMode;
+}
 
 /**
  * Configuration object used when creating {@link SpineGameObject} instances via a scene's
@@ -42,54 +62,64 @@ Skeleton.yDown = true;
 export interface SpineGameObjectConfig extends Phaser.Types.GameObjects.GameObjectConfig {
 	/** The x-position of the object, optional, default: 0 */
 	x?: number,
+
 	/** The y-position of the object, optional, default: 0 */
 	y?: number,
+
 	/** The skeleton data key */
 	dataKey: string,
+
 	/** The atlas key */
 	atlasKey: string
+
 	/** The bounds provider, optional, default: `SetupPoseBoundsProvider` */
 	boundsProvider?: SpineGameObjectBoundsProvider
+
+	/** Renderer backend, optional, default: `phaser` in WebGL games and `spine-canvas` in Canvas games */
+	renderer?: SpineGameObjectRendererType
 }
 
 /**
  * {@link ScenePlugin} implementation adding Spine Runtime capabilities to a scene.
  *
  * The scene's {@link LoaderPlugin} (`Scene.load`) gets these additional functions:
- * * `spineBinary(key: string, url: string, xhrSettings?: XHRSettingsObject)`: loads a skeleton binary `.skel` file from the `url`.
- * * `spineJson(key: string, url: string, xhrSettings?: XHRSettingsObject)`: loads a skeleton binary `.skel` file from the `url`.
- * * `spineAtlas(key: string, url: string, xhrSettings?: XHRSettingsObject)`: loads a texture atlas `.atlas` file from the `url` as well as its correponding texture atlas page images.
+ * * `spineBinary(key: string, url: string, xhrSettings?: XHRSettingsObject)`: loads skeleton binary `.skel` data from the `url`.
+ * * `spineJson(key: string, url: string, xhrSettings?: XHRSettingsObject)`: loads skeleton JSON data from the `url`.
+ * * `spineAtlas(key: string, url: string, xhrSettings?: XHRSettingsObject)`: loads a texture atlas `.atlas` file from the `url` as well as its corresponding texture atlas page images.
  *
  * The scene's {@link GameObjectFactory} (`Scene.add`) gets these additional functions:
- * * `spine(x: number, y: number, dataKey: string, atlasKey: string, boundsProvider: SpineGameObjectBoundsProvider = SetupPoseBoundsProvider())`:
- *    creates a new {@link SpineGameObject} from the data and atlas at position `(x, y)`, using the {@link BoundsProvider} to calculate its bounding box. The object is automatically added to the scene.
+ * * `spine(x: number, y: number, dataKey: string, atlasKey: string, options?: SpineGameObjectFactoryOptions)`:
+ *    creates a new {@link SpineGameObject} from the data and atlas at position `(x, y)`. The options object can configure bounds and renderer backend. The object is automatically added to the scene.
  *
  * The scene's {@link GameObjectCreator} (`Scene.make`) gets these additional functions:
  * * `spine(config: SpineGameObjectConfig)`: creates a new {@link SpineGameObject} from the given configuration object.
  *
  * The plugin has additional public methods to work with Spine Runtime core API objects:
  * * `getAtlas(atlasKey: string)`: returns the {@link TextureAtlas} instance for the given atlas key.
- * * `getSkeletonData(skeletonDataKey: string)`: returns the {@link SkeletonData} instance for the given skeleton data key.
- * * `createSkeleton(atlasKey: string)`: creates a new {@link Skeleton} instance from the given skeleton data and atlas key.
+ * * `getSkeletonData(dataKey: string, atlasKey: string)`: returns the {@link SkeletonData} instance for the given skeleton data and atlas keys.
+ * * `createSkeleton(dataKey: string, atlasKey: string)`: creates a new {@link Skeleton} instance from the given skeleton data and atlas keys.
  */
 export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 	game: Phaser.Game;
-	private isWebGL: boolean;
+	readonly isWebGL: boolean;
 	gl: WebGLRenderingContext | null;
-	gameWebGLRenderer: SceneRenderer | null = null;
+	private _webGLRenderer: SceneRenderer | null = null;
+	/** Spine WebGL scene renderer used by `renderer: "spine-webgl"` objects, or `null` in Canvas games. */
 	get webGLRenderer (): SceneRenderer | null {
-		return this.gameWebGLRenderer;
+		return this._webGLRenderer;
 	}
 	canvasRenderer: SkeletonRenderer | null;
 	phaserRenderer: Phaser.Renderer.Canvas.CanvasRenderer | Phaser.Renderer.WebGL.WebGLRenderer;
 	currentWebGLDrawingContext: Phaser.Renderer.WebGL.DrawingContext | null = null;
+	spineAdditiveBlendMode = Phaser.BlendModes.ADD;
 	private skeletonDataCache: Phaser.Cache.BaseCache;
 	private atlasCache: Phaser.Cache.BaseCache;
+	private skeletonAtlasKeys = new WeakMap<Skeleton, string>();
 
 	constructor (scene: Phaser.Scene, pluginManager: Phaser.Plugins.PluginManager, pluginKey: string) {
 		super(scene, pluginManager, pluginKey);
 		this.game = pluginManager.game;
-		this.isWebGL = this.game.config.renderType === 2;
+		this.isWebGL = this.game.config.renderType === Phaser.WEBGL;
 		this.gl = this.isWebGL ? (this.game.renderer as Phaser.Renderer.WebGL.WebGLRenderer).gl : null;
 		this.phaserRenderer = this.game.renderer;
 		this.canvasRenderer = null;
@@ -123,9 +153,11 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 		};
 		pluginManager.registerFileType("spineAtlas", atlasFileCallback, scene);
 
-		const addSpineGameObject = function (this: Phaser.GameObjects.GameObjectFactory, x: number, y: number, dataKey: string, atlasKey: string, boundsProvider: SpineGameObjectBoundsProvider) {
+		const addSpineGameObject = function (this: Phaser.GameObjects.GameObjectFactory, x: number, y: number, dataKey: string, atlasKey: string, boundsOrOptions?: SpineGameObjectBoundsProvider | SpineGameObjectFactoryOptions) {
+			const boundsProvider = boundsOrOptions && "calculateBounds" in boundsOrOptions ? boundsOrOptions : boundsOrOptions?.boundsProvider;
+			const rendererType = boundsOrOptions && !("calculateBounds" in boundsOrOptions) ? boundsOrOptions.renderer : undefined;
 			const spinePlugin = (this.scene.sys as Phaser.Scenes.Systems & Record<string, SpinePlugin>)[pluginKey] as SpinePlugin;
-			const gameObject = new SpineGameObject(this.scene, spinePlugin, x, y, dataKey, atlasKey, boundsProvider);
+			const gameObject = new SpineGameObject(this.scene, spinePlugin, { x, y, dataKey, atlasKey, boundsProvider, renderer: rendererType });
 			this.displayList.add(gameObject);
 			this.updateList.add(gameObject);
 			return gameObject;
@@ -134,10 +166,10 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 		const makeSpineGameObject = function (this: Phaser.GameObjects.GameObjectFactory, config: SpineGameObjectConfig, addToScene: boolean = false) {
 			const x = config.x ? config.x : 0;
 			const y = config.y ? config.y : 0;
-			const boundsProvider = config.boundsProvider ? config.boundsProvider : undefined;
+			const boundsProvider = config.boundsProvider ?? new SetupPoseBoundsProvider();
 
 			const spinePlugin = (this.scene.sys as Phaser.Scenes.Systems & Record<string, SpinePlugin>)[pluginKey] as SpinePlugin;
-			const gameObject = new SpineGameObject(this.scene, spinePlugin, x, y, config.dataKey, config.atlasKey, boundsProvider);
+			const gameObject = new SpineGameObject(this.scene, spinePlugin, { x, y, dataKey: config.dataKey, atlasKey: config.atlasKey, boundsProvider, renderer: config.renderer });
 			if (addToScene !== undefined) {
 				config.add = addToScene;
 			}
@@ -147,9 +179,12 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 	}
 
 	static rendererId = 0;
+	/** Initializes renderer resources and plugin event listeners. */
 	boot () {
 		if (this.isWebGL && this.gl) {
-			this.gameWebGLRenderer ||= new SceneRenderer((this.game.renderer as Phaser.Renderer.WebGL.WebGLRenderer).canvas, this.gl, true);
+			const renderer = this.game.renderer as Phaser.Renderer.WebGL.WebGLRenderer;
+			this.spineAdditiveBlendMode = getSpineAdditiveBlendMode(renderer);
+			this._webGLRenderer ||= new SceneRenderer(renderer.canvas, this.gl, true);
 		} else if (this.scene) {
 			this.canvasRenderer ||= new SkeletonRenderer(this.scene.sys.context);
 		}
@@ -164,6 +199,7 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 		this.game.events.once("destroy", this.gameDestroy, this);
 	}
 
+	/** Updates the Spine WebGL renderer camera after Phaser renderer size changes. */
 	onResize () {
 		const phaserRenderer = this.game.renderer;
 		const sceneRenderer = this.webGLRenderer;
@@ -184,9 +220,7 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 	}
 
 	shutdown () {
-		if (this.isWebGL) {
-			this.game.scale.off(Phaser.Scale.Events.RESIZE, this.onResize, this);
-		}
+		this.game.scale.off(Phaser.Scale.Events.RESIZE, this.onResize, this);
 	}
 
 	destroy () {
@@ -198,38 +232,47 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 	gameDestroy () {
 		this.pluginManager.removeGameObject(window.SPINE_GAME_OBJECT_TYPE ?? SPINE_GAME_OBJECT_TYPE, true, true);
 		if (this.webGLRenderer) this.webGLRenderer.dispose();
-		this.gameWebGLRenderer = null;
+		this._webGLRenderer = null;
 		this.currentWebGLDrawingContext = null;
 	}
 
-	/** Returns the TextureAtlas instance for the given key */
+	/**
+	 * Returns the TextureAtlas instance for the given key.
+	 * @param atlasKey Phaser cache key for the loaded Spine atlas.
+	 * @returns The Spine TextureAtlas instance.
+	 */
 	getAtlas (atlasKey: string) {
 		if (this.atlasCache.exists(atlasKey)) return this.atlasCache.get(atlasKey);
 
 		const atlas = new TextureAtlas(this.game.cache.text.get(atlasKey));
-		if (this.isWebGL && this.gl) {
-			const gl = this.gl;
-			for (const atlasPage of atlas.pages)
-				atlasPage.setTexture(new GLTexture(gl, this.game.textures.get(`${atlasKey}!${atlasPage.name}`).getSourceImage() as HTMLImageElement | ImageBitmap, atlasPage.pma, false));
-		} else {
-			for (const atlasPage of atlas.pages)
-				atlasPage.setTexture(new CanvasTexture(this.game.textures.get(`${atlasKey}!${atlasPage.name}`).getSourceImage() as HTMLImageElement | ImageBitmap));
+		for (const atlasPage of atlas.pages) {
+			const phaserTexture = this.game.textures.get(`${atlasKey}!${atlasPage.name}`);
+			atlasPage.setTexture(new PhaserTexture(phaserTexture, 0, !atlasPage.pma));
 		}
 		this.atlasCache.add(atlasKey, atlas);
 		return atlas;
 	}
 
-	/** Returns whether the TextureAtlas uses premultiplied alpha */
+	/**
+	 * Returns whether the TextureAtlas uses premultiplied alpha.
+	 * @param atlasKey Phaser cache key for the loaded Spine atlas.
+	 * @returns True if the first atlas page is marked PMA.
+	 */
 	isAtlasPremultiplied (atlasKey: string) {
 		const atlas: TextureAtlas = this.atlasCache.get(atlasKey);
 		if (!atlas || atlas.pages.length === 0) return false;
 		return atlas.pages[0].pma;
 	}
 
-	/** Returns the SkeletonData instance for the given data and atlas key */
+	/**
+	 * Returns the SkeletonData instance for the given data and atlas keys.
+	 * @param dataKey Phaser cache key for the loaded Spine skeleton data.
+	 * @param atlasKey Phaser cache key for the loaded Spine atlas.
+	 * @returns The Spine SkeletonData instance.
+	 */
 	getSkeletonData (dataKey: string, atlasKey: string) {
 		const atlas = this.getAtlas(atlasKey)
-		const combinedKey = dataKey + atlasKey;
+		const combinedKey = `${dataKey}\0${atlasKey}`;
 		let skeletonData: SkeletonData;
 		if (this.skeletonDataCache.exists(combinedKey)) {
 			skeletonData = this.skeletonDataCache.get(combinedKey);
@@ -248,7 +291,12 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 		return skeletonData;
 	}
 
-	/** Creates a new Skeleton instance from the data and atlas. */
+	/**
+	 * Creates a new Skeleton instance from the data and atlas keys.
+	 * @param dataKey Phaser cache key for the loaded Spine skeleton data.
+	 * @param atlasKey Phaser cache key for the loaded Spine atlas.
+	 * @returns A new Spine Skeleton instance.
+	 */
 	createSkeleton (dataKey: string, atlasKey: string) {
 		if (this.isWebGL) {
 			const renderer = this.phaserRenderer as Phaser.Renderer.WebGL.WebGLRenderer;
@@ -256,11 +304,21 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 			renderer.renderNodes.getNode("YieldContext")?.run();
 		}
 		const skeleton = new Skeleton(this.getSkeletonData(dataKey, atlasKey));
+		this.skeletonAtlasKeys.set(skeleton, atlasKey);
 		if (this.isWebGL) {
 			const renderer = this.phaserRenderer as Phaser.Renderer.WebGL.WebGLRenderer;
 			renderer.renderNodes.getNode("RebindContext")?.run();
 		}
 		return skeleton;
+	}
+
+	/**
+	 * Returns the atlas cache key associated with a Skeleton created by this plugin.
+	 * @param skeleton The Skeleton to query.
+	 * @returns The atlas key, or an empty string if unknown.
+	 */
+	atlasKeyForSkeleton (skeleton: Skeleton): string {
+		return this.skeletonAtlasKeys.get(skeleton) ?? "";
 	}
 }
 

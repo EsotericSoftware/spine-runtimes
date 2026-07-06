@@ -138,6 +138,14 @@ spine-ts/spine-webcomponents/dist
 spine-ts/spine-threejs/dist
 spine-ts/spine-phaser-v3/dist
 spine-ts/spine-phaser-v4/dist
+spine-ts/spine-phaser-v4/example/phaser.js
+spine-ts/spine-phaser-v4-mesh/dist
+spine-ts/spine-phaser-v4-mesh/example/phaser.js
+spine-ts/spine-phaser-v4-mesh/example/phaser-mesh2d-poc.js
+spine-ts/spine-phaser-v4-next/dist
+spine-ts/spine-phaser-v4-next/example/phaser.js
+spine-ts/.pi/
+spine-ts/spine-phaser-new/
 spine-ts/spine-pixi-v7/dist
 spine-ts/spine-pixi-v8/dist
 spine-libgdx/gradle

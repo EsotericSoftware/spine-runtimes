@@ -34,16 +34,19 @@ export * from "@esotericsoftware/spine-webgl";
 export * from "./require-shim.js"
 export * from "./mixins.js"
 export * from "./SpineGameObject.js"
+export * from "./SpineGameObjectBounds.js"
 export * from "./SpinePlugin.js"
 
 import { type SpineGameObjectConfig, SpinePlugin } from "./SpinePlugin.js";
+import type { SpineGameObjectFactoryOptions } from "./SpineGameObject.js";
 
 // biome-ignore lint/suspicious/noExplicitAny: need to add spine to window
 (window as any).spine = { SpinePlugin: SpinePlugin };
 // biome-ignore lint/suspicious/noExplicitAny: need to add spine to window
 (window as any)["spine.SpinePlugin"] = SpinePlugin;
 
-import type { SpineGameObject, SpineGameObjectBoundsProvider } from "./SpineGameObject.js";
+import type { SpineGameObject } from "./SpineGameObject.js";
+import type { SpineGameObjectBoundsProvider } from "./SpineGameObjectBounds.js";
 
 declare global {
 	namespace Phaser.Loader {
@@ -56,6 +59,8 @@ declare global {
 
 	namespace Phaser.GameObjects {
 		export interface GameObjectFactory {
+			spine (x: number, y: number, dataKey: string, atlasKey: string, options?: SpineGameObjectFactoryOptions): SpineGameObject;
+			/** @deprecated Pass `{ boundsProvider }` as the fifth argument instead. */
 			spine (x: number, y: number, dataKey: string, atlasKey: string, boundsProvider?: SpineGameObjectBoundsProvider): SpineGameObject;
 		}
 

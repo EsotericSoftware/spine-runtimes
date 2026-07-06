@@ -31,14 +31,13 @@ import {
 	AnimationState,
 	AnimationStateData,
 	type Bone,
-	MathUtils,
 	Physics,
-	Skeleton,
-	SkeletonClipping,
-	Skin,
+	type Skeleton,
+	type SkeletonCoordinateConverter,
+	SkeletonPhysicsMovement,
+	type Slot,
 	type Vector2,
 } from "@esotericsoftware/spine-core";
-import type { SceneRenderer } from "@esotericsoftware/spine-webgl";
 import * as Phaser from "phaser";
 import { SPINE_GAME_OBJECT_TYPE } from "./keys.js";
 import {
@@ -48,10 +47,20 @@ import {
 	FlipMixin,
 	OriginMixin,
 	ScrollFactorMixin,
+	TintMixin,
 	TransformMixin,
 	VisibleMixin,
 } from "./mixins.js";
+import { PhaserMesh2DRenderer } from "./renderers/PhaserMesh2DRenderer.js";
+import { SpineCanvasRenderer } from "./renderers/SpineCanvasRenderer.js";
+import type { SpineGameObjectRenderer, SpineGameObjectRendererType } from "./renderers/SpineGameObjectRenderer.js";
+import { SpineWebGLRenderer } from "./renderers/SpineWebGLRenderer.js";
+import { SetupPoseBoundsProvider, type SpineGameObjectBoundsProvider } from "./SpineGameObjectBounds.js";
 import type { SpinePlugin } from "./SpinePlugin.js";
+
+export type { SpineGameObjectRendererType } from "./renderers/SpineGameObjectRenderer.js";
+export type { SpineGameObjectBoundsProvider } from "./SpineGameObjectBounds.js";
+export { AABBRectangleBoundsProvider, SetupPoseBoundsProvider, SkinsAndAnimationBoundsProvider } from "./SpineGameObjectBounds.js";
 
 class BaseSpineGameObject extends Phaser.GameObjects.GameObject {
 	constructor (scene: Phaser.Scene, type: string) {
@@ -59,248 +68,127 @@ class BaseSpineGameObject extends Phaser.GameObjects.GameObject {
 	}
 }
 
-/** A bounds provider calculates the bounding box for a skeleton, which is then assigned as the size of the SpineGameObject. */
-export interface SpineGameObjectBoundsProvider {
-	// Returns the bounding box for the skeleton, in skeleton space.
-	calculateBounds (gameObject: SpineGameObject): {
-		x: number;
-		y: number;
-		width: number;
-		height: number;
-	};
+/** Options for attaching a Phaser GameObject to a Spine slot. */
+export interface SpineSlotObjectOptions {
+	/** If true, the attached GameObject is hidden when the slot has no attachment. */
+	followAttachmentTimeline?: boolean;
+
+	/** Whether to render the GameObject before or after the slot attachment. */
+	placement?: "before" | "after";
+
+	/** If true, active Spine clipping attachments also clip the attached GameObject. */
+	clipping?: boolean;
+
+	/** If true, keep the GameObject's current x/y as a local offset from the slot. Defaults to false. */
+	preservePosition?: boolean;
 }
 
-/** A bounds provider that provides a fixed size given by the user. */
-export class AABBRectangleBoundsProvider implements SpineGameObjectBoundsProvider {
-	constructor (
-		private x: number,
-		private y: number,
-		private width: number,
-		private height: number,
-	) { }
-	calculateBounds () {
-		return { x: this.x, y: this.y, width: this.width, height: this.height };
-	}
+/** Runtime state for a Phaser GameObject attached to a Spine slot. */
+export interface SpineSlotObjectEntry extends Required<SpineSlotObjectOptions> {
+	/** The Phaser GameObject attached to the slot. */
+	gameObject: Phaser.GameObjects.GameObject;
 }
 
-/** A bounds provider that calculates the bounding box from the setup pose. */
-export class SetupPoseBoundsProvider implements SpineGameObjectBoundsProvider {
-	/**
-	 * @param clipping If true, clipping attachments are used to compute the bounds. False, by default.
-	 */
-	constructor (
-		private clipping = false,
-	) { }
 
-	calculateBounds (gameObject: SpineGameObject) {
-		if (!gameObject.skeleton) return { x: 0, y: 0, width: 0, height: 0 };
-		// Make a copy of animation state and skeleton as this might be called while
-		// the skeleton in the GameObject has already been heavily modified. We can not
-		// reconstruct that state.
-		const skeleton = new Skeleton(gameObject.skeleton.data);
-		skeleton.setupPose();
-		skeleton.updateWorldTransform(Physics.update);
-		const bounds = skeleton.getBoundsRect(this.clipping ? new SkeletonClipping() : undefined);
-		return bounds.width === Number.NEGATIVE_INFINITY
-			? { x: 0, y: 0, width: 0, height: 0 }
-			: bounds;
-	}
+/** Options used to construct a {@link SpineGameObject}. */
+export interface SpineGameObjectOptions {
+	/** Initial x-position in Phaser coordinates. */
+	x?: number;
+
+	/** Initial y-position in Phaser coordinates. */
+	y?: number;
+
+	/** Phaser cache key for the loaded Spine skeleton data. */
+	dataKey: string;
+
+	/** Phaser cache key for the loaded Spine atlas. */
+	atlasKey: string;
+
+	/** Bounds provider used to calculate the Phaser GameObject size and display origin. */
+	boundsProvider?: SpineGameObjectBoundsProvider;
+
+	/** Renderer backend. Defaults to `"phaser"` in WebGL games and `"spine-canvas"` in Canvas games. */
+	renderer?: SpineGameObjectRendererType;
 }
 
-/** A bounds provider that calculates the bounding box by taking the maximumg bounding box for a combination of skins and specific animation. */
-export class SkinsAndAnimationBoundsProvider
-	implements SpineGameObjectBoundsProvider {
-	/**
-	 * @param animation The animation to use for calculating the bounds. If null, the setup pose is used.
-	 * @param skins The skins to use for calculating the bounds. If empty, the default skin is used.
-	 * @param timeStep The time step to use for calculating the bounds. A smaller time step means more precision, but slower calculation.
-	 * @param clipping If true, clipping attachments are used to compute the bounds. False, by default.
-	 */
-	constructor (
-		private animation: string | null,
-		private skins: string[] = [],
-		private timeStep: number = 0.05,
-		private clipping = false,
-	) { }
+/** Options accepted by the `this.add.spine(...)` factory after position and cache keys. */
+export type SpineGameObjectFactoryOptions = Omit<SpineGameObjectOptions, "x" | "y" | "dataKey" | "atlasKey">;
 
-	calculateBounds (gameObject: SpineGameObject): {
-		x: number;
-		y: number;
-		width: number;
-		height: number;
-	} {
-		if (!gameObject.skeleton || !gameObject.animationState)
-			return { x: 0, y: 0, width: 0, height: 0 };
-		// Make a copy of animation state and skeleton as this might be called while
-		// the skeleton in the GameObject has already been heavily modified. We can not
-		// reconstruct that state.
-		const animationState = new AnimationState(gameObject.animationState.data);
-		const skeleton = new Skeleton(gameObject.skeleton.data);
-		const clipper = this.clipping ? new SkeletonClipping() : undefined;
-		const data = skeleton.data;
-		if (this.skins.length > 0) {
-			const customSkin = new Skin("custom-skin");
-			for (const skinName of this.skins) {
-				const skin = data.findSkin(skinName);
-				if (skin == null) continue;
-				customSkin.addSkin(skin);
-			}
-			skeleton.setSkin(customSkin);
-		}
-		skeleton.setupPose();
-
-		const animation = this.animation != null ? data.findAnimation(this.animation) : null;
-		if (animation == null) {
-			skeleton.updateWorldTransform(Physics.update);
-			const bounds = skeleton.getBoundsRect(clipper);
-			return bounds.width === Number.NEGATIVE_INFINITY
-				? { x: 0, y: 0, width: 0, height: 0 }
-				: bounds;
-		} else {
-			let minX = Number.POSITIVE_INFINITY,
-				minY = Number.POSITIVE_INFINITY,
-				maxX = Number.NEGATIVE_INFINITY,
-				maxY = Number.NEGATIVE_INFINITY;
-			animationState.clearTracks();
-			animationState.setAnimation(0, animation, false);
-			const steps = Math.max(animation.duration / this.timeStep, 1.0);
-			for (let i = 0; i < steps; i++) {
-				const delta = i > 0 ? this.timeStep : 0;
-				animationState.update(delta);
-				animationState.apply(skeleton);
-				skeleton.update(delta);
-				skeleton.updateWorldTransform(Physics.update);
-
-				const bounds = skeleton.getBoundsRect(clipper);
-				minX = Math.min(minX, bounds.x);
-				minY = Math.min(minY, bounds.y);
-				maxX = Math.max(maxX, bounds.x + bounds.width);
-				maxY = Math.max(maxY, bounds.y + bounds.height);
-			}
-			const bounds = {
-				x: minX,
-				y: minY,
-				width: maxX - minX,
-				height: maxY - minY,
-			};
-			return bounds.width === Number.NEGATIVE_INFINITY
-				? { x: 0, y: 0, width: 0, height: 0 }
-				: bounds;
-		}
-	}
-}
-
-/**
- * A SpineGameObject is a Phaser {@link GameObject} that can be added to a Phaser Scene and render a Spine skeleton.
- *
- * The Spine GameObject is a thin wrapper around a Spine {@link Skeleton}, {@link AnimationState} and {@link AnimationStateData}. It is responsible for:
- * - updating the animation state
- * - applying the animation state to the skeleton's bones, slots, attachments, and draw order.
- * - updating the skeleton's bone world transforms
- * - rendering the skeleton
- *
- * See the {@link SpinePlugin} class for more information on how to create a `SpineGameObject`.
- *
- * The skeleton, animation state, and animation state data can be accessed via the repsective fields. They can be manually updated via {@link updatePose}.
- *
- * To modify the bone hierarchy before the world transforms are computed, a callback can be set via the {@link beforeUpdateWorldTransforms} field.
- *
- * To modify the bone hierarchy after the world transforms are computed, a callback can be set via the {@link afterUpdateWorldTransforms} field.
- *
- * The class also features methods to convert between the skeleton coordinate system and the Phaser coordinate system.
- *
- * See {@link skeletonToPhaserWorldCoordinates}, {@link phaserWorldCoordinatesToSkeleton}, and {@link phaserWorldCoordinatesToBoneLocal.}
- */
-export class SpineGameObject extends DepthMixin(
-	OriginMixin(
-		ComputedSizeMixin(
-			FlipMixin(
-				ScrollFactorMixin(
-					TransformMixin(VisibleMixin(AlphaMixin(BaseSpineGameObject)))
-				)
-			)
-		)
-	)
-) {
+/** Phaser GameObject that displays and updates a Spine skeleton. */
+export class SpineGameObject extends DepthMixin(OriginMixin(ComputedSizeMixin(FlipMixin(ScrollFactorMixin(TintMixin(TransformMixin(VisibleMixin(AlphaMixin(BaseSpineGameObject))))))))) implements SkeletonCoordinateConverter {
 	blendMode = -1;
 	skeleton: Skeleton;
 	animationStateData: AnimationStateData;
 	animationState: AnimationState;
+	/** Called after animation state is applied and before skeleton world transforms are updated. */
 	beforeUpdateWorldTransforms: (object: SpineGameObject) => void = () => { };
+
+	/** Called after skeleton world transforms are updated. */
 	afterUpdateWorldTransforms: (object: SpineGameObject) => void = () => { };
+	private readonly slotObjects = new Map<Slot, SpineSlotObjectEntry>();
 	private offsetX = 0;
 	private offsetY = 0;
-	private _physicsPositionInheritanceFactorX = 1;
-	private _physicsPositionInheritanceFactorY = 1;
-	private _physicsRotationInheritanceFactor = 1;
-	private hasLastPhysicsTransform = false;
-	private lastPhysicsX = 0;
-	private lastPhysicsY = 0;
-	private lastPhysicsRotation = 0;
-	private readonly currentPhysicsPosition = { x: 0, y: 0 };
-	private readonly lastPhysicsPosition = { x: 0, y: 0 };
+	/** Tracks this GameObject's transform movement and applies it to skeleton physics constraints when enabled. */
+	readonly skeletonPhysics: SkeletonPhysicsMovement;
 
-	/** Scales how much horizontal translation of this Phaser game object is inherited by skeleton physics constraints. */
-	public get physicsPositionInheritanceFactorX (): number {
-		return this._physicsPositionInheritanceFactorX;
-	}
+	/** Renderer backend selected for this GameObject. */
+	readonly rendererType: SpineGameObjectRendererType;
+	private rendererBackend: SpineGameObjectRenderer;
 
-	/** Scales how much vertical translation of this Phaser game object is inherited by skeleton physics constraints. */
-	public get physicsPositionInheritanceFactorY (): number {
-		return this._physicsPositionInheritanceFactorY;
-	}
-
-	/**
-	 * Sets how much translation of this Phaser game object is inherited by skeleton physics constraints.
-	 * The default is (1, 1), which applies game object translation normally. Use (0, 0)
-	 * to prevent game object translation from affecting physics constraints.
-	 */
-	public setPhysicsPositionInheritanceFactor (x: number, y: number): void {
-		const wasDisabled = this._physicsPositionInheritanceFactorX === 0 && this._physicsPositionInheritanceFactorY === 0;
-		const isEnabled = x !== 0 || y !== 0;
-
-		this._physicsPositionInheritanceFactorX = x;
-		this._physicsPositionInheritanceFactorY = y;
-		if (wasDisabled && isEnabled) this.resetPhysicsPosition();
-	}
-
-	/**
-	 * Scales how much rotation of this Phaser game object is inherited by skeleton physics constraints.
-	 * The default is `1`, which applies game object rotation normally. Use `0` to prevent game object
-	 * rotation from affecting physics constraints.
-	 */
-	public get physicsRotationInheritanceFactor (): number {
-		return this._physicsRotationInheritanceFactor;
-	}
-
-	public set physicsRotationInheritanceFactor (value: number) {
-		const wasDisabled = this._physicsRotationInheritanceFactor === 0;
-		this._physicsRotationInheritanceFactor = value;
-		if (wasDisabled && value !== 0) this.resetPhysicsRotation();
-	}
-
-	constructor (
-		scene: Phaser.Scene,
-		private plugin: SpinePlugin,
-		x: number,
-		y: number,
-		dataKey: string,
-		atlasKey: string,
-		public boundsProvider: SpineGameObjectBoundsProvider = new SetupPoseBoundsProvider()
-	) {
-		// biome-ignore lint/suspicious/noExplicitAny: necessary for phaser
-		super(scene, (window as any).SPINE_GAME_OBJECT_TYPE ? (window as any).SPINE_GAME_OBJECT_TYPE : SPINE_GAME_OBJECT_TYPE);
-		this.setPosition(x, y);
-
-		this.skeleton = this.plugin.createSkeleton(dataKey, atlasKey);
+	constructor (scene: Phaser.Scene, public readonly plugin: SpinePlugin, options: SpineGameObjectOptions) {
+		super(scene, window.SPINE_GAME_OBJECT_TYPE ?? SPINE_GAME_OBJECT_TYPE);
+		const rendererType = options.renderer ?? (plugin.isWebGL ? "phaser" : "spine-canvas");
+		if (rendererType !== "phaser" && rendererType !== "spine-webgl" && rendererType !== "spine-canvas") throw new Error(`Unsupported SpineGameObject renderer '${rendererType}'. Use 'phaser', 'spine-webgl', or 'spine-canvas'.`);
+		if (plugin.isWebGL && rendererType === "spine-canvas") throw new Error("SpineGameObject renderer 'spine-canvas' is only supported in Phaser Canvas games.");
+		if (!plugin.isWebGL && rendererType !== "spine-canvas") throw new Error(`SpineGameObject renderer '${rendererType}' requires a Phaser WebGL game. Use renderer: 'spine-canvas' or omit the renderer option in Phaser Canvas games.`);
+		this.rendererType = rendererType;
+		this.rendererBackend = rendererType === "spine-webgl" ? new SpineWebGLRenderer() : rendererType === "spine-canvas" ? new SpineCanvasRenderer() : new PhaserMesh2DRenderer(this);
+		this.boundsProvider = options.boundsProvider ?? new SetupPoseBoundsProvider();
+		this.setPosition(options.x ?? 0, options.y ?? 0);
+		this.skeleton = this.plugin.createSkeleton(options.dataKey, options.atlasKey);
+		this.skeletonPhysics = new SkeletonPhysicsMovement(this, {
+			getGameObjectTransform: () => this.getWorldTransformMatrix(),
+			getPhysicsRotation: transform => -Math.atan2(transform.b, transform.a) * 180 / Math.PI,
+		});
 		this.animationStateData = new AnimationStateData(this.skeleton.data);
 		this.animationState = new AnimationState(this.animationStateData);
 		this.skeleton.updateWorldTransform(Physics.update);
 		this.updateSize();
 	}
 
+	/**
+	 * Sets a uniform tint color for the skeleton.
+	 *
+	 * Spine skeletons do not support Phaser's four-corner gradient tint. Only the
+	 * first color is used; the other arguments are accepted for Phaser API compatibility.
+	 * @param topLeft Tint color applied to the whole skeleton.
+	 * @param _topRight Ignored.
+	 * @param _bottomLeft Ignored.
+	 * @param _bottomRight Ignored.
+	 */
+	setTint (topLeft = 0xffffff, _topRight?: number, _bottomLeft?: number, _bottomRight?: number): this {
+		this.tintTopLeft = topLeft;
+		this.tintTopRight = topLeft;
+		this.tintBottomLeft = topLeft;
+		this.tintBottomRight = topLeft;
+		this.skeleton.color.r = ((topLeft >> 16) & 0xff) / 255;
+		this.skeleton.color.g = ((topLeft >> 8) & 0xff) / 255;
+		this.skeleton.color.b = (topLeft & 0xff) / 255;
+		return this;
+	}
+
+	clearTint (): this {
+		this.setTint(0xffffff);
+		this.setTint2(0x000000);
+		this.setTintMode(Phaser.TintModes.MULTIPLY);
+		return this;
+	}
+
+	/** Bounds provider used to calculate this GameObject's size and display origin. */
+	boundsProvider: SpineGameObjectBoundsProvider = new SetupPoseBoundsProvider();
+
+	/** Recalculates this GameObject's size and display origin from its bounds provider. */
 	updateSize () {
-		if (!this.skeleton) return;
 		const bounds = this.boundsProvider.calculateBounds(this);
 		this.width = bounds.width;
 		this.height = bounds.height;
@@ -309,326 +197,190 @@ export class SpineGameObject extends DepthMixin(
 		this.offsetY = -bounds.y;
 	}
 
-	/** Converts a point from the skeleton coordinate system to the Phaser world coordinate system. */
-	skeletonToPhaserWorldCoordinates (point: { x: number; y: number }) {
-		const transform = this.getWorldTransformMatrix();
-		const a = transform.a,
-			b = transform.b,
-			c = transform.c,
-			d = transform.d,
-			tx = transform.tx,
-			ty = transform.ty;
-		const x = point.x;
-		const y = point.y;
-		point.x = x * a + y * c + tx;
-		point.y = x * b + y * d + ty;
+	/** Horizontal skeleton render offset from the Phaser GameObject origin. */
+	get renderOffsetX (): number {
+		return this.offsetX - this.displayOriginX;
 	}
 
-	/** Converts a point from the Phaser world coordinate system to the skeleton coordinate system. */
-	phaserWorldCoordinatesToSkeleton (point: { x: number; y: number }) {
-		let transform = this.getWorldTransformMatrix();
-		transform = transform.invert();
-		const a = transform.a,
-			b = transform.b,
-			c = transform.c,
-			d = transform.d,
-			tx = transform.tx,
-			ty = transform.ty;
-		const x = point.x;
-		const y = point.y;
-		point.x = x * a + y * c + tx;
-		point.y = x * b + y * d + ty;
-	}
-
-	/** Converts a point from the Phaser world coordinate system to the bone's local coordinate system. */
-	phaserWorldCoordinatesToBone (point: { x: number; y: number }, bone: Bone) {
-		this.phaserWorldCoordinatesToSkeleton(point);
-		if (bone.parent) {
-			bone.parent.appliedPose.worldToLocal(point as Vector2);
-		} else {
-			bone.appliedPose.worldToLocal(point as Vector2);
-		}
+	/** Vertical skeleton render offset from the Phaser GameObject origin. */
+	get renderOffsetY (): number {
+		return this.offsetY - this.displayOriginY;
 	}
 
 	/**
-	 * Updates the {@link AnimationState}, applies it to the {@link Skeleton}, then updates the world transforms of all bones.
-	 * @param delta The time delta in milliseconds
+	 * Converts `point` in-place from skeleton coordinates to Phaser game coordinates.
+	 * @param point The point to convert.
+	 */
+	skeletonToGame (point: { x: number; y: number }) {
+		const transform = this.getWorldTransformMatrix();
+		const x = point.x + this.renderOffsetX;
+		const y = point.y + this.renderOffsetY;
+		point.x = x * transform.a + y * transform.c + transform.tx;
+		point.y = x * transform.b + y * transform.d + transform.ty;
+	}
+
+	/**
+	 * Converts `point` in-place from Phaser game coordinates to skeleton coordinates.
+	 * @param point The point to convert.
+	 */
+	gameToSkeleton (point: { x: number; y: number }) {
+		const transform = this.getWorldTransformMatrix().invert();
+		const x = point.x, y = point.y;
+		point.x = x * transform.a + y * transform.c + transform.tx - this.renderOffsetX;
+		point.y = x * transform.b + y * transform.d + transform.ty - this.renderOffsetY;
+	}
+
+	/**
+	 * Converts `point` in-place from Phaser game coordinates to a bone's local coordinates.
+	 * @param point The point to convert.
+	 * @param bone The bone whose local coordinates should receive the converted point.
+	 */
+	gameToBone (point: { x: number; y: number }, bone: Bone) {
+		this.gameToSkeleton(point);
+		(bone.parent ? bone.parent.appliedPose : bone.appliedPose).worldToLocal(point as Vector2);
+	}
+
+	/**
+	 * Attaches a Phaser GameObject to a Spine slot.
+	 * @param slotRef Slot index, slot name, or Slot instance.
+	 * @param gameObject Phaser GameObject to render at the slot.
+	 * @param options Slot-object rendering options.
+	 */
+	addSlotObject (slotRef: number | string | Slot, gameObject: Phaser.GameObjects.GameObject, options: SpineSlotObjectOptions = {}): void {
+		this.requireSlotObjectSupport();
+		const slot = this.getSlot(slotRef);
+		this.removeSlotObject(slot);
+		this.removeGameObjectFromOtherSlots(gameObject);
+		gameObject.parentContainer?.remove(gameObject);
+		gameObject.removeFromDisplayList();
+		if (!options.preservePosition) {
+			const transform = gameObject as unknown as Phaser.GameObjects.Components.Transform;
+			transform.x = 0;
+			transform.y = 0;
+		}
+		this.slotObjects.set(slot, {
+			gameObject,
+			followAttachmentTimeline: options.followAttachmentTimeline ?? false,
+			placement: options.placement ?? "after",
+			clipping: options.clipping ?? true,
+			preservePosition: options.preservePosition ?? false,
+		});
+	}
+
+	/**
+	 * Returns the Phaser GameObject attached to a Spine slot, if any.
+	 * @param slotRef Slot index, slot name, or Slot instance.
+	 * @returns The attached Phaser GameObject, or `undefined`.
+	 */
+	getSlotObject (slotRef: number | string | Slot): Phaser.GameObjects.GameObject | undefined {
+		this.requireSlotObjectSupport();
+		return this.slotObjects.get(this.getSlot(slotRef))?.gameObject;
+	}
+
+	/**
+	 * Removes the Phaser GameObject attached to a Spine slot.
+	 * @param slotRef Slot index, slot name, or Slot instance.
+	 * @param gameObject Optional GameObject guard. If supplied, removal only occurs when it is the attached object.
+	 */
+	removeSlotObject (slotRef: number | string | Slot, gameObject?: Phaser.GameObjects.GameObject): void {
+		this.requireSlotObjectSupport();
+		const slot = this.getSlot(slotRef);
+		const entry = this.slotObjects.get(slot);
+		if (!entry) return;
+		if (gameObject && entry.gameObject !== gameObject) return;
+		this.slotObjects.delete(slot);
+	}
+
+	/** Removes all Phaser GameObjects attached to Spine slots. */
+	removeSlotObjects (): void {
+		this.requireSlotObjectSupport();
+		this.slotObjects.clear();
+	}
+
+	/**
+	 * Updates animation state, applies it to the skeleton, and updates skeleton world transforms.
+	 * @param delta Time delta in seconds.
 	 */
 	updatePose (delta: number) {
-		this.animationState.update(delta / 1000);
+		this.animationState.update(delta);
 		this.animationState.apply(this.skeleton);
-		this.applyTransformMovementToPhysics();
+		this.skeletonPhysics.applyTransformMovement();
 		this.beforeUpdateWorldTransforms(this);
-		this.skeleton.update(delta / 1000);
+		this.skeleton.update(delta);
 		this.skeleton.updateWorldTransform(Physics.update);
 		this.afterUpdateWorldTransforms(this);
 	}
 
-	/** Resets the position used for calculating inherited physics translation. */
-	public resetPhysicsPosition (): void {
-		const transform = this.getWorldTransformMatrix();
-		this.lastPhysicsX = transform.tx;
-		this.lastPhysicsY = transform.ty;
-		if (!this.hasLastPhysicsTransform) this.lastPhysicsRotation = this.getPhysicsRotation();
-		this.hasLastPhysicsTransform = true;
-	}
-
-	/** Resets the rotation used for calculating inherited physics rotation. */
-	public resetPhysicsRotation (): void {
-		const transform = this.getWorldTransformMatrix();
-		this.lastPhysicsRotation = this.getPhysicsRotation();
-		if (!this.hasLastPhysicsTransform) {
-			this.lastPhysicsX = transform.tx;
-			this.lastPhysicsY = transform.ty;
-		}
-		this.hasLastPhysicsTransform = true;
-	}
-
-	/** Resets the transform used for calculating inherited physics translation and rotation. */
-	public resetPhysicsTransform (): void {
-		this.resetPhysicsPosition();
-		this.resetPhysicsRotation();
-	}
-
-	private applyTransformMovementToPhysics (): void {
-		const transform = this.getWorldTransformMatrix();
-		const { tx, ty } = transform;
-		const currentRotation = this.getPhysicsRotation();
-
-		if (this.hasLastPhysicsTransform) {
-			this.applyPositionMovementToPhysics(tx, ty);
-			this.applyRotationMovementToPhysics(currentRotation);
-		}
-
-		this.setLastPhysicsTransform(tx, ty, currentRotation);
-	}
-
-	private applyPositionMovementToPhysics (currentX: number, currentY: number): void {
-		if (this._physicsPositionInheritanceFactorX === 0 && this._physicsPositionInheritanceFactorY === 0) return;
-
-		const currentPosition = this.currentPhysicsPosition;
-		currentPosition.x = currentX;
-		currentPosition.y = currentY;
-		this.phaserWorldCoordinatesToSkeleton(currentPosition);
-
-		const lastPosition = this.lastPhysicsPosition;
-		lastPosition.x = this.lastPhysicsX;
-		lastPosition.y = this.lastPhysicsY;
-		this.phaserWorldCoordinatesToSkeleton(lastPosition);
-
-		this.skeleton.physicsTranslate(
-			(currentPosition.x - lastPosition.x) * this._physicsPositionInheritanceFactorX,
-			(currentPosition.y - lastPosition.y) * this._physicsPositionInheritanceFactorY
-		);
-	}
-
-	private applyRotationMovementToPhysics (currentRotation: number): void {
-		const rotationFactor = this._physicsRotationInheritanceFactor;
-		if (rotationFactor === 0) return;
-
-		this.skeleton.physicsRotate(0, 0, this.getRotationDelta(currentRotation, this.lastPhysicsRotation) * rotationFactor);
-	}
-
-	private setLastPhysicsTransform (x: number, y: number, rotation: number): void {
-		this.lastPhysicsX = x;
-		this.lastPhysicsY = y;
-		this.lastPhysicsRotation = rotation;
-		this.hasLastPhysicsTransform = true;
-	}
-
-	private getPhysicsRotation (): number {
-		const transform = this.getWorldTransformMatrix();
-		return -Math.atan2(transform.b, transform.a) * 180 / Math.PI;
-	}
-
-	private getRotationDelta (current: number, previous: number): number {
-		let delta = current - previous;
-		delta = (delta + 180) % 360 - 180;
-		return delta < -180 ? delta + 360 : delta;
-	}
-
-	preUpdate (time: number, delta: number) {
-		if (!this.skeleton || !this.animationState) return;
-		this.updatePose(delta);
-	}
-
-	preDestroy () {
-		// FIXME tear down any event emitters
+	preUpdate (_time: number, delta: number) {
+		this.updatePose(delta / 1000);
 	}
 
 	willRender (camera: Phaser.Cameras.Scene2D.Camera) {
 		const GameObjectRenderMask = 0xf;
-		let result = !this.skeleton || !(GameObjectRenderMask !== this.renderFlags || (this.cameraFilter !== 0 && this.cameraFilter & camera.id));
-		if (!this.visible) result = false;
-
-		if (!result && this.parentContainer && this.plugin.webGLRenderer) {
-			const sceneRenderer = this.plugin.webGLRenderer;
-
-			if (this.plugin.gl && this.plugin.phaserRenderer instanceof Phaser.Renderer.WebGL.WebGLRenderer && sceneRenderer.batcher.isDrawing) {
-				sceneRenderer.end();
-				this.plugin.currentWebGLDrawingContext = null;
-				this.plugin.phaserRenderer.renderNodes.getNode("RebindContext")?.run();
-			}
-		}
-
-		return result;
-	}
-
-	private syncRendererCameraToDrawingContext (sceneRenderer: SceneRenderer, drawingContext: Phaser.Renderer.WebGL.DrawingContext) {
-		const viewportWidth = drawingContext.width;
-		const viewportHeight = drawingContext.height;
-		if (sceneRenderer.camera.viewportWidth === viewportWidth && sceneRenderer.camera.viewportHeight === viewportHeight &&
-			sceneRenderer.camera.position.x === viewportWidth / 2 && sceneRenderer.camera.position.y === viewportHeight / 2) {
-			return;
-		}
-
-		sceneRenderer.camera.position.x = viewportWidth / 2;
-		sceneRenderer.camera.position.y = viewportHeight / 2;
-		sceneRenderer.camera.setViewport(viewportWidth, viewportHeight);
-		sceneRenderer.camera.update();
-	}
-
-	private isRenderableInDisplayList (gameObject: Phaser.GameObjects.GameObject | undefined, camera: Phaser.Cameras.Scene2D.Camera) {
-		if (!gameObject) return false;
-
-		const GameObjectRenderMask = 0xf;
-		return GameObjectRenderMask === gameObject.renderFlags &&
-			(gameObject.cameraFilter === 0 || !(gameObject.cameraFilter & camera.id)) &&
-			(gameObject as Phaser.GameObjects.GameObject & { visible?: boolean }).visible !== false;
-	}
-
-	private isAdjacentRenderableSpineGameObject (
-		src: SpineGameObject,
-		camera: Phaser.Cameras.Scene2D.Camera,
-		displayList: Phaser.GameObjects.GameObject[],
-		displayListIndex: number,
-		direction: -1 | 1
-	) {
-		for (let i = displayListIndex + direction; i >= 0 && i < displayList.length; i += direction) {
-			const gameObject = displayList[i];
-			if (!this.isRenderableInDisplayList(gameObject, camera)) continue;
-			return gameObject.type === src.type;
-		}
-
-		return false;
+		return this.visible && !(GameObjectRenderMask !== this.renderFlags || (this.cameraFilter !== 0 && (this.cameraFilter & camera.id) !== 0));
 	}
 
 	renderWebGL (
 		renderer: Phaser.Renderer.WebGL.WebGLRenderer,
 		src: SpineGameObject,
 		drawingContext: Phaser.Renderer.WebGL.DrawingContext,
-		parentMatrix: Phaser.GameObjects.Components.TransformMatrix,
-		renderStep: number,
-		displayList: Phaser.GameObjects.GameObject[],
-		displayListIndex: number
+		parentMatrix?: Phaser.GameObjects.Components.TransformMatrix,
+		renderStep?: number,
+		displayList?: Phaser.GameObjects.GameObject[],
+		displayListIndex?: number
 	) {
-		const camera = drawingContext.camera;
-		if (!camera || !src.skeleton || !src.animationState || !src.plugin.webGLRenderer)
-			return;
-
-		const sceneRenderer = src.plugin.webGLRenderer;
-
-		// Determine object type in context. Some display lists (containers/layers) contain
-		// invisible or otherwise skipped children, so scan for the adjacent renderable object.
-		const newType = !src.isAdjacentRenderableSpineGameObject(src, camera, displayList, displayListIndex, -1);
-		const nextTypeMatch = src.isAdjacentRenderableSpineGameObject(src, camera, displayList, displayListIndex, 1);
-		// Phaser's currentBatchDrawingContext is null while an external renderer owns the GL context.
-		// Track the drawing context ourselves so consecutive Spine objects can share one Spine batch.
-		const drawingContextChanged = src.plugin.currentWebGLDrawingContext !== drawingContext;
-		const shouldBeginSpineRenderer = newType || drawingContextChanged || !sceneRenderer.batcher.isDrawing;
-		if (shouldBeginSpineRenderer) {
-			if (sceneRenderer.batcher.isDrawing) {
-				sceneRenderer.end();
-				src.plugin.currentWebGLDrawingContext = null;
-			}
-
-			if (drawingContextChanged) {
-				drawingContext.renderer.renderNodes.finishBatch();
-				drawingContext.beginDraw();
-			}
-
-			src.syncRendererCameraToDrawingContext(sceneRenderer, drawingContext);
-
-			// Yield Phaser context.
-			renderer.renderNodes.getNode('YieldContext')?.run(drawingContext);
-
-			// Enter Spine renderer.
-			sceneRenderer.begin();
-			src.plugin.currentWebGLDrawingContext = drawingContext;
-		}
-
-		camera.addToRenderList(src);
-		const transform = Phaser.GameObjects.GetCalcMatrix(
-			src,
-			camera,
-			parentMatrix,
-			!drawingContext.useCanvas,
-		).calc;
-		const a = transform.a,
-			b = transform.b,
-			c = transform.c,
-			d = transform.d,
-			tx = transform.tx,
-			ty = transform.ty;
-
-		const offsetX = src.offsetX - src.displayOriginX;
-		const offsetY = src.offsetY - src.displayOriginY;
-
-		sceneRenderer.drawSkeleton(
-			src.skeleton,
-			-1,
-			-1,
-			(vertices, numVertices, stride) => {
-				for (let i = 0; i < numVertices; i += stride) {
-					const vx = vertices[i] + offsetX;
-					const vy = vertices[i + 1] + offsetY;
-					vertices[i] = vx * a + vy * c + tx;
-					vertices[i + 1] = vx * b + vy * d + ty;
-				}
-			}
-		);
-
-		if (!nextTypeMatch) {
-			// Exit Spine renderer.
-			sceneRenderer.end();
-			src.plugin.currentWebGLDrawingContext = null;
-
-			// Rebind Phaser state.
-			renderer.renderNodes.getNode('RebindContext')?.run(drawingContext);
-		}
+		src.rendererBackend.renderWebGL(renderer, src, drawingContext, parentMatrix, renderStep, displayList, displayListIndex);
 	}
 
 	renderCanvas (
 		renderer: Phaser.Renderer.Canvas.CanvasRenderer,
 		src: SpineGameObject,
 		camera: Phaser.Cameras.Scene2D.Camera,
-		parentMatrix: Phaser.GameObjects.Components.TransformMatrix
+		parentMatrix?: Phaser.GameObjects.Components.TransformMatrix
 	) {
-		if (!this.skeleton || !this.animationState || !this.plugin.canvasRenderer)
-			return;
+		src.rendererBackend.renderCanvas?.(renderer, src, camera, parentMatrix);
+	}
 
-		const context = renderer.currentContext;
-		const skeletonRenderer = this.plugin.canvasRenderer;
-		// biome-ignore lint/suspicious/noExplicitAny: necessary for phaser
-		(skeletonRenderer as any).ctx = context;
+	preDestroy () {
+		this.rendererBackend.preDestroy();
+		this.slotObjects.clear();
+	}
 
-		camera.addToRenderList(src);
-		const transform = Phaser.GameObjects.GetCalcMatrix(
-			src,
-			camera,
-			parentMatrix
-		).calc;
-		const skeleton = this.skeleton;
-		skeleton.x = transform.tx;
-		skeleton.y = transform.ty;
-		skeleton.scaleX = transform.scaleX;
-		skeleton.scaleY = transform.scaleY;
-		const root = skeleton.getRootBone() as Bone;
-		root.appliedPose.rotation = -MathUtils.radiansToDegrees * transform.rotationNormalized;
-		this.skeleton.updateWorldTransform(Physics.update);
+	/**
+	 * Returns the internal slot object entry for a slot.
+	 * @param slot The slot to query.
+	 * @returns The slot object entry, or `undefined`.
+	 */
+	getSlotObjectEntry (slot: Slot): SpineSlotObjectEntry | undefined {
+		return this.slotObjects.get(slot);
+	}
 
-		context.save();
-		skeletonRenderer.draw(skeleton);
-		context.restore();
+	/**
+	 * Resolves a slot index, name, or Slot instance to a Slot.
+	 * @param slotRef Slot index, slot name, or Slot instance.
+	 * @returns The resolved Slot.
+	 */
+	getSlot (slotRef: number | string | Slot): Slot {
+		if (typeof slotRef === "object") return slotRef;
+		if (typeof slotRef === "number") {
+			const slot = this.skeleton.slots[slotRef];
+			if (!slot) throw new Error(`Spine slot index not found: ${slotRef}`);
+			return slot;
+		}
+		const slot = this.skeleton.findSlot(slotRef);
+		if (!slot) throw new Error(`Spine slot not found: ${slotRef}`);
+		return slot;
+	}
+
+	private requireSlotObjectSupport (): void {
+		if (this.rendererType !== "phaser") {
+			throw new Error(`SpineGameObject slot-object APIs are not supported when renderer is '${this.rendererType}'. Use renderer: 'phaser' to enable slot objects.`);
+		}
+	}
+
+	private removeGameObjectFromOtherSlots (gameObject: Phaser.GameObjects.GameObject): void {
+		for (const [slot, entry] of this.slotObjects) {
+			if (entry.gameObject === gameObject) this.slotObjects.delete(slot);
+		}
 	}
 }
