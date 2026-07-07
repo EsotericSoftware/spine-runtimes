@@ -254,7 +254,7 @@ export class SpineGameObject extends DepthMixin(OriginMixin(ComputedSizeMixin(Fl
 		gameObject.parentContainer?.remove(gameObject);
 		gameObject.removeFromDisplayList();
 		if (!options.preservePosition) {
-			const transform = gameObject as unknown as Phaser.GameObjects.Components.Transform;
+			const transform = gameObject as Phaser.GameObjects.GameObject & Phaser.GameObjects.Components.Transform;
 			transform.x = 0;
 			transform.y = 0;
 		}

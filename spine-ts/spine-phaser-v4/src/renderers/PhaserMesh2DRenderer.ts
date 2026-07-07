@@ -43,13 +43,7 @@ import type { SpineGameObjectRenderer } from "./SpineGameObjectRenderer.js";
 
 const REGION_TRIANGLES = [0, 1, 2, 0, 2, 3];
 
-type Mesh2DObject = Phaser.GameObjects.Mesh2D & {
-	renderWebGL: (renderer: Phaser.Renderer.WebGL.WebGLRenderer, src: Mesh2DObject, drawingContext: Phaser.Renderer.WebGL.DrawingContext, parentMatrix?: Phaser.GameObjects.Components.TransformMatrix) => void;
-	setTint: (color: number) => Mesh2DObject;
-	setTint2: (color: number) => Mesh2DObject;
-	setTintMode: (mode: number) => Mesh2DObject;
-	setFlipV: (value: boolean) => Mesh2DObject;
-};
+type Mesh2DObject = Phaser.GameObjects.Mesh2D & Phaser.GameObjects.Components.Tint;
 
 interface SlotMeshState {
 	mesh: Mesh2DObject;
@@ -66,8 +60,6 @@ interface ClipStencilState {
 	inverse: boolean;
 	version: number;
 }
-
-type BlendModeGameObject = Phaser.GameObjects.GameObject & { blendMode: number };
 
 export class PhaserMesh2DRenderer implements SpineGameObjectRenderer {
 	readonly type = "phaser";
@@ -396,7 +388,7 @@ export class PhaserMesh2DRenderer implements SpineGameObjectRenderer {
 			}
 		}
 
-		mesh.renderWebGL(renderer, mesh, context, parentMatrix);
+		mesh.renderWebGLStep(renderer, mesh, context, parentMatrix);
 		return context;
 	}
 
@@ -411,12 +403,12 @@ export class PhaserMesh2DRenderer implements SpineGameObjectRenderer {
 
 		if (!gameObject.willRender(camera)) return;
 
-		const blendMode = (gameObject as BlendModeGameObject).blendMode;
+		const blendMode = (gameObject as Phaser.GameObjects.GameObject & Phaser.GameObjects.Components.BlendMode).blendMode;
 		let context = drawingContext;
 		if (blendMode !== Phaser.BlendModes.SKIP_CHECK && blendMode !== drawingContext.blendMode) {
 			renderer.renderNodes.finishBatch();
 			context = drawingContext.getClone();
-			context.setBlendMode(blendMode);
+			context.setBlendMode(blendMode as number);
 			context.use();
 		}
 
@@ -432,7 +424,7 @@ export class PhaserMesh2DRenderer implements SpineGameObjectRenderer {
 		let meshState = this.meshStates.get(slot);
 		if (!meshState) {
 			const mesh = new Phaser.GameObjects.Mesh2D(this.owner.scene, 0, 0, "__DEFAULT", [], [], true) as Mesh2DObject;
-			mesh.setFlipV(true);
+			mesh.flipV = true;
 			mesh.setRenderAsTriangles(false);
 			mesh.setUseOrderedIndices(false);
 			meshState = {
