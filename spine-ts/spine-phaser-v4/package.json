@@ -36,9 +36,9 @@
     "@esotericsoftware/spine-webgl": "4.3.10"
   },
   "devDependencies": {
-    "phaser": "^4.2.0"
+    "phaser": "^4.2.1"
   },
   "peerDependencies": {
-    "phaser": "^4.2.0"
+    "phaser": "^4.2.1"
   }
 }

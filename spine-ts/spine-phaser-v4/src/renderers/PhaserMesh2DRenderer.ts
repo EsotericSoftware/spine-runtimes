@@ -253,7 +253,7 @@ export class PhaserMesh2DRenderer implements SpineGameObjectRenderer {
 			const stencil = new Phaser.GameObjects.Stencil(this.owner.scene, 0, 0, [graphics], {
 				stencilInvert: false,
 				stencilCompositeCheck: false,
-				stencilValueWrap: false,
+				stencilValueWrap: true,
 			});
 			state = this.clipStencilState = { stencil, graphics, inverse: false, version: -1 };
 		}
@@ -347,18 +347,13 @@ export class PhaserMesh2DRenderer implements SpineGameObjectRenderer {
 		}
 
 		const clipStencil = this.getActiveClipStencil();
+		clipStencil.stencil.stencilInvert = !clipStencil.inverse;
 
 		this.renderClipStencil(renderer, clipStencil.stencil, drawingContext, parentMatrix, "addLayer");
 
-		const gl = renderer.gl;
-		const readContext = drawingContext.getClone();
-		readContext.setStencil(true, clipStencil.inverse ? gl.EQUAL : gl.NOTEQUAL, 0, 0xff, gl.KEEP, gl.KEEP, gl.KEEP, 0, 0x00);
-		readContext.beginDraw();
-
-		this.renderPhaserGameObject(renderer, entry.gameObject, readContext, matrix);
+		this.renderPhaserGameObject(renderer, entry.gameObject, drawingContext, matrix);
 
 		renderer.renderNodes.finishBatch();
-		readContext.release();
 
 		this.renderClipStencil(renderer, clipStencil.stencil, drawingContext, parentMatrix, "subtractLayer");
 	}
