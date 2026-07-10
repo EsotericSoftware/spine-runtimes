@@ -38,6 +38,7 @@ import { SetupPoseBoundsProvider, type SpineGameObjectBoundsProvider } from "./S
 
 Skeleton.yDown = true;
 
+// cache once per renderer: boot runs per scene, and blend mode IDs cannot be reused across games.
 const spineAdditiveBlendModes = new WeakMap<Phaser.Renderer.WebGL.WebGLRenderer, number>();
 
 function getSpineAdditiveBlendMode (renderer: Phaser.Renderer.WebGL.WebGLRenderer): number {
