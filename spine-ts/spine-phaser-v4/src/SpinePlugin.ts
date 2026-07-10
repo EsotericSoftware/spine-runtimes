@@ -45,6 +45,8 @@ function getSpineAdditiveBlendMode (renderer: Phaser.Renderer.WebGL.WebGLRendere
 
 	const gl = renderer.gl;
 	blendMode = renderer.blendModes.length;
+	// Phaser.BlendModes.ADD uses ONE/DST_ALPHA, which attenuates the destination color on transparent targets.
+	// Spine's shader output is premultiplied and requires ONE/ONE for additive blending.
 	renderer.blendModes.push({
 		enabled: true,
 		color: [0, 0, 0, 0],
