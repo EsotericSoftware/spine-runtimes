@@ -49,7 +49,6 @@ type InheritableSlotObject = Phaser.GameObjects.GameObject & Partial<Phaser.Game
 
 interface SlotMeshState {
 	mesh: Mesh2DObject;
-	attachment: RegionAttachment | MeshAttachment | null;
 	triangles: NumberArrayLike | Uint16Array | null;
 	trianglesLength: number;
 	worldVerticesLength: number;
@@ -177,26 +176,22 @@ export class PhaserMesh2DRenderer implements SpineGameObjectRenderer {
 				for (let i = 0; i < indicesCount; i += 3) mesh.indices.push(triangles[i], triangles[i + 1], triangles[i + 2], 0);
 				mesh.setRenderAsTriangles(false);
 				mesh.setUseOrderedIndices(false);
-				meshState.attachment = attachment;
 				meshState.triangles = null;
 				meshState.trianglesLength = indicesCount;
 				meshState.worldVerticesLength = vertexCount * 2;
 				meshState.clipped = true;
 			} else {
 				const worldVerticesLength = vertexCount * 2;
-				const topologyDirty = meshState.clipped || meshState.attachment !== attachment || meshState.triangles !== triangles || meshState.trianglesLength !== indicesCount || meshState.worldVerticesLength !== worldVerticesLength;
+				const topologyDirty = meshState.clipped || meshState.triangles !== triangles || meshState.trianglesLength !== indicesCount || meshState.worldVerticesLength !== worldVerticesLength;
 				if (topologyDirty) {
 					mesh.indices.length = 0;
 					for (let i = 0; i < indicesCount; i += 3) mesh.indices.push(triangles[i], triangles[i + 1], triangles[i + 2], 0);
 					mesh.setRenderAsTriangles(false);
 					mesh.buildOrderedIndices(2, true);
-					meshState.attachment = attachment;
 					meshState.triangles = triangles;
 					meshState.trianglesLength = indicesCount;
 					meshState.worldVerticesLength = worldVerticesLength;
 					meshState.clipped = false;
-				} else {
-					mesh.setUseOrderedIndices(true);
 				}
 			}
 
@@ -444,7 +439,6 @@ export class PhaserMesh2DRenderer implements SpineGameObjectRenderer {
 			mesh.setUseOrderedIndices(false);
 			meshState = {
 				mesh,
-				attachment: null,
 				triangles: null,
 				trianglesLength: 0,
 				worldVerticesLength: 0,
