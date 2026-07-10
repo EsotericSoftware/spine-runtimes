@@ -303,17 +303,7 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 	 * @returns A new Spine Skeleton instance.
 	 */
 	createSkeleton (dataKey: string, atlasKey: string) {
-		if (this.isWebGL) {
-			const renderer = this.phaserRenderer as Phaser.Renderer.WebGL.WebGLRenderer;
-			renderer.glWrapper.updateTexturingFlipY({ texturing: { flipY: false } });
-			renderer.renderNodes.getNode("YieldContext")?.run();
-		}
-		const skeleton = new Skeleton(this.getSkeletonData(dataKey, atlasKey));
-		if (this.isWebGL) {
-			const renderer = this.phaserRenderer as Phaser.Renderer.WebGL.WebGLRenderer;
-			renderer.renderNodes.getNode("RebindContext")?.run();
-		}
-		return skeleton;
+		return new Skeleton(this.getSkeletonData(dataKey, atlasKey));
 	}
 
 }
