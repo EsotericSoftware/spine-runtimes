@@ -75,6 +75,7 @@ export class PhaserMesh2DRenderer implements SpineGameObjectRenderer {
 	private spineRenderMatrix: Phaser.GameObjects.Components.TransformMatrix = new Phaser.GameObjects.Components.TransformMatrix();
 	private boneRenderMatrix: Phaser.GameObjects.Components.TransformMatrix = new Phaser.GameObjects.Components.TransformMatrix();
 	private slotObjectRenderMatrix: Phaser.GameObjects.Components.TransformMatrix = new Phaser.GameObjects.Components.TransformMatrix();
+	private tempDisplayList: Phaser.GameObjects.GameObject[] = [];
 
 	constructor (private owner: SpineGameObject) { }
 
@@ -174,6 +175,7 @@ export class PhaserMesh2DRenderer implements SpineGameObjectRenderer {
 			if (clipped) {
 				mesh.indices.length = 0;
 				for (let i = 0; i < indicesCount; i += 3) mesh.indices.push(triangles[i], triangles[i + 1], triangles[i + 2], 0);
+				// Keep clipped geometry in the quad batch to avoid draw-call-heavy batch switches.
 				mesh.setRenderAsTriangles(false);
 				mesh.setUseOrderedIndices(false);
 				meshState.triangles = null;
@@ -221,6 +223,7 @@ export class PhaserMesh2DRenderer implements SpineGameObjectRenderer {
 		this.clipStencilState?.stencil.destroy();
 		this.clipStencilState = null;
 		this.clipStencilPoints.length = 0;
+		this.tempDisplayList.length = 0;
 	}
 
 	private startClip (slot: Slot, attachment: ClippingAttachment): void {
@@ -295,7 +298,8 @@ export class PhaserMesh2DRenderer implements SpineGameObjectRenderer {
 		stencil.scrollFactorX = this.owner.scrollFactorX;
 		stencil.scrollFactorY = this.owner.scrollFactorY;
 		const matrix = this.applySpineObjectRenderMatrix(this.spineRenderMatrix, parentMatrix);
-		stencil.renderWebGLStep(renderer, stencil, drawingContext, matrix, 0, [stencil], 0);
+		this.tempDisplayList[0] = stencil;
+		stencil.renderWebGLStep(renderer, stencil, drawingContext, matrix, 0, this.tempDisplayList, 0);
 		renderer.renderNodes.finishBatch();
 	}
 
@@ -383,7 +387,8 @@ export class PhaserMesh2DRenderer implements SpineGameObjectRenderer {
 			}
 		}
 
-		mesh.renderWebGLStep(renderer, mesh, context, parentMatrix);
+		this.tempDisplayList[0] = mesh;
+		mesh.renderWebGLStep(renderer, mesh, context, parentMatrix, undefined, this.tempDisplayList, 0);
 		return context;
 	}
 
@@ -420,7 +425,8 @@ export class PhaserMesh2DRenderer implements SpineGameObjectRenderer {
 			context.use();
 		}
 
-		gameObject.renderWebGLStep(renderer, gameObject, context, parentMatrix, undefined, [gameObject], 0);
+		this.tempDisplayList[0] = gameObject;
+		gameObject.renderWebGLStep(renderer, gameObject, context, parentMatrix, undefined, this.tempDisplayList, 0);
 		if (context !== drawingContext) {
 			renderer.renderNodes.finishBatch();
 			context.release();
