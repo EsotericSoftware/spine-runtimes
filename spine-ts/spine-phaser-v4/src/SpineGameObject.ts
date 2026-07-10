@@ -135,8 +135,26 @@ export class SpineGameObject extends DepthMixin(OriginMixin(ComputedSizeMixin(Fl
 	readonly rendererType: SpineGameObjectRendererType;
 	private rendererBackend: SpineGameObjectRenderer;
 
-	constructor (scene: Phaser.Scene, public readonly plugin: SpinePlugin, options: SpineGameObjectOptions) {
+	constructor (scene: Phaser.Scene, plugin: SpinePlugin, options: SpineGameObjectOptions);
+	/** @deprecated Pass a {@link SpineGameObjectOptions} object as the third argument instead. */
+	constructor (scene: Phaser.Scene, plugin: SpinePlugin, x: number, y: number, dataKey: string, atlasKey: string, boundsProvider?: SpineGameObjectBoundsProvider);
+	constructor (
+		scene: Phaser.Scene,
+		public readonly plugin: SpinePlugin,
+		optionsOrX: SpineGameObjectOptions | number,
+		y?: number,
+		dataKey?: string,
+		atlasKey?: string,
+		boundsProvider?: SpineGameObjectBoundsProvider,
+	) {
 		super(scene, window.SPINE_GAME_OBJECT_TYPE ?? SPINE_GAME_OBJECT_TYPE);
+		let options: SpineGameObjectOptions;
+		if (typeof optionsOrX === "number") {
+			if (dataKey === undefined || atlasKey === undefined) throw new Error("Missing dataKey and atlasKey.");
+			options = { x: optionsOrX, y: y ?? 0, dataKey, atlasKey, boundsProvider };
+		} else {
+			options = optionsOrX;
+		}
 		const rendererType = options.renderer ?? (plugin.isWebGL ? "phaser" : "spine-canvas");
 		if (rendererType !== "phaser" && rendererType !== "spine-webgl" && rendererType !== "spine-canvas") throw new Error(`Unsupported SpineGameObject renderer '${rendererType}'. Use 'phaser', 'spine-webgl', or 'spine-canvas'.`);
 		if (plugin.isWebGL && rendererType === "spine-canvas") throw new Error("SpineGameObject renderer 'spine-canvas' is only supported in Phaser Canvas games.");
@@ -240,6 +258,21 @@ export class SpineGameObject extends DepthMixin(OriginMixin(ComputedSizeMixin(Fl
 		(bone.parent ? bone.parent.appliedPose : bone.appliedPose).worldToLocal(point as Vector2);
 	}
 
+	/** @deprecated Use {@link skeletonToGame} instead. */
+	skeletonToPhaserWorldCoordinates (point: { x: number; y: number }) {
+		this.skeletonToGame(point);
+	}
+
+	/** @deprecated Use {@link gameToSkeleton} instead. */
+	phaserWorldCoordinatesToSkeleton (point: { x: number; y: number }) {
+		this.gameToSkeleton(point);
+	}
+
+	/** @deprecated Use {@link gameToBone} instead. */
+	phaserWorldCoordinatesToBone (point: { x: number; y: number }, bone: Bone) {
+		this.gameToBone(point, bone);
+	}
+
 	/**
 	 * Attaches a Phaser GameObject to a Spine slot.
 	 * @param slotRef Slot index, slot name, or Slot instance.
@@ -299,20 +332,21 @@ export class SpineGameObject extends DepthMixin(OriginMixin(ComputedSizeMixin(Fl
 
 	/**
 	 * Updates animation state, applies it to the skeleton, and updates skeleton world transforms.
-	 * @param delta Time delta in seconds.
+	 * @param delta Time delta in milliseconds.
 	 */
 	updatePose (delta: number) {
-		this.animationState.update(delta);
+		const deltaSeconds = delta / 1000;
+		this.animationState.update(deltaSeconds);
 		this.animationState.apply(this.skeleton);
 		this.skeletonPhysics.applyTransformMovement();
 		this.beforeUpdateWorldTransforms(this);
-		this.skeleton.update(delta);
+		this.skeleton.update(deltaSeconds);
 		this.skeleton.updateWorldTransform(Physics.update);
 		this.afterUpdateWorldTransforms(this);
 	}
 
 	preUpdate (_time: number, delta: number) {
-		this.updatePose(delta / 1000);
+		this.updatePose(delta);
 	}
 
 	willRender (camera: Phaser.Cameras.Scene2D.Camera) {
