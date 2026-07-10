@@ -27,12 +27,33 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import type { SceneRenderer } from "@esotericsoftware/spine-webgl";
+import { SceneRenderer } from "@esotericsoftware/spine-webgl";
 import * as Phaser from "phaser";
 import type { SpineGameObject } from "../SpineGameObject.js";
 import type { SpineGameObjectRenderer } from "./SpineGameObjectRenderer.js";
 
 export class SpineWebGLRenderer implements SpineGameObjectRenderer {
+	// Scene plugins are created per scene, so reuse one SceneRenderer per Phaser WebGL renderer.
+	private static readonly sceneRenderers = new WeakMap<Phaser.Renderer.WebGL.WebGLRenderer, SceneRenderer>();
+
+	static getSceneRenderer (renderer: Phaser.Renderer.WebGL.WebGLRenderer): SceneRenderer {
+		let sceneRenderer = SpineWebGLRenderer.sceneRenderers.get(renderer);
+		if (!sceneRenderer) {
+			sceneRenderer = new SceneRenderer(renderer.canvas, renderer.gl, true);
+			SpineWebGLRenderer.sceneRenderers.set(renderer, sceneRenderer);
+		}
+		return sceneRenderer;
+	}
+
+	static getExistingSceneRenderer (renderer: Phaser.Renderer.WebGL.WebGLRenderer): SceneRenderer | null {
+		return SpineWebGLRenderer.sceneRenderers.get(renderer) ?? null;
+	}
+
+	static disposeSceneRenderer (renderer: Phaser.Renderer.WebGL.WebGLRenderer): void {
+		SpineWebGLRenderer.sceneRenderers.get(renderer)?.dispose();
+		SpineWebGLRenderer.sceneRenderers.delete(renderer);
+	}
+
 	readonly type = "spine-webgl";
 
 	renderWebGL (
@@ -45,8 +66,8 @@ export class SpineWebGLRenderer implements SpineGameObjectRenderer {
 		displayListIndex?: number
 	) {
 		const camera = drawingContext.camera;
-		const sceneRenderer = src.plugin.webGLRenderer;
-		if (!camera || !sceneRenderer) return;
+		if (!camera) return;
+		const sceneRenderer = SpineWebGLRenderer.getSceneRenderer(renderer);
 
 		const hasDisplayListPosition = displayList !== undefined && displayListIndex !== undefined;
 		const previousIsSpineWebGL = hasDisplayListPosition && this.isAdjacentSpineWebGLGameObject(src, camera, displayList, displayListIndex, -1);

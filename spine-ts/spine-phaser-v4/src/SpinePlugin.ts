@@ -28,10 +28,11 @@
  *****************************************************************************/
 
 import { SkeletonRenderer } from "@esotericsoftware/spine-canvas";
-import { AtlasAttachmentLoader, SceneRenderer, Skeleton, SkeletonBinary, type SkeletonData, SkeletonJson, TextureAtlas } from "@esotericsoftware/spine-webgl"
+import { AtlasAttachmentLoader, type SceneRenderer, Skeleton, SkeletonBinary, type SkeletonData, SkeletonJson, TextureAtlas } from "@esotericsoftware/spine-webgl"
 import * as Phaser from "phaser";
 import { SPINE_ATLAS_CACHE_KEY, SPINE_ATLAS_FILE_TYPE, SPINE_GAME_OBJECT_TYPE, SPINE_SKELETON_FILE_CACHE_KEY as SPINE_SKELETON_DATA_CACHE_KEY, SPINE_SKELETON_DATA_FILE_TYPE } from "./keys.js";
 import { PhaserTexture } from "./PhaserTexture.js";
+import { SpineWebGLRenderer } from "./renderers/SpineWebGLRenderer.js";
 import { SpineGameObject, type SpineGameObjectFactoryOptions, type SpineGameObjectRendererType } from "./SpineGameObject.js";
 import { SetupPoseBoundsProvider, type SpineGameObjectBoundsProvider } from "./SpineGameObjectBounds.js";
 
@@ -105,10 +106,10 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 	game: Phaser.Game;
 	readonly isWebGL: boolean;
 	gl: WebGLRenderingContext | null;
-	private _webGLRenderer: SceneRenderer | null = null;
-	/** Spine WebGL scene renderer used by `renderer: "spine-webgl"` objects, or `null` in Canvas games. */
+	/** Lazily created Spine WebGL scene renderer shared by every scene in this game, or `null` in Canvas games. */
 	get webGLRenderer (): SceneRenderer | null {
-		return this._webGLRenderer;
+		if (!this.isWebGL) return null;
+		return SpineWebGLRenderer.getSceneRenderer(this.phaserRenderer as Phaser.Renderer.WebGL.WebGLRenderer);
 	}
 	canvasRenderer: SkeletonRenderer | null;
 	phaserRenderer: Phaser.Renderer.Canvas.CanvasRenderer | Phaser.Renderer.WebGL.WebGLRenderer;
@@ -186,7 +187,6 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 		if (this.isWebGL && this.gl) {
 			const renderer = this.game.renderer as Phaser.Renderer.WebGL.WebGLRenderer;
 			this.spineAdditiveBlendMode = getSpineAdditiveBlendMode(renderer);
-			this._webGLRenderer ||= new SceneRenderer(renderer.canvas, this.gl, true);
 		} else if (this.scene) {
 			this.canvasRenderer ||= new SkeletonRenderer(this.scene.sys.context);
 		}
@@ -201,10 +201,12 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 		this.game.events.once("destroy", this.gameDestroy, this);
 	}
 
-	/** Updates the Spine WebGL renderer camera after Phaser renderer size changes. */
+	/** Updates the shared Spine WebGL renderer camera after Phaser renderer size changes. */
 	onResize () {
 		const phaserRenderer = this.game.renderer;
-		const sceneRenderer = this.webGLRenderer;
+		const sceneRenderer = this.isWebGL
+			? SpineWebGLRenderer.getExistingSceneRenderer(phaserRenderer as Phaser.Renderer.WebGL.WebGLRenderer)
+			: null;
 
 		if (phaserRenderer && sceneRenderer) {
 			const viewportWidth = phaserRenderer.width;
@@ -233,8 +235,9 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 
 	gameDestroy () {
 		this.pluginManager.removeGameObject(window.SPINE_GAME_OBJECT_TYPE ?? SPINE_GAME_OBJECT_TYPE, true, true);
-		if (this.webGLRenderer) this.webGLRenderer.dispose();
-		this._webGLRenderer = null;
+		if (this.isWebGL) {
+			SpineWebGLRenderer.disposeSceneRenderer(this.phaserRenderer as Phaser.Renderer.WebGL.WebGLRenderer);
+		}
 		this.currentWebGLDrawingContext = null;
 	}
 
