@@ -35,9 +35,10 @@ import {
 	RegionAttachment,
 	SkeletonClipping,
 	type Slot,
-	type TextureAtlasRegion,
+	type TextureRegion,
 } from "@esotericsoftware/spine-core";
 import * as Phaser from "phaser";
+import type { PhaserTexture } from "../PhaserTexture.js";
 import type { SpineGameObject, SpineSlotObjectEntry } from "../SpineGameObject.js";
 import type { SpineGameObjectRenderer } from "./SpineGameObjectRenderer.js";
 
@@ -108,7 +109,7 @@ export class PhaserMesh2DRenderer implements SpineGameObjectRenderer {
 				continue;
 			}
 
-			let region: TextureAtlasRegion | null = null;
+			let region: TextureRegion | null = null;
 			let world: NumberArrayLike;
 			let uvs: NumberArrayLike;
 			let triangles: NumberArrayLike | Uint16Array;
@@ -117,7 +118,7 @@ export class PhaserMesh2DRenderer implements SpineGameObjectRenderer {
 
 			if (attachment instanceof RegionAttachment) {
 				const sequenceIndex = attachment.sequence.resolveIndex(pose);
-				region = attachment.sequence.regions[sequenceIndex] as TextureAtlasRegion;
+				region = attachment.sequence.regions[sequenceIndex];
 				if (this.worldVertices.length < 8) this.worldVertices = new Float32Array(8);
 				attachment.computeWorldVertices(slot, attachment.getOffsets(pose), this.worldVertices, 0, 2);
 				world = this.worldVertices;
@@ -126,7 +127,7 @@ export class PhaserMesh2DRenderer implements SpineGameObjectRenderer {
 				vertexCount = 4;
 			} else if (attachment instanceof MeshAttachment) {
 				const sequenceIndex = attachment.sequence.resolveIndex(pose);
-				region = attachment.sequence.regions[sequenceIndex] as TextureAtlasRegion;
+				region = attachment.sequence.regions[sequenceIndex];
 				if (this.worldVertices.length < attachment.worldVerticesLength) this.worldVertices = new Float32Array(attachment.worldVerticesLength);
 				attachment.computeWorldVertices(src.skeleton, slot, 0, attachment.worldVerticesLength, this.worldVertices, 0, 2);
 				world = this.worldVertices;
@@ -138,7 +139,8 @@ export class PhaserMesh2DRenderer implements SpineGameObjectRenderer {
 				continue;
 			}
 
-			if (!region?.page) {
+			const phaserTexture = (region?.texture as PhaserTexture | undefined)?.phaserTexture;
+			if (!phaserTexture) {
 				this.endClip(slot);
 				continue;
 			}
@@ -161,7 +163,7 @@ export class PhaserMesh2DRenderer implements SpineGameObjectRenderer {
 			const meshState = this.getMeshStateForSlot(slot);
 			const mesh = meshState.mesh;
 			mesh.vertices.length = 0;
-			mesh.setTexture(`${src.plugin.atlasKeyForSkeleton(src.skeleton)}!${region.page.name}`);
+			if (mesh.texture !== phaserTexture) mesh.setTexture(phaserTexture.key);
 			mesh.blendMode = this.toPhaserBlendMode(slot.data.blendMode);
 
 			const offsetX = src.renderOffsetX;

@@ -118,7 +118,6 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 	spineAdditiveBlendMode = Phaser.BlendModes.ADD;
 	private skeletonDataCache: Phaser.Cache.BaseCache;
 	private atlasCache: Phaser.Cache.BaseCache;
-	private skeletonAtlasKeys = new WeakMap<Skeleton, string>();
 
 	constructor (scene: Phaser.Scene, pluginManager: Phaser.Plugins.PluginManager, pluginKey: string) {
 		super(scene, pluginManager, pluginKey);
@@ -310,7 +309,6 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 			renderer.renderNodes.getNode("YieldContext")?.run();
 		}
 		const skeleton = new Skeleton(this.getSkeletonData(dataKey, atlasKey));
-		this.skeletonAtlasKeys.set(skeleton, atlasKey);
 		if (this.isWebGL) {
 			const renderer = this.phaserRenderer as Phaser.Renderer.WebGL.WebGLRenderer;
 			renderer.renderNodes.getNode("RebindContext")?.run();
@@ -318,14 +316,6 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 		return skeleton;
 	}
 
-	/**
-	 * Returns the atlas cache key associated with a Skeleton created by this plugin.
-	 * @param skeleton The Skeleton to query.
-	 * @returns The atlas key, or an empty string if unknown.
-	 */
-	atlasKeyForSkeleton (skeleton: Skeleton): string {
-		return this.skeletonAtlasKeys.get(skeleton) ?? "";
-	}
 }
 
 enum SpineSkeletonDataFileType {
