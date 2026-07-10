@@ -275,6 +275,8 @@ export class SpineGameObject extends DepthMixin(OriginMixin(ComputedSizeMixin(Fl
 
 	/**
 	 * Attaches a Phaser GameObject to a Spine slot.
+	 * While attached, the SpineGameObject controls the GameObject's scroll factors so it remains anchored to the slot.
+	 * Removing it does not restore its previous scroll factors.
 	 * @param slotRef Slot index, slot name, or Slot instance.
 	 * @param gameObject Phaser GameObject to render at the slot.
 	 * @param options Slot-object rendering options.

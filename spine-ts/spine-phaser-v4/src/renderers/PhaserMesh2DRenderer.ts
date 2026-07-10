@@ -44,6 +44,7 @@ import type { SpineGameObjectRenderer } from "./SpineGameObjectRenderer.js";
 const REGION_TRIANGLES = [0, 1, 2, 0, 2, 3];
 
 type Mesh2DObject = Phaser.GameObjects.Mesh2D & Phaser.GameObjects.Components.Tint;
+type InheritableSlotObject = Phaser.GameObjects.GameObject & Partial<Phaser.GameObjects.Components.Alpha & Phaser.GameObjects.Components.ScrollFactor>;
 
 interface SlotMeshState {
 	mesh: Mesh2DObject;
@@ -294,6 +295,8 @@ export class PhaserMesh2DRenderer implements SpineGameObjectRenderer {
 		mode: "addLayer" | "subtractLayer"
 	): void {
 		stencil.stencilLayerMode = mode;
+		stencil.scrollFactorX = this.owner.scrollFactorX;
+		stencil.scrollFactorY = this.owner.scrollFactorY;
 		const matrix = this.applySpineObjectRenderMatrix(this.spineRenderMatrix, parentMatrix);
 		stencil.renderWebGLStep(renderer, stencil, drawingContext, matrix, 0, [stencil], 0);
 		renderer.renderNodes.finishBatch();
@@ -394,9 +397,22 @@ export class PhaserMesh2DRenderer implements SpineGameObjectRenderer {
 		parentMatrix: Phaser.GameObjects.Components.TransformMatrix
 	): void {
 		const camera = drawingContext.camera;
-		if (!camera) return;
+		if (!camera || !gameObject.willRender(camera)) return;
 
-		if (!gameObject.willRender(camera)) return;
+		const owner = this.owner;
+		const child = gameObject as InheritableSlotObject;
+		let childAlphaTopLeft: number, childAlphaTopRight: number, childAlphaBottomLeft: number, childAlphaBottomRight: number;
+		if (child.alphaTopLeft !== undefined) {
+			childAlphaTopLeft = child.alphaTopLeft;
+			childAlphaTopRight = child.alphaTopRight ?? childAlphaTopLeft;
+			childAlphaBottomLeft = child.alphaBottomLeft ?? childAlphaTopLeft;
+			childAlphaBottomRight = child.alphaBottomRight ?? childAlphaTopLeft;
+		} else {
+			childAlphaTopLeft = childAlphaTopRight = childAlphaBottomLeft = childAlphaBottomRight = child.alpha ?? 1;
+		}
+		child.setScrollFactor?.(owner.scrollFactorX, owner.scrollFactorY);
+		child.setAlpha?.(childAlphaTopLeft * owner.alpha, childAlphaTopRight * owner.alpha,
+			childAlphaBottomLeft * owner.alpha, childAlphaBottomRight * owner.alpha);
 
 		const blendMode = (gameObject as Phaser.GameObjects.GameObject & Phaser.GameObjects.Components.BlendMode).blendMode;
 		let context = drawingContext;
@@ -413,6 +429,8 @@ export class PhaserMesh2DRenderer implements SpineGameObjectRenderer {
 			context.release();
 			drawingContext.beginDraw();
 		}
+
+		child.setAlpha?.(childAlphaTopLeft, childAlphaTopRight, childAlphaBottomLeft, childAlphaBottomRight);
 	}
 
 	private getMeshStateForSlot (slot: Slot): SlotMeshState {
