@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@esotericsoftware/spine-phaser-v4": "file://../../",
-    "phaser": "^4.2.0"
+    "phaser": "^4.2.1"
   },
   "devDependencies": {
     "esbuild": "^0.25.6",
