@@ -53,7 +53,7 @@
         500,
         "mix-and-match-data",
         "mix-and-match-atlas",
-        new spine.SkinsAndAnimationBoundsProvider(null, ["full-skins/girl"])
+        { boundsProvider: new spine.SkinsAndAnimationBoundsProvider(null, ["full-skins/girl"]) }
       );
       mixAndMatch.scale = 0.5;
       mixAndMatch.animationState.setAnimation(0, "walk", true);

@@ -49,7 +49,7 @@
         300,
         "spineboy-data",
         "spineboy-atlas",
-        new spine.SkinsAndAnimationBoundsProvider("run")
+        { boundsProvider: new spine.SkinsAndAnimationBoundsProvider("run") }
       );
       spineboy.scale = 0.4;
       spineboy.setInteractive();

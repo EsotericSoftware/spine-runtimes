@@ -33,9 +33,9 @@ import {
 	type Bone,
 	MathUtils,
 	Physics,
-	Skeleton,
-	SkeletonClipping,
-	Skin,
+	type Skeleton,
+	type SkeletonCoordinateConverter,
+	SkeletonPhysicsMovement,
 	type Vector2,
 } from "@esotericsoftware/spine-core";
 import * as Phaser from "phaser";
@@ -50,7 +50,11 @@ import {
 	TransformMixin,
 	VisibleMixin,
 } from "./mixins.js";
+import { SetupPoseBoundsProvider, type SpineGameObjectBoundsProvider } from "./SpineGameObjectBounds.js";
 import type { SpinePlugin } from "./SpinePlugin.js";
+
+export type { SpineGameObjectBoundsProvider } from "./SpineGameObjectBounds.js";
+export { AABBRectangleBoundsProvider, SetupPoseBoundsProvider, SkinsAndAnimationBoundsProvider } from "./SpineGameObjectBounds.js";
 
 class BaseSpineGameObject extends Phaser.GameObjects.GameObject {
 	constructor (scene: Phaser.Scene, type: string) {
@@ -58,136 +62,26 @@ class BaseSpineGameObject extends Phaser.GameObjects.GameObject {
 	}
 }
 
-/** A bounds provider calculates the bounding box for a skeleton, which is then assigned as the size of the SpineGameObject. */
-export interface SpineGameObjectBoundsProvider {
-	// Returns the bounding box for the skeleton, in skeleton space.
-	calculateBounds (gameObject: SpineGameObject): {
-		x: number;
-		y: number;
-		width: number;
-		height: number;
-	};
+/** Options used to construct a {@link SpineGameObject}. */
+export interface SpineGameObjectOptions {
+	/** Initial x-position in Phaser coordinates. */
+	x?: number;
+
+	/** Initial y-position in Phaser coordinates. */
+	y?: number;
+
+	/** Phaser cache key for the loaded Spine skeleton data. */
+	dataKey: string;
+
+	/** Phaser cache key for the loaded Spine atlas. */
+	atlasKey: string;
+
+	/** Bounds provider used to calculate the Phaser GameObject size and display origin. */
+	boundsProvider?: SpineGameObjectBoundsProvider;
 }
 
-/** A bounds provider that provides a fixed size given by the user. */
-export class AABBRectangleBoundsProvider implements SpineGameObjectBoundsProvider {
-	constructor (
-		private x: number,
-		private y: number,
-		private width: number,
-		private height: number,
-	) { }
-	calculateBounds () {
-		return { x: this.x, y: this.y, width: this.width, height: this.height };
-	}
-}
-
-/** A bounds provider that calculates the bounding box from the setup pose. */
-export class SetupPoseBoundsProvider implements SpineGameObjectBoundsProvider {
-	/**
-	 * @param clipping If true, clipping attachments are used to compute the bounds. False, by default.
-	 */
-	constructor (
-		private clipping = false,
-	) { }
-
-	calculateBounds (gameObject: SpineGameObject) {
-		if (!gameObject.skeleton) return { x: 0, y: 0, width: 0, height: 0 };
-		// Make a copy of animation state and skeleton as this might be called while
-		// the skeleton in the GameObject has already been heavily modified. We can not
-		// reconstruct that state.
-		const skeleton = new Skeleton(gameObject.skeleton.data);
-		skeleton.setupPose();
-		skeleton.updateWorldTransform(Physics.update);
-		const bounds = skeleton.getBoundsRect(this.clipping ? new SkeletonClipping() : undefined);
-		return bounds.width === Number.NEGATIVE_INFINITY
-			? { x: 0, y: 0, width: 0, height: 0 }
-			: bounds;
-	}
-}
-
-/** A bounds provider that calculates the bounding box by taking the maximumg bounding box for a combination of skins and specific animation. */
-export class SkinsAndAnimationBoundsProvider
-	implements SpineGameObjectBoundsProvider {
-	/**
-	 * @param animation The animation to use for calculating the bounds. If null, the setup pose is used.
-	 * @param skins The skins to use for calculating the bounds. If empty, the default skin is used.
-	 * @param timeStep The time step to use for calculating the bounds. A smaller time step means more precision, but slower calculation.
-	 * @param clipping If true, clipping attachments are used to compute the bounds. False, by default.
-	 */
-	constructor (
-		private animation: string | null,
-		private skins: string[] = [],
-		private timeStep: number = 0.05,
-		private clipping = false,
-	) { }
-
-	calculateBounds (gameObject: SpineGameObject): {
-		x: number;
-		y: number;
-		width: number;
-		height: number;
-	} {
-		if (!gameObject.skeleton || !gameObject.animationState)
-			return { x: 0, y: 0, width: 0, height: 0 };
-		// Make a copy of animation state and skeleton as this might be called while
-		// the skeleton in the GameObject has already been heavily modified. We can not
-		// reconstruct that state.
-		const animationState = new AnimationState(gameObject.animationState.data);
-		const skeleton = new Skeleton(gameObject.skeleton.data);
-		const clipper = this.clipping ? new SkeletonClipping() : undefined;
-		const data = skeleton.data;
-		if (this.skins.length > 0) {
-			const customSkin = new Skin("custom-skin");
-			for (const skinName of this.skins) {
-				const skin = data.findSkin(skinName);
-				if (skin == null) continue;
-				customSkin.addSkin(skin);
-			}
-			skeleton.setSkin(customSkin);
-		}
-		skeleton.setupPose();
-
-		const animation = this.animation != null ? data.findAnimation(this.animation) : null;
-		if (animation == null) {
-			skeleton.updateWorldTransform(Physics.update);
-			const bounds = skeleton.getBoundsRect(clipper);
-			return bounds.width === Number.NEGATIVE_INFINITY
-				? { x: 0, y: 0, width: 0, height: 0 }
-				: bounds;
-		} else {
-			let minX = Number.POSITIVE_INFINITY,
-				minY = Number.POSITIVE_INFINITY,
-				maxX = Number.NEGATIVE_INFINITY,
-				maxY = Number.NEGATIVE_INFINITY;
-			animationState.clearTracks();
-			animationState.setAnimation(0, animation, false);
-			const steps = Math.max(animation.duration / this.timeStep, 1.0);
-			for (let i = 0; i < steps; i++) {
-				const delta = i > 0 ? this.timeStep : 0;
-				animationState.update(delta);
-				animationState.apply(skeleton);
-				skeleton.update(delta);
-				skeleton.updateWorldTransform(Physics.update);
-
-				const bounds = skeleton.getBoundsRect(clipper);
-				minX = Math.min(minX, bounds.x);
-				minY = Math.min(minY, bounds.y);
-				maxX = Math.max(maxX, bounds.x + bounds.width);
-				maxY = Math.max(maxY, bounds.y + bounds.height);
-			}
-			const bounds = {
-				x: minX,
-				y: minY,
-				width: maxX - minX,
-				height: maxY - minY,
-			};
-			return bounds.width === Number.NEGATIVE_INFINITY
-				? { x: 0, y: 0, width: 0, height: 0 }
-				: bounds;
-		}
-	}
-}
+/** Options accepted by the `this.add.spine(...)` factory after position and cache keys. */
+export type SpineGameObjectFactoryOptions = Omit<SpineGameObjectOptions, "x" | "y" | "dataKey" | "atlasKey">;
 
 /**
  * A SpineGameObject is a Phaser {@link GameObject} that can be added to a Phaser Scene and render a Spine skeleton.
@@ -208,7 +102,7 @@ export class SkinsAndAnimationBoundsProvider
  *
  * The class also features methods to convert between the skeleton coordinate system and the Phaser coordinate system.
  *
- * See {@link skeletonToPhaserWorldCoordinates}, {@link phaserWorldCoordinatesToSkeleton}, and {@link phaserWorldCoordinatesToBoneLocal.}
+ * See {@link skeletonToGame}, {@link gameToSkeleton}, and {@link gameToBone}.
  */
 export class SpineGameObject extends DepthMixin(
 	OriginMixin(
@@ -220,7 +114,7 @@ export class SpineGameObject extends DepthMixin(
 			)
 		)
 	)
-) {
+) implements SkeletonCoordinateConverter {
 	blendMode = -1;
 	skeleton: Skeleton;
 	animationStateData: AnimationStateData;
@@ -229,77 +123,47 @@ export class SpineGameObject extends DepthMixin(
 	afterUpdateWorldTransforms: (object: SpineGameObject) => void = () => { };
 	private offsetX = 0;
 	private offsetY = 0;
-	private _physicsPositionInheritanceFactorX = 1;
-	private _physicsPositionInheritanceFactorY = 1;
-	private _physicsRotationInheritanceFactor = 1;
-	private hasLastPhysicsTransform = false;
-	private lastPhysicsX = 0;
-	private lastPhysicsY = 0;
-	private lastPhysicsRotation = 0;
-	private readonly currentPhysicsPosition = { x: 0, y: 0 };
-	private readonly lastPhysicsPosition = { x: 0, y: 0 };
+	/** Tracks this GameObject's transform movement and applies it to skeleton physics constraints when enabled. */
+	readonly skeletonPhysics: SkeletonPhysicsMovement;
 
-	/** Scales how much horizontal translation of this Phaser game object is inherited by skeleton physics constraints. */
-	public get physicsPositionInheritanceFactorX (): number {
-		return this._physicsPositionInheritanceFactorX;
-	}
-
-	/** Scales how much vertical translation of this Phaser game object is inherited by skeleton physics constraints. */
-	public get physicsPositionInheritanceFactorY (): number {
-		return this._physicsPositionInheritanceFactorY;
-	}
-
-	/**
-	 * Sets how much translation of this Phaser game object is inherited by skeleton physics constraints.
-	 * The default is (1, 1), which applies game object translation normally. Use (0, 0)
-	 * to prevent game object translation from affecting physics constraints.
-	 */
-	public setPhysicsPositionInheritanceFactor (x: number, y: number): void {
-		const wasDisabled = this._physicsPositionInheritanceFactorX === 0 && this._physicsPositionInheritanceFactorY === 0;
-		const isEnabled = x !== 0 || y !== 0;
-
-		this._physicsPositionInheritanceFactorX = x;
-		this._physicsPositionInheritanceFactorY = y;
-		if (wasDisabled && isEnabled) this.resetPhysicsPosition();
-	}
-
-	/**
-	 * Scales how much rotation of this Phaser game object is inherited by skeleton physics constraints.
-	 * The default is `1`, which applies game object rotation normally. Use `0` to prevent game object
-	 * rotation from affecting physics constraints.
-	 */
-	public get physicsRotationInheritanceFactor (): number {
-		return this._physicsRotationInheritanceFactor;
-	}
-
-	public set physicsRotationInheritanceFactor (value: number) {
-		const wasDisabled = this._physicsRotationInheritanceFactor === 0;
-		this._physicsRotationInheritanceFactor = value;
-		if (wasDisabled && value !== 0) this.resetPhysicsRotation();
-	}
-
+	constructor (scene: Phaser.Scene, plugin: SpinePlugin, options: SpineGameObjectOptions);
+	/** @deprecated Pass a {@link SpineGameObjectOptions} object as the third argument instead. */
+	constructor (scene: Phaser.Scene, plugin: SpinePlugin, x: number, y: number, dataKey: string, atlasKey: string, boundsProvider?: SpineGameObjectBoundsProvider);
 	constructor (
 		scene: Phaser.Scene,
-		private plugin: SpinePlugin,
-		x: number,
-		y: number,
-		dataKey: string,
-		atlasKey: string,
-		public boundsProvider: SpineGameObjectBoundsProvider = new SetupPoseBoundsProvider()
+		public readonly plugin: SpinePlugin,
+		optionsOrX: SpineGameObjectOptions | number,
+		y?: number,
+		dataKey?: string,
+		atlasKey?: string,
+		boundsProvider?: SpineGameObjectBoundsProvider,
 	) {
 		// biome-ignore lint/suspicious/noExplicitAny: necessary
 		super(scene, (window as any).SPINE_GAME_OBJECT_TYPE ? (window as any).SPINE_GAME_OBJECT_TYPE : SPINE_GAME_OBJECT_TYPE);
-		this.setPosition(x, y);
-
-		this.skeleton = this.plugin.createSkeleton(dataKey, atlasKey);
+		let options: SpineGameObjectOptions;
+		if (typeof optionsOrX === "number") {
+			if (dataKey === undefined || atlasKey === undefined) throw new Error("Missing dataKey and atlasKey.");
+			options = { x: optionsOrX, y: y ?? 0, dataKey, atlasKey, boundsProvider };
+		} else {
+			options = optionsOrX;
+		}
+		this.boundsProvider = options.boundsProvider ?? new SetupPoseBoundsProvider();
+		this.setPosition(options.x ?? 0, options.y ?? 0);
+		this.skeleton = this.plugin.createSkeleton(options.dataKey, options.atlasKey);
+		this.skeletonPhysics = new SkeletonPhysicsMovement(this, {
+			getGameObjectTransform: () => this.getWorldTransformMatrix(),
+			getPhysicsRotation: transform => -Math.atan2(transform.b, transform.a) * 180 / Math.PI,
+		});
 		this.animationStateData = new AnimationStateData(this.skeleton.data);
 		this.animationState = new AnimationState(this.animationStateData);
 		this.skeleton.updateWorldTransform(Physics.update);
 		this.updateSize();
 	}
 
+	/** Bounds provider used to calculate this GameObject's size and display origin. */
+	boundsProvider: SpineGameObjectBoundsProvider = new SetupPoseBoundsProvider();
+
 	updateSize () {
-		if (!this.skeleton) return;
 		const bounds = this.boundsProvider.calculateBounds(this);
 		this.width = bounds.width;
 		this.height = bounds.height;
@@ -308,45 +172,52 @@ export class SpineGameObject extends DepthMixin(
 		this.offsetY = -bounds.y;
 	}
 
-	/** Converts a point from the skeleton coordinate system to the Phaser world coordinate system. */
-	skeletonToPhaserWorldCoordinates (point: { x: number; y: number }) {
+	/** Horizontal skeleton render offset from the Phaser GameObject origin. */
+	get renderOffsetX (): number {
+		return this.offsetX - this.displayOriginX;
+	}
+
+	/** Vertical skeleton render offset from the Phaser GameObject origin. */
+	get renderOffsetY (): number {
+		return this.offsetY - this.displayOriginY;
+	}
+
+	/** Converts `point` in-place from skeleton coordinates to Phaser game coordinates. */
+	skeletonToGame (point: { x: number; y: number }) {
 		const transform = this.getWorldTransformMatrix();
-		const a = transform.a,
-			b = transform.b,
-			c = transform.c,
-			d = transform.d,
-			tx = transform.tx,
-			ty = transform.ty;
-		const x = point.x;
-		const y = point.y;
-		point.x = x * a + y * c + tx;
-		point.y = x * b + y * d + ty;
+		const x = point.x + this.renderOffsetX;
+		const y = point.y + this.renderOffsetY;
+		point.x = x * transform.a + y * transform.c + transform.tx;
+		point.y = x * transform.b + y * transform.d + transform.ty;
 	}
 
-	/** Converts a point from the Phaser world coordinate system to the skeleton coordinate system. */
+	/** Converts `point` in-place from Phaser game coordinates to skeleton coordinates. */
+	gameToSkeleton (point: { x: number; y: number }) {
+		const transform = this.getWorldTransformMatrix().invert();
+		const x = point.x, y = point.y;
+		point.x = x * transform.a + y * transform.c + transform.tx - this.renderOffsetX;
+		point.y = x * transform.b + y * transform.d + transform.ty - this.renderOffsetY;
+	}
+
+	/** Converts `point` in-place from Phaser game coordinates to a bone's local coordinates. */
+	gameToBone (point: { x: number; y: number }, bone: Bone) {
+		this.gameToSkeleton(point);
+		(bone.parent ? bone.parent.appliedPose : bone.appliedPose).worldToLocal(point as Vector2);
+	}
+
+	/** @deprecated Use {@link skeletonToGame} instead. */
+	skeletonToPhaserWorldCoordinates (point: { x: number; y: number }) {
+		this.skeletonToGame(point);
+	}
+
+	/** @deprecated Use {@link gameToSkeleton} instead. */
 	phaserWorldCoordinatesToSkeleton (point: { x: number; y: number }) {
-		let transform = this.getWorldTransformMatrix();
-		transform = transform.invert();
-		const a = transform.a,
-			b = transform.b,
-			c = transform.c,
-			d = transform.d,
-			tx = transform.tx,
-			ty = transform.ty;
-		const x = point.x;
-		const y = point.y;
-		point.x = x * a + y * c + tx;
-		point.y = x * b + y * d + ty;
+		this.gameToSkeleton(point);
 	}
 
-	/** Converts a point from the Phaser world coordinate system to the bone's local coordinate system. */
+	/** @deprecated Use {@link gameToBone} instead. */
 	phaserWorldCoordinatesToBone (point: { x: number; y: number }, bone: Bone) {
-		this.phaserWorldCoordinatesToSkeleton(point);
-		if (bone.parent) {
-			bone.parent.appliedPose.worldToLocal(point as Vector2);
-		} else {
-			bone.appliedPose.worldToLocal(point as Vector2);
-		}
+		this.gameToBone(point, bone);
 	}
 
 	/**
@@ -354,100 +225,17 @@ export class SpineGameObject extends DepthMixin(
 	 * @param delta The time delta in milliseconds
 	 */
 	updatePose (delta: number) {
-		this.animationState.update(delta / 1000);
+		const deltaSeconds = delta / 1000;
+		this.animationState.update(deltaSeconds);
 		this.animationState.apply(this.skeleton);
-		this.applyTransformMovementToPhysics();
+		this.skeletonPhysics.applyTransformMovement();
 		this.beforeUpdateWorldTransforms(this);
-		this.skeleton.update(delta / 1000);
+		this.skeleton.update(deltaSeconds);
 		this.skeleton.updateWorldTransform(Physics.update);
 		this.afterUpdateWorldTransforms(this);
 	}
 
-	/** Resets the position used for calculating inherited physics translation. */
-	public resetPhysicsPosition (): void {
-		const transform = this.getWorldTransformMatrix();
-		this.lastPhysicsX = transform.tx;
-		this.lastPhysicsY = transform.ty;
-		if (!this.hasLastPhysicsTransform) this.lastPhysicsRotation = this.getPhysicsRotation();
-		this.hasLastPhysicsTransform = true;
-	}
-
-	/** Resets the rotation used for calculating inherited physics rotation. */
-	public resetPhysicsRotation (): void {
-		const transform = this.getWorldTransformMatrix();
-		this.lastPhysicsRotation = this.getPhysicsRotation();
-		if (!this.hasLastPhysicsTransform) {
-			this.lastPhysicsX = transform.tx;
-			this.lastPhysicsY = transform.ty;
-		}
-		this.hasLastPhysicsTransform = true;
-	}
-
-	/** Resets the transform used for calculating inherited physics translation and rotation. */
-	public resetPhysicsTransform (): void {
-		this.resetPhysicsPosition();
-		this.resetPhysicsRotation();
-	}
-
-	private applyTransformMovementToPhysics (): void {
-		const transform = this.getWorldTransformMatrix();
-		const { tx, ty } = transform;
-		const currentRotation = this.getPhysicsRotation();
-
-		if (this.hasLastPhysicsTransform) {
-			this.applyPositionMovementToPhysics(tx, ty);
-			this.applyRotationMovementToPhysics(currentRotation);
-		}
-
-		this.setLastPhysicsTransform(tx, ty, currentRotation);
-	}
-
-	private applyPositionMovementToPhysics (currentX: number, currentY: number): void {
-		if (this._physicsPositionInheritanceFactorX === 0 && this._physicsPositionInheritanceFactorY === 0) return;
-
-		const currentPosition = this.currentPhysicsPosition;
-		currentPosition.x = currentX;
-		currentPosition.y = currentY;
-		this.phaserWorldCoordinatesToSkeleton(currentPosition);
-
-		const lastPosition = this.lastPhysicsPosition;
-		lastPosition.x = this.lastPhysicsX;
-		lastPosition.y = this.lastPhysicsY;
-		this.phaserWorldCoordinatesToSkeleton(lastPosition);
-
-		this.skeleton.physicsTranslate(
-			(currentPosition.x - lastPosition.x) * this._physicsPositionInheritanceFactorX,
-			(currentPosition.y - lastPosition.y) * this._physicsPositionInheritanceFactorY
-		);
-	}
-
-	private applyRotationMovementToPhysics (currentRotation: number): void {
-		const rotationFactor = this._physicsRotationInheritanceFactor;
-		if (rotationFactor === 0) return;
-
-		this.skeleton.physicsRotate(0, 0, this.getRotationDelta(currentRotation, this.lastPhysicsRotation) * rotationFactor);
-	}
-
-	private setLastPhysicsTransform (x: number, y: number, rotation: number): void {
-		this.lastPhysicsX = x;
-		this.lastPhysicsY = y;
-		this.lastPhysicsRotation = rotation;
-		this.hasLastPhysicsTransform = true;
-	}
-
-	private getPhysicsRotation (): number {
-		const transform = this.getWorldTransformMatrix();
-		return -Math.atan2(transform.b, transform.a) * 180 / Math.PI;
-	}
-
-	private getRotationDelta (current: number, previous: number): number {
-		let delta = current - previous;
-		delta = (delta + 180) % 360 - 180;
-		return delta < -180 ? delta + 360 : delta;
-	}
-
-	preUpdate (time: number, delta: number) {
-		if (!this.skeleton || !this.animationState) return;
+	preUpdate (_time: number, delta: number) {
 		this.updatePose(delta);
 	}
 
@@ -500,8 +288,8 @@ export class SpineGameObject extends DepthMixin(
 			tx = transform.tx,
 			ty = transform.ty;
 
-		const offsetX = src.offsetX - src.displayOriginX;
-		const offsetY = src.offsetY - src.displayOriginY;
+		const offsetX = src.renderOffsetX;
+		const offsetY = src.renderOffsetY;
 
 		sceneRenderer.drawSkeleton(
 			src.skeleton,
@@ -544,8 +332,10 @@ export class SpineGameObject extends DepthMixin(
 			parentMatrix
 		).calc;
 		const skeleton = this.skeleton;
-		skeleton.x = transform.tx;
-		skeleton.y = transform.ty;
+		const offsetX = this.renderOffsetX;
+		const offsetY = this.renderOffsetY;
+		skeleton.x = transform.tx + offsetX * transform.a + offsetY * transform.c;
+		skeleton.y = transform.ty + offsetX * transform.b + offsetY * transform.d;
 		skeleton.scaleX = transform.scaleX;
 		skeleton.scaleY = transform.scaleY;
 		const root = skeleton.getRootBone() as Bone;

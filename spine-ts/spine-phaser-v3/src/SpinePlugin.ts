@@ -31,7 +31,8 @@ import { CanvasTexture, SkeletonRenderer } from "@esotericsoftware/spine-canvas"
 import { AtlasAttachmentLoader, GLTexture, SceneRenderer, Skeleton, SkeletonBinary, type SkeletonData, SkeletonJson, TextureAtlas } from "@esotericsoftware/spine-webgl"
 import * as Phaser from "phaser";
 import { SPINE_ATLAS_CACHE_KEY, SPINE_ATLAS_FILE_TYPE, SPINE_GAME_OBJECT_TYPE, SPINE_SKELETON_FILE_CACHE_KEY as SPINE_SKELETON_DATA_CACHE_KEY, SPINE_SKELETON_DATA_FILE_TYPE } from "./keys.js";
-import { SpineGameObject, type SpineGameObjectBoundsProvider } from "./SpineGameObject.js";
+import { SpineGameObject, type SpineGameObjectFactoryOptions } from "./SpineGameObject.js";
+import { SetupPoseBoundsProvider, type SpineGameObjectBoundsProvider } from "./SpineGameObjectBounds.js";
 
 Skeleton.yDown = true;
 
@@ -61,8 +62,8 @@ export interface SpineGameObjectConfig extends Phaser.Types.GameObjects.GameObje
  * * `spineAtlas(key: string, url: string, xhrSettings?: XHRSettingsObject)`: loads a texture atlas `.atlas` file from the `url` as well as its correponding texture atlas page images.
  *
  * The scene's {@link GameObjectFactory} (`Scene.add`) gets these additional functions:
- * * `spine(x: number, y: number, dataKey: string, atlasKey: string, boundsProvider: SpineGameObjectBoundsProvider = SetupPoseBoundsProvider())`:
- *    creates a new {@link SpineGameObject} from the data and atlas at position `(x, y)`, using the {@link BoundsProvider} to calculate its bounding box. The object is automatically added to the scene.
+ * * `spine(x: number, y: number, dataKey: string, atlasKey: string, options?: SpineGameObjectFactoryOptions)`:
+ *    creates a new {@link SpineGameObject} from the data and atlas at position `(x, y)`. The options object can configure bounds. The object is automatically added to the scene.
  *
  * The scene's {@link GameObjectCreator} (`Scene.make`) gets these additional functions:
  * * `spine(config: SpineGameObjectConfig)`: creates a new {@link SpineGameObject} from the given configuration object.
@@ -126,13 +127,14 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 		};
 		pluginManager.registerFileType("spineAtlas", atlasFileCallback, scene);
 
-		const addSpineGameObject = function (this: Phaser.GameObjects.GameObjectFactory, x: number, y: number, dataKey: string, atlasKey: string, boundsProvider: SpineGameObjectBoundsProvider) {
+		const addSpineGameObject = function (this: Phaser.GameObjects.GameObjectFactory, x: number, y: number, dataKey: string, atlasKey: string, boundsOrOptions?: SpineGameObjectBoundsProvider | SpineGameObjectFactoryOptions) {
 			if (this.scene.sys.renderer instanceof Phaser.Renderer.WebGL.WebGLRenderer) {
 				this.scene.sys.renderer.pipelines.clear();
 			}
 
+			const boundsProvider = boundsOrOptions && "calculateBounds" in boundsOrOptions ? boundsOrOptions : boundsOrOptions?.boundsProvider;
 			const spinePlugin = (this.scene.sys as Phaser.Scenes.Systems & Record<string, SpinePlugin>)[pluginKey];
-			const gameObject = new SpineGameObject(this.scene, spinePlugin, x, y, dataKey, atlasKey, boundsProvider);
+			const gameObject = new SpineGameObject(this.scene, spinePlugin, { x, y, dataKey, atlasKey, boundsProvider });
 			this.displayList.add(gameObject);
 			this.updateList.add(gameObject);
 
@@ -150,10 +152,10 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 
 			const x = config.x ? config.x : 0;
 			const y = config.y ? config.y : 0;
-			const boundsProvider = config.boundsProvider ? config.boundsProvider : undefined;
+			const boundsProvider = config.boundsProvider ?? new SetupPoseBoundsProvider();
 
 			const spinePlugin = (this.scene.sys as Phaser.Scenes.Systems & Record<string, SpinePlugin>)[pluginKey] as SpinePlugin;
-			const gameObject = new SpineGameObject(this.scene, spinePlugin, x, y, config.dataKey, config.atlasKey, boundsProvider);
+			const gameObject = new SpineGameObject(this.scene, spinePlugin, { x, y, dataKey: config.dataKey, atlasKey: config.atlasKey, boundsProvider });
 			if (addToScene !== undefined) {
 				config.add = addToScene;
 			}
