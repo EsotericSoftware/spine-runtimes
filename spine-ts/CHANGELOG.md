@@ -23,17 +23,10 @@
 
 ### spine-phaser-v4
 
-- Added selectable `"phaser"`, `"spine-webgl"`, and `"spine-canvas"` renderer backends through `SpineGameObjectOptions`, `SpineGameObjectFactoryOptions`, and `SpineGameObjectConfig`.
-- Added the default Phaser `Mesh2D` renderer, including Spine tint, tint-black, alpha, blend modes, atlas texture filtering and wrapping, premultiplied-alpha handling, clipping, batching, and Phaser render-context integration.
-- Added APIs for attaching Phaser game objects to Spine slots with before/after placement, attachment timeline following, clipping, and optional position preservation. Attached objects inherit the `SpineGameObject` alpha and scroll factor while rendered.
-- Added stencil-buffer integration so Spine clipping attachments can clip Phaser game objects attached to slots.
-- Added a Spine-compatible additive blend mode and isolated it per Phaser WebGL renderer.
+- Added selectable `"phaser"` (default), `"spine-webgl"`, and `"spine-canvas"` renderer backends. The `phaser` renderer uses the new Phaser 4.2.1 `Mesh2D`, and supports Spine tint, tint-black, alpha, blend modes, atlas texture filtering and wrapping, premultiplied-alpha handling, clipping, batching, and Phaser render-context integration.
+- Added APIs for attaching Phaser game objects to Spine slots with before/after placement, attachment timeline following, clipping, and optional position preservation. Attached objects inherit the `SpineGameObject` alpha and scroll factor while rendered. Thanks to stencil-buffer integration, Spine clipping attachments can clip Phaser game objects attached to slots.
 - Shared the spine-webgl `SceneRenderer` between scenes using the same Phaser WebGL renderer and exposed it through `SpinePlugin.webGLRenderer`.
-- Fixed `SpineGameObject` alpha handling across renderer backends and attached slot objects.
-- Fixed possible skeleton data cache collisions between data and atlas key pairs.
-- Improved Mesh2D batching and rendering performance by reusing per-slot meshes and temporary display lists, avoiding redundant texture assignments and topology updates, and reducing unnecessary context yield/rebind operations.
-- Updated the IIFE build and TypeScript example for Phaser 4.2.1.
-- Added renderer benchmark, stencil compatibility, Dragon, performance, and slot-object examples.
+- Updated all examples to use the unified loading and game-object creation APIs.
 
 ### spine-construct3
 
