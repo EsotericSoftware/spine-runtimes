@@ -164,9 +164,15 @@ export class SpineGameObject extends DepthMixin(OriginMixin(ComputedSizeMixin(Fl
 		this.boundsProvider = options.boundsProvider ?? new SetupPoseBoundsProvider();
 		this.setPosition(options.x ?? 0, options.y ?? 0);
 		this.skeleton = this.plugin.createSkeleton(options.dataKey, options.atlasKey);
-		this.skeletonPhysics = new SkeletonPhysicsMovement(this, {
-			getGameObjectTransform: () => this.getWorldTransformMatrix(),
-			getPhysicsRotation: transform => -Math.atan2(transform.b, transform.a) * 180 / Math.PI,
+		this.skeletonPhysics = new SkeletonPhysicsMovement(this.skeleton, {
+			readTransform: (out, readRotation) => {
+				const transform = this.getWorldTransformMatrix();
+				out.x = transform.tx;
+				out.y = transform.ty;
+				out.z = 0;
+				if (readRotation) out.rotation = -Math.atan2(transform.b, transform.a) * 180 / Math.PI;
+			},
+			worldToSkeleton: point => this.gameToSkeleton(point),
 		});
 		this.animationStateData = new AnimationStateData(this.skeleton.data);
 		this.animationState = new AnimationState(this.animationStateData);
