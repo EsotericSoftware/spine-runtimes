@@ -57,6 +57,8 @@ declare global {
 			/** @deprecated Use {@link spineSkeleton} instead. */
 			spineBinary (key: string, url: string, xhrSettings?: Phaser.Types.Loader.XHRSettingsObject): LoaderPlugin;
 			spineAtlas (key: string, url: string, options?: SpineAtlasFileOptions): LoaderPlugin;
+			/** @deprecated Pass `{ xhrSettings }` as the third argument instead. */
+			spineAtlas (key: string, url: string, xhrSettings?: Phaser.Types.Loader.XHRSettingsObject): LoaderPlugin;
 		}
 	}
 

@@ -120,8 +120,11 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 
 		const atlasFileCallback = function (this: Phaser.Loader.LoaderPlugin, key: string,
 			url: string,
-			options?: SpineAtlasFileOptions) {
-			const file = new SpineAtlasFile(this, key, url, options?.xhrSettings);
+			optionsOrXhrSettings?: SpineAtlasFileOptions | Phaser.Types.Loader.XHRSettingsObject) {
+			const xhrSettings = optionsOrXhrSettings && "xhrSettings" in optionsOrXhrSettings
+				? optionsOrXhrSettings.xhrSettings
+				: optionsOrXhrSettings as Phaser.Types.Loader.XHRSettingsObject | undefined;
+			const file = new SpineAtlasFile(this, key, url, xhrSettings);
 			this.addFile(file.files);
 			return this;
 		};
