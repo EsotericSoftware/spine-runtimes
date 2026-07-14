@@ -14,7 +14,7 @@ jobs:
       matrix:
         version:
           [
-            {"tag": "4.6.1-stable", "version": "4.6.1.stable", "dev": false},
+            {"tag": "4.7-stable", "version": "4.7.stable", "dev": false},
           ]
     uses: ./.github/workflows/spine-godot-extension-v4.yml
     with:
