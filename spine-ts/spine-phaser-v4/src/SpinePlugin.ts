@@ -91,6 +91,12 @@ export interface SpineSkeletonFileOptions {
 	xhrSettings?: Phaser.Types.Loader.XHRSettingsObject;
 }
 
+/** Options for loading a texture atlas file with `this.load.spineAtlas(...)`. */
+export interface SpineAtlasFileOptions {
+	/** Optional Phaser XHR settings used to load the texture atlas file. */
+	xhrSettings?: Phaser.Types.Loader.XHRSettingsObject;
+}
+
 /** Adds Spine asset loading, GameObject creation, and runtime accessors to a Phaser scene. */
 export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 	game: Phaser.Game;
@@ -147,8 +153,8 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 
 		const atlasFileCallback = function (this: Phaser.Loader.LoaderPlugin, key: string,
 			url: string,
-			xhrSettings: Phaser.Types.Loader.XHRSettingsObject) {
-			const file = new SpineAtlasFile(this, key, url, xhrSettings);
+			options?: SpineAtlasFileOptions) {
+			const file = new SpineAtlasFile(this, key, url, options?.xhrSettings);
 			this.addFile(file.files);
 			return this;
 		};
