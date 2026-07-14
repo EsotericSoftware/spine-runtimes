@@ -83,26 +83,15 @@ export interface SpineGameObjectConfig extends Phaser.Types.GameObjects.GameObje
 	renderer?: SpineGameObjectRendererType
 }
 
-/**
- * {@link ScenePlugin} implementation adding Spine Runtime capabilities to a scene.
- *
- * The scene's {@link LoaderPlugin} (`Scene.load`) gets these additional functions:
- * * `spineBinary(key: string, url: string, xhrSettings?: XHRSettingsObject)`: loads skeleton binary `.skel` data from the `url`.
- * * `spineJson(key: string, url: string, xhrSettings?: XHRSettingsObject)`: loads skeleton JSON data from the `url`.
- * * `spineAtlas(key: string, url: string, xhrSettings?: XHRSettingsObject)`: loads a texture atlas `.atlas` file from the `url` as well as its corresponding texture atlas page images.
- *
- * The scene's {@link GameObjectFactory} (`Scene.add`) gets these additional functions:
- * * `spine(x: number, y: number, dataKey: string, atlasKey: string, options?: SpineGameObjectFactoryOptions)`:
- *    creates a new {@link SpineGameObject} from the data and atlas at position `(x, y)`. The options object can configure bounds and renderer backend. The object is automatically added to the scene.
- *
- * The scene's {@link GameObjectCreator} (`Scene.make`) gets these additional functions:
- * * `spine(config: SpineGameObjectConfig)`: creates a new {@link SpineGameObject} from the given configuration object.
- *
- * The plugin has additional public methods to work with Spine Runtime core API objects:
- * * `getAtlas(atlasKey: string)`: returns the {@link TextureAtlas} instance for the given atlas key.
- * * `getSkeletonData(dataKey: string, atlasKey: string)`: returns the {@link SkeletonData} instance for the given skeleton data and atlas keys.
- * * `createSkeleton(dataKey: string, atlasKey: string)`: creates a new {@link Skeleton} instance from the given skeleton data and atlas keys.
- */
+/** Options for loading a skeleton data file with `this.load.spineSkeleton(...)`. */
+export interface SpineSkeletonFileOptions {
+	/** Explicit data format. When omitted, the format is inferred from the `.json` or `.skel` URL extension. */
+	format?: "json" | "binary";
+	/** Optional Phaser XHR settings used to load the skeleton data file. */
+	xhrSettings?: Phaser.Types.Loader.XHRSettingsObject;
+}
+
+/** Adds Spine asset loading, GameObject creation, and runtime accessors to a Phaser scene. */
 export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 	game: Phaser.Game;
 	readonly isWebGL: boolean;
@@ -129,9 +118,18 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 		this.skeletonDataCache = this.game.cache.addCustom(SPINE_SKELETON_DATA_CACHE_KEY);
 		this.atlasCache = this.game.cache.addCustom(SPINE_ATLAS_CACHE_KEY);
 
+		const skeletonFileCallback = function (this: Phaser.Loader.LoaderPlugin, key: string,
+			url: string,
+			options?: SpineSkeletonFileOptions) {
+			const file = new SpineSkeletonDataFile(this, key, url, getSpineSkeletonDataFileType(url, options?.format), options?.xhrSettings);
+			this.addFile(file.files);
+			return this;
+		};
+		pluginManager.registerFileType("spineSkeleton", skeletonFileCallback, scene);
+
 		const skeletonJsonFileCallback = function (this: Phaser.Loader.LoaderPlugin, key: string,
 			url: string,
-			xhrSettings: Phaser.Types.Loader.XHRSettingsObject) {
+			xhrSettings?: Phaser.Types.Loader.XHRSettingsObject) {
 			const file = new SpineSkeletonDataFile(this, key, url, SpineSkeletonDataFileType.json, xhrSettings);
 			this.addFile(file.files);
 			return this;
@@ -140,7 +138,7 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 
 		const skeletonBinaryFileCallback = function (this: Phaser.Loader.LoaderPlugin, key: string,
 			url: string,
-			xhrSettings: Phaser.Types.Loader.XHRSettingsObject) {
+			xhrSettings?: Phaser.Types.Loader.XHRSettingsObject) {
 			const file = new SpineSkeletonDataFile(this, key, url, SpineSkeletonDataFileType.binary, xhrSettings);
 			this.addFile(file.files);
 			return this;
@@ -311,6 +309,17 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 enum SpineSkeletonDataFileType {
 	json,
 	binary
+}
+
+function getSpineSkeletonDataFileType (url: string, format?: "json" | "binary"): SpineSkeletonDataFileType {
+	if (format === "json") return SpineSkeletonDataFileType.json;
+	if (format === "binary") return SpineSkeletonDataFileType.binary;
+	if (format !== undefined) throw new Error(`Unsupported Spine skeleton data format: ${format}. Expected "json" or "binary".`);
+
+	const path = url.split(/[?#]/, 1)[0].toLowerCase();
+	if (path.endsWith(".json")) return SpineSkeletonDataFileType.json;
+	if (path.endsWith(".skel")) return SpineSkeletonDataFileType.binary;
+	throw new Error(`Unable to determine the Spine skeleton data format from URL: ${url}. Specify the "json" or "binary" format explicitly.`);
 }
 
 interface SpineSkeletonDataFileConfig {

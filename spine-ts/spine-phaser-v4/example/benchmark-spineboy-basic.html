@@ -113,7 +113,7 @@
       }
 
       preload() {
-        this.load.spineBinary("spineboy-data", "../../assets/spineboy-pro.skel");
+        this.load.spineSkeleton("spineboy-data", "../../assets/spineboy-pro.skel");
         this.load.spineAtlas("spineboy-atlas", "../../assets/spineboy.atlas");
         if (config.phaserObjects > 0 || config.slotObjects) this.load.image("phaser-logo", "./phaser.png");
       }

@@ -37,7 +37,7 @@ export * from "./SpineGameObject.js"
 export * from "./SpineGameObjectBounds.js"
 export * from "./SpinePlugin.js"
 
-import { type SpineGameObjectConfig, SpinePlugin } from "./SpinePlugin.js";
+import { type SpineGameObjectConfig, SpinePlugin, type SpineSkeletonFileOptions } from "./SpinePlugin.js";
 import type { SpineGameObjectFactoryOptions } from "./SpineGameObject.js";
 
 // biome-ignore lint/suspicious/noExplicitAny: need to add spine to window
@@ -51,7 +51,10 @@ import type { SpineGameObjectBoundsProvider } from "./SpineGameObjectBounds.js";
 declare global {
 	namespace Phaser.Loader {
 		export interface LoaderPlugin {
+			spineSkeleton (key: string, url: string, options?: SpineSkeletonFileOptions): LoaderPlugin;
+			/** @deprecated Use {@link spineSkeleton} instead. */
 			spineJson (key: string, url: string, xhrSettings?: Phaser.Types.Loader.XHRSettingsObject): LoaderPlugin;
+			/** @deprecated Use {@link spineSkeleton} instead. */
 			spineBinary (key: string, url: string, xhrSettings?: Phaser.Types.Loader.XHRSettingsObject): LoaderPlugin;
 			spineAtlas (key: string, url: string, xhrSettings?: Phaser.Types.Loader.XHRSettingsObject): LoaderPlugin;
 		}
