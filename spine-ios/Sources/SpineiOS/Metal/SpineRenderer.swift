@@ -228,10 +228,66 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
     }
 
     @discardableResult
+    func draw(
+        to texture: MTLTexture,
+        in view: SpineUIView,
+        commandBuffer: MTLCommandBuffer,
+        clearColor: MTLClearColor,
+        completion: ((MTLCommandBuffer) -> Void)?
+    ) -> Bool {
+        guard texture.pixelFormat == view.colorPixelFormat,
+            texture.usage.contains(.renderTarget),
+            commandBuffer.status == .notEnqueued
+        else {
+            return false
+        }
+
+        let size = CGSize(width: texture.width, height: texture.height)
+        mtkView(view, drawableSizeWillChange: size)
+
+        let renderPassDescriptor = MTLRenderPassDescriptor()
+        renderPassDescriptor.colorAttachments[0].texture = texture
+        renderPassDescriptor.colorAttachments[0].loadAction = .clear
+        renderPassDescriptor.colorAttachments[0].storeAction = .store
+        renderPassDescriptor.colorAttachments[0].clearColor = clearColor
+
+        return encode(
+            renderPassDescriptor: renderPassDescriptor,
+            commandBuffer: commandBuffer,
+            completion: completion
+        )
+    }
+
+    @discardableResult
     private func draw(
         renderPassDescriptor: MTLRenderPassDescriptor,
         present: ((MTLCommandBuffer) -> Void)?,
         completion: ((MTLCommandBuffer) -> Void)? = nil
+    ) -> Bool {
+        guard let commandBuffer = commandQueue.makeCommandBuffer() else {
+            return false
+        }
+        guard encode(
+            renderPassDescriptor: renderPassDescriptor,
+            commandBuffer: commandBuffer,
+            completion: completion
+        ) else {
+            return false
+        }
+
+        present?(commandBuffer)
+        commandBuffer.commit()
+        if waitUntilCompleted {
+            commandBuffer.waitUntilCompleted()
+        }
+        return true
+    }
+
+    @discardableResult
+    private func encode(
+        renderPassDescriptor: MTLRenderPassDescriptor,
+        commandBuffer: MTLCommandBuffer,
+        completion: ((MTLCommandBuffer) -> Void)?
     ) -> Bool {
         guard dataSource?.isPlaying(self) ?? false else {
             lastDraw = CACurrentMediaTime()
@@ -246,7 +302,6 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
         currentBufferIndex = (currentBufferIndex + 1) % SpineRenderer.numberOfBuffers
 
         guard let renderCommands = dataSource?.renderCommands(self),
-            let commandBuffer = commandQueue.makeCommandBuffer(),
             let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor)
         else {
             // this can happen if,
@@ -261,14 +316,9 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
         delegate?.spineRendererDidDraw(self)
 
         renderEncoder.endEncoding()
-        present?(commandBuffer)
         commandBuffer.addCompletedHandler { [bufferingSemaphore] commandBuffer in
             bufferingSemaphore.signal()
             completion?(commandBuffer)
-        }
-        commandBuffer.commit()
-        if waitUntilCompleted {
-            commandBuffer.waitUntilCompleted()
         }
         return true
     }
