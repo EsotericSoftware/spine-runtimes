@@ -186,9 +186,56 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
     }
 
     func draw(in view: MTKView) {
+        guard let renderPassDescriptor = view.currentRenderPassDescriptor else {
+            return
+        }
+        let drawable = view.currentDrawable
+        _ = draw(
+            renderPassDescriptor: renderPassDescriptor,
+            present: { commandBuffer in
+                drawable.flatMap { commandBuffer.present($0) }
+            }
+        )
+    }
+
+    @discardableResult
+    func draw(
+        to texture: MTLTexture,
+        in view: SpineUIView,
+        clearColor: MTLClearColor,
+        completion: ((MTLCommandBuffer) -> Void)?
+    ) -> Bool {
+        guard texture.pixelFormat == view.colorPixelFormat,
+            texture.usage.contains(.renderTarget)
+        else {
+            return false
+        }
+
+        let size = CGSize(width: texture.width, height: texture.height)
+        mtkView(view, drawableSizeWillChange: size)
+
+        let renderPassDescriptor = MTLRenderPassDescriptor()
+        renderPassDescriptor.colorAttachments[0].texture = texture
+        renderPassDescriptor.colorAttachments[0].loadAction = .clear
+        renderPassDescriptor.colorAttachments[0].storeAction = .store
+        renderPassDescriptor.colorAttachments[0].clearColor = clearColor
+
+        return draw(
+            renderPassDescriptor: renderPassDescriptor,
+            present: nil,
+            completion: completion
+        )
+    }
+
+    @discardableResult
+    private func draw(
+        renderPassDescriptor: MTLRenderPassDescriptor,
+        present: ((MTLCommandBuffer) -> Void)?,
+        completion: ((MTLCommandBuffer) -> Void)? = nil
+    ) -> Bool {
         guard dataSource?.isPlaying(self) ?? false else {
             lastDraw = CACurrentMediaTime()
-            return
+            return false
         }
 
         callNeedsUpdate()
@@ -200,31 +247,30 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
 
         guard let renderCommands = dataSource?.renderCommands(self),
             let commandBuffer = commandQueue.makeCommandBuffer(),
-            let renderPassDescriptor = view.currentRenderPassDescriptor,
             let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor)
         else {
             // this can happen if,
             // - CAMetalLayer is configured with drawable timeout, and CAMetalLayer is run out of Drawable
             // - CAMetalLayer is added to the window with frame size of zero or incorrect layout constraint -> currentRenderPassDescriptor is null
             bufferingSemaphore.signal()
-            return
+            return false
         }
 
         delegate?.spineRendererWillDraw(self)
-        draw(renderCommands: renderCommands, renderEncoder: renderEncoder, in: view)
+        draw(renderCommands: renderCommands, renderEncoder: renderEncoder)
         delegate?.spineRendererDidDraw(self)
 
         renderEncoder.endEncoding()
-        view.currentDrawable.flatMap {
-            commandBuffer.present($0)
-        }
-        commandBuffer.addCompletedHandler { [bufferingSemaphore] _ in
+        present?(commandBuffer)
+        commandBuffer.addCompletedHandler { [bufferingSemaphore] commandBuffer in
             bufferingSemaphore.signal()
+            completion?(commandBuffer)
         }
         commandBuffer.commit()
         if waitUntilCompleted {
             commandBuffer.waitUntilCompleted()
         }
+        return true
     }
 
     private func setTransform(bounds: CGRect, mode: SpineContentMode, alignment: SpineAlignment) {
@@ -273,7 +319,7 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
         delegate?.spineRendererDidUpdate(self)
     }
 
-    private func draw(renderCommands: [RenderCommand], renderEncoder: MTLRenderCommandEncoder, in view: MTKView) {
+    private func draw(renderCommands: [RenderCommand], renderEncoder: MTLRenderCommandEncoder) {
         let allVertices = renderCommands.map { renderCommand in
             Array(renderCommand.getVertices())
         }

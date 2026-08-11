@@ -321,6 +321,38 @@ public final class SpineUIView: MTKView {
             }
         }
     }
+
+    /// Renders the current skeleton pose directly into a caller-owned Metal
+    /// texture.
+    ///
+    /// The texture must use the same pixel format as ``colorPixelFormat`` and
+    /// include ``MTLTextureUsage/renderTarget`` in its usage. This method uses
+    /// the same renderer as the on-screen view, including animation updates,
+    /// clipping, mesh deformation, slot order, and blend modes.
+    ///
+    /// - Parameters:
+    ///   - texture: The Metal texture that receives the rendered frame.
+    ///   - clearColor: The color used to clear the texture before rendering.
+    ///     Defaults to the view's ``clearColor``.
+    ///   - completion: Called on Metal's completion queue after the GPU has
+    ///     finished rendering. Inspect the command buffer status and error to
+    ///     determine whether rendering succeeded.
+    /// - Returns: `true` when a command buffer was submitted, or `false` when
+    ///   the renderer is not initialized, paused, or could not encode a frame.
+    @discardableResult
+    public func render(
+        to texture: MTLTexture,
+        clearColor: MTLClearColor? = nil,
+        completion: ((MTLCommandBuffer) -> Void)? = nil
+    ) -> Bool {
+        guard let renderer else { return false }
+        return renderer.draw(
+            to: texture,
+            in: self,
+            clearColor: clearColor ?? self.clearColor,
+            completion: completion
+        )
+    }
 }
 
 extension SpineUIView {
