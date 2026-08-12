@@ -346,9 +346,13 @@ public final class SpineUIView: MTKView {
         completion: ((MTLCommandBuffer) -> Void)? = nil
     ) -> Bool {
         guard let renderer else { return false }
+        renderer.mtkView(
+            self,
+            drawableSizeWillChange: CGSize(width: texture.width, height: texture.height)
+        )
         return renderer.draw(
             to: texture,
-            in: self,
+            pixelFormat: colorPixelFormat,
             clearColor: clearColor ?? self.clearColor,
             completion: completion
         )
@@ -384,9 +388,13 @@ public final class SpineUIView: MTKView {
         completion: ((MTLCommandBuffer) -> Void)? = nil
     ) -> Bool {
         guard let renderer else { return false }
+        renderer.mtkView(
+            self,
+            drawableSizeWillChange: CGSize(width: texture.width, height: texture.height)
+        )
         return renderer.draw(
             to: texture,
-            in: self,
+            pixelFormat: colorPixelFormat,
             commandBuffer: commandBuffer,
             clearColor: clearColor ?? self.clearColor,
             completion: completion

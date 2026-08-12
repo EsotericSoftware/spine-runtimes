@@ -171,18 +171,29 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
 
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
         guard let spineView = view as? SpineUIView else { return }
-
-        backingScale = CGSize(
-            width: spineView.bounds.width > 0 && size.width > 0 ? size.width / spineView.bounds.width : 1,
-            height: spineView.bounds.height > 0 && size.height > 0 ? size.height / spineView.bounds.height : 1
-        )
-        sizeInPoints = CGSize(width: size.width / backingScale.width, height: size.height / backingScale.height)
-        viewPortSize = vector_uint2(UInt32(size.width), UInt32(size.height))
-        setTransform(
+        updateViewport(
+            sizeInPoints: spineView.bounds.size,
+            drawableSize: size,
             bounds: spineView.computedBounds,
             mode: spineView.mode,
             alignment: spineView.alignment
         )
+    }
+
+    func updateViewport(
+        sizeInPoints: CGSize,
+        drawableSize: CGSize,
+        bounds: CGRect,
+        mode: SpineContentMode,
+        alignment: SpineAlignment
+    ) {
+        backingScale = CGSize(
+            width: sizeInPoints.width > 0 && drawableSize.width > 0 ? drawableSize.width / sizeInPoints.width : 1,
+            height: sizeInPoints.height > 0 && drawableSize.height > 0 ? drawableSize.height / sizeInPoints.height : 1
+        )
+        self.sizeInPoints = sizeInPoints
+        viewPortSize = vector_uint2(UInt32(drawableSize.width), UInt32(drawableSize.height))
+        setTransform(bounds: bounds, mode: mode, alignment: alignment)
     }
 
     func draw(in view: MTKView) {
@@ -201,18 +212,15 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
     @discardableResult
     func draw(
         to texture: MTLTexture,
-        in view: SpineUIView,
+        pixelFormat: MTLPixelFormat,
         clearColor: MTLClearColor,
         completion: ((MTLCommandBuffer) -> Void)?
     ) -> Bool {
-        guard texture.pixelFormat == view.colorPixelFormat,
+        guard texture.pixelFormat == pixelFormat,
             texture.usage.contains(.renderTarget)
         else {
             return false
         }
-
-        let size = CGSize(width: texture.width, height: texture.height)
-        mtkView(view, drawableSizeWillChange: size)
 
         let renderPassDescriptor = MTLRenderPassDescriptor()
         renderPassDescriptor.colorAttachments[0].texture = texture
@@ -230,20 +238,17 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
     @discardableResult
     func draw(
         to texture: MTLTexture,
-        in view: SpineUIView,
+        pixelFormat: MTLPixelFormat,
         commandBuffer: MTLCommandBuffer,
         clearColor: MTLClearColor,
         completion: ((MTLCommandBuffer) -> Void)?
     ) -> Bool {
-        guard texture.pixelFormat == view.colorPixelFormat,
+        guard texture.pixelFormat == pixelFormat,
             texture.usage.contains(.renderTarget),
             commandBuffer.status == .notEnqueued
         else {
             return false
         }
-
-        let size = CGSize(width: texture.width, height: texture.height)
-        mtkView(view, drawableSizeWillChange: size)
 
         let renderPassDescriptor = MTLRenderPassDescriptor()
         renderPassDescriptor.colorAttachments[0].texture = texture
