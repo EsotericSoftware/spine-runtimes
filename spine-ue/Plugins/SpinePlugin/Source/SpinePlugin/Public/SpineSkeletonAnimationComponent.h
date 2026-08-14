@@ -114,6 +114,38 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
+	bool IsComplete() {
+		return entry ? entry->isComplete() : false;
+	}
+
+  	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
+	bool GetAdditive() {
+		return entry ? entry->getAdditive() : false;
+	}
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
+	void SetAdditive(bool additive) {
+		if (entry) entry->setAdditive(additive);
+	}
+
+  	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
+	bool GetReverse() {
+		return entry ? entry->getReverse() : false;
+	}
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
+	void SetReverse(bool reverse) {
+		if (entry) entry->setReverse(reverse);
+	}
+
+  	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
+	bool GetShortestRotation() {
+		return entry ? entry->getShortestRotation() : false;
+	}
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
+	void SetShortestRotation(bool shortestRotation) {
+		if (entry) entry->setShortestRotation(shortestRotation);
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
 	float GetEventThreshold() {
 		return entry ? entry->getEventThreshold() : 0;
 	}
