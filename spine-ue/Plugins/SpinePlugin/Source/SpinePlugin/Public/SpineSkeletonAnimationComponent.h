@@ -118,7 +118,7 @@ public:
 		return entry ? entry->isComplete() : false;
 	}
 
-  	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
 	bool GetAdditive() {
 		return entry ? entry->getAdditive() : false;
 	}
@@ -127,7 +127,7 @@ public:
 		if (entry) entry->setAdditive(additive);
 	}
 
-  	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
 	bool GetReverse() {
 		return entry ? entry->getReverse() : false;
 	}
@@ -136,7 +136,7 @@ public:
 		if (entry) entry->setReverse(reverse);
 	}
 
-  	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|TrackEntry")
 	bool GetShortestRotation() {
 		return entry ? entry->getShortestRotation() : false;
 	}

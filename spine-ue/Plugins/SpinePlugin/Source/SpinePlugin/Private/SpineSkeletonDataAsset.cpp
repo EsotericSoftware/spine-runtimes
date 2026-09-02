@@ -213,7 +213,7 @@ static bool checkBinary(const char *binaryData, int length) {
 	if (!binaryData || length < 9) return false;
 
 	BinaryInput input;
-	input.cursor = (const unsigned char *) binaryData + 8; // Skip hash.
+	input.cursor = (const unsigned char *) binaryData + 8;// Skip hash.
 	input.end = (const unsigned char *) binaryData + length;
 	std::string version;
 	return readString(input, version) && checkVersion(version.c_str());
@@ -242,8 +242,8 @@ bool USpineSkeletonDataAsset::SetRawDataFromImport(const TArray<uint8> &Data, FS
 	return true;
 }
 
-bool USpineSkeletonDataAsset::LoadInfo(const TArray<uint8> &Data, TArray<FString> &OutBones, TArray<FString> &OutSlots,
-									  TArray<FString> &OutSkins, TArray<FString> &OutAnimations, TArray<FString> &OutEvents, FString &Error) const {
+bool USpineSkeletonDataAsset::LoadInfo(const TArray<uint8> &Data, TArray<FString> &OutBones, TArray<FString> &OutSlots, TArray<FString> &OutSkins,
+									   TArray<FString> &OutAnimations, TArray<FString> &OutEvents, FString &Error) const {
 	if (Data.Num() == 0) {
 		Error = FString::Printf(TEXT("Couldn't load empty skeleton data: %s"), *skeletonDataFileName.ToString());
 		return false;
