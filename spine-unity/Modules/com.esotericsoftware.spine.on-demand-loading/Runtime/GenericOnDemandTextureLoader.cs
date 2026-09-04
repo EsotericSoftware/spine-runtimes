@@ -104,7 +104,12 @@ namespace Spine.Unity {
 		public struct MaterialOnDemandData {
 			public int lastFrameRequested;
 			public TextureRequest[] textureRequests;
+			public List<Material>[] materialsUsingTexture;
 		}
+
+#if UNITY_2021_1_OR_NEWER
+		static readonly Dictionary<Shader, bool> hasMainTexturePropertyByShader = new Dictionary<Shader, bool>();
+#endif
 
 		void Reset () {
 			Clear(clearAtlasAsset: true);
@@ -136,6 +141,52 @@ namespace Spine.Unity {
 		public override string GetPlaceholderTextureName (string originalTextureName) {
 			return originalTextureName + "_low";
 		}
+
+		static bool HasMainTextureProperty (Material material) {
+			if (!material || !material.shader) return false;
+			if (material.HasProperty("_MainTex")) return true;
+
+#if UNITY_2021_1_OR_NEWER
+			Shader shader = material.shader;
+			bool hasMainTextureProperty;
+			if (hasMainTexturePropertyByShader.TryGetValue(shader, out hasMainTextureProperty))
+				return hasMainTextureProperty;
+
+			for (int propertyIndex = 0, propertyCount = shader.GetPropertyCount(); propertyIndex < propertyCount; ++propertyIndex) {
+				if ((shader.GetPropertyFlags(propertyIndex) & UnityEngine.Rendering.ShaderPropertyFlags.MainTexture) != 0) {
+					hasMainTextureProperty = true;
+					break;
+				}
+			}
+			hasMainTexturePropertyByShader.Add(shader, hasMainTextureProperty);
+			return hasMainTextureProperty;
+#else
+			return false;
+#endif
+		}
+
+#if UNITY_EDITOR
+		public override bool AssignPlaceholderTexture (Material material, out Texture targetTexture) {
+			targetTexture = null;
+			if (!HasMainTextureProperty(material) || !material.mainTexture || placeholderMap == null) return false;
+
+			Texture activeTexture = material.mainTexture;
+			int textureIndex = 0; // Todo: currently only main texture is supported.
+			for (int materialIndex = 0; materialIndex < placeholderMap.Length; ++materialIndex) {
+				PlaceholderTextureMapping[] textures = placeholderMap[materialIndex].textures;
+				if (textures == null || textureIndex >= textures.Length ||
+					textures[textureIndex].targetTextureReference.EditorTexture != activeTexture)
+					continue;
+
+				Texture placeholderTexture = textures[textureIndex].placeholderTexture;
+				if (!placeholderTexture) return false;
+				targetTexture = activeTexture;
+				material.mainTexture = placeholderTexture;
+				return true;
+			}
+			return false;
+		}
+#endif
 
 		public override bool AssignPlaceholderTextures (out IEnumerable<Material> modifiedMaterials) {
 			modifiedMaterials = null;
@@ -231,7 +282,6 @@ namespace Spine.Unity {
 					AssignBlendModeTargetTextures(replacement.material, replacement);
 				}
 			}
-
 			modifiedMaterials = inputMaterials;
 			EndCustomTextureLoading();
 			return true;
@@ -272,6 +322,7 @@ namespace Spine.Unity {
 
 					int texturesAtMaterial = textures.Length;
 					loadedDataAtMaterial[i].textureRequests = new TextureRequest[texturesAtMaterial];
+					loadedDataAtMaterial[i].materialsUsingTexture = new List<Material>[texturesAtMaterial];
 				}
 			}
 		}
@@ -285,6 +336,7 @@ namespace Spine.Unity {
 		}
 
 		public override bool HasPlaceholderAssigned (Material material) {
+			if (!HasMainTextureProperty(material)) return false;
 			Texture currentTexture = material.mainTexture;
 			int textureIndex = 0; // Todo: currently only main texture is supported.
 			int foundMaterialIndex = Array.FindIndex(placeholderMap, entry => entry.textures[textureIndex].placeholderTexture == currentTexture);
@@ -292,7 +344,7 @@ namespace Spine.Unity {
 		}
 
 		public override void RequestLoadMaterialTextures (Material material, ref Material overrideMaterial) {
-			if (!material || !material.mainTexture) return;
+			if (!HasMainTextureProperty(material) || !material.mainTexture) return;
 
 			Texture currentTexture = material.mainTexture;
 			int textureIndex = 0; // Todo: currently only main texture is supported.
@@ -304,8 +356,10 @@ namespace Spine.Unity {
 			int loadedMaterialIndex = Array.FindIndex(loadedDataAtMaterial, entry =>
 				entry.textureRequests[textureIndex].WasRequested &&
 				entry.textureRequests[textureIndex].IsTarget(currentTexture));
-			if (loadedMaterialIndex >= 0)
+			if (loadedMaterialIndex >= 0) {
+				TrackMaterial(loadedMaterialIndex, textureIndex, material);
 				loadedDataAtMaterial[loadedMaterialIndex].lastFrameRequested = Time.frameCount;
+			}
 		}
 
 		public override void RequestLoadTexture (Texture placeholderTexture, ref Texture replacementTexture,
@@ -377,6 +431,7 @@ namespace Spine.Unity {
 #endif
 			MaterialOnDemandData materialData = loadedDataAtMaterial[materialIndex];
 			if (materialData.textureRequests[textureIndex].WasRequested) {
+				TrackMaterial(materialIndex, textureIndex, material);
 				Texture loadedTexture = GetAlreadyLoadedTexture(materialIndex, textureIndex);
 				if (loadedTexture != null) {
 					material.mainTexture = loadedTexture;
@@ -385,9 +440,15 @@ namespace Spine.Unity {
 				return loadedTexture;
 			}
 
-			CreateTextureRequest(targetReference, materialData, textureIndex, material, onTextureLoaded);
-			if (materialData.textureRequests[textureIndex].WasRequested)
-				OnDemandTextureLoaderCleanup.Register(this);
+			TrackMaterial(materialIndex, textureIndex, material);
+			try {
+				CreateTextureRequest(targetReference, materialData, textureIndex, material, onTextureLoaded);
+			} finally {
+				if (materialData.textureRequests[textureIndex].WasRequested)
+					OnDemandTextureLoaderCleanup.Register(this);
+				else
+					UntrackMaterial(materialIndex, textureIndex, material);
+			}
 			return null;
 		}
 
@@ -441,6 +502,7 @@ namespace Spine.Unity {
 
 			for (int materialIndex = 0, materialCount = loadedDataAtMaterial.Length; materialIndex < materialCount; ++materialIndex) {
 				MaterialOnDemandData materialData = loadedDataAtMaterial[materialIndex];
+				RemoveDestroyedMaterials(materialData);
 				if (materialData.textureRequests == null) continue;
 				int textureCount = materialData.textureRequests.Length;
 
@@ -466,6 +528,9 @@ namespace Spine.Unity {
 			if (hasActiveRequest)
 				materialData.textureRequests[textureIndex] = default(TextureRequest);
 
+			List<Material> materialsUsingTexture = materialData.materialsUsingTexture != null &&
+				textureIndex < materialData.materialsUsingTexture.Length ?
+				materialData.materialsUsingTexture[textureIndex] : null;
 			List<Material> restoredMaterials = null;
 			try {
 				if (placeholderMap == null || materialIndex >= placeholderMap.Length) return;
@@ -475,6 +540,14 @@ namespace Spine.Unity {
 				Texture placeholderTexture = placeholderTextures[textureIndex].placeholderTexture;
 				Material targetMaterial = atlasAsset ? atlasAsset.Materials.ElementAtOrDefault(materialIndex) : null;
 				Texture targetMaterialTexture = targetMaterial ? targetMaterial.mainTexture : null;
+
+				if (materialsUsingTexture != null) {
+					foreach (Material material in materialsUsingTexture) {
+						RestorePlaceholderIfTargetTexture(material, textureRequest, hasActiveRequest,
+							targetMaterialTexture, placeholderTexture, ref restoredMaterials);
+					}
+				}
+
 				RestorePlaceholderIfTargetTexture(targetMaterial, textureRequest, hasActiveRequest,
 					targetMaterialTexture, placeholderTexture, ref restoredMaterials);
 
@@ -498,6 +571,8 @@ namespace Spine.Unity {
 					}
 				}
 			} finally {
+				if (materialsUsingTexture != null)
+					materialsUsingTexture.Clear();
 				if (hasActiveRequest)
 					textureRequest.Release();
 			}
@@ -505,6 +580,60 @@ namespace Spine.Unity {
 			if (restoredMaterials == null) return;
 			foreach (Material restoredMaterial in restoredMaterials)
 				OnTextureUnloaded(restoredMaterial, textureIndex);
+		}
+
+		void TrackMaterial (int materialIndex, int textureIndex, Material material) {
+			if (!material || loadedDataAtMaterial == null ||
+				materialIndex < 0 || materialIndex >= loadedDataAtMaterial.Length)
+				return;
+
+			MaterialOnDemandData materialData = loadedDataAtMaterial[materialIndex];
+			if (materialData.textureRequests == null ||
+				textureIndex < 0 || textureIndex >= materialData.textureRequests.Length)
+				return;
+
+			if (materialData.materialsUsingTexture == null) {
+				materialData.materialsUsingTexture = new List<Material>[materialData.textureRequests.Length];
+				loadedDataAtMaterial[materialIndex] = materialData;
+			}
+
+			List<Material> materials = materialData.materialsUsingTexture[textureIndex];
+			if (materials == null) {
+				materials = new List<Material>();
+				materialData.materialsUsingTexture[textureIndex] = materials;
+			}
+			if (!materials.Contains(material))
+				materials.Add(material);
+		}
+
+		void UntrackMaterial (int materialIndex, int textureIndex, Material material) {
+			if (loadedDataAtMaterial == null ||
+				materialIndex < 0 || materialIndex >= loadedDataAtMaterial.Length)
+				return;
+
+			List<Material>[] materialsUsingTexture = loadedDataAtMaterial[materialIndex].materialsUsingTexture;
+			if (materialsUsingTexture == null ||
+				textureIndex < 0 || textureIndex >= materialsUsingTexture.Length)
+				return;
+
+			List<Material> materials = materialsUsingTexture[textureIndex];
+			if (materials != null)
+				materials.Remove(material);
+		}
+
+		void RemoveDestroyedMaterials (MaterialOnDemandData materialData) {
+			List<Material>[] materialsUsingTexture = materialData.materialsUsingTexture;
+			if (materialsUsingTexture == null) return;
+
+			for (int textureIndex = 0; textureIndex < materialsUsingTexture.Length; ++textureIndex) {
+				List<Material> materials = materialsUsingTexture[textureIndex];
+				if (materials == null) continue;
+
+				for (int materialIndex = materials.Count - 1; materialIndex >= 0; --materialIndex) {
+					if (!materials[materialIndex])
+						materials.RemoveAt(materialIndex);
+				}
+			}
 		}
 
 		void RestorePlaceholderIfTargetTexture (Material material, TextureRequest textureRequest,

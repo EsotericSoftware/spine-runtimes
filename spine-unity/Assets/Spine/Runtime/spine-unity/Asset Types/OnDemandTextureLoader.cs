@@ -50,6 +50,14 @@ namespace Spine.Unity {
 		/// <returns>True on success, false if the placeholder texture could not be assigned at any of the
 		/// AtlasAssetBase's materials.</returns>
 		public abstract bool AssignPlaceholderTextures (out IEnumerable<Material> modifiedMaterials);
+#if UNITY_EDITOR
+		/// <summary>Assigns a placeholder when the material's main texture matches a target texture of this loader.</summary>
+		/// <param name="targetTexture">The target texture which was replaced on success, otherwise null.</param>
+		public virtual bool AssignPlaceholderTexture (Material material, out Texture targetTexture) {
+			targetTexture = null;
+			return false;
+		}
+#endif
 		/// <summary>
 		/// Returns whether any placeholder textures are assigned at the Material of the associated AtlasAssetBase.
 		/// </summary>

@@ -121,6 +121,9 @@ namespace Spine.Unity.Editor {
 		internal const string DEFAULT_TEXTURE_SETTINGS_REFERENCE = "";
 		public string textureSettingsReference = DEFAULT_TEXTURE_SETTINGS_REFERENCE;
 
+		internal const bool DEFAULT_SCAN_ON_DEMAND_MATERIALS = true;
+		public bool scanOnDemandMaterials = DEFAULT_SCAN_ON_DEMAND_MATERIALS;
+
 #if HAS_ON_POSTPROCESS_PREFAB
 		internal const bool DEFAULT_FIX_PREFAB_OVERRIDE_VIA_MESH_FILTER = false;
 		public bool fixPrefabOverrideViaMeshFilter = DEFAULT_FIX_PREFAB_OVERRIDE_VIA_MESH_FILTER;
@@ -442,6 +445,12 @@ namespace Spine.Unity.Editor {
 					EditorGUILayout.PropertyField(settings.FindProperty("removePrefabPreviewMeshes"), new GUIContent("Optimize Preview Meshes", "When enabled, Spine prefab preview meshes will be removed in a pre-build step to reduce build size. This increases build time as all prefabs in the project will be processed."));
 				}
 #endif
+
+				EditorGUILayout.Space();
+				EditorGUILayout.LabelField("On-Demand Loading", EditorStyles.boldLabel);
+				{
+					EditorGUILayout.PropertyField(settings.FindProperty("scanOnDemandMaterials"), new GUIContent("Scan Additional Materials", "Scans the project for additional Materials referencing managed on-demand target textures and assigns placeholders before builds. Skipped when no active on-demand loader exists."));
+				}
 
 #if HAS_ANY_UNSAFE_OPTIONS
 				GUILayout.Space(20);

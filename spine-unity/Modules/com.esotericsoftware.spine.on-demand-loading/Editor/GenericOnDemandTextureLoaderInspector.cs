@@ -68,6 +68,8 @@ namespace Spine.Unity.Editor {
 		protected GenericOnDemandTextureLoader<TargetReference, TextureRequest> loader;
 		protected GUIContent placeholderTexturesLabel;
 
+		const string STARTUP_RECOVERY_DONE_KEY = "SPINE_ON_DEMAND_STARTUP_RECOVERY_DONE";
+
 		/// <summary>
 		/// Called via InitializeOnLoad attribute upon Editor startup or compilation.
 		/// </summary>
@@ -83,6 +85,18 @@ namespace Spine.Unity.Editor {
 			EditorApplication.playmodeStateChanged -= OnPlaymodeChanged;
 			EditorApplication.playmodeStateChanged += OnPlaymodeChanged;
 #endif
+			if (!SessionState.GetBool(STARTUP_RECOVERY_DONE_KEY, false)) {
+				EditorApplication.delayCall -= RestoreTargetTexturesAfterEditorLoad;
+				EditorApplication.delayCall += RestoreTargetTexturesAfterEditorLoad;
+			}
+		}
+
+		static void RestoreTargetTexturesAfterEditorLoad () {
+			if (SessionState.GetBool(STARTUP_RECOVERY_DONE_KEY, false)) return;
+			if (EditorApplication.isPlayingOrWillChangePlaymode || BuildPipeline.isBuildingPlayer) return;
+
+			RecoverTargetTexturesAfterInterruptedBuild();
+			SessionState.SetBool(STARTUP_RECOVERY_DONE_KEY, true);
 		}
 
 		/// <summary>
@@ -303,6 +317,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void AssignTargetTexturesAtAllLoaders () {
+			if (BuildPipeline.isBuildingPlayer) return;
 
 			string[] loaderAssets = AssetDatabase.FindAssets("t:OnDemandTextureLoader");
 			foreach (string loaderAsset in loaderAssets) {
@@ -312,29 +327,101 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
+		static void RecoverTargetTexturesAfterInterruptedBuild () {
+			List<OnDemandTextureLoader> loadersToRestore = new List<OnDemandTextureLoader>();
+			// only consider active loaders which have had their textures replaced to placeholders.
+			List<OnDemandTextureLoader> loadersWithLeftoverPlaceholders = new List<OnDemandTextureLoader>();
+			string[] loaderAssets = AssetDatabase.FindAssets("t:OnDemandTextureLoader");
+			foreach (string loaderAsset in loaderAssets) {
+				string assetPath = AssetDatabase.GUIDToAssetPath(loaderAsset);
+				OnDemandTextureLoader loader = AssetDatabase.LoadAssetAtPath<OnDemandTextureLoader>(assetPath);
+				bool hadPlaceholders;
+				if (!HasTargetTexturesToRestore(loader, out hadPlaceholders)) continue;
+
+				loadersToRestore.Add(loader);
+				if (hadPlaceholders)
+					loadersWithLeftoverPlaceholders.Add(loader);
+			}
+
+			AssignTargetTexturesAtAdditionalMaterials(loadersWithLeftoverPlaceholders);
+			foreach (OnDemandTextureLoader loader in loadersToRestore)
+				RestoreTargetTexturesAtLoader(loader);
+		}
+
 		public static void AssignTargetTexturesAtLoader (OnDemandTextureLoader loader) {
-			List<Material> placeholderMaterials;
-			List<Material> nullTextureMaterials;
-			bool anyPlaceholdersAssigned = loader.HasPlaceholderTexturesAssigned(out placeholderMaterials);
-			bool anyMaterialNull = loader.HasNullMainTexturesAssigned(out nullTextureMaterials);
-			if (anyPlaceholdersAssigned || anyMaterialNull) {
-				Debug.Log("OnDemandTextureLoader detected placeholders assigned or null main textures at one or more materials. Resetting to target textures.", loader);
-				AssetDatabase.StartAssetEditing();
+			bool hadPlaceholders;
+			if (HasTargetTexturesToRestore(loader, out hadPlaceholders))
+				RestoreTargetTexturesAtLoader(loader);
+		}
+
+		static bool HasTargetTexturesToRestore (OnDemandTextureLoader loader, out bool hadPlaceholders) {
+			hadPlaceholders = false;
+			if (!loader) return false;
+
+			List<Material> unusedMaterials;
+			hadPlaceholders = loader.HasPlaceholderTexturesAssigned(out unusedMaterials);
+			bool anyMaterialNull = loader.HasNullMainTexturesAssigned(out unusedMaterials);
+			return hadPlaceholders || anyMaterialNull;
+		}
+
+		static void RestoreTargetTexturesAtLoader (OnDemandTextureLoader loader) {
+			Debug.Log("OnDemandTextureLoader detected placeholders assigned or null main textures at one or more materials. Resetting to target textures.", loader);
+			AssetDatabase.StartAssetEditing();
+			try {
 				IEnumerable<Material> modifiedMaterials;
 				loader.AssignTargetTextures(out modifiedMaterials);
-				if (placeholderMaterials != null) {
-					foreach (Material placeholderMaterial in placeholderMaterials) {
-						EditorUtility.SetDirty(placeholderMaterial);
-					}
-				}
-				if (nullTextureMaterials != null) {
-					foreach (Material nullTextureMaterial in nullTextureMaterials) {
-						EditorUtility.SetDirty(nullTextureMaterial);
-					}
-				}
+				foreach (Material material in modifiedMaterials)
+					EditorUtility.SetDirty(material);
+			} finally {
 				AssetDatabase.StopAssetEditing();
-				AssetDatabase.SaveAssets();
 			}
+			AssetDatabase.SaveAssets();
+		}
+
+		static void AssignTargetTexturesAtAdditionalMaterials (List<OnDemandTextureLoader> loaders) {
+			if (loaders.Count == 0) return;
+
+			HashSet<string> materialAssetPaths = new HashSet<string>();
+			string[] materialAssetGuids = AssetDatabase.FindAssets("t:Material");
+			foreach (string materialAssetGuid in materialAssetGuids)
+				materialAssetPaths.Add(AssetDatabase.GUIDToAssetPath(materialAssetGuid));
+
+			bool anyMaterialModified = false;
+			AssetDatabase.StartAssetEditing();
+			try {
+				foreach (string assetPath in materialAssetPaths) {
+					UnityEngine.Object[] assets = AssetDatabase.LoadAllAssetsAtPath(assetPath);
+					foreach (UnityEngine.Object asset in assets) {
+						Material material = asset as Material;
+						if (!material) continue;
+
+						foreach (OnDemandTextureLoader loader in loaders) {
+							if (!loader.HasPlaceholderAssigned(material)) continue;
+
+							Texture placeholderTexture = material.mainTexture;
+							Material overrideMaterial = null;
+							loader.BeginCustomTextureLoading();
+							try {
+								loader.RequestLoadMaterialTextures(material, ref overrideMaterial);
+							} finally {
+								loader.EndCustomTextureLoading();
+							}
+							Texture targetTexture = material.mainTexture;
+							if (targetTexture == placeholderTexture) continue;
+
+							Debug.Log(string.Format("OnDemandTextureLoader recovered target texture '{0}' from placeholder '{1}' at Material '{2}'.",
+								targetTexture.name, placeholderTexture.name, assetPath), material);
+							EditorUtility.SetDirty(material);
+							anyMaterialModified = true;
+							break;
+						}
+					}
+				}
+			} finally {
+				AssetDatabase.StopAssetEditing();
+			}
+			if (anyMaterialModified)
+				AssetDatabase.SaveAssets();
 		}
 
 		/// <summary>
