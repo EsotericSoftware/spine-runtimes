@@ -29,11 +29,13 @@
 
 package com.esotericsoftware.spine;
 
-import com.esotericsoftware.spine.Animation.MixFrom;
 import com.esotericsoftware.spine.Animation.ConstraintTimeline;
+import com.esotericsoftware.spine.Animation.DeformTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderFolderTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
+import com.esotericsoftware.spine.Animation.MixFrom;
 import com.esotericsoftware.spine.Animation.PhysicsConstraintTimeline;
+import com.esotericsoftware.spine.Animation.SequenceTimeline;
 import com.esotericsoftware.spine.Animation.SlotTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 
@@ -102,9 +104,18 @@ public class Slider extends Constraint<Slider, SliderData, SliderPose> {
 		int physicsCount = skeleton.physics.size;
 		for (int i = 0, n = data.animation.timelines.size; i < n; i++) {
 			Timeline t = timelines[i];
-			if (t instanceof SlotTimeline timeline)
+			if (t instanceof SlotTimeline timeline) {
 				skeleton.constrained(slots[timeline.getSlotIndex()]);
-			else if (t instanceof DrawOrderTimeline || t instanceof DrawOrderFolderTimeline)
+				int[] timelineSlots;
+				if (t instanceof DeformTimeline d)
+					timelineSlots = d.attachment.getTimelineSlots();
+				else if (t instanceof SequenceTimeline s)
+					timelineSlots = s.attachment.getTimelineSlots();
+				else
+					continue;
+				for (int slotIndex : timelineSlots)
+					skeleton.constrained(slots[slotIndex]);
+			} else if (t instanceof DrawOrderTimeline || t instanceof DrawOrderFolderTimeline)
 				skeleton.drawOrder.constrained();
 			else if (t instanceof PhysicsConstraintTimeline timeline) {
 				if (timeline.constraintIndex == -1) {
