@@ -800,6 +800,10 @@ static void update_preview_animation(SpineSprite *sprite, const String &skin, co
 	}
 
 	auto track_entry = sprite->get_animation_state()->set_animation(animation, true, 0);
+	if (track_entry.is_null()) {
+		sprite->get_animation_state()->set_empty_animation(0, 0);
+		return;
+	}
 	track_entry->set_mix_duration(0);
 	if (frame) {
 		track_entry->set_time_scale(0);
