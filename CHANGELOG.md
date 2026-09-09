@@ -578,6 +578,7 @@
   - On-demand loading modules: Added `IDeferredCleanupOnDemandTextureLoader` interface for automatic cleanup by `OnDemandTextureLoaderCleanup` below. `GenericOnDemandTextureLoader` implements this interface.
   - On-demand loading modules: Added `OnDemandTextureLoaderCleanup`, which automatically maintains loaders with unreleased texture requests independently of skeleton renderer lifecycle. This is necessary because textures are deliberately kept alive for a delay after their last use to avoid unload/reload thrashing, so cleanup must continue after the last renderer using them is destroyed. When loaders are destroyed or unloaded they now also unload all textures and restore their low-resolution placeholders.
   - On-demand loading modules: Build processing now automatically assigns placeholders to all `Material` assets whose main texture references an on-demand target texture. `RenderExistingMesh` replacement materials now support on-demand texture loading. Copied and custom materials used for on-demand loading are restored to placeholders when target textures unload.
+  - Added automatic multi-atlas matching during skeleton import when required attachment regions are distributed across multiple atlas assets.
 
 - **Deprecated**
 

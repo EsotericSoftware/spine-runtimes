@@ -172,6 +172,7 @@ namespace Spine.Unity.Editor {
 			if (targetSkeletonData != null) EditorGUILayout.LabelField("(Drag and Drop to instantiate.)", EditorStyles.miniLabel);
 
 			// Main Serialized Fields
+			bool atlasAssetsChanged = false;
 			using (var changeCheck = new EditorGUI.ChangeCheckScope()) {
 				using (new SpineInspectorUtility.BoxScope())
 					DrawSkeletonDataFields();
@@ -180,13 +181,16 @@ namespace Spine.Unity.Editor {
 					return;
 
 				using (new SpineInspectorUtility.BoxScope()) {
-					DrawAtlasAssetsFields();
+					atlasAssetsChanged = DrawAtlasAssetsFields();
 					HandleAtlasAssetsNulls();
 				}
 
 				if (changeCheck.changed) {
 					if (serializedObject.ApplyModifiedProperties() || requiresReload) {
 						this.Clear();
+						if (atlasAssetsChanged)
+							BlendModeMaterialsUtility.UpdateBlendModeMaterials(targetSkeletonDataAsset);
+						requiresReload = false;
 						this.InitializeEditor();
 
 						if (SpineEditorUtilities.Preferences.autoReloadSceneSkeletons && NoProblems())
@@ -406,7 +410,7 @@ namespace Spine.Unity.Editor {
 			DrawBlendModeMaterialProperties();
 		}
 
-		void DrawAtlasAssetsFields () {
+		bool DrawAtlasAssetsFields () {
 			EditorGUILayout.LabelField("Atlas", EditorStyles.boldLabel);
 
 			using (var changeCheck = new EditorGUI.ChangeCheckScope()) {
@@ -414,9 +418,9 @@ namespace Spine.Unity.Editor {
 				if (atlasAssets.arraySize == 0)
 					EditorGUILayout.HelpBox("AtlasAssets array is empty. Skeleton's attachments will load without being mapped to images.", MessageType.Info);
 
-				if (changeCheck.changed) {
+				if (changeCheck.changed)
 					requiresReload = true;
-				}
+				return changeCheck.changed;
 			}
 		}
 

@@ -158,7 +158,7 @@ namespace Spine.Unity.Editor {
 		SkeletonDataAsset FindSkeletonDataAsset (TextAsset skeletonDataFile) {
 			string path = AssetDatabase.GetAssetPath(skeletonDataFile);
 			path = path.Replace(".json", AssetUtility.SkeletonDataSuffix + ".asset");
-			path = path.Replace(".skel.bytes", AssetUtility.SkeletonDataSuffix + ".asset");
+			path = path.Replace(AssetUtility.SkeletonBinaryExtension, AssetUtility.SkeletonDataSuffix + ".asset");
 			if (System.IO.File.Exists(path)) {
 				return AssetDatabase.LoadAssetAtPath<SkeletonDataAsset>(path);
 			}
