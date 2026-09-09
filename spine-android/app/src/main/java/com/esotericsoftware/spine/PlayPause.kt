@@ -29,9 +29,10 @@
 
 package com.esotericsoftware.spine
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -43,11 +44,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import com.esotericsoftware.spine.android.SpineController
-import com.esotericsoftware.spine.android.SpineView
 import com.esotericsoftware.spine.android.bounds.SkinAndAnimationBounds
+import com.esotericsoftware.spine.android.compose.Spine
+import com.esotericsoftware.spine.android.compose.rememberSpineStateFromAssets
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,7 +70,7 @@ fun PlayPause(
                 navigationIcon = {
                     IconButton({ nav.navigateUp() }) {
                         Icon(
-                            Icons.Rounded.ArrowBack,
+                            Icons.AutoMirrored.Rounded.ArrowBack,
                             null,
                         )
                     }
@@ -85,15 +86,18 @@ fun PlayPause(
             )
         }
     ) { paddingValues ->
-
-        AndroidView(
-            factory = { ctx ->
-                SpineView.Builder(ctx, controller)
-                    .setLoadFromAssets("dragon.atlas", "dragon-ess.skel")
-                    .setBoundsProvider(SkinAndAnimationBounds("flying"))
-                    .build()
-            },
-            modifier = Modifier.padding(paddingValues)
+        val state = rememberSpineStateFromAssets(
+            atlasFileName = "dragon.atlas",
+            skeletonFileName = "dragon-ess.skel",
+            controller = controller,
+        )
+        val boundsProvider = remember { SkinAndAnimationBounds("flying") }
+        Spine(
+            state = state,
+            boundsProvider = boundsProvider,
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize(),
         )
     }
 }
