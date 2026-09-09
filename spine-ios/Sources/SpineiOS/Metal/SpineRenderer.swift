@@ -171,24 +171,132 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
 
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
         guard let spineView = view as? SpineUIView else { return }
-
-        backingScale = CGSize(
-            width: spineView.bounds.width > 0 && size.width > 0 ? size.width / spineView.bounds.width : 1,
-            height: spineView.bounds.height > 0 && size.height > 0 ? size.height / spineView.bounds.height : 1
-        )
-        sizeInPoints = CGSize(width: size.width / backingScale.width, height: size.height / backingScale.height)
-        viewPortSize = vector_uint2(UInt32(size.width), UInt32(size.height))
-        setTransform(
+        updateViewport(
+            sizeInPoints: spineView.bounds.size,
+            drawableSize: size,
             bounds: spineView.computedBounds,
             mode: spineView.mode,
             alignment: spineView.alignment
         )
     }
 
+    func updateViewport(
+        sizeInPoints: CGSize,
+        drawableSize: CGSize,
+        bounds: CGRect,
+        mode: SpineContentMode,
+        alignment: SpineAlignment
+    ) {
+        backingScale = CGSize(
+            width: sizeInPoints.width > 0 && drawableSize.width > 0 ? drawableSize.width / sizeInPoints.width : 1,
+            height: sizeInPoints.height > 0 && drawableSize.height > 0 ? drawableSize.height / sizeInPoints.height : 1
+        )
+        self.sizeInPoints = sizeInPoints
+        viewPortSize = vector_uint2(UInt32(drawableSize.width), UInt32(drawableSize.height))
+        setTransform(bounds: bounds, mode: mode, alignment: alignment)
+    }
+
     func draw(in view: MTKView) {
+        guard let renderPassDescriptor = view.currentRenderPassDescriptor else {
+            return
+        }
+        let drawable = view.currentDrawable
+        _ = draw(
+            renderPassDescriptor: renderPassDescriptor,
+            present: { commandBuffer in
+                drawable.flatMap { commandBuffer.present($0) }
+            }
+        )
+    }
+
+    @discardableResult
+    func draw(
+        to texture: MTLTexture,
+        pixelFormat: MTLPixelFormat,
+        clearColor: MTLClearColor,
+        completion: ((MTLCommandBuffer) -> Void)?
+    ) -> Bool {
+        guard texture.pixelFormat == pixelFormat,
+            texture.usage.contains(.renderTarget)
+        else {
+            return false
+        }
+
+        let renderPassDescriptor = MTLRenderPassDescriptor()
+        renderPassDescriptor.colorAttachments[0].texture = texture
+        renderPassDescriptor.colorAttachments[0].loadAction = .clear
+        renderPassDescriptor.colorAttachments[0].storeAction = .store
+        renderPassDescriptor.colorAttachments[0].clearColor = clearColor
+
+        return draw(
+            renderPassDescriptor: renderPassDescriptor,
+            present: nil,
+            completion: completion
+        )
+    }
+
+    @discardableResult
+    func draw(
+        to texture: MTLTexture,
+        pixelFormat: MTLPixelFormat,
+        commandBuffer: MTLCommandBuffer,
+        clearColor: MTLClearColor,
+        completion: ((MTLCommandBuffer) -> Void)?
+    ) -> Bool {
+        guard texture.pixelFormat == pixelFormat,
+            texture.usage.contains(.renderTarget),
+            commandBuffer.status == .notEnqueued
+        else {
+            return false
+        }
+
+        let renderPassDescriptor = MTLRenderPassDescriptor()
+        renderPassDescriptor.colorAttachments[0].texture = texture
+        renderPassDescriptor.colorAttachments[0].loadAction = .clear
+        renderPassDescriptor.colorAttachments[0].storeAction = .store
+        renderPassDescriptor.colorAttachments[0].clearColor = clearColor
+
+        return encode(
+            renderPassDescriptor: renderPassDescriptor,
+            commandBuffer: commandBuffer,
+            completion: completion
+        )
+    }
+
+    @discardableResult
+    private func draw(
+        renderPassDescriptor: MTLRenderPassDescriptor,
+        present: ((MTLCommandBuffer) -> Void)?,
+        completion: ((MTLCommandBuffer) -> Void)? = nil
+    ) -> Bool {
+        guard let commandBuffer = commandQueue.makeCommandBuffer() else {
+            return false
+        }
+        guard encode(
+            renderPassDescriptor: renderPassDescriptor,
+            commandBuffer: commandBuffer,
+            completion: completion
+        ) else {
+            return false
+        }
+
+        present?(commandBuffer)
+        commandBuffer.commit()
+        if waitUntilCompleted {
+            commandBuffer.waitUntilCompleted()
+        }
+        return true
+    }
+
+    @discardableResult
+    private func encode(
+        renderPassDescriptor: MTLRenderPassDescriptor,
+        commandBuffer: MTLCommandBuffer,
+        completion: ((MTLCommandBuffer) -> Void)?
+    ) -> Bool {
         guard dataSource?.isPlaying(self) ?? false else {
             lastDraw = CACurrentMediaTime()
-            return
+            return false
         }
 
         callNeedsUpdate()
@@ -199,32 +307,25 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
         currentBufferIndex = (currentBufferIndex + 1) % SpineRenderer.numberOfBuffers
 
         guard let renderCommands = dataSource?.renderCommands(self),
-            let commandBuffer = commandQueue.makeCommandBuffer(),
-            let renderPassDescriptor = view.currentRenderPassDescriptor,
             let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor)
         else {
             // this can happen if,
             // - CAMetalLayer is configured with drawable timeout, and CAMetalLayer is run out of Drawable
             // - CAMetalLayer is added to the window with frame size of zero or incorrect layout constraint -> currentRenderPassDescriptor is null
             bufferingSemaphore.signal()
-            return
+            return false
         }
 
         delegate?.spineRendererWillDraw(self)
-        draw(renderCommands: renderCommands, renderEncoder: renderEncoder, in: view)
+        draw(renderCommands: renderCommands, renderEncoder: renderEncoder)
         delegate?.spineRendererDidDraw(self)
 
         renderEncoder.endEncoding()
-        view.currentDrawable.flatMap {
-            commandBuffer.present($0)
-        }
-        commandBuffer.addCompletedHandler { [bufferingSemaphore] _ in
+        commandBuffer.addCompletedHandler { [bufferingSemaphore] commandBuffer in
             bufferingSemaphore.signal()
+            completion?(commandBuffer)
         }
-        commandBuffer.commit()
-        if waitUntilCompleted {
-            commandBuffer.waitUntilCompleted()
-        }
+        return true
     }
 
     private func setTransform(bounds: CGRect, mode: SpineContentMode, alignment: SpineAlignment) {
@@ -273,7 +374,7 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
         delegate?.spineRendererDidUpdate(self)
     }
 
-    private func draw(renderCommands: [RenderCommand], renderEncoder: MTLRenderCommandEncoder, in view: MTKView) {
+    private func draw(renderCommands: [RenderCommand], renderEncoder: MTLRenderCommandEncoder) {
         let allVertices = renderCommands.map { renderCommand in
             Array(renderCommand.getVertices())
         }
