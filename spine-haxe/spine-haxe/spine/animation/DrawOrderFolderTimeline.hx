@@ -44,7 +44,12 @@ class DrawOrderFolderTimeline extends Timeline {
 	/** @param slots spine.Skeleton.slots indices controlled by this timeline, in setup order.
 	 * @param slotCount The maximum number of slots in the skeleton. */
 	public function new(frameCount:Int, slots:Array<Int>, slotCount:Int) {
+		#if (flash && !haxe5) // See HaxeFoundation/haxe#13017
+		super(frameCount);
+		this.propertyIds = DrawOrderFolderTimeline.getPropertyIds(slots);
+		#else
 		super(frameCount, ...DrawOrderFolderTimeline.getPropertyIds(slots));
+		#end
 		this.slots = slots;
 		drawOrders = new Array<Array<Int>>();
 		drawOrders.resize(frameCount);
