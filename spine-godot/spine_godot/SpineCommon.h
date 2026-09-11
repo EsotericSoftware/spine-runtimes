@@ -102,6 +102,7 @@ using namespace godot;
 #define NOTIFY_PROPERTY_LIST_CHANGED() property_list_changed_notify()
 #define VARIANT_FLOAT Variant::REAL
 #define GDREGISTER_CLASS(x) ClassDB::register_class<x>()
+#define GDREGISTER_INTERNAL_CLASS(x) ClassDB::register_class<x>()
 #define GEOMETRY2D Geometry
 #ifndef SNAME
 #define SNAME(m_arg)                                                                                                                                 \
@@ -201,12 +202,12 @@ protected:
 	}
 };
 
-class SpineSprite;
+class SpineController;
 
 template<typename OBJECT>
-class SpineSpriteOwnedObject : public SpineObjectWrapper {
+class SpineControllerOwnedObject : public SpineObjectWrapper {
 public:
-	void set_spine_object(const SpineSprite *_owner, OBJECT *_object) {
+	void set_spine_object(const SpineController *_owner, OBJECT *_object) {
 		_set_spine_object_internal(_owner, _object);
 	}
 
@@ -214,8 +215,8 @@ public:
 		return (OBJECT *) _get_spine_object_internal();
 	}
 
-	SpineSprite *get_spine_owner() {
-		return (SpineSprite *) _get_spine_owner_internal();
+	SpineController *get_spine_controller() {
+		return (SpineController *) _get_spine_owner_internal();
 	}
 };
 

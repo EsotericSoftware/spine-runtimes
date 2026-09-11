@@ -37,6 +37,11 @@
 #include "SpineSkeletonFileResource.h"
 #include "SpineSkeletonDataResource.h"
 #include "SpineSprite.h"
+#if VERSION_MAJOR > 3
+#include "SpineSprite3D.h"
+#include "SpineSlotNode3D.h"
+#endif
+#include "SpineController.h"
 #include "SpineSkeleton.h"
 #include "SpineAnimationState.h"
 #include "SpineAnimationTrack.h"
@@ -99,6 +104,7 @@ void initialize_spine_godot_module(ModuleInitializationLevel level) {
 		GDREGISTER_CLASS(SpineBinaryResourceImportPlugin);
 		GDREGISTER_CLASS(SpineSkeletonDataResourceInspectorPlugin);
 		GDREGISTER_CLASS(SpineEditorPropertyAnimationMixes);
+		GDREGISTER_INTERNAL_CLASS(SpineSprite3DGizmoPlugin);
 		GDREGISTER_CLASS(SpineEditorPlugin);
 		EditorPlugins::add_plugin_class(StringName("SpineEditorPlugin"));
 #endif
@@ -118,6 +124,7 @@ void initialize_spine_godot_module(ModuleInitializationLevel level) {
 	if (level == MODULE_INITIALIZATION_LEVEL_EDITOR) {
 #ifdef TOOLS_ENABLED
 		EditorNode::add_init_callback(editor_init_callback);
+		GDREGISTER_INTERNAL_CLASS(SpineSprite3DGizmoPlugin);
 		GDREGISTER_CLASS(SpineEditorPropertyAnimationMixes);
 		return;
 #endif
@@ -145,8 +152,13 @@ void register_spine_godot_types() {
 	GDREGISTER_CLASS(SpineSkeletonFileResource);
 	GDREGISTER_CLASS(SpineSkeletonDataResource);
 	GDREGISTER_CLASS(SpineAnimationMix);
+	GDREGISTER_INTERNAL_CLASS(SpineController);
 	GDREGISTER_CLASS(SpineSprite);
 	GDREGISTER_CLASS(SpineMesh2D);
+#if VERSION_MAJOR > 3
+	GDREGISTER_CLASS(SpineSprite3D);
+	GDREGISTER_CLASS(SpineSlotNode3D);
+#endif
 	GDREGISTER_CLASS(SpineSkeleton);
 	GDREGISTER_CLASS(SpineAnimationState);
 	GDREGISTER_CLASS(SpineAnimation);
@@ -184,9 +196,7 @@ void register_spine_godot_types() {
 
 	GDREGISTER_CLASS(SpineSlotNode);
 	GDREGISTER_CLASS(SpineBoneNode);
-#ifndef SPINE_GODOT_EXTENSION
 	GDREGISTER_CLASS(SpineAnimationTrack);
-#endif
 
 #ifdef SPINE_GODOT_EXTENSION
 #if VERSION_MAJOR > 4 || (VERSION_MAJOR == 4 && VERSION_MINOR >= 7)
@@ -268,6 +278,7 @@ void register_spine_godot_types() {
 #ifdef SPINE_GODOT_EXTENSION
 void uninitialize_spine_godot_module(ModuleInitializationLevel level) {
 	if (level == MODULE_INITIALIZATION_LEVEL_SCENE) {
+		SpineSprite3D::clear_statics();
 		SpineSprite::clear_statics();
 		return;
 	}
@@ -285,6 +296,7 @@ void uninitialize_spine_godot_module(ModuleInitializationLevel level) {
 #elif VERSION_MAJOR > 3
 void uninitialize_spine_godot_module(ModuleInitializationLevel level) {
 	if (level == MODULE_INITIALIZATION_LEVEL_SCENE) {
+		SpineSprite3D::clear_statics();
 		SpineSprite::clear_statics();
 		return;
 	}

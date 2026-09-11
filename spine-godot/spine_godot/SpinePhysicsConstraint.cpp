@@ -30,6 +30,7 @@
 #include "SpinePhysicsConstraint.h"
 #include "SpinePhysicsConstraintPose.h"
 #include "SpineCommon.h"
+#include "SpineController.h"
 #include "SpineSprite.h"
 
 void SpinePhysicsConstraint::_bind_methods() {
@@ -53,7 +54,7 @@ Ref<SpinePhysicsConstraintData> SpinePhysicsConstraint::get_data() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto &data = get_spine_object()->getData();
 	Ref<SpinePhysicsConstraintData> data_ref(memnew(SpinePhysicsConstraintData));
-	data_ref->set_spine_object(*get_spine_owner()->get_skeleton_data_res(), &data);
+	data_ref->set_spine_object(*get_spine_controller()->get_skeleton_data_res(), &data);
 	return data_ref;
 }
 
@@ -62,7 +63,7 @@ Ref<SpineBonePose> SpinePhysicsConstraint::get_bone() {
 	auto target = &get_spine_object()->getBone();
 	if (!target) return nullptr;
 	Ref<SpineBonePose> target_ref(memnew(SpineBonePose));
-	target_ref->set_spine_object(get_spine_owner(), target);
+	target_ref->set_spine_object(get_spine_controller(), target);
 	return target_ref;
 }
 
@@ -77,7 +78,7 @@ Ref<SpinePhysicsConstraintPose> SpinePhysicsConstraint::get_pose() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto &pose = get_spine_object()->getPose();
 	Ref<SpinePhysicsConstraintPose> pose_ref(memnew(SpinePhysicsConstraintPose));
-	pose_ref->set_spine_object(get_spine_owner(), &pose);
+	pose_ref->set_spine_object(get_spine_controller(), &pose);
 	return pose_ref;
 }
 
@@ -85,7 +86,7 @@ Ref<SpinePhysicsConstraintPose> SpinePhysicsConstraint::get_applied_pose() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto &pose = get_spine_object()->getAppliedPose();
 	Ref<SpinePhysicsConstraintPose> pose_ref(memnew(SpinePhysicsConstraintPose));
-	pose_ref->set_spine_object(get_spine_owner(), &pose);
+	pose_ref->set_spine_object(get_spine_controller(), &pose);
 	return pose_ref;
 }
 

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineSlotNode3D" inherits="Node3D" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>Follows a Spine slot's bone and inserts 3D geometry after that slot.</brief_description>
+	<description>
+		Place this node directly beneath a [SpineSprite3D] and select [member slot_name]. The helper follows the slot's applied bone transform after the controller's complete update. Translation is scaled by [member SpineSprite3D.pixel_size]; child offsets remain Godot3D units. Bone orientation, scale and shear are preserved in the local XY plane. Put additional offsets on child nodes, because this helper's transform is driven by Spine.
+		By default the anchor retains fixed physical slot depth, even when the parent flips its shader geometry per view. Optionally set [member depth_camera] to follow one explicit camera. This moves the helper's real transform and all descendants, not their mesh shapes or shader sources. It cannot follow opposite cameras simultaneously. For physics/collision children prefer fixed physical anchors or a separate gameplay hierarchy; camera-following updates occur before rendering, not as a physics simulation.
+		Descendant [GeometryInstance3D] nodes are inserted after the slot in explicit preorder, splitting Spine geometry batches. Sorting uses scalar offsets, not scene-tree rendering order. Offset gaps include the distance between consecutive world origins plus [member SpineSprite3D.sorting_step], preserving order for perspective/orthographic and front/back cameras without moving geometry or rewriting shaders.
+		[b]Every transparent pass must use the parent's [member SpineSprite3D.render_priority][/b], including all surfaces, particle passes, overlays, next passes, and label outlines. Shared user materials are not globally modified. Use [method get_sorting_warnings] to diagnose inspectable mismatches. A multi-draw child is one sorting element: all matching-priority transparent passes stay in the insertion gap, but Godot controls their internal order. Use separate geometry nodes when explicit internal ordering is required.
+		Opaque, alpha-scissor and depth-writing draws retain ordinary depth behavior rather than transparent painter ordering. Inserted geometry is not affected by Spine clipping attachments. Custom renderables outside [GeometryInstance3D] require their own sorting integration. Nested [SpineSprite3D] nodes are independent characters.
+		The helper temporarily owns descendants' [member VisualInstance3D.sorting_offset] and [member VisualInstance3D.sorting_use_aabb_center] fields and restores their original values on detach. For manual-mode sprites, call [method SpineSprite3D.update_skeleton] after changing the hierarchy or child transforms. An unresolved slot suspends following/insertion and leaves ordinary child rendering at the last transform.
+		Material overrides below affect the Spine attachment, not inserted children. For multiple helpers targeting one slot, the first helper supplies the override and all helpers insert in direct-child order. Available in Godot4 only.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_depth_camera" qualifiers="const"><return type="NodePath" /><description>Returns the explicit single-camera depth-following path, or an empty path for fixed physical depth.</description></method>
+		<method name="set_depth_camera"><return type="void" /><param index="0" name="path" type="NodePath" /><description>Selects a Camera3D in the same World3D. When the parent enables camera-relative depth, this camera controls the anchor's depth sign. Camera motion is tracked even when skeleton updates are paused/manual. Clearing the path or losing a valid camera restores fixed physical depth.</description></method>
+		<method name="get_additive_material" qualifiers="const"><return type="ShaderMaterial" /><description>Returns the slot attachment's additive template override.</description></method>
+		<method name="get_normal_material" qualifiers="const"><return type="ShaderMaterial" /><description>Returns the slot attachment's normal template override.</description></method>
+		<method name="get_slot_index" qualifiers="const"><return type="int" /><description>Returns the resolved slot index, or -1 before resolution or when the slot is missing.</description></method>
+		<method name="get_slot_name" qualifiers="const"><return type="String" /><description>Returns the selected slot name.</description></method>
+		<method name="get_sorting_warnings" qualifiers="const">
+			<return type="PackedStringArray" />
+			<description>Returns parent/slot, explicit-camera policy and material-priority diagnostics. Mesh surfaces, overrides, overlays, particle meshes, MultiMeshes, next-pass chains and built-in sprite/label priorities are inspected where exposed. Uninspectable custom renderables are reported rather than assumed correct. Opaque draws are depth-ordered regardless of these transparent-priority requirements.</description>
+		</method>
+		<method name="set_additive_material"><return type="void" /><param index="0" name="material" type="ShaderMaterial" /><description>Overrides the slot's additive Spine material. Null falls back to the sprite template.</description></method>
+		<method name="set_normal_material"><return type="void" /><param index="0" name="material" type="ShaderMaterial" /><description>Overrides the slot's normal Spine material. Null falls back to the sprite template.</description></method>
+		<method name="set_slot_name"><return type="void" /><param index="0" name="name" type="String" /><description>Selects the slot to follow and insert after. Resolution occurs on the sprite's next update.</description></method>
+	</methods>
+	<members>
+		<member name="depth_camera" type="NodePath" setter="set_depth_camera" getter="get_depth_camera" default="NodePath(&quot;&quot;)">Optional explicit Camera3D path for single-camera anchor following. Empty retains fixed physical depth. Invalid/deleted cameras or cameras in another World3D fall back to fixed depth and produce configuration diagnostics. The parent camera_relative_depth flag must also be enabled. Ordinary child materials need no modifications; real transforms, including physics descendants, move for this one camera.</member>
+		<member name="additive_material" type="ShaderMaterial" setter="set_additive_material" getter="get_additive_material">Optional additive material override for the Spine attachment.</member>
+		<member name="normal_material" type="ShaderMaterial" setter="set_normal_material" getter="get_normal_material">Optional normal material override for the Spine attachment.</member>
+		<member name="slot_name" type="String" setter="set_slot_name" getter="get_slot_name" default="&quot;&quot;">Name of the Spine slot to follow and insert after.</member>
+	</members>
+</class>

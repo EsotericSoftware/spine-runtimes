@@ -29,10 +29,15 @@
 
 #pragma once
 
-#ifndef SPINE_GODOT_EXTENSION
 #include "SpineSprite.h"
+#ifdef SPINE_GODOT_EXTENSION
+#include <godot_cpp/classes/animation_player.hpp>
+#include <godot_cpp/classes/animation.hpp>
+#include <godot_cpp/classes/animation_library.hpp>
+#else
 #include "scene/animation/animation_player.h"
 #include "scene/resources/animation.h"
+#endif
 
 class SpineAnimationTrack : public Node {
 	GDCLASS(SpineAnimationTrack, Node)
@@ -59,7 +64,11 @@ protected:
 	bool blend_tree_mode;
 	bool debug;
 
-	SpineSprite *sprite;
+	Node *sprite;
+	Ref<SpineController> controller;
+	bool animation_player_dirty;
+	void set_sprite(Node *node);
+	void invalidate_animation_player();
 
 	static void _bind_methods();
 
@@ -133,5 +142,3 @@ public:
 
 	bool get_debug();
 };
-
-#endif

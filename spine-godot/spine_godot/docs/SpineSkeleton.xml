@@ -5,6 +5,7 @@
 	</brief_description>
 	<description>
 		Stores the current pose for a skeleton.
+		A skeleton is owned by its [SpineSprite]. If the sprite's skeleton data resource is cleared or replaced, or the sprite is freed, a retained reference becomes inert and must be reacquired using [method SpineSprite.get_skeleton].
 		See [url]http://esotericsoftware.com/spine-runtime-architecture#Instance-objects[/url] in the Spine Runtimes Guide.
 	</description>
 	<tutorials>

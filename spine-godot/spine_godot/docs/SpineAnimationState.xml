@@ -5,6 +5,7 @@
 	</brief_description>
 	<description>
 		Applies animations over time, queues animations for later playback, mixes (crossfading) between animations, and applies multiple animations on top of each other (layering). See [url]http://esotericsoftware.com/spine-applying-animations[/url] in the Spine Runtimes Guide.
+		An animation state is owned by its [SpineSprite]. If the sprite's skeleton data resource is cleared or replaced, or the sprite is freed, a retained reference becomes inert and must be reacquired using [method SpineSprite.get_animation_state].
 	</description>
 	<tutorials>
 	</tutorials>

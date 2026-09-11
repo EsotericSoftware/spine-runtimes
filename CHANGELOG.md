@@ -312,6 +312,13 @@
 ### Godot
 
 - **Additions**
+  - Added experimental Godot 4 `SpineSprite3D` with ordered native geometry batching, reusable mesh/material buffers, shared controller/resource APIs, unlit normal/additive blending, tint black, clipping/deform, pixel scaling, and face culling. Transparent sorting uses a character-level priority and sorting offsets without an artificial slot-count cap.
+  - Added `SpineSlotNode3D` for bone following, explicit 3D geometry insertion between Spine batches, and slot material overrides, plus batching statistics and renderer benchmarks.
+  - Added `SpineSprite3D.camera_relative_depth`, `depth_write_enabled`, `alpha_cutoff`, `get_aabb()`, and `get_depth_shader_code()`, with a custom-shader guide and interactive front/back depth example for module and GDExtension.
+  - Added explicit single-camera slot-anchor following through `SpineSlotNode3D.depth_camera`, with fixed-depth fallback and diagnostics for invalid cameras and multi-view/physics limitations.
+  - Added `SpineAnimationTrack` support for `SpineSprite3D` and Godot 4 GDExtension, including AnimationPlayer playback/editor scrubbing for both 2D and 3D sprites and a shared timeline example.
+  - Added an interactive 2D/3D benchmark example with configurable character counts, animation/pause controls, CPU timing and renderer statistics for module and GDExtension.
+  - Added tint black (two-color tinting) for Godot 4.3+ module and GDExtension runtimes, with animated coin examples and custom shader color attributes. See [#3169](https://github.com/EsotericSoftware/spine-runtimes/issues/3169).
   - Added `SpineSliderData.get_max()` / `set_max()` for nonessential bone-driven slider metadata.
   - Added `SpinePhysicsConstraintData.get_scale_y_mode()` / `set_scale_y_mode()`.
   - Added `SpineTrackEntry` mix interpolation APIs and `SpineConstant.MixInterpolation`.
@@ -320,6 +327,14 @@
   - Added `SpineTrackEntry.get_additive()` / `set_additive()` for additive blending per track entry.
 
 - **Bug fixes**
+  - Fixed callback-time `time_scale` changes affecting animation and skeleton/physics advances one update late after controller extraction.
+  - Fixed unrelated scene-tree mutations resetting `SpineSlotNode3D` insertion sorting and revealing inactive-bone children on manual or paused sprites; unchanged descendants retain ownership during transfers.
+  - Fixed newly allocated `SpineSprite3D` batch instances rendering while hidden, including pool growth and inherited visibility.
+  - Fixed `SpineSprite3D` click and box selection in the Godot 4 3D editor using the current clipped and deformed attachment geometry.
+  - Expanded native 3D culling bounds and conservative editor picking to cover both camera-relative depth directions.
+  - Fixed scrubbed Spine animations unexpectedly playing when the AnimationPlayer editor loses focus. Sampled poses stay paused while explicit sprite preview animations and AnimationTree preview can still run.
+  - Fixed long shader-compilation stalls when creating many `SpineSprite3D` instances by sharing generated shader variants across characters while keeping material parameters independent.
+  - Fixed retained `SpineSkeleton`, `SpineAnimationState`, and instance-object wrappers keeping stale native objects after a `SpineSprite` resource reload or destruction. Retained wrappers are now invalidated safely and must be reacquired from the sprite.
   - Fixed `SpineSkeletonDataResource` constraint getters returning null entries and dropping constraints when multiple constraint types are present.
   - Fixed physics constraint rotation pointing opposite to translation under gravity and vertical wind.
   - Fixed Godot wrapper crashes from invalid skin attachment lookups, wrong constraint type filtering, stale cached bone/slot wrappers after skeleton rebuilds, dangling `SpineSlotNode` connections after unparenting, and stale Godot 3 wrapper signal connections.
@@ -343,6 +358,8 @@
   - Fixed Godot 3.x builds by avoiding the Godot 4-only `Transform2D(Vector2, Vector2, Vector2)` constructor.
 
 - **Breaking changes (since previous 4.3 beta)**
+  - Removed `SpineBone.get_global_transform()` and `SpineBone.set_global_transform()`. Use `SpineSprite.get_global_bone_transform()` and `SpineSprite.set_global_bone_transform()` for Godot global canvas transforms.
+  - `SpineSprite3D` now defaults to camera-relative spacing, depth writes, a 0.001 slot-depth offset and a 0.001 alpha cutoff. Custom shaders must explicitly implement the documented depth helper; their render modes and source remain unchanged. Disable depth writes and set spacing/cutoff to zero to retain the previous no-write transparent composition.
   - `SpineSkin` attachment method argument names now use `placeholder` instead of `name`.
   - `SpineTrackEntry.get_hold_previous()` / `set_hold_previous()` removed.
   - `SpineTrackEntry.get_mix_blend()` / `set_mix_blend()` removed. Use `get_additive()` / `set_additive()` for additive blending.

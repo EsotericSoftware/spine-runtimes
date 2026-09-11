@@ -37,7 +37,7 @@
 class SpineSliderPose;
 class SpineSkeleton;
 
-class SpineSlider : public SpineSpriteOwnedObject<spine::Slider> {
+class SpineSlider : public SpineControllerOwnedObject<spine::Slider> {
 	GDCLASS(SpineSlider, SpineObjectWrapper)
 
 protected:

@@ -29,6 +29,7 @@
 
 #include "SpineTrackEntry.h"
 #include "SpineCommon.h"
+#include "SpineController.h"
 
 static spine::Interpolation &to_spine_mix_interpolation(SpineConstant::MixInterpolation mix_interpolation) {
 	switch (mix_interpolation) {
@@ -117,7 +118,7 @@ Ref<SpineAnimation> SpineTrackEntry::get_animation() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto animation = &get_spine_object()->getAnimation();
 	Ref<SpineAnimation> animation_ref(memnew(SpineAnimation));
-	animation_ref->set_spine_object(*get_spine_owner()->get_skeleton_data_res(), animation);
+	animation_ref->set_spine_object(*get_spine_controller()->get_skeleton_data_res(), animation);
 	return animation_ref;
 }
 
@@ -126,7 +127,7 @@ Ref<SpineTrackEntry> SpineTrackEntry::get_previous() {
 	auto previous = get_spine_object()->getPrevious();
 	if (!previous) return nullptr;
 	Ref<SpineTrackEntry> previous_ref(memnew(SpineTrackEntry));
-	previous_ref->set_spine_object(get_spine_owner(), previous);
+	previous_ref->set_spine_object(get_spine_controller(), previous);
 	return previous_ref;
 }
 
@@ -300,7 +301,7 @@ Ref<SpineTrackEntry> SpineTrackEntry::get_next() {
 	auto next = get_spine_object()->getNext();
 	if (!next) return nullptr;
 	Ref<SpineTrackEntry> next_ref(memnew(SpineTrackEntry));
-	next_ref->set_spine_object(get_spine_owner(), next);
+	next_ref->set_spine_object(get_spine_controller(), next);
 	return next_ref;
 }
 
@@ -349,7 +350,7 @@ Ref<SpineTrackEntry> SpineTrackEntry::get_mixing_from() {
 	auto mixing_from = get_spine_object()->getMixingFrom();
 	if (!mixing_from) return nullptr;
 	Ref<SpineTrackEntry> mixing_from_ref(memnew(SpineTrackEntry));
-	mixing_from_ref->set_spine_object(get_spine_owner(), mixing_from);
+	mixing_from_ref->set_spine_object(get_spine_controller(), mixing_from);
 	return mixing_from_ref;
 }
 
@@ -358,7 +359,7 @@ Ref<SpineTrackEntry> SpineTrackEntry::get_mixing_to() {
 	auto mixing_to = get_spine_object()->getMixingTo();
 	if (!mixing_to) return nullptr;
 	Ref<SpineTrackEntry> mixing_to_ref(memnew(SpineTrackEntry));
-	mixing_to_ref->set_spine_object(get_spine_owner(), mixing_to);
+	mixing_to_ref->set_spine_object(get_spine_controller(), mixing_to);
 	return mixing_to_ref;
 }
 

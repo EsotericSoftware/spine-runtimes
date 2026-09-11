@@ -1,0 +1,13 @@
+[remap]
+
+importer="spine.json"
+type="SpineSkeletonFileResource"
+uid="uid://c2253hqfseyy0"
+path="res://.godot/imported/coin-pro.spine-json-7726e00a9bdd9ac46056203c30a7f39f.spjson"
+
+[deps]
+
+source_file="res://assets/coin/coin-pro.spine-json"
+dest_files=["res://.godot/imported/coin-pro.spine-json-7726e00a9bdd9ac46056203c30a7f39f.spjson"]
+
+[params]

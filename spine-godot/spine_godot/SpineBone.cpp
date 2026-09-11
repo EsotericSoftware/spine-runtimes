@@ -32,6 +32,7 @@
 #include "SpineSprite.h"
 #include "SpineSkeleton.h"
 #include "SpineCommon.h"
+#include "SpineController.h"
 
 void SpineBone::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("world_to_local", "world_position"), &SpineBone::world_to_local);
@@ -51,8 +52,6 @@ void SpineBone::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("update", "skeleton", "physics"), &SpineBone::update);
 	ClassDB::bind_method(D_METHOD("get_transform"), &SpineBone::get_transform);
 	ClassDB::bind_method(D_METHOD("set_transform", "local_transform"), &SpineBone::set_transform);
-	ClassDB::bind_method(D_METHOD("get_global_transform"), &SpineBone::get_global_transform);
-	ClassDB::bind_method(D_METHOD("set_global_transform", "global_transform"), &SpineBone::set_global_transform);
 }
 
 Vector2 SpineBone::world_to_local(Vector2 world_position) {
@@ -102,7 +101,7 @@ Ref<SpineBoneData> SpineBone::get_data() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto &bone_data = get_spine_object()->getData();
 	Ref<SpineBoneData> bone_data_ref(memnew(SpineBoneData));
-	bone_data_ref->set_spine_object(*get_spine_owner()->get_skeleton_data_res(), &bone_data);
+	bone_data_ref->set_spine_object(*get_spine_controller()->get_skeleton_data_res(), &bone_data);
 	return bone_data_ref;
 }
 
@@ -111,7 +110,7 @@ Ref<SpineBone> SpineBone::get_parent() {
 	auto parent = get_spine_object()->getParent();
 	if (!parent) return nullptr;
 	Ref<SpineBone> parent_ref(memnew(SpineBone));
-	parent_ref->set_spine_object(get_spine_owner(), parent);
+	parent_ref->set_spine_object(get_spine_controller(), parent);
 	return parent_ref;
 }
 
@@ -123,7 +122,7 @@ Array SpineBone::get_children() {
 	for (int i = 0; i < children.size(); ++i) {
 		auto child = children[i];
 		Ref<SpineBone> bone_ref(memnew(SpineBone));
-		bone_ref->set_spine_object(get_spine_owner(), child);
+		bone_ref->set_spine_object(get_spine_controller(), child);
 		result[i] = bone_ref;
 	}
 	return result;
@@ -133,7 +132,7 @@ Ref<SpineBonePose> SpineBone::get_pose() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto &pose = get_spine_object()->getPose();
 	Ref<SpineBonePose> pose_ref(memnew(SpineBonePose));
-	pose_ref->set_spine_object(get_spine_owner(), &pose);
+	pose_ref->set_spine_object(get_spine_controller(), &pose);
 	return pose_ref;
 }
 
@@ -141,7 +140,7 @@ Ref<SpineBonePose> SpineBone::get_applied_pose() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto &applied_pose = get_spine_object()->getAppliedPose();
 	Ref<SpineBonePose> pose_ref(memnew(SpineBonePose));
-	pose_ref->set_spine_object(get_spine_owner(), &applied_pose);
+	pose_ref->set_spine_object(get_spine_controller(), &applied_pose);
 	return pose_ref;
 }
 
@@ -179,46 +178,7 @@ void SpineBone::set_transform(Transform2D transform) {
 	pose.setScaleX(scale.x);
 	pose.setScaleY(scale.y);
 
-	get_spine_owner()->set_modified_bones();
-}
-
-Transform2D SpineBone::get_global_transform() {
-	SPINE_CHECK(get_spine_object(), Transform2D())
-	if (!get_spine_owner()) return get_transform();
-	if (!get_spine_owner()->is_visible_in_tree()) return get_transform();
-	auto &applied_pose = get_spine_object()->getAppliedPose();
-	Transform2D local;
-	local[0] = Vector2(applied_pose.getA(), applied_pose.getC());
-	local[1] = Vector2(applied_pose.getB(), applied_pose.getD());
-	// Bone::setYDown(true) is a runtime coordinate conversion for Godot. Don't expose it as an authored Node2D Y scale.
-	if (spine::Bone::isYDown()) local[1] = Vector2(-local[1].x, -local[1].y);
-	local[2] = Vector2(applied_pose.getWorldX(), applied_pose.getWorldY());
-	return get_spine_owner()->get_global_transform() * local;
-}
-
-void SpineBone::set_global_transform(Transform2D transform) {
-	SPINE_CHECK(get_spine_object(), )
-	if (!get_spine_owner()) {
-		set_transform(transform);
-		return;
-	}
-	if (!get_spine_owner()->is_visible_in_tree()) return;
-
-	auto bone = get_spine_object();
-	Transform2D inverse_sprite_transform = get_spine_owner()->get_global_transform().affine_inverse();
-	Transform2D local = inverse_sprite_transform * transform;
-	if (spine::Bone::isYDown()) local[1] = Vector2(-local[1].x, -local[1].y);
-	auto &applied_pose = bone->getAppliedPose();
-	applied_pose.setA(local[0].x);
-	applied_pose.setC(local[0].y);
-	applied_pose.setB(local[1].x);
-	applied_pose.setD(local[1].y);
-	applied_pose.setWorldX(local.get_origin().x);
-	applied_pose.setWorldY(local.get_origin().y);
-	applied_pose.updateLocalTransform(*get_spine_owner()->get_skeleton()->get_spine_object());
-	bone->getPose().set(applied_pose);
-
-	get_spine_owner()->set_modified_bones();
+	get_spine_controller()->set_modified_bones();
 }
 
 void SpineBone::update(Ref<SpineSkeleton> skeleton, SpineConstant::Physics physics) {

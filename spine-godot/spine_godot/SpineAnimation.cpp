@@ -29,6 +29,7 @@
 
 #include "SpineAnimation.h"
 #include "SpineSkeleton.h"
+#include "SpineController.h"
 #include "SpineEvent.h"
 #include "SpineTimeline.h"
 #if VERSION_MAJOR == 3
@@ -75,7 +76,7 @@ void SpineAnimation::apply(Ref<SpineSkeleton> skeleton, float last_time, float t
 							  from_setup ? spine::MixFrom_Setup : spine::MixFrom_Current, add, out, appliedPose);
 	for (int i = 0; i < (int) spineEvents.size(); ++i) {
 		auto event_ref = memnew(SpineEvent);
-		event_ref->set_spine_object(skeleton->get_spine_owner(), spineEvents[i]);
+		event_ref->set_spine_object(skeleton->get_spine_controller(), spineEvents[i]);
 		events.append(event_ref);
 	}
 }

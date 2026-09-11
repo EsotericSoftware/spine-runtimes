@@ -1,0 +1,8 @@
+[gd_resource type="SpineSkeletonDataResource" load_steps=3 format=3]
+
+[ext_resource type="SpineAtlasResource" path="res://assets/coin/coin.atlas" id="1"]
+[ext_resource type="SpineSkeletonFileResource" path="res://assets/coin/coin-pro.skel" id="2"]
+
+[resource]
+atlas_res = ExtResource("1")
+skeleton_file_res = ExtResource("2")

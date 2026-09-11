@@ -27,9 +27,19 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef SPINE_GODOT_EXTENSION
-
 #include "SpineAnimationTrack.h"
+#if VERSION_MAJOR > 3
+#include "SpineSprite3D.h"
+#endif
+#ifdef SPINE_GODOT_EXTENSION
+#include <godot_cpp/classes/engine.hpp>
+#include <godot_cpp/core/print_string.hpp>
+
+template<typename... Args>
+static Array varray(const Args &...args) {
+	return Array::make(args...);
+}
+#else
 #if VERSION_MAJOR > 3
 #include "core/config/engine.h"
 #else
@@ -37,16 +47,71 @@
 #endif
 #include "scene/animation/animation_player.h"
 #include "scene/resources/animation.h"
+#endif
 
 #include <cfloat>
 
+class SpineControllerOperation {
+	Ref<SpineController> controller;
+
+public:
+	SpineControllerOperation(const Ref<SpineController> &controller) : controller(controller) {
+		controller->begin_native_operation();
+	}
+
+	~SpineControllerOperation() {
+		controller->end_native_operation();
+	}
+};
+
 #ifdef TOOLS_ENABLED
+#ifdef SPINE_GODOT_EXTENSION
+#include <godot_cpp/classes/editor_interface.hpp>
+#include <godot_cpp/classes/control.hpp>
+#include <godot_cpp/variant/signal.hpp>
+
+// Godot connects the currently edited player to its dock, disconnecting the
+// old player on edits (and retaining it while pinned). The extension API does
+// not expose the dock's native getters, so read its public connection metadata.
+static Control *animation_editor_control(const String &type, ObjectID &cached_id) {
+	auto control = Object::cast_to<Control>(ObjectDB::get_instance(cached_id));
+	if (control) return control;
+	auto editor = EditorInterface::get_singleton();
+	if (!editor) return nullptr;
+	auto matches = editor->get_base_control()->find_children("*", type, true, false);
+	if (matches.is_empty()) return nullptr;
+	control = Object::cast_to<Control>(matches[0]);
+	if (control) cached_id = ObjectID(control->get_instance_id());
+	return control;
+}
+
+static AnimationPlayer *editing_animation_player() {
+	static ObjectID dock_id;
+	auto dock = animation_editor_control("AnimationPlayerEditor", dock_id);
+	if (!dock || !dock->is_visible_in_tree()) return nullptr;
+	Array connections = dock->get_incoming_connections();
+	for (int i = 0; i < connections.size(); i++) {
+		Dictionary connection = connections[i];
+		Signal signal = connection["signal"];
+		if (signal.get_name() == SNAME("current_animation_changed"))
+			return Object::cast_to<AnimationPlayer>(signal.get_object());
+	}
+	return nullptr;
+}
+
+static bool animation_tree_editor_visible() {
+	static ObjectID dock_id;
+	auto dock = animation_editor_control("AnimationTreeEditor", dock_id);
+	return dock && dock->is_visible_in_tree();
+}
+#else
 #if (VERSION_MAJOR >= 4 && VERSION_MINOR >= 5)
 #include "editor/animation/animation_player_editor_plugin.h"
 #include "editor/animation/animation_tree_editor_plugin.h"
 #else
 #include "editor/plugins/animation_player_editor_plugin.h"
 #include "editor/plugins/animation_tree_editor_plugin.h"
+#endif
 #endif
 #endif
 
@@ -82,6 +147,9 @@ void SpineAnimationTrack::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_debug"), &SpineAnimationTrack::get_debug);
 
 	ClassDB::bind_method(D_METHOD("update_animation_state", "spine_sprite"), &SpineAnimationTrack::update_animation_state);
+#if VERSION_MAJOR <= 3
+	ClassDB::bind_method(D_METHOD("invalidate_animation_player"), &SpineAnimationTrack::invalidate_animation_player);
+#endif
 
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "animation_name", PROPERTY_HINT_NONE, "",
 							  PROPERTY_USAGE_STORAGE | PROPERTY_USAGE_INTERNAL | PROPERTY_USAGE_NOEDITOR),
@@ -106,19 +174,14 @@ void SpineAnimationTrack::_bind_methods() {
 
 SpineAnimationTrack::SpineAnimationTrack()
 	: loop(false), animation_changed(false), track_index(-1), mix_duration(-1), additive(false), reverse(false), shortest_rotation(false),
-	  time_scale(1), alpha(1), mix_attachment_threshold(0), mix_draw_order_threshold(0), blend_tree_mode(false), debug(false), sprite(nullptr) {
+	  time_scale(1), alpha(1), mix_attachment_threshold(0), mix_draw_order_threshold(0), blend_tree_mode(false), debug(false), sprite(nullptr),
+	  animation_player_dirty(true) {
 }
 
 void SpineAnimationTrack::_notification(int what) {
 	switch (what) {
 		case NOTIFICATION_PARENTED: {
-			sprite = Object::cast_to<SpineSprite>(get_parent());
-			if (sprite)
-#if VERSION_MAJOR > 3
-				sprite->connect(SNAME("before_animation_state_update"), callable_mp(this, &SpineAnimationTrack::update_animation_state));
-#else
-				sprite->connect(SNAME("before_animation_state_update"), this, SNAME("update_animation_state"));
-#endif
+			set_sprite(get_parent());
 			NOTIFY_PROPERTY_LIST_CHANGED();
 			break;
 		}
@@ -127,19 +190,48 @@ void SpineAnimationTrack::_notification(int what) {
 			break;
 		}
 		case NOTIFICATION_UNPARENTED: {
-			if (sprite) {
-#if VERSION_MAJOR > 3
-				sprite->disconnect(SNAME("before_animation_state_update"), callable_mp(this, &SpineAnimationTrack::update_animation_state));
-#else
-				sprite->disconnect(SNAME("before_animation_state_update"), this, SNAME("update_animation_state"));
-#endif
-				sprite = nullptr;
-			}
+			set_sprite(nullptr);
 			break;
 		}
 		default:
 			break;
 	}
+}
+
+void SpineAnimationTrack::set_sprite(Node *node) {
+	if (sprite) {
+#if VERSION_MAJOR > 3
+		sprite->disconnect(SNAME("before_animation_state_update"), callable_mp(this, &SpineAnimationTrack::update_animation_state));
+		sprite->disconnect(SNAME("_internal_spine_objects_invalidated"), callable_mp(this, &SpineAnimationTrack::invalidate_animation_player));
+#else
+		sprite->disconnect(SNAME("before_animation_state_update"), this, SNAME("update_animation_state"));
+		sprite->disconnect(SNAME("_internal_spine_objects_invalidated"), this, SNAME("invalidate_animation_player"));
+#endif
+	}
+	sprite = nullptr;
+	controller.unref();
+	auto sprite_2d = Object::cast_to<SpineSprite>(node);
+	if (sprite_2d) controller = Ref<SpineController>(sprite_2d->get_spine_controller());
+#if VERSION_MAJOR > 3
+	auto sprite_3d = Object::cast_to<SpineSprite3D>(node);
+	if (sprite_3d) controller = sprite_3d->controller;
+#endif
+	if (controller.is_valid()) {
+		sprite = node;
+#if VERSION_MAJOR > 3
+		sprite->connect(SNAME("before_animation_state_update"), callable_mp(this, &SpineAnimationTrack::update_animation_state));
+		sprite->connect(SNAME("_internal_spine_objects_invalidated"), callable_mp(this, &SpineAnimationTrack::invalidate_animation_player));
+#else
+		sprite->connect(SNAME("before_animation_state_update"), this, SNAME("update_animation_state"));
+		sprite->connect(SNAME("_internal_spine_objects_invalidated"), this, SNAME("invalidate_animation_player"));
+#endif
+	}
+	invalidate_animation_player();
+}
+
+void SpineAnimationTrack::invalidate_animation_player() {
+	animation_player_dirty = true;
+	animation_changed = true;
 }
 
 AnimationPlayer *SpineAnimationTrack::find_animation_player() {
@@ -155,7 +247,8 @@ AnimationPlayer *SpineAnimationTrack::find_animation_player() {
 
 void SpineAnimationTrack::setup_animation_player() {
 	if (!sprite) return;
-	if (!sprite->get_skeleton_data_res().is_valid() || !sprite->get_skeleton_data_res()->is_skeleton_data_loaded()) return;
+	if (controller.is_null() || !controller->get_skeleton_data_res().is_valid() || !controller->get_skeleton_data_res()->is_skeleton_data_loaded()) return;
+	animation_player_dirty = false;
 	AnimationPlayer *animation_player = find_animation_player();
 
 	// If we don't have a track index yet, find the highest track number used
@@ -180,7 +273,12 @@ void SpineAnimationTrack::setup_animation_player() {
 		animation_player->set_owner(sprite->get_owner());
 	} else {
 #if VERSION_MAJOR > 3
-#if VERSION_MAJOR >= 4 && VERSION_MINOR >= 7
+#ifdef SPINE_GODOT_EXTENSION
+		auto animation_libraries = animation_player->get_animation_library_list();
+		for (int i = 0; i < animation_libraries.size(); i++) {
+			animation_player->remove_animation_library(animation_libraries[i]);
+		}
+#elif VERSION_MAJOR >= 4 && VERSION_MINOR >= 7
 		LocalVector<StringName> animation_libraries;
 		animation_player->get_animation_library_list(&animation_libraries);
 		for (uint32_t i = 0; i < animation_libraries.size(); i++) {
@@ -202,7 +300,7 @@ void SpineAnimationTrack::setup_animation_player() {
 #endif
 	}
 
-	auto skeleton_data = sprite->get_skeleton_data_res()->get_skeleton_data();
+	auto skeleton_data = controller->get_skeleton_data_res()->get_skeleton_data();
 	auto &animations = skeleton_data->getAnimations();
 #if VERSION_MAJOR > 3
 	Ref<AnimationLibrary> animation_library;
@@ -284,15 +382,20 @@ Ref<Animation> SpineAnimationTrack::create_animation(spine::Animation *animation
 }
 
 void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) {
-	if (track_index < 0) return;
-	sprite = Object::cast_to<SpineSprite>(variant_sprite);
-	if (!sprite) return;
-	if (!sprite->get_skeleton_data_res().is_valid() || !sprite->get_skeleton_data_res()->is_skeleton_data_loaded()) return;
-	if (!sprite->get_skeleton().is_valid() || !sprite->get_animation_state().is_valid()) return;
-	spine::AnimationState *animation_state = sprite->get_animation_state()->get_spine_object();
+	Node *sprite = this->sprite;
+	Ref<SpineController> controller = this->controller;
+	// The public callback must not retarget a track or change its signal owner.
+	if (!sprite || Object::cast_to<Node>(variant_sprite) != sprite || controller.is_null()) return;
+	if (!controller->get_skeleton_data_res().is_valid() || !controller->get_skeleton_data_res()->is_skeleton_data_loaded()) return;
+	if (animation_player_dirty) setup_animation_player();
+	if (controller != this->controller) return;
+	if (track_index < 0 || !controller->get_skeleton().is_valid() || !controller->get_animation_state().is_valid()) return;
+	spine::AnimationState *animation_state = controller->get_animation_state()->get_spine_object();
 	if (!animation_state) return;
-	spine::Skeleton *skeleton = sprite->get_skeleton()->get_spine_object();
+	spine::Skeleton *skeleton = controller->get_skeleton()->get_spine_object();
 	if (!skeleton) return;
+	SpineControllerOperation controller_operation(controller);
+	if (!EMPTY(animation_name) && animation_name != "[stop]" && !skeleton->getData().findAnimation(SPINE_STRING(animation_name))) return;
 	AnimationPlayer *animation_player = find_animation_player();
 	if (!animation_player) {
 		setup_animation_player();
@@ -303,14 +406,22 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 	if (Engine::get_singleton()->is_editor_hint()) {
 #ifdef TOOLS_ENABLED
 		if (blend_tree_mode) {
+#ifdef SPINE_GODOT_EXTENSION
+			bool tree_editor_visible = animation_tree_editor_visible();
+#else
 			AnimationTreeEditor *tree_editor = AnimationTreeEditor::get_singleton();
+			bool tree_editor_visible = tree_editor && tree_editor->is_visible_in_tree();
+#endif
 			// When the animation tree dock is no longer visible, leave the animation
 			// state alone so the SpineSprite preview animation can drive it.
-			if (!tree_editor || !tree_editor->is_visible_in_tree()) {
+			if (!tree_editor_visible) {
 				if (track_index == 0) animation_state->setTimeScale(1);
 				return;
 			}
+			// AnimationTree preview takes over from any manually sampled timeline.
+			if (track_index == 0) animation_state->setTimeScale(1);
 			auto current_entry = animation_state->getTrack(track_index);
+			if (current_entry) current_entry->setTimeScale(time_scale);
 			bool should_set_mix = mix_duration >= 0;
 			String other_name;
 #if (VERSION_MAJOR >= 4 && VERSION_MINOR >= 5)
@@ -356,6 +467,12 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 
 		// When the animation dock is no longer visible or we aren't being
 		// keyed in the current animation, bail.
+#ifdef SPINE_GODOT_EXTENSION
+		auto editing_player = editing_animation_player();
+		Ref<Animation> edited_animation;
+		if (editing_player && editing_player->has_animation(editing_player->get_assigned_animation()))
+			edited_animation = editing_player->get_animation(editing_player->get_assigned_animation());
+#else
 #if VERSION_MAJOR > 3
 		auto player_editor = AnimationPlayerEditor::get_singleton();
 #else
@@ -369,19 +486,20 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 		// Check if the player is actually editing an animation for which there is a track
 		// for us.
 		Ref<Animation> edited_animation = player_editor->get_track_editor()->get_current_animation();
+		auto editing_player = player_editor->get_player();
+#endif
 		if (!edited_animation.is_valid()) {
 			if (track_index == 0) animation_state->setTimeScale(1);
 			return;
 		}
 
 		int found_track_index = -1;
-		auto editing_player = player_editor->get_player();
 		if (!editing_player) {
 			if (track_index == 0) animation_state->setTimeScale(1);
 			return;
 		}
 #if VERSION_MAJOR > 3
-		auto root_node = editing_player->get_node(editing_player->get_root_node());
+		auto root_node = editing_player->get_node_or_null(editing_player->get_root_node());
 #else
 		auto root_node = editing_player->get_node(editing_player->get_root());
 #endif
@@ -389,7 +507,7 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 			if (track_index == 0) animation_state->setTimeScale(1);
 			return;
 		}
-		auto animation_player_path = root_node->get_path().rel_path_to(animation_player->get_path());
+		auto animation_player_path = root_node->get_path_to(animation_player);
 		for (int i = 0; i < edited_animation->get_track_count(); i++) {
 			auto path = edited_animation->track_get_path(i);
 			if (path == animation_player_path) {
@@ -420,7 +538,7 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 		if (edited_animation->track_get_key_count(found_track_index) == 0) return;
 
 		// Find the key in the track that matches the editor's playback position
-		auto playback_position = player_editor->get_player()->get_current_animation_position();
+		auto playback_position = editing_player->get_current_animation_position();
 		int key_index = -1;
 		for (int i = 0; i < edited_animation->track_get_key_count(found_track_index); i++) {
 			float key_time = edited_animation->track_get_key_time(found_track_index, i);
@@ -441,6 +559,7 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 		// Get the animation from our player for the key
 		float key_time = edited_animation->track_get_key_time(found_track_index, key_index);
 		String key_value = edited_animation->track_get_key_value(found_track_index, key_index);
+		if (key_value == "[stop]" || !animation_player->has_animation(key_value)) return;
 		Ref<Animation> keyed_animation = animation_player->get_animation(key_value);
 		if (!keyed_animation.is_valid()) return;
 
@@ -451,6 +570,9 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 		auto &entry = animation_state->setAnimation(track_index, SPINE_STRING(animation_name), loop);
 		entry.setMixDuration(0);
 		entry.setTrackTime(track_time);
+		// Keep sampled entries paused even when an inactive dock restores the
+		// state clock. Newly requested sprite preview animations can still run.
+		entry.setTimeScale(0);
 
 		entry.setAdditive(additive);
 		entry.setReverse(reverse);
@@ -614,5 +736,3 @@ void SpineAnimationTrack::set_debug(bool _debug) {
 bool SpineAnimationTrack::get_debug() {
 	return debug;
 }
-
-#endif

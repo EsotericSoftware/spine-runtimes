@@ -29,8 +29,7 @@
 
 #pragma once
 
-#include "SpineSkeleton.h"
-#include "SpineAnimationState.h"
+#include "SpineController.h"
 #ifdef SPINE_GODOT_EXTENSION
 #include "SpineCommon.h"
 #include <godot_cpp/classes/node2d.hpp>
@@ -42,10 +41,15 @@
 #include "scene/2d/node_2d.h"
 #include "scene/resources/font.h"
 #if VERSION_MAJOR > 3
+#if VERSION_MINOR >= 6
 #include "servers/rendering/rendering_server.h"
+#else
+#include "servers/rendering_server.h"
+#endif
 #endif
 #endif
 
+class SpineAnimationTrack;
 class SpineSlotNode;
 
 struct SpineRendererObject;
@@ -77,6 +81,15 @@ protected:
 	SpineRendererObject *renderer_object;
 
 	bool indices_changed;
+
+#if VERSION_MAJOR > 3 && VERSION_MINOR >= 3
+	bool has_dark_color = false;
+	bool mesh_has_dark_color = false;
+	Color light_color;
+	Color dark_color;
+	uint64_t add_tint_arrays(Array &arrays);
+	void update_tint_attribute_buffer();
+#endif
 
 #if VERSION_MAJOR > 3
 	RID mesh;
@@ -135,15 +148,17 @@ public:
 #endif
 };
 
-class SpineSprite : public Node2D, public spine::AnimationStateListenerObject {
+class SpineSprite : public Node2D, public SpineControllerListener {
 	GDCLASS(SpineSprite, Node2D)
 
+	friend class SpineAnimationTrack;
 	friend class SpineBone;
+	friend class SpineBoneNode;
+	friend class SpineSlotNode;
 
 protected:
-	Ref<SpineSkeletonDataResource> skeleton_data_res;
-	Ref<SpineSkeleton> skeleton;
-	Ref<SpineAnimationState> animation_state;
+	Ref<SpineController> controller;
+	Ref<SpineSkeletonDataResource> connected_skeleton_data_res;
 	SpineConstant::UpdateMode update_mode;
 	float time_scale;
 
@@ -176,7 +191,6 @@ protected:
 	Ref<Material> multiply_material;
 	Ref<Material> screen_material;
 	spine::SkeletonClipping *skeleton_clipper;
-	bool modified_bones;
 
 	static void _bind_methods();
 	void _notification(int what);
@@ -188,13 +202,27 @@ protected:
 	void remove_meshes();
 	void sort_slot_nodes();
 	void update_meshes(Ref<SpineSkeleton> skeleton_ref);
-	void set_modified_bones() {
-		modified_bones = true;
-	}
 	void draw();
 	void draw_bone(spine::Bone *bone, const Color &color);
+	SpineController *get_spine_controller() {
+		return controller.ptr();
+	}
+	Transform2D get_global_bone_transform(spine::Bone *bone);
+	void set_global_bone_transform(spine::Bone *bone, Transform2D transform);
 
-	void callback(spine::AnimationState *state, spine::EventType type, spine::TrackEntry *entry, spine::Event *event) override;
+	void before_skeleton_data_change() override;
+	void skeleton_data_changed() override;
+	bool should_apply_pose() override;
+	void on_animation_started(Ref<SpineAnimationState> animation_state, Ref<SpineTrackEntry> track_entry) override;
+	void on_animation_interrupted(Ref<SpineAnimationState> animation_state, Ref<SpineTrackEntry> track_entry) override;
+	void on_animation_ended(Ref<SpineAnimationState> animation_state, Ref<SpineTrackEntry> track_entry) override;
+	void on_animation_completed(Ref<SpineAnimationState> animation_state, Ref<SpineTrackEntry> track_entry) override;
+	void on_animation_disposed(Ref<SpineAnimationState> animation_state, Ref<SpineTrackEntry> track_entry) override;
+	void on_animation_event(Ref<SpineAnimationState> animation_state, Ref<SpineTrackEntry> track_entry, Ref<SpineEvent> event) override;
+	void before_animation_state_update() override;
+	void before_animation_state_apply() override;
+	void before_world_transforms_change() override;
+	void world_transforms_changed() override;
 
 public:
 	SpineSprite();

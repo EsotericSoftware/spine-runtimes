@@ -29,6 +29,7 @@
 
 #include "SpineAnimationState.h"
 #include "SpineTrackEntry.h"
+#include "SpineController.h"
 
 void SpineAnimationState::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("update", "delta"), &SpineAnimationState::update, DEFVAL(0));
@@ -50,40 +51,55 @@ void SpineAnimationState::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("enable_queue"), &SpineAnimationState::enable_queue);
 }
 
-SpineAnimationState::SpineAnimationState() : animation_state(nullptr), sprite(nullptr) {
+SpineAnimationState::SpineAnimationState() : animation_state(nullptr), controller(nullptr) {
 }
 
 SpineAnimationState::~SpineAnimationState() {
 	delete animation_state;
 }
 
-void SpineAnimationState::set_spine_sprite(SpineSprite *_sprite) {
+void SpineAnimationState::set_spine_controller(SpineController *_controller) {
+	clear_spine_controller();
+	controller = _controller;
+	if (!controller || !controller->get_skeleton_data_res().is_valid() || !controller->get_skeleton_data_res()->is_skeleton_data_loaded()) return;
+	animation_state = new spine::AnimationState(*controller->get_skeleton_data_res()->get_animation_state_data());
+}
+
+void SpineAnimationState::clear_spine_controller() {
+	if (animation_state) animation_state->setListener((spine::AnimationStateListenerObject *) nullptr);
 	delete animation_state;
 	animation_state = nullptr;
-	sprite = _sprite;
-	if (!sprite || !sprite->get_skeleton_data_res().is_valid() || !sprite->get_skeleton_data_res()->is_skeleton_data_loaded()) return;
-	animation_state = new spine::AnimationState(*sprite->get_skeleton_data_res()->get_animation_state_data());
+	controller = nullptr;
 }
 
 void SpineAnimationState::update(float delta) {
 	SPINE_CHECK(animation_state, )
+	if (controller) controller->begin_native_operation();
 	animation_state->update(delta);
+	if (controller) controller->end_native_operation();
 }
 
 bool SpineAnimationState::apply(Ref<SpineSkeleton> skeleton) {
 	SPINE_CHECK(animation_state, false)
 	if (!skeleton->get_spine_object()) return false;
-	return animation_state->apply(*(skeleton->get_spine_object()));
+	if (controller) controller->begin_native_operation();
+	bool result = animation_state->apply(*(skeleton->get_spine_object()));
+	if (controller) controller->end_native_operation();
+	return result;
 }
 
 void SpineAnimationState::clear_tracks() {
 	SPINE_CHECK(animation_state, )
+	if (controller) controller->begin_native_operation();
 	animation_state->clearTracks();
+	if (controller) controller->end_native_operation();
 }
 
 void SpineAnimationState::clear_track(int track_id) {
 	SPINE_CHECK(animation_state, )
+	if (controller) controller->begin_native_operation();
 	animation_state->clearTrack(track_id);
+	if (controller) controller->end_native_operation();
 }
 
 int SpineAnimationState::get_num_tracks() {
@@ -104,9 +120,11 @@ Ref<SpineTrackEntry> SpineAnimationState::set_animation(const String &animation_
 		ERR_PRINT(String("Can not find animation: ") + animation_name);
 		return nullptr;
 	}
+	if (controller) controller->begin_native_operation();
 	auto track_entry = &animation_state->setAnimation(track, *animation, loop);
 	Ref<SpineTrackEntry> track_entry_ref(memnew(SpineTrackEntry));
-	track_entry_ref->set_spine_object(sprite, track_entry);
+	track_entry_ref->set_spine_object(controller, track_entry);
+	if (controller) controller->end_native_operation();
 	return track_entry_ref;
 }
 
@@ -118,29 +136,37 @@ Ref<SpineTrackEntry> SpineAnimationState::add_animation(const String &animation_
 		ERR_PRINT(String("Can not find animation: ") + animation_name);
 		return nullptr;
 	}
+	if (controller) controller->begin_native_operation();
 	auto track_entry = &animation_state->addAnimation(track, *animation, loop, delay);
 	Ref<SpineTrackEntry> track_entry_ref(memnew(SpineTrackEntry));
-	track_entry_ref->set_spine_object(sprite, track_entry);
+	track_entry_ref->set_spine_object(controller, track_entry);
+	if (controller) controller->end_native_operation();
 	return track_entry_ref;
 }
 
 Ref<SpineTrackEntry> SpineAnimationState::set_empty_animation(int track_id, float mix_duration) {
 	SPINE_CHECK(animation_state, nullptr)
+	if (controller) controller->begin_native_operation();
 	auto track_entry = &animation_state->setEmptyAnimation(track_id, mix_duration);
 	Ref<SpineTrackEntry> track_entry_ref(memnew(SpineTrackEntry));
-	track_entry_ref->set_spine_object(sprite, track_entry);
+	track_entry_ref->set_spine_object(controller, track_entry);
+	if (controller) controller->end_native_operation();
 	return track_entry_ref;
 }
 Ref<SpineTrackEntry> SpineAnimationState::add_empty_animation(int track_id, float mix_duration, float delay) {
 	SPINE_CHECK(animation_state, nullptr)
+	if (controller) controller->begin_native_operation();
 	auto track_entry = &animation_state->addEmptyAnimation(track_id, mix_duration, delay);
 	Ref<SpineTrackEntry> track_entry_ref(memnew(SpineTrackEntry));
-	track_entry_ref->set_spine_object(sprite, track_entry);
+	track_entry_ref->set_spine_object(controller, track_entry);
+	if (controller) controller->end_native_operation();
 	return track_entry_ref;
 }
 void SpineAnimationState::set_empty_animations(float mix_duration) {
 	SPINE_CHECK(animation_state, )
+	if (controller) controller->begin_native_operation();
 	animation_state->setEmptyAnimations(mix_duration);
+	if (controller) controller->end_native_operation();
 }
 
 Ref<SpineTrackEntry> SpineAnimationState::get_track(int track_index) {
@@ -148,7 +174,7 @@ Ref<SpineTrackEntry> SpineAnimationState::get_track(int track_index) {
 	auto track_entry = animation_state->getTrack(track_index);
 	if (!track_entry) return nullptr;
 	Ref<SpineTrackEntry> track_entry_ref(memnew(SpineTrackEntry));
-	track_entry_ref->set_spine_object(sprite, track_entry);
+	track_entry_ref->set_spine_object(controller, track_entry);
 	return track_entry_ref;
 }
 

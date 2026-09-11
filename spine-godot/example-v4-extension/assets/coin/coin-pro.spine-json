@@ -1,0 +1,259 @@
+{
+"skeleton": {
+	"hash": "FUwIFtyc7GM",
+	"spine": "4.3.75-beta",
+	"x": -152.5,
+	"y": -151,
+	"width": 305,
+	"height": 302,
+	"images": "./images/",
+	"audio": null
+},
+"bones": [
+	{ "name": "root" },
+	{ "name": "coin-front", "parent": "root" },
+	{ "name": "clipping", "parent": "coin-front" },
+	{ "name": "coin-sides", "parent": "root" },
+	{ "name": "coin-side-round", "parent": "coin-sides" },
+	{ "name": "coin-side-straight", "parent": "coin-sides" },
+	{ "name": "shine", "parent": "root", "x": 243.1438 }
+],
+"slots": [
+	{ "name": "coin-side", "bone": "coin-side-straight", "color": "ffdb2fff", "attachment": "coin-side-straight" },
+	{ "name": "coin-side-round", "bone": "coin-side-round", "color": "ffdb2fff", "attachment": "coin-side-round" },
+	{ "name": "coin-front-texture", "bone": "coin-front", "color": "868686ff", "attachment": "coin-front-logo" },
+	{ "name": "coin-front-shine", "bone": "coin-front", "color": "888888ff", "dark": "000000", "attachment": "coin-front-shine-logo", "blend": "additive" },
+	{ "name": "clipping", "bone": "clipping", "attachment": "clipping" },
+	{ "name": "shine", "bone": "shine", "color": "ffffff60", "attachment": "shine", "blend": "additive" }
+],
+"skins": [
+	{
+		"name": "default",
+		"attachments": {
+			"clipping": {
+				"clipping": {
+					"type": "clipping",
+					"end": "clipping",
+					"vertexCount": 39,
+					"vertices": [ 0.1, 140.26, -26.4, 138.14, -50.51, 131.25, -75.42, 119.06, -98.21, 101.04, -115.44, 82.22, -127.63, 62.08, -136.11, 39.03, -140.08, 19.68, -141.41, -0.19, -140.08, -22.98, -134.78, -45.5, -125.24, -66.44, -113.32, -84.19, -98.21, -101.95, -80.46, -116.52, -61.38, -127.39, -38.92, -134.81, -18.22, -139.27, -0.14, -140.58, 24.23, -138.48, 45.45, -132.46, 67.98, -122.5, 86.58, -110.19, 102.56, -95.25, 115.4, -78.75, 125.36, -61.72, 134.0, -42.33, 138.46, -22.15, 139.24, -0.15, 138.46, 20.29, 133.48, 39.94, 127.19, 58.54, 117.5, 76.1, 104.4, 92.86, 88.42, 108.32, 69.03, 121.42, 50.43, 130.85, 26.32, 137.4 ],
+					"color": "ce3a3aff"
+				}
+			},
+			"coin-front-shine": {
+				"coin-front-shine-logo": { "width": 282, "height": 282 },
+				"coin-front-shine-spineboy": { "width": 282, "height": 282 }
+			},
+			"coin-front-texture": {
+				"coin-front-logo": { "width": 305, "height": 302 },
+				"coin-front-spineboy": { "width": 305, "height": 302 }
+			},
+			"coin-side": {
+				"coin-side-straight": { "x": 0.5, "width": 17, "height": 282 }
+			},
+			"coin-side-round": {
+				"coin-side-round": { "x": -69.42594, "width": 144, "height": 282 }
+			},
+			"shine": {
+				"shine": { "y": 0.5, "scaleX": 1.600418, "scaleY": 1.600418, "width": 72, "height": 245 }
+			}
+		}
+	}
+],
+"animations": {
+	"animation": {
+		"slots": {
+			"coin-front-shine": {
+				"rgba2": [
+					{ "light": "7d7d7dff", "dark": "000000" },
+					{ "time": 0.2666667, "light": "000000ff", "dark": "7e7e7e" },
+					{ "time": 0.6640074, "light": "000000ff", "dark": "000000" },
+					{ "time": 1.0333333, "light": "7f7f7fff", "dark": "000000" },
+					{ "time": 1.3333334, "light": "404040ff", "dark": "000000" },
+					{ "time": 1.6, "light": "000000ff", "dark": "7e7e7e" },
+					{ "time": 2.002222, "light": "000000ff", "dark": "000000" },
+					{ "time": 2.4, "light": "7f7f7fff", "dark": "000000" },
+					{ "time": 2.666667, "light": "7d7d7dff", "dark": "000000" }
+				],
+				"attachment": [
+					{ "time": 0.6666667, "name": "coin-front-shine-spineboy" },
+					{ "time": 2, "name": "coin-front-shine-logo" }
+				]
+			},
+			"coin-front-texture": {
+				"rgba": [
+					{ "color": "858585ff" },
+					{ "time": 0.4, "color": "ffffffff" },
+					{
+						"time": 0.6695556,
+						"color": "858585ff",
+						"curve": [ 0.7253511, 0.5923537, 0.892389, 1, 0.7253511, 0.5923537, 0.892389, 1, 0.7253511, 0.5923537, 0.892389, 1, 0.7253511, 1, 0.892389, 1 ]
+					},
+					{ "time": 0.9666666, "color": "ffffffff" },
+					{ "time": 1.331797, "color": "858585ff", "curve": "stepped" },
+					{ "time": 1.3333334, "color": "858585ff" },
+					{ "time": 1.7333333, "color": "ffffffff" },
+					{ "time": 1.9982222, "color": "858585ff", "curve": "stepped" },
+					{ "time": 2.002222, "color": "858585ff" },
+					{ "time": 2.3, "color": "ffffffff" },
+					{ "time": 2.666667, "color": "858585ff" }
+				],
+				"attachment": [
+					{ "time": 0.6666667, "name": "coin-front-spineboy" },
+					{ "time": 2, "name": "coin-front-logo" }
+				]
+			}
+		},
+		"bones": {
+			"coin-front": {
+				"translate": [
+					{},
+					{ "time": 0.6640074, "x": 8.303986, "curve": "stepped" },
+					{
+						"time": 0.6695556,
+						"x": -8.304,
+						"curve": [ 0.7942087, -7.075403, 1.167389, 0, 0.7942087, 0, 1.167389, 0 ]
+					},
+					{ "time": 1.3333334 },
+					{ "time": 1.9982222, "x": 8.303986, "curve": "stepped" },
+					{ "time": 2.002222, "x": -8.304 },
+					{ "time": 2.666667 }
+				],
+				"scale": [
+					{
+						"curve": [ 0.1641551, 1, 0.4842576, 0.09090912, 0.1641551, 1, 0.4842576, 1 ]
+					},
+					{ "time": 0.6640074, "x": 0, "curve": "stepped" },
+					{
+						"time": 0.6695556,
+						"x": 0.003497046,
+						"curve": [ 0.7855555, 0.15337366, 1.167389, 1, 0.7855555, 1, 1.167389, 1 ]
+					},
+					{
+						"time": 1.3333334,
+						"curve": [ 1.441807, 0.9921016, 1.8577527, 0.09827673, 1.441807, 1, 1.8577527, 1 ]
+					},
+					{ "time": 1.9982222, "x": 0.003497046, "curve": "stepped" },
+					{
+						"time": 2.002222,
+						"x": 0.003497046,
+						"curve": [ 2.123101, 0.1509321, 2.5005555, 1, 2.123101, 1, 2.5005555, 1 ]
+					},
+					{ "time": 2.666667 }
+				]
+			},
+			"coin-side-round": {
+				"translate": [
+					{},
+					{ "time": 0.6640074, "x": -6.74704, "curve": "stepped" },
+					{
+						"time": 0.6695556,
+						"x": 7.033793,
+						"curve": [ 0.7942087, 5.993126, 1.167389, 0, 0.7942087, 0, 1.167389, 0 ]
+					},
+					{ "time": 1.3333334 },
+					{ "time": 1.9982222, "x": -6.74704, "curve": "stepped" },
+					{ "time": 2.002222, "x": 7.033793 },
+					{ "time": 2.666667 }
+				],
+				"scale": [
+					{
+						"curve": [ 0.08456313, 1, 0.20695715, 0.7888186, 0.08456313, 1, 0.20695715, 1 ]
+					},
+					{
+						"time": 0.3333333,
+						"x": 0.5554077,
+						"curve": [ 0.448626, 0.3474611, 0.5671883, 0.12169048, 0.448626, 1, 0.5671883, 1 ]
+					},
+					{ "time": 0.6640074, "x": 0.014449487, "curve": "stepped" },
+					{
+						"time": 0.6695556,
+						"x": -0.02847758,
+						"curve": [ 0.7234247, -0.12578347, 0.8645956, -0.3669811, 0.7234247, 1, 0.8645956, 1 ]
+					},
+					{
+						"time": 1,
+						"x": -0.6091461,
+						"curve": [ 1.052501, -0.777976, 1.2903355, -0.9969021, 1.052501, 1, 1.2903355, 1 ]
+					},
+					{ "time": 1.331797, "x": -1, "curve": "stepped" },
+					{
+						"time": 1.3333334,
+						"curve": [ 1.384381, 0.9965672, 1.43931, 0.9397934, 1.384381, 1, 1.43931, 1 ]
+					},
+					{
+						"time": 1.5,
+						"x": 0.8523067,
+						"curve": [ 1.563546, 0.7481532, 1.7033066, 0.508859, 1.563546, 1, 1.7033066, 1 ]
+					},
+					{
+						"time": 1.8,
+						"x": 0.3145625,
+						"curve": [ 1.8725015, 0.12988813, 1.986691, 0.014531344, 1.8725015, 1, 1.986691, 1 ]
+					},
+					{ "time": 1.9982222, "x": 0.014449487, "curve": "stepped" },
+					{
+						"time": 2.002222,
+						"x": -0.02847758,
+						"curve": [ 2.0389545, -0.07168802, 2.122718, -0.23894, 2.0389545, 1, 2.122718, 1 ]
+					},
+					{
+						"time": 2.201774,
+						"x": -0.3648644,
+						"curve": [ 2.2691264, -0.5125144, 2.3372054, -0.6347422, 2.2691264, 1, 2.3372054, 1 ]
+					},
+					{
+						"time": 2.4,
+						"x": -0.7308877,
+						"curve": [ 2.5034475, -0.8707658, 2.595509, -0.9610173, 2.5034475, 1, 2.595509, 1 ]
+					},
+					{
+						"time": 2.659245,
+						"x": -1,
+						"curve": [ 2.661101, -1, 2.664811, 1, 2.661101, 1, 2.664811, 1 ]
+					},
+					{ "time": 2.666667 }
+				]
+			},
+			"shine": {
+				"translate": [
+					{
+						"curve": [ 0.16666667, 0, 0.5, -473.3937, 0.16666667, 0, 0.5, 0 ]
+					},
+					{
+						"time": 0.6666667,
+						"x": -473.3937,
+						"curve": [ 0.8333333, -473.3937, 1.1666666, -33.15601, 0.8333333, 0, 1.1666666, 0 ]
+					},
+					{
+						"time": 1.3333334,
+						"x": -33.15601,
+						"curve": [ 1.5, -33.15601, 1.8333334, -473.3937, 1.5, 0, 1.8333334, 0 ]
+					},
+					{
+						"time": 2,
+						"x": -473.3937,
+						"curve": [ 2.166667, -473.3937, 2.5, 0, 2.166667, 0, 2.5, 0 ]
+					},
+					{ "time": 2.666667 }
+				]
+			}
+		},
+		"drawOrder": [
+			{
+				"time": 0.6666667,
+				"offsets": [
+					{ "slot": "coin-side", "offset": 2 }
+				]
+			},
+			{ "time": 0.6695556 },
+			{
+				"time": 1.9982222,
+				"offsets": [
+					{ "slot": "coin-side", "offset": 2 }
+				]
+			},
+			{ "time": 2.002222 }
+		]
+	}
+}
+}

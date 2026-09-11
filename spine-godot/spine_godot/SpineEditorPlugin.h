@@ -419,6 +419,38 @@ public:
 #endif
 };
 
+#if VERSION_MAJOR > 3
+#ifdef SPINE_GODOT_EXTENSION
+#include <godot_cpp/classes/editor_node3d_gizmo_plugin.hpp>
+#include <godot_cpp/classes/editor_node3d_gizmo.hpp>
+#else
+#if VERSION_MINOR >= 5
+#include "editor/scene/3d/node_3d_editor_gizmos.h"
+#else
+#include "editor/plugins/node_3d_editor_gizmos.h"
+#endif
+#endif
+
+class SpineSprite3DGizmoPlugin : public EditorNode3DGizmoPlugin {
+	GDCLASS(SpineSprite3DGizmoPlugin, EditorNode3DGizmoPlugin)
+
+	static void _bind_methods() {}
+
+public:
+#ifdef SPINE_GODOT_EXTENSION
+	bool _has_gizmo(Node3D *node) const override;
+	String _get_gizmo_name() const override { return "SpineSprite3D"; }
+	bool _can_be_hidden() const override { return false; }
+	void _redraw(const Ref<EditorNode3DGizmo> &gizmo) override;
+#else
+	bool has_gizmo(Node3D *node) override;
+	String get_gizmo_name() const override { return "SpineSprite3D"; }
+	bool can_be_hidden() const override { return false; }
+	void redraw(EditorNode3DGizmo *gizmo) override;
+#endif
+};
+#endif
+
 class SpineEditorPlugin : public EditorPlugin {
 	GDCLASS(SpineEditorPlugin, EditorPlugin)
 
@@ -430,6 +462,9 @@ class SpineEditorPlugin : public EditorPlugin {
 	Ref<EditorImportPlugin> json_import_plugin;
 	Ref<EditorImportPlugin> binary_import_plugin;
 	Ref<EditorInspectorPlugin> skeleton_data_inspector_plugin;
+#endif
+#if VERSION_MAJOR > 3
+	Ref<SpineSprite3DGizmoPlugin> sprite_3d_gizmo_plugin;
 #endif
 
 public:

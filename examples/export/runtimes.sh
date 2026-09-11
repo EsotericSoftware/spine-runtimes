@@ -4,6 +4,26 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 cd $SCRIPT_DIR
 
+ROOT=$SCRIPT_DIR/../..
+
+copy_godot_coin_assets() {
+  for example in example-v4 example-v4-csharp example-v4-extension; do
+    target="$ROOT/spine-godot/$example/assets/coin"
+    mkdir -p "$target"
+    rm -f "$target"/*.atlas "$target"/*.png "$target"/*.spine-json "$target"/*.skel
+    cp -f ../coin/export/coin-pro.json "$target/coin-pro.spine-json"
+    cp -f ../coin/export/coin-pro.skel "$target/"
+    cp -f ../coin/export/coin.atlas "$target/"
+    cp -f ../coin/export/coin.png "$target/"
+  done
+}
+
+if [ "$1" = "--godot-coin" ]; then
+  echo "spine-godot coin assets"
+  copy_godot_coin_assets
+  exit
+fi
+
 # On macOS, we need gsed for the -i switch to work. Check it's available
 # and error out otherwise.
 sed="sed"
@@ -15,7 +35,6 @@ if [[ $OSTYPE == 'darwin'* ]]; then
   sed="/opt/homebrew/bin/gsed"
 fi
 
-ROOT=$SCRIPT_DIR/../..
 echo "Spine Runtimes path: $ROOT"
 echo "Copying assets to runtimes..."
 echo ""
@@ -280,6 +299,8 @@ cp -f ../raptor/manual-maps/light-sprite.png "$ROOT/spine-godot/example-v4-exten
 cp -f ../celestial-circus/export/celestial-circus-pro.skel "$ROOT/spine-godot/example-v4-extension/assets/celestial-circus/celestial-circus.skel"
 cp -f ../celestial-circus/export/celestial-circus.atlas "$ROOT/spine-godot/example-v4-extension/assets/celestial-circus/"
 cp -f ../celestial-circus/export/celestial-circus.png "$ROOT/spine-godot/example-v4-extension/assets/celestial-circus/"
+
+copy_godot_coin_assets
 
 echo "spine-sdl"
 rm -f "$ROOT/spine-sdl/data/"*

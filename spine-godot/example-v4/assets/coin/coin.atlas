@@ -1,0 +1,17 @@
+coin.png
+	size: 1024, 1024
+	filter: Linear, Linear
+coin-front-logo
+	bounds: 328, 286, 305, 302
+coin-front-shine-logo
+	bounds: 635, 22, 282, 282
+coin-front-shine-spineboy
+	bounds: 635, 306, 282, 282
+coin-front-spineboy
+	bounds: 21, 286, 305, 302
+coin-side-round
+	bounds: 2, 2, 144, 282
+coin-side-straight
+	bounds: 2, 306, 17, 282
+shine
+	bounds: 919, 343, 72, 245

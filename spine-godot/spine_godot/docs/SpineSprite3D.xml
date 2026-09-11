@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineSprite3D" inherits="Node3D" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Renders a Spine skeleton as native planar geometry in a Godot 3D world.
+	</brief_description>
+	<description>
+		[SpineSprite3D] owns an independent Spine skeleton and animation state through the same internal controller and [SpineSkeletonDataResource] used by [SpineSprite]. It creates native 3D attachment meshes; it does not use a hidden [SpineSprite] or [SubViewport].
+		Spine coordinates are mapped into the node's local XY plane, with [member pixel_size] converting Spine units to Godot 3D units. The node's normal [Node3D] transform positions and orients the plane in the world.
+		Generated materials are transparent, unlit, depth-tested, write depth by default, and do not cast shadows. Fragments below [member alpha_cutoff] (and zero-alpha fragments) are discarded before writing depth. [member camera_relative_depth] defaults to true: later attachments are offset toward each rendering camera without reversing Spine draw order. This is planar artwork, not a volumetric character; spacing flips at an edge-on transition. Normal and additive blend modes, clipping, deform, and tint black are supported. Multiply and screen slots currently fall back to normal blending with a warning; screen is not treated as additive.
+		Consecutive compatible attachments merge into native indexed batches in Spine draw order. Texture/PMA, material/blend changes and [SpineSlotNode3D] insertion boundaries split batches. Meshes and buffer capacities are reused; unchanged topology does not rebuild the surface. There is no artificial slot-count limit.
+		All native batches share the character's world sorting origin, with AABB-center sorting disabled and one character-level [member render_priority]. Increasing sorting offsets implement order across batches without moving geometry; indices preserve order inside each batch. [member sorting_step] defaults to 1 Godot unit. Back viewing does not reverse Spine draw order. Characters at the same priority may interleave. Different character priorities control submission order, but cannot override depth testing; opaque/depth-writing surfaces can still occlude later draws. Perfect intersecting transparency and extreme-coordinate float precision are not guaranteed.
+		Optional custom [ShaderMaterial] templates are duplicated per texture and draw priority without rewriting shader source. The shader must be spatial, declare [code]uniform sampler2D spine_texture[/code], and may declare [code]uniform bool spine_premultiplied_alpha[/code]. Spine light tint is provided in [code]CUSTOM0[/code] as RGBA and dark tint in [code]CUSTOM1.rgb[/code], both in authored sRGB space. A custom shader controls its own color conversion, blending, culling, depth writes, and shading. Use [method get_depth_shader_code] to participate in camera-relative depth and alpha cutoff. The node supplies reserved [code]spine_camera_relative_depth[/code] and [code]spine_alpha_cutoff[/code] uniforms to every cloned shader pass, overriding values in the template but never modifying its source. Reassign the template after changing its own uniform parameters to refresh per-draw copies.
+		Culling bounds include both possible depth directions when [member camera_relative_depth] is enabled. Editor picking conservatively includes attachment triangles at both positions; it does not follow texture alpha or arbitrary custom deformation. Inserted children and collision objects do not move with the shader: see [member SpineSlotNode3D.depth_camera] for explicit single-camera anchor following.
+		Retained skeleton, animation-state, and instance wrappers become inert after resource replacement or node destruction. Reacquire them from the node after reload. Use [method Node.queue_free] rather than immediate [method Object.free] inside animation callbacks.
+		This class is available only in Godot 4.x.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_aabb" qualifiers="const"><return type="AABB" /><description>Returns current native geometry bounds in node-local coordinates, including both depth directions when camera-relative depth is enabled. Excludes inserted children and additional custom shader displacement.</description></method>
+		<method name="get_depth_shader_code" qualifiers="static"><return type="String" /><description>Returns shared spatial shader declarations and helpers for explicit custom shader composition or a saved [ShaderInclude]. In [code]vertex()[/code], call [code]VERTEX = spine_apply_camera_depth(VERTEX, MODEL_MATRIX[3].xyz, MODEL_NORMAL_MATRIX[2], INV_VIEW_MATRIX[3].xyz);[/code] before your own 3D deformation. In [code]fragment()[/code], call [code]spine_apply_alpha_cutoff(ALPHA);[/code] after computing texture times tint alpha. Keep [code]ALPHA[/code] output and use explicit discard rather than [code]ALPHA_SCISSOR_THRESHOLD[/code] to retain transparent batch sorting. The helper changes native attachment spacing only; do not apply it to the full vertex Z of an arbitrary 3D child mesh.</description></method>
+		<method name="get_camera_relative_depth" qualifiers="const"><return type="bool" /><description>Returns whether participating shaders flip spacing for the current render view.</description></method>
+		<method name="set_camera_relative_depth"><return type="void" /><param index="0" name="value" type="bool" /><description>Enables camera-relative spacing or restores a fixed physical stack. Refreshes material uniforms and bounds without rebuilding warmed mesh buffers.</description></method>
+		<method name="get_depth_write_enabled" qualifiers="const"><return type="bool" /><description>Returns whether generated materials write depth.</description></method>
+		<method name="set_depth_write_enabled"><return type="void" /><param index="0" name="value" type="bool" /><description>Sets depth writes for generated materials only. Custom shaders retain their authored render mode.</description></method>
+		<method name="get_alpha_cutoff" qualifiers="const"><return type="float" /><description>Returns the alpha cutoff supplied to generated and participating custom shaders.</description></method>
+		<method name="set_alpha_cutoff"><return type="void" /><param index="0" name="value" type="float" /><description>Sets a finite cutoff between zero and one. Zero-alpha fragments are always discarded by the supplied helper.</description></method>
+		<method name="get_additive_material">
+			<return type="ShaderMaterial" />
+			<description>Returns the custom additive material template.</description>
+		</method>
+		<method name="get_animation_state">
+			<return type="SpineAnimationState" />
+			<description>Returns this node's animation state, or [code]null[/code] when no valid skeleton data is assigned.</description>
+		</method>
+		<method name="get_cull_mode">
+			<return type="int" enum="SpineSprite3D.CullMode" />
+			<description>Returns the generated-material face culling mode.</description>
+		</method>
+		<method name="get_normal_material">
+			<return type="ShaderMaterial" />
+			<description>Returns the custom normal material template.</description>
+		</method>
+		<method name="get_pixel_size">
+			<return type="float" />
+			<description>Returns the Spine-unit to 3D-unit scale.</description>
+		</method>
+		<method name="get_render_priority">
+			<return type="int" />
+			<description>Returns the common material render priority for this character.</description>
+		</method>
+		<method name="get_render_statistics" qualifiers="const">
+			<return type="Dictionary" />
+			<description>Returns active [code]batches[/code], [code]vertices[/code] and [code]indices[/code], retained [code]batch_pool[/code], [code]vertex_capacity[/code], [code]index_capacity[/code] and cached [code]materials[/code]. [code]mesh_builds[/code], [code]material_builds[/code], [code]index_uploads[/code], [code]vertex_uploads[/code] and [code]attribute_uploads[/code] are cumulative since construction. [code]shared_shaders[/code] is the global count of cached generated shader variants (at most twelve), shared across characters rather than compiled per instance. Other counters belong to this node. Batch count excludes inserted children and is not a draw-call count for multi-pass materials.</description>
+		</method>
+		<method name="get_sorting_step">
+			<return type="float" />
+			<description>Returns the minimum separation of consecutive transparent ordering keys.</description>
+		</method>
+		<method name="set_sorting_step">
+			<return type="void" />
+			<param index="0" name="value" type="float" />
+			<description>Sets a finite positive sorting step. This offsets sorting distance only, not geometry. Inserted children at different origins add an origin-distance safety margin.</description>
+		</method>
+		<method name="get_skeleton">
+			<return type="SpineSkeleton" />
+			<description>Returns this node's skeleton, or [code]null[/code] when no valid skeleton data is assigned.</description>
+		</method>
+		<method name="get_skeleton_data_res">
+			<return type="SpineSkeletonDataResource" />
+			<description>Returns the active skeleton data resource.</description>
+		</method>
+		<method name="get_slot_depth_offset">
+			<return type="float" />
+			<description>Returns the local Z separation between adjacent draw-order entries.</description>
+		</method>
+		<method name="get_time_scale">
+			<return type="float" />
+			<description>Returns this node's animation time scale.</description>
+		</method>
+		<method name="get_update_mode">
+			<return type="int" enum="SpineConstant.UpdateMode" />
+			<description>Returns the automatic update mode.</description>
+		</method>
+		<method name="new_skin">
+			<return type="SpineSkin" />
+			<param index="0" name="name" type="String" />
+			<description>Creates an empty skin for this node's skeleton data resource.</description>
+		</method>
+		<method name="on_skeleton_data_changed">
+			<return type="void" />
+			<description>Reloads the assigned skeleton data. Normally called automatically when the resource changes.</description>
+		</method>
+		<method name="set_additive_material">
+			<return type="void" />
+			<param index="0" name="material" type="ShaderMaterial" />
+			<description>Sets the custom additive material template. The shader source is used as authored and must follow the class material contract.</description>
+		</method>
+		<method name="set_cull_mode">
+			<return type="void" />
+			<param index="0" name="value" type="int" enum="SpineSprite3D.CullMode" />
+			<description>Sets face culling for generated materials. Custom shaders retain their authored cull mode.</description>
+		</method>
+		<method name="set_normal_material">
+			<return type="void" />
+			<param index="0" name="material" type="ShaderMaterial" />
+			<description>Sets the custom normal material template. The shader source is used as authored and must follow the class material contract.</description>
+		</method>
+		<method name="set_pixel_size">
+			<return type="void" />
+			<param index="0" name="value" type="float" />
+			<description>Sets the positive Spine-unit to 3D-unit scale.</description>
+		</method>
+		<method name="set_render_priority">
+			<return type="void" />
+			<param index="0" name="value" type="int" />
+			<description>Sets the common character material priority, clamped to Godot's [code]-128..127[/code] range independently of slot count. Inserted transparent child materials must use the same priority.</description>
+		</method>
+		<method name="set_skeleton_data_res">
+			<return type="void" />
+			<param index="0" name="skeleton_data_res" type="SpineSkeletonDataResource" />
+			<description>Sets the shared data resource and creates a new independent skeleton and animation state.</description>
+		</method>
+		<method name="set_slot_depth_offset">
+			<return type="void" />
+			<param index="0" name="value" type="float" />
+			<description>Sets the non-negative local Z separation between draw-order entries.</description>
+		</method>
+		<method name="set_time_scale">
+			<return type="void" />
+			<param index="0" name="value" type="float" />
+			<description>Sets this node's animation time scale.</description>
+		</method>
+		<method name="set_update_mode">
+			<return type="void" />
+			<param index="0" name="value" type="int" enum="SpineConstant.UpdateMode" />
+			<description>Sets process, physics, or manual updating.</description>
+		</method>
+		<method name="update_skeleton">
+			<return type="void" />
+			<param index="0" name="delta" type="float" />
+			<description>Advances and renders the skeleton by [param delta], multiplied by [member time_scale]. Call this when [member update_mode] is manual.</description>
+		</method>
+	</methods>
+	<members>
+		<member name="camera_relative_depth" type="bool" setter="set_camera_relative_depth" getter="get_camera_relative_depth" default="true">Preserves authored layering from both sides by flipping attachment spacing per rendering camera. Does not reverse attachment/index/batch order or move ordinary child nodes. Custom shaders must use the shared helper or equivalent logic.</member>
+		<member name="depth_write_enabled" type="bool" setter="set_depth_write_enabled" getter="get_depth_write_enabled" default="true">Enables depth writes for generated materials. Disable this for no-write transparent composition; custom shaders choose their own render mode.</member>
+		<member name="alpha_cutoff" type="float" setter="set_alpha_cutoff" getter="get_alpha_cutoff" default="0.001">Discard fragments whose texture times tint alpha is below this value. Alpha-zero fragments are always discarded. Surviving fractional alpha is still blended, not forced opaque. Alpha fades can reveal/hide surfaces abruptly at the threshold.</member>
+		<member name="additive_material" type="ShaderMaterial" setter="set_additive_material" getter="get_additive_material">
+			Optional additive spatial shader template. It is not used for screen slots.
+		</member>
+		<member name="cull_mode" type="int" setter="set_cull_mode" getter="get_cull_mode" enum="SpineSprite3D.CullMode" default="0">
+			Face culling applied to generated shaders only.
+		</member>
+		<member name="normal_material" type="ShaderMaterial" setter="set_normal_material" getter="get_normal_material">
+			Optional normal spatial shader template.
+		</member>
+		<member name="pixel_size" type="float" setter="set_pixel_size" getter="get_pixel_size" default="0.01">
+			Godot 3D units per Spine unit.
+		</member>
+		<member name="render_priority" type="int" setter="set_render_priority" getter="get_render_priority" default="0">
+			Common material priority for this character's native batches.
+		</member>
+		<member name="skeleton_data_res" type="SpineSkeletonDataResource" setter="set_skeleton_data_res" getter="get_skeleton_data_res">
+			Shared skeleton data used to create this node's independent state.
+		</member>
+		<member name="slot_depth_offset" type="float" setter="set_slot_depth_offset" getter="get_slot_depth_offset" default="0.001">
+			Local Z distance between adjacent Spine draw-order positions, independent of pixel_size. Camera-relative shaders flip its direction from behind. Choose spacing appropriate to scene scale, transforms and camera range: no fixed gap guarantees depth precision in every scene. Zero can produce coplanar depth conflicts when writing depth.
+		</member>
+		<member name="sorting_step" type="float" setter="set_sorting_step" getter="get_sorting_step" default="1.0">
+			Minimum sorting-distance gap between consecutive batch/inserted-geometry elements. Geometry is not moved. Avoid steps too small for the world's float precision.
+		</member>
+		<member name="time_scale" type="float" setter="set_time_scale" getter="get_time_scale" default="1.0">
+			Multiplier applied to animation delta time.
+		</member>
+		<member name="update_mode" type="int" setter="set_update_mode" getter="get_update_mode" enum="SpineConstant.UpdateMode" default="0">
+			Selects process, physics, or manual updating.
+		</member>
+	</members>
+	<signals>
+		<signal name="animation_completed">
+			<param index="0" name="spine_sprite" type="SpineSprite3D" />
+			<param index="1" name="animation_state" type="SpineAnimationState" />
+			<param index="2" name="track_entry" type="SpineTrackEntry" />
+			<description>Emitted synchronously when an animation completes a loop.</description>
+		</signal>
+		<signal name="animation_disposed">
+			<param index="0" name="spine_sprite" type="SpineSprite3D" />
+			<param index="1" name="animation_state" type="SpineAnimationState" />
+			<param index="2" name="track_entry" type="SpineTrackEntry" />
+			<description>Emitted synchronously when a track entry is disposed.</description>
+		</signal>
+		<signal name="animation_ended">
+			<param index="0" name="spine_sprite" type="SpineSprite3D" />
+			<param index="1" name="animation_state" type="SpineAnimationState" />
+			<param index="2" name="track_entry" type="SpineTrackEntry" />
+			<description>Emitted synchronously when a track entry ends.</description>
+		</signal>
+		<signal name="animation_event">
+			<param index="0" name="spine_sprite" type="SpineSprite3D" />
+			<param index="1" name="animation_state" type="SpineAnimationState" />
+			<param index="2" name="track_entry" type="SpineTrackEntry" />
+			<param index="3" name="event" type="SpineEvent" />
+			<description>Emitted synchronously for a Spine animation event.</description>
+		</signal>
+		<signal name="animation_interrupted">
+			<param index="0" name="spine_sprite" type="SpineSprite3D" />
+			<param index="1" name="animation_state" type="SpineAnimationState" />
+			<param index="2" name="track_entry" type="SpineTrackEntry" />
+			<description>Emitted synchronously when a track entry is interrupted.</description>
+		</signal>
+		<signal name="animation_started">
+			<param index="0" name="spine_sprite" type="SpineSprite3D" />
+			<param index="1" name="animation_state" type="SpineAnimationState" />
+			<param index="2" name="track_entry" type="SpineTrackEntry" />
+			<description>Emitted synchronously when a track entry starts.</description>
+		</signal>
+		<signal name="before_animation_state_apply">
+			<param index="0" name="spine_sprite" type="SpineSprite3D" />
+			<description>Emitted before animation state is applied to the skeleton.</description>
+		</signal>
+		<signal name="before_animation_state_update">
+			<param index="0" name="spine_sprite" type="SpineSprite3D" />
+			<description>Emitted before animation state time is advanced.</description>
+		</signal>
+		<signal name="before_world_transforms_change">
+			<param index="0" name="spine_sprite" type="SpineSprite3D" />
+			<description>Emitted before Spine world transforms are computed.</description>
+		</signal>
+		<signal name="world_transforms_changed">
+			<param index="0" name="spine_sprite" type="SpineSprite3D" />
+			<description>Emitted after Spine world transforms are computed.</description>
+		</signal>
+	</signals>
+	<constants>
+		<constant name="CULL_DISABLED" value="0" enum="CullMode">Generated materials render both faces.</constant>
+		<constant name="CULL_BACK" value="1" enum="CullMode">Generated materials cull back-facing triangles.</constant>
+		<constant name="CULL_FRONT" value="2" enum="CullMode">Generated materials cull front-facing triangles.</constant>
+	</constants>
+</class>

@@ -41,6 +41,8 @@
 #include <godot_cpp/variant/array.hpp>
 #include <godot_cpp/classes/mesh.hpp>
 #include <godot_cpp/classes/rendering_server.hpp>
+#include <godot_cpp/classes/shader.hpp>
+#include <godot_cpp/classes/shader_material.hpp>
 #ifdef TOOLS_ENABLED
 #include <godot_cpp/classes/editor_interface.hpp>
 #endif
@@ -60,6 +62,8 @@
 #include "core/math/transform_2d.h"
 #include "core/variant/array.h"
 #include "scene/resources/mesh.h"
+#include "scene/resources/material.h"
+#include "scene/resources/shader.h"
 #if (VERSION_MAJOR >= 4 && VERSION_MINOR >= 6)
 #include "servers/rendering/rendering_server.h"
 #else
@@ -102,6 +106,9 @@ private:
 
 public:
 	Ref<CanvasItemMaterial> default_materials[4] = {};
+#if VERSION_MAJOR > 3 && VERSION_MINOR >= 3
+	Ref<ShaderMaterial> tint_black_materials[4] = {};
+#endif
 	int sprite_count;
 	spine::Array<unsigned short> quad_indices;
 	spine::Array<float> scratch_vertices;
@@ -136,6 +143,28 @@ public:
 		Ref<CanvasItemMaterial> material_screen(memnew(CanvasItemMaterial));
 		material_screen->set_blend_mode(CanvasItemMaterial::BLEND_MODE_SUB);
 		default_materials[spine::BlendMode_Screen] = material_screen;
+
+#if VERSION_MAJOR > 3 && VERSION_MINOR >= 3
+		const char *blend_modes[] = {"blend_mix", "blend_add", "blend_mul", "blend_sub"};
+		for (int i = 0; i < 4; i++) {
+			Ref<Shader> shader(memnew(Shader));
+			shader->set_code(String("shader_type canvas_item;\nrender_mode ") + blend_modes[i] + ";\n" + R"(
+				varying vec4 light_color;
+				varying vec3 dark_color;
+				void vertex() {
+					light_color = CUSTOM1 * COLOR;
+					dark_color = CUSTOM0.rgb * COLOR.rgb;
+				}
+				void fragment() {
+					vec4 tex = texture(TEXTURE, UV);
+					COLOR = vec4(tex.rgb * light_color.rgb + (vec3(1.0) - tex.rgb) * dark_color, tex.a * light_color.a);
+				}
+			)");
+			Ref<ShaderMaterial> material(memnew(ShaderMaterial));
+			material->set_shader(shader);
+			tint_black_materials[i] = material;
+		}
+#endif
 	}
 
 	static SpineSpriteStatics &instance() {
@@ -219,10 +248,67 @@ void SpineMesh2D::_notification(int what) {
 void SpineMesh2D::_bind_methods() {
 }
 
+#if VERSION_MAJOR > 3 && VERSION_MINOR >= 3
+static void tint_to_render_colors(SpineMesh2D *mesh_instance, Color &light, Color &dark) {
+	// Unlike ARRAY_COLOR, Godot does not convert custom attributes to linear color space for HDR 2D.
+	if (mesh_instance->get_viewport()->is_using_hdr_2d() && RS::get_singleton()->get_rendering_device()) {
+		light = light.srgb_to_linear();
+		dark = dark.srgb_to_linear();
+	}
+}
+
+uint64_t SpineMesh2D::add_tint_arrays(Array &arrays) {
+	mesh_has_dark_color = has_dark_color;
+	if (!has_dark_color) return 0;
+
+	// Float attributes also work around Godot's Compatibility renderer treating RGBA8 custom attributes as a single component.
+	PackedFloat32Array dark_colors;
+	PackedFloat32Array light_colors;
+	dark_colors.resize(vertices.size() * 3);
+	light_colors.resize(vertices.size() * 4);
+	float *dark = dark_colors.ptrw();
+	float *light = light_colors.ptrw();
+	Color dark_tint = dark_color;
+	Color light_tint = light_color;
+	tint_to_render_colors(this, light_tint, dark_tint);
+	for (int i = 0; i < vertices.size(); i++) {
+		dark[i * 3] = dark_tint.r;
+		dark[i * 3 + 1] = dark_tint.g;
+		dark[i * 3 + 2] = dark_tint.b;
+		light[i * 4] = light_tint.r;
+		light[i * 4 + 1] = light_tint.g;
+		light[i * 4 + 2] = light_tint.b;
+		light[i * 4 + 3] = light_tint.a;
+	}
+	arrays[Mesh::ARRAY_CUSTOM0] = dark_colors;
+	arrays[Mesh::ARRAY_CUSTOM1] = light_colors;
+	return (uint64_t(Mesh::ARRAY_CUSTOM_RGB_FLOAT) << Mesh::ARRAY_FORMAT_CUSTOM0_SHIFT) |
+		(uint64_t(Mesh::ARRAY_CUSTOM_RGBA_FLOAT) << Mesh::ARRAY_FORMAT_CUSTOM1_SHIFT);
+}
+
+void SpineMesh2D::update_tint_attribute_buffer() {
+	if (!has_dark_color) return;
+	Color dark_tint = dark_color;
+	Color light_tint = light_color;
+	tint_to_render_colors(this, light_tint, dark_tint);
+	float dark[] = {dark_tint.r, dark_tint.g, dark_tint.b};
+	float light[] = {light_tint.r, light_tint.g, light_tint.b, light_tint.a};
+	uint8_t *buffer = attribute_buffer.ptrw();
+	for (int i = 0; i < num_vertices; i++) {
+		memcpy(&buffer[i * attribute_stride + surface_offsets[Mesh::ARRAY_CUSTOM0]], dark, sizeof(dark));
+		memcpy(&buffer[i * attribute_stride + surface_offsets[Mesh::ARRAY_CUSTOM1]], light, sizeof(light));
+	}
+}
+#endif
+
 #ifdef SPINE_GODOT_EXTENSION
 void SpineMesh2D::update_mesh(const PackedVector2Array &vertices, const PackedVector2Array &uvs, const PackedColorArray &colors,
 							  const PackedInt32Array &indices, SpineRendererObject *renderer_object) {
-	if (!mesh.is_valid() || vertices.size() != num_vertices || indices.size() != num_indices || indices_changed) {
+	if (!mesh.is_valid() || vertices.size() != num_vertices || indices.size() != num_indices || indices_changed
+#if VERSION_MINOR >= 3
+		|| has_dark_color != mesh_has_dark_color
+#endif
+	) {
 		if (mesh.is_valid()) {
 			RS::get_singleton()->free_rid(mesh);
 		}
@@ -233,13 +319,24 @@ void SpineMesh2D::update_mesh(const PackedVector2Array &vertices, const PackedVe
 		arrays[Mesh::ARRAY_TEX_UV] = uvs;
 		arrays[Mesh::ARRAY_COLOR] = colors;
 		arrays[Mesh::ARRAY_INDEX] = indices;
-		RS::get_singleton()->mesh_add_surface_from_arrays(mesh, RS::PrimitiveType::PRIMITIVE_TRIANGLES, arrays, Array(), Dictionary(),
-														  RS::ArrayFormat::ARRAY_FLAG_USE_DYNAMIC_UPDATE);
+		uint64_t flags = RS::ArrayFormat::ARRAY_FLAG_USE_DYNAMIC_UPDATE;
+#if VERSION_MINOR >= 3
+		flags |= add_tint_arrays(arrays);
+#endif
+		RS::get_singleton()->mesh_add_surface_from_arrays(mesh, RS::PrimitiveType::PRIMITIVE_TRIANGLES, arrays, Array(), Dictionary(), flags);
 		Dictionary surface = RS::get_singleton()->mesh_get_surface(mesh, 0);
 		RS::ArrayFormat surface_format = (RS::ArrayFormat) static_cast<int64_t>(surface["format"]);
 		surface_offsets[RS::ARRAY_VERTEX] = RS::get_singleton()->mesh_surface_get_format_offset(surface_format, vertices.size(), RS::ARRAY_VERTEX);
 		surface_offsets[RS::ARRAY_COLOR] = RS::get_singleton()->mesh_surface_get_format_offset(surface_format, vertices.size(), RS::ARRAY_COLOR);
 		surface_offsets[RS::ARRAY_TEX_UV] = RS::get_singleton()->mesh_surface_get_format_offset(surface_format, vertices.size(), RS::ARRAY_TEX_UV);
+#if VERSION_MINOR >= 3
+		if (has_dark_color) {
+			surface_offsets[RS::ARRAY_CUSTOM0] = RS::get_singleton()->mesh_surface_get_format_offset(surface_format, vertices.size(),
+																								 RS::ARRAY_CUSTOM0);
+			surface_offsets[RS::ARRAY_CUSTOM1] = RS::get_singleton()->mesh_surface_get_format_offset(surface_format, vertices.size(),
+																								 RS::ARRAY_CUSTOM1);
+		}
+#endif
 		vertex_stride = RS::get_singleton()->mesh_surface_get_format_vertex_stride(surface_format, vertices.size());
 		attribute_stride = RS::get_singleton()->mesh_surface_get_format_attribute_stride(surface_format, vertices.size());
 		vertex_buffer = surface["vertex_data"];
@@ -268,6 +365,9 @@ void SpineMesh2D::update_mesh(const PackedVector2Array &vertices, const PackedVe
 			memcpy(&attribute_write_buffer[i * attribute_stride + surface_offsets[RS::ARRAY_COLOR]], color, 4);
 			memcpy(&attribute_write_buffer[i * attribute_stride + surface_offsets[RS::ARRAY_TEX_UV]], uv, 8);
 		}
+#if VERSION_MINOR >= 3
+		update_tint_attribute_buffer();
+#endif
 		RS::get_singleton()->mesh_surface_update_vertex_region(mesh, 0, 0, vertex_buffer);
 		RS::get_singleton()->mesh_surface_update_attribute_region(mesh, 0, 0, attribute_buffer);
 		RS::get_singleton()->mesh_set_custom_aabb(mesh, aabb_new);
@@ -280,7 +380,11 @@ void SpineMesh2D::update_mesh(const PackedVector2Array &vertices, const PackedVe
 void SpineMesh2D::update_mesh(const Vector<Point2> &vertices, const Vector<Point2> &uvs, const Vector<Color> &colors, const Vector<int> &indices,
 							  SpineRendererObject *renderer_object) {
 #if VERSION_MAJOR > 3
-	if (!mesh.is_valid() || vertices.size() != num_vertices || indices.size() != num_indices || indices_changed) {
+	if (!mesh.is_valid() || vertices.size() != num_vertices || indices.size() != num_indices || indices_changed
+#if VERSION_MINOR >= 3
+		|| has_dark_color != mesh_has_dark_color
+#endif
+	) {
 		if (mesh.is_valid()) {
 #ifdef SPINE_GODOT_EXTENSION
 			RS::get_singleton()->free_rid(mesh);
@@ -301,13 +405,16 @@ void SpineMesh2D::update_mesh(const Vector<Point2> &vertices, const Vector<Point
 		RS::SurfaceData surface;
 #endif
 		uint32_t skin_stride;
+		uint64_t flags = Mesh::ArrayFormat::ARRAY_FLAG_USE_DYNAMIC_UPDATE;
+#if VERSION_MINOR >= 3
+		flags |= add_tint_arrays(arrays);
+#endif
 #if VERSION_MAJOR >= 4 && VERSION_MINOR >= 7
 		RS::get_singleton()->mesh_create_surface_data_from_arrays(&surface, RSE::PRIMITIVE_TRIANGLES, arrays, TypedArray<Array>(), Dictionary(),
-																  Mesh::ArrayFormat::ARRAY_FLAG_USE_DYNAMIC_UPDATE);
+																  flags);
 #else
 		RS::get_singleton()->mesh_create_surface_data_from_arrays(&surface, (RS::PrimitiveType) Mesh::PRIMITIVE_TRIANGLES, arrays,
-																  TypedArray<Array>(), Dictionary(),
-																  Mesh::ArrayFormat::ARRAY_FLAG_USE_DYNAMIC_UPDATE);
+																  TypedArray<Array>(), Dictionary(), flags);
 #endif
 		RS::get_singleton()->mesh_add_surface(mesh, surface);
 #if VERSION_MINOR > 1
@@ -349,6 +456,9 @@ void SpineMesh2D::update_mesh(const Vector<Point2> &vertices, const Vector<Point
 			memcpy(&attribute_write_buffer[i * attribute_stride + surface_offsets[RS::ARRAY_TEX_UV]], uv, 8);
 #endif
 		}
+#if VERSION_MINOR >= 3
+		update_tint_attribute_buffer();
+#endif
 		RS::get_singleton()->mesh_surface_update_vertex_region(mesh, 0, 0, vertex_buffer);
 		RS::get_singleton()->mesh_surface_update_attribute_region(mesh, 0, 0, attribute_buffer);
 		RS::get_singleton()->mesh_set_custom_aabb(mesh, aabb_new);
@@ -429,8 +539,10 @@ void SpineSprite::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_animation_state"), &SpineSprite::get_animation_state);
 	ClassDB::bind_method(D_METHOD("on_skeleton_data_changed"), &SpineSprite::on_skeleton_data_changed);
 
-	ClassDB::bind_method(D_METHOD("get_global_bone_transform", "bone_name"), &SpineSprite::get_global_bone_transform);
-	ClassDB::bind_method(D_METHOD("set_global_bone_transform", "bone_name", "global_transform"), &SpineSprite::set_global_bone_transform);
+	ClassDB::bind_method(D_METHOD("get_global_bone_transform", "bone_name"),
+					 static_cast<Transform2D (SpineSprite::*)(const String &)>(&SpineSprite::get_global_bone_transform));
+	ClassDB::bind_method(D_METHOD("set_global_bone_transform", "bone_name", "global_transform"),
+					 static_cast<void (SpineSprite::*)(const String &, Transform2D)>(&SpineSprite::set_global_bone_transform));
 
 	ClassDB::bind_method(D_METHOD("set_update_mode", "v"), &SpineSprite::set_update_mode);
 	ClassDB::bind_method(D_METHOD("get_update_mode"), &SpineSprite::get_update_mode);
@@ -542,7 +654,9 @@ void SpineSprite::_bind_methods() {
 
 SpineSprite::SpineSprite()
 	: update_mode(SpineConstant::UpdateMode_Process), time_scale(1.0), preview_skin("Default"), preview_animation("-- Empty --"),
-	  preview_frame(false), preview_time(0), skeleton_clipper(nullptr), modified_bones(false) {
+	  preview_frame(false), preview_time(0), skeleton_clipper(nullptr) {
+	controller = Ref<SpineController>(memnew(SpineController));
+	controller->set_listener(this);
 	skeleton_clipper = new spine::SkeletonClipping();
 	auto statics = SpineSpriteStatics::instance();
 
@@ -567,6 +681,8 @@ SpineSprite::SpineSprite()
 }
 
 SpineSprite::~SpineSprite() {
+	controller->set_listener(nullptr);
+	controller.unref();
 	delete skeleton_clipper;
 	auto statics = SpineSpriteStatics::instance();
 	statics.sprite_count--;
@@ -576,40 +692,42 @@ SpineSprite::~SpineSprite() {
 }
 
 void SpineSprite::set_skeleton_data_res(const Ref<SpineSkeletonDataResource> &_skeleton_data) {
-	skeleton_data_res = _skeleton_data;
-	on_skeleton_data_changed();
+	if (connected_skeleton_data_res.is_valid()) {
+#if VERSION_MAJOR > 3
+		if (connected_skeleton_data_res->is_connected(SNAME("skeleton_data_changed"), callable_mp(this, &SpineSprite::on_skeleton_data_changed)))
+			connected_skeleton_data_res->disconnect(SNAME("skeleton_data_changed"), callable_mp(this, &SpineSprite::on_skeleton_data_changed));
+#else
+		if (connected_skeleton_data_res->is_connected(SNAME("skeleton_data_changed"), this, SNAME("on_skeleton_data_changed")))
+			connected_skeleton_data_res->disconnect(SNAME("skeleton_data_changed"), this, SNAME("on_skeleton_data_changed"));
+#endif
+	}
+	connected_skeleton_data_res = _skeleton_data;
+	if (connected_skeleton_data_res.is_valid()) {
+#if VERSION_MAJOR > 3
+		connected_skeleton_data_res->connect(SNAME("skeleton_data_changed"), callable_mp(this, &SpineSprite::on_skeleton_data_changed));
+#else
+		connected_skeleton_data_res->connect(SNAME("skeleton_data_changed"), this, SNAME("on_skeleton_data_changed"));
+#endif
+	}
+	controller->set_skeleton_data_res(_skeleton_data);
 }
+
 Ref<SpineSkeletonDataResource> SpineSprite::get_skeleton_data_res() {
-	return skeleton_data_res;
+	return controller->get_skeleton_data_res();
 }
 
 void SpineSprite::on_skeleton_data_changed() {
+	controller->set_skeleton_data_res(connected_skeleton_data_res);
+}
+
+void SpineSprite::before_skeleton_data_change() {
 	remove_meshes();
-	skeleton.unref();
-	animation_state.unref();
 	emit_signal(SNAME("_internal_spine_objects_invalidated"));
+}
 
-	if (skeleton_data_res.is_valid()) {
-#if VERSION_MAJOR > 3
-		if (!skeleton_data_res->is_connected(SNAME("skeleton_data_changed"), callable_mp(this, &SpineSprite::on_skeleton_data_changed)))
-			skeleton_data_res->connect(SNAME("skeleton_data_changed"), callable_mp(this, &SpineSprite::on_skeleton_data_changed));
-#else
-		if (!skeleton_data_res->is_connected(SNAME("skeleton_data_changed"), this, SNAME("on_skeleton_data_changed")))
-			skeleton_data_res->connect(SNAME("skeleton_data_changed"), this, SNAME("on_skeleton_data_changed"));
-#endif
-	}
-
-	if (skeleton_data_res.is_valid() && skeleton_data_res->is_skeleton_data_loaded()) {
-		skeleton = Ref<SpineSkeleton>(memnew(SpineSkeleton));
-		skeleton->set_spine_sprite(this);
-
-		animation_state = Ref<SpineAnimationState>(memnew(SpineAnimationState));
-		animation_state->set_spine_sprite(this);
-		animation_state->get_spine_object()->setListener(this);
-
-		animation_state->update(0);
-		animation_state->apply(skeleton);
-		skeleton->update_world_transform(SpineConstant::Physics_Update);
+void SpineSprite::skeleton_data_changed() {
+	Ref<SpineSkeleton> skeleton = controller->get_skeleton();
+	if (skeleton.is_valid()) {
 		generate_meshes_for_slots(skeleton);
 
 		if (update_mode == SpineConstant::UpdateMode_Process) {
@@ -618,8 +736,11 @@ void SpineSprite::on_skeleton_data_changed() {
 			_notification(NOTIFICATION_INTERNAL_PHYSICS_PROCESS);
 		}
 	}
-
 	NOTIFY_PROPERTY_LIST_CHANGED();
+}
+
+bool SpineSprite::should_apply_pose() {
+	return is_visible_in_tree();
 }
 
 void SpineSprite::generate_meshes_for_slots(Ref<SpineSkeleton> skeleton_ref) {
@@ -651,7 +772,7 @@ void SpineSprite::sort_slot_nodes() {
 		slot_nodes[i].setSize(0, nullptr);
 	}
 
-	auto &draw_order = skeleton->get_spine_object()->getDrawOrder().getAppliedPose();
+	auto &draw_order = controller->get_skeleton()->get_spine_object()->getDrawOrder().getAppliedPose();
 	for (int i = 0; i < get_child_count(); i++) {
 		auto child = cast_to<Node2D>(get_child(i));
 		if (!child) continue;
@@ -677,11 +798,11 @@ void SpineSprite::sort_slot_nodes() {
 }
 
 Ref<SpineSkeleton> SpineSprite::get_skeleton() {
-	return skeleton;
+	return controller->get_skeleton();
 }
 
 Ref<SpineAnimationState> SpineSprite::get_animation_state() {
-	return animation_state;
+	return controller->get_animation_state();
 }
 
 void SpineSprite::_notification(int what) {
@@ -709,6 +830,7 @@ void SpineSprite::_notification(int what) {
 }
 
 void SpineSprite::_get_property_list(List<PropertyInfo> *list) const {
+	Ref<SpineSkeletonDataResource> skeleton_data_res = controller->get_skeleton_data_res();
 	if (!skeleton_data_res.is_valid() || !skeleton_data_res->is_skeleton_data_loaded()) return;
 #ifdef SPINE_GODOT_EXTENSION
 	PackedStringArray animation_names;
@@ -842,23 +964,14 @@ bool SpineSprite::_set(const StringName &property, const Variant &value) {
 }
 
 void SpineSprite::update_skeleton(float delta) {
-	if (!skeleton_data_res.is_valid() || !skeleton_data_res->is_skeleton_data_loaded() || !skeleton.is_valid() || !skeleton->get_spine_object() ||
-		!animation_state.is_valid() || !animation_state->get_spine_object())
-		return;
-
-	emit_signal(SNAME("before_animation_state_update"), this);
-	animation_state->update(delta * time_scale);
-	if (!is_visible_in_tree()) return;
-	emit_signal(SNAME("before_animation_state_apply"), this);
-	animation_state->apply(skeleton);
-	emit_signal(SNAME("before_world_transforms_change"), this);
-	skeleton->update(delta * time_scale);
-	skeleton->update_world_transform(SpineConstant::Physics_Update);
-	modified_bones = false;
-	emit_signal(SNAME("world_transforms_changed"), this);
-	if (modified_bones) skeleton->update_world_transform(SpineConstant::Physics_Update);
+	Ref<SpineSkeletonDataResource> skeleton_data_res = controller->get_skeleton_data_res();
+	if (!skeleton_data_res.is_valid() || !skeleton_data_res->is_skeleton_data_loaded()) return;
+	if (!controller->update_skeleton(delta, time_scale)) return;
+	Ref<SpineSkeleton> skeleton = controller->get_skeleton();
+	controller->begin_native_operation();
 	sort_slot_nodes();
 	update_meshes(skeleton);
+	if (controller->end_native_operation()) return;
 #if VERSION_MAJOR > 3
 	queue_redraw();
 #else
@@ -886,6 +999,11 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 
 		spine::Color skeleton_color = skeleton->getColor();
 		spine::Color slot_color = slot->getAppliedPose().getColor();
+#if VERSION_MAJOR > 3 && VERSION_MINOR >= 3
+		mesh_instance->has_dark_color = slot->getAppliedPose().hasDarkColor();
+		spine::Color slot_dark_color = slot->getAppliedPose().getDarkColor();
+		Color dark_tint(skeleton_color.r * slot_dark_color.r, skeleton_color.g * slot_dark_color.g, skeleton_color.b * slot_dark_color.b);
+#endif
 		spine::Color tint(skeleton_color.r * slot_color.r, skeleton_color.g * slot_color.g, skeleton_color.b * slot_color.b,
 						  skeleton_color.a * slot_color.a);
 		SpineRendererObject *renderer_object;
@@ -909,6 +1027,11 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 			tint.g *= attachment_color.g;
 			tint.b *= attachment_color.b;
 			tint.a *= attachment_color.a;
+#if VERSION_MAJOR > 3 && VERSION_MINOR >= 3
+			dark_tint.r *= attachment_color.r;
+			dark_tint.g *= attachment_color.g;
+			dark_tint.b *= attachment_color.b;
+#endif
 		} else if (attachment->getRTTI().isExactly(spine::MeshAttachment::rtti)) {
 			auto mesh = (spine::MeshAttachment *) attachment;
 			auto &sequence = mesh->getSequence();
@@ -926,6 +1049,11 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 			tint.g *= attachment_color.g;
 			tint.b *= attachment_color.b;
 			tint.a *= attachment_color.a;
+#if VERSION_MAJOR > 3 && VERSION_MINOR >= 3
+			dark_tint.r *= attachment_color.r;
+			dark_tint.g *= attachment_color.g;
+			dark_tint.b *= attachment_color.b;
+#endif
 		} else if (attachment->getRTTI().isExactly(spine::ClippingAttachment::rtti)) {
 			auto clip = (spine::ClippingAttachment *) attachment;
 			skeleton_clipper->clipStart(*skeleton, *slot, clip);
@@ -954,11 +1082,6 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 			memcpy(mesh_instance->vertices.ptrw(), vertices->buffer(), num_vertices * 2 * sizeof(float));
 			mesh_instance->uvs.resize((int) num_vertices);
 			memcpy(mesh_instance->uvs.ptrw(), uvs->buffer(), num_vertices * 2 * sizeof(float));
-			mesh_instance->colors.resize((int) num_vertices);
-			for (int j = 0; j < (int) num_vertices; j++) {
-				mesh_instance->colors.set(j, Color(tint.r, tint.g, tint.b, tint.a));
-			}
-
 			auto indices_changed = false;
 			if (mesh_instance->indices.size() == indices->size()) {
 				auto old_indices = mesh_instance->indices.ptr();
@@ -1026,11 +1149,26 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 				}
 			}
 
-			// Set the custom material, or the default material
+			Color vertex_color(tint.r, tint.g, tint.b, tint.a);
+#if VERSION_MAJOR > 3 && VERSION_MINOR >= 3
+			mesh_instance->light_color = vertex_color;
+			mesh_instance->dark_color = dark_tint;
+			if (mesh_instance->has_dark_color && !custom_material.is_valid()) {
+				// Godot modulates COLOR before vertex(). Keep Spine's colors separate so modulation also affects
+				// dark tint when a light color channel is zero. Custom materials retain their existing COLOR input.
+				vertex_color = Color(1, 1, 1, 1);
+				custom_material = statics.tint_black_materials[blend_mode];
+			}
+#endif
 			if (custom_material.is_valid())
 				mesh_instance->set_material(custom_material);
 			else
-				mesh_instance->set_material(statics.default_materials[slot->getData().getBlendMode()]);
+				mesh_instance->set_material(statics.default_materials[blend_mode]);
+
+			mesh_instance->colors.resize((int) num_vertices);
+			for (int j = 0; j < (int) num_vertices; j++) {
+				mesh_instance->colors.set(j, vertex_color);
+			}
 		}
 		skeleton_clipper->clipEnd(*slot);
 	}
@@ -1060,6 +1198,7 @@ void createLinesFromMesh(Vector<Vector2> &scratch_points, spine::Array<unsigned 
 }
 
 void SpineSprite::draw() {
+	Ref<SpineSkeleton> skeleton = controller->get_skeleton();
 	if (!skeleton.is_valid()) return;
 	if (!Engine::get_singleton()->is_editor_hint() && !get_tree()->is_debugging_collisions_hint()) return;
 
@@ -1362,52 +1501,101 @@ void SpineSprite::draw_bone(spine::Bone *bone, const Color &color) {
 	draw_colored_polygon(points, color);
 }
 
-void SpineSprite::callback(spine::AnimationState *state, spine::EventType type, spine::TrackEntry *entry, spine::Event *event) {
-	Ref<SpineTrackEntry> entry_ref = Ref<SpineTrackEntry>(memnew(SpineTrackEntry));
-	entry_ref->set_spine_object(this, entry);
+void SpineSprite::on_animation_started(Ref<SpineAnimationState> animation_state, Ref<SpineTrackEntry> track_entry) {
+	emit_signal(SNAME("animation_started"), this, animation_state, track_entry);
+}
 
-	Ref<SpineEvent> event_ref(nullptr);
-	if (event) {
-		event_ref = Ref<SpineEvent>(memnew(SpineEvent));
-		event_ref->set_spine_object(this, event);
-	}
+void SpineSprite::on_animation_interrupted(Ref<SpineAnimationState> animation_state, Ref<SpineTrackEntry> track_entry) {
+	emit_signal(SNAME("animation_interrupted"), this, animation_state, track_entry);
+}
 
-	switch (type) {
-		case spine::EventType_Start:
-			emit_signal(SNAME("animation_started"), this, animation_state, entry_ref);
-			break;
-		case spine::EventType_Interrupt:
-			emit_signal(SNAME("animation_interrupted"), this, animation_state, entry_ref);
-			break;
-		case spine::EventType_End:
-			emit_signal(SNAME("animation_ended"), this, animation_state, entry_ref);
-			break;
-		case spine::EventType_Complete:
-			emit_signal(SNAME("animation_completed"), this, animation_state, entry_ref);
-			break;
-		case spine::EventType_Dispose:
-			emit_signal(SNAME("animation_disposed"), this, animation_state, entry_ref);
-			break;
-		case spine::EventType_Event:
-			emit_signal(SNAME("animation_event"), this, animation_state, entry_ref, event_ref);
-			break;
-	}
+void SpineSprite::on_animation_ended(Ref<SpineAnimationState> animation_state, Ref<SpineTrackEntry> track_entry) {
+	emit_signal(SNAME("animation_ended"), this, animation_state, track_entry);
+}
+
+void SpineSprite::on_animation_completed(Ref<SpineAnimationState> animation_state, Ref<SpineTrackEntry> track_entry) {
+	emit_signal(SNAME("animation_completed"), this, animation_state, track_entry);
+}
+
+void SpineSprite::on_animation_disposed(Ref<SpineAnimationState> animation_state, Ref<SpineTrackEntry> track_entry) {
+	emit_signal(SNAME("animation_disposed"), this, animation_state, track_entry);
+}
+
+void SpineSprite::on_animation_event(Ref<SpineAnimationState> animation_state, Ref<SpineTrackEntry> track_entry, Ref<SpineEvent> event) {
+	emit_signal(SNAME("animation_event"), this, animation_state, track_entry, event);
+}
+
+void SpineSprite::before_animation_state_update() {
+	emit_signal(SNAME("before_animation_state_update"), this);
+}
+
+void SpineSprite::before_animation_state_apply() {
+	emit_signal(SNAME("before_animation_state_apply"), this);
+}
+
+void SpineSprite::before_world_transforms_change() {
+	emit_signal(SNAME("before_world_transforms_change"), this);
+}
+
+void SpineSprite::world_transforms_changed() {
+	emit_signal(SNAME("world_transforms_changed"), this);
 }
 
 Transform2D SpineSprite::get_global_bone_transform(const String &bone_name) {
+	Ref<SpineSkeleton> skeleton = controller->get_skeleton();
 	if (!skeleton.is_valid()) return get_global_transform();
 	auto bone = skeleton->find_bone(bone_name);
-	if (!bone.is_valid()) {
-		return get_global_transform();
+	if (!bone.is_valid()) return get_global_transform();
+	return get_global_bone_transform(bone->get_spine_object());
+}
+
+Transform2D SpineSprite::get_global_bone_transform(spine::Bone *bone) {
+	if (!bone) return get_global_transform();
+	if (!is_visible_in_tree()) {
+		float rotation_x = spine::MathUtil::Deg_Rad * (bone->getPose().getRotation() + bone->getPose().getShearX());
+		float rotation_y = spine::MathUtil::Deg_Rad * (bone->getPose().getRotation() + 90 + bone->getPose().getShearY());
+		Transform2D transform;
+		transform[0] = Vector2(spine::MathUtil::cos(rotation_x) * bone->getPose().getScaleX(),
+							   spine::MathUtil::sin(rotation_x) * bone->getPose().getScaleX());
+		transform[1] = Vector2(spine::MathUtil::cos(rotation_y) * bone->getPose().getScaleY(),
+							   spine::MathUtil::sin(rotation_y) * bone->getPose().getScaleY());
+		transform[2] = Vector2(bone->getPose().getX(), bone->getPose().getY());
+		return transform;
 	}
-	return bone->get_global_transform();
+
+	auto &applied_pose = bone->getAppliedPose();
+	Transform2D local;
+	local[0] = Vector2(applied_pose.getA(), applied_pose.getC());
+	local[1] = Vector2(applied_pose.getB(), applied_pose.getD());
+	// Bone::setYDown(true) is a runtime coordinate conversion for Godot. Don't expose it as an authored Node2D Y scale.
+	if (spine::Bone::isYDown()) local[1] = Vector2(-local[1].x, -local[1].y);
+	local[2] = Vector2(applied_pose.getWorldX(), applied_pose.getWorldY());
+	return get_global_transform() * local;
 }
 
 void SpineSprite::set_global_bone_transform(const String &bone_name, Transform2D transform) {
+	Ref<SpineSkeleton> skeleton = controller->get_skeleton();
 	if (!skeleton.is_valid()) return;
 	auto bone = skeleton->find_bone(bone_name);
 	if (!bone.is_valid()) return;
-	bone->set_global_transform(transform);
+	set_global_bone_transform(bone->get_spine_object(), transform);
+}
+
+void SpineSprite::set_global_bone_transform(spine::Bone *bone, Transform2D transform) {
+	Ref<SpineSkeleton> skeleton = controller->get_skeleton();
+	if (!skeleton.is_valid() || !bone || !is_visible_in_tree()) return;
+	Transform2D local = get_global_transform().affine_inverse() * transform;
+	if (spine::Bone::isYDown()) local[1] = Vector2(-local[1].x, -local[1].y);
+	auto &applied_pose = bone->getAppliedPose();
+	applied_pose.setA(local[0].x);
+	applied_pose.setC(local[0].y);
+	applied_pose.setB(local[1].x);
+	applied_pose.setD(local[1].y);
+	applied_pose.setWorldX(local.get_origin().x);
+	applied_pose.setWorldY(local.get_origin().y);
+	applied_pose.updateLocalTransform(*skeleton->get_spine_object());
+	bone->getPose().set(applied_pose);
+	controller->set_modified_bones();
 }
 
 SpineConstant::UpdateMode SpineSprite::get_update_mode() {
@@ -1421,9 +1609,7 @@ void SpineSprite::set_update_mode(SpineConstant::UpdateMode v) {
 }
 
 Ref<SpineSkin> SpineSprite::new_skin(const String &name) {
-	Ref<SpineSkin> skin = memnew(SpineSkin);
-	skin->init(name, this);
-	return skin;
+	return controller->new_skin(name);
 }
 
 Ref<Material> SpineSprite::get_normal_material() {
@@ -1470,6 +1656,7 @@ float SpineSprite::get_time_scale() {
 // FIXME
 #ifdef TOOLS_ENABLED
 Rect2 SpineSprite::_edit_get_rect() const {
+	Ref<SpineSkeletonDataResource> skeleton_data_res = controller->get_skeleton_data_res();
 	if (skeleton_data_res.is_valid() && skeleton_data_res->is_skeleton_data_loaded()) {
 		auto data = skeleton_data_res->get_skeleton_data();
 		return Rect2(data->getX(), -data->getY() - data->getHeight(), data->getWidth(), data->getHeight());
@@ -1478,6 +1665,7 @@ Rect2 SpineSprite::_edit_get_rect() const {
 }
 
 bool SpineSprite::_edit_use_rect() const {
+	Ref<SpineSkeletonDataResource> skeleton_data_res = controller->get_skeleton_data_res();
 	return skeleton_data_res.is_valid() && skeleton_data_res->is_skeleton_data_loaded();
 }
 #endif

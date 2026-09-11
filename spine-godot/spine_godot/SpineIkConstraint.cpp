@@ -31,6 +31,7 @@
 #include "SpineIkConstraintPose.h"
 #include "SpineBone.h"
 #include "SpineCommon.h"
+#include "SpineController.h"
 #include "SpineSprite.h"
 
 void SpineIkConstraint::_bind_methods() {
@@ -54,7 +55,7 @@ Ref<SpineIkConstraintData> SpineIkConstraint::get_data() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto &ik_constraint_data = get_spine_object()->getData();
 	Ref<SpineIkConstraintData> ik_constraint_data_ref(memnew(SpineIkConstraintData));
-	ik_constraint_data_ref->set_spine_object(*get_spine_owner()->get_skeleton_data_res(), &ik_constraint_data);
+	ik_constraint_data_ref->set_spine_object(*get_spine_controller()->get_skeleton_data_res(), &ik_constraint_data);
 	return ik_constraint_data_ref;
 }
 
@@ -66,7 +67,7 @@ Array SpineIkConstraint::get_bones() {
 	for (int i = 0; i < bones.size(); ++i) {
 		auto bone = bones[i];
 		Ref<SpineBonePose> bone_ref(memnew(SpineBonePose));
-		bone_ref->set_spine_object(get_spine_owner(), bone);
+		bone_ref->set_spine_object(get_spine_controller(), bone);
 		result[i] = bone_ref;
 	}
 	return result;
@@ -77,7 +78,7 @@ Ref<SpineBone> SpineIkConstraint::get_target() {
 	auto target = &get_spine_object()->getTarget();
 	if (!target) return nullptr;
 	Ref<SpineBone> target_ref(memnew(SpineBone));
-	target_ref->set_spine_object(get_spine_owner(), target);
+	target_ref->set_spine_object(get_spine_controller(), target);
 	return target_ref;
 }
 
@@ -92,7 +93,7 @@ Ref<SpineIkConstraintPose> SpineIkConstraint::get_pose() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto &pose = get_spine_object()->getPose();
 	Ref<SpineIkConstraintPose> pose_ref(memnew(SpineIkConstraintPose));
-	pose_ref->set_spine_object(get_spine_owner(), &pose);
+	pose_ref->set_spine_object(get_spine_controller(), &pose);
 	return pose_ref;
 }
 
@@ -100,7 +101,7 @@ Ref<SpineIkConstraintPose> SpineIkConstraint::get_applied_pose() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto &pose = get_spine_object()->getAppliedPose();
 	Ref<SpineIkConstraintPose> pose_ref(memnew(SpineIkConstraintPose));
-	pose_ref->set_spine_object(get_spine_owner(), &pose);
+	pose_ref->set_spine_object(get_spine_controller(), &pose);
 	return pose_ref;
 }
 

@@ -178,11 +178,11 @@ void SpineBoneNode::update_transform(SpineSprite *sprite) {
 	Ref<SpineBone> bone = find_bone();
 	if (!bone.is_valid()) return;
 
-	Transform2D bone_transform = bone->get_global_transform();
+	Transform2D bone_transform = sprite->get_global_bone_transform(bone->get_spine_object());
 	Transform2D this_transform = get_global_transform();
 
 	if (bone_mode == SpineConstant::BoneMode_Drive) {
-		bone->set_global_transform(this_transform);
+		sprite->set_global_bone_transform(bone->get_spine_object(), this_transform);
 	} else {
 		set_global_transform(bone_transform);
 	}

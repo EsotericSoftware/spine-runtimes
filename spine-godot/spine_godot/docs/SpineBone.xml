@@ -8,7 +8,7 @@
 
 		A bone has a local transform which is used to compute its world transform. A bone also has an applied transform, which is a local transform that can be applied to compute the world transform. The local transform and applied transform may differ if a constraint or application code modifies the world transform after it was computed from the local transform.
 
-		The bone's world transform is relative to the skeleton's coordinate system origin. Use [method set_global_transform] and [method get_global_transform] to convert from and to Godot's Canvas coordinate system.
+		The bone's world transform is relative to the skeleton's coordinate system origin. Use [method SpineSprite.get_global_bone_transform] and [method SpineSprite.set_global_bone_transform] to convert from and to Godot's Canvas coordinate system.
 	</description>
 	<methods>
 		<method name="world_to_local">
@@ -124,19 +124,6 @@
 			<param index="0" name="local_transform" type="Transform2D" />
 			<description>
 				Sets the bone transform to the Godot Transform2D relative to the SpineSprite.
-			</description>
-		</method>
-		<method name="get_global_transform">
-			<return type="Transform2D" />
-			<description>
-				Returns the bone transform as a Transform2D relative to Godot's global canvas coordinate space. Shear is not encoded in the transform.
-			</description>
-		</method>
-		<method name="set_global_transform">
-			<return type="void" />
-			<param index="0" name="global_transform" type="Transform2D" />
-			<description>
-				Sets the bone's transform to the global Godot Transform2D.
 			</description>
 		</method>
 	</methods>

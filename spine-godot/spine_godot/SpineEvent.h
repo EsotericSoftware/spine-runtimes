@@ -35,7 +35,7 @@
 
 class SpineSprite;
 
-class SpineEvent : public SpineSpriteOwnedObject<spine::Event> {
+class SpineEvent : public SpineControllerOwnedObject<spine::Event> {
 	GDCLASS(SpineEvent, SpineObjectWrapper)
 
 protected:
