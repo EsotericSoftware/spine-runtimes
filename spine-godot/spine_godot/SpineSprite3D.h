@@ -70,12 +70,15 @@ struct SpineVertex3D {
 	float uv[2];
 	float light[4];
 	float dark[3];
+	float tangent[4];
 };
 
 struct SpineBatch3D {
 	RID mesh;
 	RID instance;
+	RID shadow_instance;
 	Ref<ShaderMaterial> material;
+	Ref<ShaderMaterial> shadow_material;
 	std::vector<SpineVertex3D> vertices;
 	std::vector<uint32_t> indices;
 	std::vector<uint32_t> uploaded_indices;
@@ -84,34 +87,53 @@ struct SpineBatch3D {
 	PackedByteArray index_buffer;
 	uint32_t surface_offsets[Mesh::ARRAY_MAX] = {};
 	uint32_t vertex_stride = 0;
+	uint32_t normal_tangent_stride = 0;
 	uint32_t attribute_stride = 0;
 	uint32_t index_stride = 0;
 	int vertex_capacity = 0;
 	int index_capacity = 0;
 	bool active = false;
+	bool custom_material = false;
+	bool uses_tangents = false;
 	float sorting_offset = 0;
 	bool sorting_initialized = false;
 	bool last_visible = false;
 	RID last_scenario;
 	RID last_material;
+	RID last_shadow_material;
+	RID last_shadow_mesh;
+	int last_shadow_casting = -1;
 	Transform3D last_transform;
+	bool last_shadow_visible = false;
+	RID last_shadow_scenario;
+	Transform3D last_shadow_transform;
+	bool shadow_transform_initialized = false;
 	AABB bounds;
 	AABB uploaded_bounds;
 
 	SpineBatch3D();
 	~SpineBatch3D();
+	void ensure_shadow_instance();
 	void clear_mesh();
 };
 
 struct SpineBatchMaterial3D {
 	RID texture;
+	RID normal_texture;
 	ObjectID source;
 	Ref<ShaderMaterial> material;
 	spine::BlendMode blend;
 	bool pma;
+	bool lighting;
 	int priority;
 	int cull;
 	bool depth_write;
+};
+
+struct SpineShadowMaterial3D {
+	RID texture;
+	Ref<ShaderMaterial> material;
+	int cull;
 };
 
 struct SpineDrawItem3D {
@@ -142,6 +164,13 @@ public:
 		CULL_FRONT
 	};
 
+	enum ShadowCasting {
+		SHADOW_CASTING_OFF,
+		SHADOW_CASTING_ON,
+		SHADOW_CASTING_DOUBLE_SIDED,
+		SHADOW_CASTING_SHADOWS_ONLY
+	};
+
 private:
 	Ref<SpineController> controller;
 	Ref<SpineSkeletonDataResource> connected_skeleton_data_res;
@@ -155,10 +184,21 @@ private:
 	float sorting_step;
 	int render_priority;
 	CullMode cull_mode;
+	bool lighting_enabled;
+	bool normal_map_enabled;
+	bool normal_map_flip_y;
+	float normal_scale;
+	float specular;
+	float roughness;
+	float metallic;
+	ShadowCasting shadow_casting;
+	float shadow_alpha_cutoff;
 	Ref<ShaderMaterial> normal_material;
 	Ref<ShaderMaterial> additive_material;
-	static Ref<Shader> generated_shaders[2][3][2];
+	static Ref<Shader> generated_shaders[2][3][2][2];
+	static Ref<Shader> generated_shadow_shaders[3];
 	std::vector<SpineBatchMaterial3D> materials;
+	std::vector<SpineShadowMaterial3D> shadow_materials;
 
 	String preview_skin;
 	String preview_animation;
@@ -172,6 +212,8 @@ private:
 	spine::SkeletonClipping *skeleton_clipper;
 	spine::Array<unsigned short> quad_indices;
 	spine::Array<float> scratch_vertices;
+	std::vector<Vector3> tangent_accum;
+	std::vector<Vector3> bitangent_accum;
 	bool slots_dirty;
 	bool updating_meshes;
 	bool warned_multiply;
@@ -182,6 +224,7 @@ private:
 	uint64_t mesh_builds;
 	uint64_t index_uploads;
 	uint64_t vertex_uploads;
+	uint64_t tangent_uploads;
 	uint64_t attribute_uploads;
 	uint64_t material_builds;
 
@@ -198,14 +241,17 @@ private:
 	void update_render_item_world_state();
 	void update_sorting();
 	void invalidate_materials();
-	void apply_depth_parameters(const Ref<Material> &material);
-	void refresh_depth_parameters();
+	void apply_runtime_parameters(const Ref<Material> &material);
+	void refresh_runtime_parameters();
+	void refresh_shadow_parameters();
 	void refresh_material_template(const Ref<ShaderMaterial> &source);
-	SpineBatch3D *begin_batch(const Ref<ShaderMaterial> &material);
+	SpineBatch3D *begin_batch(const Ref<ShaderMaterial> &material, const Ref<ShaderMaterial> &shadow_material, bool custom_material);
 	void upload_batch(SpineBatch3D *batch);
 	Ref<ShaderMaterial> get_material(SpineRendererObject *renderer_object, bool pma, spine::BlendMode blend,
 									 const Ref<ShaderMaterial> &override_material);
+	Ref<ShaderMaterial> get_shadow_material(SpineRendererObject *renderer_object);
 	Ref<Shader> get_generated_shader(spine::BlendMode blend_mode);
+	Ref<Shader> get_generated_shadow_shader(int shadow_cull);
 
 	void before_skeleton_data_change() override;
 	void skeleton_data_changed() override;
@@ -254,6 +300,24 @@ public:
 	int get_render_priority();
 	void set_cull_mode(CullMode value);
 	CullMode get_cull_mode();
+	void set_lighting_enabled(bool value);
+	bool get_lighting_enabled() const;
+	void set_normal_map_enabled(bool value);
+	bool get_normal_map_enabled() const;
+	void set_normal_map_flip_y(bool value);
+	bool get_normal_map_flip_y() const;
+	void set_normal_scale(float value);
+	float get_normal_scale() const;
+	void set_specular(float value);
+	float get_specular() const;
+	void set_roughness(float value);
+	float get_roughness() const;
+	void set_metallic(float value);
+	float get_metallic() const;
+	void set_shadow_casting(ShadowCasting value);
+	ShadowCasting get_shadow_casting() const;
+	void set_shadow_alpha_cutoff(float value);
+	float get_shadow_alpha_cutoff() const;
 	void set_normal_material(const Ref<ShaderMaterial> &material);
 	Ref<ShaderMaterial> get_normal_material();
 	void set_additive_material(const Ref<ShaderMaterial> &material);
@@ -262,4 +326,5 @@ public:
 };
 
 VARIANT_ENUM_CAST(SpineSprite3D::CullMode)
+VARIANT_ENUM_CAST(SpineSprite3D::ShadowCasting)
 #endif

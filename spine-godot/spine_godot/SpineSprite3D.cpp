@@ -64,19 +64,22 @@
 #include <algorithm>
 #include <mutex>
 
-Ref<Shader> SpineSprite3D::generated_shaders[2][3][2];
+Ref<Shader> SpineSprite3D::generated_shaders[2][3][2][2];
+Ref<Shader> SpineSprite3D::generated_shadow_shaders[3];
 static std::mutex generated_shader_mutex;
 
 void SpineSprite3D::clear_statics() {
 	std::lock_guard<std::mutex> lock(generated_shader_mutex);
 	for (auto &blend : generated_shaders)
 		for (auto &cull : blend)
-			for (auto &shader : cull) shader.unref();
+			for (auto &depth : cull)
+				for (auto &shader : depth) shader.unref();
+	for (auto &shader : generated_shadow_shaders) shader.unref();
 }
 
 SpineBatch3D::SpineBatch3D() {
 	instance = RS::get_singleton()->instance_create();
-	// Godot instances start visible; synchronize the server with last_visible.
+	// Godot instances start visible; synchronize the server with cached state.
 	RS::get_singleton()->instance_set_visible(instance, false);
 #if !defined(SPINE_GODOT_EXTENSION) && VERSION_MINOR >= 7
 	RS::get_singleton()->instance_geometry_set_cast_shadows_setting(instance, RSE::SHADOW_CASTING_SETTING_OFF);
@@ -85,9 +88,21 @@ SpineBatch3D::SpineBatch3D() {
 #endif
 }
 
+void SpineBatch3D::ensure_shadow_instance() {
+	if (shadow_instance.is_valid()) return;
+	shadow_instance = RS::get_singleton()->instance_create();
+	RS::get_singleton()->instance_set_visible(shadow_instance, false);
+#if !defined(SPINE_GODOT_EXTENSION) && VERSION_MINOR >= 7
+	RS::get_singleton()->instance_geometry_set_cast_shadows_setting(shadow_instance, RSE::SHADOW_CASTING_SETTING_SHADOWS_ONLY);
+#else
+	RS::get_singleton()->instance_geometry_set_cast_shadows_setting(shadow_instance, RS::SHADOW_CASTING_SETTING_SHADOWS_ONLY);
+#endif
+}
+
 SpineBatch3D::~SpineBatch3D() {
 	clear_mesh();
 	if (instance.is_valid()) RS::get_singleton()->free_rid(instance);
+	if (shadow_instance.is_valid()) RS::get_singleton()->free_rid(shadow_instance);
 }
 
 void SpineBatch3D::clear_mesh() {
@@ -96,6 +111,7 @@ void SpineBatch3D::clear_mesh() {
 		mesh = RID();
 	}
 	if (instance.is_valid()) RS::get_singleton()->instance_set_base(instance, RID());
+	if (shadow_instance.is_valid()) RS::get_singleton()->instance_set_base(shadow_instance, RID());
 	vertex_capacity = 0;
 	index_capacity = 0;
 	uploaded_indices.clear();
@@ -103,10 +119,12 @@ void SpineBatch3D::clear_mesh() {
 	attribute_buffer.clear();
 	index_buffer.clear();
 	last_material = RID();
+	last_shadow_material = RID();
+	last_shadow_mesh = RID();
 	uploaded_bounds = AABB();
 }
 
-static uint64_t get_tint_array_flags() {
+static uint64_t get_custom_array_flags() {
 	return (uint64_t(Mesh::ARRAY_CUSTOM_RGBA_FLOAT) << Mesh::ARRAY_FORMAT_CUSTOM0_SHIFT) |
 		(uint64_t(Mesh::ARRAY_CUSTOM_RGB_FLOAT) << Mesh::ARRAY_FORMAT_CUSTOM1_SHIFT);
 }
@@ -125,10 +143,35 @@ static bool update_bytes(uint8_t *target, const void *source, size_t size) {
 	return true;
 }
 
+static bool update_tangent_bytes(uint8_t *target, const float tangent[4]) {
+	Vector3 direction(tangent[0], tangent[1], tangent[2]);
+	Vector2 encoded = direction.octahedron_tangent_encode(tangent[3]);
+	uint16_t packed[2] = {(uint16_t) CLAMP(encoded.x * 65535, 0, 65535), (uint16_t) CLAMP(encoded.y * 65535, 0, 65535)};
+	// (1, 1) and (0, 1) decode identically, but the latter collides with
+	// Godot's compression sentinel.
+	if (packed[0] == 0 && packed[1] == 65535) packed[0] = 65535;
+	return update_bytes(target, packed, sizeof(packed));
+}
+
 void SpineSprite3D::upload_batch(SpineBatch3D *item) {
+	int cast_shadows = item->custom_material ? (int) shadow_casting : (int) SHADOW_CASTING_OFF;
+	if (cast_shadows != item->last_shadow_casting) {
+#if !defined(SPINE_GODOT_EXTENSION) && VERSION_MINOR >= 7
+		RSE::ShadowCastingSetting setting = cast_shadows == SHADOW_CASTING_ON ? RSE::SHADOW_CASTING_SETTING_ON :
+			(cast_shadows == SHADOW_CASTING_DOUBLE_SIDED ? RSE::SHADOW_CASTING_SETTING_DOUBLE_SIDED :
+				(cast_shadows == SHADOW_CASTING_SHADOWS_ONLY ? RSE::SHADOW_CASTING_SETTING_SHADOWS_ONLY : RSE::SHADOW_CASTING_SETTING_OFF));
+#else
+		RS::ShadowCastingSetting setting = cast_shadows == SHADOW_CASTING_ON ? RS::SHADOW_CASTING_SETTING_ON :
+			(cast_shadows == SHADOW_CASTING_DOUBLE_SIDED ? RS::SHADOW_CASTING_SETTING_DOUBLE_SIDED :
+				(cast_shadows == SHADOW_CASTING_SHADOWS_ONLY ? RS::SHADOW_CASTING_SETTING_SHADOWS_ONLY : RS::SHADOW_CASTING_SETTING_OFF));
+#endif
+		RS::get_singleton()->instance_geometry_set_cast_shadows_setting(item->instance, setting);
+		item->last_shadow_casting = cast_shadows;
+	}
 	ERR_FAIL_COND_MSG(item->vertices.size() > INT_MAX || item->indices.size() > INT_MAX, "Batch exceeds Godot's mesh buffer index range.");
 	int vertex_count = (int) item->vertices.size();
 	int index_count = (int) item->indices.size();
+	bool shadow_data_changed = false;
 	if (!item->mesh.is_valid() || vertex_count > item->vertex_capacity || index_count > item->index_capacity) {
 		int vertex_capacity = grow_capacity(item->vertex_capacity, vertex_count);
 		int index_capacity = grow_capacity(item->index_capacity, index_count);
@@ -149,9 +192,13 @@ void SpineSprite3D::upload_batch(SpineBatch3D *item) {
 		Vector<Vector2> uvs;
 		Vector<int> indices;
 #endif
+		PackedVector3Array normals;
+		PackedFloat32Array tangents;
 		PackedFloat32Array light;
 		PackedFloat32Array dark;
 		vertices.resize(vertex_capacity);
+		normals.resize(vertex_capacity);
+		tangents.resize(vertex_capacity * 4);
 		uvs.resize(vertex_capacity);
 		light.resize(vertex_capacity * 4);
 		dark.resize(vertex_capacity * 3);
@@ -159,29 +206,40 @@ void SpineSprite3D::upload_batch(SpineBatch3D *item) {
 		memset(indices.ptrw(), 0, index_capacity * sizeof(int32_t));
 		memset(light.ptrw(), 0, vertex_capacity * 4 * sizeof(float));
 		memset(dark.ptrw(), 0, vertex_capacity * 3 * sizeof(float));
+		for (int i = 0; i < vertex_capacity; i++) {
+			normals.set(i, Vector3(0, 0, 1));
+			tangents.set(i * 4, 1);
+			tangents.set(i * 4 + 1, 0);
+			tangents.set(i * 4 + 2, 0);
+			tangents.set(i * 4 + 3, 1);
+		}
 		for (int i = 0; i < vertex_count; i++) {
 			const SpineVertex3D &v = item->vertices[i];
 			vertices.set(i, Vector3(v.position[0], v.position[1], v.position[2]));
 			uvs.set(i, Vector2(v.uv[0], v.uv[1]));
 			memcpy(light.ptrw() + i * 4, v.light, sizeof(v.light));
 			memcpy(dark.ptrw() + i * 3, v.dark, sizeof(v.dark));
+			memcpy(tangents.ptrw() + i * 4, v.tangent, sizeof(v.tangent));
 		}
 		for (int i = 0; i < index_count; i++) indices.set(i, item->indices[i]);
 		Array arrays;
 		arrays.resize(Mesh::ARRAY_MAX);
 		arrays[Mesh::ARRAY_VERTEX] = vertices;
+		arrays[Mesh::ARRAY_NORMAL] = normals;
+		arrays[Mesh::ARRAY_TANGENT] = tangents;
 		arrays[Mesh::ARRAY_TEX_UV] = uvs;
 		arrays[Mesh::ARRAY_CUSTOM0] = light;
 		arrays[Mesh::ARRAY_CUSTOM1] = dark;
 		arrays[Mesh::ARRAY_INDEX] = indices;
-		uint64_t flags = Mesh::ARRAY_FLAG_USE_DYNAMIC_UPDATE | get_tint_array_flags();
+		uint64_t flags = Mesh::ARRAY_FLAG_USE_DYNAMIC_UPDATE | get_custom_array_flags();
 #ifdef SPINE_GODOT_EXTENSION
 		RS::get_singleton()->mesh_add_surface_from_arrays(item->mesh, RS::PRIMITIVE_TRIANGLES, arrays, Array(), Dictionary(), flags);
 		Dictionary surface = RS::get_singleton()->mesh_get_surface(item->mesh, 0);
 		RS::ArrayFormat format = (RS::ArrayFormat) static_cast<int64_t>(surface["format"]);
-		for (int array : {RS::ARRAY_VERTEX, RS::ARRAY_TEX_UV, RS::ARRAY_CUSTOM0, RS::ARRAY_CUSTOM1})
+		for (int array : {RS::ARRAY_VERTEX, RS::ARRAY_NORMAL, RS::ARRAY_TANGENT, RS::ARRAY_TEX_UV, RS::ARRAY_CUSTOM0, RS::ARRAY_CUSTOM1})
 			item->surface_offsets[array] = RS::get_singleton()->mesh_surface_get_format_offset(format, vertex_capacity, array);
 		item->vertex_stride = RS::get_singleton()->mesh_surface_get_format_vertex_stride(format, vertex_capacity);
+		item->normal_tangent_stride = RS::get_singleton()->mesh_surface_get_format_normal_tangent_stride(format, vertex_capacity);
 		item->attribute_stride = RS::get_singleton()->mesh_surface_get_format_attribute_stride(format, vertex_capacity);
 		item->index_stride = RS::get_singleton()->mesh_surface_get_format_index_stride(format, vertex_capacity);
 		item->vertex_buffer = surface["vertex_data"];
@@ -198,9 +256,9 @@ void SpineSprite3D::upload_batch(SpineBatch3D *item) {
 																  flags);
 #endif
 		RS::get_singleton()->mesh_add_surface(item->mesh, surface);
-		uint32_t normal_stride, skin_stride;
+		uint32_t skin_stride;
 		RS::get_singleton()->mesh_surface_make_offsets_from_format(surface.format, vertex_capacity, index_capacity, item->surface_offsets,
-																   item->vertex_stride, normal_stride, item->attribute_stride, skin_stride);
+																   item->vertex_stride, item->normal_tangent_stride, item->attribute_stride, skin_stride);
 		item->index_stride = RS::get_singleton()->mesh_surface_get_format_index_stride(surface.format, vertex_capacity);
 		item->vertex_buffer = surface.vertex_data;
 		item->attribute_buffer = surface.attribute_data;
@@ -208,32 +266,46 @@ void SpineSprite3D::upload_batch(SpineBatch3D *item) {
 #endif
 		item->uploaded_indices = item->indices;
 		RS::get_singleton()->instance_set_base(item->instance, item->mesh);
+		if (item->shadow_material.is_valid()) item->ensure_shadow_instance();
 	} else {
 		bool positions_changed = false;
+		bool tangents_changed = false;
+		bool vertex_data_changed = false;
 		bool attributes_changed = false;
 		uint8_t *positions = item->vertex_buffer.ptrw();
 		uint8_t *attributes = item->attribute_buffer.ptrw();
 		for (int i = 0; i < vertex_count; i++) {
 			const SpineVertex3D &v = item->vertices[i];
-			positions_changed |= update_bytes(positions + i * item->vertex_stride + item->surface_offsets[Mesh::ARRAY_VERTEX], v.position,
-											  sizeof(v.position));
+			bool position_changed = update_bytes(positions + i * item->vertex_stride + item->surface_offsets[Mesh::ARRAY_VERTEX], v.position,
+												 sizeof(v.position));
+			positions_changed |= position_changed;
+			vertex_data_changed |= position_changed;
+			if (item->uses_tangents) {
+				bool tangent_changed = update_tangent_bytes(positions + item->surface_offsets[Mesh::ARRAY_TANGENT] +
+																 i * item->normal_tangent_stride,
+															 v.tangent);
+				tangents_changed |= tangent_changed;
+				vertex_data_changed |= tangent_changed;
+			}
 			uint8_t *a = attributes + i * item->attribute_stride;
 			attributes_changed |= update_bytes(a + item->surface_offsets[Mesh::ARRAY_TEX_UV], v.uv, sizeof(v.uv));
 			attributes_changed |= update_bytes(a + item->surface_offsets[Mesh::ARRAY_CUSTOM0], v.light, sizeof(v.light));
 			attributes_changed |= update_bytes(a + item->surface_offsets[Mesh::ARRAY_CUSTOM1], v.dark, sizeof(v.dark));
 		}
-		if (positions_changed) {
 #ifdef TOOLS_ENABLED
-			editor_geometry_dirty = true;
+		if (positions_changed) editor_geometry_dirty = true;
 #endif
+		if (vertex_data_changed) {
 			RS::get_singleton()->mesh_surface_update_vertex_region(item->mesh, 0, 0, item->vertex_buffer);
 			vertex_uploads++;
+			if (tangents_changed) tangent_uploads++;
 		}
 		if (attributes_changed) {
 			RS::get_singleton()->mesh_surface_update_attribute_region(item->mesh, 0, 0, item->attribute_buffer);
 			attribute_uploads++;
 		}
-		if (item->indices != item->uploaded_indices) {
+		bool indices_changed = item->indices != item->uploaded_indices;
+		if (indices_changed) {
 #ifdef TOOLS_ENABLED
 			editor_geometry_dirty = true;
 #endif
@@ -251,6 +323,7 @@ void SpineSprite3D::upload_batch(SpineBatch3D *item) {
 			item->uploaded_indices = item->indices;
 			index_uploads++;
 		}
+		shadow_data_changed = vertex_data_changed || attributes_changed || indices_changed;
 	}
 	AABB bounds = item->bounds;
 	if (camera_relative_depth) {
@@ -266,6 +339,28 @@ void SpineSprite3D::upload_batch(SpineBatch3D *item) {
 	if (material != item->last_material) {
 		RS::get_singleton()->mesh_surface_set_material(item->mesh, 0, material);
 		item->last_material = material;
+	}
+	RID shadow_material = item->shadow_material.is_valid() ? item->shadow_material->get_rid() : RID();
+	if (shadow_material.is_valid()) item->ensure_shadow_instance();
+	if (item->shadow_instance.is_valid() && item->last_shadow_mesh != item->mesh) {
+		RS::get_singleton()->instance_set_base(item->shadow_instance, item->mesh);
+		item->last_shadow_mesh = item->mesh;
+	}
+	if (item->shadow_instance.is_valid() && shadow_material != item->last_shadow_material) {
+		RS::get_singleton()->instance_geometry_set_material_override(item->shadow_instance, shadow_material);
+		item->last_shadow_material = shadow_material;
+	}
+	if (shadow_data_changed && shadow_casting != SHADOW_CASTING_OFF) {
+		if (item->custom_material) {
+			// Compatibility may retain a positional light's cached shadow after raw
+			// mesh-buffer updates. Pulse the existing authored material as an instance
+			// override, then restore surface-material ownership without rewriting it.
+			RS::get_singleton()->instance_geometry_set_material_override(item->instance, item->material->get_rid());
+			RS::get_singleton()->instance_geometry_set_material_override(item->instance, RID());
+		} else if (item->shadow_instance.is_valid() && shadow_material.is_valid()) {
+			RS::get_singleton()->instance_geometry_set_material_override(item->shadow_instance, RID());
+			RS::get_singleton()->instance_geometry_set_material_override(item->shadow_instance, shadow_material);
+		}
 	}
 }
 
@@ -300,6 +395,24 @@ void SpineSprite3D::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_render_priority"), &SpineSprite3D::get_render_priority);
 	ClassDB::bind_method(D_METHOD("set_cull_mode", "value"), &SpineSprite3D::set_cull_mode);
 	ClassDB::bind_method(D_METHOD("get_cull_mode"), &SpineSprite3D::get_cull_mode);
+	ClassDB::bind_method(D_METHOD("set_lighting_enabled", "value"), &SpineSprite3D::set_lighting_enabled);
+	ClassDB::bind_method(D_METHOD("get_lighting_enabled"), &SpineSprite3D::get_lighting_enabled);
+	ClassDB::bind_method(D_METHOD("set_normal_map_enabled", "value"), &SpineSprite3D::set_normal_map_enabled);
+	ClassDB::bind_method(D_METHOD("get_normal_map_enabled"), &SpineSprite3D::get_normal_map_enabled);
+	ClassDB::bind_method(D_METHOD("set_normal_map_flip_y", "value"), &SpineSprite3D::set_normal_map_flip_y);
+	ClassDB::bind_method(D_METHOD("get_normal_map_flip_y"), &SpineSprite3D::get_normal_map_flip_y);
+	ClassDB::bind_method(D_METHOD("set_normal_scale", "value"), &SpineSprite3D::set_normal_scale);
+	ClassDB::bind_method(D_METHOD("get_normal_scale"), &SpineSprite3D::get_normal_scale);
+	ClassDB::bind_method(D_METHOD("set_specular", "value"), &SpineSprite3D::set_specular);
+	ClassDB::bind_method(D_METHOD("get_specular"), &SpineSprite3D::get_specular);
+	ClassDB::bind_method(D_METHOD("set_roughness", "value"), &SpineSprite3D::set_roughness);
+	ClassDB::bind_method(D_METHOD("get_roughness"), &SpineSprite3D::get_roughness);
+	ClassDB::bind_method(D_METHOD("set_metallic", "value"), &SpineSprite3D::set_metallic);
+	ClassDB::bind_method(D_METHOD("get_metallic"), &SpineSprite3D::get_metallic);
+	ClassDB::bind_method(D_METHOD("set_shadow_casting", "value"), &SpineSprite3D::set_shadow_casting);
+	ClassDB::bind_method(D_METHOD("get_shadow_casting"), &SpineSprite3D::get_shadow_casting);
+	ClassDB::bind_method(D_METHOD("set_shadow_alpha_cutoff", "value"), &SpineSprite3D::set_shadow_alpha_cutoff);
+	ClassDB::bind_method(D_METHOD("get_shadow_alpha_cutoff"), &SpineSprite3D::get_shadow_alpha_cutoff);
 	ClassDB::bind_method(D_METHOD("set_normal_material", "material"), &SpineSprite3D::set_normal_material);
 	ClassDB::bind_method(D_METHOD("get_normal_material"), &SpineSprite3D::get_normal_material);
 	ClassDB::bind_method(D_METHOD("set_additive_material", "material"), &SpineSprite3D::set_additive_material);
@@ -348,6 +461,18 @@ void SpineSprite3D::_bind_methods() {
 				 "get_sorting_step");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "render_priority", PROPERTY_HINT_RANGE, "-128,127,1"), "set_render_priority", "get_render_priority");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "cull_mode", PROPERTY_HINT_ENUM, "Disabled,Back,Front"), "set_cull_mode", "get_cull_mode");
+	ADD_GROUP("Lighting and Shadows", "");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "lighting_enabled"), "set_lighting_enabled", "get_lighting_enabled");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "normal_map_enabled"), "set_normal_map_enabled", "get_normal_map_enabled");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "normal_map_flip_y"), "set_normal_map_flip_y", "get_normal_map_flip_y");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "normal_scale", PROPERTY_HINT_RANGE, "0,16,0.01,or_greater"), "set_normal_scale", "get_normal_scale");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "specular", PROPERTY_HINT_RANGE, "0,1,0.01"), "set_specular", "get_specular");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "roughness", PROPERTY_HINT_RANGE, "0,1,0.01"), "set_roughness", "get_roughness");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "metallic", PROPERTY_HINT_RANGE, "0,1,0.01"), "set_metallic", "get_metallic");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "shadow_casting", PROPERTY_HINT_ENUM, "Off,On,Double-Sided,Shadows Only"), "set_shadow_casting",
+				 "get_shadow_casting");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "shadow_alpha_cutoff", PROPERTY_HINT_RANGE, "0,1,0.01"), "set_shadow_alpha_cutoff",
+				 "get_shadow_alpha_cutoff");
 	ADD_GROUP("Materials", "");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "normal_material", PROPERTY_HINT_RESOURCE_TYPE, "ShaderMaterial"), "set_normal_material",
 				 "get_normal_material");
@@ -358,14 +483,20 @@ void SpineSprite3D::_bind_methods() {
 	BIND_ENUM_CONSTANT(CULL_DISABLED);
 	BIND_ENUM_CONSTANT(CULL_BACK);
 	BIND_ENUM_CONSTANT(CULL_FRONT);
+	BIND_ENUM_CONSTANT(SHADOW_CASTING_OFF);
+	BIND_ENUM_CONSTANT(SHADOW_CASTING_ON);
+	BIND_ENUM_CONSTANT(SHADOW_CASTING_DOUBLE_SIDED);
+	BIND_ENUM_CONSTANT(SHADOW_CASTING_SHADOWS_ONLY);
 }
 
 SpineSprite3D::SpineSprite3D()
 	: update_mode(SpineConstant::UpdateMode_Process), time_scale(1.0f), pixel_size(0.01f), slot_depth_offset(0.001f), camera_relative_depth(true),
 	  depth_write_enabled(true), alpha_cutoff(0.001f), sorting_step(1.0f),
-	  render_priority(0), cull_mode(CULL_DISABLED), preview_skin("Default"), preview_animation("-- Empty --"), preview_frame(false), preview_time(0),
+	  render_priority(0), cull_mode(CULL_DISABLED), lighting_enabled(false), normal_map_enabled(true), normal_map_flip_y(true), normal_scale(1.0f),
+	  specular(0.25f), roughness(0.65f), metallic(0.0f), shadow_casting(SHADOW_CASTING_OFF), shadow_alpha_cutoff(0.3f),
+	  preview_skin("Default"), preview_animation("-- Empty --"), preview_frame(false), preview_time(0),
 	  skeleton_clipper(new spine::SkeletonClipping()), slots_dirty(true), updating_meshes(false), warned_multiply(false), warned_screen(false),
-	  active_batches(0), active_vertices(0), active_indices(0), mesh_builds(0), index_uploads(0), vertex_uploads(0), attribute_uploads(0),
+	  active_batches(0), active_vertices(0), active_indices(0), mesh_builds(0), index_uploads(0), vertex_uploads(0), tangent_uploads(0), attribute_uploads(0),
 	  material_builds(0) {
 	controller = Ref<SpineController>(memnew(SpineController));
 	controller->set_listener(this);
@@ -474,6 +605,7 @@ void SpineSprite3D::remove_render_items() {
 	batches.clear();
 	draw_items.clear();
 	materials.clear();
+	shadow_materials.clear();
 	active_batches = active_vertices = active_indices = 0;
 	slots_dirty = true;
 	warned_multiply = false;
@@ -519,12 +651,15 @@ Ref<TriangleMesh> SpineSprite3D::get_editor_selection_mesh() {
 }
 #endif
 
-SpineBatch3D *SpineSprite3D::begin_batch(const Ref<ShaderMaterial> &material) {
+SpineBatch3D *SpineSprite3D::begin_batch(const Ref<ShaderMaterial> &material, const Ref<ShaderMaterial> &shadow_material, bool custom_material) {
 	if (active_batches == (int) batches.size()) batches.push_back(new SpineBatch3D());
 	auto batch = batches[active_batches++];
 	batch->vertices.clear();
 	batch->indices.clear();
 	batch->material = material;
+	batch->shadow_material = shadow_material;
+	batch->custom_material = custom_material;
+	batch->uses_tangents = false;
 	batch->bounds = AABB();
 	draw_items.push_back({batch, ObjectID(), Vector3(), 0, ObjectID(), 0});
 	return batch;
@@ -546,17 +681,46 @@ void spine_apply_alpha_cutoff(float alpha) {
 }
 
 Ref<Shader> SpineSprite3D::get_generated_shader(spine::BlendMode blend_mode) {
-	// Shader source depends only on blend/culling/depth writes, not on the character. Sharing
+	// Shader source depends only on blend/culling/depth writes/lighting, not on the character. Sharing
 	// these resources avoids compiling the same GLSL program for every sprite.
 	std::lock_guard<std::mutex> lock(generated_shader_mutex);
 	int blend_index = blend_mode == spine::BlendMode_Additive ? 1 : 0;
-	Ref<Shader> &shared = generated_shaders[blend_index][cull_mode][depth_write_enabled ? 1 : 0];
+	int lighting_index = lighting_enabled ? 1 : 0;
+	Ref<Shader> &shared = generated_shaders[blend_index][cull_mode][depth_write_enabled ? 1 : 0][lighting_index];
 	if (shared.is_valid()) return shared;
 	const char *blend = blend_index == 1 ? "blend_add" : "blend_mix";
 	const char *cull = cull_mode == CULL_BACK ? "cull_back" : (cull_mode == CULL_FRONT ? "cull_front" : "cull_disabled");
-	Ref<Shader> shader(memnew(Shader));
 	const char *depth = depth_write_enabled ? "depth_draw_always" : "depth_draw_never";
-	shader->set_code(String("shader_type spatial;\nrender_mode unshaded, ") + depth + ", " + blend + ", " + cull + ";\n" +
+	String lighting_mode = lighting_enabled ? String() : String("unshaded, ");
+	String lighting_declarations;
+	String lighting_vertex;
+	String lighting_fragment;
+	if (lighting_enabled) {
+		lighting_declarations = R"(
+uniform sampler2D spine_normal_texture : hint_normal, repeat_disable;
+uniform bool spine_has_normal_texture = false;
+uniform bool spine_normal_map_enabled = true;
+uniform bool spine_normal_map_flip_y = true;
+uniform float spine_normal_scale = 1.0;
+uniform float spine_specular = 0.25;
+uniform float spine_roughness = 0.65;
+uniform float spine_metallic = 0.0;
+)";
+		lighting_fragment = R"(
+	if (dot(NORMAL, VIEW) < 0.0) NORMAL = -NORMAL;
+	if (spine_normal_map_enabled && spine_has_normal_texture) {
+		vec3 spine_mapped_normal = texture(spine_normal_texture, UV).rgb;
+		if (spine_normal_map_flip_y) spine_mapped_normal.g = 1.0 - spine_mapped_normal.g;
+		NORMAL_MAP = spine_mapped_normal;
+		NORMAL_MAP_DEPTH = spine_normal_scale;
+	}
+	SPECULAR = spine_specular;
+	ROUGHNESS = spine_roughness;
+	METALLIC = spine_metallic;
+)";
+	}
+	Ref<Shader> shader(memnew(Shader));
+	shader->set_code(String("shader_type spatial;\nrender_mode ") + lighting_mode + depth + ", " + blend + ", " + cull + ";\n" +
 		get_depth_shader_code() + R"(
 // Read encoded atlas colors: PMA must be undone before sRGB decoding.
 uniform sampler2D spine_texture : repeat_disable;
@@ -566,6 +730,7 @@ varying vec3 spine_dark_color;
 vec3 spine_srgb_to_linear(vec3 color) {
 	return mix(pow((color + vec3(0.055)) / 1.055, vec3(2.4)), color / 12.92, lessThanEqual(color, vec3(0.04045)));
 }
+)" + lighting_declarations + R"(
 void vertex() {
 	VERTEX = spine_apply_camera_depth(VERTEX, MODEL_MATRIX[3].xyz, MODEL_NORMAL_MATRIX[2], INV_VIEW_MATRIX[3].xyz);
 	spine_light_color = CUSTOM0;
@@ -574,6 +739,7 @@ void vertex() {
 		spine_light_color.rgb = spine_srgb_to_linear(spine_light_color.rgb);
 		spine_dark_color = spine_srgb_to_linear(spine_dark_color);
 	}
+)" + lighting_vertex + R"(
 }
 void fragment() {
 	vec4 tex = texture(spine_texture, UV);
@@ -582,6 +748,30 @@ void fragment() {
 	ALBEDO = tex.rgb * spine_light_color.rgb + (vec3(1.0) - tex.rgb) * spine_dark_color;
 	ALPHA = tex.a * spine_light_color.a;
 	spine_apply_alpha_cutoff(ALPHA);
+)" + lighting_fragment + R"(
+}
+)");
+	shared = shader;
+	return shader;
+}
+
+Ref<Shader> SpineSprite3D::get_generated_shadow_shader(int shadow_cull) {
+	std::lock_guard<std::mutex> lock(generated_shader_mutex);
+	Ref<Shader> &shared = generated_shadow_shaders[shadow_cull];
+	if (shared.is_valid()) return shared;
+	const char *cull = shadow_cull == CULL_BACK ? "cull_back" : (shadow_cull == CULL_FRONT ? "cull_front" : "cull_disabled");
+	Ref<Shader> shader(memnew(Shader));
+	shader->set_code(String("shader_type spatial;\nrender_mode unshaded, depth_draw_opaque, ") + cull + R"(;
+uniform sampler2D spine_texture : repeat_disable;
+uniform float spine_shadow_alpha_cutoff = 0.3;
+varying float spine_tint_alpha;
+void vertex() {
+	spine_tint_alpha = CUSTOM0.a;
+}
+void fragment() {
+	ALBEDO = vec3(1.0);
+	ALPHA = texture(spine_texture, UV).a * spine_tint_alpha;
+	ALPHA_SCISSOR_THRESHOLD = max(spine_shadow_alpha_cutoff, 0.000001);
 }
 )");
 	shared = shader;
@@ -605,14 +795,17 @@ Ref<ShaderMaterial> SpineSprite3D::get_material(SpineRendererObject *renderer_ob
 	}
 
 	RID texture_rid = renderer_object && renderer_object->texture.is_valid() ? renderer_object->texture->get_rid() : RID();
+	RID normal_texture_rid = renderer_object && renderer_object->normal_map.is_valid() ? renderer_object->normal_map->get_rid() : RID();
 	Ref<ShaderMaterial> source = override_material;
 	if (source.is_null()) source = blend_mode == spine::BlendMode_Additive ? additive_material : normal_material;
 	ObjectID source_id = source.is_valid() ? ObjectID(source->get_instance_id()) : ObjectID();
+	bool generated_lighting = source.is_null() && lighting_enabled;
 	int cull = source.is_valid() ? -1 : (int) cull_mode;
 	bool depth_write = source.is_null() && depth_write_enabled;
 	for (const auto &cached : materials) {
-		if (cached.texture == texture_rid && cached.source == source_id && cached.blend == blend_mode && cached.pma == premultiplied_alpha &&
-			cached.priority == render_priority && cached.cull == cull && cached.depth_write == depth_write)
+		if (cached.texture == texture_rid && cached.normal_texture == normal_texture_rid && cached.source == source_id && cached.blend == blend_mode &&
+			cached.pma == premultiplied_alpha && cached.lighting == generated_lighting && cached.priority == render_priority && cached.cull == cull &&
+			cached.depth_write == depth_write)
 			return cached.material;
 	}
 	Ref<ShaderMaterial> material;
@@ -637,6 +830,8 @@ Ref<ShaderMaterial> SpineSprite3D::get_material(SpineRendererObject *renderer_ob
 			Ref<ShaderMaterial> shader_pass = pass;
 			if (shader_pass.is_valid()) {
 				shader_pass->set_shader_parameter(SNAME("spine_texture"), renderer_object ? Variant(renderer_object->texture) : Variant());
+				shader_pass->set_shader_parameter(SNAME("spine_normal_texture"), renderer_object ? Variant(renderer_object->normal_map) : Variant());
+				shader_pass->set_shader_parameter(SNAME("spine_has_normal_texture"), renderer_object && renderer_object->normal_map.is_valid());
 				shader_pass->set_shader_parameter(SNAME("spine_premultiplied_alpha"), premultiplied_alpha);
 			}
 			tail->set_next_pass(pass);
@@ -653,12 +848,75 @@ Ref<ShaderMaterial> SpineSprite3D::get_material(SpineRendererObject *renderer_ob
 		material->set_shader_parameter(SNAME("spine_texture"), renderer_object->texture);
 	else
 		material->set_shader_parameter(SNAME("spine_texture"), Variant());
+	material->set_shader_parameter(SNAME("spine_normal_texture"), renderer_object ? Variant(renderer_object->normal_map) : Variant());
+	material->set_shader_parameter(SNAME("spine_has_normal_texture"), renderer_object && renderer_object->normal_map.is_valid());
 	material->set_shader_parameter(SNAME("spine_premultiplied_alpha"), premultiplied_alpha);
 
-	apply_depth_parameters(material);
-	materials.push_back({texture_rid, source_id, material, blend_mode, premultiplied_alpha, render_priority, cull, depth_write});
+	apply_runtime_parameters(material);
+	materials.push_back({texture_rid, normal_texture_rid, source_id, material, blend_mode, premultiplied_alpha, generated_lighting, render_priority, cull,
+						 depth_write});
 	material_builds++;
 	return material;
+}
+
+Ref<ShaderMaterial> SpineSprite3D::get_shadow_material(SpineRendererObject *renderer_object) {
+	if (shadow_casting == SHADOW_CASTING_OFF || !renderer_object || !renderer_object->texture.is_valid()) return Ref<ShaderMaterial>();
+	RID texture = renderer_object->texture->get_rid();
+	int shadow_cull = shadow_casting == SHADOW_CASTING_DOUBLE_SIDED ? CULL_DISABLED : (int) cull_mode;
+	for (const auto &cached : shadow_materials)
+		if (cached.texture == texture && cached.cull == shadow_cull) return cached.material;
+	Ref<ShaderMaterial> material(memnew(ShaderMaterial));
+	material->set_shader(get_generated_shadow_shader(shadow_cull));
+	material->set_shader_parameter(SNAME("spine_texture"), renderer_object->texture);
+	material->set_shader_parameter(SNAME("spine_shadow_alpha_cutoff"), shadow_alpha_cutoff);
+	shadow_materials.push_back({texture, material, shadow_cull});
+	material_builds++;
+	return material;
+}
+
+static void build_spine_vertex_tangents(SpineBatch3D *batch, uint32_t base_vertex, int vertex_count, spine::Array<unsigned short> &indices,
+										std::vector<Vector3> &tangent_accum, std::vector<Vector3> &bitangent_accum) {
+	tangent_accum.assign(vertex_count, Vector3());
+	bitangent_accum.assign(vertex_count, Vector3());
+	for (size_t i = 0; i + 2 < indices.size(); i += 3) {
+		int i0 = indices[i], i1 = indices[i + 1], i2 = indices[i + 2];
+		if (i0 < 0 || i1 < 0 || i2 < 0 || i0 >= vertex_count || i1 >= vertex_count || i2 >= vertex_count) continue;
+		const SpineVertex3D &v0 = batch->vertices[base_vertex + i0];
+		const SpineVertex3D &v1 = batch->vertices[base_vertex + i1];
+		const SpineVertex3D &v2 = batch->vertices[base_vertex + i2];
+		Vector3 p0(v0.position[0], v0.position[1], v0.position[2]);
+		Vector3 p1(v1.position[0], v1.position[1], v1.position[2]);
+		Vector3 p2(v2.position[0], v2.position[1], v2.position[2]);
+		Vector2 uv0(v0.uv[0], v0.uv[1]);
+		Vector2 uv1(v1.uv[0], v1.uv[1]);
+		Vector2 uv2(v2.uv[0], v2.uv[1]);
+		Vector3 e1 = p1 - p0, e2 = p2 - p0;
+		Vector2 duv1 = uv1 - uv0, duv2 = uv2 - uv0;
+		float denominator = duv1.x * duv2.y - duv2.x * duv1.y;
+		if (Math::abs(denominator) <= 0.0000001f) continue;
+		float inverse = 1.0f / denominator;
+		Vector3 tangent = (e1 * duv2.y - e2 * duv1.y) * inverse;
+		Vector3 bitangent = (e2 * duv1.x - e1 * duv2.x) * inverse;
+		for (int index : {i0, i1, i2}) {
+			tangent_accum[index] += tangent;
+			bitangent_accum[index] += bitangent;
+		}
+	}
+	const Vector3 normal(0, 0, 1);
+	for (int i = 0; i < vertex_count; i++) {
+		Vector3 tangent = tangent_accum[i];
+		if (tangent.length_squared() <= CMP_EPSILON2)
+			tangent = Vector3(1, 0, 0);
+		else
+			tangent = (tangent - normal * normal.dot(tangent)).normalized();
+		Vector3 bitangent = bitangent_accum[i];
+		float sign = bitangent.length_squared() <= CMP_EPSILON2 || normal.cross(tangent).dot(bitangent) >= 0 ? 1.0f : -1.0f;
+		SpineVertex3D &vertex = batch->vertices[base_vertex + i];
+		vertex.tangent[0] = tangent.x;
+		vertex.tangent[1] = tangent.y;
+		vertex.tangent[2] = tangent.z;
+		vertex.tangent[3] = sign;
+	}
 }
 
 void SpineSprite3D::update_render_items(Ref<SpineSkeleton> skeleton_ref) {
@@ -781,7 +1039,12 @@ void SpineSprite3D::update_render_items(Ref<SpineSkeleton> skeleton_ref) {
 				}
 			}
 			Ref<ShaderMaterial> material = get_material(renderer_object, premultiplied_alpha, blend, override_material);
-			if (!current || current->material != material) current = begin_batch(material);
+			bool custom_material = override_material.is_valid();
+			if (!custom_material)
+				custom_material = blend == spine::BlendMode_Additive ? additive_material.is_valid() : normal_material.is_valid();
+			Ref<ShaderMaterial> shadow_material = custom_material ? Ref<ShaderMaterial>() : get_shadow_material(renderer_object);
+			if (!current || current->material != material || current->shadow_material != shadow_material || current->custom_material != custom_material)
+				current = begin_batch(material, shadow_material, custom_material);
 			uint32_t base_vertex = (uint32_t) current->vertices.size();
 			int vertex_count = (int) vertices->size() / 2;
 			current->vertices.resize(base_vertex + vertex_count);
@@ -791,12 +1054,17 @@ void SpineSprite3D::update_render_items(Ref<SpineSkeleton> skeleton_ref) {
 				v = {{(*vertices)[j * 2] * pixel_size, -(*vertices)[j * 2 + 1] * pixel_size, z},
 					 {(*uvs)[j * 2], (*uvs)[j * 2 + 1]},
 					 {light_tint.r, light_tint.g, light_tint.b, light_tint.a},
-					 {dark_tint.r, dark_tint.g, dark_tint.b}};
+					 {dark_tint.r, dark_tint.g, dark_tint.b},
+					 {1, 0, 0, 1}};
 				Vector3 position(v.position[0], v.position[1], v.position[2]);
 				if (base_vertex + j == 0)
 					current->bounds.position = position;
 				else
 					current->bounds.expand_to(position);
+			}
+			if (custom_material || (lighting_enabled && renderer_object && renderer_object->normal_map.is_valid())) {
+				current->uses_tangents = true;
+				build_spine_vertex_tangents(current, base_vertex, vertex_count, *indices, tangent_accum, bitangent_accum);
 			}
 			for (size_t j = 0; j < indices->size(); j++) current->indices.push_back(base_vertex + (*indices)[j]);
 			active_vertices += vertex_count;
@@ -842,10 +1110,24 @@ void SpineSprite3D::update_render_item_world_state() {
 			RS::get_singleton()->instance_set_transform(batch->instance, transform);
 			batch->last_transform = transform;
 		}
-		bool visible = node_visible && batch->active;
+		if (batch->shadow_instance.is_valid() && batch->last_shadow_scenario != render_scenario) {
+			RS::get_singleton()->instance_set_scenario(batch->shadow_instance, render_scenario);
+			batch->last_shadow_scenario = render_scenario;
+		}
+		if (batch->shadow_instance.is_valid() && (!batch->shadow_transform_initialized || batch->last_shadow_transform != transform)) {
+			RS::get_singleton()->instance_set_transform(batch->shadow_instance, transform);
+			batch->last_shadow_transform = transform;
+			batch->shadow_transform_initialized = true;
+		}
+		bool visible = node_visible && batch->active && (batch->custom_material || shadow_casting != SHADOW_CASTING_SHADOWS_ONLY);
 		if (visible != batch->last_visible) {
 			RS::get_singleton()->instance_set_visible(batch->instance, visible);
 			batch->last_visible = visible;
+		}
+		bool shadow_visible = node_visible && batch->active && shadow_casting != SHADOW_CASTING_OFF && batch->shadow_material.is_valid();
+		if (batch->shadow_instance.is_valid() && shadow_visible != batch->last_shadow_visible) {
+			RS::get_singleton()->instance_set_visible(batch->shadow_instance, shadow_visible);
+			batch->last_shadow_visible = shadow_visible;
 		}
 	}
 	update_sorting();
@@ -900,9 +1182,20 @@ Dictionary SpineSprite3D::get_render_statistics() const {
 	result["indices"] = active_indices;
 	result["batch_pool"] = (int) batches.size();
 	result["materials"] = (int) materials.size();
+	result["shadow_materials"] = (int) shadow_materials.size();
+	int shadow_instances = 0;
+	int shadow_instance_pool = 0;
+	for (auto batch : batches) {
+		if (batch->shadow_instance.is_valid()) shadow_instance_pool++;
+		if (batch->active && batch->shadow_instance.is_valid() && batch->shadow_material.is_valid() && shadow_casting != SHADOW_CASTING_OFF)
+			shadow_instances++;
+	}
+	result["shadow_instances"] = shadow_instances;
+	result["shadow_instance_pool"] = shadow_instance_pool;
 	result["mesh_builds"] = (int64_t) mesh_builds;
 	result["index_uploads"] = (int64_t) index_uploads;
 	result["vertex_uploads"] = (int64_t) vertex_uploads;
+	result["tangent_uploads"] = (int64_t) tangent_uploads;
 	result["attribute_uploads"] = (int64_t) attribute_uploads;
 	result["material_builds"] = (int64_t) material_builds;
 	int shared_shaders = 0;
@@ -910,8 +1203,11 @@ Dictionary SpineSprite3D::get_render_statistics() const {
 		std::lock_guard<std::mutex> lock(generated_shader_mutex);
 		for (const auto &blend : generated_shaders)
 			for (const auto &cull : blend)
-				for (const auto &shader : cull)
-					if (shader.is_valid()) shared_shaders++;
+				for (const auto &depth : cull)
+					for (const auto &shader : depth)
+						if (shader.is_valid()) shared_shaders++;
+		for (const auto &shader : generated_shadow_shaders)
+			if (shader.is_valid()) shared_shaders++;
 	}
 	result["shared_shaders"] = shared_shaders;
 	int64_t vertex_capacity = 0, index_capacity = 0;
@@ -935,20 +1231,38 @@ AABB SpineSprite3D::get_aabb() const {
 	return bounds;
 }
 
-void SpineSprite3D::apply_depth_parameters(const Ref<Material> &material) {
+void SpineSprite3D::apply_runtime_parameters(const Ref<Material> &material) {
 	Ref<Material> pass = material;
 	while (pass.is_valid()) {
 		Ref<ShaderMaterial> shader_pass = pass;
 		if (shader_pass.is_valid()) {
 			shader_pass->set_shader_parameter(SNAME("spine_camera_relative_depth"), camera_relative_depth);
 			shader_pass->set_shader_parameter(SNAME("spine_alpha_cutoff"), alpha_cutoff);
+			shader_pass->set_shader_parameter(SNAME("spine_normal_map_enabled"), normal_map_enabled);
+			shader_pass->set_shader_parameter(SNAME("spine_normal_map_flip_y"), normal_map_flip_y);
+			shader_pass->set_shader_parameter(SNAME("spine_normal_scale"), normal_scale);
+			shader_pass->set_shader_parameter(SNAME("spine_specular"), specular);
+			shader_pass->set_shader_parameter(SNAME("spine_roughness"), roughness);
+			shader_pass->set_shader_parameter(SNAME("spine_metallic"), metallic);
 		}
 		pass = pass->get_next_pass();
 	}
 }
 
-void SpineSprite3D::refresh_depth_parameters() {
-	for (const auto &entry : materials) apply_depth_parameters(entry.material);
+void SpineSprite3D::refresh_runtime_parameters() {
+	for (const auto &entry : materials) apply_runtime_parameters(entry.material);
+}
+
+void SpineSprite3D::refresh_shadow_parameters() {
+	for (const auto &entry : shadow_materials) entry.material->set_shader_parameter(SNAME("spine_shadow_alpha_cutoff"), shadow_alpha_cutoff);
+	// Static shadow maps are not always invalidated by a shader uniform update.
+	// Reapplying the instance override dirties shadow rendering without allocating
+	// another material for every animated cutoff value.
+	for (auto batch : batches) {
+		if (!batch->shadow_instance.is_valid() || !batch->shadow_material.is_valid()) continue;
+		RS::get_singleton()->instance_geometry_set_material_override(batch->shadow_instance, RID());
+		RS::get_singleton()->instance_geometry_set_material_override(batch->shadow_instance, batch->shadow_material->get_rid());
+	}
 }
 
 void SpineSprite3D::invalidate_materials() {
@@ -974,6 +1288,8 @@ void SpineSprite3D::refresh_material_template(const Ref<ShaderMaterial> &source)
 				continue;
 			}
 			Variant texture = entry.material->get_shader_parameter(SNAME("spine_texture"));
+			Variant normal_texture = entry.material->get_shader_parameter(SNAME("spine_normal_texture"));
+			Variant has_normal_texture = entry.material->get_shader_parameter(SNAME("spine_has_normal_texture"));
 			if (entry.material->get_shader() != shader) entry.material->set_shader(shader);
 			if (shader.is_valid()) {
 #ifdef SPINE_GODOT_EXTENSION
@@ -990,8 +1306,10 @@ void SpineSprite3D::refresh_material_template(const Ref<ShaderMaterial> &source)
 #endif
 			}
 			entry.material->set_shader_parameter(SNAME("spine_texture"), texture);
+			entry.material->set_shader_parameter(SNAME("spine_normal_texture"), normal_texture);
+			entry.material->set_shader_parameter(SNAME("spine_has_normal_texture"), has_normal_texture);
 			entry.material->set_shader_parameter(SNAME("spine_premultiplied_alpha"), entry.pma);
-			apply_depth_parameters(entry.material);
+			apply_runtime_parameters(entry.material);
 		}
 	}
 	materials.erase(std::remove_if(materials.begin(), materials.end(), [](const SpineBatchMaterial3D &entry) { return entry.material.is_null(); }),
@@ -1097,6 +1415,10 @@ static void update_preview_animation_3d(SpineSprite3D *sprite, const String &ski
 		return;
 	}
 	Ref<SpineTrackEntry> entry = sprite->get_animation_state()->set_animation(animation, true, 0);
+	if (entry.is_null()) {
+		sprite->get_animation_state()->set_empty_animation(0, 0);
+		return;
+	}
 	entry->set_mix_duration(0);
 	if (frame) {
 		entry->set_time_scale(0);
@@ -1187,7 +1509,7 @@ float SpineSprite3D::get_slot_depth_offset() {
 void SpineSprite3D::set_camera_relative_depth(bool value) {
 	if (camera_relative_depth == value) return;
 	camera_relative_depth = value;
-	refresh_depth_parameters();
+	refresh_runtime_parameters();
 #ifdef TOOLS_ENABLED
 	editor_geometry_dirty = true;
 #endif
@@ -1208,7 +1530,7 @@ void SpineSprite3D::set_alpha_cutoff(float value) {
 	ERR_FAIL_COND_MSG(!Math::is_finite(value) || value < 0 || value > 1, "alpha_cutoff must be finite and between zero and one.");
 	if (alpha_cutoff == value) return;
 	alpha_cutoff = value;
-	refresh_depth_parameters();
+	refresh_runtime_parameters();
 }
 float SpineSprite3D::get_alpha_cutoff() const {
 	return alpha_cutoff;
@@ -1235,6 +1557,84 @@ void SpineSprite3D::set_cull_mode(CullMode value) {
 }
 SpineSprite3D::CullMode SpineSprite3D::get_cull_mode() {
 	return cull_mode;
+}
+void SpineSprite3D::set_lighting_enabled(bool value) {
+	if (lighting_enabled == value) return;
+	lighting_enabled = value;
+	invalidate_materials();
+}
+bool SpineSprite3D::get_lighting_enabled() const {
+	return lighting_enabled;
+}
+void SpineSprite3D::set_normal_map_enabled(bool value) {
+	if (normal_map_enabled == value) return;
+	normal_map_enabled = value;
+	refresh_runtime_parameters();
+}
+bool SpineSprite3D::get_normal_map_enabled() const {
+	return normal_map_enabled;
+}
+void SpineSprite3D::set_normal_map_flip_y(bool value) {
+	if (normal_map_flip_y == value) return;
+	normal_map_flip_y = value;
+	refresh_runtime_parameters();
+}
+bool SpineSprite3D::get_normal_map_flip_y() const {
+	return normal_map_flip_y;
+}
+void SpineSprite3D::set_normal_scale(float value) {
+	ERR_FAIL_COND_MSG(!Math::is_finite(value) || value < 0, "normal_scale must be finite and non-negative.");
+	if (normal_scale == value) return;
+	normal_scale = value;
+	refresh_runtime_parameters();
+}
+float SpineSprite3D::get_normal_scale() const {
+	return normal_scale;
+}
+void SpineSprite3D::set_specular(float value) {
+	ERR_FAIL_COND_MSG(!Math::is_finite(value) || value < 0 || value > 1, "specular must be finite and between zero and one.");
+	if (specular == value) return;
+	specular = value;
+	refresh_runtime_parameters();
+}
+float SpineSprite3D::get_specular() const {
+	return specular;
+}
+void SpineSprite3D::set_roughness(float value) {
+	ERR_FAIL_COND_MSG(!Math::is_finite(value) || value < 0 || value > 1, "roughness must be finite and between zero and one.");
+	if (roughness == value) return;
+	roughness = value;
+	refresh_runtime_parameters();
+}
+float SpineSprite3D::get_roughness() const {
+	return roughness;
+}
+void SpineSprite3D::set_metallic(float value) {
+	ERR_FAIL_COND_MSG(!Math::is_finite(value) || value < 0 || value > 1, "metallic must be finite and between zero and one.");
+	if (metallic == value) return;
+	metallic = value;
+	refresh_runtime_parameters();
+}
+float SpineSprite3D::get_metallic() const {
+	return metallic;
+}
+void SpineSprite3D::set_shadow_casting(ShadowCasting value) {
+	ERR_FAIL_INDEX((int) value, 4);
+	if (shadow_casting == value) return;
+	shadow_casting = value;
+	invalidate_materials();
+}
+SpineSprite3D::ShadowCasting SpineSprite3D::get_shadow_casting() const {
+	return shadow_casting;
+}
+void SpineSprite3D::set_shadow_alpha_cutoff(float value) {
+	ERR_FAIL_COND_MSG(!Math::is_finite(value) || value < 0 || value > 1, "shadow_alpha_cutoff must be finite and between zero and one.");
+	if (shadow_alpha_cutoff == value) return;
+	shadow_alpha_cutoff = value;
+	refresh_shadow_parameters();
+}
+float SpineSprite3D::get_shadow_alpha_cutoff() const {
+	return shadow_alpha_cutoff;
 }
 void SpineSprite3D::set_normal_material(const Ref<ShaderMaterial> &material) {
 	normal_material = material;

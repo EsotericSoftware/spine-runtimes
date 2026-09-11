@@ -9,6 +9,8 @@ sprite.camera_relative_depth = true
 sprite.depth_write_enabled = true
 sprite.slot_depth_offset = 0.001
 sprite.alpha_cutoff = 0.001
+sprite.lighting_enabled = false
+sprite.shadow_casting = SpineSprite3D.SHADOW_CASTING_OFF
 ```
 
 The generated materials are unlit and double-sided by default. Each attachment gets a small local Z offset according to its position in the **applied Spine draw order**. From behind, the vertex shader flips that offset, putting later attachments nearer the camera again. Attachment, triangle and batch submission order do not reverse. This preserves the authored layering from both sides, rather than revealing the back of a physical stack. It does not turn planar artwork into a volumetric character.
@@ -32,7 +34,34 @@ These depth-write settings control **generated materials**. Custom materials ret
 
 The regression covers default `pixel_size = 0.01` with a `0.001` gap, and a larger 48-unit-wide fixture viewed from 60 units away with a `0.01` gap. On the tested Compatibility backend, the latter needed more than `0.001` once vertex displacement was active. Tune spacing and camera clipping ranges for your scene. Larger gaps make the layered construction more visible and increase the position jump when the camera crosses edge-on.
 
-Alpha fades and soft atlas edges also deserve testing: fragments disappear at the cutoff, and surviving translucent fragments can occlude later geometry behind them. This is not order-independent transparency. Lighting and shadow support are separate from this depth policy; generated Spine materials currently cast no shadows.
+Alpha fades and soft atlas edges also deserve testing: fragments disappear at the cutoff, and surviving translucent fragments can occlude later geometry behind them. This is not order-independent transparency.
+
+## Generated lighting, normal maps, and shadows
+
+Lighting is opt-in so existing scenes keep their authored unlit appearance:
+
+```gdscript
+sprite.lighting_enabled = true
+sprite.normal_map_enabled = true
+sprite.normal_map_flip_y = true
+sprite.normal_scale = 1.0
+sprite.specular = 0.25
+sprite.roughness = 0.65
+sprite.metallic = 0.0
+```
+
+Generated lit materials use the attachment plane's normal when no normal map exists. The runtime supplies standard mesh normals and UV-derived tangents, so atlas pages with imported normal maps can use Godot's compressed tangent-space normal-map path. Normal-map loading is not a separate 3D path: configure the atlas importer's existing normal-map prefix (for example, `n` resolves `n_raptor.png`) and `SpineAtlasResource` supplies the matching page texture. `normal_map_flip_y` defaults on for the convention used by the bundled Raptor asset; disable it for maps authored with the opposite Y convention. Example19 starts the high-contrast Raptor map at `normal_scale = 0.25`; tune strength for each asset and light rig. Animated normal/PBR controls are uniforms and do not rebuild mesh buffers or duplicate warmed materials.
+
+Generated shadow casting is also opt-in:
+
+```gdscript
+sprite.shadow_casting = SpineSprite3D.SHADOW_CASTING_DOUBLE_SIDED
+sprite.shadow_alpha_cutoff = 0.3
+```
+
+Modes are **Off**, **On**, **Double-Sided**, and **Shadows Only**. Generated shadows use dedicated shadows-only RenderingServer instances and alpha-tested materials. They share the visible batch meshes and are allocated lazily on first use; turning shadows off hides and retains the warmed pool. `shadow_alpha_cutoff` is independent of visible `alpha_cutoff`, includes skeleton/slot/attachment tint alpha, and can be animated without creating a material for each value. Lighting does not need to be enabled for a generated material to cast shadows.
+
+`camera_relative_depth` still operates per rendering camera for visible generated shaders. A shadow map has the light's view, so test extreme slot spacing, culling, and lights crossing the planar character in your scene. The alpha-tested shadow is a planar silhouette, not volumetric self-shadowing.
 
 ## Custom Spine materials
 
@@ -40,8 +69,36 @@ No user shader source is rewritten. Every cached `ShaderMaterial` pass receives 
 
 - `spine_texture`: current atlas-page texture.
 - `spine_premultiplied_alpha`: the atlas page's PMA flag.
+- `spine_normal_texture`: current atlas-page normal map, when one was imported.
+- `spine_has_normal_texture`: whether the current page has a normal map.
 - `spine_camera_relative_depth`: the sprite's camera-relative-depth flag.
-- `spine_alpha_cutoff`: the sprite's alpha cutoff.
+- `spine_alpha_cutoff`: the sprite's visible alpha cutoff.
+- `spine_normal_map_enabled`, `spine_normal_map_flip_y`, and `spine_normal_scale`.
+- `spine_specular`, `spine_roughness`, and `spine_metallic`.
+
+Custom shaders receive light tint in `CUSTOM0`, dark tint in `CUSTOM1`, and standard mesh `NORMAL`/`TANGENT` attributes. They remain authored contracts: the runtime never inserts lighting, normal-map, blending, culling, depth, or shadow code into their source. Custom batches cast directly according to `shadow_casting`, so the shader's authored alpha/scissor and culling behavior controls its shadow pass; `shadow_alpha_cutoff` is only for generated shadow materials.
+
+Use Godot's normal-map outputs in a custom lit shader:
+
+```glsl
+uniform sampler2D spine_normal_texture : hint_normal, repeat_disable;
+uniform bool spine_has_normal_texture = false;
+uniform bool spine_normal_map_enabled = true;
+uniform bool spine_normal_map_flip_y = true;
+uniform float spine_normal_scale = 1.0;
+
+void fragment() {
+    // Set ALBEDO and ALPHA first.
+    if (spine_normal_map_enabled && spine_has_normal_texture) {
+        vec3 mapped_normal = texture(spine_normal_texture, UV).rgb;
+        if (spine_normal_map_flip_y) mapped_normal.g = 1.0 - mapped_normal.g;
+        NORMAL_MAP = mapped_normal;
+        NORMAL_MAP_DEPTH = spine_normal_scale;
+    }
+}
+```
+
+Do not manually rely on the sampled blue channel: Godot may import normal maps with two-channel compression and reconstruct Z internally when `NORMAL_MAP` is used. `NORMAL_MAP_DEPTH = 0.0` restores the flat normal.
 
 Template values for reserved uniforms do not override the sprite. Other uniforms remain template-owned. Reassign a template after changing its parameters to refresh cached copies. Every visible custom pass, including `next_pass`, needs to implement the policy if it should match the generated geometry. A pass that ignores it retains physical vertex positions and can hide or detach facial details from the back. Non-shader next passes do not acquire custom vertex logic automatically.
 
@@ -132,3 +189,5 @@ Native mesh culling bounds and `sprite.get_aabb()` include both possible depth d
 Editor click/box picking conservatively includes attachment triangles at both possible depth positions. It may select a triangle at the currently unused position, especially with exaggerated spacing. It does not follow texture alpha, arbitrary custom shader deformation, or gameplay collision shapes.
 
 Run `examples/18-depth-offset-orbit/depth-offset-orbit.tscn` in either Godot 4 example project. It uses the native sprite properties and generated materials. Compare the front/back toggle, then use **Exaggerate gap**, **Marker follows flip**, and **Face shader ignores flip** to inspect the child/custom-material contracts. The default gap can be restored with **Gap 0.001**.
+
+Run `examples/19-3d-lighting/3d-lighting.tscn` to inspect generated lighting, the Raptor atlas normal map, moving omni-light response, normal strength/Y convention, and texture-alpha shadows on opaque ground.

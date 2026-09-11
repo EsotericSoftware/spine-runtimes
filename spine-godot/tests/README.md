@@ -126,6 +126,19 @@ bash spine-godot/tests/editor-picking-3d.sh /absolute/path/to/vanilla-godot \
 
 Use an editor build with a graphical session. Check for `Spine 3D editor picking regression passed.` and no errors. Picking follows attachment triangles, like Godot's mesh gizmos, rather than individual texture-alpha pixels or custom vertex-shader displacement. The picking mesh is editor-only and cached until geometry changes; it does not add runtime draw calls.
 
+## Native 3D lighting and shadows (Godot 4)
+
+`lighting-3d.gd` loads example19's Raptor normal map and performs GPU comparisons for opt-in directional/omni light response, normal-map enable/strength/Y convention, animated tangent uploads, localized black artifacts, negative-scale flat/mapped normals and shadows, generated lit/unlit shader reuse, alpha-tested shadows, all generated shadow modes, lazy shadow instance pooling, animated shadow cutoff, and custom-shader shadow ownership without source rewriting. It creates a half-alpha fixture under `user://` to prove that `shadow_alpha_cutoff` changes the shadow without changing visible alpha, plus a temporary S3TC DDS atlas under the ignored `res://.godot/` directory to exercise a two-channel compressed normal texture.
+
+```sh
+for renderer in gl_compatibility mobile forward_plus; do
+  "$GODOT" --rendering-method "$renderer" --path /path/to/imported-example-project \
+    --script "$(pwd)/spine-godot/tests/lighting-3d.gd"
+done
+```
+
+The project must contain `examples/19-3d-lighting/` and imported Raptor resources. Repeat with module and GDExtension editor builds. Require `Spine 3D lighting and shadows regression passed.` and no shader/script errors.
+
 ## Native 3D (Godot 4)
 
 `controller-3d.gd` covers mixed 2D/3D shared resources with independent state, 3D lifecycle signal arguments/order, hidden animation time, callback resource replacement, retained wrappers, shared-resource reload, world exit/re-entry, and character priorities independent of slot count (including 257 and 1024 slots). Its deliberate negative checks log **7** `Native Spine object not set.` errors. There is no slot-count rejection.
@@ -161,6 +174,6 @@ done
 
 `performance-3d.gd` also runs on the pre-batching Stage2 binary for an identical 128-compatible-quad comparison. Run both benchmarks on all three renderers. Godot4.6/4.7 **Mobile's viewport draw-call statistic counts visible instances**, not surfaces/passes; it underreports multi-draw children. The single-surface batch benchmark counts remain comparable, and multi-surface insertion correctness is checked against GPU reference pixels.
 
-These tests create and remove their own fixtures under `user://`. They do not change example scenes or imports. The 3D GPU test explicitly calls `RenderingServer.force_draw()` before readback because a manual-mode sprite in an otherwise empty main window need not request window redraws. Check for the test's `regression passed.` message **and no `SCRIPT ERROR`**, rather than relying on Godot's process exit code alone.
+These tests create and remove their own fixtures under `user://` or the ignored `res://.godot/` directory. They do not change example scenes or imports. The 3D GPU test explicitly calls `RenderingServer.force_draw()` before readback because a manual-mode sprite in an otherwise empty main window need not request window redraws. Check for the test's `regression passed.` message **and no `SCRIPT ERROR`**, rather than relying on Godot's process exit code alone.
 
-Run the controller, tint-black, rendering-3d and batching-3d regression scripts for every supported Godot minor in `.github/workflows/spine-godot-v4-all.yml` and `spine-godot-extension-v4-all.yml`, using the matching vanilla editor for GDExtension tests. Module and GDExtension API builds must be validated independently: their include paths and APIs differ. Use isolated example copies for editor/demo imports, since Godot can automatically change shared textures' import settings after detecting 3D use.
+Run the controller, tint-black, rendering-3d, lighting-3d and batching-3d regression scripts for every supported Godot minor in `.github/workflows/spine-godot-v4-all.yml` and `spine-godot-extension-v4-all.yml`, using the matching vanilla editor for GDExtension tests. Module and GDExtension API builds must be validated independently: their include paths and APIs differ. Use isolated example copies for editor/demo imports, since Godot can automatically change shared textures' import settings after detecting 3D use.

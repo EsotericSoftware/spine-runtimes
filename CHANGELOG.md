@@ -316,6 +316,7 @@
   - Added `SpineSlotNode3D` for bone following, explicit 3D geometry insertion between Spine batches, and slot material overrides, plus batching statistics and renderer benchmarks.
   - Added `SpineSprite3D.camera_relative_depth`, `depth_write_enabled`, `alpha_cutoff`, `get_aabb()`, and `get_depth_shader_code()`, with a custom-shader guide and interactive front/back depth example for module and GDExtension.
   - Added explicit single-camera slot-anchor following through `SpineSlotNode3D.depth_camera`, with fixed-depth fallback and diagnostics for invalid cameras and multi-view/physics limitations.
+  - Added opt-in generated lighting, atlas normal maps, PBR controls, and texture-alpha-tested shadow modes to `SpineSprite3D`, with lazy shadow-only instances and an interactive Raptor lighting example.
   - Added `SpineAnimationTrack` support for `SpineSprite3D` and Godot 4 GDExtension, including AnimationPlayer playback/editor scrubbing for both 2D and 3D sprites and a shared timeline example.
   - Added an interactive 2D/3D benchmark example with configurable character counts, animation/pause controls, CPU timing and renderer statistics for module and GDExtension.
   - Added tint black (two-color tinting) for Godot 4.3+ module and GDExtension runtimes, with animated coin examples and custom shader color attributes. See [#3169](https://github.com/EsotericSoftware/spine-runtimes/issues/3169).
@@ -327,6 +328,7 @@
   - Added `SpineTrackEntry.get_additive()` / `set_additive()` for additive blending per track entry.
 
 - **Bug fixes**
+  - Fixed invalid `SpineSprite3D` preview animation names dereferencing a null track entry.
   - Fixed callback-time `time_scale` changes affecting animation and skeleton/physics advances one update late after controller extraction.
   - Fixed unrelated scene-tree mutations resetting `SpineSlotNode3D` insertion sorting and revealing inactive-bone children on manual or paused sprites; unchanged descendants retain ownership during transfers.
   - Fixed newly allocated `SpineSprite3D` batch instances rendering while hidden, including pool growth and inherited visibility.
