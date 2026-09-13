@@ -18,7 +18,7 @@ jobs:
         version:
           [
             {"tag": "4.6.3-stable", "version": "4.6.3.stable", "api_version": "4.6", "dev": false},
-            {"tag": "4.7.1-stable", "version": "4.7.1.stable", "api_version": "4.7", "dev": false},
+            {"tag": "4.7.2-stable", "version": "4.7.2.stable", "api_version": "4.7", "dev": false},
           ]
     uses: ./.github/workflows/spine-godot-extension-v4.yml
     with:
