@@ -32,6 +32,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
 #include "Rendering/DrawElements.h"
+#include "Runtime/Launch/Resources/Version.h"
 #include "Runtime/SlateRHIRenderer/Public/Interfaces/ISlateRHIRendererModule.h"
 #include "Slate/SMeshWidget.h"
 #include "Slate/SlateVectorArtData.h"
@@ -56,7 +57,11 @@ struct SpineSlateMaterialBrush : public FSlateBrush {
 		FScopeLock Lock(&NamePoolLock);
 
 		if (NamePool.Num() > 0) {
+#if ENGINE_MAJOR_VERSION > 5 || (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
+			ResourceName = NamePool.Pop(EAllowShrinking::No);
+#else
 			ResourceName = NamePool.Pop(false);
+#endif
 		} else {
 			static uint32 NextId = 0;
 			FString brushName = TEXT("SpineSlateMatBrush");

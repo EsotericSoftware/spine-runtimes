@@ -1375,6 +1375,7 @@
 ## Unreal Engine
 
 - **Bug fixes**
+  - Fixed `SSpineWidget` compilation with Unreal Engine 5.8 after the removal of boolean shrinking arguments from `TArray::Pop()`.
   - Fixed Spine atlas and skeleton data reimport actions and automatic source change detection in recent Unreal Engine versions.
   - Fixed editor crashes caused by parsing stale skeleton data while loading assets. Skeleton metadata is now validated and cached during import and reimport.
 
