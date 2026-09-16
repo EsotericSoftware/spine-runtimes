@@ -329,7 +329,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "4.3.6"
+    version: "4.3.7"
   stack_trace:
     dependency: transitive
     description:

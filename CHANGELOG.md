@@ -671,6 +671,8 @@
   - Added convex and inverse clipping support through the updated spine-cpp clipping runtime.
   - Added `fromMemory` methods to `AtlasFlutter`, `SkeletonDataFlutter`, `SkeletonDrawableFlutter`, and `SpineWidget` for loading Spine data from custom sources (memory, encrypted storage, databases, custom caching, etc.)
   - Added example `load_from_memory.dart` demonstrating how to load all assets into memory and use the `fromMemory` API
+  - Added `AtlasFlutter.addRegion()` and `Attachment.setRegion()` for using custom Flutter images with region and mesh attachments at runtime.
+  - Added example `custom_attachment.dart` demonstrating an animated custom image on a copied mesh attachment.
 
 - **Bug fixes**
   - Fixed draw order timelines not mixing out to the setup pose.
