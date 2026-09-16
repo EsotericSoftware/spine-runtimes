@@ -57,6 +57,103 @@ namespace Spine.Unity {
 			targetTexture = null;
 			return false;
 		}
+
+		/// <summary>Assigns placeholders at every texture property of the material (main texture and any
+		/// additional texture properties such as normal maps) whose texture matches a target texture of this loader.
+		/// The default implementation calls <see cref="AssignPlaceholderTexture"/> to maintain existing behaviour
+		/// of loaders only supporting the main texture, for backwards compatibility.</summary>
+		/// <param name="targetTextures">The replaced target textures indexed by texture index (0 is the main texture),
+		/// with null entries where nothing was replaced. Null if nothing was replaced at all.
+		/// Pass to <see cref="RestoreTargetTextures"/> to undo the replacement.</param>
+		/// <returns>True if any placeholder texture was assigned.</returns>
+		public virtual bool AssignPlaceholderTextures (Material material, out Texture[] targetTextures) {
+			Texture targetTexture;
+			bool anyAssigned = AssignPlaceholderTexture(material, out targetTexture);
+			targetTextures = anyAssigned ? new Texture[] { targetTexture } : null;
+			return anyAssigned;
+		}
+
+		/// <summary>Restores target textures previously replaced via
+		/// <see cref="AssignPlaceholderTextures(Material, out Texture[])"/> at the material.</summary>
+		/// <param name="targetTextures">The target textures indexed by texture index (0 is the main texture),
+		/// null entries are skipped.</param>
+		public virtual void RestoreTargetTextures (Material material, Texture[] targetTextures) {
+			if (!material || targetTextures == null || targetTextures.Length == 0 || !targetTextures[0]) return;
+			material.mainTexture = targetTextures[0];
+		}
+
+		/// <summary>Replaces each placeholder texture assigned at any texture property of the material with its target
+		/// texture. Placeholders are identified by texture instead of by property name. Used to recover materials
+		/// after an interrupted build and before placeholder textures are deleted.</summary>
+		/// <returns>True if any target texture was assigned.</returns>
+		public virtual bool RestoreTargetTextures (Material material) {
+			if (!material || !HasPlaceholderAssigned(material)) return false;
+			Material overrideMaterial = null;
+			BeginCustomTextureLoading();
+			try {
+				RequestLoadMaterialTextures(material, ref overrideMaterial);
+			} finally {
+				EndCustomTextureLoading();
+			}
+			return !HasPlaceholderAssigned(material);
+		}
+
+		/// <summary>Calls <see cref="RestoreTargetTextures(Material)"/> for each material of the associated AtlasAssetBase.</summary>
+		/// <param name="restoredMaterials">A newly created list of the modified materials, null if none was modified.</param>
+		/// <returns>True if any material was modified.</returns>
+		public virtual bool RestoreTargetTextures (out List<Material> restoredMaterials) {
+			restoredMaterials = null;
+			if (!atlasAsset) return false;
+			foreach (Material material in atlasAsset.Materials) {
+				if (!RestoreTargetTextures(material)) continue;
+				if (restoredMaterials == null) restoredMaterials = new List<Material>();
+				restoredMaterials.Add(material);
+			}
+			return restoredMaterials != null;
+		}
+
+		/// <summary>Returns whether the texture is a placeholder referenced by this loader, including mappings whose
+		/// target reference is missing. Used to protect shared placeholder assets across different loading backends.
+		/// Loaders not derived from GenericOnDemandTextureLoader should override this to expose their placeholders.</summary>
+		public virtual bool IsPlaceholderTexture (Texture texture) {
+			return false;
+		}
+
+		/// <summary>Returns whether the texture is a target texture of this loader, which is replaced by a placeholder
+		/// texture when building and loaded on demand at runtime.</summary>
+		public virtual bool IsTargetTexture (Texture texture) {
+			return false;
+		}
+
+		/// <summary>Validates the loader setup, logging a warning for each problem found. Called before placeholder
+		/// textures are assigned for a build.</summary>
+		/// <returns>True if the setup is valid.</returns>
+		public virtual bool ValidateSetup () {
+			return true;
+		}
+
+		/// <summary>Returns the names of all texture properties of the material's shader. Unused texture properties
+		/// remaining at the material from a previously assigned shader are not included.</summary>
+		public static string[] GetTexturePropertyNames (Material material) {
+			if (!material || !material.shader) return new string[0];
+			List<string> propertyNames = new List<string>();
+#if UNITY_2018_1_OR_NEWER
+			// Material.GetTexturePropertyNames also returns unused properties of previously assigned shaders.
+			string[] materialPropertyNames = material.GetTexturePropertyNames();
+			foreach (string propertyName in materialPropertyNames) {
+				if (material.HasProperty(propertyName))
+					propertyNames.Add(propertyName);
+			}
+#else
+			// ShaderUtil property access is obsolete on newer Unity versions, only used for the spine-unity core minimum version.
+			Shader shader = material.shader;
+			for (int i = 0, count = UnityEditor.ShaderUtil.GetPropertyCount(shader); i < count; ++i) {
+				if (UnityEditor.ShaderUtil.GetPropertyType(shader, i) == UnityEditor.ShaderUtil.ShaderPropertyType.TexEnv)
+					propertyNames.Add(UnityEditor.ShaderUtil.GetPropertyName(shader, i));
+			}
+#endif
+			return propertyNames.ToArray();
+		}
 #endif
 		/// <summary>
 		/// Returns whether any placeholder textures are assigned at the Material of the associated AtlasAssetBase.

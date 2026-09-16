@@ -47,7 +47,7 @@ namespace Spine.Unity {
 #if UNITY_EDITOR
 		public Texture EditorTexture {
 			get {
-				return (Texture)assetReference.editorAsset;
+				return assetReference != null ? (Texture)assetReference.editorAsset : null;
 			}
 		}
 #endif
@@ -84,6 +84,7 @@ namespace Spine.Unity {
 			MaterialOnDemandData materialData, int textureIndex, Material materialToUpdate,
 			System.Action<Texture> onTextureLoaded) {
 
+			Texture textureBeforeLoad = GetTexture(materialToUpdate, textureIndex);
 			OnTextureRequested(materialToUpdate, textureIndex);
 			AsyncOperationHandle<Texture> requestHandle = targetReference.assetReference.LoadAssetAsync<Texture>();
 			materialData.textureRequests[textureIndex].handle = requestHandle;
@@ -94,7 +95,9 @@ namespace Spine.Unity {
 
 				if (obj.Status == AsyncOperationStatus.Succeeded) {
 					Texture loadedTexture = obj.Result;
-					materialToUpdate.mainTexture = loadedTexture;
+					// Preserve texture changes made while loading.
+					if (GetTexture(materialToUpdate, textureIndex) == textureBeforeLoad)
+						SetTexture(materialToUpdate, textureIndex, loadedTexture);
 					OnTextureLoaded(materialToUpdate, textureIndex);
 					if (onTextureLoaded != null) onTextureLoaded(loadedTexture);
 				} else {

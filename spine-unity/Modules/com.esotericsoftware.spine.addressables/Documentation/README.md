@@ -18,6 +18,12 @@ The following steps are all that is required to setup your textures to be replac
 
 From now on when building your game executable, the low resolution placeholder textures are automatically assigned initially and the corresponding high-resolution textures loaded on-demand.
 
+If the placeholder texture map no longer matches the atlas materials, e.g. after changing textures, the loader is skipped when building and its textures are included at full resolution. Hit `Regenerate` at the loader to update the map.
+
+### Additional Textures (Normal Maps, etc.)
+
+By default only the main texture of each atlas material is loaded on-demand. If your materials use additional textures such as normal maps, add the respective shader texture property names (e.g. `_BumpMap`) to the `Additional Texture Properties` list of the `AddressableTextureLoader` asset, or hit `Add All Textures` to fill the list with all texture properties which have a texture assigned at any atlas material. The loader then searches the atlas materials for these properties, creates low-resolution placeholder textures for the assigned textures and loads the high-resolution textures on-demand together with the main texture. Be sure to also declare these additional textures as addressable. Blend mode materials and copied materials referencing these textures are handled automatically as well. Textures at properties not listed (e.g. a differently named normal map property of a custom shader) are not loaded on demand.
+
 ### Editor Preview
 
 Please note that the low-resolution textures are activated only when building the game executable, they are usually never shown in the Editor, also not in play-mode.
