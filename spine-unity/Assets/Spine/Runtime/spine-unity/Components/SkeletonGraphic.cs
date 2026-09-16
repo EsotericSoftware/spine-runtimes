@@ -1703,7 +1703,13 @@ namespace Spine.Unity {
 
 		[SerializeField] protected bool wasDeprecatedTransferred = false;
 
-		[FormerlySerializedAs("meshGenerator")] [SerializeField] private MeshGenerator meshGeneratorDeprecated;
+		// Note: required because current MeshGenerator.settings is a [NonSerialized] member.
+		[System.Serializable]
+		private class MeshGeneratorDeprecated {
+			public MeshGenerator.Settings settings = MeshGenerator.Settings.Default;
+		}
+
+		[FormerlySerializedAs("meshGenerator")] [SerializeField] private MeshGeneratorDeprecated meshGeneratorDeprecated;
 		[FormerlySerializedAs("updateTiming")] [SerializeField] private UpdateTiming updateTimingDeprecated = UpdateTiming.InUpdate;
 		[FormerlySerializedAs("startingAnimation")] [SerializeField] private string startingAnimationDeprecated;
 		[FormerlySerializedAs("startingLoop")] [SerializeField] private bool startingLoopDeprecated;
