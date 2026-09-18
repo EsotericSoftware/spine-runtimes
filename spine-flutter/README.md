@@ -53,6 +53,79 @@ You can then open `spine-flutter` in an IDE or editor of your choice that suppor
 
 Alternatively, you can run the example from the [command line](https://docs.flutter.dev/get-started/test-drive?tab=terminal).
 
+## Custom attachments
+
+A custom attachment uses a Flutter `Image` that is not part of the skeleton's original texture atlas. This is useful for
+runtime customization such as downloaded avatar images, equipment, or clothing.
+
+First decode the image and add it to the same `AtlasFlutter` used to render the skeleton. Then copy the existing region
+or mesh attachment and set its region. This example places a copied hoverboard mesh in a custom skin because the
+`hoverboard` animation has an attachment timeline for that slot:
+
+```dart
+import 'dart:ui' as ui;
+
+import 'package:flutter/services.dart';
+import 'package:spine_flutter/spine_flutter.dart';
+
+final data = await rootBundle.load('assets/custom-hoverboard.png');
+final bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+final codec = await ui.instantiateImageCodec(bytes);
+late final ui.Image image;
+try {
+  image = (await codec.getNextFrame()).image;
+} finally {
+  codec.dispose();
+}
+
+late final AtlasRegion region;
+try {
+  region = drawable.atlasFlutter.addRegion('custom-hoverboard', image);
+} finally {
+  image.dispose(); // addRegion() keeps its own image handle.
+}
+
+final slot = drawable.skeleton.findSlot('hoverboard-board');
+final originalAttachment = drawable.skeleton.getAttachment('hoverboard-board', 'hoverboard-board');
+if (slot == null || originalAttachment is! MeshAttachment) {
+  throw StateError('The hoverboard mesh attachment could not be found.');
+}
+
+final customAttachment = originalAttachment.copy() as MeshAttachment;
+customAttachment.setRegion(region);
+
+final customSkin = Skin('custom-hoverboard');
+customSkin.setAttachment(slot.data.index, 'hoverboard-board', customAttachment);
+drawable.skeleton
+  ..setSkin2(customSkin)
+  ..setupPoseSlots();
+drawable.animationState.setAnimation(0, 'hoverboard', true);
+drawable.animationState.apply(drawable.skeleton);
+
+// Later, when cleaning up, dispose the skeleton before the skin. The skin owns customAttachment.
+drawable.dispose();
+customSkin.dispose();
+```
+
+`setRegion()` supports `RegionAttachment` and `MeshAttachment`. It preserves the attachment's geometry. Region
+attachments may need their dimensions adjusted to match a differently shaped image. Mesh attachments retain their
+existing vertices and UV layout, so replacement artwork should use a compatible layout. Copying avoids changing an
+attachment that may be shared by other skeletons.
+
+For a slot without an attachment timeline, the copied attachment can be assigned directly to `slot.pose.attachment`.
+Such a copy remains caller-owned and must be disposed after no slot or skeleton uses it. An attachment timeline can
+replace a direct assignment. Adding the copy under the same skin placeholder, as above, lets the timeline resolve the
+custom attachment instead. A `Skin` owns attachments added to it; keep the skin alive while a skeleton uses it and do
+not also dispose those attachments separately.
+
+The atlas owns the returned region, so do not dispose it. The region must only be rendered with the `AtlasFlutter` that
+created it and must remain valid while an attachment may use it. Each `addRegion()` call creates a full-image atlas page
+and retains its cloned image handle until the atlas is disposed. There is no packing, cropping, deduplication, or
+individual removal, so reuse returned regions rather than repeatedly adding the same image. Separate pages may also
+prevent draw-call batching between attachments.
+
+See [`custom_attachment.dart`](example/lib/custom_attachment.dart) for a complete animated example, including cleanup.
+
 ## Development
 Run `./setup.sh` to copy over the spine-cpp and spine-c sources. This step needs to be executed every time spine-cpp or spine-c changes.
 
@@ -60,7 +133,7 @@ If all you modify are the Dart sources of the plugin, then the development setup
 
 If you need to update or modify the bindings generated from spine-c, run `./generate-bindings.sh`. If you regenerate the bindings, you must also compile the WASM binaries via `./compile-wasm.sh`.
 
-The `./tests` folder contains headless tests that exercise the bindings to [spine-c](../spine-c).
+The `./test` folder contains headless tests for the [spine-c](../spine-c) bindings and Flutter rendering tests.
 
 ## Releasing
 
