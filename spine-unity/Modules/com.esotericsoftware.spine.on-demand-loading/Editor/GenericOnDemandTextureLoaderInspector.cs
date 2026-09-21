@@ -61,6 +61,16 @@ namespace Spine.Unity.Editor {
 		protected SerializedProperty unloadAfterSecondsUnused;
 		protected SerializedProperty additionalTextureProperties;
 		static protected bool placeholdersFoldout = true;
+		static GUIStyle boldFoldoutStyle;
+		static GUIStyle BoldFoldoutStyle {
+			get {
+				if (boldFoldoutStyle == null) {
+					boldFoldoutStyle = new GUIStyle(EditorStyles.foldout);
+					boldFoldoutStyle.fontStyle = FontStyle.Bold;
+				}
+				return boldFoldoutStyle;
+			}
+		}
 		protected SerializedProperty loadedDataAtMaterial;
 		protected GenericOnDemandTextureLoader<TargetReference, TextureRequest> loader;
 		protected GUIContent placeholderTexturesLabel;
@@ -535,57 +545,72 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.PropertyField(maxPlaceholderSize);
 			EditorGUILayout.PropertyField(unloadAfterSecondsUnused);
 
-			EditorGUI.BeginChangeCheck();
-			EditorGUILayout.PropertyField(additionalTextureProperties, additionalTexturePropertiesLabel, true);
-			bool additionalTexturePropertiesChanged = EditorGUI.EndChangeCheck();
+			bool additionalTexturePropertiesChanged;
+			bool previousHierarchyMode = EditorGUIUtility.hierarchyMode;
+			EditorGUIUtility.hierarchyMode = false; // draws foldout arrows inside the boxes below instead of left of them.
+			try {
+				EditorGUILayout.Space();
+				using (new SpineInspectorUtility.BoxScope(false)) {
+					EditorGUI.BeginChangeCheck();
+					EditorGUILayout.PropertyField(additionalTextureProperties, additionalTexturePropertiesLabel, true);
+					additionalTexturePropertiesChanged = EditorGUI.EndChangeCheck();
 
-			EditorGUI.BeginDisabledGroup(Application.isPlaying || loader.atlasAsset == null);
-			if (GUILayout.Button(new GUIContent("Add All Textures", "Adds all texture properties which have a texture assigned " +
-				"at any AtlasAsset material to the Additional Texture Properties list."), EditorStyles.miniButton, GUILayout.Width(160f))) {
-				serializedObject.ApplyModifiedProperties(); // apply pending list edits before modifying the list directly.
-				if (loader.AddAllTextureProperties() > 0) {
-					serializedObject.Update();
-					additionalTexturePropertiesChanged = true;
-				}
-			}
-			EditorGUI.EndDisabledGroup();
-
-			if (!Application.isPlaying && loader.atlasAsset != null && !loader.ValidateSetup(false)) {
-				EditorGUILayout.HelpBox("The loader setup is invalid, e.g. the placeholder texture map does not match the AtlasAsset " +
-					"materials after textures were changed, or a target texture can't be loaded on demand. Details are logged as warnings " +
-					"when building. The loader is skipped when building until fixed. Hit 'Regenerate' to update the placeholder map.", MessageType.Warning);
-			}
-
-			placeholdersFoldout = EditorGUILayout.Foldout(placeholdersFoldout, placeholderTexturesLabel, true);
-			if (placeholdersFoldout) {
-				for (int m = 0, materialCount = placeholderMap.arraySize; m < materialCount; ++m) {
-					// line below equals: PlaceholderTextureMapping[] materialTextures = placeholderMap[m].textures;
-					SerializedProperty materialTextures = placeholderMap.GetArrayElementAtIndex(m).FindPropertyRelative("textures");
-
-					for (int t = 0, textureCount = materialTextures.arraySize; t < textureCount; ++t) {
-						// line below equals: PlaceholderTextureMapping textureMapping = materialTextures[t];
-						SerializedProperty textureMapping = materialTextures.GetArrayElementAtIndex(t);
-						// skip empty entries of additional texture properties not used at this material.
-						if (t > 0 && textureMapping.FindPropertyRelative("placeholderTexture").objectReferenceValue == null)
-							continue;
-						DrawPlaceholderMapping(textureMapping, GetTexturePropertyName(t));
+					EditorGUI.BeginDisabledGroup(Application.isPlaying || loader.atlasAsset == null);
+					EditorGUILayout.BeginHorizontal(GUILayout.Height(EditorGUIUtility.singleLineHeight + 5));
+					if (GUILayout.Button(new GUIContent("Add All Textures", "Adds all texture properties which have a texture assigned " +
+						"at any AtlasAsset material to the Additional Texture Properties list."), EditorStyles.miniButton, GUILayout.Width(160f))) {
+						serializedObject.ApplyModifiedProperties(); // apply pending list edits before modifying the list directly.
+						if (loader.AddAllTextureProperties() > 0) {
+							serializedObject.Update();
+							additionalTexturePropertiesChanged = true;
+						}
 					}
+					EditorGUILayout.EndHorizontal();
+					EditorGUI.EndDisabledGroup();
 				}
+
+				if (!Application.isPlaying && loader.atlasAsset != null && !loader.ValidateSetup(false)) {
+					EditorGUILayout.HelpBox("The loader setup is invalid, e.g. the placeholder texture map does not match the AtlasAsset " +
+						"materials after textures were changed, or a target texture can't be loaded on demand. Details are logged as warnings " +
+						"when building. The loader is skipped when building until fixed. Hit 'Regenerate' to update the placeholder map.", MessageType.Warning);
+				}
+
+				EditorGUILayout.Space();
+				using (new SpineInspectorUtility.BoxScope(false)) {
+					placeholdersFoldout = EditorGUILayout.Foldout(placeholdersFoldout, placeholderTexturesLabel, true, BoldFoldoutStyle);
+					if (placeholdersFoldout) {
+						for (int m = 0, materialCount = placeholderMap.arraySize; m < materialCount; ++m) {
+							// line below equals: PlaceholderTextureMapping[] materialTextures = placeholderMap[m].textures;
+							SerializedProperty materialTextures = placeholderMap.GetArrayElementAtIndex(m).FindPropertyRelative("textures");
+
+							for (int t = 0, textureCount = materialTextures.arraySize; t < textureCount; ++t) {
+								// line below equals: PlaceholderTextureMapping textureMapping = materialTextures[t];
+								SerializedProperty textureMapping = materialTextures.GetArrayElementAtIndex(t);
+								// skip empty entries of additional texture properties not used at this material.
+								if (t > 0 && textureMapping.FindPropertyRelative("placeholderTexture").objectReferenceValue == null)
+									continue;
+								DrawPlaceholderMapping(textureMapping, GetTexturePropertyName(t));
+							}
+						}
+					}
+
+					EditorGUI.BeginDisabledGroup(Application.isPlaying);
+					if (GUILayout.Button(new GUIContent("Regenerate", "Re-initialize the placeholder texture maps."), EditorStyles.miniButton, GUILayout.Width(160f)))
+						ReinitPlaceholderTextures(loader);
+					EditorGUI.EndDisabledGroup();
+
+					GUILayout.Space(16f);
+					EditorGUILayout.LabelField("Testing", EditorStyles.boldLabel);
+					EditorGUILayout.BeginHorizontal(GUILayout.Height(EditorGUIUtility.singleLineHeight + 5));
+					if (GUILayout.Button(new GUIContent("Assign Placeholders", "Assign placeholder textures for testing (only atlas materials)."), EditorStyles.miniButton, GUILayout.Width(160f)))
+						AssignPlaceholderTextures(loader);
+					if (GUILayout.Button(new GUIContent("Assign Normal Textures", "Re-assign target textures."), EditorStyles.miniButton, GUILayout.Width(160f)))
+						AssignTargetTextures(loader);
+					EditorGUILayout.EndHorizontal();
+				}
+			} finally {
+				EditorGUIUtility.hierarchyMode = previousHierarchyMode;
 			}
-
-			EditorGUI.BeginDisabledGroup(Application.isPlaying);
-			if (GUILayout.Button(new GUIContent("Regenerate", "Re-initialize the placeholder texture maps."), EditorStyles.miniButton, GUILayout.Width(160f)))
-				ReinitPlaceholderTextures(loader);
-			EditorGUI.EndDisabledGroup();
-
-			GUILayout.Space(16f);
-			EditorGUILayout.LabelField("Testing", EditorStyles.boldLabel);
-			EditorGUILayout.BeginHorizontal(GUILayout.Height(EditorGUIUtility.singleLineHeight + 5));
-			if (GUILayout.Button(new GUIContent("Assign Placeholders", "Assign placeholder textures for testing (only atlas materials)."), EditorStyles.miniButton, GUILayout.Width(160f)))
-				AssignPlaceholderTextures(loader);
-			if (GUILayout.Button(new GUIContent("Assign Normal Textures", "Re-assign target textures."), EditorStyles.miniButton, GUILayout.Width(160f)))
-				AssignTargetTextures(loader);
-			EditorGUILayout.EndHorizontal();
 
 			if (!Application.isPlaying) {
 				serializedObject.ApplyModifiedProperties();
