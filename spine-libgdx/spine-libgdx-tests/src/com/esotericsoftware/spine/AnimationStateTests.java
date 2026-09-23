@@ -36,8 +36,13 @@ import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Pool;
 
+import com.esotericsoftware.spine.Animation.EventTimeline;
+import com.esotericsoftware.spine.Animation.PhysicsConstraintResetTimeline;
+import com.esotericsoftware.spine.Animation.RotateTimeline;
+import com.esotericsoftware.spine.Animation.Timeline;
 import com.esotericsoftware.spine.AnimationState.AnimationStateListener;
 import com.esotericsoftware.spine.AnimationState.TrackEntry;
 import com.esotericsoftware.spine.attachments.AttachmentLoader;
@@ -847,7 +852,57 @@ public class AnimationStateTests {
 		state.addAnimation(0, "events1", false, 0).setTrackEnd(1);
 		run(0.1f, 1000, null);
 
+		EventTimeline eventTimeline = new EventTimeline(1);
+		eventTimeline.setFrame(0, new Event(0, new EventData("event")));
+		testUnkeyedRotation(eventTimeline);
+
+		PhysicsConstraintResetTimeline resetTimeline = new PhysicsConstraintResetTimeline(1, -1);
+		resetTimeline.setFrame(0, 0);
+		testUnkeyedRotation(resetTimeline);
+
 		System.out.println("AnimationState tests passed.");
+	}
+
+	private void testUnkeyedRotation (Timeline timeline) {
+		SkeletonData data = new SkeletonData();
+		Array<Timeline> timelines = new Array(true, 64, Timeline[]::new);
+		IntArray bones = new IntArray(64);
+		for (int i = 0; i < 64; i++) {
+			BoneData bone = new BoneData(i, "bone" + i, i == 0 ? null : data.bones.first());
+			bone.setupPose.rotation = 20;
+			data.bones.add(bone);
+			RotateTimeline rotate = new RotateTimeline(1, 0, i);
+			rotate.setFrame(0, 0, 60);
+			timelines.add(rotate);
+			bones.add(i);
+		}
+		Animation keyed = new Animation("keyed");
+		keyed.setTimelines(timelines, bones);
+		keyed.setDuration(1);
+
+		timelines = new Array(true, 1, Timeline[]::new);
+		timelines.add(timeline);
+		Animation unkeyed = new Animation("unkeyed");
+		unkeyed.setTimelines(timelines, new IntArray(0));
+		unkeyed.setDuration(1);
+
+		Skeleton skeleton = new Skeleton(data);
+		AnimationStateData stateData = new AnimationStateData(data);
+		stateData.setDefaultMix(0.5f);
+		AnimationState state = new AnimationState(stateData);
+		state.setAnimation(0, keyed, true);
+		state.apply(skeleton);
+		state.setAnimation(0, unkeyed, true);
+		for (int i = 1; i <= 3; i++) {
+			state.update(0.25f);
+			state.apply(skeleton);
+			float expected = i == 1 ? 50 : 20;
+			for (Bone bone : skeleton.bones) {
+				if (!MathUtils.isEqual(bone.pose.rotation, expected)) throw new AssertionError(
+					timeline.getClass().getSimpleName() + ": " + bone + " rotation " + bone.pose.rotation + " != " + expected);
+			}
+		}
+		if (state.getTrack(0).mixingFrom != null) throw new AssertionError("Mixing did not finish.");
 	}
 
 	void setup (String description, Result... expectedArray) {
