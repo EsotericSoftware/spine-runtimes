@@ -1929,7 +1929,7 @@ namespace Spine {
 
 	/// <summary>Fires an <see cref="Event"/> when specific animation times are reached.</summary>
 	public class EventTimeline : Timeline {
-		new readonly static ulong[] propertyIds = { (ulong)Property.Event };
+		new readonly static ulong[] propertyIds = { (ulong)Property.Event << 58 };
 		readonly Event[] events;
 
 		public EventTimeline (int frameCount)
@@ -2714,7 +2714,7 @@ namespace Spine {
 
 	/// <summary>Resets a physics constraint when specific animation times are reached.</summary>
 	public class PhysicsConstraintResetTimeline : Timeline, IConstraintTimeline {
-		new internal static readonly ulong[] propertyIds = { (ulong)Property.PhysicsConstraintReset };
+		new internal static readonly ulong[] propertyIds = { (ulong)Property.PhysicsConstraintReset << 58 };
 
 		readonly int constraintIndex;
 
