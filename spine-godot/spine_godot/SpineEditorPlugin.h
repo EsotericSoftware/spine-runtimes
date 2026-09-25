@@ -434,18 +434,27 @@ public:
 class SpineSprite3DGizmoPlugin : public EditorNode3DGizmoPlugin {
 	GDCLASS(SpineSprite3DGizmoPlugin, EditorNode3DGizmoPlugin)
 
-	static void _bind_methods() {}
+	static void _bind_methods() {
+	}
 
 public:
 #ifdef SPINE_GODOT_EXTENSION
 	bool _has_gizmo(Node3D *node) const override;
-	String _get_gizmo_name() const override { return "SpineSprite3D"; }
-	bool _can_be_hidden() const override { return false; }
+	String _get_gizmo_name() const override {
+		return "SpineSprite3D";
+	}
+	bool _can_be_hidden() const override {
+		return false;
+	}
 	void _redraw(const Ref<EditorNode3DGizmo> &gizmo) override;
 #else
 	bool has_gizmo(Node3D *node) override;
-	String get_gizmo_name() const override { return "SpineSprite3D"; }
-	bool can_be_hidden() const override { return false; }
+	String get_gizmo_name() const override {
+		return "SpineSprite3D";
+	}
+	bool can_be_hidden() const override {
+		return false;
+	}
 	void redraw(EditorNode3DGizmo *gizmo) override;
 #endif
 };

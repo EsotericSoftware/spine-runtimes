@@ -332,9 +332,9 @@ void SpineMesh2D::update_mesh(const PackedVector2Array &vertices, const PackedVe
 #if VERSION_MINOR >= 3
 		if (has_dark_color) {
 			surface_offsets[RS::ARRAY_CUSTOM0] = RS::get_singleton()->mesh_surface_get_format_offset(surface_format, vertices.size(),
-																								 RS::ARRAY_CUSTOM0);
+																									 RS::ARRAY_CUSTOM0);
 			surface_offsets[RS::ARRAY_CUSTOM1] = RS::get_singleton()->mesh_surface_get_format_offset(surface_format, vertices.size(),
-																								 RS::ARRAY_CUSTOM1);
+																									 RS::ARRAY_CUSTOM1);
 		}
 #endif
 		vertex_stride = RS::get_singleton()->mesh_surface_get_format_vertex_stride(surface_format, vertices.size());
@@ -540,9 +540,9 @@ void SpineSprite::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("on_skeleton_data_changed"), &SpineSprite::on_skeleton_data_changed);
 
 	ClassDB::bind_method(D_METHOD("get_global_bone_transform", "bone_name"),
-					 static_cast<Transform2D (SpineSprite::*)(const String &)>(&SpineSprite::get_global_bone_transform));
+						 static_cast<Transform2D (SpineSprite::*)(const String &)>(&SpineSprite::get_global_bone_transform));
 	ClassDB::bind_method(D_METHOD("set_global_bone_transform", "bone_name", "global_transform"),
-					 static_cast<void (SpineSprite::*)(const String &, Transform2D)>(&SpineSprite::set_global_bone_transform));
+						 static_cast<void (SpineSprite::*)(const String &, Transform2D)>(&SpineSprite::set_global_bone_transform));
 
 	ClassDB::bind_method(D_METHOD("set_update_mode", "v"), &SpineSprite::set_update_mode);
 	ClassDB::bind_method(D_METHOD("get_update_mode"), &SpineSprite::get_update_mode);

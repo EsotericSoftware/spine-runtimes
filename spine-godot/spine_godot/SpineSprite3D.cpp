@@ -157,13 +157,17 @@ void SpineSprite3D::upload_batch(SpineBatch3D *item) {
 	int cast_shadows = item->custom_material ? (int) shadow_casting : (int) SHADOW_CASTING_OFF;
 	if (cast_shadows != item->last_shadow_casting) {
 #if !defined(SPINE_GODOT_EXTENSION) && VERSION_MINOR >= 7
-		RSE::ShadowCastingSetting setting = cast_shadows == SHADOW_CASTING_ON ? RSE::SHADOW_CASTING_SETTING_ON :
-			(cast_shadows == SHADOW_CASTING_DOUBLE_SIDED ? RSE::SHADOW_CASTING_SETTING_DOUBLE_SIDED :
-				(cast_shadows == SHADOW_CASTING_SHADOWS_ONLY ? RSE::SHADOW_CASTING_SETTING_SHADOWS_ONLY : RSE::SHADOW_CASTING_SETTING_OFF));
+		RSE::ShadowCastingSetting setting = cast_shadows == SHADOW_CASTING_ON
+			? RSE::SHADOW_CASTING_SETTING_ON
+			: (cast_shadows == SHADOW_CASTING_DOUBLE_SIDED
+				   ? RSE::SHADOW_CASTING_SETTING_DOUBLE_SIDED
+				   : (cast_shadows == SHADOW_CASTING_SHADOWS_ONLY ? RSE::SHADOW_CASTING_SETTING_SHADOWS_ONLY : RSE::SHADOW_CASTING_SETTING_OFF));
 #else
-		RS::ShadowCastingSetting setting = cast_shadows == SHADOW_CASTING_ON ? RS::SHADOW_CASTING_SETTING_ON :
-			(cast_shadows == SHADOW_CASTING_DOUBLE_SIDED ? RS::SHADOW_CASTING_SETTING_DOUBLE_SIDED :
-				(cast_shadows == SHADOW_CASTING_SHADOWS_ONLY ? RS::SHADOW_CASTING_SETTING_SHADOWS_ONLY : RS::SHADOW_CASTING_SETTING_OFF));
+		RS::ShadowCastingSetting setting = cast_shadows == SHADOW_CASTING_ON
+			? RS::SHADOW_CASTING_SETTING_ON
+			: (cast_shadows == SHADOW_CASTING_DOUBLE_SIDED
+				   ? RS::SHADOW_CASTING_SETTING_DOUBLE_SIDED
+				   : (cast_shadows == SHADOW_CASTING_SHADOWS_ONLY ? RS::SHADOW_CASTING_SETTING_SHADOWS_ONLY : RS::SHADOW_CASTING_SETTING_OFF));
 #endif
 		RS::get_singleton()->instance_geometry_set_cast_shadows_setting(item->instance, setting);
 		item->last_shadow_casting = cast_shadows;
@@ -258,7 +262,8 @@ void SpineSprite3D::upload_batch(SpineBatch3D *item) {
 		RS::get_singleton()->mesh_add_surface(item->mesh, surface);
 		uint32_t skin_stride;
 		RS::get_singleton()->mesh_surface_make_offsets_from_format(surface.format, vertex_capacity, index_capacity, item->surface_offsets,
-																   item->vertex_stride, item->normal_tangent_stride, item->attribute_stride, skin_stride);
+																   item->vertex_stride, item->normal_tangent_stride, item->attribute_stride,
+																   skin_stride);
 		item->index_stride = RS::get_singleton()->mesh_surface_get_format_index_stride(surface.format, vertex_capacity);
 		item->vertex_buffer = surface.vertex_data;
 		item->attribute_buffer = surface.attribute_data;
@@ -281,9 +286,8 @@ void SpineSprite3D::upload_batch(SpineBatch3D *item) {
 			positions_changed |= position_changed;
 			vertex_data_changed |= position_changed;
 			if (item->uses_tangents) {
-				bool tangent_changed = update_tangent_bytes(positions + item->surface_offsets[Mesh::ARRAY_TANGENT] +
-																 i * item->normal_tangent_stride,
-															 v.tangent);
+				bool tangent_changed = update_tangent_bytes(positions + item->surface_offsets[Mesh::ARRAY_TANGENT] + i * item->normal_tangent_stride,
+															v.tangent);
 				tangents_changed |= tangent_changed;
 				vertex_data_changed |= tangent_changed;
 			}
@@ -491,13 +495,12 @@ void SpineSprite3D::_bind_methods() {
 
 SpineSprite3D::SpineSprite3D()
 	: update_mode(SpineConstant::UpdateMode_Process), time_scale(1.0f), pixel_size(0.01f), slot_depth_offset(0.001f), camera_relative_depth(true),
-	  depth_write_enabled(true), alpha_cutoff(0.001f), sorting_step(1.0f),
-	  render_priority(0), cull_mode(CULL_DISABLED), lighting_enabled(false), normal_map_enabled(true), normal_map_flip_y(true), normal_scale(1.0f),
-	  specular(0.25f), roughness(0.65f), metallic(0.0f), shadow_casting(SHADOW_CASTING_OFF), shadow_alpha_cutoff(0.3f),
-	  preview_skin("Default"), preview_animation("-- Empty --"), preview_frame(false), preview_time(0),
-	  skeleton_clipper(new spine::SkeletonClipping()), slots_dirty(true), updating_meshes(false), warned_multiply(false), warned_screen(false),
-	  active_batches(0), active_vertices(0), active_indices(0), mesh_builds(0), index_uploads(0), vertex_uploads(0), tangent_uploads(0), attribute_uploads(0),
-	  material_builds(0) {
+	  depth_write_enabled(true), alpha_cutoff(0.001f), sorting_step(1.0f), render_priority(0), cull_mode(CULL_DISABLED), lighting_enabled(false),
+	  normal_map_enabled(true), normal_map_flip_y(true), normal_scale(1.0f), specular(0.25f), roughness(0.65f), metallic(0.0f),
+	  shadow_casting(SHADOW_CASTING_OFF), shadow_alpha_cutoff(0.3f), preview_skin("Default"), preview_animation("-- Empty --"), preview_frame(false),
+	  preview_time(0), skeleton_clipper(new spine::SkeletonClipping()), slots_dirty(true), updating_meshes(false), warned_multiply(false),
+	  warned_screen(false), active_batches(0), active_vertices(0), active_indices(0), mesh_builds(0), index_uploads(0), vertex_uploads(0),
+	  tangent_uploads(0), attribute_uploads(0), material_builds(0) {
 	controller = Ref<SpineController>(memnew(SpineController));
 	controller->set_listener(this);
 	quad_indices.setSize(6, 0);
@@ -721,7 +724,7 @@ uniform float spine_metallic = 0.0;
 	}
 	Ref<Shader> shader(memnew(Shader));
 	shader->set_code(String("shader_type spatial;\nrender_mode ") + lighting_mode + depth + ", " + blend + ", " + cull + ";\n" +
-		get_depth_shader_code() + R"(
+					 get_depth_shader_code() + R"(
 // Read encoded atlas colors: PMA must be undone before sRGB decoding.
 uniform sampler2D spine_texture : repeat_disable;
 uniform bool spine_premultiplied_alpha = false;
@@ -730,7 +733,8 @@ varying vec3 spine_dark_color;
 vec3 spine_srgb_to_linear(vec3 color) {
 	return mix(pow((color + vec3(0.055)) / 1.055, vec3(2.4)), color / 12.92, lessThanEqual(color, vec3(0.04045)));
 }
-)" + lighting_declarations + R"(
+)" + lighting_declarations +
+					 R"(
 void vertex() {
 	VERTEX = spine_apply_camera_depth(VERTEX, MODEL_MATRIX[3].xyz, MODEL_NORMAL_MATRIX[2], INV_VIEW_MATRIX[3].xyz);
 	spine_light_color = CUSTOM0;
@@ -739,7 +743,8 @@ void vertex() {
 		spine_light_color.rgb = spine_srgb_to_linear(spine_light_color.rgb);
 		spine_dark_color = spine_srgb_to_linear(spine_dark_color);
 	}
-)" + lighting_vertex + R"(
+)" + lighting_vertex +
+					 R"(
 }
 void fragment() {
 	vec4 tex = texture(spine_texture, UV);
@@ -748,7 +753,8 @@ void fragment() {
 	ALBEDO = tex.rgb * spine_light_color.rgb + (vec3(1.0) - tex.rgb) * spine_dark_color;
 	ALPHA = tex.a * spine_light_color.a;
 	spine_apply_alpha_cutoff(ALPHA);
-)" + lighting_fragment + R"(
+)" + lighting_fragment +
+					 R"(
 }
 )");
 	shared = shader;
@@ -803,9 +809,9 @@ Ref<ShaderMaterial> SpineSprite3D::get_material(SpineRendererObject *renderer_ob
 	int cull = source.is_valid() ? -1 : (int) cull_mode;
 	bool depth_write = source.is_null() && depth_write_enabled;
 	for (const auto &cached : materials) {
-		if (cached.texture == texture_rid && cached.normal_texture == normal_texture_rid && cached.source == source_id && cached.blend == blend_mode &&
-			cached.pma == premultiplied_alpha && cached.lighting == generated_lighting && cached.priority == render_priority && cached.cull == cull &&
-			cached.depth_write == depth_write)
+		if (cached.texture == texture_rid && cached.normal_texture == normal_texture_rid && cached.source == source_id &&
+			cached.blend == blend_mode && cached.pma == premultiplied_alpha && cached.lighting == generated_lighting &&
+			cached.priority == render_priority && cached.cull == cull && cached.depth_write == depth_write)
 			return cached.material;
 	}
 	Ref<ShaderMaterial> material;
@@ -853,8 +859,8 @@ Ref<ShaderMaterial> SpineSprite3D::get_material(SpineRendererObject *renderer_ob
 	material->set_shader_parameter(SNAME("spine_premultiplied_alpha"), premultiplied_alpha);
 
 	apply_runtime_parameters(material);
-	materials.push_back({texture_rid, normal_texture_rid, source_id, material, blend_mode, premultiplied_alpha, generated_lighting, render_priority, cull,
-						 depth_write});
+	materials.push_back({texture_rid, normal_texture_rid, source_id, material, blend_mode, premultiplied_alpha, generated_lighting, render_priority,
+						 cull, depth_write});
 	material_builds++;
 	return material;
 }
@@ -1040,10 +1046,10 @@ void SpineSprite3D::update_render_items(Ref<SpineSkeleton> skeleton_ref) {
 			}
 			Ref<ShaderMaterial> material = get_material(renderer_object, premultiplied_alpha, blend, override_material);
 			bool custom_material = override_material.is_valid();
-			if (!custom_material)
-				custom_material = blend == spine::BlendMode_Additive ? additive_material.is_valid() : normal_material.is_valid();
+			if (!custom_material) custom_material = blend == spine::BlendMode_Additive ? additive_material.is_valid() : normal_material.is_valid();
 			Ref<ShaderMaterial> shadow_material = custom_material ? Ref<ShaderMaterial>() : get_shadow_material(renderer_object);
-			if (!current || current->material != material || current->shadow_material != shadow_material || current->custom_material != custom_material)
+			if (!current || current->material != material || current->shadow_material != shadow_material ||
+				current->custom_material != custom_material)
 				current = begin_batch(material, shadow_material, custom_material);
 			uint32_t base_vertex = (uint32_t) current->vertices.size();
 			int vertex_count = (int) vertices->size() / 2;

@@ -93,8 +93,7 @@ static AnimationPlayer *editing_animation_player() {
 	for (int i = 0; i < connections.size(); i++) {
 		Dictionary connection = connections[i];
 		Signal signal = connection["signal"];
-		if (signal.get_name() == SNAME("current_animation_changed"))
-			return Object::cast_to<AnimationPlayer>(signal.get_object());
+		if (signal.get_name() == SNAME("current_animation_changed")) return Object::cast_to<AnimationPlayer>(signal.get_object());
 	}
 	return nullptr;
 }
@@ -247,7 +246,8 @@ AnimationPlayer *SpineAnimationTrack::find_animation_player() {
 
 void SpineAnimationTrack::setup_animation_player() {
 	if (!sprite) return;
-	if (controller.is_null() || !controller->get_skeleton_data_res().is_valid() || !controller->get_skeleton_data_res()->is_skeleton_data_loaded()) return;
+	if (controller.is_null() || !controller->get_skeleton_data_res().is_valid() || !controller->get_skeleton_data_res()->is_skeleton_data_loaded())
+		return;
 	animation_player_dirty = false;
 	AnimationPlayer *animation_player = find_animation_player();
 

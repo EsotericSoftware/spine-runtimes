@@ -64,7 +64,8 @@ void SpineSlotNode3D::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_additive_material"), &SpineSlotNode3D::get_additive_material);
 	ClassDB::bind_method(D_METHOD("get_sorting_warnings"), &SpineSlotNode3D::get_sorting_warnings);
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "slot_name"), "set_slot_name", "get_slot_name");
-	ADD_PROPERTY(PropertyInfo(Variant::NODE_PATH, "depth_camera", PROPERTY_HINT_NODE_PATH_VALID_TYPES, "Camera3D"), "set_depth_camera", "get_depth_camera");
+	ADD_PROPERTY(PropertyInfo(Variant::NODE_PATH, "depth_camera", PROPERTY_HINT_NODE_PATH_VALID_TYPES, "Camera3D"), "set_depth_camera",
+				 "get_depth_camera");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "normal_material", PROPERTY_HINT_RESOURCE_TYPE, "ShaderMaterial"), "set_normal_material",
 				 "get_normal_material");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "additive_material", PROPERTY_HINT_RESOURCE_TYPE, "ShaderMaterial"), "set_additive_material",
@@ -178,7 +179,9 @@ const std::vector<ObjectID> &SpineSlotNode3D::get_geometries() {
 	if (geometries_dirty) {
 		update_geometry_list();
 		for (ObjectID id : geometries) {
-			if (std::find_if(saved_sorting.begin(), saved_sorting.end(), [id](const SortingState &state) { return state.id == id; }) != saved_sorting.end()) continue;
+			if (std::find_if(saved_sorting.begin(), saved_sorting.end(), [id](const SortingState &state) { return state.id == id; }) !=
+				saved_sorting.end())
+				continue;
 			auto geometry = Object::cast_to<GeometryInstance3D>(ObjectDB::get_instance(id));
 			if (geometry) saved_sorting.push_back({id, geometry->get_sorting_offset(), geometry->is_sorting_use_aabb_center()});
 		}
@@ -220,7 +223,8 @@ float SpineSlotNode3D::get_depth_sign() const {
 	// tree_changed can run between a Node3D's world exit and tree exit. Resolve
 	// the world through its viewport, rather than calling get_world_3d then.
 	if (!camera || !camera->is_inside_tree() || !camera->get_viewport() || !sprite->get_viewport() ||
-		camera->get_viewport()->find_world_3d() != sprite->get_viewport()->find_world_3d()) return 1;
+		camera->get_viewport()->find_world_3d() != sprite->get_viewport()->find_world_3d())
+		return 1;
 	return sprite->to_local(camera->get_global_transform().origin).z < 0 ? -1 : 1;
 }
 
@@ -316,7 +320,8 @@ PackedStringArray SpineSlotNode3D::get_sorting_warnings() const {
 		if (!camera || !camera->is_inside_tree() || !camera->get_viewport() || !sprite->get_viewport() ||
 			camera->get_viewport()->find_world_3d() != sprite->get_viewport()->find_world_3d())
 			warnings.push_back("depth_camera must reference a Camera3D in the same World3D; using fixed physical depth instead.");
-		warnings.push_back("depth_camera moves this node and all descendants for ONE camera, including physics objects. It cannot follow opposite views simultaneously.");
+		warnings.push_back("depth_camera moves this node and all descendants for ONE camera, including physics objects. It cannot follow opposite "
+						   "views simultaneously.");
 	}
 	std::vector<ObjectID> descendants;
 	collect_geometry((Node *) this, descendants);

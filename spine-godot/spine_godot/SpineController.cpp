@@ -37,8 +37,7 @@ void SpineController::_bind_methods() {
 	ADD_SIGNAL(MethodInfo("_internal_spine_objects_invalidated"));
 }
 
-SpineController::SpineController()
-	: listener(nullptr), modified_bones(false), native_operation_depth(0), skeleton_data_reset_pending(false) {
+SpineController::SpineController() : listener(nullptr), modified_bones(false), native_operation_depth(0), skeleton_data_reset_pending(false) {
 }
 
 SpineController::~SpineController() {
