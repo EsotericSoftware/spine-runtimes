@@ -31,21 +31,22 @@ package com.esotericsoftware.spine
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import com.esotericsoftware.spine.android.DebugRenderer
 import com.esotericsoftware.spine.android.SpineController
-import com.esotericsoftware.spine.android.SpineView
+import com.esotericsoftware.spine.android.compose.Spine
+import com.esotericsoftware.spine.android.compose.rememberSpineStateFromAssets
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,7 +63,7 @@ fun DebugRendering(nav: NavHostController) {
                 navigationIcon = {
                     IconButton({ nav.navigateUp() }) {
                         Icon(
-                            Icons.Rounded.ArrowBack,
+                            Icons.AutoMirrored.Rounded.ArrowBack,
                             null,
                         )
                     }
@@ -70,22 +71,25 @@ fun DebugRendering(nav: NavHostController) {
             )
         }
     ) { paddingValues ->
-        AndroidView(
-            factory = { context ->
-                SpineView.loadFromAssets(
-                    "spineboy.atlas",
-                    "spineboy-pro.json",
-                    context,
-                    SpineController.Builder { controller ->
-                        controller.animationState.setAnimation(0, "walk", true)
-                    }
-                    .setOnAfterPaint { controller, canvas, commands ->
-                        debugRenderer.render(controller.drawable, canvas, commands)
-                    }
-                    .build()
-                )
-            },
-            modifier = Modifier.padding(paddingValues)
+        val controller = remember {
+            SpineController.Builder { controller ->
+                controller.animationState.setAnimation(0, "walk", true)
+            }
+                .setOnAfterPaint { controller, canvas, commands ->
+                    debugRenderer.render(controller.drawable, canvas, commands)
+                }
+                .build()
+        }
+        val state = rememberSpineStateFromAssets(
+            atlasFileName = "spineboy.atlas",
+            skeletonFileName = "spineboy-pro.json",
+            controller = controller,
+        )
+        Spine(
+            state = state,
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize(),
         )
     }
 }

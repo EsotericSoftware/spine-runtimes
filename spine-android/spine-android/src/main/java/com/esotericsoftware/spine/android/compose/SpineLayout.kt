@@ -27,15 +27,42 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package com.esotericsoftware.spine.android.bounds;
+package com.esotericsoftware.spine.android.compose
 
-import androidx.compose.runtime.Stable;
+import com.esotericsoftware.spine.android.bounds.Alignment
+import com.esotericsoftware.spine.android.bounds.Bounds
+import com.esotericsoftware.spine.android.bounds.ContentMode
+import kotlin.math.max
+import kotlin.math.min
 
-import com.esotericsoftware.spine.android.AndroidSkeletonDrawable;
+internal data class SpineLayout(
+    val offsetX: Float,
+    val offsetY: Float,
+    val scaleX: Float,
+    val scaleY: Float,
+    val x: Float,
+    val y: Float,
+)
 
-/** A {@link BoundsProvider} that calculates the bounding box of the skeleton based on the visible attachments in the setup
- * pose. */
-@Stable
-public interface BoundsProvider {
-	Bounds computeBounds (AndroidSkeletonDrawable drawable);
+/** Compose equivalent of `SpineView.updateCanvasTransform` — keep the math in sync. Unlike the
+ * view, degenerate bounds yield scale 0 here; the caller skips the transform in that case. */
+internal fun computeLayout(
+    viewWidth: Float,
+    viewHeight: Float,
+    bounds: Bounds,
+    alignment: Alignment,
+    contentMode: ContentMode,
+): SpineLayout {
+    val bw = bounds.width
+    val bh = bounds.height
+    val scale = when {
+        bw <= 0.0 || bh <= 0.0 || viewWidth <= 0f || viewHeight <= 0f -> 0f
+        contentMode == ContentMode.FIT -> min(viewWidth / bw, viewHeight / bh).toFloat()
+        else /* FILL */ -> max(viewWidth / bw, viewHeight / bh).toFloat()
+    }
+    val x = (-bounds.x - bw / 2.0 - alignment.x * bw / 2.0).toFloat()
+    val y = (-bounds.y - bh / 2.0 - alignment.y * bh / 2.0).toFloat()
+    val offsetX = (viewWidth / 2.0 + alignment.x * viewWidth / 2.0).toFloat()
+    val offsetY = (viewHeight / 2.0 + alignment.y * viewHeight / 2.0).toFloat()
+    return SpineLayout(offsetX, offsetY, scale, scale, x, y)
 }
