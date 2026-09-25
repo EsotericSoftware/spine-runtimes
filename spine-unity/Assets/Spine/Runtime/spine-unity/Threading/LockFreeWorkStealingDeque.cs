@@ -27,6 +27,10 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if NET_STANDARD || NET_STANDARD_2_0 || NET_STANDARD_2_1 || NET_4_6
+#define HAS_SYSTEM_THREADING_VOLATILE
+#endif
+
 using System.Threading;
 
 /// <summary>
@@ -42,8 +46,8 @@ public class LockFreeWorkStealingDeque<T> {
 	public static readonly T Abort = default(T);
 
 	private /*volatile*/ CircularArray<T> activeArray;
-	private volatile int bottom = 0;
-	private volatile int top = 0;
+	private int bottom = 0;
+	private int top = 0;
 
 	public int Capacity { get { return activeArray.Size; } }
 
@@ -54,10 +58,26 @@ public class LockFreeWorkStealingDeque<T> {
 		top = 0;
 	}
 
+	static int VolatileRead (ref int location) {
+#if HAS_SYSTEM_THREADING_VOLATILE
+		return Volatile.Read(ref location);
+#else
+		return Thread.VolatileRead(ref location);
+#endif
+	}
+
+	static void VolatileWrite (ref int location, int value) {
+#if HAS_SYSTEM_THREADING_VOLATILE
+		Volatile.Write(ref location, value);
+#else
+		Thread.VolatileWrite(ref location, value);
+#endif
+	}
+
 	/// <summary>Push an element (at the bottom), has to be called by owner of the deque, not a thief.</summary>
 	public void Push (T item) {
 		int b = bottom;
-		int t = top;
+		int t = VolatileRead(ref top);
 		CircularArray<T> a = this.activeArray;
 		int size = b - t;
 		if (size >= a.Size - 1) {
@@ -65,11 +85,12 @@ public class LockFreeWorkStealingDeque<T> {
 			this.activeArray = a;
 		}
 		a.Put(b, item);
-		bottom = b + 1;
+		VolatileWrite(ref bottom, b + 1);
 	}
 
 	/// <summary>Non-standard addition for ahead-of-time pushing to maintain queue FIFO order.
-	/// Push an element at the top, must only be called before any other thread calls Push, Pop or Steal.</summary>
+	/// Push an element at the top, must only be called before any other thread calls Push, Pop or Steal.
+	/// The caller must synchronize publication of the populated deque to those threads.</summary>
 	public void PushTop (T item) {
 		int b = bottom;
 		int t = top;
@@ -90,7 +111,8 @@ public class LockFreeWorkStealingDeque<T> {
 	/// </summary>
 	public bool Steal (out T item) {
 		int t = top;
-		int b = bottom;
+		Thread.MemoryBarrier(); // requires full fence between observing top and bottom.
+		int b = VolatileRead(ref bottom);
 		CircularArray<T> a = this.activeArray;
 		int size = b - t;
 		if (size <= 0) {
@@ -114,6 +136,7 @@ public class LockFreeWorkStealingDeque<T> {
 		CircularArray<T> a = this.activeArray;
 		--b;
 		this.bottom = b;
+		Thread.MemoryBarrier(); // requires full fence here to prevent store-load reordering
 		int t = top;
 		int size = b - t;
 		if (size < 0) {
@@ -131,8 +154,7 @@ public class LockFreeWorkStealingDeque<T> {
 		if (Interlocked.CompareExchange(ref top, t + 1, t) != t) {
 			item = Empty;
 			wasSuccessful = false;
-		}
-		else {
+		} else {
 			item = o;
 		}
 		bottom = t + 1;

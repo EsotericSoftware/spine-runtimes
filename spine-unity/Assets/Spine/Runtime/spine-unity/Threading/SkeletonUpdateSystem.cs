@@ -57,7 +57,7 @@
 #define RUN_NO_SKELETON_LATEUPDATE_ON_MAIN_THREAD // actual configuration option, recommended enabled when not using work stealing
 #endif
 
-#if NET_STANDARD_2_0 || NET_STANDARD_2_1 || NET_4_6
+#if NET_STANDARD || NET_STANDARD_2_0 || NET_STANDARD_2_1 || NET_4_6
 #define HAS_MANUAL_RESET_EVENT_SLIM
 #define HAS_SYSTEM_THREADING_VOLATILE
 #endif
