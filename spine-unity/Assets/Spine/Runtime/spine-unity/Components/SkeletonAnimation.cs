@@ -297,6 +297,10 @@ namespace Spine.Unity {
 		/// <summary>Transfer of former base class SkeletonRenderer parameters.</summary>
 		protected void TransferDeprecatedFields () {
 			wasDeprecatedTransferred = true;
+			// No deprecated asset means no pre-split data (component created after the split or saved with
+			// auto-upgrade disabled). Transferring would overwrite the renderer's values with defaults.
+			if (this.skeletonDataAssetDeprecated == null)
+				return;
 
 			SkeletonRenderer skeletonRenderer = gameObject.GetComponent<SkeletonRenderer>();
 			if (skeletonRenderer == null)
