@@ -61,6 +61,7 @@ public class LockFreeWorkerPool<T> : IDisposable {
 
 			int index = i; // Capture the index for the thread
 			_threads[i] = new Thread(() => WorkerLoop(index));
+			_threads[i].IsBackground = true; // never keeps the process alive, also after Abandon
 			_threads[i].Start();
 		}
 	}
@@ -96,6 +97,17 @@ public class LockFreeWorkerPool<T> : IDisposable {
 #if SPINE_ENABLE_THREAD_PROFILING
 		Profiler.EndThreadProfiling();
 #endif
+	}
+
+	/// <summary>Releases the worker threads without waiting for them, for use when a batch ran into a timeout or
+	/// a worker failed. Idle workers exit. A worker inside a task exits only if that task ever returns. A worker stuck
+	/// in it stays alive as a background thread, holding its stack and whatever it holds, without touching its queue
+	/// again. The caller continues with a new pool. The events stay open: workers woken from their wake-up event by
+	/// this call may still be inside that wait (a closed handle would throw on that thread).</summary>
+	public void Abandon () {
+		_running = false;
+		for (int i = 0; i < _threadCount; i++)
+			_taskAvailable[i].Set();
 	}
 
 	public void Dispose () {

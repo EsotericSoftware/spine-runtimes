@@ -38,8 +38,6 @@ using System.Threading;
 /// "Dynamic Circular Work-Stealing Deque", authors David Chase and Yossi Lev
 /// https://www.dre.vanderbilt.edu/~schmidt/PDF/work-stealing-dequeue.pdf.
 /// Requires that Push and Pop are called from the same thread.
-/// Simplified by not supporting growing the array size during a Push,
-/// in our usage scenario we populate tasks ahead of time before the first Pop.
 /// </summary>
 public class LockFreeWorkStealingDeque<T> {
 	public static readonly T Empty = default(T);
@@ -82,34 +80,29 @@ public class LockFreeWorkStealingDeque<T> {
 		int size = b - t;
 		if (size >= a.Size - 1) {
 			a = a.Grow(b, t, a.Size * 2);
+			Thread.MemoryBarrier(); // requires full fence to publish the copied elements before the new array reference.
 			this.activeArray = a;
 		}
 		a.Put(b, item);
 		VolatileWrite(ref bottom, b + 1);
 	}
 
-	/// <summary>Non-standard addition for ahead-of-time pushing to maintain queue FIFO order.
-	/// Push an element at the top, must only be called before any other thread calls Push, Pop or Steal.
-	/// The caller must synchronize publication of the populated deque to those threads.</summary>
-	public void PushTop (T item) {
-		int b = bottom;
-		int t = top;
-		CircularArray<T> a = this.activeArray;
-		int size = b - t;
-		if (size >= a.Size - 1) {
-			a = a.Grow(b, t, a.Size * 2);
-			this.activeArray = a;
-		}
-		int newT = t - 1;
-		a.Put(newT, item);
-		top = newT;
+	/// <summary>
+	/// Makes a different worker than the owner steal an element (from the top).
+	/// Returns false if empty or if another thief took the element.
+	/// </summary>
+	public bool Steal (out T item) {
+		bool empty;
+		return Steal(out item, out empty);
 	}
 
 	/// <summary>
 	/// Makes a different worker than the owner steal an element (from the top).
-	/// Returns false if empty.
+	/// Returns false if empty or if another thief took the element.
 	/// </summary>
-	public bool Steal (out T item) {
+	/// <param name="empty">True if the deque was empty. False with a false return value means another thief
+	/// took the element, the caller may retry.</param>
+	public bool Steal (out T item, out bool empty) {
 		int t = top;
 		Thread.MemoryBarrier(); // requires full fence between observing top and bottom.
 		int b = VolatileRead(ref bottom);
@@ -117,8 +110,10 @@ public class LockFreeWorkStealingDeque<T> {
 		int size = b - t;
 		if (size <= 0) {
 			item = Empty;
+			empty = true;
 			return false;
 		}
+		empty = false;
 		T o = a.Get(t);
 		// increment top
 		if (Interlocked.CompareExchange(ref top, t + 1, t) != t) {
