@@ -373,9 +373,9 @@ namespace Spine.Unity {
 #if RUN_ALL_ON_MAIN_THREAD
 			int numAsyncThreads = 0;
 #elif RUN_NO_ANIMATION_UPDATE_ON_MAIN_THREAD
-			int numAsyncThreads = mainThreadUpdateCallbacks ? numThreads - 1 : numThreads;
+			int numAsyncThreads = mainThreadUpdateCallbacks ? Math.Max(1, numThreads - 1) : numThreads;
 #else
-			int numAsyncThreads = numThreads - 1;
+			int numAsyncThreads = Math.Max(1, numThreads - 1);
 #endif
 			int tasksPerThread = UpdateChunksPerThread;
 			int numTasks = numThreads * tasksPerThread;
@@ -620,7 +620,7 @@ namespace Spine.Unity {
 #elif RUN_NO_SKELETON_LATEUPDATE_ON_MAIN_THREAD
 			int numAsyncThreads = numThreads;
 #else
-			int numAsyncThreads = numThreads - 1;
+			int numAsyncThreads = Math.Max(1, numThreads - 1);
 #endif
 			int tasksPerThread = LateUpdateChunksPerThread;
 			int numTasks = numThreads * tasksPerThread;
@@ -659,11 +659,12 @@ namespace Spine.Unity {
 
 			int skeletonEnd = skeletonRenderers.Count;
 #if DONT_WAIT_FOR_ALL_LATEUPDATE_TASKS
-			if (skeletonsLateUpdatedAtTask == null) {
+			if (skeletonsLateUpdatedAtTask == null || skeletonsLateUpdatedAtTask.Length < numAsyncTasks) {
 				skeletonsLateUpdatedAtTask = new int[numAsyncTasks];
 				mainThreadProcessedAtTask = new int[numAsyncTasks];
-				lateUpdateWorkAvailable = new AutoResetEvent(false);
 			}
+			if (lateUpdateWorkAvailable == null)
+				lateUpdateWorkAvailable = new AutoResetEvent(false);
 			for (int t = 0; t < numAsyncTasks; ++t) {
 				skeletonsLateUpdatedAtTask[t] = 0;
 			}
@@ -793,7 +794,13 @@ namespace Spine.Unity {
 		/// fresh worker pool and fresh task records, leaving the previous worker threads to themselves: idle ones exit,
 		/// a worker still executing a task exits after it. Unlikely late writes to skeleton data are accepted, the next
 		/// frame updates normally.</summary>
-		private void AbandonWorkerPool (string reason) {
+		private void AbandonWorkerPool (string reason, Exception exception = null) {
+#if ENABLE_WORK_STEALING
+			if (exception == null && workerPool != null)
+				exception = workerPool.WorkerException;
+#endif
+			if (exception != null)
+				reason += "\n" + exception;
 			Debug.LogError("Spine threaded update: " + reason);
 			if (workerPool != null)
 				workerPool.Abandon();
@@ -821,7 +828,7 @@ namespace Spine.Unity {
 					return true;
 				AbandonWorkerPool("Waiting for worker threads timed out, skipping the remaining threaded update of this frame.");
 			} catch (Exception exc) {
-				AbandonWorkerPool("A worker thread failed, skipping the remaining threaded update of this frame. " + exc);
+				AbandonWorkerPool("A worker thread failed, skipping the remaining threaded update of this frame.", exc);
 			}
 			return false;
 		}

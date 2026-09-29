@@ -64,6 +64,11 @@ public class LockFreeWorkStealingWorkerPool<T> : IDisposable {
 	private bool _processingTasks;
 	private volatile bool _running = true;
 
+	/// <summary>The first recorded worker exception, or null. Can be read without waiting for task completion.</summary>
+	public Exception WorkerException {
+		get { return Interlocked.CompareExchange(ref _workerException, null, null); }
+	}
+
 	public LockFreeWorkStealingWorkerPool (int threadCount, int queueCapacity = 8) {
 		_threadCount = threadCount;
 		_threads = new Thread[_threadCount];
