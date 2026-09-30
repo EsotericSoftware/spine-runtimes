@@ -303,6 +303,7 @@
   - Fixed `SpineBoneDriverComponent` failing to drive bones affected by constraints.
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
   - Fixed one-bone IK inheritance calculations in Y-down coordinate systems.
+  - Fixed atlas import and reimport not updating existing page textures. Changed source images are now reimported in place.
 
 - **Breaking changes**
   - Custom C++ `AttachmentLoader` implementations now receive both the skin `placeholder` and resolved attachment `name`.

@@ -65,6 +65,14 @@ static void LoadAtlas(const FString &Filename, const FString &TargetPath) {
 	const FString atlasFile = FPaths::ChangeExtension(Filename, TEXT("atlas"));
 	if (!FPaths::FileExists(atlasFile)) return;
 
+	// Reimport an existing atlas in place instead of prompting to overwrite it, which also updates its page textures.
+	const FString atlasName = FPaths::GetBaseFilename(atlasFile);
+	const FString atlasObjectPath = TargetPath / atlasName + TEXT(".") + atlasName;
+	if (USpineAtlasAsset *atlas = LoadObject<USpineAtlasAsset>(nullptr, *atlasObjectPath, nullptr, LOAD_NoWarn | LOAD_Quiet)) {
+		FReimportManager::Instance()->Reimport(atlas, false, true, atlasFile, nullptr, INDEX_NONE, false, true);
+		return;
+	}
+
 	TArray<FString> fileNames;
 	fileNames.Add(atlasFile);
 	AssetToolsModule.Get().ImportAssets(fileNames, TargetPath, nullptr, false);
