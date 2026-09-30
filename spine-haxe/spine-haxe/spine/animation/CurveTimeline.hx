@@ -43,7 +43,12 @@ abstract class CurveTimeline extends Timeline {
 	/** @param bezierCount The maximum number of Bezier curves. See CurveTimeline.shrink().
 	 * @param propertyIds Unique identifiers for the properties the timeline modifies. */
 	public function new(frameCount:Int, bezierCount:Int, propertyIds:...String) {
+		#if (flash && !haxe5) // See HaxeFoundation/haxe#13017
+		super(frameCount);
+		this.propertyIds = propertyIds;
+		#else
 		super(frameCount, ...propertyIds);
+		#end
 		curves = ArrayUtils.resize(new Array<Float>(), frameCount + bezierCount * BEZIER_SIZE, 0);
 		curves[frameCount - 1] = STEPPED;
 	}

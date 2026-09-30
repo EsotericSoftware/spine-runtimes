@@ -33,7 +33,12 @@ abstract class SlotCurveTimeline extends CurveTimeline implements SlotTimeline {
 	public final slotIndex:Int;
 
 	public function new(frameCount:Int, bezierCount:Int, slotIndex:Int, propertyIds:...String) {
+		#if (flash && !haxe5) // See HaxeFoundation/haxe#13017
+		super(frameCount, bezierCount);
+		this.propertyIds = propertyIds;
+		#else
 		super(frameCount, bezierCount, ...propertyIds);
+		#end
 		this.slotIndex = slotIndex;
 	}
 
