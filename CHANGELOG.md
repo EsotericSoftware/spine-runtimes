@@ -131,6 +131,7 @@
   - Added `Animation::getColor()` and `BoneData` icon size/rotation accessors for nonessential editor data.
 
 - **Bug fixes**
+  - Fixed `SPINE_USE_STD_FUNCTION` animation listeners failing to compile after listener user data was added.
   - Fixed physics constraint rotation, shear, and scale forces using the wrong Y direction in Y-down runtimes.
   - Fixed draw order timelines not mixing out to the setup pose.
   - Fixed slider sorting crashes when slider animations key slot or constraint timelines.
