@@ -34,7 +34,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,13 +43,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import com.badlogic.gdx.graphics.Color
 import com.esotericsoftware.spine.android.SpineController
-import com.esotericsoftware.spine.android.SpineView
+import com.esotericsoftware.spine.android.compose.Spine
+import com.esotericsoftware.spine.android.compose.rememberSpineStateFromAssets
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -145,7 +146,7 @@ fun AnimationState(nav: NavHostController) {
                 navigationIcon = {
                     IconButton({ nav.navigateUp() }) {
                         Icon(
-                            Icons.Rounded.ArrowBack,
+                            Icons.AutoMirrored.Rounded.ArrowBack,
                             null,
                         )
                     }
@@ -159,16 +160,12 @@ fun AnimationState(nav: NavHostController) {
             verticalArrangement = Arrangement.Center
         ) {
             Text("See output in console!")
-            AndroidView(
-                factory = { context ->
-                    SpineView.loadFromAssets(
-                        "spineboy.atlas",
-                        "spineboy-pro.json",
-                        context,
-                        controller
-                    )
-                }
+            val state = rememberSpineStateFromAssets(
+                atlasFileName = "spineboy.atlas",
+                skeletonFileName = "spineboy-pro.json",
+                controller = controller,
             )
+            Spine(state = state, modifier = Modifier.fillMaxSize())
         }
     }
 }

@@ -27,15 +27,23 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package com.esotericsoftware.spine.android.bounds;
+package com.esotericsoftware.spine.android.compose
 
-import androidx.compose.runtime.Stable;
+import android.os.Build
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 
-import com.esotericsoftware.spine.android.AndroidSkeletonDrawable;
-
-/** A {@link BoundsProvider} that calculates the bounding box of the skeleton based on the visible attachments in the setup
- * pose. */
-@Stable
-public interface BoundsProvider {
-	Bounds computeBounds (AndroidSkeletonDrawable drawable);
-}
+/**
+ * Equivalent of [android.view.View.LAYER_TYPE_SOFTWARE] for Compose. Required on API < 29 because
+ * [android.graphics.Canvas.drawVertices] does not work on hardware-accelerated canvases on older
+ * Android. See https://github.com/EsotericSoftware/spine-runtimes/issues/2638.
+ * Keep in sync with the same API-level gate in the [com.esotericsoftware.spine.android.SpineView]
+ * constructor.
+ */
+internal fun Modifier.spineSoftwareLayerIfNeeded(): Modifier =
+    if (Build.VERSION.SDK_INT < 29) {
+        this.graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
+    } else {
+        this
+    }
