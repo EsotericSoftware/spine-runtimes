@@ -1013,7 +1013,7 @@ MonoBehaviour:
   color: {r: 1, g: 1, b: 1, a: 1}
   maxRenderTextureSize: 1024
   quad: {fileID: 0}
-  quadMaterial: {fileID: 0}
+  quadMaterial: {fileID: 2100000, guid: 4c507f887c6274a44a603d96e0eabf2a, type: 2}
   renderTexture: {fileID: 0}
   targetCamera: {fileID: 0}
   shaderPasses: 00000000
