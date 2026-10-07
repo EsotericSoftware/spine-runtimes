@@ -128,6 +128,7 @@ namespace Spine {
 					if (current.delay > 0) continue;
 					currentDelta = -current.delay;
 					current.delay = 0;
+					animationsChanged = true;
 				}
 
 				TrackEntry next = current.next;
@@ -145,8 +146,8 @@ namespace Spine {
 						}
 						continue;
 					}
-				} else if (current.trackLast >= current.trackEnd && current.mixingFrom == null) {
-					// Clear the track when there is no next entry, the track end time is reached, and there is no mixingFrom.
+				} else if (current.trackLast >= current.trackEnd && current.mixedOut) {
+					// Clear the track when there is no next entry and the entry was applied mixed out after the track end time.
 					tracksItems[i] = null;
 					queue.End(current);
 					ClearNext(current);
@@ -213,10 +214,14 @@ namespace Spine {
 
 				// Apply mixing from entries first.
 				float alpha = current.alpha;
+				bool mixOut = false;
 				if (current.mixingFrom != null)
 					alpha *= ApplyMixingFrom(current, skeleton);
-				else if (current.trackTime >= current.trackEnd && current.next == null) //
+				else if (current.trackTime >= current.trackEnd && current.next == null) {
 					alpha = 0; // Set to setup pose the last time the entry will be applied.
+					mixOut = true;
+				}
+				current.mixedOut = mixOut;
 
 				// Apply current entry.
 				float animationLast = current.animationLast, animationTime = current.AnimationTime, applyTime = animationTime;
@@ -240,7 +245,7 @@ namespace Spine {
 				} else {
 					int[] timelineMode = current.timelineMode.Items;
 
-					bool retainAttachments = alpha >= current.alphaAttachmentThreshold;
+					bool retainAttachments = !mixOut && alpha >= current.alphaAttachmentThreshold;
 					bool add = current.additive, shortestRotation = add || current.shortestRotation;
 					bool firstFrame = !shortestRotation && current.timelinesRotation.Count != timelineCount << 1;
 					if (firstFrame) current.timelinesRotation.EnsureSize(timelineCount << 1);
@@ -255,7 +260,7 @@ namespace Spine {
 						else if (timeline is AttachmentTimeline)
 							ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, from, retainAttachments);
 						else
-							timeline.Apply(skeleton, animationLast, applyTime, applyEvents, alpha, from, add, false, false);
+							timeline.Apply(skeleton, animationLast, applyTime, applyEvents, alpha, from, add, mixOut, false);
 					}
 				}
 				if (current.reverse) EventsReverse(current, animationLast, animationTime);
@@ -298,6 +303,7 @@ namespace Spine {
 
 				// Apply mixing from entries first.
 				if (current.mixingFrom != null) ApplyMixingFromEventTimelinesOnly(current, skeleton, issueEvents);
+				current.mixedOut = current.mixingFrom == null && current.trackTime >= current.trackEnd && current.next == null;
 
 				// Apply current entry.
 				float animationLast = current.animationLast, animationTime = current.AnimationTime, applyTime = animationTime;
@@ -496,6 +502,7 @@ namespace Spine {
 			diff -= (float)Math.Ceiling(diff / 360 - 0.5f) * 360;
 			if (diff == 0) {
 				total = timelinesRotation[i];
+				total = timelinesRotation[i] = Math.Sign(total) * (float)Math.Ceiling(Math.Abs(total) / 360 - 0.5f) * 360;
 			} else {
 				float lastTotal, lastDiff;
 				if (firstFrame) {
@@ -650,6 +657,7 @@ namespace Spine {
 				from.mixingTo = current;
 				current.mixTime = 0;
 				from.timelinesRotation.Clear(); // Reset rotation for mixing out, in case entry was mixed in.
+				from.mixedOut = false; // Reset in case it was applied past its track end.
 			}
 
 			queue.Start(current); // triggers AnimationsChanged
@@ -863,7 +871,7 @@ namespace Spine {
 			TrackEntry[] tracksItems = tracks.Items;
 			for (int i = 0; i < n; i++) {
 				TrackEntry track = tracksItems[i];
-				if (track == null) continue;
+				if (track == null || track.delay > 0) continue;
 				TrackEntry entry = track;
 				while (entry.mixingFrom != null) // Move to last entry, then iterate in reverse.
 					entry = entry.mixingFrom;
