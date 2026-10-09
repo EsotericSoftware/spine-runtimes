@@ -75,7 +75,7 @@ void dummyOnAnimationEventFunc(AnimationState *state, spine::EventType type, Tra
 
 TrackEntry::TrackEntry()
 	: _animation(NULL), _previous(NULL), _next(NULL), _mixingFrom(NULL), _mixingTo(0), _trackIndex(0), _loop(false), _additive(false),
-	  _reverse(false), _shortestRotation(false), _keepHold(false), _eventThreshold(0), _mixAttachmentThreshold(0), _alphaAttachmentThreshold(0),
+	  _reverse(false), _shortestRotation(false), _mixedOut(false), _eventThreshold(0), _mixAttachmentThreshold(0), _alphaAttachmentThreshold(0),
 	  _mixDrawOrderThreshold(0), _animationStart(0), _animationEnd(0), _animationLast(0), _nextAnimationLast(0), _delay(0), _trackTime(0),
 	  _trackLast(0), _nextTrackLast(0), _trackEnd(0), _timeScale(1.0f), _alpha(0), _mixTime(0), _mixDuration(0), _totalAlpha(0),
 	  _mixInterpolation(&Interpolation::linear()), _listener(dummyOnAnimationEventFunc), SP_ANIMATION_LISTENER_USER_DATA_CTOR _listenerObject(NULL),
@@ -516,6 +516,7 @@ void AnimationState::update(float delta) {
 			}
 			currentDelta = -current._delay;
 			current._delay = 0;
+			_animationsChanged = true;
 		}
 
 		TrackEntry *next = current._next;
@@ -533,8 +534,8 @@ void AnimationState::update(float delta) {
 				}
 				continue;
 			}
-		} else if (current._trackLast >= current._trackEnd && current._mixingFrom == NULL) {
-			// clear the track when there is no next entry, the track end time is reached, and there is no mixingFrom.
+		} else if (current._trackLast >= current._trackEnd && current._mixedOut) {
+			// Clear the track when there is no next entry and the entry was applied mixed out after the track end time.
 			_tracks[i] = NULL;
 
 			_queue->end(currentP);
@@ -577,11 +578,14 @@ bool AnimationState::apply(Skeleton &skeleton) {
 
 		// Apply mixing from entries first.
 		float alpha = current._alpha;
+		bool mixOut = false;
 		if (current._mixingFrom != NULL) {
 			alpha *= applyMixingFrom(currentP, skeleton);
 		} else if (current._trackTime >= current._trackEnd && current._next == NULL) {
 			alpha = 0;// Set to setup pose the last time the entry will be applied.
+			mixOut = true;
 		}
+		current._mixedOut = mixOut;
 
 		// Apply current entry.
 		float animationLast = current._animationLast, animationTime = current.getAnimationTime();
@@ -603,7 +607,7 @@ bool AnimationState::apply(Skeleton &skeleton) {
 			}
 		} else {
 			Array<int> &timelineMode = current._timelineMode;
-			bool retainAttachments = alpha >= current._alphaAttachmentThreshold;
+			bool retainAttachments = !mixOut && alpha >= current._alphaAttachmentThreshold;
 			bool add = current._additive, shortestRotation = add || current._shortestRotation;
 			bool firstFrame = !shortestRotation && current._timelinesRotation.size() != timelines.size() << 1;
 			if (firstFrame) current._timelinesRotation.setSize(timelines.size() << 1, 0);
@@ -621,7 +625,7 @@ bool AnimationState::apply(Skeleton &skeleton) {
 				else if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti))
 					applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, mixFrom, retainAttachments);
 				else
-					timeline->apply(skeleton, animationLast, applyTime, applyEvents, alpha, mixFrom, add, false, false);
+					timeline->apply(skeleton, animationLast, applyTime, applyEvents, alpha, mixFrom, add, mixOut, false);
 			}
 		}
 
@@ -900,6 +904,7 @@ void AnimationState::applyRotateTimeline(RotateTimeline *rotateTimeline, Skeleto
 	diff -= MathUtil::ceil(diff / 360 - 0.5) * 360;
 	if (diff == 0) {
 		total = timelinesRotation[i];
+		total = timelinesRotation[i] = MathUtil::sign(total) * MathUtil::ceil(MathUtil::abs(total) / 360 - 0.5f) * 360;
 	} else {
 		float lastTotal, lastDiff;
 		if (firstFrame) {
@@ -941,15 +946,12 @@ bool AnimationState::updateMixingFrom(TrackEntry *to, float delta) {
 	from->_animationLast = from->_nextAnimationLast;
 	from->_trackLast = from->_nextTrackLast;
 
-	// The from entry was applied at least once and the mix is complete.
-	if (to->_nextTrackLast != -1 && to->_mixTime >= to->_mixDuration) {
+	// The mix is complete and the from entry was applied with it complete, so it is mixed out.
+	if (from->_mixedOut && to->_mixTime >= to->_mixDuration) {
 		// Mixing is complete for all entries before the from entry or the mix is instantaneous.
 		if (from->_totalAlpha == 0 || to->_mixDuration == 0) {
 			to->_mixingFrom = from->_mixingFrom;
 			if (from->_mixingFrom) from->_mixingFrom->_mixingTo = to;
-			if (from->_totalAlpha == 0) {
-				for (TrackEntry *next = to; next->_mixingTo != NULL; next = next->_mixingTo) next->_keepHold = true;
-			}
 			_queue->end(from);
 		}
 		return finished;
@@ -1022,6 +1024,7 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton) {
 
 	from->_nextAnimationLast = animationTime;
 	from->_nextTrackLast = from->_trackTime;
+	from->_mixedOut = mix == 1;
 	return mix;
 }
 
@@ -1101,6 +1104,7 @@ void AnimationState::setTrack(size_t index, TrackEntry *current, bool interrupt)
 		from->_mixingTo = current;
 		current->_mixTime = 0;
 		from->_timelinesRotation.clear();// Reset rotation for mixing out, in case entry was mixed in.
+		from->_mixedOut = false;         // Reset in case it was applied past its track end.
 	}
 
 	_queue->start(current);// triggers animationsChanged
@@ -1147,7 +1151,7 @@ TrackEntry *AnimationState::newTrackEntry(size_t trackIndex, Animation *animatio
 	entry._mixDuration = (last == NULL) ? 0 : _data->getMix(*last->_animation, *animation);
 	entry._mixInterpolation = &Interpolation::linear();
 	entry._totalAlpha = 0;
-	entry._keepHold = false;
+	entry._mixedOut = false;
 
 	return entryP;
 }
@@ -1166,7 +1170,7 @@ void AnimationState::animationsChanged() {
 
 	for (size_t i = 0, n = _tracks.size(); i < n; ++i) {
 		TrackEntry *track = _tracks[i];
-		if (!track) continue;
+		if (!track || track->_delay > 0) continue;
 		TrackEntry *entry = track;
 
 		while (entry->_mixingFrom != NULL) entry = entry->_mixingFrom;
@@ -1187,7 +1191,7 @@ void AnimationState::computeHold(TrackEntry *entry, TrackEntry *track) {
 	entry->_timelineHoldMix.clear();
 	Array<TrackEntry *> &timelineHoldMix = entry->_timelineHoldMix;
 	timelineHoldMix.setSize(timelinesCount, NULL);
-	bool add = entry->_additive, keepHold = entry->_keepHold;
+	bool add = entry->_additive;
 	TrackEntry *to = entry->_mixingTo;
 
 	for (size_t i = 0; i < timelinesCount; ++i) {
@@ -1201,21 +1205,18 @@ void AnimationState::computeHold(TrackEntry *entry, TrackEntry *track) {
 		}
 
 		// Hold if the next entry will overwrite this property.
-		int mode;
 		if (to == NULL || timeline->getInstant() || (to->_additive && timeline->getAdditive()) || !to->_animation->hasTimeline(ids))
-			mode = mixFrom;
+			timelineMode[i] = mixFrom;
 		else {
-			mode = mixFrom | Hold;
-			// Find next entry that doesn't overwrite this property. Its mix fades out the hold.
+			timelineMode[i] = mixFrom | Hold;
+			// Find next entry that doesn't overwrite this property. Its mix fades out the hold, instead of it ending abruptly.
 			for (TrackEntry *next = to->_mixingTo; next != NULL; next = next->_mixingTo) {
 				if ((next->_additive && timeline->getAdditive()) || !next->_animation->hasTimeline(ids)) {
-					if (next->_mixDuration > 0) timelineHoldMix[i] = next;
+					timelineHoldMix[i] = next;
 					break;
 				}
 			}
 		}
-		if (keepHold) mode = (mode & ~Hold) | (timelineMode[i] & Hold);
-		timelineMode[i] = mode;
 	}
 }
 
