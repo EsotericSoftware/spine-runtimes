@@ -29,9 +29,10 @@
 
 package com.esotericsoftware.spine
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,13 +40,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import com.esotericsoftware.spine.android.SpineController
-import com.esotericsoftware.spine.android.SpineView
-import java.io.File
-import java.net.URL
+import com.esotericsoftware.spine.android.compose.Spine
+import com.esotericsoftware.spine.android.compose.rememberSpineStateFromAssets
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,7 +57,7 @@ fun SimpleAnimation(nav: NavHostController) {
                 navigationIcon = {
                     IconButton({ nav.navigateUp() }) {
                         Icon(
-                            Icons.Rounded.ArrowBack,
+                            Icons.AutoMirrored.Rounded.ArrowBack,
                             null,
                         )
                     }
@@ -65,27 +65,19 @@ fun SimpleAnimation(nav: NavHostController) {
             )
         }
     ) { paddingValues ->
-        AndroidView(
-            factory = { context ->
-                SpineView.loadFromAssets(
-                    "spineboy.atlas",
-                    "spineboy-pro.json",
-                    context,
-                    SpineController {
-                        it.animationState.setAnimation(0, "walk", true)
-                    }
-                )
-//                SpineView.loadFromHttp(
-//                    URL("https://raw.githubusercontent.com/EsotericSoftware/spine-runtimes/4.2/examples/spineboy/export/spineboy.atlas"),
-//                    URL("https://raw.githubusercontent.com/EsotericSoftware/spine-runtimes/4.2/examples/spineboy/export/spineboy-pro.skel"),
-//                    context.filesDir,
-//                    context,
-//                    SpineController {
-//                        it.animationState.setAnimation(0, "walk", true)
-//                    }
-//                )
-            },
-            modifier = Modifier.padding(paddingValues)
+        val controller = remember {
+            SpineController { it.animationState.setAnimation(0, "walk", true) }
+        }
+        val state = rememberSpineStateFromAssets(
+            atlasFileName = "spineboy.atlas",
+            skeletonFileName = "spineboy-pro.json",
+            controller = controller,
+        )
+        Spine(
+            state = state,
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize(),
         )
     }
 }
