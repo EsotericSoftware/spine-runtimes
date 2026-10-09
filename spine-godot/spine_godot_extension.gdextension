@@ -3,6 +3,17 @@
 entry_symbol = "spine_godot_library_init"
 compatibility_minimum = "4.1"
 
+[icons]
+
+SpineSprite = "icons/SpineSprite.svg"
+SpineSkeletonDataResource = "icons/SpineSkeletonDataResource.svg"
+SpineSkeletonFileResource = "icons/SpineSkeletonFileResource.svg"
+SpineAtlasResource = "icons/SpineAtlasResource.svg"
+SpineBoneNode = "icons/SpineBoneNode.svg"
+SpineSlotNode = "icons/SpineSlotNode.svg"
+SpineAnimationTrack = "icons/SpineAnimationTrack.svg"
+SpineMesh2D = "icons/SpineMesh2D.svg"
+
 [libraries]
 
 macos.editor = "macos/libspine_godot.macos.editor.framework"
