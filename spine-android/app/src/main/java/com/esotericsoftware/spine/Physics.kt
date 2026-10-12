@@ -35,7 +35,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -49,10 +49,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import com.esotericsoftware.spine.android.SpineController
-import com.esotericsoftware.spine.android.SpineView
+import com.esotericsoftware.spine.android.compose.Spine
+import com.esotericsoftware.spine.android.compose.rememberSpineStateFromAssets
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,7 +98,7 @@ fun Physics(nav: NavHostController) {
                 navigationIcon = {
                     IconButton({ nav.navigateUp() }) {
                         Icon(
-                            Icons.Rounded.ArrowBack,
+                            Icons.AutoMirrored.Rounded.ArrowBack,
                             null,
                         )
                     }
@@ -137,17 +137,12 @@ fun Physics(nav: NavHostController) {
                 )
             }
         ) {
-            AndroidView(
-                factory = { context ->
-                    SpineView.loadFromAssets(
-                        "celestial-circus.atlas",
-                        "celestial-circus-pro.skel",
-                        context,
-                        controller
-                    )
-                },
-                modifier = Modifier.padding(paddingValues)
+            val state = rememberSpineStateFromAssets(
+                atlasFileName = "celestial-circus.atlas",
+                skeletonFileName = "celestial-circus-pro.skel",
+                controller = controller,
             )
+            Spine(state = state, modifier = Modifier.fillMaxSize())
         }
     }
 }
