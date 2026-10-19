@@ -249,6 +249,9 @@ namespace Spine.Unity {
 
 		public void FillStateData (bool quiet = false) {
 			if (stateData != null) {
+#if UNITY_EDITOR
+				stateData.ClearMixes();
+#endif
 				stateData.DefaultMix = defaultMix;
 
 				for (int i = 0, n = fromAnimation.Length; i < n; i++) {

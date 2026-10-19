@@ -69,6 +69,11 @@ namespace Spine {
 			animationToMixTime.Add(key, duration);
 		}
 
+		/// <summary>Clears all previously set mix durations without changing <see cref="DefaultMix"/>.</summary>
+		public void ClearMixes () {
+			animationToMixTime.Clear();
+		}
+
 		/// <summary>
 		/// Returns the mix duration to use when changing from the specified animation to the other on the same track,
 		/// or the <see cref="DefaultMix"/> if no mix duration has been set.
