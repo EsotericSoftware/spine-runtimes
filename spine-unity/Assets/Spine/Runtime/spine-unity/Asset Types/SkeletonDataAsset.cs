@@ -92,6 +92,12 @@ namespace Spine.Unity {
 		void Reset () {
 			Clear();
 		}
+
+#if UNITY_EDITOR
+		void OnValidate () {
+			FillStateData(quiet: true);
+		}
+#endif
 		#endregion
 
 		SkeletonData skeletonData;
