@@ -50,6 +50,12 @@ namespace Spine.Unity {
 			}
 		}
 
+#if UNITY_EDITOR
+		void OnValidate () {
+			eventData = null;
+		}
+#endif
+
 		public void Initialize () {
 			if (skeletonDataAsset == null)
 				return;
