@@ -324,8 +324,13 @@ void SpineMesh2D::update_mesh(const PackedVector2Array &vertices, const PackedVe
 		flags |= add_tint_arrays(arrays);
 #endif
 		RS::get_singleton()->mesh_add_surface_from_arrays(mesh, RS::PrimitiveType::PRIMITIVE_TRIANGLES, arrays, Array(), Dictionary(), flags);
-		Dictionary surface = RS::get_singleton()->mesh_get_surface(mesh, 0);
-		RS::ArrayFormat surface_format = (RS::ArrayFormat) static_cast<int64_t>(surface["format"]);
+		// The layout follows from the arrays above. Don't ask the server for it with mesh_get_surface(): on RenderingDevice
+		// backends that reads every buffer back from the GPU and waits for all submitted frames, once per new mesh.
+		uint64_t format = RS::ARRAY_FORMAT_VERTEX | RS::ARRAY_FORMAT_TEX_UV | RS::ARRAY_FORMAT_COLOR | RS::ARRAY_FLAG_USE_2D_VERTICES | flags;
+#if VERSION_MINOR >= 3
+		if (has_dark_color) format |= RS::ARRAY_FORMAT_CUSTOM0 | RS::ARRAY_FORMAT_CUSTOM1;
+#endif
+		RS::ArrayFormat surface_format = (RS::ArrayFormat) format;
 		surface_offsets[RS::ARRAY_VERTEX] = RS::get_singleton()->mesh_surface_get_format_offset(surface_format, vertices.size(), RS::ARRAY_VERTEX);
 		surface_offsets[RS::ARRAY_COLOR] = RS::get_singleton()->mesh_surface_get_format_offset(surface_format, vertices.size(), RS::ARRAY_COLOR);
 		surface_offsets[RS::ARRAY_TEX_UV] = RS::get_singleton()->mesh_surface_get_format_offset(surface_format, vertices.size(), RS::ARRAY_TEX_UV);
@@ -339,8 +344,10 @@ void SpineMesh2D::update_mesh(const PackedVector2Array &vertices, const PackedVe
 #endif
 		vertex_stride = RS::get_singleton()->mesh_surface_get_format_vertex_stride(surface_format, vertices.size());
 		attribute_stride = RS::get_singleton()->mesh_surface_get_format_attribute_stride(surface_format, vertices.size());
-		vertex_buffer = surface["vertex_data"];
-		attribute_buffer = surface["attribute_data"];
+		// CPU-side copies for the in-place updates below, which write the position, color, UV and tint of every vertex
+		// (all these buffers hold) before uploading them.
+		vertex_buffer.resize(vertex_stride * vertices.size());
+		attribute_buffer.resize(attribute_stride * vertices.size());
 		num_vertices = vertices.size();
 		num_indices = indices.size();
 		indices_changed = false;
