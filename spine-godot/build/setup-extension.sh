@@ -61,7 +61,7 @@ rm -rf godot-cpp
 git clone --depth 1 $godot_cpp_repo -b $godot_cpp_branch
 
 rm -rf example-v4-extension/bin
-mkdir -p example-v4-extension/bin
+mkdir -p example-v4-extension/bin/icons
 
 if [ $dev == "true" ]; then
     echo "Dev build, creating godot-cpp/dev"
@@ -74,6 +74,7 @@ if [ $dev == "true" ]; then
 fi
 
 cp spine_godot_extension.gdextension example-v4-extension/bin
+cp spine_godot/icons/Spine*.svg example-v4-extension/bin/icons
 rm -rf spine_godot/spine-cpp
 cp -r ../spine-cpp spine_godot
 
