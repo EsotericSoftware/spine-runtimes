@@ -50,6 +50,7 @@ import 'generated/skeleton.dart';
 import 'generated/skeleton_data.dart';
 import 'generated/skin.dart';
 import 'generated/spine_dart_bindings_generated.dart';
+import 'generated/texture_region.dart';
 import 'generated/track_entry.dart';
 import 'spine_bindings.dart';
 import 'spine_dart_init.dart' if (dart.library.html) 'spine_dart_init_web.dart';
@@ -148,6 +149,40 @@ SkeletonData loadSkeletonDataBinary(Atlas atlas, Uint8List binaryData, {String? 
   final skeletonData = SkeletonData.fromPointer(skeletonDataPtr);
   SpineBindings.bindings.spine_skeleton_data_result_dispose(resultPtr.cast());
   return skeletonData;
+}
+
+/// Extension methods for changing the texture region of an attachment.
+extension AttachmentExtensions on Attachment {
+  /// Replaces the texture region at [sequenceIndex] and recomputes the attachment's sequence data.
+  ///
+  /// This operation is supported for [RegionAttachment] and [MeshAttachment]. Attachments from skeleton data may be
+  /// shared by multiple skeletons, so call [Attachment.copy] before changing a region when the change should only
+  /// affect one skeleton. This method does not copy or resize the attachment and does not take ownership of [region].
+  /// The region must remain valid for as long as the attachment may be rendered.
+  void setRegion(TextureRegion region, {int sequenceIndex = 0}) {
+    final attachment = this;
+    final ArrayTextureRegion regions;
+    if (attachment is RegionAttachment) {
+      regions = attachment.sequence.regions;
+    } else if (attachment is MeshAttachment) {
+      regions = attachment.sequence.regions;
+    } else {
+      throw UnsupportedError('Only region and mesh attachments have texture regions.');
+    }
+
+    if (sequenceIndex < 0 || sequenceIndex >= regions.length) {
+      throw RangeError.index(sequenceIndex, regions, 'sequenceIndex');
+    }
+
+    final buffer = SpineBindings.bindings.spine_array_texture_region_buffer(regions.nativePtr.cast());
+    buffer[sequenceIndex] = region.nativePtr.cast();
+
+    if (attachment is RegionAttachment) {
+      attachment.updateSequence();
+    } else {
+      (attachment as MeshAttachment).updateSequence();
+    }
+  }
 }
 
 /// Represents an entry in a skin
