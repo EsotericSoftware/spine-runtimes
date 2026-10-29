@@ -190,6 +190,9 @@ namespace Spine.Unity {
 		/// see https://docs.unity3d.com/ScriptReference/SpriteMaskInteraction.html. </remarks>
 		public SpriteMaskInteraction maskInteraction = SpriteMaskInteraction.None;
 
+		// Only runtime-created clones are owned. Assigned materials are never adopted.
+		[System.NonSerialized] List<Material> ownedMaskMaterials;
+
 		[System.Serializable]
 		public class SpriteMaskInteractionMaterials {
 			public bool AnyMaterialCreated {
@@ -429,6 +432,9 @@ namespace Spine.Unity {
 		}
 
 		void OnDestroy () {
+#if BUILT_IN_SPRITE_MASK_COMPONENT
+			DestroyOwnedMaskMaterials();
+#endif
 			rendererBuffers.Dispose();
 			valid = false;
 		}
@@ -680,9 +686,13 @@ namespace Spine.Unity {
 			} else if (materialsChanged) {
 				meshRenderer.sharedMaterials = rendererBuffers.GetUpdatedSharedMaterialsArray();
 			}
-			if (materialsChanged && (this.maskMaterials.AnyMaterialCreated)) {
-				this.maskMaterials = new SpriteMaskInteractionMaterials();
+#if BUILT_IN_SPRITE_MASK_COMPONENT
+			if (materialsChanged) {
+				DestroyOwnedMaskMaterials();
+				if (this.maskMaterials.AnyMaterialCreated)
+					this.maskMaterials = new SpriteMaskInteractionMaterials();
 			}
+#endif
 
 			meshGenerator.FillLateVertexData(currentMesh);
 
@@ -814,6 +824,48 @@ namespace Spine.Unity {
 			}
 		}
 
+		/// <summary>Creates a mask material clone. In Play mode, this renderer owns the clone and destroys
+		/// it when the mask material cache is invalidated or this renderer is destroyed. Call
+		/// <see cref="ReleaseMaskMaterialOwnership"/> before sharing the clone beyond that lifetime.
+		/// In Edit mode, the clone is not tracked and must be managed by the caller.</summary>
+		public Material CreateRuntimeMaskMaterial (Material originalMaterial,
+			UnityEngine.Rendering.CompareFunction maskFunction) {
+
+			Material material = new Material(originalMaterial);
+			if (Application.isPlaying) {
+				if (ownedMaskMaterials == null)
+					ownedMaskMaterials = new List<Material>();
+				ownedMaskMaterials.Add(material);
+			}
+			material.SetFloat(STENCIL_COMP_PARAM_ID, (int)maskFunction);
+			return material;
+		}
+
+		/// <summary>Transfers cleanup responsibility for an owned mask material to the caller,
+		/// without destroying or unassigning it. Returns true if ownership was released.</summary>
+		/// <remarks>Only needed when user code retains or shares a generated mask material
+		/// beyond this renderer's cache lifetime.</remarks>
+		public bool ReleaseMaskMaterialOwnership (Material material) {
+			return ownedMaskMaterials != null && ownedMaskMaterials.Remove(material);
+		}
+
+		private void DestroyOwnedMaskMaterials () {
+			if (ownedMaskMaterials == null) return;
+
+			foreach (Material material in ownedMaskMaterials) {
+				if (material == null) continue;
+#if UNITY_EDITOR
+				// A caller may have saved a generated clone as a persistent asset.
+				if (UnityEditor.EditorUtility.IsPersistent(material)) continue;
+				if (!Application.isPlaying)
+					UnityEngine.Object.DestroyImmediate(material);
+				else
+#endif
+					UnityEngine.Object.Destroy(material);
+			}
+			ownedMaskMaterials.Clear();
+		}
+
 		private bool InitSpriteMaskMaterialsInsideMask () {
 			return InitSpriteMaskMaterialsForMaskType(STENCIL_COMP_MASKINTERACTION_VISIBLE_INSIDE, ref maskMaterials.materialsInsideMask);
 		}
@@ -836,9 +888,7 @@ namespace Spine.Unity {
 					materialsToFill[i] = null;
 					continue;
 				}
-				Material newMaterial = new Material(originalMaterial);
-				newMaterial.SetFloat(STENCIL_COMP_PARAM_ID, (int)maskFunction);
-				materialsToFill[i] = newMaterial;
+				materialsToFill[i] = CreateRuntimeMaskMaterial(originalMaterial, maskFunction);
 			}
 			return true;
 		}

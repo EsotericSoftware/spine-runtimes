@@ -159,8 +159,7 @@ namespace Spine.Unity.Editor {
 					newMaterial = EditorCreateOrLoadMaskMaterialAsset(maskMaterials, maskFunction, originalMaterials[i]);
 				}
 				if (newMaterial == null) {
-					newMaterial = new Material(originalMaterials[i]);
-					newMaterial.SetFloat(SkeletonRenderer.STENCIL_COMP_PARAM_ID, (int)maskFunction);
+					newMaterial = skeleton.CreateRuntimeMaskMaterial(originalMaterials[i], maskFunction);
 				}
 				materialsToFill[i] = newMaterial;
 			}
