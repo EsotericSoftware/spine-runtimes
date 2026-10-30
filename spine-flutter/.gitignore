@@ -28,6 +28,3 @@ migrate_working_dir/
 .dart_tool/
 .packages
 build/
-ios/spine_flutter/Sources/spine_flutter/spine-c
-macos/spine_flutter/Sources/spine_flutter/spine-c
-src/spine-c

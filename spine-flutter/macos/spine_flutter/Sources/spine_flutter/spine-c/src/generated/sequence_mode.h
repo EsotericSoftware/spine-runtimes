@@ -1,0 +1,22 @@
+#ifndef SPINE_SPINE_SEQUENCE_MODE_H
+#define SPINE_SPINE_SEQUENCE_MODE_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef enum spine_sequence_mode {
+	SPINE_SEQUENCE_MODE_HOLD = 0,
+	SPINE_SEQUENCE_MODE_ONCE = 1,
+	SPINE_SEQUENCE_MODE_LOOP = 2,
+	SPINE_SEQUENCE_MODE_PINGPONG = 3,
+	SPINE_SEQUENCE_MODE_ONCE_REVERSE = 4,
+	SPINE_SEQUENCE_MODE_LOOP_REVERSE = 5,
+	SPINE_SEQUENCE_MODE_PINGPONG_REVERSE = 6
+} spine_sequence_mode;
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* SPINE_SPINE_SEQUENCE_MODE_H */

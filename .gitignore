@@ -169,18 +169,11 @@ spine-godot/logs
 spine-ts/spine-ts.zip
 *.d
 
-spine-flutter/ios/spine_flutter/Sources/spine_flutter/spine-cpp
-spine-flutter/macos/spine_flutter/Sources/spine_flutter/spine-cpp
-spine-flutter/src/spine-cpp
-
 spine-godot/.clang-format
 
 spine-godot/.cache
 spine-godot/build/compile_commands.json
 
-spine-flutter/ios/spine_flutter/Sources/spine_flutter/spine-cpp
-spine-flutter/macos/spine_flutter/Sources/spine_flutter/spine-cpp
-spine-flutter/src/spine-cpp
 spine-godot/godot-nuget
 spine-godot/godot-spine-csharp
 spine-ue/Plugins/Developer
