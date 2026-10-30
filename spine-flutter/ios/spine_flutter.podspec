@@ -13,8 +13,13 @@ A new Flutter FFI plugin project.
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Your Company' => 'email@example.com' }
   s.source           = { :path => '.' }
-  s.source_files     = 'Classes/**/*.{cpp}'
-  s.xcconfig = { 'HEADER_SEARCH_PATHS' => '"$(PODS_TARGET_SRCROOT)/Classes/spine-cpp/include" "$(PODS_TARGET_SRCROOT)/Classes/spine-c/include"' }
+  s.prepare_command  = <<-CMD
+    if [ ! -d "spine_flutter/Sources/spine_flutter/spine-cpp" ] && [ -f "../setup.sh" ]; then
+      bash -c "cd .. && ./setup.sh"
+    fi
+  CMD
+  s.source_files     = 'spine_flutter/Sources/spine_flutter/**/*.{cpp}'
+  s.xcconfig = { 'HEADER_SEARCH_PATHS' => '"$(PODS_TARGET_SRCROOT)/spine_flutter/Sources/spine_flutter/spine-cpp/include" "$(PODS_TARGET_SRCROOT)/spine_flutter/Sources/spine_flutter/spine-c/include"' }
   s.dependency 'Flutter'
   s.platform = :ios, '9.0'
 
