@@ -45,9 +45,13 @@ Future<DynamicLibrary> initDynamicLibrary() async {
   if (Platform.isMacOS || Platform.isIOS) {
     try {
       return await DynamicLibrary.open('$_libName.framework/$_libName');
-    } catch (e) {
-      // Fallback for macOS where the library might not be in a framework
-      return await DynamicLibrary.open('$_libName.dylib');
+    } catch (_) {
+      try {
+        return await DynamicLibrary.open('spine-flutter.framework/spine-flutter');
+      } catch (_) {
+        // Fallback for macOS where the library might not be in a framework
+        return await DynamicLibrary.open('$_libName.dylib');
+      }
     }
   } else if (Platform.isAndroid || Platform.isLinux) {
     return await DynamicLibrary.open('lib$_libName.so');
