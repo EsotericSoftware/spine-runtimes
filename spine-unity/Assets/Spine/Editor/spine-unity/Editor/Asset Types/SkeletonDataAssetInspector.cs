@@ -327,6 +327,8 @@ namespace Spine.Unity.Editor {
 		}
 
 		void OnInspectorGUIMulti () {
+			serializedObject.Update();
+			EditorGUI.BeginChangeCheck();
 
 			// Skeleton data file field.
 			using (new SpineInspectorUtility.BoxScope()) {
@@ -340,10 +342,16 @@ namespace Spine.Unity.Editor {
 			}
 
 			// Texture source field.
+			bool atlasAssetsChanged;
 			using (new SpineInspectorUtility.BoxScope()) {
 				EditorGUILayout.LabelField("Atlas", EditorStyles.boldLabel);
+				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(atlasAssets, true);
+				atlasAssetsChanged = EditorGUI.EndChangeCheck();
 			}
+
+			if (EditorGUI.EndChangeCheck())
+				ApplySkeletonDataChanges(atlasAssetsChanged);
 
 			// Mix settings.
 			using (new SpineInspectorUtility.BoxScope()) {
@@ -352,6 +360,17 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.Space();
 			}
 
+			// AnimationStateData is updated in-place by SkeletonDataAsset.OnValidate.
+			serializedObject.ApplyModifiedProperties();
+		}
+
+		void ApplySkeletonDataChanges (bool atlasAssetsChanged) {
+			serializedObject.ApplyModifiedProperties();
+			foreach (SkeletonDataAsset skeletonDataAsset in targets) {
+				if (atlasAssetsChanged)
+					BlendModeMaterialsUtility.UpdateBlendModeMaterials(skeletonDataAsset);
+				SpineEditorUtilities.DataReloadHandler.ReloadSkeletonDataAssetAndSceneComponents(skeletonDataAsset);
+			}
 		}
 
 		void DrawBlendModeMaterialProperties () {

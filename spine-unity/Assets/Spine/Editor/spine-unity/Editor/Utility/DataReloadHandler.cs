@@ -35,6 +35,10 @@
 #define NEWPLAYMODECALLBACKS
 #endif
 
+#if UNITY_2020_2_OR_NEWER
+#define HAS_OBJECT_CHANGE_EVENTS
+#endif
+
 #if UNITY_2022_2_OR_NEWER
 #define USE_FIND_OBJECTS_BY_TYPE
 #endif
@@ -150,12 +154,64 @@ namespace Spine.Unity.Editor {
 				}
 			}
 
+			/// <summary>Reloads the SkeletonDataAsset if loaded, then its scene components if enabled in the
+			/// Spine preferences, and refreshes Inspectors showing it.</summary>
+			public static void ReloadSkeletonDataAssetAndSceneComponents (SkeletonDataAsset skeletonDataAsset) {
+				if (!skeletonDataAsset.IsLoaded) return;
+				ReloadSkeletonDataAsset(skeletonDataAsset, false);
+				if (Preferences.autoReloadSceneSkeletons && skeletonDataAsset.IsLoaded)
+					ReloadSceneSkeletonComponents(skeletonDataAsset);
+				foreach (SkeletonDataAssetInspector inspector in Resources.FindObjectsOfTypeAll<SkeletonDataAssetInspector>()) {
+					if (inspector.target == skeletonDataAsset)
+						inspector.UpdateSkeletonData();
+				}
+			}
+
+#if HAS_OBJECT_CHANGE_EVENTS
+			// Only supported on 2020.2 and newer. Best solution as it's independent of whether the Inspector
+			// is closed or inspecting something else while Undo / Redo is performed and
+			// ObjectChangeEvents.changesPublished runs on the main thread.
+			internal static void OnUndoRedoPerformed () {
+				ObjectChangeEvents.changesPublished -= ReloadChangedSkeletonDataAssets;
+				ObjectChangeEvents.changesPublished += ReloadChangedSkeletonDataAssets;
+			}
+
+			static void ReloadChangedSkeletonDataAssets (ref ObjectChangeEventStream stream) {
+				ObjectChangeEvents.changesPublished -= ReloadChangedSkeletonDataAssets;
+				// In play mode, SkeletonDataAsset.OnValidate updates mix settings in-place.
+				if (EditorApplication.isPlayingOrWillChangePlaymode) return;
+
+				HashSet<SkeletonDataAsset> skeletonDataAssets = new HashSet<SkeletonDataAsset>();
+				for (int i = 0; i < stream.length; ++i) {
+					if (stream.GetEventType(i) != ObjectChangeKind.ChangeAssetObjectProperties) continue;
+					ChangeAssetObjectPropertiesEventArgs change;
+					stream.GetChangeAssetObjectPropertiesEvent(i, out change);
+#if USES_ENTITY_ID
+					SkeletonDataAsset skeletonDataAsset = EditorUtility.EntityIdToObject(change.instanceId) as SkeletonDataAsset;
+#else
+					SkeletonDataAsset skeletonDataAsset = EditorUtility.InstanceIDToObject(change.instanceId) as SkeletonDataAsset;
+#endif
+					if (skeletonDataAsset != null) skeletonDataAssets.Add(skeletonDataAsset);
+				}
+				foreach (SkeletonDataAsset skeletonDataAsset in skeletonDataAssets)
+					ReloadSkeletonDataAssetAndSceneComponents(skeletonDataAsset);
+			}
+#endif
+
 			public static void ClearAnimationReferenceAssets (SkeletonDataAsset skeletonDataAsset) {
 				ForEachAnimationReferenceAsset(skeletonDataAsset, (referenceAsset) => referenceAsset.Clear());
 			}
 
 			public static void ReloadAnimationReferenceAssets (SkeletonDataAsset skeletonDataAsset) {
 				ForEachAnimationReferenceAsset(skeletonDataAsset, (referenceAsset) => referenceAsset.Initialize());
+			}
+
+			public static void ClearEventDataReferenceAssets (SkeletonDataAsset skeletonDataAsset) {
+				// Only loaded reference assets hold cached EventData, others look it up once loaded.
+				foreach (EventDataReferenceAsset referenceAsset in Resources.FindObjectsOfTypeAll<EventDataReferenceAsset>()) {
+					if (referenceAsset.SkeletonDataAsset == skeletonDataAsset)
+						referenceAsset.Clear();
+				}
 			}
 
 			private static void ForEachAnimationReferenceAsset (SkeletonDataAsset skeletonDataAsset,
