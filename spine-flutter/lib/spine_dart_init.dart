@@ -33,6 +33,7 @@ import 'package:universal_ffi/ffi.dart';
 import 'package:universal_ffi/ffi_utils.dart';
 
 const String _libName = 'spine_flutter';
+const String _spmLibName = 'spine-flutter';
 
 class SpineDartFFI {
   DynamicLibrary dylib;
@@ -43,12 +44,23 @@ class SpineDartFFI {
 
 Future<DynamicLibrary> initDynamicLibrary() async {
   if (Platform.isMacOS || Platform.isIOS) {
-    try {
-      return await DynamicLibrary.open('$_libName.framework/$_libName');
-    } catch (e) {
+    // CocoaPods builds 'spine_flutter.framework', Swift Package Manager builds
+    // 'spine-flutter.framework' (product names must use dashes).
+    final candidates = [
+      '$_libName.framework/$_libName',
+      '$_spmLibName.framework/$_spmLibName',
       // Fallback for macOS where the library might not be in a framework
-      return await DynamicLibrary.open('$_libName.dylib');
+      '$_libName.dylib',
+    ];
+    Object? lastError;
+    for (final candidate in candidates) {
+      try {
+        return await DynamicLibrary.open(candidate);
+      } catch (e) {
+        lastError = e;
+      }
     }
+    throw lastError!;
   } else if (Platform.isAndroid || Platform.isLinux) {
     return await DynamicLibrary.open('lib$_libName.so');
   } else if (Platform.isWindows) {
