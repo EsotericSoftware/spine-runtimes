@@ -45,6 +45,15 @@ void SpineSlotPose::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_sequence_index", "v"), &SpineSlotPose::set_sequence_index);
 	ClassDB::bind_method(D_METHOD("get_deform"), &SpineSlotPose::get_deform);
 	ClassDB::bind_method(D_METHOD("set_deform", "v"), &SpineSlotPose::set_deform);
+
+	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "color", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_color", "get_color");
+	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "dark_color", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_dark_color", "get_dark_color");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "has_dark_color", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_has_dark_color", "has_dark_color");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "attachment", PROPERTY_HINT_RESOURCE_TYPE, "SpineAttachment", PROPERTY_USAGE_NONE), "set_attachment",
+				 "get_attachment");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "sequence_index", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_sequence_index",
+				 "get_sequence_index");
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "deform", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_deform", "get_deform");
 }
 
 Color SpineSlotPose::get_color() {

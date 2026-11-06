@@ -34,6 +34,9 @@
 void SpineConstraintData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_constraint_name"), &SpineConstraintData::get_constraint_name);
 	ClassDB::bind_method(D_METHOD("is_skin_required"), &SpineConstraintData::is_skin_required);
+
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "constraint_name", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_constraint_name");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "skin_required", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "is_skin_required");
 }
 
 String SpineConstraintData::get_constraint_name() {

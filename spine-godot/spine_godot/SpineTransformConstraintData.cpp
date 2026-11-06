@@ -43,6 +43,19 @@ void SpineTransformConstraintData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("is_local_source"), &SpineTransformConstraintData::is_local_source);
 	ClassDB::bind_method(D_METHOD("is_local_target"), &SpineTransformConstraintData::is_local_target);
 	ClassDB::bind_method(D_METHOD("get_setup_pose"), &SpineTransformConstraintData::get_setup_pose);
+
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "bones", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_bones");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "source", PROPERTY_HINT_RESOURCE_TYPE, "SpineBoneData", PROPERTY_USAGE_NONE), "", "get_source");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "offset_rotation", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_offset_rotation");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "offset_x", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_offset_x");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "offset_y", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_offset_y");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "offset_scale_x", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_offset_scale_x");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "offset_scale_y", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_offset_scale_y");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "offset_shear_y", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_offset_shear_y");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "local_source", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "is_local_source");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "local_target", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "is_local_target");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "setup_pose", PROPERTY_HINT_RESOURCE_TYPE, "SpineTransformConstraintPose", PROPERTY_USAGE_NONE), "",
+				 "get_setup_pose");
 }
 
 Array SpineTransformConstraintData::get_bones() {

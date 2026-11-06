@@ -44,6 +44,14 @@ void SpineIkConstraint::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_applied_pose"), &SpineIkConstraint::get_applied_pose);
 	ClassDB::bind_method(D_METHOD("is_active"), &SpineIkConstraint::is_active);
 	ClassDB::bind_method(D_METHOD("set_active", "v"), &SpineIkConstraint::set_active);
+
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "data", PROPERTY_HINT_RESOURCE_TYPE, "SpineIkConstraintData", PROPERTY_USAGE_NONE), "", "get_data");
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "bones", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_bones");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "target", PROPERTY_HINT_RESOURCE_TYPE, "SpineBone", PROPERTY_USAGE_NONE), "set_target", "get_target");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "pose", PROPERTY_HINT_RESOURCE_TYPE, "SpineIkConstraintPose", PROPERTY_USAGE_NONE), "", "get_pose");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "applied_pose", PROPERTY_HINT_RESOURCE_TYPE, "SpineIkConstraintPose", PROPERTY_USAGE_NONE), "",
+				 "get_applied_pose");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "active", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_active", "is_active");
 }
 
 void SpineIkConstraint::update(Ref<SpineSkeleton> skeleton) {

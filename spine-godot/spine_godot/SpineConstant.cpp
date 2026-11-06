@@ -63,6 +63,7 @@ void SpineConstant::_bind_methods() {
 	BIND_ENUM_CONSTANT(SpacingMode_Length)
 	BIND_ENUM_CONSTANT(SpacingMode_Fixed)
 	BIND_ENUM_CONSTANT(SpacingMode_Percent)
+	BIND_ENUM_CONSTANT(SpacingMode_Proportional)
 
 	BIND_ENUM_CONSTANT(RotateMode_Tangent)
 	BIND_ENUM_CONSTANT(RotateMode_Chain)

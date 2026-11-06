@@ -58,6 +58,26 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="frame_entries" type="int" setter="" getter="get_frame_entries">
+			The number of values stored for each frame in [member frames].
+		</member>
+		<member name="frame_count" type="int" setter="" getter="get_frame_count">
+			The number of frames in this timeline.
+		</member>
+		<member name="frames" type="Array" setter="" getter="get_frames">
+			A snapshot of the frame times in seconds and the other values stored for each frame. Each access copies the values; modifying the returned array does not modify the timeline.
+		</member>
+		<member name="duration" type="float" setter="" getter="get_duration">
+			The timeline duration in seconds.
+		</member>
+		<member name="property_ids" type="Array" setter="" getter="get_property_ids">
+			A snapshot of the IDs that uniquely encode this timeline's type and the skeleton properties it affects. Each access copies the IDs; modifying the returned array does not modify the timeline.
+		</member>
+		<member name="type" type="String" setter="" getter="get_type">
+			The runtime timeline type name.
+		</member>
+	</members>
 	<constants>
 	</constants>
 </class>

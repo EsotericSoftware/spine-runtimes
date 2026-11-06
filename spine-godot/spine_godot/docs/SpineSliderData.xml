@@ -111,4 +111,33 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="animation" type="SpineAnimation" setter="" getter="get_animation">
+			The animation applied by this slider. A new wrapper may be returned on each access.
+		</member>
+		<member name="additive" type="bool" setter="set_additive" getter="get_additive">
+			Whether the animation is added to the current pose instead of overwriting it.
+		</member>
+		<member name="loop" type="bool" setter="set_loop" getter="get_loop">
+			Whether the animation repeats after its duration; otherwise its last frame is used.
+		</member>
+		<member name="bone" type="SpineBoneData" setter="set_bone" getter="get_bone">
+			The optional bone whose transform property sets the slider time, or [code]null[/code] when no bone is configured. A new wrapper may be returned on each access. Assigning [code]null[/code] is ignored, so this property cannot clear an existing bone.
+		</member>
+		<member name="scale" type="float" setter="set_scale" getter="get_scale">
+			When a bone is configured, the scale applied to its transform property value to obtain the slider time.
+		</member>
+		<member name="offset" type="float" setter="set_offset" getter="get_offset">
+			When a bone is configured, the offset added to its transform property value.
+		</member>
+		<member name="max" type="float" setter="set_max" getter="get_max">
+			When a bone is configured, the maximum slider time for the bone property range, or 0 if nonessential data was not exported.
+		</member>
+		<member name="local" type="bool" setter="set_local" getter="get_local">
+			Whether the configured bone's local transform property is read instead of its world transform property.
+		</member>
+		<member name="setup_pose" type="SpineSliderPose" setter="" getter="get_setup_pose">
+			The slider's setup time and mix values. A new wrapper may be returned on each access.
+		</member>
+	</members>
 </class>

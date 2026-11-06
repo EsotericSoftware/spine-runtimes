@@ -40,6 +40,12 @@ void SpineSlot::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_bone"), &SpineSlot::get_bone);
 	ClassDB::bind_method(D_METHOD("get_pose"), &SpineSlot::get_pose);
 	ClassDB::bind_method(D_METHOD("get_applied_pose"), &SpineSlot::get_applied_pose);
+
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "data", PROPERTY_HINT_RESOURCE_TYPE, "SpineSlotData", PROPERTY_USAGE_NONE), "", "get_data");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "bone", PROPERTY_HINT_RESOURCE_TYPE, "SpineBone", PROPERTY_USAGE_NONE), "", "get_bone");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "pose", PROPERTY_HINT_RESOURCE_TYPE, "SpineSlotPose", PROPERTY_USAGE_NONE), "", "get_pose");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "applied_pose", PROPERTY_HINT_RESOURCE_TYPE, "SpineSlotPose", PROPERTY_USAGE_NONE), "",
+				 "get_applied_pose");
 }
 
 void SpineSlot::set_to_setup_pose() {

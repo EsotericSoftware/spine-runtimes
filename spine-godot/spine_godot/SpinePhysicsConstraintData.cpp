@@ -50,6 +50,26 @@ void SpinePhysicsConstraintData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("is_gravity_global"), &SpinePhysicsConstraintData::is_gravity_global);
 	ClassDB::bind_method(D_METHOD("is_mix_global"), &SpinePhysicsConstraintData::is_mix_global);
 	ClassDB::bind_method(D_METHOD("get_setup_pose"), &SpinePhysicsConstraintData::get_setup_pose);
+
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "bone", PROPERTY_HINT_RESOURCE_TYPE, "SpineBoneData", PROPERTY_USAGE_NONE), "", "get_bone");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "x", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_x");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "y", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_y");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "rotate", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_rotate");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "scale_x", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_scale_x");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "shear_x", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_shear_x");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "limit", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_limit");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "step", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_step");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "scale_y_mode", PROPERTY_HINT_ENUM, "None,Uniform,Volume", PROPERTY_USAGE_NONE), "set_scale_y_mode",
+				 "get_scale_y_mode");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "inertia_global", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "is_inertia_global");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "strength_global", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "is_strength_global");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "damping_global", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "is_damping_global");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "mass_global", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "is_mass_global");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "wind_global", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "is_wind_global");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "gravity_global", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "is_gravity_global");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "mix_global", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "is_mix_global");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "setup_pose", PROPERTY_HINT_RESOURCE_TYPE, "SpinePhysicsConstraintPose", PROPERTY_USAGE_NONE), "",
+				 "get_setup_pose");
 }
 
 

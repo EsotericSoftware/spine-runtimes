@@ -134,6 +134,29 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="bones" type="Array" setter="" getter="get_bones">
+			A snapshot of the [SpineBoneData] objects modified by this path constraint. Each access rebuilds the array; modifying the returned array does not modify the constraint data.
+		</member>
+		<member name="slot" type="SpineSlotData" setter="set_slot" getter="get_slot">
+			The slot whose path attachment constrains the bones. A new wrapper may be returned on each access. Assigning [code]null[/code] is ignored and does not clear the current slot.
+		</member>
+		<member name="position_mode" type="int" setter="set_position_mode" getter="get_position_mode" enum="SpineConstant.PositionMode">
+			The mode used to position the first bone on the path.
+		</member>
+		<member name="spacing_mode" type="int" setter="set_spacing_mode" getter="get_spacing_mode" enum="SpineConstant.SpacingMode">
+			The mode used to position constrained bones after the first bone on the path.
+		</member>
+		<member name="rotate_mode" type="int" setter="set_rotate_mode" getter="get_rotate_mode" enum="SpineConstant.RotateMode">
+			The mode used to adjust the constrained bones' rotation along the path.
+		</member>
+		<member name="offset_rotation" type="float" setter="set_offset_rotation" getter="get_offset_rotation">
+			The offset added to the constrained bones' rotation.
+		</member>
+		<member name="setup_pose" type="SpinePathConstraintPose" setter="" getter="get_setup_pose">
+			The path constraint's setup position, spacing, rotation mix, and translation mix values. A new wrapper may be returned on each access.
+		</member>
+	</members>
 	<constants>
 	</constants>
 </class>

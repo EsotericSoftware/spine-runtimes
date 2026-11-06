@@ -64,6 +64,26 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="data" type="SpineTransformConstraintData" setter="" getter="get_data">
+			The transform constraint's setup pose data. A new wrapper may be returned on each access.
+		</member>
+		<member name="bones" type="Array" setter="" getter="get_bones">
+			A snapshot of [SpineBonePose] wrappers for the bones modified by this constraint. Each access rebuilds the array; modifying the returned array does not change the constraint's bone collection.
+		</member>
+		<member name="source" type="SpineBone" setter="set_source" getter="get_source">
+			The source bone whose world transform is copied to the constrained bones. A new wrapper may be returned on each access. Assigning [code]null[/code] is ignored and does not clear the current source.
+		</member>
+		<member name="pose" type="SpineTransformConstraintPose" setter="" getter="get_pose">
+			The current transform constraint mix values. A new wrapper may be returned on each access.
+		</member>
+		<member name="applied_pose" type="SpineTransformConstraintPose" setter="" getter="get_applied_pose">
+			The transform constraint pose last applied by the animation state. A new wrapper may be returned on each access.
+		</member>
+		<member name="active" type="bool" setter="set_active" getter="is_active">
+			Whether this transform constraint is applied when the skeleton's world transform is updated.
+		</member>
+	</members>
 	<constants>
 	</constants>
 </class>

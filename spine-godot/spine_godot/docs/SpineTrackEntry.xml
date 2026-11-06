@@ -327,6 +327,92 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="track_index" type="int" setter="" getter="get_track_index">
+			The index of the track where this entry is current or queued.
+		</member>
+		<member name="animation" type="SpineAnimation" setter="" getter="get_animation">
+			The animation applied by this track entry. A new wrapper may be returned on each access. Do not retain this track entry after its dispose event.
+		</member>
+		<member name="previous" type="SpineTrackEntry" setter="" getter="get_previous">
+			The entry queued immediately before this entry, or [code]null[/code]. This transient link is part of a doubly linked queue and may return a new wrapper on each access. Do not retain linked track entries after their dispose events.
+		</member>
+		<member name="loop" type="bool" setter="set_loop" getter="get_loop">
+			If [code]true[/code], the animation repeats. Otherwise its last frame continues to be applied after its duration.
+		</member>
+		<member name="additive" type="bool" setter="set_additive" getter="get_additive">
+			If [code]true[/code], the animation is applied additively to the current pose rather than replacing it.
+		</member>
+		<member name="reverse" type="bool" setter="set_reverse" getter="get_reverse">
+			If [code]true[/code], the animation is applied in reverse. Events are not fired during reverse playback.
+		</member>
+		<member name="shortest_rotation" type="bool" setter="set_shortest_rotation" getter="get_shortest_rotation">
+			If [code]true[/code], rotation mixing always chooses the currently shortest direction. Otherwise the direction chosen when the mix starts is retained for the rest of the mix.
+		</member>
+		<member name="delay" type="float" setter="set_delay" getter="get_delay">
+			Seconds to postpone playback. For a queued entry, this is measured from the start of the previous animation; [member time_scale] affects the delay.
+		</member>
+		<member name="track_time" type="float" setter="set_track_time" getter="get_track_time">
+			The current time in seconds this entry has been current. It determines [member animation_time] and may be set to start playback away from time zero without changing looping.
+		</member>
+		<member name="track_end" type="float" setter="set_track_end" getter="get_track_end">
+			The track time in seconds when this animation is removed. Once reached with no queued animation and no remaining mix, keyed properties return to setup pose and the track is cleared.
+		</member>
+		<member name="animation_start" type="float" setter="set_animation_start" getter="get_animation_start">
+			The animation time in seconds where playback starts initially and after looping. When changing it, setting [member animation_last] to the same value can prevent earlier timeline keys from triggering.
+		</member>
+		<member name="animation_end" type="float" setter="set_animation_end" getter="get_animation_end">
+			The animation time in seconds of the last frame to play. Non-looping playback does not play past it, while looping playback returns to [member animation_start].
+		</member>
+		<member name="animation_last" type="float" setter="set_animation_last" getter="get_animation_last">
+			The animation time in seconds at which this entry was last applied. Timelines use it with [member animation_time] to determine one-time triggers such as events.
+		</member>
+		<member name="animation_time" type="float" setter="" getter="get_animation_time">
+			The current animation time computed from [member track_time], constrained by [member animation_start], [member animation_end], and looping behavior.
+		</member>
+		<member name="time_scale" type="float" setter="set_time_scale" getter="get_time_scale">
+			Multiplier for delta time when this entry is updated, causing its animation to play slower or faster. Negative values are unsupported; use [member reverse] for reverse playback. Mix time is unaffected.
+		</member>
+		<member name="alpha" type="float" setter="set_alpha" getter="get_alpha">
+			The amount this animation contributes relative to the skeleton's current pose, usually the result of lower tracks.
+		</member>
+		<member name="event_threshold" type="float" setter="set_event_threshold" getter="get_event_threshold">
+			Event timelines are applied while mixing out only while [member mix_time] divided by [member mix_duration] is below this threshold.
+		</member>
+		<member name="mix_attachment_threshold" type="float" setter="set_mix_attachment_threshold" getter="get_mix_attachment_threshold">
+			Attachment timelines are applied while mixing out only while [member mix_time] divided by [member mix_duration] is below this threshold.
+		</member>
+		<member name="mix_draw_order_threshold" type="float" setter="set_mix_draw_order_threshold" getter="get_mix_draw_order_threshold">
+			Draw-order timelines are applied while mixing out only while [member mix_time] divided by [member mix_duration] is below this threshold.
+		</member>
+		<member name="alpha_attachment_threshold" type="float" setter="set_alpha_attachment_threshold" getter="get_alpha_attachment_threshold">
+			Attachment timelines are not applied while [member alpha] is below this threshold.
+		</member>
+		<member name="next" type="SpineTrackEntry" setter="" getter="get_next">
+			The entry queued immediately after this entry, or [code]null[/code]. This transient link is part of a doubly linked queue and may return a new wrapper on each access. Do not retain linked track entries after their dispose events.
+		</member>
+		<member name="complete" type="bool" setter="" getter="is_complete">
+			Whether at least one animation loop has completed.
+		</member>
+		<member name="mix_time" type="float" setter="set_mix_time" getter="get_mix_time">
+			Seconds elapsed while mixing from the previous animation to this one. It can be slightly greater than [member mix_duration] after the mix completes.
+		</member>
+		<member name="mix_duration" type="float" setter="set_mix_duration" getter="get_mix_duration">
+			Seconds used to mix from the previous animation to this one. A zero duration still mixes out over one frame so the previous entry can restore properties it animated.
+		</member>
+		<member name="mix_interpolation" type="int" setter="set_mix_interpolation" getter="get_mix_interpolation" enum="SpineConstant.MixInterpolation">
+			The interpolation function used while mixing from the previous animation.
+		</member>
+		<member name="mixing_from" type="SpineTrackEntry" setter="" getter="get_mixing_from">
+			The previous entry currently being mixed out, or [code]null[/code]. During multi-entry mixing this transient link forms a chain and may return a new wrapper on each access. Do not retain linked track entries after their dispose events.
+		</member>
+		<member name="mixing_to" type="SpineTrackEntry" setter="" getter="get_mixing_to">
+			The next entry currently being mixed into, or [code]null[/code]. During multi-entry mixing this transient link forms a chain and may return a new wrapper on each access. Do not retain linked track entries after their dispose events.
+		</member>
+		<member name="track_complete" type="float" setter="" getter="get_track_complete">
+			For a non-looping entry, the track time when [member animation_end] is reached, or the current [member track_time] if already reached. For a looping entry, the track time of the next loop completion.
+		</member>
+	</members>
 	<constants>
 	</constants>
 </class>

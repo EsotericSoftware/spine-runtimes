@@ -116,15 +116,35 @@
 		<method name="get_transform">
 			<return type="Transform2D" />
 			<description>
-				Returns the bone transform as a Transform2D relative to the SpineSprite node representing the skeleton. Shear is not encoded in the transform.
+				Returns the bone's local pose relative to its parent as a Transform2D. The transform's axes include the current shear.
 			</description>
 		</method>
 		<method name="set_transform">
 			<return type="void" />
 			<param index="0" name="local_transform" type="Transform2D" />
 			<description>
-				Sets the bone transform to the Godot Transform2D relative to the SpineSprite.
+				Updates the bone's local position, rotation, and scale from the Transform2D while preserving the existing shear.
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="data" type="SpineBoneData" setter="" getter="get_data">
+			The bone's setup pose data. A new wrapper may be returned on each access.
+		</member>
+		<member name="parent" type="SpineBone" setter="" getter="get_parent">
+			The parent bone, or [code]null[/code] for the root bone. A new wrapper may be returned on each access.
+		</member>
+		<member name="children" type="Array" setter="" getter="get_children">
+			A snapshot of the immediate child [SpineBone] wrappers. Each access rebuilds the array; modifying the returned array does not change the bone hierarchy.
+		</member>
+		<member name="pose" type="SpineBonePose" setter="" getter="get_pose">
+			The unconstrained local pose, containing the bone's position, rotation, scale, and shear. A new wrapper may be returned on each access.
+		</member>
+		<member name="applied_pose" type="SpineBonePose" setter="" getter="get_applied_pose">
+			The applied local and world pose. It may differ from [member pose] after a constraint or application code modifies the world transform. A new wrapper may be returned on each access.
+		</member>
+		<member name="active" type="bool" setter="set_active" getter="is_active">
+			Whether this bone is computed. A bone can be inactive when its setup data requires the active skin and that skin does not contain the bone.
+		</member>
+	</members>
 </class>

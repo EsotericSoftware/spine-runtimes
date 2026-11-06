@@ -103,6 +103,20 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="bones" type="Array" setter="" getter="get_bones">
+			A snapshot of the [SpineBoneData] objects constrained by this IK constraint. Each access rebuilds the array; modifying the returned array does not modify the constraint data.
+		</member>
+		<member name="target" type="SpineBoneData" setter="set_target" getter="get_target">
+			The bone used as the IK target. A new wrapper may be returned on each access. Assigning [code]null[/code] is ignored and does not clear the current target.
+		</member>
+		<member name="scale_y_mode" type="int" setter="set_scale_y_mode" getter="get_scale_y_mode" enum="SpineConstant.ScaleYMode">
+			How the constrained bones' Y scale changes when compression or stretching changes their X scale.
+		</member>
+		<member name="setup_pose" type="SpineIkConstraintPose" setter="" getter="get_setup_pose">
+			The IK constraint's setup mix, softness, bend direction, compression, and stretch values. A new wrapper may be returned on each access.
+		</member>
+	</members>
 	<constants>
 		<constant name="ScaleYMode_None" value="0" enum="ScaleYMode">
 			ScaleY is not changed.

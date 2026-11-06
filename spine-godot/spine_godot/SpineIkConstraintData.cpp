@@ -38,6 +38,14 @@ void SpineIkConstraintData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_scale_y_mode"), &SpineIkConstraintData::get_scale_y_mode);
 	ClassDB::bind_method(D_METHOD("set_scale_y_mode", "v"), &SpineIkConstraintData::set_scale_y_mode);
 	ClassDB::bind_method(D_METHOD("get_setup_pose"), &SpineIkConstraintData::get_setup_pose);
+
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "bones", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_bones");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "target", PROPERTY_HINT_RESOURCE_TYPE, "SpineBoneData", PROPERTY_USAGE_NONE), "set_target",
+				 "get_target");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "scale_y_mode", PROPERTY_HINT_ENUM, "None,Uniform,Volume", PROPERTY_USAGE_NONE), "set_scale_y_mode",
+				 "get_scale_y_mode");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "setup_pose", PROPERTY_HINT_RESOURCE_TYPE, "SpineIkConstraintPose", PROPERTY_USAGE_NONE), "",
+				 "get_setup_pose");
 }
 
 Array SpineIkConstraintData::get_bones() {

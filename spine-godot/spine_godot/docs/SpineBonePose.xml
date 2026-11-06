@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="SpineBonePose" inherits="SpineBoneLocal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+<class name="SpineBonePose" inherits="SpineObjectWrapper" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
 		The applied pose for a bone with constraints applied and world transform computed.
 	</brief_description>
 	<description>
-		The applied pose for a bone. This is the bone pose with constraints applied and the world transform computed by [SpineSkeleton]'s update_world_transform method. Inherits all local transform properties from [SpineBoneLocal] and adds world transform properties and transformation methods.
+		The applied pose for a bone. This is the bone pose with constraints applied and the world transform computed by [SpineSkeleton]'s update_world_transform method. Directly exposes the same local transform properties as [SpineBoneLocal], plus its world transform properties and transformation methods.
 
 		See [url=https://esotericsoftware.com/spine-runtime-skeletons#World-transforms]World transforms[/url] in the Spine Runtimes Guide.
 	</description>
@@ -183,4 +183,60 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="x" type="float" setter="set_x" getter="get_x">
+			The applied local translation along the X axis, relative to the parent bone.
+		</member>
+		<member name="y" type="float" setter="set_y" getter="get_y">
+			The applied local translation along the Y axis, relative to the parent bone.
+		</member>
+		<member name="rotation" type="float" setter="set_rotation" getter="get_rotation">
+			The applied local counterclockwise rotation in degrees.
+		</member>
+		<member name="scale_x" type="float" setter="set_scale_x" getter="get_scale_x">
+			The applied local scale along the X axis.
+		</member>
+		<member name="scale_y" type="float" setter="set_scale_y" getter="get_scale_y">
+			The applied local scale along the Y axis.
+		</member>
+		<member name="shear_x" type="float" setter="set_shear_x" getter="get_shear_x">
+			The applied local shear along the X axis in degrees.
+		</member>
+		<member name="shear_y" type="float" setter="set_shear_y" getter="get_shear_y">
+			The applied local shear along the Y axis in degrees.
+		</member>
+		<member name="inherit" type="int" setter="set_inherit" getter="get_inherit" enum="SpineConstant.Inherit">
+			How the parent bone's world transform affects this bone's world transform.
+		</member>
+		<member name="a" type="float" setter="set_a" getter="get_a">
+			The X component of the world transform matrix's X axis. Call [method update_local_transform] after changing the world transform if the applied local transform is needed.
+		</member>
+		<member name="b" type="float" setter="set_b" getter="get_b">
+			The X component of the world transform matrix's Y axis. Call [method update_local_transform] after changing the world transform if the applied local transform is needed.
+		</member>
+		<member name="c" type="float" setter="set_c" getter="get_c">
+			The Y component of the world transform matrix's X axis. Call [method update_local_transform] after changing the world transform if the applied local transform is needed.
+		</member>
+		<member name="d" type="float" setter="set_d" getter="get_d">
+			The Y component of the world transform matrix's Y axis. Call [method update_local_transform] after changing the world transform if the applied local transform is needed.
+		</member>
+		<member name="world_x" type="float" setter="set_world_x" getter="get_world_x">
+			The bone's world X position. Call [method update_local_transform] after changing it if the applied local transform is needed.
+		</member>
+		<member name="world_y" type="float" setter="set_world_y" getter="get_world_y">
+			The bone's world Y position. Call [method update_local_transform] after changing it if the applied local transform is needed.
+		</member>
+		<member name="world_rotation_x" type="float" setter="" getter="get_world_rotation_x">
+			The world rotation of the X axis in degrees, calculated from [member a] and [member c]. This is the direction the bone points.
+		</member>
+		<member name="world_rotation_y" type="float" setter="" getter="get_world_rotation_y">
+			The world rotation of the Y axis in degrees, calculated from [member b] and [member d].
+		</member>
+		<member name="world_scale_x" type="float" setter="" getter="get_world_scale_x">
+			The always-positive magnitude of the world X scale, calculated from [member a] and [member c].
+		</member>
+		<member name="world_scale_y" type="float" setter="" getter="get_world_scale_y">
+			The always-positive magnitude of the world Y scale, calculated from [member b] and [member d].
+		</member>
+	</members>
 </class>

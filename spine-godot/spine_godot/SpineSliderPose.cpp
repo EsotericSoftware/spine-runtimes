@@ -35,6 +35,9 @@ void SpineSliderPose::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_time", "value"), &SpineSliderPose::set_time);
 	ClassDB::bind_method(D_METHOD("get_mix"), &SpineSliderPose::get_mix);
 	ClassDB::bind_method(D_METHOD("set_mix", "value"), &SpineSliderPose::set_mix);
+
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "time", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_time", "get_time");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "mix", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_mix", "get_mix");
 }
 
 float SpineSliderPose::get_time() {
