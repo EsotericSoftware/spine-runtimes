@@ -50,7 +50,6 @@ void SpineSlotData::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "bone_data", PROPERTY_HINT_RESOURCE_TYPE, "SpineBoneData", PROPERTY_USAGE_NONE), "", "get_bone_data");
 	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "color", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_color", "get_color");
 	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "dark_color", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_dark_color", "get_dark_color");
-	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "has_dark_color", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_has_dark_color", "has_dark_color");
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "attachment_name", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_attachment_name",
 				 "get_attachment_name");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "blend_mode", PROPERTY_HINT_ENUM, "Normal,Additive,Multiply,Screen", PROPERTY_USAGE_NONE),

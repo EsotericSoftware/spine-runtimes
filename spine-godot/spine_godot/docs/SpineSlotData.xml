@@ -102,10 +102,7 @@
 			The setup light color used to tint the slot's attachment. When [member has_dark_color] is true, this is the light color for two-color tinting.
 		</member>
 		<member name="dark_color" type="Color" setter="set_dark_color" getter="get_dark_color">
-			The setup dark color used for two-color tinting. Its alpha component is not used; check [member has_dark_color] to determine whether the dark color is enabled.
-		</member>
-		<member name="has_dark_color" type="bool" setter="set_has_dark_color" getter="has_dark_color">
-			Whether two-color tinting is enabled for the slot's setup color.
+			The setup dark color used for two-color tinting. Its alpha component is not used; call [method has_dark_color] to determine whether the dark color is enabled.
 		</member>
 		<member name="attachment_name" type="String" setter="set_attachment_name" getter="get_attachment_name">
 			The name of the attachment visible for this slot in the setup pose, or an empty string when no attachment is visible.

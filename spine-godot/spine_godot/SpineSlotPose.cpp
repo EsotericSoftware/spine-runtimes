@@ -48,7 +48,6 @@ void SpineSlotPose::_bind_methods() {
 
 	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "color", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_color", "get_color");
 	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "dark_color", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_dark_color", "get_dark_color");
-	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "has_dark_color", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_has_dark_color", "has_dark_color");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "attachment", PROPERTY_HINT_RESOURCE_TYPE, "SpineAttachment", PROPERTY_USAGE_NONE), "set_attachment",
 				 "get_attachment");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "sequence_index", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_sequence_index",

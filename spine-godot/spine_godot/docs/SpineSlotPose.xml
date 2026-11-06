@@ -93,9 +93,6 @@
 		<member name="dark_color" type="Color" setter="set_dark_color" getter="get_dark_color">
 			The dark color used for two-color tinting. Its alpha component is not used.
 		</member>
-		<member name="has_dark_color" type="bool" setter="set_has_dark_color" getter="has_dark_color">
-			Whether the slot uses [member dark_color] for two-color tinting.
-		</member>
 		<member name="attachment" type="SpineAttachment" setter="set_attachment" getter="get_attachment">
 			The slot's current attachment, or [code]null[/code] if none is set. Changing it resets [member sequence_index] and usually clears [member deform]; the deform is preserved when the old and new attachments share the same timeline attachment. A new wrapper may be returned on each access.
 		</member>
