@@ -45,7 +45,11 @@
 
 #if UNITY_6000_3_OR_NEWER
 #define USES_ENTITY_ID
+#if UNITY_6000_3
+#define USES_ENTITY_ID_TO_OBJECT_WITH_INSTANCE_ID
 #endif
+#endif
+
 
 using System.Collections.Generic;
 using System.Globalization;
@@ -186,8 +190,10 @@ namespace Spine.Unity.Editor {
 					if (stream.GetEventType(i) != ObjectChangeKind.ChangeAssetObjectProperties) continue;
 					ChangeAssetObjectPropertiesEventArgs change;
 					stream.GetChangeAssetObjectPropertiesEvent(i, out change);
-#if USES_ENTITY_ID
+#if USES_ENTITY_ID_TO_OBJECT_WITH_INSTANCE_ID
 					SkeletonDataAsset skeletonDataAsset = EditorUtility.EntityIdToObject(change.instanceId) as SkeletonDataAsset;
+#elif USES_ENTITY_ID
+					SkeletonDataAsset skeletonDataAsset = EditorUtility.EntityIdToObject(change.entityId) as SkeletonDataAsset;
 #else
 					SkeletonDataAsset skeletonDataAsset = EditorUtility.InstanceIDToObject(change.instanceId) as SkeletonDataAsset;
 #endif
