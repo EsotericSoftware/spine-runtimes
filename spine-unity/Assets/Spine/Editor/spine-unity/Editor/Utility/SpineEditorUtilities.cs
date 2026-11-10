@@ -342,6 +342,11 @@ namespace Spine.Unity.Editor {
 			if (component.Animation != null) {
 				// Any set animation needs to be applied as well since it might set attachments,
 				// having an effect on generated SpriteMaskMaterials below.
+				// After Initialize above, GatherAnimatorState needs to be called manually as ApplyAnimation
+				// below skips MainThreadBeforeUpdateInternal of a regular update.
+				SkeletonMecanim skeletonMecanim = component.Animation as SkeletonMecanim;
+				if (skeletonMecanim != null && skeletonMecanim.IsValid)
+					skeletonMecanim.Translator.GatherAnimatorState();
 				component.Animation.ApplyAnimation();
 				component.LateUpdate();
 			}
