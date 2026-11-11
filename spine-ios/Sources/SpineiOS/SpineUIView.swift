@@ -321,6 +321,85 @@ public final class SpineUIView: MTKView {
             }
         }
     }
+
+    /// Renders the current skeleton pose directly into a caller-owned Metal
+    /// texture.
+    ///
+    /// The texture must use the same pixel format as ``colorPixelFormat`` and
+    /// include ``MTLTextureUsage/renderTarget`` in its usage. This method uses
+    /// the same renderer as the on-screen view, including animation updates,
+    /// clipping, mesh deformation, slot order, and blend modes.
+    ///
+    /// - Parameters:
+    ///   - texture: The Metal texture that receives the rendered frame.
+    ///   - clearColor: The color used to clear the texture before rendering.
+    ///     Defaults to the view's ``clearColor``.
+    ///   - completion: Called on Metal's completion queue after the GPU has
+    ///     finished rendering. Inspect the command buffer status and error to
+    ///     determine whether rendering succeeded.
+    /// - Returns: `true` when a command buffer was submitted, or `false` when
+    ///   the renderer is not initialized, paused, or could not encode a frame.
+    @discardableResult
+    public func render(
+        to texture: MTLTexture,
+        clearColor: MTLClearColor? = nil,
+        completion: ((MTLCommandBuffer) -> Void)? = nil
+    ) -> Bool {
+        guard let renderer else { return false }
+        renderer.mtkView(
+            self,
+            drawableSizeWillChange: CGSize(width: texture.width, height: texture.height)
+        )
+        return renderer.draw(
+            to: texture,
+            pixelFormat: colorPixelFormat,
+            clearColor: clearColor ?? self.clearColor,
+            completion: completion
+        )
+    }
+
+    /// Encodes the current skeleton pose directly into a caller-owned Metal
+    /// texture and command buffer.
+    ///
+    /// Use this overload when the destination texture is synchronized by the
+    /// caller's command buffer, such as a RealityKit `LowLevelTexture`. The
+    /// caller must commit the command buffer after this method returns `true`.
+    /// Spine adds its completion handler before returning and retains its
+    /// per-frame resources until the command buffer completes.
+    ///
+    /// The texture must use the same pixel format as ``colorPixelFormat`` and
+    /// include ``MTLTextureUsage/renderTarget`` in its usage. The command
+    /// buffer must not already be committed or completed.
+    ///
+    /// - Parameters:
+    ///   - texture: The Metal texture that receives the rendered frame.
+    ///   - commandBuffer: The caller-owned command buffer used for encoding.
+    ///   - clearColor: The color used to clear the texture before rendering.
+    ///     Defaults to the view's ``clearColor``.
+    ///   - completion: Called on Metal's completion queue after the caller
+    ///     commits the command buffer and the GPU finishes rendering.
+    /// - Returns: `true` when the frame was encoded, or `false` when the
+    ///   renderer is not initialized, paused, or could not encode a frame.
+    @discardableResult
+    public func render(
+        to texture: MTLTexture,
+        commandBuffer: MTLCommandBuffer,
+        clearColor: MTLClearColor? = nil,
+        completion: ((MTLCommandBuffer) -> Void)? = nil
+    ) -> Bool {
+        guard let renderer else { return false }
+        renderer.mtkView(
+            self,
+            drawableSizeWillChange: CGSize(width: texture.width, height: texture.height)
+        )
+        return renderer.draw(
+            to: texture,
+            pixelFormat: colorPixelFormat,
+            commandBuffer: commandBuffer,
+            clearColor: clearColor ?? self.clearColor,
+            completion: completion
+        )
+    }
 }
 
 extension SpineUIView {
