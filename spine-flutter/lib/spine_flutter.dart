@@ -5,7 +5,9 @@ export 'spine_widget.dart';
 export 'raw_image_provider.dart';
 
 import 'dart:convert' as convert;
-import 'dart:io' if (dart.library.html) 'io_stub.dart';
+import 'dart:io'
+    if (dart.library.html) 'io_stub.dart'
+    if (dart.library.js_interop) 'io_stub.dart';
 import 'dart:typed_data';
 import 'dart:ui';
 
