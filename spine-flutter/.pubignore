@@ -1,4 +1,7 @@
+!src/spine-c
 !src/spine-cpp
 !src/spine-cpp-lite
-!ios/Classes/spine-cpp
-!macos/Classes/spine-cpp
+!ios/spine_flutter/Sources/spine_flutter/spine-c
+!ios/spine_flutter/Sources/spine_flutter/spine-cpp
+!macos/spine_flutter/Sources/spine_flutter/spine-c
+!macos/spine_flutter/Sources/spine_flutter/spine-cpp

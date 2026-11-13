@@ -23,9 +23,10 @@ if (flutterVersionName == null) {
 }
 
 android {
-    compileSdkVersion flutter.compileSdkVersion
-    // ndkVersion flutter.ndkVersion
-    ndkVersion "28.1.13356709"
+    compileSdk {
+        version = release(36)
+    }
+    ndkVersion flutter.ndkVersion
     namespace "com.esotericsoftware.spine.android"
 
     compileOptions {
