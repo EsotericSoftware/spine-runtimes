@@ -67,4 +67,24 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="data" type="SpineIkConstraintData" setter="" getter="get_data">
+			The IK constraint's setup pose data. A new wrapper may be returned on each access.
+		</member>
+		<member name="bones" type="Array" setter="" getter="get_bones">
+			A snapshot of [SpineBonePose] wrappers for the bones modified by this constraint. Each access rebuilds the array; modifying the returned array does not change the constraint's bone collection.
+		</member>
+		<member name="target" type="SpineBone" setter="set_target" getter="get_target">
+			The target bone the constrained bones rotate toward. A new wrapper may be returned on each access. Assigning [code]null[/code] is ignored and does not clear the current target.
+		</member>
+		<member name="pose" type="SpineIkConstraintPose" setter="" getter="get_pose">
+			The current mix, softness, bend direction, compression, and stretch values. A new wrapper may be returned on each access.
+		</member>
+		<member name="applied_pose" type="SpineIkConstraintPose" setter="" getter="get_applied_pose">
+			The IK constraint pose last applied by the animation state. A new wrapper may be returned on each access.
+		</member>
+		<member name="active" type="bool" setter="set_active" getter="is_active">
+			Whether this IK constraint is applied when the skeleton's world transform is updated.
+		</member>
+	</members>
 </class>

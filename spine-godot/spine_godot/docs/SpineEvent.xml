@@ -75,6 +75,29 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="data" type="SpineEventData" setter="" getter="get_data">
+			The setup-pose event data for this event. A new wrapper may be returned on each access.
+		</member>
+		<member name="time" type="float" setter="" getter="get_time">
+			The time in seconds when this event occurs in its animation.
+		</member>
+		<member name="int_value" type="int" setter="set_int_value" getter="get_int_value">
+			The event's current integer value.
+		</member>
+		<member name="float_value" type="float" setter="set_float_value" getter="get_float_value">
+			The event's current floating-point value.
+		</member>
+		<member name="string_value" type="String" setter="set_string_value" getter="get_string_value">
+			The event's current string value.
+		</member>
+		<member name="volume" type="float" setter="set_volume" getter="get_volume">
+			The event's current audio volume.
+		</member>
+		<member name="balance" type="float" setter="set_balance" getter="get_balance">
+			The event's current audio balance.
+		</member>
+	</members>
 	<constants>
 	</constants>
 </class>

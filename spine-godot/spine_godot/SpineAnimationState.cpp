@@ -49,6 +49,9 @@ void SpineAnimationState::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_time_scale", "time_scale"), &SpineAnimationState::set_time_scale);
 	ClassDB::bind_method(D_METHOD("disable_queue"), &SpineAnimationState::disable_queue);
 	ClassDB::bind_method(D_METHOD("enable_queue"), &SpineAnimationState::enable_queue);
+
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "num_tracks", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_num_tracks");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "time_scale", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_time_scale", "get_time_scale");
 }
 
 SpineAnimationState::SpineAnimationState() : animation_state(nullptr), controller(nullptr) {

@@ -81,4 +81,21 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="mix" type="float" setter="set_mix" getter="get_mix">
+			The percentage from 0 to 1 used to mix between unconstrained and IK-constrained rotation. For two-bone IK with nonuniform parent scale, applying the constraint sets the child bone's local Y translation to 0.
+		</member>
+		<member name="softness" type="float" setter="set_softness" getter="get_softness">
+			For two-bone IK, the target's distance beyond maximum reach where the bones begin slowing their rotation, preventing them from fully straightening until the target is this far out of range.
+		</member>
+		<member name="bend_direction" type="int" setter="set_bend_direction" getter="get_bend_direction">
+			For two-bone IK, the bend direction of the constrained bones: [code]1[/code] or [code]-1[/code].
+		</member>
+		<member name="compress" type="bool" setter="set_compress" getter="get_compress">
+			For one-bone IK, whether the bone is scaled to reach a target that is too close.
+		</member>
+		<member name="stretch" type="bool" setter="set_stretch" getter="get_stretch">
+			Whether the parent bone is scaled to reach an out-of-range target. For two-bone IK, stretching is disabled when softness is greater than 0 or the parent has nonuniform local scale, and applying it sets the child bone's local Y translation to 0.
+		</member>
+	</members>
 </class>

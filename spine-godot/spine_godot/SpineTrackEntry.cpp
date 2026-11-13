@@ -107,6 +107,45 @@ void SpineTrackEntry::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("reset_rotation_directions"), &SpineTrackEntry::reset_rotation_directions);
 	ClassDB::bind_method(D_METHOD("get_track_complete"), &SpineTrackEntry::get_track_complete);
 	ClassDB::bind_method(D_METHOD("was_applied"), &SpineTrackEntry::was_applied);
+
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "track_index", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_track_index");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "animation", PROPERTY_HINT_RESOURCE_TYPE, "SpineAnimation", PROPERTY_USAGE_NONE), "", "get_animation");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "previous", PROPERTY_HINT_RESOURCE_TYPE, "SpineTrackEntry", PROPERTY_USAGE_NONE), "", "get_previous");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "loop", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_loop", "get_loop");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "additive", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_additive", "get_additive");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "reverse", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_reverse", "get_reverse");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "shortest_rotation", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_shortest_rotation",
+				 "get_shortest_rotation");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "delay", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_delay", "get_delay");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "track_time", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_track_time", "get_track_time");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "track_end", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_track_end", "get_track_end");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "animation_start", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_animation_start",
+				 "get_animation_start");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "animation_end", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_animation_end", "get_animation_end");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "animation_last", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_animation_last",
+				 "get_animation_last");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "animation_time", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_animation_time");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "time_scale", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_time_scale", "get_time_scale");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "alpha", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_alpha", "get_alpha");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "event_threshold", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_event_threshold",
+				 "get_event_threshold");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "mix_attachment_threshold", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_mix_attachment_threshold",
+				 "get_mix_attachment_threshold");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "mix_draw_order_threshold", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_mix_draw_order_threshold",
+				 "get_mix_draw_order_threshold");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "alpha_attachment_threshold", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE),
+				 "set_alpha_attachment_threshold", "get_alpha_attachment_threshold");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "next", PROPERTY_HINT_RESOURCE_TYPE, "SpineTrackEntry", PROPERTY_USAGE_NONE), "", "get_next");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "complete", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "is_complete");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "mix_time", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_mix_time", "get_mix_time");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "mix_duration", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_mix_duration", "get_mix_duration");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "mix_interpolation", PROPERTY_HINT_ENUM, "Linear,Smooth,Slow Fast,Fast Slow,Circle", PROPERTY_USAGE_NONE),
+				 "set_mix_interpolation", "get_mix_interpolation");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "mixing_from", PROPERTY_HINT_RESOURCE_TYPE, "SpineTrackEntry", PROPERTY_USAGE_NONE), "",
+				 "get_mixing_from");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "mixing_to", PROPERTY_HINT_RESOURCE_TYPE, "SpineTrackEntry", PROPERTY_USAGE_NONE), "",
+				 "get_mixing_to");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "track_complete", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_track_complete");
 }
 
 int SpineTrackEntry::get_track_index() {

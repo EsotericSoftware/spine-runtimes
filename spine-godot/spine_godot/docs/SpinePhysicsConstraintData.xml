@@ -119,4 +119,57 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="bone" type="SpineBoneData" setter="" getter="get_bone">
+			The bone constrained by this physics constraint. A new wrapper may be returned on each access.
+		</member>
+		<member name="x" type="float" setter="" getter="get_x">
+			The physics influence on X translation, from 0 to 1.
+		</member>
+		<member name="y" type="float" setter="" getter="get_y">
+			The physics influence on Y translation, from 0 to 1.
+		</member>
+		<member name="rotate" type="float" setter="" getter="get_rotate">
+			The physics influence on rotation, from 0 to 1.
+		</member>
+		<member name="scale_x" type="float" setter="" getter="get_scale_x">
+			The physics influence on X scale, from 0 to 1.
+		</member>
+		<member name="shear_x" type="float" setter="" getter="get_shear_x">
+			The physics influence on X shear, from 0 to 1.
+		</member>
+		<member name="limit" type="float" setter="" getter="get_limit">
+			The movement threshold beyond which additional movement has no greater effect on the physics simulation.
+		</member>
+		<member name="step" type="float" setter="" getter="get_step">
+			The time in seconds per simulation step, equivalent to 1 / physics FPS.
+		</member>
+		<member name="scale_y_mode" type="int" setter="set_scale_y_mode" getter="get_scale_y_mode" enum="SpineConstant.ScaleYMode">
+			How the constrained bone's Y scale changes when physics changes its X scale.
+		</member>
+		<member name="inertia_global" type="bool" setter="" getter="is_inertia_global">
+			Whether this constraint's inertia is controlled by global slider timelines.
+		</member>
+		<member name="strength_global" type="bool" setter="" getter="is_strength_global">
+			Whether this constraint's strength is controlled by global slider timelines.
+		</member>
+		<member name="damping_global" type="bool" setter="" getter="is_damping_global">
+			Whether this constraint's damping is controlled by global slider timelines.
+		</member>
+		<member name="mass_global" type="bool" setter="" getter="is_mass_global">
+			Whether this constraint's mass is controlled by global slider timelines.
+		</member>
+		<member name="wind_global" type="bool" setter="" getter="is_wind_global">
+			Whether this constraint's wind is controlled by global slider timelines.
+		</member>
+		<member name="gravity_global" type="bool" setter="" getter="is_gravity_global">
+			Whether this constraint's gravity is controlled by global slider timelines.
+		</member>
+		<member name="mix_global" type="bool" setter="" getter="is_mix_global">
+			Whether this constraint's mix is controlled by global slider timelines.
+		</member>
+		<member name="setup_pose" type="SpinePhysicsConstraintPose" setter="" getter="get_setup_pose">
+			The physics constraint's setup inertia, strength, damping, inverse mass, wind, gravity, and mix values. A new wrapper may be returned on each access.
+		</member>
+	</members>
 </class>

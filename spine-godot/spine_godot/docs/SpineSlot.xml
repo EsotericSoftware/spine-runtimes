@@ -38,4 +38,18 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="data" type="SpineSlotData" setter="" getter="get_data">
+			The slot's setup pose data.
+		</member>
+		<member name="bone" type="SpineBone" setter="" getter="get_bone">
+			The bone this slot belongs to.
+		</member>
+		<member name="pose" type="SpineSlotPose" setter="" getter="get_pose">
+			The current pose, containing the slot's color, attachment, and deform data. A new wrapper may be returned on each access.
+		</member>
+		<member name="applied_pose" type="SpineSlotPose" setter="" getter="get_applied_pose">
+			The pose last applied by the animation state, containing color, attachment, and deform data. A new wrapper may be returned on each access.
+		</member>
+	</members>
 </class>

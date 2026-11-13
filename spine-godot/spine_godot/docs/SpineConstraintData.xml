@@ -40,6 +40,14 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="constraint_name" type="String" setter="" getter="get_constraint_name">
+			The constraint's name, which is unique among constraints of the same type in the skeleton.
+		</member>
+		<member name="skin_required" type="bool" setter="" getter="is_skin_required">
+			Whether the constraint is updated only when the active skin contains it.
+		</member>
+	</members>
 	<constants>
 	</constants>
 </class>

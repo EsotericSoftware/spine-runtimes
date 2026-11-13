@@ -104,6 +104,9 @@ using namespace godot;
 #define GDREGISTER_CLASS(x) ClassDB::register_class<x>()
 #define GDREGISTER_INTERNAL_CLASS(x) ClassDB::register_class<x>()
 #define GEOMETRY2D Geometry
+#ifndef PROPERTY_USAGE_NONE
+#define PROPERTY_USAGE_NONE 0
+#endif
 #ifndef SNAME
 #define SNAME(m_arg)                                                                                                                                 \
 	([]() -> const StringName & {                                                                                                                    \

@@ -43,6 +43,14 @@ void SpinePhysicsConstraint::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("reset", "skeleton"), &SpinePhysicsConstraint::reset);
 	ClassDB::bind_method(D_METHOD("translate", "x", "y"), &SpinePhysicsConstraint::translate);
 	ClassDB::bind_method(D_METHOD("rotate", "x", "y", "degrees"), &SpinePhysicsConstraint::rotate);
+
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "data", PROPERTY_HINT_RESOURCE_TYPE, "SpinePhysicsConstraintData", PROPERTY_USAGE_NONE), "",
+				 "get_data");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "bone", PROPERTY_HINT_RESOURCE_TYPE, "SpineBonePose", PROPERTY_USAGE_NONE), "set_bone", "get_bone");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "pose", PROPERTY_HINT_RESOURCE_TYPE, "SpinePhysicsConstraintPose", PROPERTY_USAGE_NONE), "",
+				 "get_pose");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "applied_pose", PROPERTY_HINT_RESOURCE_TYPE, "SpinePhysicsConstraintPose", PROPERTY_USAGE_NONE), "",
+				 "get_applied_pose");
 }
 
 void SpinePhysicsConstraint::update(Ref<SpineSkeleton> skeleton, SpineConstant::Physics physics) {

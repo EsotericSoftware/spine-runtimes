@@ -58,6 +58,17 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="name" type="String" setter="" getter="get_name">
+			The animation's name, which is unique across all animations in the skeleton.
+		</member>
+		<member name="duration" type="float" setter="set_duration" getter="get_duration">
+			The animation duration in seconds, usually the highest frame time among its timelines. It determines when the animation completes and loops.
+		</member>
+		<member name="timelines" type="Array" setter="" getter="get_timelines">
+			A snapshot of the [SpineTimeline] wrappers making up this animation. Each access rebuilds the array; modifying the returned array does not modify the animation.
+		</member>
+	</members>
 	<constants>
 	</constants>
 </class>

@@ -56,7 +56,7 @@ class SpineControllerOperation {
 
 public:
 	SpineControllerOperation(const Ref<SpineController> &controller) : controller(controller) {
-		controller->begin_native_operation();
+		this->controller->begin_native_operation();
 	}
 
 	~SpineControllerOperation() {
