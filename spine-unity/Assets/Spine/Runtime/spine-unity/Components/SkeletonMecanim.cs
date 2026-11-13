@@ -676,12 +676,16 @@ namespace Spine.Unity {
 			}
 
 			void ClearClipInfosForLayers () {
+				layerCount = 0;
 				for (int layer = 0, n = layerClipInfos.Length; layer < n; ++layer) {
 					if (layerClipInfos[layer] == null)
 						layerClipInfos[layer] = new ClipInfos();
 					else {
 						layerClipInfos[layer].isInterruptionActive = false;
 						layerClipInfos[layer].isLastFrameOfInterruption = false;
+						layerClipInfos[layer].clipInfoCount = 0;
+						layerClipInfos[layer].nextClipInfoCount = 0;
+						layerClipInfos[layer].interruptingClipInfoCount = 0;
 						layerClipInfos[layer].clipInfos.Clear();
 						layerClipInfos[layer].nextClipInfos.Clear();
 						layerClipInfos[layer].interruptingClipInfos.Clear();

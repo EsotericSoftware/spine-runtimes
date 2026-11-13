@@ -67,7 +67,8 @@ namespace Spine.Unity.Editor {
 
 		override public void OnInspectorGUI () {
 			if (serializedObject.isEditingMultipleObjects) {
-				DrawDefaultInspector();
+				if (DrawDefaultInspector())
+					RequestRegionsUpdateInPlayMode();
 				return;
 			}
 
@@ -149,6 +150,12 @@ namespace Spine.Unity.Editor {
 
 			if (serializedObject.ApplyModifiedProperties() || SpineInspectorUtility.UndoRedoPerformed(Event.current))
 				atlasAsset.Clear();
+		}
+
+		/// <summary>As in the single-object branch, saved regions of changed atlases are updated in the next play mode session.</summary>
+		void RequestRegionsUpdateInPlayMode () {
+			foreach (SpineSpriteAtlasAsset spriteAtlasAsset in targets)
+				spriteAtlasAsset.updateRegionsInPlayMode = true;
 		}
 	}
 

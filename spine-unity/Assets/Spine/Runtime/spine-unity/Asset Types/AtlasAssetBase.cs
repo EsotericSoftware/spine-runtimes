@@ -48,6 +48,14 @@ namespace Spine.Unity {
 			InitializeRuntimeOverrides();
 		}
 
+#if UNITY_EDITOR
+		/// <summary>Clears loaded atlas data after serialized settings change,
+		/// e.g. in the Inspector or via Undo/Redo.</summary>
+		protected void OnValidate () {
+			Clear();
+		}
+#endif
+
 		public bool HasMaterialOverrideSets {
 			get {
 #if UNITY_EDITOR

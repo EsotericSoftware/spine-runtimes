@@ -54,6 +54,10 @@
 #define HAS_ON_POSTPROCESS_PREFAB
 #endif
 
+#if UNITY_2020_2_OR_NEWER
+#define HAS_OBJECT_CHANGE_EVENTS
+#endif
+
 #if UNITY_2020_1_OR_NEWER
 #define HAS_EDIT_PREFAB_CONTENTS_SCOPE
 #endif
@@ -254,6 +258,13 @@ namespace Spine.Unity.Editor {
 			EditorApplication.playmodeStateChanged += DataReloadHandler.OnPlaymodeStateChanged;
 			DataReloadHandler.OnPlaymodeStateChanged();
 #endif
+#if HAS_OBJECT_CHANGE_EVENTS
+			// Only supported on 2020.2 and newer. Best solution as it's independent of whether the Inspector
+			// is closed or inspecting something else while undo / redo is performed and
+			// ObjectChangeEvents.changesPublished in OnUndoRedoPerformed runs on the main thread.
+			Undo.undoRedoPerformed -= DataReloadHandler.OnUndoRedoPerformed;
+			Undo.undoRedoPerformed += DataReloadHandler.OnUndoRedoPerformed;
+#endif
 			EditorBridge.OnRequestMarkDirty += OnRequestMarkDirty;
 
 			if (SpineEditorUtilities.Preferences.textureImporterWarning) {
@@ -305,6 +316,7 @@ namespace Spine.Unity.Editor {
 		public static void ClearSkeletonDataAsset (SkeletonDataAsset skeletonDataAsset) {
 			skeletonDataAsset.Clear();
 			DataReloadHandler.ClearAnimationReferenceAssets(skeletonDataAsset);
+			DataReloadHandler.ClearEventDataReferenceAssets(skeletonDataAsset);
 		}
 
 		public static void ReloadSkeletonDataAsset (SkeletonDataAsset skeletonDataAsset, bool clearAtlasAssets = true) {
@@ -330,6 +342,11 @@ namespace Spine.Unity.Editor {
 			if (component.Animation != null) {
 				// Any set animation needs to be applied as well since it might set attachments,
 				// having an effect on generated SpriteMaskMaterials below.
+				// After Initialize above, GatherAnimatorState needs to be called manually as ApplyAnimation
+				// below skips MainThreadBeforeUpdateInternal of a regular update.
+				SkeletonMecanim skeletonMecanim = component.Animation as SkeletonMecanim;
+				if (skeletonMecanim != null && skeletonMecanim.IsValid)
+					skeletonMecanim.Translator.GatherAnimatorState();
 				component.Animation.ApplyAnimation();
 				component.LateUpdate();
 			}
