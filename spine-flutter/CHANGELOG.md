@@ -1,3 +1,16 @@
+# 4.3.7
+
+## Dart
+
+- **Additions**
+  - Added `Attachment.setRegion()` for changing a region or mesh attachment's texture region at runtime.
+
+## Flutter
+
+- **Additions**
+  - Added `AtlasFlutter.addRegion()` for using custom Flutter images as attachment texture regions.
+  - Added example `custom_attachment.dart` demonstrating an animated custom image on a copied mesh attachment.
+
 # 4.3.6
 
 ## Flutter

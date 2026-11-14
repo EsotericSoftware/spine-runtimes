@@ -10,6 +10,7 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import "package:universal_ffi/ffi.dart";
+import 'package:universal_ffi/ffi_utils.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart' as material;
@@ -32,6 +33,23 @@ class AtlasFlutter extends Atlas {
   bool _disposed = false;
 
   AtlasFlutter._(super.ptr, this.atlasPages, this.atlasPagePaints) : super.fromPointer();
+
+  static Map<BlendMode, Paint> _createPagePaints(Image image) {
+    final paints = <BlendMode, Paint>{};
+    for (final blendMode in BlendMode.values) {
+      paints[blendMode] = Paint()
+        ..shader = ImageShader(
+          image,
+          TileMode.clamp,
+          TileMode.clamp,
+          Matrix4.identity().storage,
+          filterQuality: filterQuality,
+        )
+        ..isAntiAlias = true
+        ..blendMode = blendMode.toFlutterBlendMode();
+    }
+    return paints;
+  }
 
   /// Loads an [AtlasFlutter] using a custom file loading function.
   ///
@@ -88,22 +106,7 @@ class AtlasFlutter extends Atlas {
       final frameInfo = await codec.getNextFrame();
       final image = frameInfo.image;
       pages.add(image);
-
-      // Create paints for each blend mode
-      final pagePaints = <BlendMode, Paint>{};
-      for (final blendMode in BlendMode.values) {
-        pagePaints[blendMode] = Paint()
-          ..shader = ImageShader(
-            image,
-            TileMode.clamp,
-            TileMode.clamp,
-            Matrix4.identity().storage,
-            filterQuality: filterQuality,
-          )
-          ..isAntiAlias = true
-          ..blendMode = blendMode.toFlutterBlendMode();
-      }
-      paints.add(pagePaints);
+      paints.add(_createPagePaints(image));
     }
 
     return AtlasFlutter._(atlas.nativePtr.cast(), pages, paints);
@@ -132,6 +135,80 @@ class AtlasFlutter extends Atlas {
       }
       return response.bodyBytes;
     });
+  }
+
+  /// Adds [image] to this atlas as a full-image texture region named [name].
+  ///
+  /// The image handle is cloned, so the caller retains ownership of the supplied [image] and may dispose it after this
+  /// method returns. This atlas owns the cloned handle and the returned region. The region remains valid until this
+  /// atlas is disposed and must not be disposed separately. It must only be used by attachments rendered with this
+  /// atlas.
+  ///
+  /// Each call creates a separate atlas page that is retained until this atlas is disposed. Reuse the returned region
+  /// instead of repeatedly adding the same image.
+  AtlasRegion addRegion(String name, Image image) {
+    if (_disposed) {
+      throw StateError('Cannot add a region to a disposed AtlasFlutter.');
+    }
+    if (name.isEmpty) {
+      throw ArgumentError.value(name, 'name', 'Must not be empty.');
+    }
+
+    final nativePages = pages;
+    final pageIndex = nativePages.length;
+    if (atlasPages.length != pageIndex || atlasPagePaints.length != pageIndex) {
+      throw StateError('Native atlas pages, images, and paints must have matching lengths.');
+    }
+
+    final ownedImage = image.clone();
+    late final Map<BlendMode, Paint> pagePaints;
+    try {
+      pagePaints = _createPagePaints(ownedImage);
+    } catch (_) {
+      ownedImage.dispose();
+      rethrow;
+    }
+    final rendererObject = Pointer<Void>.fromAddress(pageIndex);
+
+    final nameNative = name.toNativeUtf8();
+    late final AtlasPage page;
+    late final AtlasRegion region;
+    try {
+      page = AtlasPage.fromPointer(SpineBindings.bindings.spine_atlas_page_create(nameNative.cast<Char>()))
+        ..width = ownedImage.width
+        ..height = ownedImage.height
+        ..index = pageIndex;
+      SpineBindings.bindings.spine_atlas_page_set_texture(page.nativePtr.cast(), rendererObject);
+
+      region = AtlasRegion()
+        ..page = page
+        ..x = 0
+        ..y = 0
+        ..offsetX = 0
+        ..offsetY = 0
+        ..packedWidth = ownedImage.width
+        ..packedHeight = ownedImage.height
+        ..originalWidth = ownedImage.width
+        ..originalHeight = ownedImage.height
+        ..rotate = false
+        ..degrees = 0
+        ..u = 0
+        ..v = 0
+        ..u2 = 1
+        ..v2 = 1
+        ..regionWidth = ownedImage.width
+        ..regionHeight = ownedImage.height;
+      SpineBindings.bindings.spine_atlas_region_set_name(region.nativePtr.cast(), nameNative.cast<Char>());
+      SpineBindings.bindings.spine_texture_region_set_renderer_object(region.nativePtr.cast(), rendererObject);
+    } finally {
+      malloc.free(nameNative);
+    }
+
+    nativePages.add(page);
+    regions.add(region);
+    atlasPages.add(ownedImage);
+    atlasPagePaints.add(pagePaints);
+    return region;
   }
 
   /// Disposes all resources including the native atlas and images
