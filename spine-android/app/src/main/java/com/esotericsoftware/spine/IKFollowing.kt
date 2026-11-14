@@ -35,7 +35,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -49,12 +49,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import com.badlogic.gdx.math.Vector2
 import com.esotericsoftware.spine.android.SpineController
-import com.esotericsoftware.spine.android.SpineView
 import com.esotericsoftware.spine.android.bounds.Alignment
+import com.esotericsoftware.spine.android.compose.Spine
+import com.esotericsoftware.spine.android.compose.rememberSpineStateFromAssets
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -88,7 +88,7 @@ fun IKFollowing(nav: NavHostController) {
                 navigationIcon = {
                     IconButton({ nav.navigateUp() }) {
                         Icon(
-                            Icons.Rounded.ArrowBack,
+                            Icons.AutoMirrored.Rounded.ArrowBack,
                             null,
                         )
                     }
@@ -123,17 +123,15 @@ fun IKFollowing(nav: NavHostController) {
                 )
             }
         ) {
-            AndroidView(
-                factory = { context ->
-                    SpineView.loadFromAssets(
-                        "spineboy.atlas",
-                        "spineboy-pro.json",
-                        context,
-                        controller
-                    ).apply {
-                        alignment = Alignment.CENTER_LEFT
-                    }
-                }
+            val state = rememberSpineStateFromAssets(
+                atlasFileName = "spineboy.atlas",
+                skeletonFileName = "spineboy-pro.json",
+                controller = controller,
+            )
+            Spine(
+                state = state,
+                alignment = Alignment.CENTER_LEFT,
+                modifier = Modifier.fillMaxSize(),
             )
         }
     }
