@@ -126,7 +126,10 @@ namespace Spine.Unity {
 		}
 
 		protected bool UsesThreadedAnimation {
-			get { return threadedAnimation == SettingsTriState.Enable || RuntimeSettings.UseThreadedAnimation; }
+			get {
+				return threadedAnimation == SettingsTriState.Enable ||
+					(threadedAnimation == SettingsTriState.UseGlobalSetting && RuntimeSettings.UseThreadedAnimation);
+			}
 		}
 
 		public SettingsTriState ThreadedAnimation {
@@ -137,7 +140,7 @@ namespace Spine.Unity {
 
 				SkeletonUpdateSystem system = SkeletonUpdateSystem.Instance;
 				if (system) {
-					if (threadedAnimation == SettingsTriState.Enable || RuntimeSettings.UseThreadedAnimation)
+					if (UsesThreadedAnimation)
 						system.RegisterForUpdate(updateTiming, this);
 					else
 						system.UnregisterFromUpdate(updateTiming, this);

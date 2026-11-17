@@ -291,7 +291,10 @@ namespace Spine.Unity {
 		}
 
 		protected bool UsesThreadedMeshGeneration {
-			get { return threadedMeshGeneration == SettingsTriState.Enable || RuntimeSettings.UseThreadedMeshGeneration; }
+			get {
+				return threadedMeshGeneration == SettingsTriState.Enable ||
+					(threadedMeshGeneration == SettingsTriState.UseGlobalSetting && RuntimeSettings.UseThreadedMeshGeneration);
+			}
 		}
 
 		public bool RequiresMeshBufferAssignmentMainThread {
@@ -306,7 +309,7 @@ namespace Spine.Unity {
 
 				SkeletonUpdateSystem system = SkeletonUpdateSystem.Instance;
 				if (system) {
-					if (threadedMeshGeneration == SettingsTriState.Enable || RuntimeSettings.UseThreadedMeshGeneration)
+					if (UsesThreadedMeshGeneration)
 						system.RegisterForUpdate(this);
 					else
 						system.UnregisterFromUpdate(this);
