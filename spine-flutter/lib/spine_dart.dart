@@ -52,7 +52,9 @@ import 'generated/skin.dart';
 import 'generated/spine_dart_bindings_generated.dart';
 import 'generated/track_entry.dart';
 import 'spine_bindings.dart';
-import 'spine_dart_init.dart' if (dart.library.html) 'spine_dart_init_web.dart';
+import 'spine_dart_init.dart'
+    if (dart.library.html) 'spine_dart_init_web.dart'
+    if (dart.library.js_interop) 'spine_dart_init_web.dart';
 
 // Export generated classes
 export 'generated/api.dart';
