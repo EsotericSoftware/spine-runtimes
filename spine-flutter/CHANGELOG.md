@@ -1,3 +1,10 @@
+# Unreleased
+
+## Flutter
+
+- **Additions**
+  - Added `clipBehavior` to `SpineWidget` (`Clip.antiAlias` by default). Use `Clip.none` to draw outside the widget bounds.
+
 # 4.3.6
 
 ## Flutter
