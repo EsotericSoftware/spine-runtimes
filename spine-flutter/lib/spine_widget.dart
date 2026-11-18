@@ -270,6 +270,13 @@ class SkinAndAnimationBounds extends BoundsProvider {
 ///
 /// The size of the widget can be derived from the bounds provided by a [BoundsProvider]. If the widget is not sized by the bounds
 /// computed by the [BoundsProvider], the widget will use the computed bounds to fit the skeleton inside the widget's dimensions.
+///
+/// By default, the widget clips painting to its bounds with [Clip.antiAlias]. Pass [Clip.none] as `clipBehavior` to
+/// let the skeleton and paint callbacks draw outside the bounds. This does not change layout or hit testing.
+/// Ancestor clips and Spine clipping attachments still apply.
+///
+/// [Clip.antiAliasWithSaveLayer] can add an offscreen layer and change blending. The legacy HTML renderer ignores the
+/// clip antialiasing flag and does not apply save layers. Use CanvasKit on older Flutter web builds if you need either.
 class SpineWidget extends StatefulWidget {
   final _AssetType _assetType;
   final AssetBundle? _bundle;
@@ -282,6 +289,7 @@ class SpineWidget extends StatefulWidget {
   final Alignment _alignment;
   final BoundsProvider _boundsProvider;
   final bool _sizedByBounds;
+  final Clip _clipBehavior;
 
   /// Constructs a new [SpineWidget] from files in the root bundle or the optionally specified [bundle]. The [_atlasFile] specifies the
   /// `.atlas` file to be loaded for the images used to render the skeleton. The [_skeletonFile] specifies either a Skeleton `.json` or
@@ -304,12 +312,14 @@ class SpineWidget extends StatefulWidget {
     Alignment? alignment,
     BoundsProvider? boundsProvider,
     bool? sizedByBounds,
+    Clip clipBehavior = Clip.antiAlias,
     super.key,
   })  : _assetType = _AssetType.asset,
         _fit = fit ?? BoxFit.contain,
         _alignment = alignment ?? Alignment.center,
         _boundsProvider = boundsProvider ?? const SetupPoseBounds(),
         _sizedByBounds = sizedByBounds ?? false,
+        _clipBehavior = clipBehavior,
         _drawable = null,
         _loadFile = null,
         _bundle = bundle ?? rootBundle;
@@ -333,6 +343,7 @@ class SpineWidget extends StatefulWidget {
     Alignment? alignment,
     BoundsProvider? boundsProvider,
     bool? sizedByBounds,
+    Clip clipBehavior = Clip.antiAlias,
     super.key,
   })  : _assetType = _AssetType.file,
         _bundle = null,
@@ -340,6 +351,7 @@ class SpineWidget extends StatefulWidget {
         _alignment = alignment ?? Alignment.center,
         _boundsProvider = boundsProvider ?? const SetupPoseBounds(),
         _sizedByBounds = sizedByBounds ?? false,
+        _clipBehavior = clipBehavior,
         _drawable = null,
         _loadFile = null;
 
@@ -362,6 +374,7 @@ class SpineWidget extends StatefulWidget {
     Alignment? alignment,
     BoundsProvider? boundsProvider,
     bool? sizedByBounds,
+    Clip clipBehavior = Clip.antiAlias,
     super.key,
   })  : _assetType = _AssetType.http,
         _bundle = null,
@@ -369,6 +382,7 @@ class SpineWidget extends StatefulWidget {
         _alignment = alignment ?? Alignment.center,
         _boundsProvider = boundsProvider ?? const SetupPoseBounds(),
         _sizedByBounds = sizedByBounds ?? false,
+        _clipBehavior = clipBehavior,
         _drawable = null,
         _loadFile = null;
 
@@ -394,6 +408,7 @@ class SpineWidget extends StatefulWidget {
     Alignment? alignment,
     BoundsProvider? boundsProvider,
     bool? sizedByBounds,
+    Clip clipBehavior = Clip.antiAlias,
     super.key,
   })  : _assetType = _AssetType.memory,
         _bundle = null,
@@ -401,6 +416,7 @@ class SpineWidget extends StatefulWidget {
         _alignment = alignment ?? Alignment.center,
         _boundsProvider = boundsProvider ?? const SetupPoseBounds(),
         _sizedByBounds = sizedByBounds ?? false,
+        _clipBehavior = clipBehavior,
         _drawable = null;
 
   /// Constructs a new [SpineWidget] from a [SkeletonDrawableFlutter].
@@ -420,6 +436,7 @@ class SpineWidget extends StatefulWidget {
     Alignment? alignment,
     BoundsProvider? boundsProvider,
     bool? sizedByBounds,
+    Clip clipBehavior = Clip.antiAlias,
     super.key,
   })  : _assetType = _AssetType.drawable,
         _bundle = null,
@@ -427,6 +444,7 @@ class SpineWidget extends StatefulWidget {
         _alignment = alignment ?? Alignment.center,
         _boundsProvider = boundsProvider ?? const SetupPoseBounds(),
         _sizedByBounds = sizedByBounds ?? false,
+        _clipBehavior = clipBehavior,
         _skeletonFile = null,
         _atlasFile = null,
         _loadFile = null;
@@ -539,6 +557,7 @@ class _SpineWidgetState extends State<SpineWidget> {
         widget._alignment,
         _computedBounds,
         widget._sizedByBounds,
+        widget._clipBehavior,
       );
     } else {
       return const SizedBox();
@@ -560,6 +579,7 @@ class _SpineRenderObjectWidget extends LeafRenderObjectWidget {
   final Alignment _alignment;
   final Bounds _bounds;
   final bool _sizedByBounds;
+  final Clip _clipBehavior;
 
   const _SpineRenderObjectWidget(
     this._skeletonDrawable,
@@ -568,11 +588,12 @@ class _SpineRenderObjectWidget extends LeafRenderObjectWidget {
     this._alignment,
     this._bounds,
     this._sizedByBounds,
+    this._clipBehavior,
   );
 
   @override
   RenderObject createRenderObject(BuildContext context) {
-    return _SpineRenderObject(_skeletonDrawable, _controller, _fit, _alignment, _bounds, _sizedByBounds);
+    return _SpineRenderObject(_skeletonDrawable, _controller, _fit, _alignment, _bounds, _sizedByBounds, _clipBehavior);
   }
 
   @override
@@ -582,6 +603,7 @@ class _SpineRenderObjectWidget extends LeafRenderObjectWidget {
     renderObject.alignment = _alignment;
     renderObject.bounds = _bounds;
     renderObject.sizedByBounds = _sizedByBounds;
+    renderObject.clipBehavior = _clipBehavior;
   }
 }
 
@@ -594,6 +616,7 @@ class _SpineRenderObject extends RenderBox {
   Alignment _alignment;
   Bounds _bounds;
   bool _sizedByBounds;
+  Clip _clipBehavior;
   bool _disposed = false;
   bool _firstUpdated = false;
 
@@ -604,6 +627,7 @@ class _SpineRenderObject extends RenderBox {
     this._alignment,
     this._bounds,
     this._sizedByBounds,
+    this._clipBehavior,
   );
 
   set skeletonDrawable(SkeletonDrawableFlutter skeletonDrawable) {
@@ -650,6 +674,15 @@ class _SpineRenderObject extends RenderBox {
     if (sizedByBounds != _sizedByBounds) {
       _sizedByBounds = _sizedByBounds;
       markNeedsLayout();
+      markNeedsPaint();
+    }
+  }
+
+  Clip get clipBehavior => _clipBehavior;
+
+  set clipBehavior(Clip clipBehavior) {
+    if (clipBehavior != _clipBehavior) {
+      _clipBehavior = clipBehavior;
       markNeedsPaint();
     }
   }
@@ -783,23 +816,40 @@ class _SpineRenderObject extends RenderBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    final Canvas canvas = context.canvas
-      ..save()
-      ..clipRect(offset & size);
-
-    canvas.save();
-    _setCanvasTransform(canvas, offset);
-
-    if (_firstUpdated) {
-      _controller.onBeforePaint?.call(_controller, canvas);
-      final commands = _skeletonDrawable.renderFlutter();
-      for (final cmd in commands) {
-        final paint = _skeletonDrawable.atlasFlutter.atlasPagePaints[cmd.atlasPageIndex][cmd.blendMode]!;
-        canvas.drawVertices(cmd.vertices, rendering.BlendMode.modulate, paint);
+    final Canvas canvas = context.canvas;
+    // A throwing paint callback can leave extra saves on the canvas.
+    final int saveCount = canvas.getSaveCount();
+    try {
+      canvas.save();
+      final Rect clipBounds = offset & size;
+      switch (_clipBehavior) {
+        case Clip.none:
+          break;
+        case Clip.hardEdge:
+          canvas.clipRect(clipBounds, doAntiAlias: false);
+          break;
+        case Clip.antiAlias:
+          canvas.clipRect(clipBounds);
+          break;
+        case Clip.antiAliasWithSaveLayer:
+          canvas.clipRect(clipBounds);
+          canvas.saveLayer(clipBounds, Paint());
+          break;
       }
-      _controller.onAfterPaint?.call(_controller, canvas, commands);
-    }
 
-    canvas.restore();
+      _setCanvasTransform(canvas, offset);
+
+      if (_firstUpdated) {
+        _controller.onBeforePaint?.call(_controller, canvas);
+        final commands = _skeletonDrawable.renderFlutter();
+        for (final cmd in commands) {
+          final paint = _skeletonDrawable.atlasFlutter.atlasPagePaints[cmd.atlasPageIndex][cmd.blendMode]!;
+          canvas.drawVertices(cmd.vertices, rendering.BlendMode.modulate, paint);
+        }
+        _controller.onAfterPaint?.call(_controller, canvas, commands);
+      }
+    } finally {
+      canvas.restoreToCount(saveCount);
+    }
   }
 }
