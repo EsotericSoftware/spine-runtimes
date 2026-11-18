@@ -97,6 +97,9 @@
 		<constant name="SpacingMode_Percent" value="2" enum="SpacingMode">
 			Path constraint spacing as percentage of path length.
 		</constant>
+		<constant name="SpacingMode_Proportional" value="3" enum="SpacingMode">
+			Path constraint spacing proportional to each bone's length.
+		</constant>
 		<constant name="RotateMode_Tangent" value="0" enum="RotateMode">
 			Path constraint rotation follows the path tangent.
 		</constant>

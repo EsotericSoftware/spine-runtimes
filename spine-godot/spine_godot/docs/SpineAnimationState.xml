@@ -130,6 +130,14 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="num_tracks" type="int" setter="" getter="get_num_tracks">
+			The number of track slots through the highest track index on which an animation has previously been set.
+		</member>
+		<member name="time_scale" type="float" setter="set_time_scale" getter="get_time_scale">
+			Multiplier for delta time when the animation state is updated, causing all animations and mixes to play slower or faster.
+		</member>
+	</members>
 	<constants>
 	</constants>
 </class>

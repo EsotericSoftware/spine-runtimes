@@ -80,6 +80,27 @@ void SpineBonePose::_bind_methods() {
 	// Update methods
 	ClassDB::bind_method(D_METHOD("update_world_transform", "skeleton"), &SpineBonePose::update_world_transform);
 	ClassDB::bind_method(D_METHOD("update_local_transform", "skeleton"), &SpineBonePose::update_local_transform);
+
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "x", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_x", "get_x");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "y", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_y", "get_y");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "rotation", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_rotation", "get_rotation");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "scale_x", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_scale_x", "get_scale_x");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "scale_y", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_scale_y", "get_scale_y");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "shear_x", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_shear_x", "get_shear_x");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "shear_y", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_shear_y", "get_shear_y");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "inherit", PROPERTY_HINT_ENUM,
+							  "Normal,Only Translation,No Rotation Or Reflection,No Scale,No Scale Or Reflection", PROPERTY_USAGE_NONE),
+				 "set_inherit", "get_inherit");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "a", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_a", "get_a");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "b", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_b", "get_b");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "c", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_c", "get_c");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "d", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_d", "get_d");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "world_x", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_world_x", "get_world_x");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "world_y", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_world_y", "get_world_y");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "world_rotation_x", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_world_rotation_x");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "world_rotation_y", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_world_rotation_y");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "world_scale_x", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_world_scale_x");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "world_scale_y", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_world_scale_y");
 }
 
 // BoneLocal properties

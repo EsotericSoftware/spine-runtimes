@@ -52,6 +52,17 @@ void SpineBoneLocal::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_position", "x", "y"), &SpineBoneLocal::set_position);
 	ClassDB::bind_method(D_METHOD("set_scale", "scale_x", "scale_y"), &SpineBoneLocal::set_scale);
 	ClassDB::bind_method(D_METHOD("set_scale_uniform", "scale"), &SpineBoneLocal::set_scale_uniform);
+
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "x", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_x", "get_x");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "y", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_y", "get_y");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "rotation", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_rotation", "get_rotation");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "scale_x", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_scale_x", "get_scale_x");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "scale_y", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_scale_y", "get_scale_y");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "shear_x", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_shear_x", "get_shear_x");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "shear_y", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_shear_y", "get_shear_y");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "inherit", PROPERTY_HINT_ENUM,
+							  "Normal,Only Translation,No Rotation Or Reflection,No Scale,No Scale Or Reflection", PROPERTY_USAGE_NONE),
+				 "set_inherit", "get_inherit");
 }
 
 float SpineBoneLocal::get_x() {

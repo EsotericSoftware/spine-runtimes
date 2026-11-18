@@ -86,6 +86,24 @@ void SpineSkeleton::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("update", "delta"), &SpineSkeleton::update);
 	ClassDB::bind_method(D_METHOD("physics_translate", "x", "y"), &SpineSkeleton::physics_translate);
 	ClassDB::bind_method(D_METHOD("physics_rotate", "x", "y", "degrees"), &SpineSkeleton::physics_rotate);
+
+	ADD_PROPERTY(PropertyInfo(Variant::RECT2, "bounds", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_bounds");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "root_bone", PROPERTY_HINT_RESOURCE_TYPE, "SpineBone", PROPERTY_USAGE_NONE), "", "get_root_bone");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "data", PROPERTY_HINT_RESOURCE_TYPE, "SpineSkeletonDataResource", PROPERTY_USAGE_NONE), "",
+				 "get_data");
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "bones", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_bones");
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "slots", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_slots");
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "draw_order", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_draw_order");
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "ik_constraints", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_ik_constraints");
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "path_constraints", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_path_constraints");
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "transform_constraints", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_transform_constraints");
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "sliders", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_sliders");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "skin", PROPERTY_HINT_RESOURCE_TYPE, "SpineSkin", PROPERTY_USAGE_NONE), "set_skin", "get_skin");
+	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "color", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_color", "get_color");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "x", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_x", "get_x");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "y", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_y", "get_y");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "scale_x", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_scale_x", "get_scale_x");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "time", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_time", "get_time");
 }
 
 SpineSkeleton::SpineSkeleton() : skeleton(nullptr), controller(nullptr), last_skin(nullptr) {

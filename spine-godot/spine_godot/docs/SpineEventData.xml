@@ -92,4 +92,27 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="event_name" type="String" setter="" getter="get_event_name">
+			The event name, which is unique within the skeleton.
+		</member>
+		<member name="int_value" type="int" setter="set_int_value" getter="get_int_value">
+			The integer value in this event's setup pose.
+		</member>
+		<member name="float_value" type="float" setter="set_float_value" getter="get_float_value">
+			The floating-point value in this event's setup pose.
+		</member>
+		<member name="string_value" type="String" setter="set_string_value" getter="get_string_value">
+			The string value in this event's setup pose.
+		</member>
+		<member name="audio_path" type="String" setter="set_audio_path" getter="get_audio_path">
+			The audio path associated with this event definition.
+		</member>
+		<member name="volume" type="float" setter="set_volume" getter="get_volume">
+			The audio volume in this event's setup pose.
+		</member>
+		<member name="balance" type="float" setter="set_balance" getter="get_balance">
+			The audio balance in this event's setup pose.
+		</member>
+	</members>
 </class>

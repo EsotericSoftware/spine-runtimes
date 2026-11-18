@@ -43,6 +43,13 @@ void SpineSlider::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_applied_pose"), &SpineSlider::get_applied_pose);
 	ClassDB::bind_method(D_METHOD("is_active"), &SpineSlider::is_active);
 	ClassDB::bind_method(D_METHOD("set_active", "v"), &SpineSlider::set_active);
+
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "data", PROPERTY_HINT_RESOURCE_TYPE, "SpineSliderData", PROPERTY_USAGE_NONE), "", "get_data");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "bone", PROPERTY_HINT_RESOURCE_TYPE, "SpineBone", PROPERTY_USAGE_NONE), "set_bone", "get_bone");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "pose", PROPERTY_HINT_RESOURCE_TYPE, "SpineSliderPose", PROPERTY_USAGE_NONE), "", "get_pose");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "applied_pose", PROPERTY_HINT_RESOURCE_TYPE, "SpineSliderPose", PROPERTY_USAGE_NONE), "",
+				 "get_applied_pose");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "active", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_active", "is_active");
 }
 
 void SpineSlider::update(Ref<SpineSkeleton> skeleton, SpineConstant::Physics physics) {

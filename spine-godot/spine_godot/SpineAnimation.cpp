@@ -45,6 +45,10 @@ void SpineAnimation::_bind_methods() {
 						 &SpineAnimation::apply);
 	ClassDB::bind_method(D_METHOD("get_timelines"), &SpineAnimation::get_timelines);
 	ClassDB::bind_method(D_METHOD("has_timeline", "ids"), &SpineAnimation::has_timeline);
+
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "name", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_name");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "duration", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_duration", "get_duration");
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "timelines", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_timelines");
 }
 
 String SpineAnimation::get_name() {

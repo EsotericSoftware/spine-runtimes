@@ -33,6 +33,8 @@
 void SpineAttachment::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_attachment_name"), &SpineAttachment::get_attachment_name);
 	ClassDB::bind_method(D_METHOD("copy"), &SpineAttachment::copy);
+
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "attachment_name", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_attachment_name");
 }
 
 SpineAttachment::~SpineAttachment() {

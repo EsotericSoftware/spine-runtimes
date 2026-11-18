@@ -45,6 +45,14 @@ void SpineEvent::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_volume", "v"), &SpineEvent::set_volume);
 	ClassDB::bind_method(D_METHOD("get_balance"), &SpineEvent::get_balance);
 	ClassDB::bind_method(D_METHOD("set_balance", "v"), &SpineEvent::set_balance);
+
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "data", PROPERTY_HINT_RESOURCE_TYPE, "SpineEventData", PROPERTY_USAGE_NONE), "", "get_data");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "time", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_time");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "int_value", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_int_value", "get_int_value");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "float_value", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_float_value", "get_float_value");
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "string_value", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_string_value", "get_string_value");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "volume", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_volume", "get_volume");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "balance", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_balance", "get_balance");
 }
 
 Ref<SpineEventData> SpineEvent::get_data() {

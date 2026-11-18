@@ -45,6 +45,11 @@ void SpineSkin::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_attachments"), &SpineSkin::get_attachments);
 	ClassDB::bind_method(D_METHOD("get_bones"), &SpineSkin::get_bones);
 	ClassDB::bind_method(D_METHOD("get_constraints"), &SpineSkin::get_constraints);
+
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "name", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_name");
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "attachments", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_attachments");
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "bones", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_bones");
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "constraints", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_constraints");
 }
 
 SpineSkin::SpineSkin() : owns_skin(false) {
@@ -199,6 +204,11 @@ void SpineSkinEntry::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_slot_index"), &SpineSkinEntry::get_slot_index);
 	ClassDB::bind_method(D_METHOD("get_name"), &SpineSkinEntry::get_name);
 	ClassDB::bind_method(D_METHOD("get_attachment"), &SpineSkinEntry::get_attachment);
+
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "slot_index", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_slot_index");
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "name", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_name");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "attachment", PROPERTY_HINT_RESOURCE_TYPE, "SpineAttachment", PROPERTY_USAGE_NONE), "",
+				 "get_attachment");
 }
 
 SpineSkinEntry::SpineSkinEntry() : slot_index(0) {

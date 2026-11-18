@@ -99,4 +99,27 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="inertia" type="float" setter="set_inertia" getter="get_inertia">
+			Controls how much movement of the constrained bone is converted into physics movement.
+		</member>
+		<member name="strength" type="float" setter="set_strength" getter="get_strength">
+			The force used to return the constrained properties toward their unconstrained values.
+		</member>
+		<member name="damping" type="float" setter="set_damping" getter="get_damping">
+			Reduces the speed of physics movement, with a greater reduction at higher speeds.
+		</member>
+		<member name="mass_inverse" type="float" setter="set_mass_inverse" getter="get_mass_inverse">
+			The inverse mass that determines the constraint's susceptibility to acceleration.
+		</member>
+		<member name="wind" type="float" setter="set_wind" getter="get_wind">
+			The constant force applied along the skeleton's wind vector.
+		</member>
+		<member name="gravity" type="float" setter="set_gravity" getter="get_gravity">
+			The constant force applied along the skeleton's gravity vector.
+		</member>
+		<member name="mix" type="float" setter="set_mix" getter="get_mix">
+			The percentage, from 0 upward, used to mix between unconstrained and physics-constrained poses.
+		</member>
+	</members>
 </class>

@@ -22,4 +22,9 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="attachment_name" type="String" setter="" getter="get_attachment_name">
+			The attachment's name.
+		</member>
+	</members>
 </class>

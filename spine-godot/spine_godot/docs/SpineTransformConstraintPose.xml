@@ -86,4 +86,24 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="mix_rotate" type="float" setter="set_mix_rotate" getter="get_mix_rotate">
+			The unbounded percentage used to mix between unconstrained and constrained rotation.
+		</member>
+		<member name="mix_x" type="float" setter="set_mix_x" getter="get_mix_x">
+			The unbounded percentage used to mix between unconstrained and constrained X translation.
+		</member>
+		<member name="mix_y" type="float" setter="set_mix_y" getter="get_mix_y">
+			The unbounded percentage used to mix between unconstrained and constrained Y translation.
+		</member>
+		<member name="mix_scale_x" type="float" setter="set_mix_scale_x" getter="get_mix_scale_x">
+			The unbounded percentage used to mix between unconstrained and constrained X scale.
+		</member>
+		<member name="mix_scale_y" type="float" setter="set_mix_scale_y" getter="get_mix_scale_y">
+			The unbounded percentage used to mix between unconstrained and constrained Y scale.
+		</member>
+		<member name="mix_shear_y" type="float" setter="set_mix_shear_y" getter="get_mix_shear_y">
+			The unbounded percentage used to mix between unconstrained and constrained Y shear.
+		</member>
+	</members>
 </class>

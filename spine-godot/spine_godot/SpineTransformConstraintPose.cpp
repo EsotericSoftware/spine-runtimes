@@ -43,6 +43,13 @@ void SpineTransformConstraintPose::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_mix_scale_y", "value"), &SpineTransformConstraintPose::set_mix_scale_y);
 	ClassDB::bind_method(D_METHOD("get_mix_shear_y"), &SpineTransformConstraintPose::get_mix_shear_y);
 	ClassDB::bind_method(D_METHOD("set_mix_shear_y", "value"), &SpineTransformConstraintPose::set_mix_shear_y);
+
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "mix_rotate", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_mix_rotate", "get_mix_rotate");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "mix_x", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_mix_x", "get_mix_x");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "mix_y", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_mix_y", "get_mix_y");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "mix_scale_x", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_mix_scale_x", "get_mix_scale_x");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "mix_scale_y", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_mix_scale_y", "get_mix_scale_y");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "mix_shear_y", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_mix_shear_y", "get_mix_shear_y");
 }
 
 float SpineTransformConstraintPose::get_mix_rotate() {

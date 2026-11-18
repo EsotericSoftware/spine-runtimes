@@ -49,6 +49,17 @@ void SpineSliderData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_local"), &SpineSliderData::get_local);
 	ClassDB::bind_method(D_METHOD("set_local", "value"), &SpineSliderData::set_local);
 	ClassDB::bind_method(D_METHOD("get_setup_pose"), &SpineSliderData::get_setup_pose);
+
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "animation", PROPERTY_HINT_RESOURCE_TYPE, "SpineAnimation", PROPERTY_USAGE_NONE), "", "get_animation");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "additive", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_additive", "get_additive");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "loop", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_loop", "get_loop");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "bone", PROPERTY_HINT_RESOURCE_TYPE, "SpineBoneData", PROPERTY_USAGE_NONE), "set_bone", "get_bone");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "scale", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_scale", "get_scale");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "offset", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_offset", "get_offset");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "max", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_max", "get_max");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "local", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_local", "get_local");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "setup_pose", PROPERTY_HINT_RESOURCE_TYPE, "SpineSliderPose", PROPERTY_USAGE_NONE), "",
+				 "get_setup_pose");
 }
 
 Ref<SpineAnimation> SpineSliderData::get_animation() {

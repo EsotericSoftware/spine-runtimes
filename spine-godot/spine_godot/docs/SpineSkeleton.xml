@@ -313,6 +313,56 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="bounds" type="Rect2" setter="" getter="get_bounds">
+			The axis-aligned bounds of the current region and mesh attachments, relative to the [SpineSprite]. The bounds, including clipping, are computed each time this property is accessed.
+		</member>
+		<member name="root_bone" type="SpineBone" setter="" getter="get_root_bone">
+			The root bone, or [code]null[/code] if the skeleton has no bones. A new wrapper may be returned on each access.
+		</member>
+		<member name="data" type="SpineSkeletonDataResource" setter="" getter="get_data">
+			The skeleton data resource from which this skeleton instance was created.
+		</member>
+		<member name="bones" type="Array" setter="" getter="get_bones">
+			A snapshot of the skeleton's [SpineBone] wrappers, sorted parent first with the root bone first. Each access rebuilds the array; modifying it does not change the skeleton.
+		</member>
+		<member name="slots" type="Array" setter="" getter="get_slots">
+			A snapshot of the skeleton's [SpineSlot] wrappers in setup-pose order. Each access rebuilds the array; modifying it does not change the skeleton.
+		</member>
+		<member name="draw_order" type="Array" setter="" getter="get_draw_order">
+			A snapshot of the [SpineSlot] wrappers in their current applied draw order. Each access rebuilds the array; modifying it does not change the skeleton's draw order.
+		</member>
+		<member name="ik_constraints" type="Array" setter="" getter="get_ik_constraints">
+			A snapshot of the skeleton's [SpineIkConstraint] wrappers. Each access rebuilds the array; modifying it does not change the skeleton.
+		</member>
+		<member name="path_constraints" type="Array" setter="" getter="get_path_constraints">
+			A snapshot of the skeleton's [SpinePathConstraint] wrappers. Each access rebuilds the array; modifying it does not change the skeleton.
+		</member>
+		<member name="transform_constraints" type="Array" setter="" getter="get_transform_constraints">
+			A snapshot of the skeleton's [SpineTransformConstraint] wrappers. Each access rebuilds the array; modifying it does not change the skeleton.
+		</member>
+		<member name="sliders" type="Array" setter="" getter="get_sliders">
+			A snapshot of the skeleton's [SpineSlider] wrappers. Each access rebuilds the array; modifying it does not change the skeleton.
+		</member>
+		<member name="skin" type="SpineSkin" setter="set_skin" getter="get_skin">
+			The current skin used to look up attachments before the default skin, or [code]null[/code] when no skin is assigned. A new wrapper may be returned on each access; assigning [code]null[/code] clears the current skin.
+		</member>
+		<member name="color" type="Color" setter="set_color" getter="get_color">
+			The color that tints all attachments in the skeleton.
+		</member>
+		<member name="x" type="float" setter="set_x" getter="get_x">
+			The skeleton's X position relative to the [SpineSprite], added to the root bone's world X position. Bones that do not inherit translation are still affected.
+		</member>
+		<member name="y" type="float" setter="set_y" getter="get_y">
+			The skeleton's Y position relative to the [SpineSprite], added to the root bone's world Y position. Bones that do not inherit translation are still affected.
+		</member>
+		<member name="scale_x" type="float" setter="set_scale_x" getter="get_scale_x">
+			The scale applied to the entire skeleton on the X axis. Bones that do not inherit scale are still affected.
+		</member>
+		<member name="time" type="float" setter="set_time" getter="get_time">
+			The skeleton's current time in seconds, used when evaluating physics constraints.
+		</member>
+	</members>
 	<constants>
 	</constants>
 </class>

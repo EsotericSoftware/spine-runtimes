@@ -90,4 +90,33 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="index" type="int" setter="" getter="get_index">
+			The index of this bone in the skeleton's bone array.
+		</member>
+		<member name="bone_name" type="String" setter="" getter="get_bone_name">
+			The bone's name, which is unique across all bones in the skeleton.
+		</member>
+		<member name="parent" type="SpineBoneData" setter="" getter="get_parent">
+			The parent bone data, or [code]null[/code] for the root bone. A new wrapper may be returned on each access.
+		</member>
+		<member name="length" type="float" setter="set_length" getter="get_length">
+			The bone's setup length.
+		</member>
+		<member name="setup_pose" type="SpineBonePose" setter="" getter="get_setup_pose">
+			The bone's setup position, rotation, scale, shear, and transform values. A new wrapper may be returned on each access.
+		</member>
+		<member name="skin_required" type="bool" setter="set_skin_required" getter="is_skin_required">
+			Whether the bone is active only when the active skin contains it.
+		</member>
+		<member name="color" type="Color" setter="set_color" getter="get_color">
+			The bone color authored in Spine, or a default color if nonessential data was not exported. Bones are not normally rendered at runtime.
+		</member>
+		<member name="icon" type="String" setter="" getter="get_icon">
+			The bone icon name authored in Spine, or an empty string if none was assigned or nonessential data was not exported.
+		</member>
+		<member name="visible" type="bool" setter="set_visible" getter="is_visible">
+			Whether the bone is marked visible in its setup data.
+		</member>
+	</members>
 </class>

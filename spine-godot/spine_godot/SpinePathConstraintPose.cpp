@@ -41,6 +41,12 @@ void SpinePathConstraintPose::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_mix_x", "value"), &SpinePathConstraintPose::set_mix_x);
 	ClassDB::bind_method(D_METHOD("get_mix_y"), &SpinePathConstraintPose::get_mix_y);
 	ClassDB::bind_method(D_METHOD("set_mix_y", "value"), &SpinePathConstraintPose::set_mix_y);
+
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "position", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_position", "get_position");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "spacing", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_spacing", "get_spacing");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "mix_rotate", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_mix_rotate", "get_mix_rotate");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "mix_x", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_mix_x", "get_mix_x");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "mix_y", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_mix_y", "get_mix_y");
 }
 
 float SpinePathConstraintPose::get_position() {

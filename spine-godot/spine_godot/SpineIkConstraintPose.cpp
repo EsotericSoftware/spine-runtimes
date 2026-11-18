@@ -41,6 +41,13 @@ void SpineIkConstraintPose::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_compress", "value"), &SpineIkConstraintPose::set_compress);
 	ClassDB::bind_method(D_METHOD("get_stretch"), &SpineIkConstraintPose::get_stretch);
 	ClassDB::bind_method(D_METHOD("set_stretch", "value"), &SpineIkConstraintPose::set_stretch);
+
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "mix", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_mix", "get_mix");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "softness", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_softness", "get_softness");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "bend_direction", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_bend_direction",
+				 "get_bend_direction");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "compress", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_compress", "get_compress");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "stretch", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_stretch", "get_stretch");
 }
 
 float SpineIkConstraintPose::get_mix() {

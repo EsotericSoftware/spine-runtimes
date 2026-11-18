@@ -25,15 +25,24 @@ func _run():
 	_finish()
 
 func _test_public_api_and_shared_resource(skeleton_data: SpineSkeletonDataResource):
+	_check(SpineConstant.SpacingMode_Proportional == 3, "proportional path spacing mode has the native value")
 	var first := _new_sprite(skeleton_data)
 	var second := _new_sprite(skeleton_data)
 	await process_frame
 	_check(first.get_skeleton() != null and second.get_skeleton() != null, "shared resource creates both skeleton instances")
 	_check(first.get_skeleton() != second.get_skeleton(), "shared resource does not share instance skeleton wrappers")
-	var first_bone := first.get_skeleton().find_bone("child")
+	var first_skeleton := first.get_skeleton()
+	_check(first_skeleton.data is SpineSkeletonDataResource and first_skeleton.data == first_skeleton.get_data(),
+		"resource-valued skeleton.data property agrees with its getter")
+	_check(first_skeleton.bones is Array and first_skeleton.bones.size() == first_skeleton.get_bones().size(),
+		"skeleton.bones array property agrees with its getter")
+	var first_bone := first_skeleton.find_bone("child")
 	var second_bone := second.get_skeleton().find_bone("child")
 	_check(first_bone != null and second_bone != null, "shared resource bones are available")
 	if first_bone != null:
+		_check(first_bone.pose is SpineBonePose and first_bone.pose.get_x() == first_bone.get_pose().get_x(),
+			"bone.pose wrapper property agrees with its getter")
+		_check(first_bone.active == first_bone.is_active(), "bone.active property agrees with its is_* getter")
 		_check(not first_bone.has_method("get_global_transform"), "SpineBone.get_global_transform is removed")
 		_check(not first_bone.has_method("set_global_transform"), "SpineBone.set_global_transform is removed")
 	first.position = Vector2(23, 17)
@@ -67,6 +76,45 @@ func _test_signal_arguments_and_order(skeleton_data: SpineSkeletonDataResource):
 	)
 	var state := sprite.get_animation_state()
 	var entry := state.set_animation("idle", true, 0)
+	_check(entry.get_animation().get_name() == "idle", "legacy animation getters remain available")
+	_check(entry.animation is SpineAnimation, "animation property retains its wrapper type")
+	_check(entry.animation.name == "idle", "nested animation.name properties work")
+	_check(entry.animation.name == entry.get_animation().get_name(), "property and method animation values agree")
+	entry.loop = false
+	_check(entry.loop == false and entry.get_loop() == false, "writable loop property uses the existing setter and getter")
+	entry.loop = true
+	_check(entry.loop == true and entry.get_loop() == true, "loop property is restored to true")
+	_check(entry.complete == entry.is_complete(), "is_* complete getter maps to a property without is_")
+
+	var animation_property_info: Dictionary = {}
+	for entry_property_info in entry.get_property_list():
+		if entry_property_info["name"] == "animation":
+			animation_property_info = entry_property_info
+			break
+	_check(not animation_property_info.is_empty(), "animation property metadata is registered")
+	if not animation_property_info.is_empty():
+		_check(animation_property_info["type"] == TYPE_OBJECT, "animation property metadata uses TYPE_OBJECT")
+		_check(animation_property_info["hint"] == PROPERTY_HINT_RESOURCE_TYPE,
+			"animation property metadata uses PROPERTY_HINT_RESOURCE_TYPE")
+		_check(animation_property_info["hint_string"] == "SpineAnimation",
+			"animation property metadata names SpineAnimation")
+		var animation_usage := int(animation_property_info["usage"])
+		_check((animation_usage & (PROPERTY_USAGE_STORAGE | PROPERTY_USAGE_EDITOR)) == 0,
+			"animation property metadata has neither storage nor editor usage")
+
+	var animation_name_property_info: Dictionary = {}
+	for name_property_info in entry.animation.get_property_list():
+		if name_property_info["name"] == "name":
+			animation_name_property_info = name_property_info
+			break
+	_check(not animation_name_property_info.is_empty(), "SpineAnimation.name property metadata is registered")
+	if not animation_name_property_info.is_empty():
+		_check(animation_name_property_info["type"] == TYPE_STRING,
+			"SpineAnimation.name property metadata uses TYPE_STRING")
+		var animation_name_usage := int(animation_name_property_info["usage"])
+		_check((animation_name_usage & (PROPERTY_USAGE_STORAGE | PROPERTY_USAGE_EDITOR)) == 0,
+			"SpineAnimation.name property metadata has neither storage nor editor usage")
+
 	_check(started.args.size() == 3, "animation_started is forwarded synchronously")
 	if started.args.size() == 3:
 		_check(started.args[0] == sprite, "animation_started keeps SpineSprite argument")
