@@ -235,7 +235,7 @@ export class SpinePipe implements RenderPipe<Spine> {
 	}
 
 	destroyRenderable (spine: Spine) {
-		(this.gpuSpineData[spine.uid] as unknown) = null;
+		delete this.gpuSpineData[spine.uid];
 		spine.off('destroyed', this._destroyRenderableBound);
 	}
 
