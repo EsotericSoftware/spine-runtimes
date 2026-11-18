@@ -11,7 +11,7 @@ buildscript {
 
     dependencies {
         // The Android Gradle Plugin knows how to build native code with the NDK.
-        classpath 'com.android.tools.build:gradle:8.5.1'
+        classpath 'com.android.tools.build:gradle:8.13.0'
     }
 }
 
@@ -24,16 +24,50 @@ rootProject.allprojects {
 
 apply plugin: 'com.android.library'
 
+// Minimum NDK version required by this plugin. The highest installed NDK that
+// is >= this version is used; if none is installed, this version is used (and
+// downloaded by AGP).
+def minNdkVersion = "28.1.13356709"
+
+def compareVersions = { String a, String b ->
+    def pa = a.tokenize('.').collect { it.isInteger() ? it.toInteger() : 0 }
+    def pb = b.tokenize('.').collect { it.isInteger() ? it.toInteger() : 0 }
+    for (int i = 0; i < Math.max(pa.size(), pb.size()); i++) {
+        int x = i < pa.size() ? pa[i] : 0
+        int y = i < pb.size() ? pb[i] : 0
+        if (x != y) return x <=> y
+    }
+    return 0
+}
+
+def resolveNdkVersion = {
+    def sdkDir = null
+    def localProps = rootProject.file("local.properties")
+    if (localProps.exists()) {
+        def props = new Properties()
+        localProps.withInputStream { props.load(it) }
+        sdkDir = props.getProperty("sdk.dir")
+    }
+    sdkDir = sdkDir ?: System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
+    def ndkDir = sdkDir ? new File(sdkDir, "ndk") : null
+    def installed = (ndkDir?.isDirectory() ? ndkDir.listFiles().findAll {
+        it.isDirectory() && new File(it, "source.properties").exists()
+    }*.name : []).findAll { compareVersions(it, minNdkVersion) >= 0 }
+    return installed ? installed.max { a, b -> compareVersions(a, b) } : minNdkVersion
+}
+
 android {
     namespace "com.esotericsoftware.spine.flutter"
 
     // Bumping the plugin compileSdkVersion requires all clients of this plugin
     // to bump the version in their app.
-    compileSdkVersion 31
+    compileSdk {
+        version = release(36)
+    }
 
     // Bumping the plugin ndkVersion requires all clients of this plugin to bump
     // the version in their app and to download a newer version of the NDK.
-    ndkVersion "28.1.13356709"
+    ndkVersion resolveNdkVersion()
 
     // Invoke the shared CMake build with the Android Gradle Plugin.
     externalNativeBuild {
