@@ -511,6 +511,7 @@ namespace Spine {
 			int n = polygon.Count;
 			bool noCW = true, noCCW = true;
 			float area = 0, prevX = v[n - 2], prevY = v[n - 1], currX = v[0], currY = v[1];
+			int prevDir = 0, firstDir = 0, flips = 0;
 
 			for (int i = 2; i < n; i += 2) {
 				float nextX = v[i], nextY = v[i + 1];
@@ -518,6 +519,15 @@ namespace Spine {
 				float cross1 = (currX - prevX) * (nextY - currY) - (currY - prevY) * (nextX - currX);
 				noCCW &= cross1 <= 0;
 				noCW &= cross1 >= 0;
+				// Edge direction: sign of the x difference, or of the y difference if x is equal.
+				int currDir = nextX > currX ? 1 : nextX < currX ? -1 : nextY > currY ? 1 : nextY < currY ? -1 : 0;
+				if (currDir != 0) {
+					if (prevDir == 0)
+						firstDir = currDir;
+					else if (currDir != prevDir)
+						flips++;
+					prevDir = currDir;
+				}
 				prevX = currX;
 				prevY = currY;
 				currX = nextX;
@@ -527,6 +537,16 @@ namespace Spine {
 			float cross = (currX - prevX) * (v[1] - currY) - (currY - prevY) * (v[0] - currX);
 			noCCW &= cross <= 0;
 			noCW &= cross >= 0;
+			int closingDir = v[0] > currX ? 1 : v[0] < currX ? -1 : v[1] > currY ? 1 : v[1] < currY ? -1 : 0;
+			if (closingDir != 0) {
+				if (prevDir == 0)
+					firstDir = closingDir;
+				else if (closingDir != prevDir)
+					flips++;
+				prevDir = closingDir;
+			}
+			if (prevDir != firstDir) flips++;
+			if (flips > 2) noCW = noCCW = false; // Convex polygons change edge direction exactly twice.
 			if (area >= 0) {
 				for (int i = 0, lastX = n - 2, half = n >> 1; i < half; i += 2) {
 					float x = v[i], y = v[i + 1];
