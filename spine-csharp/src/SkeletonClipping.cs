@@ -436,7 +436,8 @@ namespace Spine {
 
 			for (int i = 0; ; i += 2) {
 				float edgeX = v[i], edgeY = v[i + 1], ex = edgeX - v[i + 2], ey = edgeY - v[i + 3];
-				int outputStart = output.Count, fragmentStart = inverseVertices.Count++;
+				int outputStart = output.Count, fragmentStart = inverseVertices.Count;
+				inverseVertices.Add(0);
 				iv = input.Items;
 				x1 = iv[0];
 				y1 = iv[1];
@@ -563,7 +564,7 @@ namespace Spine {
 
 		private void MakeConvex (ExposedList<float> polygon) {
 			int n = polygon.Count;
-			polygon.EnsureCapacity(n);
+			polygon.EnsureCapacity(n * 2); // Note: libgdx reference implementation has added capacity as argument here.
 			float[] v = polygon.Items, sorted = clipOutput.EnsureSize(n).Items;
 			sorted[0] = v[0];
 			sorted[1] = v[1];
