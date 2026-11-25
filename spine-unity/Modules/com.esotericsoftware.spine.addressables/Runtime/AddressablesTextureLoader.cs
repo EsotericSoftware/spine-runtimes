@@ -47,7 +47,7 @@ namespace Spine.Unity {
 #if UNITY_EDITOR
 		public Texture EditorTexture {
 			get {
-				return (Texture)assetReference.editorAsset;
+				return assetReference != null ? (Texture)assetReference.editorAsset : null;
 			}
 		}
 #endif
@@ -75,16 +75,29 @@ namespace Spine.Unity {
 
 	[System.Serializable]
 	public class AddressablesTextureLoader : GenericOnDemandTextureLoader<AddressableTextureReference, AddressableRequest> {
+		protected override bool HasRequestFailed (AddressableRequest textureRequest) {
+			return textureRequest.handle.IsValid() && textureRequest.handle.IsDone &&
+				textureRequest.handle.Status == AsyncOperationStatus.Failed;
+		}
+
 		public override void CreateTextureRequest (AddressableTextureReference targetReference,
 			MaterialOnDemandData materialData, int textureIndex, Material materialToUpdate,
 			System.Action<Texture> onTextureLoaded) {
 
+			Texture textureBeforeLoad = GetTexture(materialToUpdate, textureIndex);
 			OnTextureRequested(materialToUpdate, textureIndex);
-			materialData.textureRequests[textureIndex].handle = targetReference.assetReference.LoadAssetAsync<Texture>();
-			materialData.textureRequests[textureIndex].handle.Completed += (obj) => {
+			AsyncOperationHandle<Texture> requestHandle = targetReference.assetReference.LoadAssetAsync<Texture>();
+			materialData.textureRequests[textureIndex].handle = requestHandle;
+			requestHandle.Completed += (obj) => {
+				AddressableRequest currentRequest = materialData.textureRequests[textureIndex];
+				if (!this || !materialToUpdate || !currentRequest.WasRequested || !currentRequest.handle.Equals(obj))
+					return;
+
 				if (obj.Status == AsyncOperationStatus.Succeeded) {
-					Texture loadedTexture = (Texture)targetReference.assetReference.Asset;
-					materialToUpdate.mainTexture = loadedTexture;
+					Texture loadedTexture = obj.Result;
+					// Preserve texture changes made while loading.
+					if (GetTexture(materialToUpdate, textureIndex) == textureBeforeLoad)
+						SetTexture(materialToUpdate, textureIndex, loadedTexture);
 					OnTextureLoaded(materialToUpdate, textureIndex);
 					if (onTextureLoaded != null) onTextureLoaded(loadedTexture);
 				} else {

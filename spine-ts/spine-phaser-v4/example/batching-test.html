@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="//cdn.jsdelivr.net/npm/phaser@4.0.0/dist/phaser.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/phaser@4.2.1/dist/phaser.js"></script>
   <link rel="stylesheet" href="../../index.css" />
   <title>Spine Phaser Example</title>
 </head>
@@ -40,9 +40,9 @@
   let debug;
 
   function preload() {
-    this.load.spineJson("raptor-data", "/assets/raptor-pro.json");
+    this.load.spineSkeleton("raptor-data", "/assets/raptor-pro.json");
     this.load.spineAtlas("raptor-atlas", "/assets/raptor-pma.atlas");
-    this.load.spineBinary("spineboy-data", "/assets/spineboy-pro.skel");
+    this.load.spineSkeleton("spineboy-data", "/assets/spineboy-pro.skel");
     this.load.spineAtlas("spineboy-atlas", "/assets/spineboy-pma.atlas");
   }
 
@@ -55,8 +55,8 @@
       for (let i = 0; i < 20; i++, x += 800 / 20) {
         const obj =
           Math.random() > 0.5
-            ? this.add.spine(x, y, "spineboy-data", "spineboy-atlas")
-            : this.add.spine(x, y, "raptor-data", "raptor-atlas");
+            ? this.add.spine(x, y, "spineboy-data", "spineboy-atlas", { renderer: "spine-webgl" })
+            : this.add.spine(x, y, "raptor-data", "raptor-atlas", { renderer: "spine-webgl" });
         obj.animationState.setAnimation(0, "walk", true);
         obj.scale = 0.1;
         n++;

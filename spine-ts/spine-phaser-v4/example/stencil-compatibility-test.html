@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>spine-phaser-v4 stencil compatibility test</title>
+  <style>
+    html, body { margin: 0; padding: 0; overflow: hidden; background: #202020; }
+    canvas { display: block; }
+    #note {
+      position: fixed;
+      left: 10px;
+      top: 10px;
+      z-index: 10;
+      color: white;
+      font: 14px/1.35 monospace;
+      white-space: pre;
+      pointer-events: none;
+      text-shadow: 0 1px 2px #000;
+    }
+    #benchmarkHud {
+      position: fixed;
+      left: 8px;
+      top: 8px;
+      z-index: 10;
+      padding: 8px 10px;
+      background: rgba(0, 0, 0, 0.65);
+      color: #fff;
+      font: 12px/1.35 monospace;
+      white-space: pre;
+      pointer-events: none;
+    }
+  </style>
+  <script src="//cdn.jsdelivr.net/npm/phaser@4.2.1/dist/phaser.js"></script>
+  <script src="../dist/iife/spine-phaser-v4.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.20.0/dist/lil-gui.umd.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/lil-gui@0.20.0/dist/lil-gui.min.css" rel="stylesheet">
+</head>
+<body>
+  <script>
+    const patchGL = name => {
+      const proto = WebGLRenderingContext.prototype;
+      const original = proto[name];
+      if (!original) return;
+      proto[name] = function () {
+        window.__spineStencilDrawCalls = (window.__spineStencilDrawCalls || 0) + 1;
+        return original.apply(this, arguments);
+      };
+    };
+    patchGL("drawArrays");
+    patchGL("drawElements");
+    if (window.WebGL2RenderingContext) {
+      const patchGL2 = name => {
+        const proto = WebGL2RenderingContext.prototype;
+        const original = proto[name];
+        if (!original) return;
+        proto[name] = function () {
+          window.__spineStencilDrawCalls = (window.__spineStencilDrawCalls || 0) + 1;
+          return original.apply(this, arguments);
+        };
+      };
+      patchGL2("drawArrays");
+      patchGL2("drawElements");
+    }
+
+    const bench = {
+      lastDrawCallTotal: 0,
+      lastFrameDrawCalls: 0,
+      fpsWindowStart: performance.now(),
+      fpsWindowFrames: 0,
+      displayFps: 0,
+      lastHudUpdate: 0,
+    };
+    const hud = document.createElement("div");
+    hud.id = "benchmarkHud";
+    hud.textContent = "Loading...";
+    document.body.appendChild(hud);
+
+    class Demo extends Phaser.Scene {
+      preload() {
+        this.load.spineSkeleton("spineboy-data", "../../assets/spineboy-pro.skel");
+        this.load.spineAtlas("spineboy-atlas", "../../assets/spineboy-pma.atlas");
+        this.load.image("raptor-jaw", "../../assets/raptor-jaw-tooth.png");
+      }
+
+      create() {
+        const width = this.scale.width;
+        const height = this.scale.height;
+
+        const controls = this.controls = {
+          barWidth: 10,
+          barDistance: 27,
+          phaserStencilInverse: false,
+          spineboys: 1,
+          spineClipInverse: false,
+          forceNormalBlend: false,
+          play: true,
+          time: 0,
+        };
+        const maskGraphics = this.add.graphics();
+        const guideGraphics = this.add.graphics();
+
+        const updateBars = () => {
+          maskGraphics.clear();
+          guideGraphics.clear();
+          maskGraphics.fillStyle(0xffffff, 1);
+          guideGraphics.lineStyle(1, 0xffffff, 0.7);
+
+          for (let x = 0; x < width; x += controls.barWidth + controls.barDistance) {
+            maskGraphics.fillRect(x, 0, controls.barWidth, height);
+            guideGraphics.lineBetween(x, 0, x, height);
+            guideGraphics.lineBetween(x + controls.barWidth, 0, x + controls.barWidth, height);
+          }
+        };
+        updateBars();
+
+        const phaserStencil = this.add.stencil(0, 0, [maskGraphics], {
+          stencilCompositeCheck: false,
+          stencilValueWrap: true,
+          stencilInvert: controls.phaserStencilInverse,
+        });
+
+        const gui = new lil.GUI({ title: "Stencil" });
+        gui.add(controls, "barWidth", 1, 200, 1).name("bar width").onChange(updateBars);
+        gui.add(controls, "barDistance", 0, 200, 1).name("bar distance").onChange(updateBars);
+        gui.add(controls, "phaserStencilInverse").name("Phaser stencil inverse").onChange(value => phaserStencil.stencilInvert = value);
+
+        const spineboys = [];
+        const originalBlendModes = new WeakMap();
+        const setSpineClipInverse = () => {
+          const spineboy = spineboys[0]?.spineboy;
+          if (!spineboy) return;
+          for (const skin of spineboy.skeleton.data.skins) {
+            for (const entry of skin.getAttachments()) {
+              if (entry.attachment && "inverse" in entry.attachment) {
+                entry.attachment.inverse = controls.spineClipInverse;
+              }
+            }
+          }
+        };
+
+        const setSpineBlendModes = () => {
+          const data = spineboys[0]?.spineboy.skeleton.data;
+          if (!data) return;
+
+          if (!originalBlendModes.has(data)) {
+            originalBlendModes.set(data, data.slots.map(slot => slot.blendMode));
+          }
+
+          const originals = originalBlendModes.get(data);
+          for (let i = 0; i < data.slots.length; i++) {
+            data.slots[i].blendMode = controls.forceNormalBlend && originals[i] === spine.BlendMode.Additive
+              ? spine.BlendMode.Normal
+              : originals[i];
+          }
+        };
+
+        const setSpineboyTime = time => {
+          for (const item of spineboys) {
+            item.entry.trackTime = time;
+            item.spineboy.updatePose(0);
+          }
+        };
+
+        const destroySpineboys = () => {
+          for (const item of spineboys) item.spineboy.destroy();
+          spineboys.length = 0;
+        };
+
+        const createSpineboys = () => {
+          destroySpineboys();
+          const count = controls.spineboys;
+          const cols = Math.ceil(Math.sqrt(count * width / height));
+          const rows = Math.ceil(count / cols);
+          const cellW = width / cols;
+          const cellH = height / rows;
+
+          for (let i = 0; i < count; i++) {
+            const x = (i % cols + 0.5) * cellW;
+            const y = (Math.floor(i / cols) + 0.5) * cellH;
+            const spineboy = this.add.spine(x, y, "spineboy-data", "spineboy-atlas", {
+              boundsProvider: new spine.SkinsAndAnimationBoundsProvider("portal"),
+              renderer: "phaser"
+            });
+            spineboy.setOrigin(0.5, 0.5);
+            spineboy.setScale(Math.min(0.5, cellW / spineboy.width, cellH / spineboy.height) * 0.85);
+            spineboy.animationState.timeScale = controls.play ? 1 : 0;
+            const entry = spineboy.animationState.setAnimation(0, "portal", true);
+            entry.trackTime = controls.time;
+            spineboy.updatePose(0);
+
+            const tooth = this.add.image(-60, 120, "raptor-jaw");
+            tooth.setOrigin(0, 0);
+            tooth.setScale(2);
+            tooth.angle = 180;
+            tooth.setTint(0xffdd00);
+            const foot = this.add.container(0, 0, [tooth]);
+            foot.removeFromDisplayList();
+            spineboy.addSlotObject("rear-foot", foot, { clipping: true });
+            spineboys.push({ spineboy, entry });
+          }
+          setSpineClipInverse();
+          setSpineBlendModes();
+        };
+
+        // Control object demonstrating that the global stencil affects normal Phaser objects.
+        this.add.rectangle(width / 2, height - 80, width * 0.9, 40, 0x00ffff, 0.8);
+
+        createSpineboys();
+        gui.add(controls, "spineboys", 1, 100, 1).name("Spineboys").onFinishChange(createSpineboys);
+        gui.add(controls, "spineClipInverse").name("Spine clip inverse").onChange(setSpineClipInverse);
+        gui.add(controls, "forceNormalBlend").name("Additive as normal").onChange(setSpineBlendModes);
+        gui.add(controls, "play").name("play").onChange(value => {
+          for (const item of spineboys) item.spineboy.animationState.timeScale = value ? 1 : 0;
+        });
+        const playback = gui.add(controls, "time", 0, spineboys[0].entry.animation.duration, 0.01).name("playback").onChange(setSpineboyTime);
+        this.events.on("update", () => {
+          if (!controls.play || spineboys.length === 0) return;
+          controls.time = spineboys[0].entry.trackTime % spineboys[0].entry.animation.duration;
+          playback.updateDisplay();
+        });
+      }
+
+      update() {
+        const now = performance.now();
+        bench.fpsWindowFrames++;
+
+        const drawCallTotal = window.__spineStencilDrawCalls || 0;
+        bench.lastFrameDrawCalls = drawCallTotal - bench.lastDrawCallTotal;
+        bench.lastDrawCallTotal = drawCallTotal;
+
+        if (now - bench.fpsWindowStart >= 500) {
+          bench.displayFps = bench.fpsWindowFrames * 1000 / (now - bench.fpsWindowStart);
+          bench.fpsWindowStart = now;
+          bench.fpsWindowFrames = 0;
+        }
+
+        if (now - bench.lastHudUpdate >= 250) {
+          bench.lastHudUpdate = now;
+          hud.textContent =
+            `spineboys: ${this.controls?.spineboys ?? 0}\n` +
+            `fps:       ${bench.displayFps.toFixed(1)}\n` +
+            `draws:     ${bench.lastFrameDrawCalls}`;
+        }
+      }
+    }
+
+    new Phaser.Game({
+      type: Phaser.WEBGL,
+      parent: document.body,
+      width: window.innerWidth,
+      height: window.innerHeight,
+      resolution: window.devicePixelRatio || 1,
+      backgroundColor: "#202020",
+      render: {
+        stencil: true
+      },
+      scene: Demo,
+      plugins: {
+        scene: [{ key: "spine.SpinePlugin", plugin: spine.SpinePlugin, mapping: "spine" }]
+      },
+      scale: {
+        mode: Phaser.Scale.RESIZE
+      },
+      fps: {
+        smoothStep: false
+      }
+    });
+  </script>
+</body>
+</html>

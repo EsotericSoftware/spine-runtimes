@@ -27,6 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if canImport(UIKit)
 import SwiftUI
 
 /// A `SwiftUI` `View` to display a Spine skeleton. The skeleton can be loaded from a bundle, local files, http, or a pre-loaded ``SkeletonDrawableWrapper``.
@@ -38,7 +39,6 @@ import SwiftUI
 ///
 /// This is a ``UIViewRepresentable`` of `SpineUIView`.
 public struct SpineView: UIViewRepresentable {
-
     public typealias UIViewType = SpineUIView
 
     private let source: SpineViewSource
@@ -46,7 +46,8 @@ public struct SpineView: UIViewRepresentable {
     private let mode: SpineContentMode
     private let alignment: SpineAlignment
     private let boundsProvider: BoundsProvider
-    private let backgroundColor: UIColor  // Not using `SwiftUI.Color`, as briging to `UIColor` prior iOS 14 might not always work.
+    private let backgroundColor: SpineUIColor  // Not using `SwiftUI.Color`, as bridging to `UIColor` prior to iOS 14 might not always work.
+    private let textureFilter: SpineTextureFilter
 
     @Binding
     private var isRendering: Bool?
@@ -64,8 +65,9 @@ public struct SpineView: UIViewRepresentable {
     ///     - mode: How the skeleton is fitted inside ``SpineUIView``. Per default, it is `.fit`
     ///     - alignment: How the skeleton is alignment inside ``SpineUIView``. Per default, it is `.center`
     ///     - boundsProvider: The skeleton bounds must be computed via a ``BoundsProvider``. Per default, ``SetupPoseBounds`` is used.
-    ///     - backgroundColor: The background color of the view. Per defaut, `UIColor.clear` is used
-    ///     - isRendering: Bindgin to disable or enable rendering. Disable it when the spine view is out of bounds and you want to preserve CPU/GPU resources.
+    ///     - backgroundColor: The background color of the view. Per default, `UIColor.clear` is used
+    ///     - textureFilter: The texture filtering mode. Per default, atlas page settings are used.
+    ///     - isRendering: Binding to disable or enable rendering. Disable it when the spine view is out of bounds and you want to preserve CPU/GPU resources.
     ///
     /// - Returns: A new instance of ``SpineView``.
     public init(
@@ -74,7 +76,8 @@ public struct SpineView: UIViewRepresentable {
         mode: SpineContentMode = .fit,
         alignment: SpineAlignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .clear,
+        backgroundColor: SpineUIColor = .clear,
+        textureFilter: SpineTextureFilter = .atlas,
         isRendering: Binding<Bool?> = .constant(nil)
     ) {
         self.source = source
@@ -83,6 +86,7 @@ public struct SpineView: UIViewRepresentable {
         self.alignment = alignment
         self.boundsProvider = boundsProvider
         self.backgroundColor = backgroundColor
+        self.textureFilter = textureFilter
         _isRendering = isRendering
     }
 
@@ -93,7 +97,8 @@ public struct SpineView: UIViewRepresentable {
             mode: mode,
             alignment: alignment,
             boundsProvider: boundsProvider,
-            backgroundColor: backgroundColor
+            backgroundColor: backgroundColor,
+            textureFilter: textureFilter
         )
     }
 
@@ -103,3 +108,4 @@ public struct SpineView: UIViewRepresentable {
         }
     }
 }
+#endif

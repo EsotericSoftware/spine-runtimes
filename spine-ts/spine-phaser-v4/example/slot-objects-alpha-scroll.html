@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>spine-phaser-v4 slot object alpha and scroll factors</title>
+  <style>
+    html, body { margin: 0; padding: 0; overflow: hidden; background: #18222d; }
+    canvas { display: block; }
+    #reference {
+      position: fixed;
+      z-index: 10;
+      width: 500px;
+      padding: 8px 12px;
+      color: #fff;
+      background: rgba(0, 0, 0, 0.65);
+      font: 14px/1.4 monospace;
+      pointer-events: none;
+      white-space: pre-line;
+    }
+  </style>
+  <script src="//cdn.jsdelivr.net/npm/phaser@4.2.1/dist/phaser.js"></script>
+  <script src="../dist/iife/spine-phaser-v4.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.20.0/dist/lil-gui.umd.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/lil-gui@0.20.0/dist/lil-gui.min.css" rel="stylesheet">
+</head>
+<body>
+  <div id="reference"></div>
+  <script>
+    const width = 1000;
+    const height = 900;
+    class Demo extends Phaser.Scene {
+      preload() {
+        this.load.spineSkeleton("spineboy-data", "../../assets/spineboy-pro.skel");
+        this.load.spineAtlas("spineboy-atlas", "../../assets/spineboy-pma.atlas");
+        this.load.image("phaser-logo", "./phaser.png");
+      }
+
+      create() {
+        this.drawWorldGrid();
+
+        const reference = this.createSpineboy(500, 450);
+        const subject = this.createSpineboy(500, 700);
+        this.subject = subject.spineboy;
+        this.subjectSlotObject = subject.slotObject;
+
+        this.settings = {
+          ownerAlpha: 0.6,
+          slotAlpha: 0.5,
+          ownerScrollFactor: 0.6,
+          cameraMotion: true,
+          cameraRange: 220
+        };
+        this.applySettings();
+
+        const gui = new lil.GUI({ title: "Inheritance test" });
+        gui.add(this.settings, "ownerAlpha", 0, 1, 0.01).onChange(() => this.applySettings());
+        gui.add(this.settings, "slotAlpha", 0, 1, 0.01).onChange(() => this.applySettings());
+        gui.add(this.settings, "ownerScrollFactor", 0, 1, 0.01).onChange(() => this.applySettings());
+        gui.add(this.settings, "cameraMotion");
+        gui.add(this.settings, "cameraRange", 0, 400, 1);
+
+        this.testLabel = document.querySelector("#reference");
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => gui.destroy());
+      }
+
+      createSpineboy(x, y) {
+        const spineboy = this.add.spine(x, y, "spineboy-data", "spineboy-atlas", {
+          boundsProvider: new spine.SkinsAndAnimationBoundsProvider("walk"),
+          renderer: "phaser"
+        });
+        spineboy.setScale(0.32);
+        spineboy.animationState.setAnimation(0, "walk", true);
+
+        const slotObject = this.add.image(0, 0, "phaser-logo");
+        slotObject.setDisplaySize(110, 110);
+        slotObject.setTint(0x00ffff);
+        spineboy.addSlotObject("front-foot", slotObject, {
+          placement: "after",
+          clipping: false
+        });
+
+        return { spineboy, slotObject };
+      }
+
+      drawWorldGrid() {
+        const graphics = this.add.graphics();
+        graphics.lineStyle(1, 0x526475, 0.7);
+        for (let x = -600; x <= width; x += 50) graphics.lineBetween(x, 0, x, height);
+        for (let y = 0; y <= height; y += 50) graphics.lineBetween(-600, y, width, y);
+        graphics.lineStyle(3, 0xffffff, 0.5);
+        graphics.lineBetween(0, 0, 0, 700);
+      }
+
+      applySettings() {
+        const settings = this.settings;
+        this.subject.setAlpha(settings.ownerAlpha);
+        this.subject.setScrollFactor(settings.ownerScrollFactor);
+        this.subjectSlotObject.setAlpha(settings.slotAlpha);
+      }
+
+      update(time) {
+        this.cameras.main.scrollX = this.settings.cameraMotion
+          ? Math.sin(time * 0.001) * this.settings.cameraRange
+          : 0;
+
+        const ownerAlpha = this.subject.alpha;
+        const slotAlpha = this.subjectSlotObject.alpha;
+        const ownerScroll = this.subject.scrollFactorX;
+        const slotScroll = this.subjectSlotObject.scrollFactorX;
+        this.testLabel.textContent =
+          `owner alpha:              ${ownerAlpha.toFixed(2)}\n` +
+          `slot object local alpha:  ${slotAlpha.toFixed(2)}\n` +
+          `rendered alpha:           ${(ownerAlpha * slotAlpha).toFixed(2)}\n\n` +
+          `owner scroll:             ${ownerScroll.toFixed(2)}\n` +
+          `slot object scroll:       ${slotScroll.toFixed(2)}\n` +
+          `rendered scroll:          ${ownerScroll.toFixed(2)}\n\n` +
+          `Alpha is combined with the Spine GameObject's alpha.\n` +
+          `Scroll factor is fixed to the Spine GameObject's one.`;
+      }
+    }
+
+    new Phaser.Game({
+      type: Phaser.WEBGL,
+      parent: document.body,
+      width,
+      height,
+      resolution: window.devicePixelRatio || 1,
+      backgroundColor: "#18222d",
+      scene: Demo,
+      plugins: {
+        scene: [{ key: "spine.SpinePlugin", plugin: spine.SpinePlugin, mapping: "spine" }]
+      }
+    });
+  </script>
+</body>
+</html>

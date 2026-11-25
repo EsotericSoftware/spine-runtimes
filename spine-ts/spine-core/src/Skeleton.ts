@@ -436,7 +436,7 @@ export class Skeleton {
 	/** Finds a constraint of the specified type by comparing each constraints's name. It is more efficient to cache the results of
 	 * this method than to call it multiple times. */
 	// biome-ignore lint/suspicious/noExplicitAny: reference runtime does not restrict to specific types
-	findConstraint<T extends Constraint<any, any, any>> (constraintName: string, type: new () => T): T | null {
+	findConstraint<T extends Constraint<any, any, any>> (constraintName: string, type: abstract new (...args: any[]) => T): T | null {
 		if (constraintName == null) throw new Error("constraintName cannot be null.");
 		if (type == null) throw new Error("type cannot be null.");
 		const constraints = this.constraints;

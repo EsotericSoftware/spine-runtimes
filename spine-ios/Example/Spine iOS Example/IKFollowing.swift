@@ -55,17 +55,21 @@ struct IKFollowing: View {
             model.dispose()
         }
         .navigationTitle("IK Following")
-        .navigationBarTitleDisplayMode(.inline)
+        .inlineNavigationTitle()
     }
 }
 
 #Preview {
+#if canImport(UIKit)
     if #available(iOS 15.0, *) {
         IKFollowing()
             .previewInterfaceOrientation(.landscapeLeft)
     } else {
         IKFollowing()
     }
+#else
+    IKFollowing()
+#endif
 }
 
 final class IKFollowingModel: ObservableObject {

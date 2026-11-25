@@ -41,6 +41,8 @@ import {
 	SkeletonClipping,
 	type SkeletonData,
 	SkeletonJson,
+	SkeletonPhysicsMovement,
+	type SkeletonPhysicsMovementTransform,
 	Utils,
 	Vector2,
 } from "@esotericsoftware/spine-core";
@@ -92,6 +94,8 @@ export class SkeletonMesh extends THREE.Object3D {
 	tempDark = new Color();
 	skeleton: Skeleton;
 	state: AnimationState;
+	/** Tracks this Object3D's world movement and applies it to skeleton physics constraints. */
+	readonly skeletonPhysics: SkeletonPhysicsMovement;
 	zOffset: number = 0.1;
 
 	private batches = [] as MeshBatcher[];
@@ -110,58 +114,17 @@ export class SkeletonMesh extends THREE.Object3D {
 
 	private _castShadow = false;
 	private _receiveShadow = false;
-	private _physicsPositionInheritanceFactorX = 1;
-	private _physicsPositionInheritanceFactorY = 1;
-	private _physicsRotationInheritanceFactor = 1;
-	private hasLastPhysicsTransform = false;
-	private lastPhysicsX = 0;
-	private lastPhysicsY = 0;
-	private lastPhysicsRotation = 0;
-	private readonly currentPhysicsPosition = new THREE.Vector3();
-	private readonly lastPhysicsPosition = new THREE.Vector3();
 	private readonly physicsWorldPosition = new THREE.Vector3();
 	private readonly physicsWorldQuaternion = new THREE.Quaternion();
-	private readonly physicsWorldScale = new THREE.Vector3();
-	private readonly physicsEuler = new THREE.Euler();
-
-	/** Scales how much horizontal translation of this Three.js object is inherited by skeleton physics constraints. */
-	public get physicsPositionInheritanceFactorX (): number {
-		return this._physicsPositionInheritanceFactorX;
-	}
-
-	/** Scales how much vertical translation of this Three.js object is inherited by skeleton physics constraints. */
-	public get physicsPositionInheritanceFactorY (): number {
-		return this._physicsPositionInheritanceFactorY;
-	}
-
-	/**
-	 * Sets how much translation of this Three.js object is inherited by skeleton physics constraints.
-	 * The default is (1, 1), which applies object translation normally. Use (0, 0)
-	 * to prevent object translation from affecting physics constraints.
-	 */
-	public setPhysicsPositionInheritanceFactor (x: number, y: number): void {
-		const wasDisabled = this._physicsPositionInheritanceFactorX === 0 && this._physicsPositionInheritanceFactorY === 0;
-		const isEnabled = x !== 0 || y !== 0;
-
-		this._physicsPositionInheritanceFactorX = x;
-		this._physicsPositionInheritanceFactorY = y;
-		if (wasDisabled && isEnabled) this.resetPhysicsPosition();
-	}
-
-	/**
-	 * Scales how much rotation of this Three.js object is inherited by skeleton physics constraints.
-	 * The default is `1`, which applies object rotation normally. Use `0` to prevent object rotation
-	 * from affecting physics constraints.
-	 */
-	public get physicsRotationInheritanceFactor (): number {
-		return this._physicsRotationInheritanceFactor;
-	}
-
-	public set physicsRotationInheritanceFactor (value: number) {
-		const wasDisabled = this._physicsRotationInheritanceFactor === 0;
-		this._physicsRotationInheritanceFactor = value;
-		if (wasDisabled && value !== 0) this.resetPhysicsRotation();
-	}
+	private readonly physicsPreviousWorldQuaternion = new THREE.Quaternion();
+	private readonly physicsRelativeQuaternion = new THREE.Quaternion();
+	private readonly physicsDecomposedPosition = new THREE.Vector3();
+	private readonly physicsDecomposedQuaternion = new THREE.Quaternion();
+	private readonly physicsDecomposedScale = new THREE.Vector3();
+	private readonly physicsWorldToLocal = new THREE.Matrix4();
+	private physicsWorldToLocalValid = false;
+	private physicsHasWorldQuaternion = false;
+	private physicsRotation = 0;
 
 	/**
 	 * Create an Object3D containing meshes representing your Spine animation.
@@ -201,6 +164,10 @@ export class SkeletonMesh extends THREE.Object3D {
 
 		this.materialFactory = skeletonDataOrConfiguration.materialFactory ?? (() => new THREE.MeshBasicMaterial(SkeletonMesh.DEFAULT_MATERIAL_PARAMETERS));
 		this.skeleton = new Skeleton(skeletonDataOrConfiguration.skeletonData);
+		this.skeletonPhysics = new SkeletonPhysicsMovement(this.skeleton, {
+			readTransform: (out, readRotation) => this.readPhysicsTransform(out, readRotation),
+			worldToSkeleton: point => this.physicsWorldToSkeleton(point),
+		});
 		const animData = new AnimationStateData(skeletonDataOrConfiguration.skeletonData);
 		this.state = new AnimationState(animData);
 
@@ -236,94 +203,60 @@ export class SkeletonMesh extends THREE.Object3D {
 
 		state.update(deltaTime);
 		state.apply(skeleton);
-		this.applyTransformMovementToPhysics();
+		this.skeletonPhysics.applyTransformMovement();
 		skeleton.update(deltaTime);
 		skeleton.updateWorldTransform(Physics.update);
 
 		this.updateGeometry();
 	}
 
-	/** Resets the position used for calculating inherited physics translation. */
-	public resetPhysicsPosition (): void {
-		this.getWorldPosition(this.physicsWorldPosition);
-		this.lastPhysicsX = this.physicsWorldPosition.x;
-		this.lastPhysicsY = this.physicsWorldPosition.y;
-		if (!this.hasLastPhysicsTransform) this.lastPhysicsRotation = this.getPhysicsRotation();
-		this.hasLastPhysicsTransform = true;
-	}
-
-	/** Resets the rotation used for calculating inherited physics rotation. */
-	public resetPhysicsRotation (): void {
-		this.getWorldPosition(this.physicsWorldPosition);
-		this.lastPhysicsRotation = this.getPhysicsRotation();
-		if (!this.hasLastPhysicsTransform) {
-			this.lastPhysicsX = this.physicsWorldPosition.x;
-			this.lastPhysicsY = this.physicsWorldPosition.y;
-		}
-		this.hasLastPhysicsTransform = true;
-	}
-
-	/** Resets the transform used for calculating inherited physics translation and rotation. */
-	public resetPhysicsTransform (): void {
-		this.resetPhysicsPosition();
-		this.resetPhysicsRotation();
-	}
-
-	private applyTransformMovementToPhysics (): void {
-		this.getWorldPosition(this.physicsWorldPosition);
-		const { x, y } = this.physicsWorldPosition;
-		const currentRotation = this.getPhysicsRotation();
-
-		if (this.hasLastPhysicsTransform) {
-			this.applyPositionMovementToPhysics(x, y);
-			this.applyRotationMovementToPhysics(currentRotation);
-		}
-
-		this.setLastPhysicsTransform(x, y, currentRotation);
-	}
-
-	private applyPositionMovementToPhysics (currentX: number, currentY: number): void {
-		if (this._physicsPositionInheritanceFactorX === 0 && this._physicsPositionInheritanceFactorY === 0) return;
-
-		const currentPosition = this.currentPhysicsPosition;
-		currentPosition.set(currentX, currentY, 0);
-		this.worldToLocal(currentPosition);
-
-		const lastPosition = this.lastPhysicsPosition;
-		lastPosition.set(this.lastPhysicsX, this.lastPhysicsY, 0);
-		this.worldToLocal(lastPosition);
-
-		this.skeleton.physicsTranslate(
-			(currentPosition.x - lastPosition.x) * this._physicsPositionInheritanceFactorX,
-			(currentPosition.y - lastPosition.y) * this._physicsPositionInheritanceFactorY
-		);
-	}
-
-	private applyRotationMovementToPhysics (currentRotation: number): void {
-		const rotationFactor = this._physicsRotationInheritanceFactor;
-		if (rotationFactor === 0) return;
-
-		this.skeleton.physicsRotate(0, 0, this.getRotationDelta(currentRotation, this.lastPhysicsRotation) * rotationFactor);
-	}
-
-	private setLastPhysicsTransform (x: number, y: number, rotation: number): void {
-		this.lastPhysicsX = x;
-		this.lastPhysicsY = y;
-		this.lastPhysicsRotation = rotation;
-		this.hasLastPhysicsTransform = true;
-	}
-
-	private getPhysicsRotation (): number {
+	private readPhysicsTransform (out: SkeletonPhysicsMovementTransform, readRotation: boolean): void {
 		this.updateWorldMatrix(true, false);
-		this.matrixWorld.decompose(this.physicsWorldPosition, this.physicsWorldQuaternion, this.physicsWorldScale);
-		this.physicsEuler.setFromQuaternion(this.physicsWorldQuaternion, 'XYZ');
-		return this.physicsEuler.z * 180 / Math.PI;
+		const elements = this.matrixWorld.elements;
+		out.x = elements[12];
+		out.y = elements[13];
+		out.z = elements[14];
+		this.physicsWorldToLocalValid = false;
+
+		if (!readRotation) return;
+
+		// a rotated object below a non-uniformly scaled parent has a sheared world matrix,
+		// which cannot be decomposed into a reliable world quaternion.
+		this.physicsWorldQuaternion.identity();
+		for (let object: THREE.Object3D | null = this; object; object = object.parent) {
+			if (object.matrixAutoUpdate) {
+				this.physicsWorldQuaternion.premultiply(object.quaternion);
+			} else {
+				object.matrix.decompose(this.physicsDecomposedPosition, this.physicsDecomposedQuaternion, this.physicsDecomposedScale);
+				this.physicsWorldQuaternion.premultiply(this.physicsDecomposedQuaternion);
+			}
+		}
+
+		if (this.physicsHasWorldQuaternion) {
+			const relative = this.physicsRelativeQuaternion
+				.copy(this.physicsPreviousWorldQuaternion)
+				.invert()
+				.multiply(this.physicsWorldQuaternion)
+				.normalize();
+			const twistLength = Math.hypot(relative.z, relative.w);
+			if (twistLength > 0.000001) {
+				this.physicsRotation += 2 * Math.atan2(relative.z / twistLength, relative.w / twistLength) * 180 / Math.PI;
+			}
+		}
+		this.physicsPreviousWorldQuaternion.copy(this.physicsWorldQuaternion);
+		this.physicsHasWorldQuaternion = true;
+		out.rotation = this.physicsRotation;
 	}
 
-	private getRotationDelta (current: number, previous: number): number {
-		let delta = current - previous;
-		delta = (delta + 180) % 360 - 180;
-		return delta < -180 ? delta + 360 : delta;
+	private physicsWorldToSkeleton (point: { x: number; y: number; z: number }): void {
+		if (!this.physicsWorldToLocalValid) {
+			this.physicsWorldToLocal.copy(this.matrixWorld).invert();
+			this.physicsWorldToLocalValid = true;
+		}
+		this.physicsWorldPosition.set(point.x, point.y, point.z).applyMatrix4(this.physicsWorldToLocal);
+		point.x = this.physicsWorldPosition.x;
+		point.y = this.physicsWorldPosition.y;
+		point.z = this.physicsWorldPosition.z;
 	}
 
 	dispose () {

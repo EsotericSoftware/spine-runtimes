@@ -47,6 +47,15 @@ extension View {
     func reportLeaksOnDisappear() -> some View {
         modifier(LeakReporter())
     }
+
+    @ViewBuilder
+    func inlineNavigationTitle() -> some View {
+#if canImport(UIKit)
+        navigationBarTitleDisplayMode(.inline)
+#else
+        self
+#endif
+    }
 }
 
 struct MainView: View {
@@ -59,6 +68,10 @@ struct MainView: View {
                 }
                 NavigationLink("Play/Pause") {
                     PlayPauseAnimation()
+                        .reportLeaksOnDisappear()
+                }
+                NavigationLink("Texture Filtering") {
+                    TextureFiltering()
                         .reportLeaksOnDisappear()
                 }
                 NavigationLink("Animation State Listener") {
@@ -86,16 +99,6 @@ struct MainView: View {
                 }
             } header: {
                 Text("Swift + SwiftUI")
-            }
-            Section {
-                NavigationLink("Simple Animation") {
-                    SimpleAnimationViewControllerRepresentable()
-                        .navigationTitle("Simple Animation")
-                        .navigationBarTitleDisplayMode(.inline)
-                        .reportLeaksOnDisappear()
-                }
-            } header: {
-                Text("ObjC + UIKit")
             } footer: {
                 HStack {
                     Spacer()
@@ -105,6 +108,18 @@ struct MainView: View {
                     Spacer()
                 }
             }
+#if canImport(UIKit)
+            Section {
+                NavigationLink("Simple Animation") {
+                    SimpleAnimationViewControllerRepresentable()
+                        .navigationTitle("Simple Animation")
+                        .inlineNavigationTitle()
+                        .reportLeaksOnDisappear()
+                }
+            } header: {
+                Text("ObjC + UIKit")
+            }
+#endif
         }
         .navigationTitle("Spine Examples")
     }

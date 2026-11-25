@@ -40,26 +40,32 @@ export class SkeletonRendererCore {
 	private clipping = new SkeletonClipping();
 	private renderCommands: RenderCommand[] = [];
 
-	render (skeleton: Skeleton, pma = false, inColor?: [number, number, number, number], stride = 2): RenderCommand | undefined {
+	render (skeleton: Skeleton, pma = false, inColor?: [number, number, number, number], stride = 2, slotZOffset = 0): RenderCommand | undefined {
 		this.commandPool.reset();
 		this.renderCommands.length = 0;
 
 		const clipper = this.clipping;
 
+		let z = 0;
 		const drawOrder = skeleton.drawOrder.appliedPose;
-		for (let i = 0; i < skeleton.slots.length; i++) {
+		for (let i = 0, n = drawOrder.length; i < n; i++) {
 			const slot = drawOrder[i];
-			const attachment = slot.appliedPose.attachment;
+			if (!slot.bone.active) {
+				clipper.clipEnd(slot);
+				continue;
+			}
+
+			const pose = slot.appliedPose;
+			const attachment = pose.attachment;
 
 			if (!attachment) {
 				clipper.clipEnd(slot);
 				continue;
 			}
 
-			const pose = slot.appliedPose;
 			const slotColor = pose.color;
 			const alpha = slotColor.a;
-			if ((alpha === 0 || !slot.bone.active) && !(attachment instanceof ClippingAttachment)) {
+			if (alpha === 0 && !(attachment instanceof ClippingAttachment)) {
 				clipper.clipEnd(slot);
 				continue;
 			}
@@ -116,9 +122,16 @@ export class SkeletonRendererCore {
 				texture = sequence.regions[sequenceIndex]?.texture;
 
 			} else if (attachment instanceof ClippingAttachment) {
+				clipper.clipEnd(slot);
 				clipper.clipStart(skeleton, slot, attachment);
 				continue;
 			} else {
+				clipper.clipEnd(slot);
+				continue;
+			}
+
+			if (!texture) {
+				clipper.clipEnd(slot);
 				continue;
 			}
 
@@ -184,6 +197,11 @@ export class SkeletonRendererCore {
 			cmd.texture = texture;
 
 			cmd.positions.set(vertices.subarray(0, verticesCount * stride));
+			// Store slot depth before batching so renderers can separate overlapping attachments.
+			if (stride >= 3) {
+				for (let j = 2, n = verticesCount * stride; j < n; j += stride)
+					cmd.positions[j] = z;
+			}
 			cmd.uvs.set(uvs.subarray(0, verticesCount << 1));
 
 			for (let j = 0; j < verticesCount; j++) {
@@ -198,6 +216,7 @@ export class SkeletonRendererCore {
 			}
 
 			this.renderCommands.push(cmd);
+			z += slotZOffset;
 			clipper.clipEnd(slot);
 		}
 

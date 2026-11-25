@@ -264,7 +264,8 @@ public class RootMotionTests {
 		skeletonAnimation.AnimationState.Complete += OnLoopComplete;
 		yield return null;
 
-		for (int i = 0; i < 600 && loopsComplete == 0; ++i) {
+		float timeoutTime = Time.time + 10f;
+		while (loopsComplete == 0 && Time.time < timeoutTime) {
 			// note: done via existing example component now.
 			// Vector3 toTarget = jumpTarget.position - skeletonTransform.position;
 			// skeletonRootMotion.AdjustRootMotionToDistance(toTarget);

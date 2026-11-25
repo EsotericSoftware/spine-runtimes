@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>spine-phaser-v4 basic rendering benchmark</title>
+  <style>
+    html, body { margin: 0; padding: 0; overflow: hidden; background: #202020; }
+    canvas { display: block; }
+    #benchmarkHud {
+      position: fixed;
+      left: 8px;
+      top: 8px;
+      z-index: 10;
+      padding: 8px 10px;
+      background: rgba(0, 0, 0, 0.65);
+      color: #fff;
+      font: 12px/1.35 monospace;
+      white-space: pre;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.20.0/dist/lil-gui.umd.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/lil-gui@0.20.0/dist/lil-gui.min.css" rel="stylesheet">
+  <script>
+    // Basic visual benchmark page. Disable HUD with ?hud=0 and GL draw-call patching with ?stats=0.
+    const params = new URLSearchParams(location.search);
+    const config = {
+      count: Number(params.get("count") || 50),
+      renderer: ["phaser", "spine-webgl"].includes(params.get("renderer")) ? params.get("renderer") : "phaser",
+      width: Number(params.get("width") || 800),
+      height: Number(params.get("height") || 600),
+      resolution: Number(params.get("dpr") || 1),
+      animation: params.get("anim") || params.get("animation") || "portal",
+      phaserObjects: Number(params.get("phaserObjects") || 0),
+      slotObjects: params.get("slotObjects") !== "0",
+      slotName: params.get("slot") || "front-foot",
+      slotClipping: params.get("slotClipping") !== "0",
+      controls: params.get("controls") !== "0",
+      timeScale: Number(params.get("timeScale") || 1),
+      stagger: params.get("stagger") !== "0",
+      hud: params.get("hud") !== "0",
+      stats: params.get("stats") !== "0",
+      background: params.get("background") || "#303030"
+    };
+
+    config.slotObjects = config.slotObjects && config.renderer !== "spine-webgl";
+
+    window.SPINE_PHASER_V4_BENCHMARK_CONFIG = config;
+
+    if (config.stats) {
+      const patchGL = (name) => {
+        const proto = WebGLRenderingContext.prototype;
+        const original = proto[name];
+        if (!original) return;
+        proto[name] = function () {
+          window.__spineBenchmarkDrawCalls = (window.__spineBenchmarkDrawCalls || 0) + 1;
+          return original.apply(this, arguments);
+        };
+      };
+      patchGL("drawArrays");
+      patchGL("drawElements");
+      if (window.WebGL2RenderingContext) {
+        const patchGL2 = (name) => {
+          const proto = WebGL2RenderingContext.prototype;
+          const original = proto[name];
+          if (!original) return;
+          proto[name] = function () {
+            window.__spineBenchmarkDrawCalls = (window.__spineBenchmarkDrawCalls || 0) + 1;
+            return original.apply(this, arguments);
+          };
+        };
+        patchGL2("drawArrays");
+        patchGL2("drawElements");
+      }
+    }
+
+    const hud = config.hud ? document.createElement("div") : null;
+    if (hud) {
+      hud.id = "benchmarkHud";
+      hud.textContent = "Loading...";
+      document.body.appendChild(hud);
+    }
+
+    console.log("Spine Phaser basic rendering benchmark", config);
+  </script>
+  <script src="//cdn.jsdelivr.net/npm/phaser@4.2.1/dist/phaser.js"></script>
+  <script src="../dist/iife/spine-phaser-v4.js"></script>
+  <script>
+    const cols = Math.ceil(Math.sqrt(config.count * config.width / config.height));
+    const rows = Math.ceil(config.count / cols);
+
+    const bench = {
+      frameCount: 0,
+      startTime: 0,
+      lastTime: 0,
+      lastDrawCallTotal: 0,
+      lastFrameDrawCalls: 0,
+      fpsWindowStart: 0,
+      fpsWindowFrames: 0,
+      displayFps: 0,
+      lastHudUpdate: 0
+    };
+    window.SPINE_PHASER_V4_BENCHMARK = bench;
+
+    class Demo extends Phaser.Scene {
+      constructor() {
+        super();
+        this.spineInstances = [];
+        this.animationControls = null;
+        this.animationController = null;
+      }
+
+      preload() {
+        this.load.spineSkeleton("spineboy-data", "../../assets/spineboy-pro.skel");
+        this.load.spineAtlas("spineboy-atlas", "../../assets/spineboy.atlas");
+        if (config.phaserObjects > 0 || config.slotObjects) this.load.image("phaser-logo", "./phaser.png");
+      }
+
+      create() {
+        const cellW = this.scale.width / cols;
+        const cellH = this.scale.height / rows;
+
+        for (let i = 0; i < config.count; i++) {
+          const x = (i % cols + 0.5) * cellW;
+          const y = (Math.floor(i / cols) + 0.9) * cellH;
+          const spineboy = this.add.spine(x, y, "spineboy-data", "spineboy-atlas", {
+            boundsProvider: new spine.SkinsAndAnimationBoundsProvider(config.animation),
+            renderer: config.renderer
+          });
+          const scale = Math.min(cellW / Math.max(spineboy.width, 1), cellH / Math.max(spineboy.height, 1)) * 0.82;
+          spineboy.setScale(scale);
+          spineboy.animationState.timeScale = config.controls ? 0 : config.timeScale;
+          const entry = spineboy.animationState.setAnimation(0, config.animation, true);
+          const offset = entry && config.stagger ? (i / Math.max(config.count, 1)) * entry.animation.duration : 0;
+          if (entry) entry.trackTime = offset;
+          if (entry) this.spineInstances.push({ spineboy, entry, offset, duration: entry.animation.duration });
+
+          if (config.slotObjects) {
+            // Use an Image, not Graphics/Circle: Graphics uses a different render path
+            // and would make this benchmark measure unavoidable Graphics batch breaks.
+            const marker = this.add.image(0, 0, "phaser-logo");
+            // marker.setDisplaySize(Math.max(14, Math.min(cellW, cellH) * 0.35), Math.max(14, Math.min(cellW, cellH) * 0.35));
+            marker.setTint(0x00ffff);
+            marker.setAlpha(0.85);
+            spineboy.addSlotObject(config.slotName, marker, {
+              placement: "after",
+              followAttachmentTimeline: false,
+              clipping: config.slotClipping
+            });
+          }
+
+          if (config.phaserObjects >= 1) {
+            const image = this.add.image(x - cellW * 0.28, y - cellH * 0.42, "phaser-logo");
+            image.setDisplaySize(Math.min(cellW, cellH) * 0.22, Math.min(cellW, cellH) * 0.22);
+            image.setAlpha(0.85);
+          }
+          if (config.phaserObjects >= 2) {
+            const sprite = this.add.sprite(x + cellW * 0.28, y - cellH * 0.42, "phaser-logo");
+            sprite.setDisplaySize(Math.min(cellW, cellH) * 0.18, Math.min(cellW, cellH) * 0.18);
+            sprite.setTint(0x88ccff);
+            sprite.setAlpha(0.85);
+          }
+        }
+
+        if (config.controls) this.createAnimationControls();
+
+        bench.startTime = performance.now();
+        bench.lastTime = bench.startTime;
+        bench.fpsWindowStart = bench.startTime;
+        bench.lastDrawCallTotal = window.__spineBenchmarkDrawCalls || 0;
+        console.log("Benchmark URLs to compare:", {
+          spineOnly: location.pathname + `?count=${config.count}&renderer=${config.renderer}`,
+          mixed: location.pathname + `?count=${config.count}&renderer=${config.renderer}&phaserObjects=2`,
+          phaserRenderer: location.pathname + `?count=${config.count}&renderer=phaser&phaserObjects=${config.phaserObjects}`,
+          spineWebGLRenderer: location.pathname + `?count=${config.count}&renderer=spine-webgl&phaserObjects=${config.phaserObjects}&slotObjects=0`,
+          noHud: location.pathname + `?count=${config.count}&renderer=${config.renderer}&phaserObjects=${config.phaserObjects}&slotObjects=${config.slotObjects ? 1 : 0}&slot=${config.slotName}&slotClipping=${config.slotClipping ? 1 : 0}&hud=0&stats=0`,
+          controls: location.pathname + `?count=1&renderer=${config.renderer}&phaserObjects=${config.phaserObjects}&slotObjects=${config.slotObjects ? 1 : 0}&slot=${config.slotName}&slotClipping=${config.slotClipping ? 1 : 0}&controls=1`
+        });
+      }
+
+      createAnimationControls() {
+        const maxDuration = this.spineInstances.reduce((max, item) => Math.max(max, item.duration), 1);
+        const controls = this.animationControls = {
+          time: 0,
+          play: true,
+          timeScale: config.timeScale,
+          reset: () => {
+            controls.time = 0;
+            this.applyAnimationTime(0);
+            this.animationController?.updateDisplay();
+          }
+        };
+
+        this.applyAnimationTime(0);
+
+        if (!window.lil?.GUI) {
+          console.warn("lil-gui failed to load; animation controls unavailable");
+          return;
+        }
+
+        const gui = new lil.GUI({ title: "Benchmark" });
+        const reload = (changes) => {
+          const next = new URLSearchParams(location.search);
+          for (const [key, value] of Object.entries(changes)) next.set(key, String(value));
+          next.set("controls", "1");
+          location.search = next.toString();
+        };
+        const benchmarkControls = {
+          renderer: config.renderer,
+          count: config.count,
+          phaserObjects: config.phaserObjects,
+          slotObjects: config.slotObjects,
+          slotClipping: config.slotClipping,
+          animation: config.animation
+        };
+        gui.add(benchmarkControls, "renderer", ["phaser", "spine-webgl"]).name("renderer").onChange(value => {
+          reload({ renderer: value, slotObjects: value === "spine-webgl" ? 0 : (benchmarkControls.slotObjects ? 1 : 0) });
+        });
+        gui.add(benchmarkControls, "count", 1, 1000, 1).name("count").onFinishChange(value => reload({ count: Math.max(1, Math.round(value)) }));
+        gui.add(benchmarkControls, "phaserObjects", 0, 2, 1).name("phaser objects").onFinishChange(value => reload({ phaserObjects: Math.max(0, Math.min(2, Math.round(value))) }));
+        gui.add(benchmarkControls, "slotObjects").name("slot object").onChange(value => {
+          reload({ slotObjects: value ? 1 : 0, renderer: value && config.renderer === "spine-webgl" ? "phaser" : config.renderer });
+        });
+        gui.add(benchmarkControls, "slotClipping").name("slot clipping").onChange(value => reload({ slotClipping: value ? 1 : 0 }));
+        gui.add(benchmarkControls, "animation", ["walk", "portal"]).name("animation").onChange(value => reload({ anim: value }));
+
+        this.animationController = gui.add(controls, "time", 0, maxDuration, 0.001).name("time").onChange(value => this.applyAnimationTime(value));
+        gui.add(controls, "play").name("play");
+        gui.add(controls, "reset").name("reset");
+      }
+
+      applyAnimationTime(time) {
+        for (const item of this.spineInstances) {
+          const duration = Math.max(item.duration, 0.0001);
+          item.entry.trackTime = (time + item.offset) % duration;
+          item.spineboy.updatePose(0);
+        }
+      }
+
+      update(_time, delta) {
+        if (this.animationControls?.play) {
+          const maxDuration = this.spineInstances.reduce((max, item) => Math.max(max, item.duration), 1);
+          this.animationControls.time = (this.animationControls.time + delta / 1000 * this.animationControls.timeScale) % maxDuration;
+          this.applyAnimationTime(this.animationControls.time);
+          this.animationController?.updateDisplay();
+        }
+
+        const now = performance.now();
+        bench.lastTime = now;
+        bench.frameCount++;
+        bench.fpsWindowFrames++;
+
+        const drawCallTotal = window.__spineBenchmarkDrawCalls || 0;
+        bench.lastFrameDrawCalls = drawCallTotal - bench.lastDrawCallTotal;
+        bench.lastDrawCallTotal = drawCallTotal;
+
+        if (now - bench.fpsWindowStart >= 500) {
+          bench.displayFps = bench.fpsWindowFrames * 1000 / (now - bench.fpsWindowStart);
+          bench.fpsWindowStart = now;
+          bench.fpsWindowFrames = 0;
+        }
+
+        if (hud && now - bench.lastHudUpdate >= 250) {
+          bench.lastHudUpdate = now;
+          hud.textContent =
+            `renderer: ${config.renderer}\n` +
+            `count:    ${config.count}\n` +
+            `anim:     ${config.animation}\n` +
+            `phaser:   ${config.phaserObjects}/spine\n` +
+            `slot obj: ${config.slotObjects ? config.slotName : "off"}\n` +
+            `slot clip:${config.slotClipping ? "on" : "off"}\n` +
+            `fps:      ${bench.displayFps.toFixed(1)}\n` +
+            `draws:    ${config.stats ? bench.lastFrameDrawCalls : "stats=0"}`;
+        }
+      }
+    }
+
+    new Phaser.Game({
+      type: Phaser.WEBGL,
+      parent: document.body,
+      width: config.width,
+      height: config.height,
+      resolution: config.resolution,
+      backgroundColor: config.background,
+      scene: Demo,
+      plugins: {
+        scene: [{ key: "spine.SpinePlugin", plugin: spine.SpinePlugin, mapping: "spine" }]
+      },
+      fps: {
+        smoothStep: false
+      }
+    });
+  </script>
+</body>
+</html>

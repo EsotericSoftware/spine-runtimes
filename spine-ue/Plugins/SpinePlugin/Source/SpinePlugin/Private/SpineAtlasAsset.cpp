@@ -41,7 +41,20 @@ using namespace spine;
 #if WITH_EDITORONLY_DATA
 
 void USpineAtlasAsset::SetAtlasFileName(const FName &AtlasFileName) {
+	atlasFileName = AtlasFileName;
+	if (!importData) return;
+
 	importData->UpdateFilenameOnly(AtlasFileName.ToString());
+	TArray<FString> files;
+	importData->ExtractFilenames(files);
+	if (files.Num() > 0) atlasFileName = FName(*files[0]);
+}
+
+void USpineAtlasAsset::UpdateAtlasFileName(const FName &AtlasFileName) {
+	atlasFileName = AtlasFileName;
+	if (!importData) return;
+
+	importData->Update(AtlasFileName.ToString());
 	TArray<FString> files;
 	importData->ExtractFilenames(files);
 	if (files.Num() > 0) atlasFileName = FName(*files[0]);
@@ -51,6 +64,23 @@ void USpineAtlasAsset::PostInitProperties() {
 	if (!HasAnyFlags(RF_ClassDefaultObject)) importData = NewObject<UAssetImportData>(this, TEXT("AssetImportData"));
 	Super::PostInitProperties();
 }
+
+#if ((ENGINE_MAJOR_VERSION >= 5) && (ENGINE_MINOR_VERSION >= 4))
+void USpineAtlasAsset::GetAssetRegistryTags(FAssetRegistryTagsContext Context) const {
+	if (importData) {
+		Context.AddTag(FAssetRegistryTag(SourceFileTagName(), importData->GetSourceData().ToJson(), FAssetRegistryTag::TT_Hidden));
+	}
+	Super::GetAssetRegistryTags(Context);
+}
+#else
+void USpineAtlasAsset::GetAssetRegistryTags(TArray<FAssetRegistryTag> &OutTags) const {
+	if (importData) {
+		OutTags.Add(FAssetRegistryTag(SourceFileTagName(), importData->GetSourceData().ToJson(), FAssetRegistryTag::TT_Hidden));
+	}
+
+	Super::GetAssetRegistryTags(OutTags);
+}
+#endif
 
 void USpineAtlasAsset::Serialize(FArchive &Ar) {
 	Super::Serialize(Ar);

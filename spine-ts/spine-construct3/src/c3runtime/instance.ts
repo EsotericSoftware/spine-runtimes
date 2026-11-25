@@ -69,6 +69,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	propOffsetAngle = 0;
 	propScaleX = 1;
 	propScaleY = 1;
+	propSlotZOffset = 0;
 	propDebugSkeleton = false;
 	propBoundsProvider: SpineBoundsProviderType = "setup";
 	propEnableCollision = false;
@@ -85,27 +86,28 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	private collisionBodyDrivesObject = false;
 	private collisionBodyPrevX = 0;
 	private collisionBodyPrevY = 0;
+	private collisionBodyPrevAngle = 0;
 	isPlaying = true;
 	physicsMode = spine.Physics.update;
-	customSkins: Record<string, Skin> = {};
+	customSkins = new Map<string, Skin>();
 
 	textureAtlas?: TextureAtlas;
 	renderer?: IRenderer;
-	atlasLoaded = false;
-	atlasLoading = false;
 	skeletonLoaded = false;
-	skeletonLoading = false;
+	private loadStarted = false;
 	skeleton?: Skeleton;
 	state?: AnimationState;
 	public triggeredEventTrack = -1;
 	public triggeredEventAnimation = "";
 	public triggeredEventName = "";
 	public triggeredEventData?: Event & { track: number, animation: string };
+	private pendingAnimationEvents: { eventName: string, track: number, animation: string, event?: Event }[] = [];
 	private assetLoader: AssetLoader;
 	private skeletonRenderer?: C3RendererRuntime;
 	private matrix: C3Matrix;
+	private quaternion: Vec4Arr = [0, 0, 0, 1];
 	private requestRedraw = false;
-	private triggerSkeletonLoadedOnFirstTick = false;
+	private initializeSkeletonOnFirstTick = false;
 
 	private spineBounds = {
 		x: 0,
@@ -153,7 +155,17 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			this.propOffsetAngle = properties[11] as number;
 			this.propScaleX = properties[12] as number;
 			this.propScaleY = properties[13] as number;
+			this.propSlotZOffset = (properties[14] as number | undefined) ?? 0;
 		}
+
+		if (typeof this.propAtlas !== "string" || typeof this.propSkel !== "string" || !this.propAtlas || !this.propSkel)
+			throw new Error("Spine atlas and skeleton files must be configured.");
+		if (!this.propAtlas.toLowerCase().endsWith(".atlas"))
+			throw new Error(`Invalid Spine atlas file: ${this.propAtlas}`);
+		if (!/\.(json|skel)$/i.test(this.propSkel))
+			throw new Error(`Invalid Spine skeleton file: ${this.propSkel}`);
+		if (!Number.isFinite(this.propLoaderScale) || this.propLoaderScale <= 0)
+			throw new Error("Spine loader scale must be a finite number greater than zero.");
 
 		this.collisionSpriteClassName = `${this.objectType.name}_CollisionBody`;
 
@@ -178,37 +190,42 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	}
 
 	private updateMatrix () {
+		this.quaternion = this.getQuaternion();
 		this.matrix.update(
 			this.x + this.propOffsetX,
 			this.y + this.propOffsetY,
 			this.totalZ,
-			this.angle + this.propOffsetAngle,
+			this.angle,
 			this.width / this.spineBounds.width * this.propScaleX,
-			this.height / this.spineBounds.height * this.propScaleY);
+			this.height / this.spineBounds.height * this.propScaleY,
+			this.quaternion,
+			this.propOffsetAngle);
 	}
 
 	_tick (): void {
 		this.renderer ||= this.runtime.renderer;
 		if (!this.renderer) return;
 
-		if (!this.skeletonLoaded) {
+		if (this.initializeSkeletonOnFirstTick) {
+			this.initializeSkeletonOnFirstTick = false;
+			this.completeSkeletonInitialization();
+		}
+
+		if (!this.skeletonLoaded && !this.loadStarted) {
 			if (!this.initializeCachedSpine(true)) {
 				this.loadSpine();
 				return;
 			}
 		}
-
-		if (this.triggerSkeletonLoadedOnFirstTick) {
-			this.triggerSkeletonLoadedOnFirstTick = false;
-			this.initializeInitialSkeletonState();
-			this._trigger(C3.Plugins.EsotericSoftware_SpineConstruct3.Cnds.OnSkeletonLoaded);
-		}
+		if (!this.skeletonLoaded) return;
 
 		this.updateMatrix();
+		this.updateObjectFromCollisionBody();
 
-		this.updateCollisionSprite();
-
-		if (this.isPlaying) this.update(this.dt);
+		if (this.isPlaying)
+			this.update(this.dt);
+		else
+			this.updateCollisionSprite();
 	}
 
 	private update (delta: number) {
@@ -229,21 +246,43 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		this.updateCollisionSprite();
 		this.updateBoneFollowers(matrix);
 
-		this.runtime.sdk.updateRender();
+		this.invalidateRender();
+	}
+
+	private invalidateRender () {
 		this.requestRedraw = true;
+		this.runtime.sdk.updateRender();
+	}
+
+	private refreshPose (applyAnimationState = false) {
+		const { skeleton, state, matrix } = this;
+		if (!skeleton) return;
+
+		if (applyAnimationState && state) {
+			state.update(0);
+			state.apply(skeleton);
+		}
+		this.updateMatrix();
+		this.updateObjectFromCollisionBody();
+		this.updateBonesOverride();
+		skeleton.updateWorldTransform(this.physicsMode === spine.Physics.none ? spine.Physics.none : spine.Physics.pose);
+		this.updateCollisionSprite();
+		this.updateBoneFollowers(matrix);
+		this.invalidateRender();
 	}
 
 	_draw (renderer: IRenderer) {
 		this.renderer ||= renderer;
 
 		if (!this.isVisible) return;
-		if (!this.isOnScreen) return;
+		if (!this.isOnScreen()) return;
 
 		const { skeleton } = this;
 		if (!skeleton) return;
 
 		this.skeletonRenderer ||= new spine.C3RendererRuntime(renderer, this.matrix);
-		this.skeletonRenderer.draw(skeleton, this.colorRgb, this.opacity, this.requestRedraw);
+		const slotZOffset = this.layer.renderingMode === "3d" ? this.propSlotZOffset : 0;
+		this.skeletonRenderer.draw(skeleton, this.colorRgb, this.opacity, this.requestRedraw, slotZOffset);
 		this.requestRedraw = false;
 
 		if (this.propDebugSkeleton) this.skeletonRenderer.drawDebug(skeleton, this.x, this.y, this.getBoundingQuad(false));
@@ -283,53 +322,80 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	private touchDown = false;
 	private touchX = 0;
 	private touchY = 0;
+	private activeDragPointerId?: number;
 	public addDragHandle (type: 0 | 1, name: string, radius = 10, debug = false) {
+		if (!Number.isFinite(radius) || radius <= 0)
+			throw new Error("[Spine] Handle radius must be a finite number greater than zero.");
+		if (!this.skeleton) return;
 		if (type === 0) {
 			const bone = this.getBone(name);
-			if (!bone) return;
+			if (!bone) throw new Error(`[Spine] Bone not found: ${name}`);
 			this.dragHandles.add({ bone, debug, radius, offsetX: 0, offsetY: 0 });
 		} else {
 			const slot = this.getSlot(name);
-			if (!slot) return;
+			if (!slot) throw new Error(`[Spine] Slot not found: ${name}`);
 			this.dragHandles.add({ slot, bone: slot.bone, debug, radius, offsetX: 0, offsetY: 0 });
 		}
 
 		if (this.dragHandles.size === 1) {
-			this.touchDown = false;
+			this.endDragHandlePointer();
 			this.runtime.addEventListener("pointerdown", this.dragHandleDown);
 			this.runtime.addEventListener("pointermove", this.dragHandleMove);
 			this.runtime.addEventListener("pointerup", this.dragHandleUp);
+			this.runtime.addEventListener("pointercancel", this.dragHandleCancel);
 		}
 		this.isPlaying = true;
+		this.invalidateRender();
+	}
+
+	private updateDragHandlePointerPosition (event: ConstructPointerEvent) {
+		[this.touchX, this.touchY] = this.layer.cssPxToLayer(event.clientX, event.clientY, this.totalZ);
 	}
 
 	private dragHandleDown = (event: ConstructPointerEvent) => {
-		if (event.button !== 0) return;
+		if (event.button !== 0 || this.activeDragPointerId !== undefined) return;
+		this.activeDragPointerId = event.pointerId;
 		this.touchDown = true;
-		this.touchX = event.clientX;
-		this.touchY = event.clientY;
+		this.updateDragHandlePointerPosition(event);
 	};
 
 	private dragHandleMove = (event: ConstructPointerEvent) => {
-		if (!this.touchDown) return;
-		this.touchX = event.clientX;
-		this.touchY = event.clientY;
+		if (event.pointerId !== this.activeDragPointerId) return;
+		if ((event.buttons & 1) === 0) {
+			this.endDragHandlePointer();
+			return;
+		}
+		this.updateDragHandlePointerPosition(event);
 	};
 
 	private dragHandleUp = (event: ConstructPointerEvent) => {
-		if (event.button === 0) this.touchDown = false;
+		if (event.pointerId === this.activeDragPointerId) this.endDragHandlePointer();
 	};
+
+	private dragHandleCancel = (event: ConstructPointerEvent) => {
+		if (event.pointerId === this.activeDragPointerId) this.endDragHandlePointer();
+	};
+
+	private endDragHandlePointer () {
+		this.touchDown = false;
+		this.activeDragPointerId = undefined;
+		this.prevLeftClickDown = false;
+		for (const handle of this.dragHandles) handle.dragging = false;
+	}
 
 	private dragHandleDispose () {
 		this.runtime.removeEventListener("pointerdown", this.dragHandleDown);
 		this.runtime.removeEventListener("pointermove", this.dragHandleMove);
 		this.runtime.removeEventListener("pointerup", this.dragHandleUp);
+		this.runtime.removeEventListener("pointercancel", this.dragHandleCancel);
+		this.endDragHandlePointer();
 	}
 
 	public removeDragHandle (type: 0 | 1, name: string) {
+		if (!this.skeleton) return;
 		if (type === 0) {
 			const bone = this.getBone(name);
-			if (!bone) return;
+			if (!bone) throw new Error(`[Spine] Bone not found: ${name}`);
 
 			for (const handle of this.dragHandles) {
 				if (handle.bone === bone && !handle.slot) {
@@ -339,7 +405,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			}
 		} else {
 			const slot = this.getSlot(name);
-			if (!slot) return;
+			if (!slot) throw new Error(`[Spine] Slot not found: ${name}`);
 
 			for (const handle of this.dragHandles) {
 				if (handle.slot === slot) {
@@ -350,6 +416,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		}
 
 		if (this.dragHandles.size === 0) this.dragHandleDispose();
+		this.invalidateRender();
 	}
 
 	private updateHandles (skeleton: Skeleton, matrix: C3Matrix) {
@@ -369,16 +436,10 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			const bone = handleObject.bone;
 
 			if (handleObject.dragging) {
-				const pose = bone.pose;
-				if (bone.parent) {
-					const { x, y } = matrix.gameToBone(touchX - handleObject.offsetX, touchY - handleObject.offsetY, bone);
-					pose.x = x;
-					pose.y = y;
-				} else {
-					const { x, y } = matrix.gameToSkeleton(touchX - handleObject.offsetX, touchY - handleObject.offsetY);
-					pose.x = x;
-					pose.y = -y * spine.Skeleton.yDir;
-				}
+				const position = matrix.gameToBone(touchX - handleObject.offsetX, touchY - handleObject.offsetY, bone);
+				if (!Number.isFinite(position.x) || !Number.isFinite(position.y)) continue;
+				bone.pose.x = position.x;
+				bone.pose.y = position.y;
 			} else if (!this.prevLeftClickDown) {
 				const { x: boneGameX, y: boneGameY } = matrix.boneToGame(bone);
 				const inside = handleObject.slot
@@ -402,6 +463,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		const attachment = slot.appliedPose.attachment;
 		if (!(attachment instanceof spine.RegionAttachment || attachment instanceof spine.MeshAttachment)) return false;
 
+		const verticesLength = attachment instanceof spine.MeshAttachment ? attachment.worldVerticesLength : 8;
+		if (this.verticesTemp.length < verticesLength) this.verticesTemp = spine.Utils.newFloatArray(verticesLength);
 		const vertices = this.verticesTemp;
 		let hullLength = 8;
 
@@ -414,14 +477,18 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 		if (skeletonCoordinate) return this.isPointInPolygon(vertices, hullLength, x, y);
 
+		this.updateMatrix();
 		const coords = this.matrix.gameToSkeleton(x, y);
-		return this.isPointInPolygon(vertices, hullLength, coords.x, coords.y);
+		return Number.isFinite(coords.x) && Number.isFinite(coords.y)
+			? this.isPointInPolygon(vertices, hullLength, coords.x, coords.y)
+			: false;
 	}
 
 	public isInsideBone (x: number, y: number, boneName: string, radius: number) {
 		const bone = this.getBone(boneName);
 		if (!bone || !bone.active) return false;
 
+		this.updateMatrix();
 		const bonePos = this.matrix.boneToGame(bone);
 		return this.inRadius(x, y, bonePos.x, bonePos.y, radius);
 	}
@@ -491,16 +558,19 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 	_release () {
 		super._release();
-		this.assetLoader.releaseInstanceResources(this.propSkel, this.propAtlas, this.propLoaderScale);
+		this.assetLoader.releaseInstanceResources(this);
 		this.textureAtlas = undefined;
 		this.renderer = undefined;
 		this.skeleton = undefined;
 		this.state = undefined;
+		this.pendingAnimationEvents.length = 0;
 		this.dragHandleDispose();
 
-		if (this.collisionSpriteInstance) {
-			this.collisionSpriteInstance.destroy();
-			this.collisionSpriteInstance = undefined;
+		const collisionSpriteInstance = this.collisionSpriteInstance;
+		if (collisionSpriteInstance) {
+			collisionSpriteInstance.removeEventListener("destroy", this.collisionSpriteDestroyed);
+			this.clearCollisionSprite();
+			collisionSpriteInstance.destroy();
 		}
 	}
 
@@ -513,50 +583,33 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	private initializeCachedSpine (triggerLoaded: boolean) {
 		if (this.skeletonLoaded || !this.renderer) return false;
 
-		const cached = this.assetLoader.getCachedRuntimeSkeletonAndAtlas(this.propSkel, this.propAtlas, this.propLoaderScale);
+		const cached = this.assetLoader.getCachedRuntimeSkeletonAndAtlas(this.propSkel, this.propAtlas, this, this.propLoaderScale);
 		if (!cached) return false;
 
+		this.loadStarted = true;
 		this.initializeSkeleton(cached.textureAtlas, cached.skeletonData, triggerLoaded);
 		return true;
 	}
 
 	private async loadSpine () {
 		const { renderer, propAtlas, propSkel, propLoaderScale } = this;
-		if (this.skeletonLoading || this.skeletonLoaded || !renderer) return;
+		if (this.loadStarted || this.skeletonLoaded || !renderer) return;
+
+		this.loadStarted = true;
 		if (!propAtlas || !propSkel) return;
 
-		if (this.initializeCachedSpine(true)) return;
+		const textureAtlas = await this.assetLoader.loadAtlasRuntime(propAtlas, this, this.plugin.runtime, renderer);
+		if (this.renderer !== renderer) return;
 
-		this.skeletonLoading = true;
-		this.atlasLoading = true;
+		this.textureAtlas = textureAtlas;
+		const skeletonData = await this.assetLoader.loadSkeletonRuntime(propSkel, propAtlas, textureAtlas, this, propLoaderScale, this.plugin.runtime);
+		if (this.renderer !== renderer) return;
 
-		try {
-			const textureAtlas = await this.assetLoader.loadAtlasRuntime(propAtlas, this.plugin.runtime, renderer);
-			if (this.renderer !== renderer) return;
-
-			this.textureAtlas = textureAtlas;
-			this.atlasLoaded = true;
-			this.atlasLoading = false;
-
-			const skeletonData = await this.assetLoader.loadSkeletonRuntime(propSkel, propAtlas, textureAtlas, propLoaderScale, this.plugin.runtime);
-			if (this.renderer !== renderer) return;
-
-			this.initializeSkeleton(textureAtlas, skeletonData, true);
-		} catch (error) {
-			if (this.renderer === renderer)
-				console.error("[Spine] Failed to load skeleton:", error);
-		} finally {
-			if (this.renderer === renderer && !this.skeletonLoaded) {
-				this.skeletonLoading = false;
-				this.atlasLoading = false;
-			}
-		}
+		this.initializeSkeleton(textureAtlas, skeletonData, true);
 	}
 
 	private initializeSkeleton (textureAtlas: TextureAtlas, skeletonData: SkeletonData, triggerLoaded: boolean) {
 		this.textureAtlas = textureAtlas;
-		this.atlasLoaded = true;
-		this.atlasLoading = false;
 
 		this.skeleton = new spine.Skeleton(skeletonData);
 		const animationStateData = new spine.AnimationStateData(skeletonData);
@@ -570,22 +623,31 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			complete: (entry) => this.triggerAnimationEvent("complete", entry.trackIndex, entry.animation?.name ?? ""),
 		});
 
+		if (triggerLoaded)
+			this.completeSkeletonInitialization();
+		else
+			this.initializeSkeletonOnFirstTick = true;
+	}
+
+	private completeSkeletonInitialization () {
+		this.initializeInitialSkeletonState();
 		this.skeletonLoaded = true;
-		this.skeletonLoading = false;
-		if (triggerLoaded) {
-			this.initializeInitialSkeletonState();
-			this._trigger(C3.Plugins.EsotericSoftware_SpineConstruct3.Cnds.OnSkeletonLoaded);
-		} else {
-			this.triggerSkeletonLoadedOnFirstTick = true;
-		}
+		const pendingEvents = this.pendingAnimationEvents.splice(0);
+		for (const { eventName, track, animation, event } of pendingEvents)
+			this.triggerAnimationEvent(eventName, track, animation, event);
+		this._trigger(C3.Plugins.EsotericSoftware_SpineConstruct3.Cnds.OnSkeletonLoaded);
 	}
 
 	private initializeInitialSkeletonState () {
 		this._setSkin();
-		if (this.propAnimation) this.setAnimation(0, this.propAnimation, true);
+		if (this.propAnimation && this.state) {
+			this.state.setAnimation(0, this.propAnimation, true);
+			this.isPlaying = true;
+		}
 		this.calculateBounds();
-		this.update(0);
+		this.updateMatrix();
 		this.createCollisionSprite();
+		this.update(0);
 	}
 
 	private createCollisionSprite () {
@@ -596,11 +658,41 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			throw new Error(`[Spine] Collision sprite object type "${this.collisionSpriteClassName}" not found`);
 
 		this.collisionSpriteInstance = objectType.createInstance(this.layer.name, this.x, this.y);
+		this.collisionSpriteInstance.addEventListener("destroy", this.collisionSpriteDestroyed);
+		this.syncCollisionSprite3DTransform(this.collisionSpriteInstance, this.x, this.y);
+		this.collisionSpriteInstance.angle = this.angle;
 		this.collisionSpriteInstance.setOrigin(this.originX, this.originY);
 	}
 
+	private collisionSpriteDestroyed = (event: InstanceDestroyEvent<IWorldInstance>) => {
+		if (event.instance !== this.collisionSpriteInstance) return;
+		this.clearCollisionSprite();
+		this.invalidateRender();
+	};
+
+	private clearCollisionSprite () {
+		this.collisionSpriteInstance = undefined;
+		this.collisionBoundingBoxMeshSize = [0, 0];
+		this.collisionBoundingBoxGamePoints.length = 0;
+		this.collisionBodyDrivesObject = false;
+	}
+
+	private syncCollisionSprite3DTransform (collisionSpriteInstance: IWorldInstance, x: number, y: number, syncQuaternion = true) {
+		collisionSpriteInstance.setPosition3d(x, y, this.z);
+		if (syncQuaternion) {
+			collisionSpriteInstance.setQuaternion(...this.quaternion);
+		} else {
+			collisionSpriteInstance.setQuaternion(0, 0, 0, 1);
+		}
+	}
+
+	private captureCollisionBodyTransform (collisionSpriteInstance: IWorldInstance) {
+		this.collisionBodyPrevX = collisionSpriteInstance.x;
+		this.collisionBodyPrevY = collisionSpriteInstance.y;
+		this.collisionBodyPrevAngle = collisionSpriteInstance.angle;
+	}
+
 	private updateCollisionSprite () {
-		this.updateObjectFromCollisionBody();
 		if (!this.collisionSpriteInstance) return;
 
 		if (this.collisionBoundingBoxSlotName && this.collisionBoundingBoxAttachmentName) {
@@ -614,14 +706,11 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		}
 
 		this.collisionSpriteInstance.isCollisionEnabled = true;
-		this.collisionSpriteInstance.setPosition(this.x, this.y);
-		if (this.collisionBodyDrivesObject) {
-			this.collisionBodyPrevX = this.collisionSpriteInstance.x;
-			this.collisionBodyPrevY = this.collisionSpriteInstance.y;
-		}
+		this.syncCollisionSprite3DTransform(this.collisionSpriteInstance, this.x, this.y);
 		this.collisionSpriteInstance.setSize(this.width, this.height);
-		this.collisionSpriteInstance.angleDegrees = this.angleDegrees;
+		this.collisionSpriteInstance.angle = this.angle;
 		this.collisionSpriteInstance.setOrigin(this.originX, this.originY);
+		if (this.collisionBodyDrivesObject) this.captureCollisionBodyTransform(this.collisionSpriteInstance);
 	}
 
 	private updateCollisionBoundingBoxSprite () {
@@ -679,14 +768,13 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		}
 
 		collisionSpriteInstance.isCollisionEnabled = true;
-		collisionSpriteInstance.setPosition(minX, minY);
-		if (this.collisionBodyDrivesObject) {
-			this.collisionBodyPrevX = collisionSpriteInstance.x;
-			this.collisionBodyPrevY = collisionSpriteInstance.y;
-		}
+		// These mesh points are already transformed to game-space by the legacy
+		// 2D matrix, so applying the quaternion again would double-transform them.
+		this.syncCollisionSprite3DTransform(collisionSpriteInstance, minX, minY, false);
 		collisionSpriteInstance.setSize(width, height);
 		collisionSpriteInstance.angle = 0;
 		collisionSpriteInstance.setOrigin(0, 0);
+		if (this.collisionBodyDrivesObject) this.captureCollisionBodyTransform(collisionSpriteInstance);
 
 		const perimeterPointCount = meshWidth * 2;
 		for (let i = 0; i < perimeterPointCount; i++) {
@@ -702,11 +790,19 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	}
 
 	public setCollisionBoundingBox (slotName: string, attachmentName: string) {
+		const skeleton = this.skeleton;
+		if (skeleton) {
+			const slot = skeleton.findSlot(slotName);
+			if (!slot) throw new Error(`[Spine] Slot not found: ${slotName}`);
+			const attachment = skeleton.getAttachment(slot.data.index, attachmentName);
+			if (!(attachment instanceof spine.BoundingBoxAttachment))
+				throw new Error(`[Spine] Bounding box attachment not found: ${attachmentName}, for slot: ${slotName}`);
+			skeleton.setAttachment(slotName, attachmentName);
+			this.collisionBoundingBoxSlot = slot;
+		}
 		this.collisionBoundingBoxSlotName = slotName;
 		this.collisionBoundingBoxAttachmentName = attachmentName;
-		this.collisionBoundingBoxSlot = this.skeleton?.findSlot(slotName) ?? undefined;
-		if (slotName && attachmentName) this.skeleton?.setAttachment(slotName, attachmentName);
-		this.updateCollisionSprite();
+		this.refreshPose();
 	}
 
 	public clearCollisionBoundingBox () {
@@ -714,13 +810,12 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		this.collisionBoundingBoxAttachmentName = "";
 		this.collisionBoundingBoxSlot = undefined;
 		this.collisionBoundingBoxGamePoints.length = 0;
-		this.updateCollisionSprite();
+		this.refreshPose();
 	}
 
 	public setCollisionBoundingBoxDebug (enabled: boolean) {
 		this.collisionBoundingBoxDebug = enabled;
-		this.requestRedraw = true;
-		this.runtime.sdk.updateRender();
+		this.invalidateRender();
 	}
 
 	public hasCollisionBody () {
@@ -748,6 +843,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			this.collisionBoundingBoxVertices = spine.Utils.newFloatArray(attachment.worldVerticesLength);
 
 		attachment.computeWorldVertices(skeleton, slot, 0, attachment.worldVerticesLength, this.collisionBoundingBoxVertices, 0, 2);
+		this.updateMatrix();
 
 		let left = Number.POSITIVE_INFINITY;
 		let top = Number.POSITIVE_INFINITY;
@@ -831,12 +927,18 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	public setCollisionBodyDrivesObject (enabled: boolean) {
 		if (enabled === this.collisionBodyDrivesObject) return;
 
+		this.updateMatrix();
 		if (enabled) {
 			this.collisionBodyDrivesObject = false;
 			this.updateCollisionSprite();
 			this.collisionBodyDrivesObject = true;
-			this.collisionBodyPrevX = this.collisionSpriteInstance?.x ?? this.x;
-			this.collisionBodyPrevY = this.collisionSpriteInstance?.y ?? this.y;
+			if (this.collisionSpriteInstance) {
+				this.captureCollisionBodyTransform(this.collisionSpriteInstance);
+			} else {
+				this.collisionBodyPrevX = this.x;
+				this.collisionBodyPrevY = this.y;
+				this.collisionBodyPrevAngle = this.angle;
+			}
 		} else {
 			this.collisionBodyDrivesObject = false;
 			this.updateCollisionSprite();
@@ -849,11 +951,13 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 		const dx = collisionSpriteInstance.x - this.collisionBodyPrevX;
 		const dy = collisionSpriteInstance.y - this.collisionBodyPrevY;
-		this.collisionBodyPrevX = collisionSpriteInstance.x;
-		this.collisionBodyPrevY = collisionSpriteInstance.y;
-		if (dx === 0 && dy === 0) return;
+		const angle = collisionSpriteInstance.angle;
+		const angleChanged = angle !== this.collisionBodyPrevAngle;
+		this.captureCollisionBodyTransform(collisionSpriteInstance);
+		if (dx === 0 && dy === 0 && !angleChanged) return;
 
-		this.offsetPosition(dx, dy);
+		if (dx !== 0 || dy !== 0) this.offsetPosition(dx, dy);
+		if (angleChanged) this.angle = angle;
 		this.updateMatrix();
 	}
 
@@ -875,7 +979,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			boundsProvider = new spine.AABBRectangleBoundsProvider(0, 0, 100, 100);
 		}
 
-		this.spineBounds = boundsProvider.calculateBounds(this);
+		const bounds = boundsProvider.calculateBounds(this);
+		if (spine.isValidBounds(bounds)) this.spineBounds = bounds;
 	}
 	/**********/
 
@@ -896,27 +1001,47 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	}
 
 	public setAnimation (track: number, animation: string, loop = false, additive = false) {
+		if (!Number.isInteger(track) || track < 0) throw new Error("[Spine] Track index must be a non-negative integer.");
 		const { state } = this;
 		if (!state) return;
-		const entry = state.setAnimation(track, animation, loop);
+		const animationData = state.data.skeletonData.findAnimation(animation);
+		if (!animationData) throw new Error(`[Spine] Animation not found: ${animation}`);
+		const entry = state.setAnimation(track, animationData, loop);
 		entry.additive = additive;
 		this.isPlaying = true;
+		this.refreshPose(true);
 	}
 
 	public addAnimation (track: number, animation: string, loop = false, delay = 0, additive = false) {
+		if (!Number.isInteger(track) || track < 0) throw new Error("[Spine] Track index must be a non-negative integer.");
+		if (!Number.isFinite(delay)) throw new Error("[Spine] Animation delay must be finite.");
 		const { state } = this;
 		if (!state) return;
-		const entry = state.addAnimation(track, animation, loop, delay);
+		const animationData = state.data.skeletonData.findAnimation(animation);
+		if (!animationData) throw new Error(`[Spine] Animation not found: ${animation}`);
+		const entry = state.addAnimation(track, animationData, loop, delay);
 		entry.additive = additive;
 		this.isPlaying = true;
+		this.refreshPose(true);
 	}
 
 	public addEmptyAnimation (track: number, mixDuration: number, delay: number) {
-		this.state?.addEmptyAnimation(track, mixDuration, delay);
+		if (!Number.isInteger(track) || track < 0) throw new Error("[Spine] Track index must be a non-negative integer.");
+		if (!Number.isFinite(mixDuration) || mixDuration < 0) throw new Error("[Spine] Mix duration must be finite and non-negative.");
+		if (!Number.isFinite(delay)) throw new Error("[Spine] Animation delay must be finite.");
+		if (!this.state) return;
+		this.state.addEmptyAnimation(track, mixDuration, delay);
+		this.isPlaying = true;
+		this.refreshPose(true);
 	}
 
 	public setEmptyAnimation (track: number, mixDuration: number) {
-		this.state?.setEmptyAnimation(track, mixDuration);
+		if (!Number.isInteger(track) || track < 0) throw new Error("[Spine] Track index must be a non-negative integer.");
+		if (!Number.isFinite(mixDuration) || mixDuration < 0) throw new Error("[Spine] Mix duration must be finite and non-negative.");
+		if (!this.state) return;
+		this.state.setEmptyAnimation(track, mixDuration);
+		this.isPlaying = true;
+		this.refreshPose(true);
 	}
 
 	public getCurrentAnimation (trackIndex: number): string {
@@ -932,6 +1057,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	}
 
 	public setTimeScale (track: number, timeScale: number) {
+		if (!Number.isInteger(track) || track < -1) throw new Error("[Spine] Track index must be -1 or a non-negative integer.");
+		if (!Number.isFinite(timeScale)) throw new Error("[Spine] Time scale must be finite.");
 		if (!this.state) return;
 		if (track < 0) {
 			this.state.timeScale = timeScale;
@@ -942,38 +1069,33 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	}
 
 	public setAnimationTime (units: 0 | 1, time: number, track: number) {
+		if (!Number.isInteger(track) || track < 0) throw new Error("[Spine] Track index must be a non-negative integer.");
+		if (!Number.isFinite(time)) throw new Error("[Spine] Animation time must be finite.");
 		if (!this.state) return;
 
 		const trackEntry = this.state.getTrack(track);
 		if (!trackEntry) return;
 
 		if (units === 0) {
-			if (time < trackEntry.animationStart || time > trackEntry.animationEnd) {
-				console.warn(`[Spine] Animation time ${time} is out of bounds [${trackEntry.animationStart}, ${trackEntry.animationEnd}]`);
-				return;
-			}
+			if (time < trackEntry.animationStart || time > trackEntry.animationEnd)
+				throw new Error(`[Spine] Animation time must be from ${trackEntry.animationStart} to ${trackEntry.animationEnd}.`);
 			trackEntry.trackTime = time;
 		} else {
-			if (time < 0 || time > 1) {
-				console.warn(`[Spine] Animation time ratio ${time} is out of bounds [0, 1]`);
-				return;
-			}
+			if (time < 0 || time > 1) throw new Error("[Spine] Animation time ratio must be from 0 to 1.");
 			trackEntry.trackTime = trackEntry.animationStart + time * (trackEntry.animationEnd - trackEntry.animationStart);
 		}
+		this.refreshPose(true);
 	}
 
 	public setAnimationMix (fromName: string, toName: string, duration: number) {
+		if (!Number.isFinite(duration) || duration < 0) throw new Error("[Spine] Mix duration must be finite and non-negative.");
 		const stateData = this.state?.data;
 		if (!stateData) return;
-
-		try {
-			stateData.setMix(fromName, toName, duration);
-		} catch (error) {
-			console.error('[Spine] setAnimationMix error:', error);
-		}
+		stateData.setMix(fromName, toName, duration);
 	}
 
 	public setDefaultMix (duration: number) {
+		if (!Number.isFinite(duration) || duration < 0) throw new Error("[Spine] Default mix duration must be finite and non-negative.");
 		const stateData = this.state?.data;
 		if (!stateData) {
 			console.warn('[Spine] setDefaultMix: no state data');
@@ -984,6 +1106,9 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	}
 
 	public setTrackAlpha (alpha: number, trackIndex: number) {
+		if (!Number.isFinite(alpha) || alpha < 0 || alpha > 1)
+			throw new Error("[Spine] Track alpha must be a finite number from 0 to 1.");
+		if (!Number.isInteger(trackIndex) || trackIndex < 0) throw new Error("[Spine] Track index must be a non-negative integer.");
 		const { state } = this;
 		if (!state) {
 			console.warn('[Spine] setAlpha: no state');
@@ -997,19 +1122,26 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		}
 
 		track.alpha = spine.MathUtils.clamp(alpha, 0, 1);
+		this.refreshPose(true);
 	}
 
 
 	public clearTrack (track: number) {
+		if (!Number.isInteger(track) || track < -1) throw new Error("[Spine] Track index must be -1 or a non-negative integer.");
 		const { state } = this;
 		if (!state) return;
 		if (track === -1)
 			state.clearTracks();
 		else
 			state.clearTrack(track);
+		this.refreshPose(true);
 	}
 
 	private triggerAnimationEvent (eventName: string, track: number, animation: string, event?: Event) {
+		if (!this.skeletonLoaded) {
+			this.pendingAnimationEvents.push({ eventName, track, animation, event });
+			return;
+		}
 		this.triggeredEventTrack = track;
 		this.triggeredEventAnimation = animation;
 		this.triggeredEventName = eventName;
@@ -1024,8 +1156,14 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	*/
 
 	public setSkin (skins: string[]) {
+		if (skins.some(skinName => skinName.length === 0)) throw new Error("[Spine] Skin names must not be empty.");
+		if (this.skeleton)
+			for (const skinName of skins)
+				if (!this.skeleton.data.findSkin(skinName))
+					throw new Error(`[Spine] Skin not found: ${skinName}`);
 		this.propSkin = skins;
 		this._setSkin();
+		this.refreshPose(true);
 	}
 
 	public getCurrentSkin (): string {
@@ -1048,13 +1186,13 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		} else if (skins.length === 1) {
 			const skinName = skins[0];
 			const skin = skeleton.data.findSkin(skinName);
-			if (!skin) throw new Error(`The given skin is not present in the skeleton data: ${skinName}`);
+			if (!skin) throw new Error(`[Spine] Skin not found: ${skinName}`);
 			skeleton.setSkin(skins[0]);
 		} else {
 			const customSkin = new spine.Skin(skins.join(","));
 			for (const s of skins) {
 				const skin = skeleton.data.findSkin(s);
-				if (!skin) throw new Error(`The given skin is not present in the skeleton data: ${s}`);
+				if (!skin) throw new Error(`[Spine] Skin not found: ${s}`);
 				customSkin.addSkin(skin);
 			}
 			skeleton.setSkin(customSkin);
@@ -1064,41 +1202,37 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	}
 
 	public createCustomSkin (skinName: string) {
+		if (skinName.length === 0) throw new Error("[Spine] Custom skin name must not be empty.");
 		if (!this.skeleton) return;
 
-		if (this.customSkins[skinName])
-			this.customSkins[skinName].clear();
+		const skin = this.customSkins.get(skinName);
+		if (skin)
+			skin.clear();
 		else
-			this.customSkins[skinName] = new spine.Skin(skinName);
+			this.customSkins.set(skinName, new spine.Skin(skinName));
 	}
 
 	public addCustomSkin (customSkinName: string, skinToAddName: string) {
 		if (!this.skeleton) return;
 
-		if (!this.customSkins[customSkinName]) {
-			console.warn(`[Spine] Custom skin "${customSkinName}" does not exist. Create it first.`);
-			return;
-		}
+		const customSkin = this.customSkins.get(customSkinName);
+		if (!customSkin) throw new Error(`[Spine] Custom skin not found: ${customSkinName}`);
 
 		const skinToAdd = this.skeleton.data.findSkin(skinToAddName);
-		if (!skinToAdd) {
-			console.warn(`[Spine] Skin "${skinToAddName}" not found in skeleton data.`);
-			return;
-		}
+		if (!skinToAdd) throw new Error(`[Spine] Skin not found: ${skinToAddName}`);
 
-		this.customSkins[customSkinName].addSkin(skinToAdd);
+		customSkin.addSkin(skinToAdd);
 	}
 
 	public setCustomSkin (skinName: string) {
 		if (!this.skeleton) return;
 
-		if (!this.customSkins[skinName]) {
-			console.warn(`[Spine] Custom skin "${skinName}" does not exist.`);
-			return;
-		}
+		const skin = this.customSkins.get(skinName);
+		if (!skin) throw new Error(`[Spine] Custom skin not found: ${skinName}`);
 
-		this.skeleton.setSkin(this.customSkins[skinName]);
+		this.skeleton.setSkin(skin);
 		this.skeleton.setupPose();
+		this.refreshPose(true);
 	}
 
 	/**********/
@@ -1115,6 +1249,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		}
 
 		skeleton.color.setFromString(color);
+		this.invalidateRender();
 	}
 
 	public setSlotColor (slotName: string, color: string) {
@@ -1125,12 +1260,10 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		}
 
 		const slot = skeleton.findSlot(slotName);
-		if (!slot) {
-			console.warn(`[Spine] setSlotColor: slot not found: ${slotName}`);
-			return;
-		}
+		if (!slot) throw new Error(`[Spine] Slot not found: ${slotName}`);
 
 		slot.pose.color.setFromString(color);
+		this.refreshPose();
 	}
 
 	public resetSlotColors (slotName: string = "") {
@@ -1145,12 +1278,10 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 				slot.pose.color.setFromColor(slot.data.setupPose.color);
 		} else {
 			const slot = skeleton.findSlot(slotName);
-			if (!slot) {
-				console.warn(`[Spine] resetSlotColors: slot not found: ${slotName}`);
-				return;
-			}
+			if (!slot) throw new Error(`[Spine] Slot not found: ${slotName}`);
 			slot.pose.color.setFromColor(slot.data.setupPose.color);
 		}
+		this.refreshPose();
 	}
 
 	/**********/
@@ -1160,35 +1291,44 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	*/
 
 	public attachInstanceToBone (uid: number, boneName: string, offsetX = 0, offsetY = 0, offsetAngle = 0, offsetScaleX = 1, offsetScaleY = 1) {
+		if (!Number.isSafeInteger(uid) || uid < 0) throw new Error("[Spine] UID must be a non-negative safe integer.");
+		if (![offsetX, offsetY, offsetAngle, offsetScaleX, offsetScaleY].every(Number.isFinite))
+			throw new Error("[Spine] Bone follower offsets and scales must be finite.");
 		if (!this.skeleton) return;
+
+		const bone = this.skeleton.findBone(boneName);
+		if (!bone) throw new Error(`[Spine] Bone not found: ${boneName}`);
+
+		const target = this.runtime.getInstanceByUid(uid);
+		if (!target) throw new Error(`[Spine] Instance not found for UID: ${uid}`);
+		if (!("width" in target) || !("height" in target) || !("setSize" in target) || typeof target.setSize !== "function")
+			throw new Error(`[Spine] Instance for UID ${uid} is not a world instance.`);
+		const instance = target as IWorldInstance;
 
 		this.updateMatrix();
 		this.updateBonesOverride();
 		this.skeleton.updateWorldTransform(this.physicsMode === spine.Physics.none ? spine.Physics.none : spine.Physics.pose);
 
-		const bone = this.skeleton.findBone(boneName);
-		if (!bone) {
-			console.warn(`[Spine] attachInstanceToBone: bone not found: ${boneName}`);
-			return;
-		}
-
-		const instance = this.runtime.getInstanceByUid(uid) as IWorldInstance;
-		if (!instance) return;
-
 		const refGameScale = this.getSkeletonGameScale(this.matrix);
+		const existingFollowers = this.boneFollowers.get(boneName);
+		let existingFollower: BoneFollower | undefined;
+		if (existingFollowers)
+			for (const follower of existingFollowers)
+				if (follower.uid === uid) existingFollower = follower;
+
 		const follower: BoneFollower = {
 			uid, offsetX, offsetY, offsetAngle, offsetScaleX, offsetScaleY,
-			originalWidth: Math.abs(instance.width),
-			originalHeight: Math.abs(instance.height),
-			refGameScaleX: refGameScale.scaleX,
-			refGameScaleY: refGameScale.scaleY,
+			originalWidth: existingFollower?.originalWidth ?? Math.abs(instance.width),
+			originalHeight: existingFollower?.originalHeight ?? Math.abs(instance.height),
+			refGameScaleX: existingFollower?.refGameScaleX ?? refGameScale.scaleX,
+			refGameScaleY: existingFollower?.refGameScaleY ?? refGameScale.scaleY,
 		};
-		const followers = this.boneFollowers.get(boneName);
-		if (!followers) {
+		this.detachInstanceFromBoneByUid(uid, boneName);
+		const remainingFollowers = this.boneFollowers.get(boneName);
+		if (remainingFollowers)
+			remainingFollowers.push(follower);
+		else
 			this.boneFollowers.set(boneName, [follower]);
-		} else {
-			followers.push(follower);
-		}
 
 		this.updateBoneFollowers(this.matrix);
 		this.isPlaying = true;
@@ -1198,13 +1338,10 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		const followers = this.boneFollowers.get(boneName);
 		if (!followers) return;
 
-		const index = followers.findIndex(f => f.uid === uid);
-		if (index !== -1) {
-			followers.splice(index, 1);
-			if (followers.length === 0) {
-				this.boneFollowers.delete(boneName);
-			}
-		}
+		for (let i = followers.length - 1; i >= 0; i--)
+			if (followers[i].uid === uid) followers.splice(i, 1);
+
+		if (followers.length === 0) this.boneFollowers.delete(boneName);
 	}
 
 	public detachAllFromBone (boneName: string) {
@@ -1317,11 +1454,16 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 					x ?? this.matrix.boneToGame(bone).x,
 					y ?? this.matrix.boneToGame(bone).y,
 					bone);
-				bone.pose.x = locals.x;
-				bone.pose.y = locals.y;
+				if (Number.isFinite(locals.x) && Number.isFinite(locals.y)) {
+					bone.pose.x = locals.x;
+					bone.pose.y = locals.y;
+				}
 			}
 
-			if (rotation !== undefined) bone.pose.rotation = this.matrix.gameToBoneRotation(rotation, bone);
+			if (rotation !== undefined) {
+				const localRotation = this.matrix.gameToBoneRotation(rotation, bone);
+				if (Number.isFinite(localRotation)) bone.pose.rotation = localRotation;
+			}
 		}
 
 		if (mode === "local") {
@@ -1424,6 +1566,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			return 0;
 		}
 
+		this.updateMatrix();
 		const point = this.matrix.boneToGame(bone);
 		return point.x;
 	}
@@ -1441,6 +1584,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			return 0;
 		}
 
+		this.updateMatrix();
 		const point = this.matrix.boneToGame(bone);
 		return point.y;
 	}
@@ -1490,8 +1634,9 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	}
 
 	public setBonePose (boneName: string, mode: "game" | "local", applyMode: "once" | "hold", c3X?: number, c3Y?: number, c3Rotation?: number, scaleX?: number, scaleY?: number) {
+		if (!this.skeleton) return;
 		const bone = this.getBone(boneName);
-		if (!bone) return;
+		if (!bone) throw new Error(`[Spine] Bone not found: ${boneName}`);
 		if (applyMode === "hold") {
 			const existing = this.bonesOverride.get(bone);
 			this.bonesOverride.set(bone, {
@@ -1503,15 +1648,19 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 				scaleY: scaleY ?? existing?.scaleY,
 			});
 		} else {
+			if (mode === "game") this.updateMatrix();
 			this.updateBonePoseOnce(bone, { mode, x: c3X, y: c3Y, rotation: c3Rotation, scaleX, scaleY });
 		}
+		this.refreshPose();
 	}
 
 	public releaseBoneHold (boneName: string, resetToSetup: boolean) {
+		if (!this.skeleton) return;
 		const bone = this.getBone(boneName);
-		if (!bone) return;
+		if (!bone) throw new Error(`[Spine] Bone not found: ${boneName}`);
 		this.bonesOverride.delete(bone);
 		if (resetToSetup) bone.setupPose();
+		this.refreshPose();
 	}
 
 	public setupPose (target: 0 | 1 | 2) {
@@ -1520,18 +1669,21 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		if (target === 0) skeleton.setupPose();
 		else if (target === 1) skeleton.setupPoseBones();
 		else skeleton.setupPoseSlots();
+		this.refreshPose();
 	}
 
 	public setupBoneSlotPose (type: "bone" | "slot", name: string) {
+		if (!this.skeleton) return;
 		if (type === "bone") {
 			const bone = this.getBone(name);
-			if (!bone) return;
+			if (!bone) throw new Error(`[Spine] Bone not found: ${name}`);
 			bone.setupPose();
 		} else {
 			const slot = this.getSlot(name);
-			if (!slot) return;
+			if (!slot) throw new Error(`[Spine] Slot not found: ${name}`);
 			slot.setupPose();
 		}
+		this.refreshPose();
 	}
 
 	private getBone (boneName: string | Bone) {
@@ -1560,7 +1712,9 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	}
 
 	public setAttachment (slotName: string, attachmentName: string | null) {
-		this.skeleton?.setAttachment(slotName, attachmentName);
+		if (!this.skeleton) return;
+		this.skeleton.setAttachment(slotName, attachmentName);
+		this.refreshPose();
 	}
 
 	/**********/
@@ -1572,16 +1726,14 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	public mirror (isMirrored: boolean) {
 		if ((this.width < 0) !== isMirrored) {
 			this.width = -this.width;
-			this.updateMatrix();
-			this.updateBoneFollowers(this.matrix);
+			this.refreshPose();
 		}
 	}
 
 	public flip (isFlipped: boolean) {
 		if ((this.height < 0) !== isFlipped) {
 			this.height = -this.height;
-			this.updateMatrix();
-			this.updateBoneFollowers(this.matrix);
+			this.refreshPose();
 		}
 	}
 
@@ -1591,8 +1743,9 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			case 1: this.physicsMode = spine.Physics.reset; break;
 			case 2: this.physicsMode = spine.Physics.update; break;
 			case 3: this.physicsMode = spine.Physics.pose; break;
-			default: console.warn('[Spine] Invalid physics mode:', mode);
+			default: throw new Error(`[Spine] Invalid physics mode: ${mode}`);
 		}
+		this.refreshPose();
 	}
 
 	/**********/
@@ -1602,10 +1755,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 	*/
 
 	public setBounds (x: number, y: number, width: number, height: number) {
-		if (width <= 0 || height <= 0) {
-			console.warn('[Spine] setBounds: width and height must be positive');
-			return;
-		}
+		if (!spine.isValidBounds({ x, y, width, height }))
+			throw new Error("[Spine] Bounds values must be finite and dimensions must be positive.");
 
 		const scaleX = (Math.abs(this.width) / this.spineBounds.width) * this.propScaleX;
 		const scaleY = (Math.abs(this.height) / this.spineBounds.height) * this.propScaleY;
@@ -1619,7 +1770,7 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		this.propScaleX = 1;
 		this.propScaleY = 1;
 
-		this.updateCollisionSprite();
+		this.refreshPose();
 	}
 
 	public getBounds () {
@@ -1631,6 +1782,10 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 			console.warn('[Spine] setBoundsForSkinAnimation: skeleton or state not loaded');
 			return;
 		}
+		for (const skinName of skins)
+			if (!this.skeleton.data.findSkin(skinName)) throw new Error(`[Spine] Skin not found: ${skinName}`);
+		if (animation && !this.skeleton.data.findAnimation(animation))
+			throw new Error(`[Spine] Animation not found: ${animation}`);
 
 		const boundsProvider = new spine.SkinsAndAnimationBoundsProvider(
 			animation || undefined,
@@ -1639,8 +1794,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 
 		const bounds = boundsProvider.calculateBounds(this);
 
-		if (bounds.width <= 0 || bounds.height <= 0) {
-			console.warn('[Spine] setBoundsForSkinAnimation: calculated bounds have invalid dimensions');
+		if (!spine.isValidBounds(bounds)) {
+			console.warn('[Spine] setBoundsForSkinAnimation: calculated bounds are invalid');
 			return;
 		}
 
@@ -1658,8 +1813,8 @@ class SpineC3Instance extends globalThis.ISDKWorldInstanceBase {
 		const boundsProvider = new spine.SetupPoseBoundsProvider();
 		const bounds = boundsProvider.calculateBounds(this);
 
-		if (bounds.width <= 0 || bounds.height <= 0) {
-			console.warn('[Spine] setBoundsForSetupPose: calculated bounds have invalid dimensions');
+		if (!spine.isValidBounds(bounds)) {
+			console.warn('[Spine] setBoundsForSetupPose: calculated bounds are invalid');
 			return;
 		}
 

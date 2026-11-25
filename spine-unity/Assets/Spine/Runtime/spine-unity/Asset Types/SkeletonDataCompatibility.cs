@@ -237,7 +237,9 @@ namespace Spine.Unity {
 		public static void DisplayCompatibilityProblem (string descriptionString, TextAsset spineJson) {
 			if (!wasVersionDialogShown) {
 				wasVersionDialogShown = true;
-				UnityEditor.EditorUtility.DisplayDialog("Version mismatch!", descriptionString, "OK");
+				UnityEditor.EditorUtility.DisplayDialog("Version mismatch!",
+					string.Format("Skeleton '{0}'\n\n{1}", spineJson.name, descriptionString), "OK");
+				UnityEditor.EditorGUIUtility.PingObject(spineJson);
 			}
 			Debug.LogError(string.Format("Error importing skeleton '{0}': {1}",
 				spineJson.name, descriptionString), spineJson);

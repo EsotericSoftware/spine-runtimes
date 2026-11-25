@@ -52,6 +52,11 @@ declare namespace SDK {
 		SetAngle(a: number): void;
 		GetAngle(): number;
 
+		SetQuaternion(qx: number, qy: number, qz: number, qw: number): void;
+		GetQuaternion(): Vec4Arr;
+		SetRotationEuler(rx: number, ry: number, rz: number): void;
+		GetRotationEuler(): Vec3Arr;
+
 		GetLayer(): SDK.ILayer;
 		GetLayout(): SDK.ILayout;
 

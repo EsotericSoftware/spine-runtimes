@@ -71,19 +71,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FSpineAnimationStateMixData> MixData;
 
-	UPROPERTY(Transient, VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	TArray<FString> Bones;
 
-	UPROPERTY(Transient, VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	TArray<FString> Slots;
 
-	UPROPERTY(Transient, VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	TArray<FString> Skins;
 
-	UPROPERTY(Transient, VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	TArray<FString> Animations;
 
-	UPROPERTY(Transient, VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	TArray<FString> Events;
 
 protected:
@@ -108,6 +108,8 @@ protected:
 #if WITH_EDITORONLY_DATA
 public:
 	void SetSkeletonDataFileName(const FName &skeletonDataFileName);
+	void UpdateSkeletonDataFileName(const FName &skeletonDataFileName);
+	bool SetRawDataFromImport(const TArray<uint8> &Data, FString &Error);
 
 protected:
 	UPROPERTY(VisibleAnywhere, Instanced, Category = ImportSettings)
@@ -121,7 +123,8 @@ protected:
 #endif
 
 	virtual void Serialize(FArchive &Ar) override;
-#endif
 
-	void LoadInfo();
+	bool LoadInfo(const TArray<uint8> &Data, TArray<FString> &OutBones, TArray<FString> &OutSlots, TArray<FString> &OutSkins,
+				  TArray<FString> &OutAnimations, TArray<FString> &OutEvents, FString &Error) const;
+#endif
 };

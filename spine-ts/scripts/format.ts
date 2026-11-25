@@ -32,7 +32,7 @@ fs.readdirSync('.').forEach(name => {
 
 if (allFiles.length > 0) {
 	console.log(`Formatting ${allFiles.length} TypeScript files...`);
-	execSync(`npx -y typescript-formatter -r ${allFiles.join(' ')}`, { stdio: 'inherit' });
+	execSync(`npx -y --package=typescript@6.0.3 --package=typescript-formatter@7.2.2 tsfmt -r ${allFiles.join(' ')}`, { stdio: 'inherit' });
 } else {
 	console.log('No TypeScript files found to format.');
 }

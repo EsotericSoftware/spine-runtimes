@@ -100,7 +100,7 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 
 	/** Constructs a new batch with the specified max vertices and max triangles and the default shader. */
 	public TwoColorPolygonBatch (int maxVertices, int maxTriangles) {
-		this(maxTriangles, maxTriangles, null);
+		this(maxVertices, maxTriangles, null);
 	}
 
 	/** Constructs a new batch with the specified max vertices, max triangles, and shader. The shader will not be disposed
@@ -108,7 +108,7 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 	public TwoColorPolygonBatch (int maxVertices, int maxTriangles, @Null ShaderProgram defaultShader) {
 		// 32767 is max vertex index.
 		if (maxVertices > 32767)
-			throw new IllegalArgumentException("Can't have more than 32767 vertices per batch: " + maxTriangles);
+			throw new IllegalArgumentException("Can't have more than 32767 vertices per batch: " + maxVertices);
 
 		Mesh.VertexDataType vertexDataType = Mesh.VertexDataType.VertexArray;
 		if (Gdx.gl30 != null) vertexDataType = VertexDataType.VertexBufferObjectWithVAO;
@@ -1528,7 +1528,7 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 			+ "}";
 
 		var shader = new ShaderProgram(vertexShader, fragmentShader);
-		if (shader.isCompiled() == false) throw new IllegalArgumentException("Error compiling shader: " + shader.getLog());
+		if (!shader.isCompiled()) throw new IllegalArgumentException("Error compiling shader: " + shader.getLog());
 		return shader;
 	}
 }

@@ -39,7 +39,7 @@
 #define CONFIGURABLE_ENTER_PLAY_MODE
 #endif
 
-#if !SPINE_DISABLE_THREADING
+#if !SPINE_DISABLE_THREADING && !UNITY_WEBGL
 #define USE_THREADED_ANIMATION_UPDATE
 #endif
 
@@ -62,10 +62,22 @@ namespace Spine.Unity {
 		ISkeletonAnimation, ISkeletonComponent, IHasSkeletonRenderer,
 		ISkeletonRendererEvents, IHasModifyableSkeletonDataAsset, IUpgradable {
 
+		public delegate void DeltaTimeOverrideDelegate (SkeletonAnimationBase animation, ref float deltaTime);
+
 		[SerializeField] protected UpdateTiming updateTiming = UpdateTiming.InUpdate;
 		protected int frameOfLastUpdate = -1;
 		protected ISkeletonRenderer skeletonRenderer;
 		protected bool skipUpdate = false;
+		protected float resolvedDeltaTime = 0f;
+		protected DeltaTimeOverrideDelegate deltaTimeOverride;
+
+		/// <summary>Allows advancing by custom delta time for e.g. stepped animation updates in a threaded context.
+		/// The callback may change <see cref="UpdateMode"/> to disable or limit skeleton updates for certain frames.
+		/// Called on the main thread once before animation update.</summary>
+		public DeltaTimeOverrideDelegate DeltaTimeOverride {
+			get { return deltaTimeOverride; }
+			set { deltaTimeOverride = value; }
+		}
 
 		public UpdateTiming UpdateTiming {
 			get { return updateTiming; }
@@ -114,7 +126,10 @@ namespace Spine.Unity {
 		}
 
 		protected bool UsesThreadedAnimation {
-			get { return threadedAnimation == SettingsTriState.Enable || RuntimeSettings.UseThreadedAnimation; }
+			get {
+				return threadedAnimation == SettingsTriState.Enable ||
+					(threadedAnimation == SettingsTriState.UseGlobalSetting && RuntimeSettings.UseThreadedAnimation);
+			}
 		}
 
 		public SettingsTriState ThreadedAnimation {
@@ -125,7 +140,7 @@ namespace Spine.Unity {
 
 				SkeletonUpdateSystem system = SkeletonUpdateSystem.Instance;
 				if (system) {
-					if (threadedAnimation == SettingsTriState.Enable || RuntimeSettings.UseThreadedAnimation)
+					if (UsesThreadedAnimation)
 						system.RegisterForUpdate(updateTiming, this);
 					else
 						system.UnregisterFromUpdate(updateTiming, this);
@@ -256,6 +271,7 @@ namespace Spine.Unity {
 			InitializeMainThreadID();
 #if UNITY_EDITOR
 			SkeletonAnimationBase.ApplicationIsPlaying = Application.isPlaying;
+			if (IssueNullRendererError()) return;
 #endif
 			EnsureRendererEventsSubscribed();
 		}
@@ -266,7 +282,7 @@ namespace Spine.Unity {
 		}
 
 #if UNITY_EDITOR && AUTO_UPGRADE_TO_43_COMPONENTS
-		// compatibility layer between 4.1 and 4.2, automatically transfer serialized attributes.
+		// compatibility layer for new split animation component architecture, automatically transfer serialized attributes.
 		public abstract void UpgradeTo43 ();
 #endif
 
@@ -346,8 +362,20 @@ namespace Spine.Unity {
 		}
 
 #if UNITY_EDITOR
+		protected bool IssueNullRendererError () {
+			if (Renderer == null) {
+				Debug.LogError(string.Format(
+					"No skeleton renderer (SkeletonRenderer or SkeletonGraphic) found at {0}.\n" +
+					"Did you turn off 'Split Component Upgrade' or forget to open and save the scene or prefab?", this.gameObject),
+					this.gameObject);
+				return true;
+			}
+			return false;
+		}
+
 		protected void OnValidate () {
 			if (!Application.isPlaying) {
+				if (IssueNullRendererError()) return;
 				Renderer.OnRebuild -= OnRendererRebuild;
 				Renderer.OnRebuild += OnRendererRebuild;
 				requiresEditorUpdate = true;
@@ -395,8 +423,9 @@ namespace Spine.Unity {
 		/// <summary>Calls <see cref="Update()"/> if it has not yet been called this frame.</summary>
 		public virtual void UpdateOncePerFrame (float deltaTime) {
 			if (frameOfLastUpdate != Time.frameCount) {
+				resolvedDeltaTime = deltaTime;
 				MainThreadBeforeUpdateInternal();
-				UpdateInternal(deltaTime, Time.frameCount, calledFromOnlyMainThread: true);
+				UpdateInternal(resolvedDeltaTime, Time.frameCount, calledFromOnlyMainThread: true);
 			}
 		}
 
@@ -405,6 +434,13 @@ namespace Spine.Unity {
 		/// To be followed by a potentially threaded call to <see cref="UpdateInternal"/>.
 		/// </summary>
 		public virtual void MainThreadBeforeUpdateInternal () {
+#if USE_THREADED_ANIMATION_UPDATE
+			if (isUpdatedExternally)
+				resolvedDeltaTime = UsedExternalDeltaTime;
+#endif
+			if (deltaTimeOverride != null)
+				deltaTimeOverride(this, ref resolvedDeltaTime);
+
 			if (skeletonRenderer == null || !skeletonRenderer.IsValid || skeletonRenderer.Freeze || !this.IsValid
 				|| skeletonRenderer.UpdateMode < UpdateMode.OnlyAnimationStatus) {
 				skipUpdate = true;
@@ -420,7 +456,7 @@ namespace Spine.Unity {
 
 #if USE_THREADED_ANIMATION_UPDATE
 		public virtual void UpdateExternal (int currentFrameCount, bool calledFromOnlyMainThread = true) {
-			UpdateInternal(UsedExternalDeltaTime, currentFrameCount, calledFromOnlyMainThread);
+			UpdateInternal(resolvedDeltaTime, currentFrameCount, calledFromOnlyMainThread);
 		}
 #endif
 		public virtual void UpdateInternal (float deltaTime, int currentFrameCount, bool calledFromOnlyMainThread = true) {
@@ -453,7 +489,7 @@ namespace Spine.Unity {
 				if (skipUpdate)
 					return CoroutineIterator.Done;
 				frameOfLastUpdate = currentFrameCount;
-				UpdateAnimationStatus(UsedExternalDeltaTime);
+				UpdateAnimationStatus(resolvedDeltaTime);
 				skeletonRenderer.ApplyTransformMovementToPhysics();
 
 				if (skeletonRenderer.UpdateMode == UpdateMode.OnlyAnimationStatus)
@@ -474,8 +510,9 @@ namespace Spine.Unity {
 		/// <summary>Progresses the AnimationState according to the given deltaTime, and applies it to the Skeleton.
 		/// Use Time.deltaTime to update manually. Use deltaTime 0 to update without progressing the time.</summary>
 		public virtual void Update (float deltaTime) {
+			resolvedDeltaTime = deltaTime;
 			MainThreadBeforeUpdateInternal();
-			UpdateInternal(deltaTime, Time.frameCount, calledFromOnlyMainThread: true);
+			UpdateInternal(resolvedDeltaTime, Time.frameCount, calledFromOnlyMainThread: true);
 		}
 
 		public virtual void ApplyAnimation (bool calledFromMainThread = true) {

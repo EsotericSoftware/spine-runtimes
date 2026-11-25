@@ -63,7 +63,7 @@ int main() {
 
     // Setup animation sequence with listener callback on the "run" animation
     animationState.setAnimation(0, "portal", false);
-    animationState.addAnimation(0, "run", true, 0).setListener([](AnimationState* state, EventType type, TrackEntry* entry, Event* event) {
+    animationState.addAnimation(0, "run", true, 0).setListener([](AnimationState* state, EventType type, TrackEntry* entry, Event* event, void* userData) {
        switch(type) {
         case spine::EventType_Start:
             printf("Animation started: %s\n", entry->getAnimation().getName().buffer());

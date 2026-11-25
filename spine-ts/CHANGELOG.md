@@ -2,6 +2,83 @@
 
 ## Unreleased
 
+### spine-canvas
+
+- Added slot blend mode and clipping attachment support to triangle rendering, now backed by `SkeletonRendererCore`.
+- Added blend/clipping examples and improved canvas example fitting.
+
+## 4.3.13 - 2026-07-24
+
+### spine-construct3
+
+- Added an opt-in slot Z offset to mitigate z-fighting between overlapping attachments.
+
+### spine-phaser-v3
+
+- Automatically restored Spine WebGL resources, including atlas textures, after context restoration.
+
+### spine-phaser-v4
+
+- Restored the legacy `spine-webgl` backend after WebGL context restoration.
+
+## 4.3.12 - 2026-07-23
+
+### spine-core
+
+- Expose restore WebGL logic on ManagedWebGLRenderingContext, so applications that pass an existing WebGL context instead of a canvas can restore all registered WebGL resources.
+
+### spine-construct3
+
+- Added planar 3D rotation for rendering; collisions, hit tests, and other gameplay logic remain 2D. Generated collision bodies synchronize their visual 3D transform.
+
+## 4.3.11 - 2026-07-20
+
+### **BREAKING CHANGES**
+
+- `spine-phaser-v4` now requires Phaser 4.2.1 and uses Phaser's native `Mesh2D` renderer by default in WebGL games. Pass `{ renderer: "spine-webgl" }` when creating a `SpineGameObject` to retain the previous spine-webgl renderer. Phaser Canvas games use `renderer: "spine-canvas"`.
+- In `spine-phaser-v3`, `spine-phaser-v4`, `spine-pixi-v7`, `spine-pixi-v8`, and `spine-threejs`, physics movement inheritance is now opt-in and defaults to `0`; the previous properties and methods have been replaced by the runtime object's `skeletonPhysics` API.
+
+### spine-core
+
+- Added the renderer-agnostic `SkeletonCoordinateConverter` and `SkeletonPhysicsMovement` APIs for converting runtime coordinates and optionally passing host-object translation and rotation to skeleton physics constraints. Movement adapters provide 3D world position, rotation around the skeleton plane normal, and world-to-skeleton conversion without exposing engine-specific matrix types; 2D runtimes use `z = 0`.
+
+### spine-phaser-v3 / spine-phaser-v4
+
+- Added `spineSkeleton(key, url, options)` as the unified skeleton data loader. It infers JSON or binary data from `.json` and `.skel` URL extensions, including URLs with query strings or fragments. Use `options.format` when the URL has no usable extension and `options.xhrSettings` to customize the request. The existing `spineJson()` and `spineBinary()` loaders remain available as deprecated aliases.
+- Changed the preferred `spineAtlas()` third argument to `SpineAtlasFileOptions`, with XHR settings supplied through `options.xhrSettings`. Passing a raw `XHRSettingsObject` remains supported as a deprecated overload.
+- Added the options-object `SpineGameObject` constructor and `SpineGameObjectFactoryOptions` for `this.add.spine()`. The previous positional constructor and direct bounds-provider factory argument remain available as deprecated overloads.
+- Added `skeletonToGame()`, `gameToSkeleton()`, and `gameToBone()` coordinate conversion methods. The previous Phaser-specific method names remain available as deprecated aliases.
+- Moved `SpineGameObjectBoundsProvider`, `AABBRectangleBoundsProvider`, `SetupPoseBoundsProvider`, and `SkinsAndAnimationBoundsProvider` into `SpineGameObjectBounds.ts` while preserving their existing exports.
+- Added the opt-in `SpineGameObject.skeletonPhysics` movement inheritance API backed by `SkeletonPhysicsMovement`.
+- Updated all examples to use the unified loading and game-object creation APIs.
+
+### spine-phaser-v4
+
+- Added selectable `"phaser"` (default), `"spine-webgl"`, and `"spine-canvas"` renderer backends. The `phaser` renderer uses the new Phaser 4.2.1 `Mesh2D`, and supports Spine tint, tint-black, alpha, blend modes, atlas texture filtering and wrapping, premultiplied-alpha handling, clipping, batching, and Phaser render-context integration.
+- Added APIs for attaching Phaser game objects to Spine slots with before/after placement, attachment timeline following, clipping, and optional position preservation. Attached objects inherit the `SpineGameObject` alpha and scroll factor while rendered. Thanks to stencil-buffer integration, Spine clipping attachments can clip Phaser game objects attached to slots.
+- Shared the spine-webgl `SceneRenderer` between scenes using the same Phaser WebGL renderer and exposed it through `SpinePlugin.webGLRenderer`.
+- Updated all examples to use the unified loading and game-object creation APIs.
+
+### spine-threejs
+
+- Added `SkeletonMesh.skeletonPhysics` with 3D transform movement inheritance.
+
+### spine-pixi-v7 / spine-pixi-v8
+
+- Added `Spine.skeletonPhysics` and fixed rotation inheritance under non-uniformly scaled containers.
+
+### spine-construct3
+
+- Add drag and drop support for a zip file containing skeleton assets.
+
+## 4.3.10 - 2026-07-06
+
+### spine-core
+
+- Fixed `SkeletonRendererCore` clipping lifecycle and missing texture handling.
+- Port of 92be332e: Clipping performance improvements.
+- Relax `findConstraint` constructor type.
+
 ## 4.3.9 - 2026-06-24
 
 ### spine-pixi-v8

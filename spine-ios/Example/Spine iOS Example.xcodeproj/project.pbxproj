@@ -14,7 +14,7 @@
 		76381FDE2C2EF53A0087712B /* mix-and-match-pma.png in Resources */ = {isa = PBXBuildFile; fileRef = 76381FDC2C2EF53A0087712B /* mix-and-match-pma.png */; };
 		76381FDF2C2EF53A0087712B /* mix-and-match-pma.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 76381FDD2C2EF53A0087712B /* mix-and-match-pma.atlas */; };
 		76DD66952E5DE75400963397 /* SpineiOS in Frameworks */ = {isa = PBXBuildFile; productRef = 76DD66942E5DE75400963397 /* SpineiOS */; };
-		9205FCD42C0760B1006EE07E /* SimpleAnimationViewControllerRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9205FCD32C0760B1006EE07E /* SimpleAnimationViewControllerRepresentable.swift */; };
+		9205FCD42C0760B1006EE07E /* SimpleAnimationViewControllerRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9205FCD32C0760B1006EE07E /* SimpleAnimationViewControllerRepresentable.swift */; platformFilter = ios; };
 		920BD1162BEBC52D0050A5A9 /* spineboy-pro.skel in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1122BEBC52D0050A5A9 /* spineboy-pro.skel */; };
 		920BD1182BEBC52D0050A5A9 /* spineboy-pro.json in Resources */ = {isa = PBXBuildFile; fileRef = 920BD1142BEBC52D0050A5A9 /* spineboy-pro.json */; };
 		920BD11B2BEBDBA60050A5A9 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920BD11A2BEBDBA60050A5A9 /* MainView.swift */; };
@@ -30,7 +30,7 @@
 		921C1EAF2BF609F60001A0BA /* DressUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921C1EAE2BF609F60001A0BA /* DressUp.swift */; };
 		921C1EBA2BF60AE90001A0BA /* mix-and-match-pro.skel in Resources */ = {isa = PBXBuildFile; fileRef = 921C1EB72BF60AE90001A0BA /* mix-and-match-pro.skel */; };
 		922839DF2BF4F7D8006DA9F6 /* AnimationStateEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922839DE2BF4F7D8006DA9F6 /* AnimationStateEvents.swift */; };
-		9240C26E2C0754DD003EE243 /* SimpleAnimationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9240C26D2C0754DD003EE243 /* SimpleAnimationViewController.m */; };
+		9240C26E2C0754DD003EE243 /* SimpleAnimationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9240C26D2C0754DD003EE243 /* SimpleAnimationViewController.m */; platformFilter = ios; };
 		924C0C162BCFCF21004E63F7 /* SpineExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924C0C152BCFCF21004E63F7 /* SpineExampleApp.swift */; };
 		924C0C182BCFCF21004E63F7 /* SimpleAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924C0C172BCFCF21004E63F7 /* SimpleAnimation.swift */; };
 		924C0C1A2BCFCF22004E63F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 924C0C192BCFCF22004E63F7 /* Assets.xcassets */; };
@@ -39,6 +39,7 @@
 		9270C1742BFE389600BD25BC /* celestial-circus-pro.skel in Resources */ = {isa = PBXBuildFile; fileRef = 9270C1712BFE389600BD25BC /* celestial-circus-pro.skel */; };
 		92D7DDA82BFF3C8800EB9E3A /* DebugRendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D7DDA72BFF3C8800EB9E3A /* DebugRendering.swift */; };
 		92FE93292BF4AB9600CCDF48 /* IKFollowing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92FE93282BF4AB9600CCDF48 /* IKFollowing.swift */; };
+		A10000012F10000000000001 /* TextureFiltering.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000022F10000000000001 /* TextureFiltering.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -77,6 +78,7 @@
 		9270C1712BFE389600BD25BC /* celestial-circus-pro.skel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "celestial-circus-pro.skel"; sourceTree = "<group>"; };
 		92D7DDA72BFF3C8800EB9E3A /* DebugRendering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugRendering.swift; sourceTree = "<group>"; };
 		92FE93282BF4AB9600CCDF48 /* IKFollowing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IKFollowing.swift; sourceTree = "<group>"; };
+		A10000022F10000000000001 /* TextureFiltering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextureFiltering.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -155,6 +157,7 @@
 				9240C26C2C0754DD003EE243 /* SimpleAnimationViewController.h */,
 				9240C26D2C0754DD003EE243 /* SimpleAnimationViewController.m */,
 				920BD11C2BEBDC380050A5A9 /* PlayPauseAnimation.swift */,
+				A10000022F10000000000001 /* TextureFiltering.swift */,
 				922839DE2BF4F7D8006DA9F6 /* AnimationStateEvents.swift */,
 				92D7DDA72BFF3C8800EB9E3A /* DebugRendering.swift */,
 				921C1EAE2BF609F60001A0BA /* DressUp.swift */,
@@ -296,6 +299,7 @@
 				92D7DDA82BFF3C8800EB9E3A /* DebugRendering.swift in Sources */,
 				92FE93292BF4AB9600CCDF48 /* IKFollowing.swift in Sources */,
 				920BD11D2BEBDC380050A5A9 /* PlayPauseAnimation.swift in Sources */,
+				A10000012F10000000000001 /* TextureFiltering.swift in Sources */,
 				9240C26E2C0754DD003EE243 /* SimpleAnimationViewController.m in Sources */,
 				921C1EAF2BF609F60001A0BA /* DressUp.swift in Sources */,
 				922839DF2BF4F7D8006DA9F6 /* AnimationStateEvents.swift in Sources */,
@@ -436,7 +440,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = 9ZFD4KCY8F;
+				DEVELOPMENT_TEAM = 7F5Y92G2Z4;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -454,15 +458,16 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 14.2;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.esotericsoftware.spine-ios-example";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Spine iOS Example/Spine iOS Example-Bridging-Header.h";
+				"SWIFT_OBJC_BRIDGING_HEADER[sdk=iphoneos*]" = "Spine iOS Example/Spine iOS Example-Bridging-Header.h";
+				"SWIFT_OBJC_BRIDGING_HEADER[sdk=iphonesimulator*]" = "Spine iOS Example/Spine iOS Example-Bridging-Header.h";
 				SWIFT_OBJC_INTEROP_MODE = objc;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -480,7 +485,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = 9ZFD4KCY8F;
+				DEVELOPMENT_TEAM = 7F5Y92G2Z4;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -498,15 +503,16 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 14.2;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.esotericsoftware.spine-ios-example";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Spine iOS Example/Spine iOS Example-Bridging-Header.h";
+				"SWIFT_OBJC_BRIDGING_HEADER[sdk=iphoneos*]" = "Spine iOS Example/Spine iOS Example-Bridging-Header.h";
+				"SWIFT_OBJC_BRIDGING_HEADER[sdk=iphonesimulator*]" = "Spine iOS Example/Spine iOS Example-Bridging-Header.h";
 				SWIFT_OBJC_INTEROP_MODE = objc;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

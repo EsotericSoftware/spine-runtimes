@@ -1050,7 +1050,7 @@ namespace Spine {
 				} else
 					color += new Color32F((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
 			}
-			color.Clamp();
+			color = color.Clamp();
 			pose.SetColor(color); // see above
 		}
 	}
@@ -1145,7 +1145,7 @@ namespace Spine {
 			color.r = r;
 			color.g = g;
 			color.b = b;
-			color.ClampRGB();
+			color = color.ClampRGB();
 			pose.SetColor(color); // see above
 		}
 	}
@@ -1313,14 +1313,14 @@ namespace Spine {
 
 			if (alpha == 1) {
 				light = new Color32F(r, g, b, a);
-				light.Clamp();
+				light = light.Clamp();
 				pose.SetColor(light); // required due to Color being a struct
 			} else if (from == MixFrom.Setup) {
 				SlotPose setupPose = slot.data.setupPose;
 				Color32F setup = setupPose.GetColor();
 				light = new Color32F(setup.r + (r - setup.r) * alpha, setup.g + (g - setup.g) * alpha, setup.b + (b - setup.b) * alpha,
 					setup.a + (a - setup.a) * alpha);
-				light.Clamp();
+				light = light.Clamp();
 				pose.SetColor(light); // see above
 
 				Color32F? setupDark = setupPose.GetDarkColor();
@@ -1330,14 +1330,14 @@ namespace Spine {
 				b2 = setup.b + (b2 - setup.b) * alpha;
 			} else {
 				light += new Color32F((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha, (a - light.a) * alpha);
-				light.Clamp();
+				light = light.Clamp();
 				pose.SetColor(light); // see above
 				r2 = dark.r + (r2 - dark.r) * alpha;
 				g2 = dark.g + (g2 - dark.g) * alpha;
 				b2 = dark.b + (b2 - dark.b) * alpha;
 			}
 			Color32F darkValue = new Color32F(r2, g2, b2);
-			darkValue.ClampRGB();
+			darkValue = darkValue.ClampRGB();
 			pose.SetDarkColor(darkValue);
 		}
 	}
@@ -1474,9 +1474,9 @@ namespace Spine {
 			light.r = r;
 			light.g = g;
 			light.b = b;
-			light.ClampRGB();
+			light = light.ClampRGB();
 			Color32F darkValue = new Color32F(r2, g2, b2);
-			darkValue.ClampRGB();
+			darkValue = darkValue.ClampRGB();
 
 			pose.SetColor(light); // see above
 			pose.SetDarkColor(darkValue);
@@ -1929,7 +1929,7 @@ namespace Spine {
 
 	/// <summary>Fires an <see cref="Event"/> when specific animation times are reached.</summary>
 	public class EventTimeline : Timeline {
-		new readonly static ulong[] propertyIds = { (ulong)Property.Event };
+		new readonly static ulong[] propertyIds = { (ulong)Property.Event << 58 };
 		readonly Event[] events;
 
 		public EventTimeline (int frameCount)
@@ -2714,7 +2714,7 @@ namespace Spine {
 
 	/// <summary>Resets a physics constraint when specific animation times are reached.</summary>
 	public class PhysicsConstraintResetTimeline : Timeline, IConstraintTimeline {
-		new internal static readonly ulong[] propertyIds = { (ulong)Property.PhysicsConstraintReset };
+		new internal static readonly ulong[] propertyIds = { (ulong)Property.PhysicsConstraintReset << 58 };
 
 		readonly int constraintIndex;
 

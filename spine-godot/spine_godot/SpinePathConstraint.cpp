@@ -31,6 +31,7 @@
 #include "SpinePathConstraintPose.h"
 #include "SpineBone.h"
 #include "SpineCommon.h"
+#include "SpineController.h"
 #include "SpineSprite.h"
 
 void SpinePathConstraint::_bind_methods() {
@@ -54,7 +55,7 @@ Ref<SpinePathConstraintPose> SpinePathConstraint::get_pose() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto &pose = get_spine_object()->getPose();
 	Ref<SpinePathConstraintPose> pose_ref(memnew(SpinePathConstraintPose));
-	pose_ref->set_spine_object(get_spine_owner(), &pose);
+	pose_ref->set_spine_object(get_spine_controller(), &pose);
 	return pose_ref;
 }
 
@@ -62,7 +63,7 @@ Ref<SpinePathConstraintPose> SpinePathConstraint::get_applied_pose() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto &pose = get_spine_object()->getAppliedPose();
 	Ref<SpinePathConstraintPose> pose_ref(memnew(SpinePathConstraintPose));
-	pose_ref->set_spine_object(get_spine_owner(), &pose);
+	pose_ref->set_spine_object(get_spine_controller(), &pose);
 	return pose_ref;
 }
 
@@ -74,7 +75,7 @@ Array SpinePathConstraint::get_bones() {
 	for (int i = 0; i < bones.size(); ++i) {
 		auto bone = bones[i];
 		Ref<SpineBonePose> bone_ref(memnew(SpineBonePose));
-		bone_ref->set_spine_object(get_spine_owner(), bone);
+		bone_ref->set_spine_object(get_spine_controller(), bone);
 		result[i] = bone_ref;
 	}
 	return result;
@@ -85,7 +86,7 @@ Ref<SpineSlot> SpinePathConstraint::get_slot() {
 	auto target = &get_spine_object()->getSlot();
 	if (!target) return nullptr;
 	Ref<SpineSlot> target_ref(memnew(SpineSlot));
-	target_ref->set_spine_object(get_spine_owner(), target);
+	target_ref->set_spine_object(get_spine_controller(), target);
 	return target_ref;
 }
 
@@ -100,7 +101,7 @@ Ref<SpinePathConstraintData> SpinePathConstraint::get_data() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto &data = get_spine_object()->getData();
 	Ref<SpinePathConstraintData> data_ref(memnew(SpinePathConstraintData));
-	data_ref->set_spine_object(*get_spine_owner()->get_skeleton_data_res(), &data);
+	data_ref->set_spine_object(*get_spine_controller()->get_skeleton_data_res(), &data);
 	return data_ref;
 }
 

@@ -31,7 +31,7 @@
 #define USE_FIND_OBJECTS_BY_TYPE
 #endif
 
-#if !SPINE_DISABLE_THREADING
+#if !SPINE_DISABLE_THREADING && !UNITY_WEBGL
 #define USE_THREADED_SKELETON_UPDATE
 #define USE_THREADED_ANIMATION_UPDATE // requires USE_THREADED_SKELETON_UPDATE enabled
 #endif
@@ -57,7 +57,7 @@
 #define RUN_NO_SKELETON_LATEUPDATE_ON_MAIN_THREAD // actual configuration option, recommended enabled when not using work stealing
 #endif
 
-#if NET_STANDARD_2_0 || NET_STANDARD_2_1 || NET_4_6
+#if NET_STANDARD || NET_STANDARD_2_0 || NET_STANDARD_2_1 || NET_4_6
 #define HAS_MANUAL_RESET_EVENT_SLIM
 #define HAS_SYSTEM_THREADING_VOLATILE
 #endif
@@ -362,7 +362,9 @@ namespace Spine.Unity {
 
 		public void UpdateAsync (List<SkeletonAnimationBase> skeletons, UpdateTiming updateTiming) {
 			if (skeletons.Count == 0) return;
-
+#if ENABLE_WORK_STEALING
+			WaitForWorkerPoolIdle();
+#endif
 			// Sort by skeleton data to allow for better cache utilization.
 			if (sortSkeletonAnimations)
 				skeletons.Sort(SkeletonAnimationComparer);
@@ -371,9 +373,9 @@ namespace Spine.Unity {
 #if RUN_ALL_ON_MAIN_THREAD
 			int numAsyncThreads = 0;
 #elif RUN_NO_ANIMATION_UPDATE_ON_MAIN_THREAD
-			int numAsyncThreads = mainThreadUpdateCallbacks ? numThreads - 1 : numThreads;
+			int numAsyncThreads = mainThreadUpdateCallbacks ? Math.Max(1, numThreads - 1) : numThreads;
 #else
-			int numAsyncThreads = numThreads - 1;
+			int numAsyncThreads = Math.Max(1, numThreads - 1);
 #endif
 			int tasksPerThread = UpdateChunksPerThread;
 			int numTasks = numThreads * tasksPerThread;
@@ -395,12 +397,14 @@ namespace Spine.Unity {
 			PartitionTasks(ref taskPartitionsUpdate, out endIndexThreaded, tasksPerThread, skeletons.Count,
 				numAsyncThreads, numAvailableThreads);
 
+#if !ENABLE_WORK_STEALING
 			for (int t = 0; t < updateDone.Count; ++t) {
 				updateDone[t].Reset();
 			}
 			for (int t = updateDone.Count; t < numTasks; ++t) {
 				updateDone.Add(new ResetEvent(false));
 			}
+#endif
 
 			if (exceptions == null) {
 				exceptions = new Exception[numThreads];
@@ -476,7 +480,9 @@ namespace Spine.Unity {
 			for (int taskIndex = 0, count = asyncTaskPartitions.Count; taskIndex < count; ++taskIndex) {
 				SkeletonPartitionRange partition = asyncPartitionsItems[taskIndex];
 				if (partition.rangeStart == partition.rangeEndExclusive) {
+#if !ENABLE_WORK_STEALING
 					updateDone[taskIndex].Set();
+#endif
 					continue;
 				}
 				var range = new SkeletonUpdateRange() {
@@ -528,7 +534,9 @@ namespace Spine.Unity {
 				for (int taskIndex = 0, count = asyncTaskPartitions.Count; taskIndex < count; ++taskIndex) {
 					SkeletonPartitionRange partition = asyncPartitionsItems[taskIndex];
 					if (partition.rangeStart == partition.rangeEndExclusive) {
+#if !ENABLE_WORK_STEALING
 						updateDone[taskIndex].Set();
+#endif
 						continue;
 					}
 					var range = new SkeletonUpdateRange() {
@@ -557,10 +565,13 @@ namespace Spine.Unity {
 				}
 
 				// wait for all threaded tasks
-				WaitForThreadUpdateTasks(asyncTaskPartitions.Count);
+				if (!WaitForThreadUpdateTasks(asyncTaskPartitions.Count))
+					break; // abandoned, remaining split steps of this frame are skipped and the iterators reset below.
+#if !ENABLE_WORK_STEALING
 				for (int t = 0; t < asyncTaskPartitions.Count; ++t) {
 					updateDone[t].Reset();
 				}
+#endif
 
 				// Note: the call above contains calls to ResetEvent.WaitOne, creating implicit memory barriers.
 				// The explicit memory barrier below is added to ensure a memory barrier is in place on the many
@@ -595,6 +606,9 @@ namespace Spine.Unity {
 
 		public void LateUpdateAsync () {
 			if (skeletonRenderers.Count == 0) return;
+#if ENABLE_WORK_STEALING
+			WaitForWorkerPoolIdle();
+#endif
 
 			// Sort by skeleton data to allow for better cache utilization.
 			if (sortSkeletonRenderers)
@@ -606,7 +620,7 @@ namespace Spine.Unity {
 #elif RUN_NO_SKELETON_LATEUPDATE_ON_MAIN_THREAD
 			int numAsyncThreads = numThreads;
 #else
-			int numAsyncThreads = numThreads - 1;
+			int numAsyncThreads = Math.Max(1, numThreads - 1);
 #endif
 			int tasksPerThread = LateUpdateChunksPerThread;
 			int numTasks = numThreads * tasksPerThread;
@@ -634,22 +648,23 @@ namespace Spine.Unity {
 			ExposedList<SkeletonPartitionRange> asyncTaskPartitions = taskPartitionsLateUpdate;
 			int numAsyncTasks = asyncTaskPartitions.Count;
 
-#if !DONT_WAIT_FOR_ALL_LATEUPDATE_TASKS
+#if !DONT_WAIT_FOR_ALL_LATEUPDATE_TASKS && !ENABLE_WORK_STEALING
 			for (int t = 0; t < lateUpdateDone.Count; ++t) {
 				lateUpdateDone[t].Reset();
 			}
 			for (int t = lateUpdateDone.Count; t < numAsyncTasks; ++t) {
 				lateUpdateDone.Add(new ResetEvent(false));
 			}
-#endif // !DONT_WAIT_FOR_ALL_LATEUPDATE_TASKS
+#endif
 
 			int skeletonEnd = skeletonRenderers.Count;
 #if DONT_WAIT_FOR_ALL_LATEUPDATE_TASKS
-			if (skeletonsLateUpdatedAtTask == null) {
+			if (skeletonsLateUpdatedAtTask == null || skeletonsLateUpdatedAtTask.Length < numAsyncTasks) {
 				skeletonsLateUpdatedAtTask = new int[numAsyncTasks];
 				mainThreadProcessedAtTask = new int[numAsyncTasks];
-				lateUpdateWorkAvailable = new AutoResetEvent(false);
 			}
+			if (lateUpdateWorkAvailable == null)
+				lateUpdateWorkAvailable = new AutoResetEvent(false);
 			for (int t = 0; t < numAsyncTasks; ++t) {
 				skeletonsLateUpdatedAtTask[t] = 0;
 			}
@@ -667,7 +682,7 @@ namespace Spine.Unity {
 			for (int taskIndex = 0, count = asyncTaskPartitions.Count; taskIndex < count; ++taskIndex) {
 				SkeletonPartitionRange partition = asyncPartitionsItems[taskIndex];
 				if (partition.rangeStart == partition.rangeEndExclusive) {
-#if !DONT_WAIT_FOR_ALL_LATEUPDATE_TASKS
+#if !DONT_WAIT_FOR_ALL_LATEUPDATE_TASKS && !ENABLE_WORK_STEALING
 					lateUpdateDone[taskIndex].Set();
 #endif
 					continue;
@@ -746,9 +761,13 @@ namespace Spine.Unity {
 					timedOut = !lateUpdateWorkAvailable.WaitOne(timeoutMilliseconds);
 				}
 			} while (anySkeletonsLeft && !timedOut);
-			if (timedOut) {
-				Debug.LogError("Internal threading logic error: exited LateUpdate loop after timeout!");
-			}
+			if (timedOut)
+				AbandonWorkerPool("Waiting for threaded skeleton mesh updates timed out, " +
+					"skipping the remaining mesh updates of this frame.");
+#if ENABLE_WORK_STEALING
+			// Keep incremental mesh uploads above. Join only before the dispatch state is reused.
+			WaitForWorkerPoolIdle();
+#endif
 #else
 			// wait for all threaded task, then process all renderers in main thread
 			WaitForThreadLateUpdateTasks(numAsyncTasks);
@@ -771,7 +790,56 @@ namespace Spine.Unity {
 			}
 		}
 
-		private void WaitForThreadUpdateTasks (int numAsyncTasks) {
+		/// <summary>Called when worker threads failed or ran into a timeout. Logs the error and continues with a
+		/// fresh worker pool and fresh task records, leaving the previous worker threads to themselves: idle ones exit,
+		/// a worker still executing a task exits after it. Unlikely late writes to skeleton data are accepted, the next
+		/// frame updates normally.</summary>
+		private void AbandonWorkerPool (string reason, Exception exception = null) {
+#if ENABLE_WORK_STEALING
+			if (exception == null && workerPool != null)
+				exception = workerPool.WorkerException;
+#endif
+			if (exception != null)
+				reason += "\n" + exception;
+			Debug.LogError("Spine threaded update: " + reason);
+			if (workerPool != null)
+				workerPool.Abandon();
+			workerPool = new WorkerPool(UsedThreadCount, Math.Max(UpdateChunksPerThread, LateUpdateChunksPerThread) * 2);
+			if (genericSkeletonTasks != null) {
+				genericSkeletonTasks = new WorkerPoolTask[genericSkeletonTasks.Length];
+				for (int t = 0; t < genericSkeletonTasks.Length; ++t)
+					genericSkeletonTasks[t] = new WorkerPoolTask();
+			}
+			if (splitUpdateMethod != null)
+				splitUpdateMethod = new CoroutineIterator[splitUpdateMethod.Length];
+#if DONT_WAIT_FOR_ALL_LATEUPDATE_TASKS
+			if (skeletonsLateUpdatedAtTask != null)
+				skeletonsLateUpdatedAtTask = new int[skeletonsLateUpdatedAtTask.Length];
+#endif
+		}
+
+#if ENABLE_WORK_STEALING
+		/// <returns>False if the batch was abandoned because workers ran into a timeout or a worker failed.</returns>
+		private bool WaitForWorkerPoolIdle () {
+			if (workerPool == null) return true;
+			try {
+				int timeoutMilliseconds = 1000;
+				if (workerPool.WaitUntilIdle(timeoutMilliseconds))
+					return true;
+				AbandonWorkerPool("Waiting for worker threads timed out, skipping the remaining threaded update of this frame.");
+			} catch (Exception exc) {
+				AbandonWorkerPool("A worker thread failed, skipping the remaining threaded update of this frame.", exc);
+			}
+			return false;
+		}
+#endif
+
+		/// <returns>False if the batch was abandoned because workers ran into a timeout or a worker failed.</returns>
+		private bool WaitForThreadUpdateTasks (int numAsyncTasks) {
+#if ENABLE_WORK_STEALING
+			bool completed = WaitForWorkerPoolIdle();
+#else
+			bool completed = true;
 			for (int t = 0; t < numAsyncTasks; ++t) {
 				int timeoutMilliseconds = 1000;
 #if HAS_MANUAL_RESET_EVENT_SLIM
@@ -779,10 +847,15 @@ namespace Spine.Unity {
 #else // HAS_MANUAL_RESET_EVENT_SLIM
 				bool success = updateDone[t].WaitOne(timeoutMilliseconds);
 #endif // HAS_MANUAL_RESET_EVENT_SLIM
-				if (!success)
-					Debug.LogError(string.Format("Waiting for updateDone on main thread ran into a timeout (task index: {0})!", t));
+				if (!success) {
+					AbandonWorkerPool(string.Format("Waiting for skeleton update task {0} timed out, skipping the remaining threaded update of this frame.", t));
+					completed = false;
+					break;
+				}
 			}
+#endif
 			LogWorkerThreadExceptions();
+			return completed;
 		}
 
 		private void LogWorkerThreadExceptions () {
@@ -827,6 +900,9 @@ namespace Spine.Unity {
 
 #if !DONT_WAIT_FOR_ALL_LATEUPDATE_TASKS
 		private void WaitForThreadLateUpdateTasks (int numAsyncTasks) {
+#if ENABLE_WORK_STEALING
+			WaitForWorkerPoolIdle();
+#else
 			for (int t = 0; t < numAsyncTasks; ++t) {
 				int timeoutMilliseconds = 1000;
 #if HAS_MANUAL_RESET_EVENT_SLIM
@@ -834,9 +910,12 @@ namespace Spine.Unity {
 #else // HAS_MANUAL_RESET_EVENT_SLIM
 				bool success = lateUpdateDone[t].WaitOne(timeoutMilliseconds);
 #endif // HAS_MANUAL_RESET_EVENT_SLIM
-				if (!success)
-					Debug.LogError(string.Format("Waiting for lateUpdateDone on main thread ran into a timeout (task index: {0})!", t));
+				if (!success) {
+					AbandonWorkerPool(string.Format("Waiting for skeleton mesh update task {0} timed out, skipping the remaining threaded update of this frame.", t));
+					break;
+				}
 			}
+#endif
 		}
 #endif // !DONT_WAIT_FOR_ALL_LATEUPDATE_TASKS
 
@@ -885,7 +964,9 @@ namespace Spine.Unity {
 					instance.DeferredLogException(exc, skeletonAnimations[r], threadIndex);
 				}
 			}
+#if !ENABLE_WORK_STEALING
 			instance.updateDone[taskIndex].Set();
+#endif
 #if SPINE_ENABLE_THREAD_PROFILING
 			instance.profilerSamplerUpdate[threadIndex].End();
 #endif
@@ -939,7 +1020,9 @@ namespace Spine.Unity {
 					instance.DeferredLogException(exc, skeletonAnimations[r], threadIndex);
 				}
 			}
+#if !ENABLE_WORK_STEALING
 			instance.updateDone[taskIndex].Set();
+#endif
 
 #if SPINE_ENABLE_THREAD_PROFILING
 			instance.profilerSamplerUpdate[threadIndex].End();
@@ -957,13 +1040,15 @@ namespace Spine.Unity {
 						Debug.LogError("Internal threading logic error: skeletonAnimations never called UpdateInternal before!", skeletons[r]);
 					} else {
 						if (!splitUpdateMethod[r].IsDone) {
-							anyWorkLeft = true;
 							splitUpdateMethod[r] = targetSkeletonAnimation.UpdateInternalSplit(splitUpdateMethod[r], frameCount);
+							if (!splitUpdateMethod[r].IsDone)
+								anyWorkLeft = true;
 						}
 					}
 				} catch (Exception exc) {
+					splitUpdateMethod[r] = CoroutineIterator.Done;
 					Debug.LogError(string.Format("Exception in main thread: {0}.\nStackTrace: {1}",
-						exc.Message, exc.StackTrace));
+						exc.Message, exc.StackTrace), skeletons[r]);
 				}
 			}
 			return anyWorkLeft;
@@ -1009,7 +1094,10 @@ namespace Spine.Unity {
 			instance.profilerSamplerLateUpdate[threadIndex].Begin();
 #endif
 #if DONT_WAIT_FOR_ALL_LATEUPDATE_TASKS
-			instance.skeletonsLateUpdatedAtTask[taskIndex] = 0;
+			// Local reference: AbandonWorkerPool re-creates the array, a worker resuming after timeout writes to
+			// the old array without harm.
+			int[] lateUpdatedAtTask = instance.skeletonsLateUpdatedAtTask;
+			lateUpdatedAtTask[taskIndex] = 0;
 #endif
 			for (int r = start; r < end; ++r) {
 				try {
@@ -1018,11 +1106,11 @@ namespace Spine.Unity {
 					instance.DeferredLogException(exc, instance.skeletonRenderers[r].Component, threadIndex);
 				}
 #if DONT_WAIT_FOR_ALL_LATEUPDATE_TASKS
-				Interlocked.Increment(ref instance.skeletonsLateUpdatedAtTask[taskIndex]);
+				Interlocked.Increment(ref lateUpdatedAtTask[taskIndex]);
 				instance.lateUpdateWorkAvailable.Set(); // signal as soon as it can be processed by main thread
 #endif
 			}
-#if !DONT_WAIT_FOR_ALL_LATEUPDATE_TASKS
+#if !DONT_WAIT_FOR_ALL_LATEUPDATE_TASKS && !ENABLE_WORK_STEALING
 			instance.lateUpdateDone[taskIndex].Set(); // signal once after all work is done
 #endif
 #if SPINE_ENABLE_THREAD_PROFILING

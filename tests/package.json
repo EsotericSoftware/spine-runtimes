@@ -2,7 +2,7 @@
   "name": "spine-tests",
   "type": "module",
   "scripts": {
-    "format": "npx -y typescript-formatter -r **/*.ts"
+    "format": "npx -y --package=typescript@6.0.3 --package=typescript-formatter@7.2.2 tsfmt -r **/*.ts"
   },
   "dependencies": {
     "@mariozechner/lsp-cli": "^0.1.3"

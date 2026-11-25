@@ -43,7 +43,9 @@ export class C3TextureEditor extends Texture {
 			mipMap: toC3MipMap(page.minFilter),
 		};
 		this.texture = renderer.CreateDynamicTexture(image.width, image.height, options);
-		this.renderer.UpdateTexture(image, this.texture, { premultiplyAlpha: !page.pma });
+		renderer.UpdateTexture(image, this.texture, { premultiplyAlpha: !page.pma });
+		if (image instanceof ImageBitmap) image.close();
+		this._image = undefined;
 	}
 
 	setFilters () {
@@ -74,7 +76,9 @@ export class C3TextureRuntime extends Texture {
 			mipMap: toC3MipMap(page.minFilter),
 		};
 		this.texture = renderer.createDynamicTexture(image.width, image.height, options);
-		this.renderer.updateTexture(image, this.texture, { premultiplyAlpha: !page.pma });
+		renderer.updateTexture(image, this.texture, { premultiplyAlpha: !page.pma });
+		if (image instanceof ImageBitmap) image.close();
+		this._image = undefined;
 	}
 
 	setFilters () {

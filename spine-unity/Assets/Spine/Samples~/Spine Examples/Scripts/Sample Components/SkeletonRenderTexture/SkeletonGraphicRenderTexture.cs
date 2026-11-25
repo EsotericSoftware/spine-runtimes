@@ -280,7 +280,7 @@ namespace Spine.Unity.Examples {
 			} else {
 				commandBuffer.SetViewMatrix(targetCamera.worldToCameraMatrix);
 				Matrix4x4 projectionMatrix = CalculateProjectionMatrix(targetCamera,
-					screenSpaceMin, screenSpaceMax, skeletonGraphic.canvas.pixelRect.size);
+					screenSpaceMin, screenSpaceMax, targetCamera.pixelRect.size);
 				commandBuffer.SetProjectionMatrix(projectionMatrix);
 			}
 			Rect viewportRect = new Rect(Vector2.zero, targetViewportSize * downScaleFactor);

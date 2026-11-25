@@ -18,4 +18,4 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 spine-godot works with data exported from Spine 4.3.xx.
 
-spine-godot supports all Spine features, except two-color tinting and the screen blend mode.
+The 2D spine-godot renderer supports all Spine features, except the screen blend mode. Two-color tinting (tint black) requires Godot 4.3 or newer, with either the module or GDExtension runtime.

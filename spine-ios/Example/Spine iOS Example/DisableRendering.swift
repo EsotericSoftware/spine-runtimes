@@ -82,7 +82,7 @@ struct DisableRendering: View {
             controller.dispose()
         }
         .navigationTitle("Disable Rendering")
-        .navigationBarTitleDisplayMode(.inline)
+        .inlineNavigationTitle()
     }
 }
 

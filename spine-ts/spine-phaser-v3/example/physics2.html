@@ -16,7 +16,7 @@
   <script>
     class BasicExample extends Phaser.Scene {
       preload() {
-        this.load.spineBinary("celestial-circus-data", "/assets/celestial-circus-pro.skel");
+        this.load.spineSkeleton("celestial-circus-data", "/assets/celestial-circus-pro.skel");
         this.load.spineAtlas("celestial-circus-atlas", "/assets/celestial-circus-pma.atlas");
       }
 
@@ -27,6 +27,7 @@
           "celestial-circus-data",
           "celestial-circus-atlas"
         );
+        gameObject.skeletonPhysics.setPositionInheritance(1, 1);
         gameObject.setInteractive();
         this.input.setDraggable(gameObject);
         gameObject.displayWidth = 150;
@@ -47,8 +48,8 @@
           // converting drag movement to skeleton space
           const pointBefore = { x: lastX, y: lastY };
           const pointAfter = { x: dragX, y: dragY };
-          gameObject.phaserWorldCoordinatesToSkeleton(pointBefore);
-          gameObject.phaserWorldCoordinatesToSkeleton(pointAfter);
+          gameObject.gameToSkeleton(pointBefore);
+          gameObject.gameToSkeleton(pointAfter);
 
           lastX = dragX;
           lastY = dragY;

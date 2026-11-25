@@ -47,7 +47,7 @@
 #define REVERT_HAS_OVERLOADS
 #endif
 
-#if !SPINE_DISABLE_THREADING
+#if !SPINE_DISABLE_THREADING && !UNITY_WEBGL
 #define USE_THREADED_SKELETON_UPDATE
 #endif
 
@@ -249,8 +249,10 @@ namespace Spine.Unity {
 		}
 #endif
 		/// <summary>
-		/// Initialize this component. Attempts to load the SkeletonData and creates the internal Skeleton object and buffers.</summary>
-		/// <param name="overwrite">If set to <c>true</c>, it will overwrite internal objects if they were already generated. Otherwise, the initialized component will ignore subsequent calls to initialize.</param>
+		/// Initialize this component. Attempts to load the SkeletonData and creates the internal Skeleton object and
+		/// buffers.</summary>
+		/// <param name="overwrite">If <c>true</c>, it will overwrite internal objects if they were already
+		/// generated. Otherwise, the initialized component will ignore subsequent calls to initialize.</param>
 		public virtual void Initialize (bool overwrite, bool quiet = false) {
 			if (valid && !overwrite)
 				return;
@@ -700,7 +702,12 @@ namespace Spine.Unity {
 #if USE_THREADED_SKELETON_UPDATE
 		public virtual void MainThreadPrepareLateUpdateInternal () {
 			if (!valid) return;
-			if (updateMode != UpdateMode.FullUpdate && wasMeshUpdatedAfterInit) return;
+			if (updateMode != UpdateMode.FullUpdate && wasMeshUpdatedAfterInit) {
+#if SPINE_OPTIONAL_ON_DEMAND_LOADING
+				HandleOnDemandLoadingWithoutMeshUpdate();
+#endif
+				return;
+			}
 
 			if (NeedsMainThreadRendererPreparation)
 				PrepareInstructionsAndRenderers();
@@ -741,8 +748,19 @@ namespace Spine.Unity {
 				skeletonAnimation.UpdateOncePerFrame(0);
 
 			// Generate mesh once, required to update mesh bounds for visibility
-			if (updateMode != UpdateMode.FullUpdate && wasMeshUpdatedAfterInit) return;
-			if (calledFromMainThread && !NeedsToGenerateMesh) return;
+			if (updateMode != UpdateMode.FullUpdate && wasMeshUpdatedAfterInit) {
+#if SPINE_OPTIONAL_ON_DEMAND_LOADING
+				if (calledFromMainThread)
+					HandleOnDemandLoadingWithoutMeshUpdate();
+#endif
+				return;
+			}
+			if (calledFromMainThread && !NeedsToGenerateMesh) {
+#if SPINE_OPTIONAL_ON_DEMAND_LOADING
+				HandleOnDemandLoadingWithoutMeshUpdate();
+#endif
+				return;
+			}
 			UpdateMesh(calledFromMainThread);
 		}
 		#endregion Internal Methods
@@ -863,13 +881,15 @@ namespace Spine.Unity {
 
 #if UNITY_EDITOR && AUTO_UPGRADE_TO_43_COMPONENTS
 		public void UpgradeTo43 () {
-			TransferDeprecatedFields();
+			if (!Application.isPlaying && !wasDeprecatedTransferred) {
+				TransferDeprecatedFields();
+			}
 		}
 
 		protected virtual void TransferDeprecatedFields () {
 			wasDeprecatedTransferred = true;
 			// only transfer once, let SkeletonAnimation transfer properties if present
-			if (this.Animation != null) return;
+			if (this.GetComponent<ISkeletonAnimation>() != null) return;
 
 			meshSettings.zSpacing = this.zSpacingDeprecated;
 			meshSettings.useClipping = this.useClippingDeprecated;

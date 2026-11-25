@@ -55,7 +55,7 @@ struct PlayPauseAnimation: View {
             controller.dispose()
         }
         .navigationTitle("Play/Pause")
-        .navigationBarTitleDisplayMode(.inline)
+        .inlineNavigationTitle()
         .toolbar {
             Button(action: {
                 if controller.isPlaying {

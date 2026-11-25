@@ -69,6 +69,12 @@ namespace Spine.Unity {
 			}
 		}
 
+#if UNITY_EDITOR
+		void OnValidate () {
+			Clear();
+		}
+#endif
+
 		/// <summary>Clears the cached animation corresponding to a loaded SkeletonData object.
 		/// Use this to force a reload for the next time Animation is called.</summary>
 		public void Clear () {

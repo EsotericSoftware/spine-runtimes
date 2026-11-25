@@ -31,7 +31,8 @@ import { CanvasTexture, SkeletonRenderer } from "@esotericsoftware/spine-canvas"
 import { AtlasAttachmentLoader, GLTexture, SceneRenderer, Skeleton, SkeletonBinary, type SkeletonData, SkeletonJson, TextureAtlas } from "@esotericsoftware/spine-webgl"
 import * as Phaser from "phaser";
 import { SPINE_ATLAS_CACHE_KEY, SPINE_ATLAS_FILE_TYPE, SPINE_GAME_OBJECT_TYPE, SPINE_SKELETON_FILE_CACHE_KEY as SPINE_SKELETON_DATA_CACHE_KEY, SPINE_SKELETON_DATA_FILE_TYPE } from "./keys.js";
-import { SpineGameObject, type SpineGameObjectBoundsProvider } from "./SpineGameObject.js";
+import { SpineGameObject, type SpineGameObjectFactoryOptions } from "./SpineGameObject.js";
+import { SetupPoseBoundsProvider, type SpineGameObjectBoundsProvider } from "./SpineGameObjectBounds.js";
 
 Skeleton.yDown = true;
 
@@ -52,27 +53,21 @@ export interface SpineGameObjectConfig extends Phaser.Types.GameObjects.GameObje
 	boundsProvider?: SpineGameObjectBoundsProvider
 }
 
-/**
- * {@link ScenePlugin} implementation adding Spine Runtime capabilities to a scene.
- *
- * The scene's {@link LoaderPlugin} (`Scene.load`) gets these additional functions:
- * * `spineBinary(key: string, url: string, xhrSettings?: XHRSettingsObject)`: loads a skeleton binary `.skel` file from the `url`.
- * * `spineJson(key: string, url: string, xhrSettings?: XHRSettingsObject)`: loads a skeleton binary `.skel` file from the `url`.
- * * `spineAtlas(key: string, url: string, xhrSettings?: XHRSettingsObject)`: loads a texture atlas `.atlas` file from the `url` as well as its correponding texture atlas page images.
- *
- * The scene's {@link GameObjectFactory} (`Scene.add`) gets these additional functions:
- * * `spine(x: number, y: number, dataKey: string, atlasKey: string, boundsProvider: SpineGameObjectBoundsProvider = SetupPoseBoundsProvider())`:
- *    creates a new {@link SpineGameObject} from the data and atlas at position `(x, y)`, using the {@link BoundsProvider} to calculate its bounding box. The object is automatically added to the scene.
- *
- * The scene's {@link GameObjectCreator} (`Scene.make`) gets these additional functions:
- * * `spine(config: SpineGameObjectConfig)`: creates a new {@link SpineGameObject} from the given configuration object.
- *
- * The plugin has additional public methods to work with Spine Runtime core API objects:
- * * `getAtlas(atlasKey: string)`: returns the {@link TextureAtlas} instance for the given atlas key.
- * * `getSkeletonData(skeletonDataKey: string)`: returns the {@link SkeletonData} instance for the given skeleton data key.
- * * `createSkeleton(skeletonDataKey: string, atlasKey: string)`: creates a new {@link Skeleton} instance from the given skeleton data and atlas key.
- * * `isPremultipliedAlpha(atlasKey: string)`: returns `true` if the atlas with the given key has premultiplied alpha.
- */
+/** Options for loading a skeleton data file with `this.load.spineSkeleton(...)`. */
+export interface SpineSkeletonFileOptions {
+	/** Explicit data format. When omitted, the format is inferred from the `.json` or `.skel` URL extension. */
+	format?: "json" | "binary";
+	/** Optional Phaser XHR settings used to load the skeleton data file. */
+	xhrSettings?: Phaser.Types.Loader.XHRSettingsObject;
+}
+
+/** Options for loading a texture atlas file with `this.load.spineAtlas(...)`. */
+export interface SpineAtlasFileOptions {
+	/** Optional Phaser XHR settings used to load the texture atlas file. */
+	xhrSettings?: Phaser.Types.Loader.XHRSettingsObject;
+}
+
+/** Adds Spine asset loading, GameObject creation, and runtime accessors to a Phaser scene. */
 export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 	game: Phaser.Game;
 	private isWebGL: boolean;
@@ -96,21 +91,27 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 		this.skeletonDataCache = this.game.cache.addCustom(SPINE_SKELETON_DATA_CACHE_KEY);
 		this.atlasCache = this.game.cache.addCustom(SPINE_ATLAS_CACHE_KEY);
 
+		const skeletonFileCallback = function (this: Phaser.Loader.LoaderPlugin, key: string,
+			url: string,
+			options?: SpineSkeletonFileOptions) {
+			const file = new SpineSkeletonDataFile(this, key, url, getSpineSkeletonDataFileType(url, options?.format), options?.xhrSettings);
+			this.addFile(file.files);
+			return this;
+		};
+		pluginManager.registerFileType("spineSkeleton", skeletonFileCallback, scene);
+
 		const skeletonJsonFileCallback = function (this: Phaser.Loader.LoaderPlugin, key: string,
 			url: string,
-			xhrSettings: Phaser.Types.Loader.XHRSettingsObject) {
+			xhrSettings?: Phaser.Types.Loader.XHRSettingsObject) {
 			const file = new SpineSkeletonDataFile(this, key, url, SpineSkeletonDataFileType.json, xhrSettings);
 			this.addFile(file.files);
-
-			console.log(this);
-
 			return this;
 		};
 		pluginManager.registerFileType("spineJson", skeletonJsonFileCallback, scene);
 
 		const skeletonBinaryFileCallback = function (this: Phaser.Loader.LoaderPlugin, key: string,
 			url: string,
-			xhrSettings: Phaser.Types.Loader.XHRSettingsObject) {
+			xhrSettings?: Phaser.Types.Loader.XHRSettingsObject) {
 			const file = new SpineSkeletonDataFile(this, key, url, SpineSkeletonDataFileType.binary, xhrSettings);
 			this.addFile(file.files);
 			return this;
@@ -119,20 +120,24 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 
 		const atlasFileCallback = function (this: Phaser.Loader.LoaderPlugin, key: string,
 			url: string,
-			xhrSettings: Phaser.Types.Loader.XHRSettingsObject) {
+			optionsOrXhrSettings?: SpineAtlasFileOptions | Phaser.Types.Loader.XHRSettingsObject) {
+			const xhrSettings = optionsOrXhrSettings && "xhrSettings" in optionsOrXhrSettings
+				? optionsOrXhrSettings.xhrSettings
+				: optionsOrXhrSettings as Phaser.Types.Loader.XHRSettingsObject | undefined;
 			const file = new SpineAtlasFile(this, key, url, xhrSettings);
 			this.addFile(file.files);
 			return this;
 		};
 		pluginManager.registerFileType("spineAtlas", atlasFileCallback, scene);
 
-		const addSpineGameObject = function (this: Phaser.GameObjects.GameObjectFactory, x: number, y: number, dataKey: string, atlasKey: string, boundsProvider: SpineGameObjectBoundsProvider) {
+		const addSpineGameObject = function (this: Phaser.GameObjects.GameObjectFactory, x: number, y: number, dataKey: string, atlasKey: string, boundsOrOptions?: SpineGameObjectBoundsProvider | SpineGameObjectFactoryOptions) {
 			if (this.scene.sys.renderer instanceof Phaser.Renderer.WebGL.WebGLRenderer) {
 				this.scene.sys.renderer.pipelines.clear();
 			}
 
+			const boundsProvider = boundsOrOptions && "calculateBounds" in boundsOrOptions ? boundsOrOptions : boundsOrOptions?.boundsProvider;
 			const spinePlugin = (this.scene.sys as Phaser.Scenes.Systems & Record<string, SpinePlugin>)[pluginKey];
-			const gameObject = new SpineGameObject(this.scene, spinePlugin, x, y, dataKey, atlasKey, boundsProvider);
+			const gameObject = new SpineGameObject(this.scene, spinePlugin, { x, y, dataKey, atlasKey, boundsProvider });
 			this.displayList.add(gameObject);
 			this.updateList.add(gameObject);
 
@@ -150,10 +155,10 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 
 			const x = config.x ? config.x : 0;
 			const y = config.y ? config.y : 0;
-			const boundsProvider = config.boundsProvider ? config.boundsProvider : undefined;
+			const boundsProvider = config.boundsProvider ?? new SetupPoseBoundsProvider();
 
 			const spinePlugin = (this.scene.sys as Phaser.Scenes.Systems & Record<string, SpinePlugin>)[pluginKey] as SpinePlugin;
-			const gameObject = new SpineGameObject(this.scene, spinePlugin, x, y, config.dataKey, config.atlasKey, boundsProvider);
+			const gameObject = new SpineGameObject(this.scene, spinePlugin, { x, y, dataKey: config.dataKey, atlasKey: config.atlasKey, boundsProvider });
 			if (addToScene !== undefined) {
 				config.add = addToScene;
 			}
@@ -168,9 +173,15 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 	}
 
 	static rendererId = 0;
+	private static contextRestoredHandler = () => SpinePlugin.gameWebGLRenderer?.context.restore();
+
 	boot () {
 		if (this.isWebGL && this.gl) {
-			SpinePlugin.gameWebGLRenderer ||= new SceneRenderer((this.game.renderer as Phaser.Renderer.WebGL.WebGLRenderer).canvas, this.gl, true);
+			if (!SpinePlugin.gameWebGLRenderer) {
+				const canvas = (this.game.renderer as Phaser.Renderer.WebGL.WebGLRenderer).canvas;
+				SpinePlugin.gameWebGLRenderer = new SceneRenderer(canvas, this.gl, true);
+				canvas.addEventListener("webglcontextrestored", SpinePlugin.contextRestoredHandler);
+			}
 		} else if (this.scene) {
 			this.canvasRenderer ||= new SkeletonRenderer(this.scene.sys.context);
 		}
@@ -218,7 +229,11 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 
 	gameDestroy () {
 		this.pluginManager.removeGameObject(window.SPINE_GAME_OBJECT_TYPE ?? SPINE_GAME_OBJECT_TYPE, true, true);
-		if (this.webGLRenderer) this.webGLRenderer.dispose();
+		const webGLRenderer = this.webGLRenderer;
+		if (webGLRenderer) {
+			webGLRenderer.canvas.removeEventListener("webglcontextrestored", SpinePlugin.contextRestoredHandler);
+			webGLRenderer.dispose();
+		}
 		SpinePlugin.gameWebGLRenderer = null;
 	}
 
@@ -227,10 +242,10 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 		if (this.atlasCache.exists(atlasKey)) return this.atlasCache.get(atlasKey);
 
 		const atlas = new TextureAtlas(this.game.cache.text.get(atlasKey));
-		if (this.isWebGL && this.gl) {
-			const gl = this.gl;
+		if (this.isWebGL && this.webGLRenderer) {
+			const glContext = this.webGLRenderer.context;
 			for (const atlasPage of atlas.pages)
-				atlasPage.setTexture(new GLTexture(gl, this.game.textures.get(`${atlasKey}!${atlasPage.name}`).getSourceImage() as HTMLImageElement | ImageBitmap, atlasPage.pma, false));
+				atlasPage.setTexture(new GLTexture(glContext, this.game.textures.get(`${atlasKey}!${atlasPage.name}`).getSourceImage() as HTMLImageElement | ImageBitmap, atlasPage.pma, false));
 		} else {
 			for (const atlasPage of atlas.pages)
 				atlasPage.setTexture(new CanvasTexture(this.game.textures.get(`${atlasKey}!${atlasPage.name}`).getSourceImage() as HTMLImageElement | ImageBitmap));
@@ -277,6 +292,17 @@ export class SpinePlugin extends Phaser.Plugins.ScenePlugin {
 enum SpineSkeletonDataFileType {
 	json,
 	binary
+}
+
+function getSpineSkeletonDataFileType (url: string, format?: "json" | "binary"): SpineSkeletonDataFileType {
+	if (format === "json") return SpineSkeletonDataFileType.json;
+	if (format === "binary") return SpineSkeletonDataFileType.binary;
+	if (format !== undefined) throw new Error(`Unsupported Spine skeleton data format: ${format}. Expected "json" or "binary".`);
+
+	const path = url.split(/[?#]/, 1)[0].toLowerCase();
+	if (path.endsWith(".json")) return SpineSkeletonDataFileType.json;
+	if (path.endsWith(".skel")) return SpineSkeletonDataFileType.binary;
+	throw new Error(`Unable to determine the Spine skeleton data format from URL: ${url}. Specify the "json" or "binary" format explicitly.`);
 }
 
 interface SpineSkeletonDataFileConfig {

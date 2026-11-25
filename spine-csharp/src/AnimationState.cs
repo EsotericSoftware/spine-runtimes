@@ -128,6 +128,7 @@ namespace Spine {
 					if (current.delay > 0) continue;
 					currentDelta = -current.delay;
 					current.delay = 0;
+					animationsChanged = true;
 				}
 
 				TrackEntry next = current.next;
@@ -145,8 +146,8 @@ namespace Spine {
 						}
 						continue;
 					}
-				} else if (current.trackLast >= current.trackEnd && current.mixingFrom == null) {
-					// Clear the track when there is no next entry, the track end time is reached, and there is no mixingFrom.
+				} else if (current.trackLast >= current.trackEnd && current.mixedOut) {
+					// Clear the track when there is no next entry and the entry was applied mixed out after the track end time.
 					tracksItems[i] = null;
 					queue.End(current);
 					ClearNext(current);
@@ -179,16 +180,12 @@ namespace Spine {
 			from.animationLast = from.nextAnimationLast;
 			from.trackLast = from.nextTrackLast;
 
-			// The from entry was applied at least once and the mix is complete.
-			if (to.nextTrackLast != -1 && to.mixTime >= to.mixDuration) {
+			// The mix is complete and the from entry was applied with it complete, so it is mixed out.
+			if (from.mixedOut && to.mixTime >= to.mixDuration) {
 				// Mixing is complete for all entries before the from entry or the mix is instantaneous.
 				if (from.totalAlpha == 0 || to.mixDuration == 0) {
 					to.mixingFrom = from.mixingFrom;
 					if (from.mixingFrom != null) from.mixingFrom.mixingTo = to;
-					if (from.totalAlpha == 0) {
-						for (TrackEntry next = to; next.mixingTo != null; next = next.mixingTo)
-							next.keepHold = true;
-					}
 					queue.End(from);
 				}
 				return finished;
@@ -217,10 +214,14 @@ namespace Spine {
 
 				// Apply mixing from entries first.
 				float alpha = current.alpha;
+				bool mixOut = false;
 				if (current.mixingFrom != null)
 					alpha *= ApplyMixingFrom(current, skeleton);
-				else if (current.trackTime >= current.trackEnd && current.next == null) //
+				else if (current.trackTime >= current.trackEnd && current.next == null) {
 					alpha = 0; // Set to setup pose the last time the entry will be applied.
+					mixOut = true;
+				}
+				current.mixedOut = mixOut;
 
 				// Apply current entry.
 				float animationLast = current.animationLast, animationTime = current.AnimationTime, applyTime = animationTime;
@@ -244,7 +245,7 @@ namespace Spine {
 				} else {
 					int[] timelineMode = current.timelineMode.Items;
 
-					bool retainAttachments = alpha >= current.alphaAttachmentThreshold;
+					bool retainAttachments = !mixOut && alpha >= current.alphaAttachmentThreshold;
 					bool add = current.additive, shortestRotation = add || current.shortestRotation;
 					bool firstFrame = !shortestRotation && current.timelinesRotation.Count != timelineCount << 1;
 					if (firstFrame) current.timelinesRotation.EnsureSize(timelineCount << 1);
@@ -259,7 +260,7 @@ namespace Spine {
 						else if (timeline is AttachmentTimeline)
 							ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, from, retainAttachments);
 						else
-							timeline.Apply(skeleton, animationLast, applyTime, applyEvents, alpha, from, add, false, false);
+							timeline.Apply(skeleton, animationLast, applyTime, applyEvents, alpha, from, add, mixOut, false);
 					}
 				}
 				if (current.reverse) EventsReverse(current, animationLast, animationTime);
@@ -302,6 +303,7 @@ namespace Spine {
 
 				// Apply mixing from entries first.
 				if (current.mixingFrom != null) ApplyMixingFromEventTimelinesOnly(current, skeleton, issueEvents);
+				current.mixedOut = current.mixingFrom == null && current.trackTime >= current.trackEnd && current.next == null;
 
 				// Apply current entry.
 				float animationLast = current.animationLast, animationTime = current.AnimationTime, applyTime = animationTime;
@@ -392,6 +394,7 @@ namespace Spine {
 
 			from.nextAnimationLast = animationTime;
 			from.nextTrackLast = from.trackTime;
+			from.mixedOut = mix == 1;
 			return mix;
 		}
 
@@ -428,6 +431,7 @@ namespace Spine {
 			}
 			from.nextAnimationLast = animationTime;
 			from.nextTrackLast = from.trackTime;
+			from.mixedOut = mix == 1;
 
 			return mix;
 		}
@@ -498,6 +502,7 @@ namespace Spine {
 			diff -= (float)Math.Ceiling(diff / 360 - 0.5f) * 360;
 			if (diff == 0) {
 				total = timelinesRotation[i];
+				total = timelinesRotation[i] = Math.Sign(total) * (float)Math.Ceiling(Math.Abs(total) / 360 - 0.5f) * 360;
 			} else {
 				float lastTotal, lastDiff;
 				if (firstFrame) {
@@ -652,6 +657,7 @@ namespace Spine {
 				from.mixingTo = current;
 				current.mixTime = 0;
 				from.timelinesRotation.Clear(); // Reset rotation for mixing out, in case entry was mixed in.
+				from.mixedOut = false; // Reset in case it was applied past its track end.
 			}
 
 			queue.Start(current); // triggers AnimationsChanged
@@ -843,7 +849,7 @@ namespace Spine {
 			entry.mixDuration = last == null ? 0 : data.GetMix(last.animation, animation);
 			entry.mixInterpolation = Interpolation.Linear;
 			entry.totalAlpha = 0;
-			entry.keepHold = false;
+			entry.mixedOut = false;
 			return entry;
 		}
 
@@ -865,7 +871,7 @@ namespace Spine {
 			TrackEntry[] tracksItems = tracks.Items;
 			for (int i = 0; i < n; i++) {
 				TrackEntry track = tracksItems[i];
-				if (track == null) continue;
+				if (track == null || track.delay > 0) continue;
 				TrackEntry entry = track;
 				while (entry.mixingFrom != null) // Move to last entry, then iterate in reverse.
 					entry = entry.mixingFrom;
@@ -884,7 +890,7 @@ namespace Spine {
 			entry.timelineHoldMix.Clear();
 			TrackEntry[] timelineHoldMix = entry.timelineHoldMix.Resize(timelinesCount).Items;
 
-			bool add = entry.additive, keepHold = entry.keepHold;
+			bool add = entry.additive;
 			TrackEntry to = entry.mixingTo;
 
 			// outer:
@@ -898,21 +904,18 @@ namespace Spine {
 				}
 
 				// Hold if the next entry will overwrite this property.
-				int mode;
 				if (to == null || timeline.instant || (to.additive && timeline.additive) || !to.animation.HasTimeline(ids))
-					mode = from;
+					timelineMode[i] = from;
 				else {
-					mode = from | AnimationState.Hold;
+					timelineMode[i] = from | AnimationState.Hold;
 					// Find next entry that doesn't overwrite this property. Its mix fades out the hold, instead of it ending abruptly.
 					for (TrackEntry next = to.mixingTo; next != null; next = next.mixingTo) {
 						if ((next.additive && timeline.additive) || !next.animation.HasTimeline(ids)) {
-							if (next.mixDuration > 0) timelineHoldMix[i] = next;
+							timelineHoldMix[i] = next;
 							break;
 						}
 					}
 				}
-				if (keepHold) mode = (mode & ~AnimationState.Hold) | (timelineMode[i] & AnimationState.Hold);
-				timelineMode[i] = mode;
 			}
 		}
 
@@ -1035,7 +1038,7 @@ namespace Spine {
 
 		internal int trackIndex;
 
-		internal bool loop, additive, reverse, shortestRotation, keepHold;
+		internal bool loop, additive, reverse, shortestRotation, mixedOut;
 		internal float eventThreshold, mixAttachmentThreshold, alphaAttachmentThreshold, mixDrawOrderThreshold;
 		internal float animationStart, animationEnd, animationLast, nextAnimationLast;
 		internal float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale = 1f;
@@ -1046,9 +1049,9 @@ namespace Spine {
 		/// For each timeline:
 		/// <list type="bullet">
 		/// <item>Bits 0-1: MixFrom.</item>
-		/// <item>Bit 2, HOLD: 0 = mix out using alphaMix, 1 = apply full alpha to prevent dipping. Timeline is first on its track to
-		/// set the property and the next entry (mixingTo) also sets it. When held, timelineHoldMix's mix controls how the hold fades
-		/// out (for 3+ entry chains where the chain eventually stops setting the property).</item>
+		/// <item>Bit 2, HOLD: 0 = mix out using alphaMix, 1 = mix out using alphaHold. Set when the next entry (mixingTo) also sets
+		/// the property, so it mixes from the held value instead of the value dipping. The hold is faded out by the mix of
+		/// timelineHoldMix: the first later entry that doesn't set the property, or null if all later entries do.</item>
 		/// </list>
 		/// </summary>
 		internal readonly ExposedList<int> timelineMode = new ExposedList<int>();

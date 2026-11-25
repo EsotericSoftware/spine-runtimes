@@ -150,6 +150,7 @@ namespace Spine.Unity.Editor {
 				SkeletonRenderer skeletonRenderer = ((SkeletonMecanim)c).Renderer as SkeletonRenderer;
 				if (skeletonRenderer == null) continue;
 				Skeleton skeleton = skeletonRenderer.Skeleton;
+				if (skeleton == null) continue;
 				SkeletonData skeletonData = skeleton.Data;
 
 				skeleton.SetupPose();
@@ -211,7 +212,7 @@ namespace Spine.Unity.Editor {
 			int maxIndex = 0;
 			for (int i = 0; i < targets.Length; ++i) {
 				SkeletonMecanim skeletonMecanim = ((SkeletonMecanim)targets[i]);
-
+				if (skeletonMecanim.Translator == null) continue;
 				Animator animator = skeletonMecanim.Translator.Animator;
 				if (!Application.isPlaying) {
 					if (animator != null && animator.isInitialized &&

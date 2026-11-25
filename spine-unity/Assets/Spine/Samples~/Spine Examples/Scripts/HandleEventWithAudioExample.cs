@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#if !SPINE_DISABLE_THREADING
+#if !SPINE_DISABLE_THREADING && !UNITY_WEBGL
 #define USE_THREADED_ANIMATION_UPDATE
 #endif
 

@@ -29,7 +29,7 @@
 
 #include "SpineSkeleton.h"
 #include "SpineCommon.h"
-#include "SpineSprite.h"
+#include "SpineController.h"
 #include "SpineIkConstraint.h"
 #include "SpineTransformConstraint.h"
 #include "SpinePathConstraint.h"
@@ -88,7 +88,7 @@ void SpineSkeleton::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("physics_rotate", "x", "y", "degrees"), &SpineSkeleton::physics_rotate);
 }
 
-SpineSkeleton::SpineSkeleton() : skeleton(nullptr), sprite(nullptr), last_skin(nullptr) {
+SpineSkeleton::SpineSkeleton() : skeleton(nullptr), controller(nullptr), last_skin(nullptr) {
 }
 
 SpineSkeleton::~SpineSkeleton() {
@@ -96,19 +96,24 @@ SpineSkeleton::~SpineSkeleton() {
 	delete skeleton;
 }
 
-void SpineSkeleton::set_spine_sprite(SpineSprite *_sprite) {
+void SpineSkeleton::set_spine_controller(SpineController *_controller) {
+	clear_spine_controller();
+	controller = _controller;
+	if (!controller || !controller->get_skeleton_data_res().is_valid() || !controller->get_skeleton_data_res()->is_skeleton_data_loaded()) return;
+	skeleton = new spine::Skeleton(*controller->get_skeleton_data_res()->get_skeleton_data());
+}
+
+void SpineSkeleton::clear_spine_controller() {
 	delete skeleton;
 	skeleton = nullptr;
 	_cached_bones.clear();
 	_cached_slots.clear();
-	sprite = _sprite;
-	if (!sprite || !sprite->get_skeleton_data_res().is_valid() || !sprite->get_skeleton_data_res()->is_skeleton_data_loaded()) return;
-	skeleton = new spine::Skeleton(*sprite->get_skeleton_data_res()->get_skeleton_data());
+	controller = nullptr;
 }
 
 Ref<SpineSkeletonDataResource> SpineSkeleton::get_skeleton_data_res() const {
-	if (!sprite) return nullptr;
-	return sprite->get_skeleton_data_res();
+	if (!controller) return nullptr;
+	return controller->get_skeleton_data_res();
 }
 
 void SpineSkeleton::update_world_transform(SpineConstant::Physics physics) {
@@ -140,7 +145,7 @@ Ref<SpineBone> SpineSkeleton::find_bone(const String &name) {
 		return _cached_bones[bone];
 	}
 	Ref<SpineBone> bone_ref(memnew(SpineBone));
-	bone_ref->set_spine_object(sprite, bone);
+	bone_ref->set_spine_object(controller, bone);
 	_cached_bones[bone] = bone_ref;
 	return bone_ref;
 }
@@ -154,7 +159,7 @@ Ref<SpineSlot> SpineSkeleton::find_slot(const String &name) {
 		return _cached_slots[slot];
 	}
 	Ref<SpineSlot> slot_ref(memnew(SpineSlot));
-	slot_ref->set_spine_object(sprite, slot);
+	slot_ref->set_spine_object(controller, slot);
 	_cached_slots[slot] = slot_ref;
 	return slot_ref;
 }
@@ -176,7 +181,7 @@ Ref<SpineAttachment> SpineSkeleton::get_attachment_by_slot_name(const String &sl
 	auto attachment = skeleton->getAttachment(SPINE_STRING_TMP(slot_name), SPINE_STRING_TMP(attachment_name));
 	if (!attachment) return nullptr;
 	Ref<SpineAttachment> attachment_ref(memnew(SpineAttachment));
-	attachment_ref->set_spine_object(*sprite->get_skeleton_data_res(), attachment);
+	attachment_ref->set_spine_object(*controller->get_skeleton_data_res(), attachment);
 	return attachment_ref;
 }
 
@@ -185,7 +190,7 @@ Ref<SpineAttachment> SpineSkeleton::get_attachment_by_slot_index(int slot_index,
 	auto attachment = skeleton->getAttachment(slot_index, SPINE_STRING_TMP(attachment_name));
 	if (!attachment) return nullptr;
 	Ref<SpineAttachment> attachment_ref(memnew(SpineAttachment));
-	attachment_ref->set_spine_object(*sprite->get_skeleton_data_res(), attachment);
+	attachment_ref->set_spine_object(*controller->get_skeleton_data_res(), attachment);
 	return attachment_ref;
 }
 
@@ -200,7 +205,7 @@ Ref<SpineIkConstraint> SpineSkeleton::find_ik_constraint(const String &constrain
 	auto constraint = skeleton->findConstraint<spine::IkConstraint>(SPINE_STRING_TMP(constraint_name));
 	if (!constraint) return nullptr;
 	Ref<SpineIkConstraint> constraint_ref(memnew(SpineIkConstraint));
-	constraint_ref->set_spine_object(sprite, constraint);
+	constraint_ref->set_spine_object(controller, constraint);
 	return constraint_ref;
 }
 
@@ -210,7 +215,7 @@ Ref<SpineTransformConstraint> SpineSkeleton::find_transform_constraint(const Str
 	auto constraint = skeleton->findConstraint<spine::TransformConstraint>(SPINE_STRING_TMP(constraint_name));
 	if (!constraint) return nullptr;
 	Ref<SpineTransformConstraint> constraint_ref(memnew(SpineTransformConstraint));
-	constraint_ref->set_spine_object(sprite, constraint);
+	constraint_ref->set_spine_object(controller, constraint);
 	return constraint_ref;
 }
 
@@ -220,7 +225,7 @@ Ref<SpinePathConstraint> SpineSkeleton::find_path_constraint(const String &const
 	auto constraint = skeleton->findConstraint<spine::PathConstraint>(SPINE_STRING_TMP(constraint_name));
 	if (!constraint) return nullptr;
 	Ref<SpinePathConstraint> constraint_ref(memnew(SpinePathConstraint));
-	constraint_ref->set_spine_object(sprite, constraint);
+	constraint_ref->set_spine_object(controller, constraint);
 	return constraint_ref;
 }
 
@@ -231,7 +236,7 @@ Ref<SpinePhysicsConstraint> SpineSkeleton::find_physics_constraint(const String 
 	auto constraint = skeleton->findConstraint<spine::PhysicsConstraint>(SPINE_STRING_TMP(constraint_name));
 	if (!constraint) return nullptr;
 	Ref<SpinePhysicsConstraint> constraint_ref(memnew(SpinePhysicsConstraint));
-	constraint_ref->set_spine_object(sprite, constraint);
+	constraint_ref->set_spine_object(controller, constraint);
 	return constraint_ref;
 }
 
@@ -241,7 +246,7 @@ Ref<SpineSlider> SpineSkeleton::find_slider(const String &slider_name) {
 	auto slider = skeleton->findConstraint<spine::Slider>(SPINE_STRING_TMP(slider_name));
 	if (!slider) return nullptr;
 	Ref<SpineSlider> slider_ref(memnew(SpineSlider));
-	slider_ref->set_spine_object(sprite, slider);
+	slider_ref->set_spine_object(controller, slider);
 	return slider_ref;
 }
 
@@ -258,7 +263,7 @@ Ref<SpineBone> SpineSkeleton::get_root_bone() {
 	auto bone = skeleton->getRootBone();
 	if (!bone) return nullptr;
 	Ref<SpineBone> bone_ref(memnew(SpineBone));
-	bone_ref->set_spine_object(sprite, bone);
+	bone_ref->set_spine_object(controller, bone);
 	return bone_ref;
 }
 
@@ -270,7 +275,7 @@ Array SpineSkeleton::get_bones() {
 	for (int i = 0; i < result.size(); ++i) {
 		auto bone = bones[i];
 		Ref<SpineBone> bone_ref(memnew(SpineBone));
-		bone_ref->set_spine_object(sprite, bone);
+		bone_ref->set_spine_object(controller, bone);
 		result[i] = bone_ref;
 	}
 	return result;
@@ -284,7 +289,7 @@ Array SpineSkeleton::get_slots() {
 	for (int i = 0; i < result.size(); ++i) {
 		auto slot = slots[i];
 		Ref<SpineSlot> slot_ref(memnew(SpineSlot));
-		slot_ref->set_spine_object(sprite, slot);
+		slot_ref->set_spine_object(controller, slot);
 		result[i] = slot_ref;
 	}
 	return result;
@@ -298,7 +303,7 @@ Array SpineSkeleton::get_draw_order() {
 	for (int i = 0; i < result.size(); ++i) {
 		auto slot = slots[i];
 		Ref<SpineSlot> slot_ref(memnew(SpineSlot));
-		slot_ref->set_spine_object(sprite, slot);
+		slot_ref->set_spine_object(controller, slot);
 		result[i] = slot_ref;
 	}
 	return result;
@@ -314,7 +319,7 @@ Array SpineSkeleton::get_ik_constraints() {
 		auto constraint = constraints[i];
 		if (!constraint->getRTTI().isExactly(spine::IkConstraint::rtti)) continue;
 		Ref<SpineIkConstraint> constraint_ref(memnew(SpineIkConstraint));
-		constraint_ref->set_spine_object(sprite, static_cast<spine::IkConstraint *>(constraint));
+		constraint_ref->set_spine_object(controller, static_cast<spine::IkConstraint *>(constraint));
 		result[size] = constraint_ref;
 		size++;
 	}
@@ -332,7 +337,7 @@ Array SpineSkeleton::get_transform_constraints() {
 		auto constraint = constraints[i];
 		if (!constraint->getRTTI().isExactly(spine::TransformConstraint::rtti)) continue;
 		Ref<SpineTransformConstraint> constraint_ref(memnew(SpineTransformConstraint));
-		constraint_ref->set_spine_object(sprite, static_cast<spine::TransformConstraint *>(constraint));
+		constraint_ref->set_spine_object(controller, static_cast<spine::TransformConstraint *>(constraint));
 		result[size] = constraint_ref;
 		size++;
 	}
@@ -350,7 +355,7 @@ Array SpineSkeleton::get_path_constraints() {
 		auto constraint = constraints[i];
 		if (!constraint->getRTTI().isExactly(spine::PathConstraint::rtti)) continue;
 		Ref<SpinePathConstraint> constraint_ref(memnew(SpinePathConstraint));
-		constraint_ref->set_spine_object(sprite, static_cast<spine::PathConstraint *>(constraint));
+		constraint_ref->set_spine_object(controller, static_cast<spine::PathConstraint *>(constraint));
 		result[size] = constraint_ref;
 		size++;
 	}
@@ -366,7 +371,7 @@ Array SpineSkeleton::get_physics_constraints() {
 	for (int i = 0; i < constraints.size(); ++i) {
 		auto constraint = constraints[i];
 		Ref<SpinePhysicsConstraint> constraint_ref(memnew(SpinePhysicsConstraint));
-		constraint_ref->set_spine_object(sprite, constraint);
+		constraint_ref->set_spine_object(controller, constraint);
 		result[i] = constraint_ref;
 	}
 	return result;
@@ -380,7 +385,7 @@ Array SpineSkeleton::get_sliders() {
 		auto constraint = constraints[i];
 		if (!constraint->getRTTI().isExactly(spine::Slider::rtti)) continue;
 		Ref<SpineSlider> slider_ref(memnew(SpineSlider));
-		slider_ref->set_spine_object(sprite, static_cast<spine::Slider *>(constraint));
+		slider_ref->set_spine_object(controller, static_cast<spine::Slider *>(constraint));
 		result.append(slider_ref);
 	}
 	return result;
@@ -391,7 +396,7 @@ Ref<SpineSkin> SpineSkeleton::get_skin() {
 	auto skin = skeleton->getSkin();
 	if (!skin) return nullptr;
 	Ref<SpineSkin> skin_ref(memnew(SpineSkin));
-	skin_ref->set_spine_object(*sprite->get_skeleton_data_res(), skin);
+	skin_ref->set_spine_object(*controller->get_skeleton_data_res(), skin);
 	return skin_ref;
 }
 

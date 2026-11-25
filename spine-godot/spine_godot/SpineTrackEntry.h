@@ -36,7 +36,7 @@
 
 #include "SpineSprite.h"
 
-class SpineTrackEntry : public SpineSpriteOwnedObject<spine::TrackEntry> {
+class SpineTrackEntry : public SpineControllerOwnedObject<spine::TrackEntry> {
 	GDCLASS(SpineTrackEntry, SpineObjectWrapper);
 
 protected:

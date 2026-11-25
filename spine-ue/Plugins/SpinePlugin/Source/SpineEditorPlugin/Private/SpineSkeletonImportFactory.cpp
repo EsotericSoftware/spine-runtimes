@@ -31,7 +31,7 @@
 #include "AssetToolsModule.h"
 #include "Developer/AssetTools/Public/IAssetTools.h"
 #include "SpineSkeletonDataAsset.h"
-#include <string.h>
+#include "Editor.h"
 
 #define LOCTEXT_NAMESPACE "Spine"
 
@@ -50,43 +50,54 @@ FText USpineSkeletonAssetFactory::GetToolTip() const {
 }
 
 bool USpineSkeletonAssetFactory::FactoryCanImport(const FString &Filename) {
-	if (Filename.Contains(TEXT(".skel"))) return true;
+	const FString extension = FPaths::GetExtension(Filename);
+	if (extension.Equals(TEXT("skel"), ESearchCase::IgnoreCase)) return true;
+	if (!extension.Equals(TEXT("json"), ESearchCase::IgnoreCase)) return false;
 
-	if (Filename.Contains(TEXT(".json"))) {
-		TArray<uint8> rawData;
-		if (!FFileHelper::LoadFileToArray(rawData, *Filename, 0)) {
-			return false;
-		}
-		if (rawData.Num() == 0) return false;
-		return strcmp((const char *) rawData.GetData(), "skeleton") > 0 && strcmp((const char *) rawData.GetData(), "spine") > 0;
-	}
-
-	return false;
+	FString rawData;
+	if (!FFileHelper::LoadFileToString(rawData, *Filename)) return false;
+	return rawData.Contains(TEXT("\"skeleton\"")) && rawData.Contains(TEXT("\"spine\""));
 }
 
-void LoadAtlas(const FString &Filename, const FString &TargetPath) {
+static void LoadAtlas(const FString &Filename, const FString &TargetPath) {
 	FAssetToolsModule &AssetToolsModule = FModuleManager::GetModuleChecked<FAssetToolsModule>("AssetTools");
 
-	FString skelFile = Filename.Replace(TEXT(".skel"), TEXT(".atlas")).Replace(TEXT(".json"), TEXT(".atlas"));
-	if (!FPaths::FileExists(skelFile)) return;
+	const FString atlasFile = FPaths::ChangeExtension(Filename, TEXT("atlas"));
+	if (!FPaths::FileExists(atlasFile)) return;
+
+	// Reimport an existing atlas in place instead of prompting to overwrite it, which also updates its page textures.
+	const FString atlasName = FPaths::GetBaseFilename(atlasFile);
+	const FString atlasObjectPath = TargetPath / atlasName + TEXT(".") + atlasName;
+	if (USpineAtlasAsset *atlas = LoadObject<USpineAtlasAsset>(nullptr, *atlasObjectPath, nullptr, LOAD_NoWarn | LOAD_Quiet)) {
+		FReimportManager::Instance()->Reimport(atlas, false, true, atlasFile, nullptr, INDEX_NONE, false, true);
+		return;
+	}
 
 	TArray<FString> fileNames;
-	fileNames.Add(skelFile);
-	AssetToolsModule.Get().ImportAssets(fileNames, TargetPath);
+	fileNames.Add(atlasFile);
+	AssetToolsModule.Get().ImportAssets(fileNames, TargetPath, nullptr, false);
 }
 
 UObject *USpineSkeletonAssetFactory::FactoryCreateFile(UClass *InClass, UObject *InParent, FName InName, EObjectFlags Flags, const FString &Filename,
 													   const TCHAR *Parms, FFeedbackContext *Warn, bool &bOutOperationCanceled) {
-	USpineSkeletonDataAsset *asset = NewObject<USpineSkeletonDataAsset>(InParent, InClass, InName, Flags);
+	const FString fileExtension = FPaths::GetExtension(Filename);
+	GEditor->GetEditorSubsystem<UImportSubsystem>()->BroadcastAssetPreImport(this, InClass, InParent, InName, *fileExtension);
+
 	TArray<uint8> rawData;
-	if (!FFileHelper::LoadFileToArray(rawData, *Filename, 0)) {
+	if (!FFileHelper::LoadFileToArray(rawData, *Filename, 0)) return nullptr;
+
+	USpineSkeletonDataAsset *asset = NewObject<USpineSkeletonDataAsset>(InParent, InClass, InName, Flags);
+	asset->SetSkeletonDataFileName(FName(*Filename));
+	FString error;
+	if (!asset->SetRawDataFromImport(rawData, error)) {
+		if (Warn) Warn->Logf(ELogVerbosity::Error, TEXT("%s"), *error);
 		return nullptr;
 	}
-	asset->SetSkeletonDataFileName(FName(*Filename));
-	asset->SetRawData(rawData);
+	asset->UpdateSkeletonDataFileName(FName(*Filename));
 
 	const FString longPackagePath = FPackageName::GetLongPackagePath(asset->GetOutermost()->GetPathName());
 	LoadAtlas(Filename, longPackagePath);
+	GEditor->GetEditorSubsystem<UImportSubsystem>()->BroadcastAssetPostImport(this, asset);
 	return asset;
 }
 
@@ -108,18 +119,28 @@ void USpineSkeletonAssetFactory::SetReimportPaths(UObject *Obj, const TArray<FSt
 
 EReimportResult::Type USpineSkeletonAssetFactory::Reimport(UObject *Obj) {
 	USpineSkeletonDataAsset *asset = Cast<USpineSkeletonDataAsset>(Obj);
+	if (!asset) return EReimportResult::Failed;
+
+	const FString sourceFilename = asset->GetSkeletonDataFileName().ToString();
 	TArray<uint8> rawData;
-	if (!FFileHelper::LoadFileToArray(rawData, *asset->GetSkeletonDataFileName().ToString(), 0)) return EReimportResult::Failed;
-	asset->SetRawData(rawData);
+	if (!FFileHelper::LoadFileToArray(rawData, *sourceFilename, 0)) return EReimportResult::Failed;
+
+	FString error;
+	if (!asset->SetRawDataFromImport(rawData, error)) {
+		UE_LOG(LogTemp, Error, TEXT("%s"), *error);
+		return EReimportResult::Failed;
+	}
+	asset->UpdateSkeletonDataFileName(FName(*sourceFilename));
 
 	const FString longPackagePath = FPackageName::GetLongPackagePath(asset->GetOutermost()->GetPathName());
-	LoadAtlas(*asset->GetSkeletonDataFileName().ToString(), longPackagePath);
+	LoadAtlas(sourceFilename, longPackagePath);
 
 	if (Obj->GetOuter())
 		Obj->GetOuter()->MarkPackageDirty();
 	else
 		Obj->MarkPackageDirty();
 
+	GEditor->GetEditorSubsystem<UImportSubsystem>()->BroadcastAssetReimport(asset);
 	return EReimportResult::Succeeded;
 }
 

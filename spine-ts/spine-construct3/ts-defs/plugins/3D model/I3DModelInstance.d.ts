@@ -1,9 +1,9 @@
 
 type Model3DRenderModeType = "hierarchy" | "isolate";
 type Model3DTransformTypes = "offset" | "rotation" | "scale";
-type Model3DOriginsX = "left" | "middle" | "right";
-type Model3DOriginsY = "top" | "middle" | "bottom";
-type Model3DOriginsZ = "back" | "middle" | "front";
+type Model3DAxisScaleModeTypes = "legacy" | "fit" | "stretch";
+
+type Model3DLoadUrlTargets = "object-type" | "instance";
 
 type Model3DQuaternion = {
 	x: number;
@@ -23,8 +23,10 @@ declare class I3DModelInstance extends IWorldInstance
 	onLoad(): void;
 	onError(): void;
 
+	loadTextureFromURL(uri: string, mesh: string, target: Model3DLoadUrlTargets): Promise<null | undefined>;
+	unloadTextures(modelName?: string, meshName?: string): Promise<null | undefined>;
+
 	modelName: string;
-	// meshName: string; // deprecated
 	meshNames: Array<string>;
 	animationName: string;
 	animationProgress: number;
@@ -32,6 +34,7 @@ declare class I3DModelInstance extends IWorldInstance
 	isLooping: boolean;
 	meshRenderMode: Model3DRenderModeType;
 	backfaceCulling: boolean;
+	axisScaleMode: Model3DAxisScaleModeTypes;
 
 	onAnimationFinished: Model3dAnimationCallback;
 	onAnimationLooped: Model3dAnimationCallback;
@@ -45,9 +48,6 @@ declare class I3DModelInstance extends IWorldInstance
 	scaleX: number;
 	scaleY: number;
 	scaleZ: number;
-	originX: Model3DOriginsX;
-	originY: Model3DOriginsY;
-	originZ: Model3DOriginsZ;
 
 	setTransform(x: number, y: number, z: number, type: Model3DTransformTypes): void;
 	addTransform(x: number, y: number, z: number, type: Model3DTransformTypes): void;

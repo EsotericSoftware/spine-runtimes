@@ -35,7 +35,7 @@
 #define HAS_CULL_TRANSPARENT_MESH
 #endif
 
-#if !SPINE_DISABLE_THREADING
+#if !SPINE_DISABLE_THREADING && !UNITY_WEBGL
 #define USE_THREADED_SKELETON_UPDATE
 #endif
 
@@ -266,6 +266,10 @@ namespace Spine.Unity {
 #if USE_THREADED_SKELETON_UPDATE
 		public float CanvasReferencePixelsPerUnit {
 			get {
+#if UNITY_EDITOR
+				if (!this.isUpdatedExternally)
+					return (canvas == null) ? 100 : canvas.referencePixelsPerUnit;
+#endif
 				return canvasReferencePixelsPerUnit;
 			}
 		}
@@ -353,6 +357,9 @@ namespace Spine.Unity {
 			if (skeletonAnimation != null)
 				skeletonAnimation.EnsureRendererEventsSubscribed();
 
+#if USE_THREADED_SKELETON_UPDATE
+			SetCurrentRectSize();
+#endif
 			InitializeCommon(overwrite, quiet);
 			SetMaterialDirty();
 
@@ -526,12 +533,55 @@ namespace Spine.Unity {
 				boundsSet = GetMeshBoundsSingleRenderer(ref bounds);
 			else
 				boundsSet = GetMeshBoundsMultipleRenderers(ref bounds);
-			SetRectTransformBounds(bounds);
-			return boundsSet;
+			bool boundsApplied = SetRectTransformBounds(bounds);
+			return boundsSet && boundsApplied;
 		}
 
-		private void SetRectTransformBounds (Bounds combinedBounds) {
+		public bool MatchReferenceRectWithBounds () {
+			if (layoutScaleMode == LayoutMode.None || EditReferenceRect)
+				return MatchRectTransformWithBounds();
+
+			RectTransform targetRectTransform = this.rectTransform;
+			Vector2 targetSize = targetRectTransform.rect.size;
+			if (!IsValidReferenceSize(targetSize)) return false;
+#if USE_THREADED_SKELETON_UPDATE
+			SetCurrentRectSize();
+#endif
+			Vector2 savedPivot = targetRectTransform.pivot;
+
+			if (skeletonAnimation != null)
+				skeletonAnimation.UpdateOncePerFrame(0);
+			UpdateMesh();
+			Vector2 defaultSize = new Vector2(50f, 50f);
+			Bounds bounds = new Bounds(defaultSize * 0.5f, defaultSize);
+			bool boundsSet;
+			if (!allowMultipleCanvasRenderers)
+				boundsSet = GetMeshBoundsSingleRenderer(ref bounds);
+			else
+				boundsSet = GetMeshBoundsMultipleRenderers(ref bounds);
+
+			Vector3 size = bounds.size;
+			if (!boundsSet || !IsValidReferenceSize(new Vector2(size.x, size.y))) return false;
+
+			float currentLayoutScale = layoutScale;
+			Vector2 unscaledOffsetDelta = pivotOffset - meshOffset;
+			Vector3 center = bounds.center + (Vector3)unscaledOffsetDelta;
+			Vector2 matchedPivot = new Vector2(
+				0.5f - (center.x / size.x),
+				0.5f - (center.y / size.y));
+
+			referenceSize = size;
+			referenceScale *= currentLayoutScale;
+			layoutScale = 1f;
+			pivotOffset += Vector2.Scale(matchedPivot - savedPivot, referenceSize);
+			UpdateMesh();
+			return true;
+		}
+
+		private bool SetRectTransformBounds (Bounds combinedBounds) {
 			Vector3 size = combinedBounds.size;
+			if (!IsValidReferenceSize(new Vector2(size.x, size.y))) return false;
+
 			Vector3 center = combinedBounds.center;
 			Vector2 p = new Vector2(
 				0.5f - (center.x / size.x),
@@ -554,8 +604,10 @@ namespace Spine.Unity {
 			}
 
 			this.referenceSize = size;
-			referenceScale = referenceScale * layoutScale;
+			if (layoutScale != 0f)
+				referenceScale *= layoutScale;
 			layoutScale = 1f;
+			return true;
 		}
 
 		public static void SetRectTransformSize (Graphic target, Vector2 size) {
@@ -573,19 +625,32 @@ namespace Spine.Unity {
 			targetRectTransform.sizeDelta = size - anchorAreaSize;
 		}
 
+		private static bool IsValidReferenceSize (Vector2 size) {
+			if (size.x <= 0f || size.y <= 0f ||
+				float.IsNaN(size.x) || float.IsNaN(size.y) ||
+				float.IsInfinity(size.x) || float.IsInfinity(size.y)) return false;
+			return true;
+		}
+
 		public void SetScaledPivotOffset (Vector2 pivotOffsetScaled) {
-			pivotOffset = pivotOffsetScaled / GetLayoutScale(layoutScaleMode);
+			float currentLayoutScale = GetLayoutScale(layoutScaleMode);
+			if (currentLayoutScale == 0f) return;
+			pivotOffset = pivotOffsetScaled / currentLayoutScale;
 		}
 
 		protected float GetLayoutScale (LayoutMode mode) {
 			Vector2 currentSize = GetCurrentRectSize();
-			mode = GetEffectiveLayoutMode(mode);
+			float widthScale = currentSize.x / referenceSize.x;
+			float heightScale = currentSize.y / referenceSize.y;
 
-			if (mode == LayoutMode.WidthControlsHeight) {
-				return currentSize.x / referenceSize.x;
-			} else if (mode == LayoutMode.HeightControlsWidth) {
-				return currentSize.y / referenceSize.y;
-			}
+			if (mode == LayoutMode.WidthControlsHeight)
+				return widthScale;
+			else if (mode == LayoutMode.HeightControlsWidth)
+				return heightScale;
+			else if (mode == LayoutMode.FitInParent)
+				return Mathf.Min(widthScale, heightScale);
+			else if (mode == LayoutMode.EnvelopeParent)
+				return Mathf.Max(widthScale, heightScale);
 			return 1f;
 		}
 
@@ -596,18 +661,18 @@ namespace Spine.Unity {
 		/// </summary>
 		protected LayoutMode GetEffectiveLayoutMode (LayoutMode mode) {
 			Vector2 currentSize = GetCurrentRectSize();
-			float referenceAspect = referenceSize.x / referenceSize.y;
-			float frameAspect = currentSize.x / currentSize.y;
+			float widthScale = currentSize.x / referenceSize.x;
+			float heightScale = currentSize.y / referenceSize.y;
 			if (mode == LayoutMode.FitInParent)
-				mode = frameAspect > referenceAspect ? LayoutMode.HeightControlsWidth : LayoutMode.WidthControlsHeight;
+				mode = widthScale > heightScale ? LayoutMode.HeightControlsWidth : LayoutMode.WidthControlsHeight;
 			else if (mode == LayoutMode.EnvelopeParent)
-				mode = frameAspect > referenceAspect ? LayoutMode.WidthControlsHeight : LayoutMode.HeightControlsWidth;
+				mode = widthScale > heightScale ? LayoutMode.WidthControlsHeight : LayoutMode.HeightControlsWidth;
 			return mode;
 		}
 
 #if USE_THREADED_SKELETON_UPDATE
 		public void SetCurrentRectSize () {
-			threadedRectTransformSize = this.rectTransform.rect.size; ;
+			threadedRectTransformSize = this.rectTransform.rect.size;
 		}
 
 		private Vector2 GetCurrentRectSize () {
@@ -1187,15 +1252,23 @@ namespace Spine.Unity {
 
 			bool hasSlotOverrides = customSlotMaterials.Count > 0;
 			for (int i = 0, count = sharedMaterials.Length; i < count; ++i) {
-				Material instructionMaterial = instructionItems[i].material;
+				SubmeshInstruction instruction = instructionItems[i];
+				Material instructionMaterial = instruction.material;
 				if (instructionMaterial == null) {
 					usedTextureItems[i] = null;
 					sharedMaterials[i] = null;
 					continue;
 				}
 				usedTextureItems[i] = instructionMaterial.mainTexture;
+
 				bool isExplicitSlotOverride = hasSlotOverrides && customSlotMaterials.ContainsValue(instructionMaterial);
 				sharedMaterials[i] = isExplicitSlotOverride ? instructionMaterial : modifiedRenderingMaterial;
+				if (isExplicitSlotOverride) {
+					Slot slot = skeleton.DrawOrder.AppliedPose.Items[instruction.startSlot];
+					Texture originalSlotTexture = GetOriginalSlotTexture(slot);
+					if (originalSlotTexture)
+						usedTextureItems[i] = originalSlotTexture;
+				}
 			}
 
 			BlendModeMaterials blendModeMaterials = skeletonDataAsset.blendModeMaterials;
@@ -1247,6 +1320,19 @@ namespace Spine.Unity {
 			} else {
 				canvasRenderer.SetMaterial(sharedMaterials.Length > 0 ? sharedMaterials[0] : material, usedTextures.Items[0]);
 			}
+		}
+
+		protected Texture GetOriginalSlotTexture (Slot slot) {
+			IHasSequence sequenceAttachment = slot.AppliedPose.Attachment as IHasSequence;
+			if (sequenceAttachment != null) {
+				Sequence sequence = sequenceAttachment.Sequence;
+				TextureRegion region = sequence.GetRegion(sequence.ResolveIndex(slot.AppliedPose));
+				if (region != null) {
+					Material regionMaterial = (Material)((AtlasRegion)region).page.rendererObject;
+					return regionMaterial.mainTexture;
+				}
+			}
+			return null;
 		}
 
 		/// <returns>True if any element of the given <c>instructions</c> list has
@@ -1420,10 +1506,16 @@ namespace Spine.Unity {
 		#region Internal Methods
 #if USE_THREADED_SKELETON_UPDATE
 		public virtual void MainThreadPrepareLateUpdateInternal () {
+			SetCurrentRectSize();
 			canvasReferencePixelsPerUnit = (canvas == null) ? 100 : canvas.referencePixelsPerUnit;
 
 			if (!valid) return;
-			if (updateMode != UpdateMode.FullUpdate && wasMeshUpdatedAfterInit) return;
+			if (updateMode != UpdateMode.FullUpdate && wasMeshUpdatedAfterInit) {
+#if SPINE_OPTIONAL_ON_DEMAND_LOADING
+				HandleOnDemandLoadingWithoutMeshUpdate();
+#endif
+				return;
+			}
 
 			if (NeedsMainThreadRendererPreparation)
 				PrepareInstructionsAndRenderers();
@@ -1455,8 +1547,19 @@ namespace Spine.Unity {
 				skeletonAnimation.UpdateOncePerFrame(0);
 
 			// Generate mesh once, required to update mesh bounds for visibility
-			if (updateMode != UpdateMode.FullUpdate && wasMeshUpdatedAfterInit) return;
-			if (calledFromMainThread && !NeedsToGenerateMesh) return;
+			if (updateMode != UpdateMode.FullUpdate && wasMeshUpdatedAfterInit) {
+#if SPINE_OPTIONAL_ON_DEMAND_LOADING
+				if (calledFromMainThread)
+					HandleOnDemandLoadingWithoutMeshUpdate();
+#endif
+				return;
+			}
+			if (calledFromMainThread && !NeedsToGenerateMesh) {
+#if SPINE_OPTIONAL_ON_DEMAND_LOADING
+				HandleOnDemandLoadingWithoutMeshUpdate();
+#endif
+				return;
+			}
 			UpdateMesh(calledFromMainThread);
 		}
 		#endregion Internal Methods
@@ -1479,6 +1582,14 @@ namespace Spine.Unity {
 		}
 
 		protected void UpdateReferenceRectSizes () {
+			if (!Application.isPlaying && !IsValidReferenceSize(referenceSize)) {
+				Vector2 rectSize = GetCurrentRectSize();
+				if (!IsValidReferenceSize(rectSize)) return;
+
+				referenceSize = rectSize;
+				EditorBridge.RequestMarkDirty(gameObject);
+			}
+
 			if (rectTransformSize == Vector2.zero)
 				rectTransformSize = GetCurrentRectSize();
 
@@ -1493,8 +1604,11 @@ namespace Spine.Unity {
 					SetRectTransformSize(this, rectTransformSize);
 				}
 			}
-			if (editReferenceRect || layoutScaleMode == LayoutMode.None)
-				referenceSize = GetCurrentRectSize();
+			if (editReferenceRect || layoutScaleMode == LayoutMode.None) {
+				Vector2 rectSize = GetCurrentRectSize();
+				if (IsValidReferenceSize(rectSize))
+					referenceSize = rectSize;
+			}
 
 			previousLayoutScaleMode = layoutScaleMode;
 		}
@@ -1512,15 +1626,19 @@ namespace Spine.Unity {
 		}
 
 		public void ResetRectToReferenceRectSize () {
-			referenceScale *= GetLayoutScale(previousLayoutScaleMode);
-			float referenceAspect = referenceSize.x / referenceSize.y;
+			float currentLayoutScale = GetLayoutScale(previousLayoutScaleMode);
+			if (currentLayoutScale == 0f) return;
+			referenceScale *= currentLayoutScale;
 			Vector2 newSize = GetCurrentRectSize();
 
 			LayoutMode mode = GetEffectiveLayoutMode(previousLayoutScaleMode);
-			if (mode == LayoutMode.WidthControlsHeight)
-				newSize.y = newSize.x / referenceAspect;
-			else if (mode == LayoutMode.HeightControlsWidth)
-				newSize.x = newSize.y * referenceAspect;
+			if (mode == LayoutMode.WidthControlsHeight) {
+				float widthScale = newSize.x / referenceSize.x;
+				newSize.y = referenceSize.y * widthScale;
+			} else if (mode == LayoutMode.HeightControlsWidth) {
+				float heightScale = newSize.y / referenceSize.y;
+				newSize.x = referenceSize.x * heightScale;
+			}
 			SetRectTransformSize(this, newSize);
 		}
 
@@ -1548,15 +1666,16 @@ namespace Spine.Unity {
 
 		#region Transfer of Deprecated Fields
 #if UNITY_EDITOR && AUTO_UPGRADE_TO_43_COMPONENTS
-		// compatibility layer for new split animation component architecture,
-		// automatically transfer serialized attributes.
+		// compatibility layer for new split animation component architecture, automatically transfer serialized attributes.
 		public void UpgradeTo43 () {
-			UpgradeTo43Components();
-			TransferDeprecatedFields();
+			if (!Application.isPlaying && !wasDeprecatedTransferred) {
+				UpgradeTo43Components();
+				TransferDeprecatedFields();
+			}
 		}
 
 		protected void UpgradeTo43Components () {
-			if (gameObject.GetComponent<SkeletonAnimation>() == null) {
+			if (meshGeneratorDeprecated != null && gameObject.GetComponent<ISkeletonAnimation>() == null) {
 				gameObject.AddComponent<SkeletonAnimation>();
 				EditorBridge.RequestMarkDirty(gameObject);
 				Debug.Log(string.Format("{0}: Auto-migrated old SkeletonGraphic component to split SkeletonAnimation + SkeletonGraphic components.",
@@ -1574,6 +1693,7 @@ namespace Spine.Unity {
 
 			SkeletonAnimation skeletonAnimationComponent = skeletonAnimation as SkeletonAnimation;
 			if (skeletonAnimationComponent) {
+				skeletonAnimationComponent.UpdateTiming = updateTimingDeprecated;
 				skeletonAnimationComponent.AnimationName = startingAnimationDeprecated;
 				skeletonAnimationComponent.loop = startingLoopDeprecated;
 				skeletonAnimationComponent.timeScale = timeScaleDeprecated;
@@ -1583,7 +1703,14 @@ namespace Spine.Unity {
 
 		[SerializeField] protected bool wasDeprecatedTransferred = false;
 
-		[FormerlySerializedAs("meshGenerator")] [SerializeField] private MeshGenerator meshGeneratorDeprecated;
+		// Note: required because current MeshGenerator.settings is a [NonSerialized] member.
+		[System.Serializable]
+		private class MeshGeneratorDeprecated {
+			public MeshGenerator.Settings settings = MeshGenerator.Settings.Default;
+		}
+
+		[FormerlySerializedAs("meshGenerator")] [SerializeField] private MeshGeneratorDeprecated meshGeneratorDeprecated;
+		[FormerlySerializedAs("updateTiming")] [SerializeField] private UpdateTiming updateTimingDeprecated = UpdateTiming.InUpdate;
 		[FormerlySerializedAs("startingAnimation")] [SerializeField] private string startingAnimationDeprecated;
 		[FormerlySerializedAs("startingLoop")] [SerializeField] private bool startingLoopDeprecated;
 		[FormerlySerializedAs("timeScale")] [SerializeField] private float timeScaleDeprecated = 1;

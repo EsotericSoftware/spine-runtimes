@@ -1,0 +1,28 @@
+extends SceneTree
+
+const Capture = preload("../example-v4/examples/17-interactive-benchmark/timing_capture.gd")
+
+func _init():
+	var capture = Capture.new()
+	capture.reset(0, 3, 5)
+	assert(not capture.advance(0, 0))
+	assert(not capture.advance(3100000, 900))
+	assert(capture.frame_samples.is_empty(), "exclude long startup frame crossing warm-up boundary")
+	assert(not capture.advance(3110000, 2))
+	assert(capture.frame_samples == [10.0] and capture.cpu_samples == [2.0])
+	assert(not capture.advance(5600000, 3))
+	assert(capture.advance(8100000, 4))
+	assert(capture.result.frames == 3 and is_equal_approx(capture.result.seconds, 5))
+	assert(capture.result.frame_ms.worst == 2500 and capture.result.frame_ms.p95 == 2500)
+	assert(not capture.advance(9100000, 99) and capture.result.frames == 3, "completed captures remain stable")
+	capture.reset(0, 0, 0.025)
+	assert(capture.result.is_empty() and capture.cpu_samples.is_empty())
+	assert(not capture.advance(0, 0))
+	assert(not capture.advance(10000, 1))
+	assert(capture.advance(30000, 3))
+	assert(capture.result.frame_ms.mean == 15 and capture.result.frame_ms.median == 15)
+	assert(capture.result.cpu_update_ms.mean == 2 and capture.result.cpu_update_ms.median == 2)
+	assert(capture.result.frame_ms.p95 == 20 and capture.result.frame_ms.worst == 20)
+	assert(is_equal_approx(capture.result.fps, 1000.0 / 15))
+	print("Spine benchmark timing regression passed.")
+	quit()

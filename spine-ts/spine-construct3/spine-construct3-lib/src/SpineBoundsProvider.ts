@@ -56,7 +56,7 @@ export class AABBRectangleBoundsProvider implements SpineBoundsProvider {
 		private height: number,
 	) { }
 	calculateBounds () {
-		return { x: this.x, y: this.y, width: this.width, height: this.height };
+		return validateBounds({ x: this.x, y: this.y, width: this.width, height: this.height });
 	}
 }
 
@@ -91,7 +91,10 @@ export class SkinsAndAnimationBoundsProvider implements SpineBoundsProvider {
 		private skins: string[] = [],
 		private timeStep: number = 0.05,
 		private clipping = false,
-	) { }
+	) {
+		if (!Number.isFinite(timeStep) || timeStep <= 0)
+			throw new Error("timeStep must be a finite number greater than zero.");
+	}
 
 	calculateBounds (gameObject: GameObject): {
 		x: number;
@@ -123,42 +126,56 @@ export class SkinsAndAnimationBoundsProvider implements SpineBoundsProvider {
 
 		if (animation == null) {
 			skeleton.updateWorldTransform(Physics.update);
-			const bounds = skeleton.getBoundsRect(clipper);
-			return validateBounds(bounds);
-		} else {
-			let minX = Number.POSITIVE_INFINITY,
-				minY = Number.POSITIVE_INFINITY,
-				maxX = Number.NEGATIVE_INFINITY,
-				maxY = Number.NEGATIVE_INFINITY;
-			animationState.clearTracks();
-			animationState.setAnimation(0, animation, false);
-			const steps = Math.max(animation.duration / this.timeStep, 1.0);
-			for (let i = 0; i < steps; i++) {
-				const delta = i > 0 ? this.timeStep : 0;
-				animationState.update(delta);
-				animationState.apply(skeleton);
-				skeleton.update(delta);
-				skeleton.updateWorldTransform(Physics.update);
-
-				const bounds = skeleton.getBoundsRect(clipper);
-				minX = Math.min(minX, bounds.x);
-				minY = Math.min(minY, bounds.y);
-				maxX = Math.max(maxX, bounds.x + bounds.width);
-				maxY = Math.max(maxY, bounds.y + bounds.height);
-			}
-			const bounds = {
-				x: minX,
-				y: minY,
-				width: maxX - minX,
-				height: maxY - minY,
-			};
-			return validateBounds(bounds);
+			return validateBounds(skeleton.getBoundsRect(clipper));
 		}
+
+		const duration = animation.duration;
+		if (!Number.isFinite(duration) || duration < 0)
+			return { x: 0, y: 0, width: 0, height: 0 };
+
+		const steps = duration === 0
+			? 0
+			: Math.min(Math.max(Math.ceil(duration / this.timeStep), 1), 10_000);
+		let minX = Number.POSITIVE_INFINITY;
+		let minY = Number.POSITIVE_INFINITY;
+		let maxX = Number.NEGATIVE_INFINITY;
+		let maxY = Number.NEGATIVE_INFINITY;
+		let previousTime = 0;
+
+		animationState.clearTracks();
+		animationState.setAnimation(0, animation, false);
+		for (let i = 0; i <= steps; i++) {
+			const time = i === steps ? duration : duration * (i / steps);
+			const delta = time - previousTime;
+			previousTime = time;
+			animationState.update(delta);
+			animationState.apply(skeleton);
+			skeleton.update(delta);
+			skeleton.updateWorldTransform(Physics.update);
+
+			const bounds = skeleton.getBoundsRect(clipper);
+			if (!isValidBounds(bounds)) continue;
+			minX = Math.min(minX, bounds.x);
+			minY = Math.min(minY, bounds.y);
+			maxX = Math.max(maxX, bounds.x + bounds.width);
+			maxY = Math.max(maxY, bounds.y + bounds.height);
+		}
+
+		return validateBounds({ x: minX, y: minY, width: maxX - minX, height: maxY - minY });
 	}
 }
 
+export function isValidBounds (bounds: Rectangle) {
+	return Number.isFinite(bounds.x)
+		&& Number.isFinite(bounds.y)
+		&& Number.isFinite(bounds.width)
+		&& Number.isFinite(bounds.height)
+		&& bounds.width > 0
+		&& bounds.height > 0;
+}
+
 function validateBounds (bounds: Rectangle): Rectangle {
-	return bounds.width === Number.NEGATIVE_INFINITY
-		? { x: 0, y: 0, width: 0, height: 0 }
-		: bounds;
+	return isValidBounds(bounds)
+		? bounds
+		: { x: 0, y: 0, width: 0, height: 0 };
 }

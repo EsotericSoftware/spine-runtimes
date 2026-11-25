@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Port of 92be332e: Clipping performance improvements.
 - Port of 50e82f31: Fixed constraints overwriting bone transforms from other constraints.
 
 ## 4.3.1 - 2026-06-04

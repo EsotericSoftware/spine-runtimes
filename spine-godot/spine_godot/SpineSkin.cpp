@@ -31,7 +31,7 @@
 #include "SpineBoneData.h"
 #include "SpineConstraintData.h"
 #include "SpineCommon.h"
-#include "SpineSprite.h"
+#include "SpineController.h"
 
 void SpineSkin::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_attachment", "slot_index", "placeholder", "attachment"), &SpineSkin::set_attachment);
@@ -54,21 +54,21 @@ SpineSkin::~SpineSkin() {
 	if (owns_skin) delete get_spine_object();
 }
 
-Ref<SpineSkin> SpineSkin::init(const String &name, SpineSprite *sprite) {
+Ref<SpineSkin> SpineSkin::init(const String &name, SpineController *controller) {
 	if (get_spine_object()) {
 		ERR_PRINT("Can not initialize an already initialized skin.");
 		return this;
 	}
-	if (!sprite) {
-		ERR_PRINT("Must provide a valid SpineSprite.");
+	if (!controller) {
+		ERR_PRINT("Must provide a valid SpineController.");
 		return this;
 	}
-	if (!sprite->get_skeleton_data_res().is_valid() || !sprite->get_skeleton_data_res()->is_skeleton_data_loaded()) {
-		ERR_PRINT("SpineSkeletonDataResource on SpineSprite must be valid and loaded.");
+	if (!controller->get_skeleton_data_res().is_valid() || !controller->get_skeleton_data_res()->is_skeleton_data_loaded()) {
+		ERR_PRINT("SpineSkeletonDataResource on SpineController must be valid and loaded.");
 		return this;
 	}
 	owns_skin = true;
-	set_spine_object(*sprite->get_skeleton_data_res(), new spine::Skin(SPINE_STRING(name)));
+	set_spine_object(*controller->get_skeleton_data_res(), new spine::Skin(SPINE_STRING(name)));
 	return this;
 }
 

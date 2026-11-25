@@ -681,7 +681,8 @@
           },
           {
             "id": "radius",
-            "type": "number"
+            "type": "number",
+            "initialValue": "10"
           },
           {
             "id": "debug",

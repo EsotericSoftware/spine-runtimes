@@ -328,18 +328,20 @@ namespace Spine.Unity.Editor {
 				editReferenceRect.boolValue = false;
 			}
 
-			using (new EditorGUI.DisabledGroupScope(editReferenceRect.boolValue == false && layoutScaleMode.intValue != 0)) {
-				EditorGUILayout.BeginHorizontal(GUILayout.Height(EditorGUIUtility.singleLineHeight + 5));
-				EditorGUILayout.PrefixLabel("Match RectTransform with Mesh");
-				if (GUILayout.Button("Match", EditorStyles.miniButton, GUILayout.Width(65f))) {
-					foreach (UnityEngine.Object target in targets) {
-						SkeletonGraphic skeletonGraphic = target as SkeletonGraphic;
-						if (skeletonGraphic == null) continue;
+			EditorGUILayout.BeginHorizontal(GUILayout.Height(EditorGUIUtility.singleLineHeight + 5));
+			EditorGUILayout.PrefixLabel("Match RectTransform with Mesh");
+			if (GUILayout.Button("Match", EditorStyles.miniButton, GUILayout.Width(65f))) {
+				bool isOutsideEditMode = editReferenceRect.boolValue == false && layoutScaleMode.intValue != 0;
+				foreach (UnityEngine.Object target in targets) {
+					SkeletonGraphic skeletonGraphic = target as SkeletonGraphic;
+					if (skeletonGraphic == null) continue;
+					if (!isOutsideEditMode)
 						MatchRectTransformWithBounds(skeletonGraphic);
-					}
+					else
+						MatchReferenceRectWithBounds(skeletonGraphic);
 				}
-				EditorGUILayout.EndHorizontal();
 			}
+			EditorGUILayout.EndHorizontal();
 		}
 
 		protected bool SkeletonHasMultipleSubmeshes () {
@@ -371,6 +373,7 @@ namespace Spine.Unity.Editor {
 				}
 			}
 			SpineHandles.DrawPivotOffsetHandle(skeletonGraphic, Color.green);
+			SpineHandles.DrawPivotHandle(skeletonGraphic, Color.blue);
 		}
 
 		#region Menus
@@ -382,6 +385,11 @@ namespace Spine.Unity.Editor {
 
 		static void MatchRectTransformWithBounds (SkeletonGraphic skeletonGraphic) {
 			if (!skeletonGraphic.MatchRectTransformWithBounds())
+				Debug.Log("Mesh was not previously generated.");
+		}
+
+		static void MatchReferenceRectWithBounds (SkeletonGraphic skeletonGraphic) {
+			if (!skeletonGraphic.MatchReferenceRectWithBounds())
 				Debug.Log("Mesh was not previously generated.");
 		}
 		#endregion

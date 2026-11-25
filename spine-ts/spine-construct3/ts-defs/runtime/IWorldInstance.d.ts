@@ -10,6 +10,7 @@ interface SceneGraphHierarchyOpts {
 	transformZ: boolean;
 	transformWidth: boolean;
 	transformHeight: boolean;
+	transformDepth: boolean;
 	transformAngle: boolean;
 	transformOpacity: boolean;
 	transformVisibility: boolean;
@@ -73,8 +74,11 @@ declare class IWorldInstance extends IInstance
 
 	originX: number;
 	originY: number;
+	originZ: number;
 	setOrigin(x: number, y: number): void;
 	getOrigin(): Vec2Arr;
+	setOrigin3d(x: number, y: number, z: number): void;
+	getOrigin3d(): Vec3Arr;
 
 	width: number;
 	height: number;
@@ -87,6 +91,11 @@ declare class IWorldInstance extends IInstance
 	angle: number;
 	angleDegrees: number;
 
+	setQuaternion(qx: number, qy: number, qz: number, qw: number): void;
+	getQuaternion(): Vec4Arr;
+	setRotationEuler(rx: number, ry: number, rz: number): void;
+	getRotationEuler(): Vec3Arr;
+	
 	getBoundingBox(ignoreMesh?: boolean): DOMRect;
 	getBoundingBox3d(ignoreMesh?: boolean): IAABB3D;
 	getBoundingQuad(ignoreMesh?: boolean): DOMQuad;

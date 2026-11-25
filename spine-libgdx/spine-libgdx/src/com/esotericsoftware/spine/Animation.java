@@ -1795,7 +1795,7 @@ public class Animation {
 
 	/** Fires an {@link Event} when specific animation times are reached. */
 	static public class EventTimeline extends Timeline {
-		static private final long[] propertyIds = {Property.event.ordinal()};
+		static private final long[] propertyIds = {(long)Property.event.ordinal() << 58};
 
 		private final Event[] events;
 
@@ -2533,7 +2533,7 @@ public class Animation {
 
 	/** Resets a physics constraint when specific animation times are reached. */
 	static public class PhysicsConstraintResetTimeline extends Timeline implements ConstraintTimeline {
-		static private final long[] propertyIds = {Property.physicsConstraintReset.ordinal()};
+		static private final long[] propertyIds = {(long)Property.physicsConstraintReset.ordinal() << 58};
 
 		final int constraintIndex;
 

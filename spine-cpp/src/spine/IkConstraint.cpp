@@ -103,18 +103,19 @@ void IkConstraint::apply(Skeleton &skeleton, BonePose &bone, float targetX, floa
 	bone.modifyLocal(skeleton);
 	BonePose &p = *bone._bone->_parent->_appliedPose;
 	float pa = p._a, pb = p._b, pc = p._c, pd = p._d;
+	float sx = skeleton.getScaleX(), sy = skeleton.getScaleY();
 	float rotationIK = -bone._shearX - bone._rotation, tx, ty;
 	switch (bone._inherit) {
 		case Inherit_OnlyTranslation:
-			tx = (targetX - bone._worldX) * MathUtil::sign(skeleton._scaleX);
-			ty = (targetY - bone._worldY) * MathUtil::sign(skeleton._scaleY);
+			tx = (targetX - bone._worldX) * MathUtil::sign(sx);
+			ty = (targetY - bone._worldY) * MathUtil::sign(sy);
 			break;
 		case Inherit_NoRotationOrReflection: {
 			float s = MathUtil::abs(pa * pd - pb * pc) / MathUtil::max(MathUtil::Epsilon, pa * pa + pc * pc);
-			float sa = pa / skeleton._scaleX;
-			float sc = pc / skeleton._scaleY;
-			pb = -sc * s * skeleton._scaleX;
-			pd = sa * s * skeleton._scaleY;
+			float sa = pa / sx;
+			float sc = pc / sy;
+			pb = -sc * s * sx;
+			pd = sa * s * sy;
 			rotationIK += MathUtil::atan2Deg(sc, sa);
 			// Fall through.
 		}

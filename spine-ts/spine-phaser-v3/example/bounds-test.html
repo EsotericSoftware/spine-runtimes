@@ -39,7 +39,7 @@
     let spineboy;
 
     function preload() {
-      this.load.spineBinary("spineboy-data", "/assets/spineboy-pro.skel");
+      this.load.spineSkeleton("spineboy-data", "/assets/spineboy-pro.skel");
       this.load.spineAtlas("spineboy-atlas", "/assets/spineboy-pma.atlas");
     }
 
@@ -49,7 +49,7 @@
         300,
         "spineboy-data",
         "spineboy-atlas",
-        new spine.SkinsAndAnimationBoundsProvider("run")
+        { boundsProvider: new spine.SkinsAndAnimationBoundsProvider("run") }
       );
       spineboy.scale = 0.4;
       spineboy.setInteractive();

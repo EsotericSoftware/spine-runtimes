@@ -833,7 +833,57 @@ namespace Spine {
 			Run(0.1f, 1000, null);
 #endif // RUN_ADDITIONAL_FORUM_RELATED_TEST
 
+			EventTimeline eventTimeline = new EventTimeline(1);
+			eventTimeline.SetFrame(0, new Event(0, new EventData("event")));
+			TestUnkeyedRotation(eventTimeline);
+
+			PhysicsConstraintResetTimeline resetTimeline = new PhysicsConstraintResetTimeline(1, -1);
+			resetTimeline.SetFrame(0, 0);
+			TestUnkeyedRotation(resetTimeline);
+
 			Log("AnimationState tests passed.");
+		}
+
+		void TestUnkeyedRotation (Timeline timeline) {
+			SkeletonData data = new SkeletonData();
+			ExposedList<Timeline> timelines = new ExposedList<Timeline>(64);
+			ExposedList<int> bones = new ExposedList<int>(64);
+			for (int i = 0; i < 64; i++) {
+				BoneData bone = new BoneData(i, "bone" + i, i == 0 ? null : data.Bones.Items[0]);
+				bone.GetSetupPose().Rotation = 20;
+				data.Bones.Add(bone);
+				RotateTimeline rotate = new RotateTimeline(1, 0, i);
+				rotate.SetFrame(0, 0, 60);
+				timelines.Add(rotate);
+				bones.Add(i);
+			}
+			Animation keyed = new Animation("keyed");
+			keyed.SetTimelines(timelines, bones);
+			keyed.Duration = 1;
+
+			timelines = new ExposedList<Timeline>(1);
+			timelines.Add(timeline);
+			Animation unkeyed = new Animation("unkeyed");
+			unkeyed.SetTimelines(timelines, new ExposedList<int>(0));
+			unkeyed.Duration = 1;
+
+			Skeleton skeleton = new Skeleton(data);
+			AnimationStateData stateData = new AnimationStateData(data);
+			stateData.DefaultMix = 0.5f;
+			AnimationState state = new AnimationState(stateData);
+			state.SetAnimation(0, keyed, true);
+			state.Apply(skeleton);
+			state.SetAnimation(0, unkeyed, true);
+			for (int i = 1; i <= 3; i++) {
+				state.Update(0.25f);
+				state.Apply(skeleton);
+				float expected = i == 1 ? 50 : 20;
+				foreach (Bone bone in skeleton.Bones) {
+					if (!IsEqual(bone.Pose.Rotation, expected)) FailTestRun(
+						timeline.GetType().Name + ": " + bone + " rotation " + bone.Pose.Rotation + " != " + expected);
+				}
+			}
+			if (state.GetTrack(0).MixingFrom != null) FailTestRun("Mixing did not finish.");
 		}
 
 		void Setup (string description, params Result[] expectedArray) {

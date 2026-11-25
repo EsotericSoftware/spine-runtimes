@@ -46,6 +46,15 @@ public:
 	uint32 GetCategories() override {
 		return EAssetTypeCategories::Misc;
 	};
+	bool IsImportedAsset() const override {
+		return true;
+	};
+	void GetResolvedSourceFilePaths(const TArray<UObject *> &TypeAssets, TArray<FString> &OutSourceFilePaths) const override {
+		for (UObject *Object : TypeAssets) {
+			USpineAtlasAsset *Asset = CastChecked<USpineAtlasAsset>(Object);
+			OutSourceFilePaths.Add(Asset->GetAtlasFileName().ToString());
+		}
+	};
 };
 
 class FSpineSkeletonDataAssetTypeActions : public FAssetTypeActions_Base {
@@ -61,6 +70,15 @@ public:
 	};
 	uint32 GetCategories() override {
 		return EAssetTypeCategories::Misc;
+	};
+	bool IsImportedAsset() const override {
+		return true;
+	};
+	void GetResolvedSourceFilePaths(const TArray<UObject *> &TypeAssets, TArray<FString> &OutSourceFilePaths) const override {
+		for (UObject *Object : TypeAssets) {
+			USpineSkeletonDataAsset *Asset = CastChecked<USpineSkeletonDataAsset>(Object);
+			OutSourceFilePaths.Add(Asset->GetSkeletonDataFileName().ToString());
+		}
 	};
 };
 

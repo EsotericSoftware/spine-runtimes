@@ -40,6 +40,11 @@ namespace Spine.Unity {
 		[SerializeField, SpineEvent(dataField: "skeletonDataAsset")] protected string eventName;
 
 		EventData eventData;
+
+		public SkeletonDataAsset SkeletonDataAsset {
+			get { return skeletonDataAsset; }
+		}
+
 		public EventData EventData {
 			get {
 #if AUTOINIT_SPINEREFERENCE
@@ -48,6 +53,18 @@ namespace Spine.Unity {
 #endif
 				return eventData;
 			}
+		}
+
+#if UNITY_EDITOR
+		void OnValidate () {
+			Clear();
+		}
+#endif
+
+		/// <summary>Clears the cached event data corresponding to a loaded SkeletonData object.
+		/// Use this to force a reload for the next time EventData is called.</summary>
+		public void Clear () {
+			eventData = null;
 		}
 
 		public void Initialize () {

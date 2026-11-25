@@ -22,6 +22,8 @@
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
   - Fixed `Skeleton::updateWorldTransform()` to avoid copying draw order unless it is constrained.
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
+  - Fixed one-bone IK inheritance calculations in Y-down coordinate systems.
+  - Improved clipping performance through the updated spine-cpp clipping runtime.
 
 - **Breaking changes**
   - Removed generated `spine_bone_pose_reset_world()` because resetWorld is an internal implementation detail.
@@ -129,8 +131,11 @@
   - Added `Animation::getColor()` and `BoneData` icon size/rotation accessors for nonessential editor data.
 
 - **Bug fixes**
+  - Fixed `SPINE_USE_STD_FUNCTION` animation listeners failing to compile after listener user data was added.
+  - Fixed physics constraint rotation, shear, and scale forces using the wrong Y direction in Y-down runtimes.
   - Fixed draw order timelines not mixing out to the setup pose.
   - Fixed slider sorting crashes when slider animations key slot or constraint timelines.
+  - Fixed `SliderData` leaking its `FromProperty` by adding a destructor that frees `_property` and its `ToProperty` children, matching `TransformConstraintData`.
   - Fixed bones that don't inherit rotation when parent scale is near zero.
   - Fixed `BonePose::updateLocalTransform()` for `noScale` and `noScaleOrReflection` inheritance, plus related IK epsilon handling.
   - Fixed `ScaleYMode_Volume` to avoid extreme scaleY values for very small scaleX factors.
@@ -138,6 +143,8 @@
   - Fixed `AnimationState` attachment timeline handling so deforms are applied correctly when an attachment is hidden in the setup pose.
   - Fixed `Skeleton::updateWorldTransform()` to avoid copying draw order unless it is constrained.
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
+  - Fixed one-bone IK inheritance calculations in Y-down coordinate systems.
+  - Improved clipping performance by computing barycentric data lazily and reusing edge side tests.
 
 - **Breaking changes**
   - `MathUtil::Epsilon2` renamed to `MathUtil::EpsilonSq`.
@@ -293,7 +300,10 @@
   - Added convex and inverse clipping support through the updated spine-cpp clipping runtime.
 
 - **Bug fixes**
+  - Fixed `SpineBoneDriverComponent` failing to drive bones affected by constraints.
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
+  - Fixed one-bone IK inheritance calculations in Y-down coordinate systems.
+  - Fixed atlas import and reimport not updating existing page textures. Changed source images are now reimported in place.
 
 - **Breaking changes**
   - Custom C++ `AttachmentLoader` implementations now receive both the skin `placeholder` and resolved attachment `name`.
@@ -304,6 +314,14 @@
 ### Godot
 
 - **Additions**
+  - Added experimental Godot 4 `SpineSprite3D` with ordered native geometry batching, reusable mesh/material buffers, shared controller/resource APIs, unlit normal/additive blending, tint black, clipping/deform, pixel scaling, and face culling. Transparent sorting uses a character-level priority and sorting offsets without an artificial slot-count cap.
+  - Added `SpineSlotNode3D` for bone following, explicit 3D geometry insertion between Spine batches, and slot material overrides, plus batching statistics and renderer benchmarks.
+  - Added `SpineSprite3D.camera_relative_depth`, `depth_write_enabled`, `alpha_cutoff`, `get_aabb()`, and `get_depth_shader_code()`, with a custom-shader guide and interactive front/back depth example for module and GDExtension.
+  - Added explicit single-camera slot-anchor following through `SpineSlotNode3D.depth_camera`, with fixed-depth fallback and diagnostics for invalid cameras and multi-view/physics limitations.
+  - Added opt-in generated lighting, atlas normal maps, PBR controls, and texture-alpha-tested shadow modes to `SpineSprite3D`, with lazy shadow-only instances and an interactive Raptor lighting example.
+  - Added `SpineAnimationTrack` support for `SpineSprite3D` and Godot 4 GDExtension, including AnimationPlayer playback/editor scrubbing for both 2D and 3D sprites and a shared timeline example.
+  - Added an interactive 2D/3D benchmark example with configurable character counts, animation/pause controls, CPU timing and renderer statistics for module and GDExtension.
+  - Added tint black (two-color tinting) for Godot 4.3+ module and GDExtension runtimes, with animated coin examples and custom shader color attributes. See [#3169](https://github.com/EsotericSoftware/spine-runtimes/issues/3169).
   - Added `SpineSliderData.get_max()` / `set_max()` for nonessential bone-driven slider metadata.
   - Added `SpinePhysicsConstraintData.get_scale_y_mode()` / `set_scale_y_mode()`.
   - Added `SpineTrackEntry` mix interpolation APIs and `SpineConstant.MixInterpolation`.
@@ -312,15 +330,29 @@
   - Added `SpineTrackEntry.get_additive()` / `set_additive()` for additive blending per track entry.
 
 - **Bug fixes**
+  - Fixed invalid `SpineSprite3D` preview animation names dereferencing a null track entry.
+  - Fixed callback-time `time_scale` changes affecting animation and skeleton/physics advances one update late after controller extraction.
+  - Fixed unrelated scene-tree mutations resetting `SpineSlotNode3D` insertion sorting and revealing inactive-bone children on manual or paused sprites; unchanged descendants retain ownership during transfers.
+  - Fixed newly allocated `SpineSprite3D` batch instances rendering while hidden, including pool growth and inherited visibility.
+  - Fixed `SpineSprite3D` click and box selection in the Godot 4 3D editor using the current clipped and deformed attachment geometry.
+  - Expanded native 3D culling bounds and conservative editor picking to cover both camera-relative depth directions.
+  - Fixed scrubbed Spine animations unexpectedly playing when the AnimationPlayer editor loses focus. Sampled poses stay paused while explicit sprite preview animations and AnimationTree preview can still run.
+  - Fixed long shader-compilation stalls when creating many `SpineSprite3D` instances by sharing generated shader variants across characters while keeping material parameters independent.
+  - Fixed retained `SpineSkeleton`, `SpineAnimationState`, and instance-object wrappers keeping stale native objects after a `SpineSprite` resource reload or destruction. Retained wrappers are now invalidated safely and must be reacquired from the sprite.
+  - Fixed `SpineSkeletonDataResource` constraint getters returning null entries and dropping constraints when multiple constraint types are present.
+  - Fixed physics constraint rotation pointing opposite to translation under gravity and vertical wind.
   - Fixed Godot wrapper crashes from invalid skin attachment lookups, wrong constraint type filtering, stale cached bone/slot wrappers after skeleton rebuilds, dangling `SpineSlotNode` connections after unparenting, and stale Godot 3 wrapper signal connections.
   - Fixed `SpineSprite` debug drawing and global bone transform helpers to work when a skeleton exists without an animation state.
   - Fixed draw order timelines not mixing out to the setup pose.
   - Fixed editor crashes when assigning skeleton data with slider animations that key slots or constraints.
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
+  - Fixed one-bone IK inheritance calculations in Y-down coordinate systems.
   - Fixed `SpineAnimationTrack` editor preview paths for nested `AnimationPlayer` roots, and prevented inactive tracks from clearing `SpineSprite` preview animations.
   - Fixed GDExtension animation mix editing in the Godot inspector.
   - Fixed `SpineBoneNode` and `SpineSlotNode` transforms when bones use negative scale or shear, and applied `SpineBoneNode` Drive mode before world transforms are computed.
+  - Fixed `SpineSlotNode` and global bone transforms exposing the runtime Y-down coordinate conversion as negative Godot Node2D Y scale.
+  - Fixed Godot 4.7 GDExtension resource loading for raw `.skel`, `.spine-json`, and `.atlas` Spine asset files.
   - Updated Godot 4.x CI builds to Godot 4.6.2.
   - Fixed Godot 4.6 Windows editor CI builds by installing Direct3D 12 SDK dependencies before building Godot.
   - Fixed Godot 4.6 GDExtension builds with the latest `godot-cpp` by including the required `Ref` support header in `SpineCommon.h`, updated `SpineEventData` for the `EventData.setupPose` API change, and refreshed vendored `spine-cpp` sources during clean setup.
@@ -330,6 +362,8 @@
   - Fixed Godot 3.x builds by avoiding the Godot 4-only `Transform2D(Vector2, Vector2, Vector2)` constructor.
 
 - **Breaking changes (since previous 4.3 beta)**
+  - Removed `SpineBone.get_global_transform()` and `SpineBone.set_global_transform()`. Use `SpineSprite.get_global_bone_transform()` and `SpineSprite.set_global_bone_transform()` for Godot global canvas transforms.
+  - `SpineSprite3D` now defaults to camera-relative spacing, depth writes, a 0.001 slot-depth offset and a 0.001 alpha cutoff. Custom shaders must explicitly implement the documented depth helper; their render modes and source remain unchanged. Disable depth writes and set spacing/cutoff to zero to retain the previous no-write transparent composition.
   - `SpineSkin` attachment method argument names now use `placeholder` instead of `name`.
   - `SpineTrackEntry.get_hold_previous()` / `set_hold_previous()` removed.
   - `SpineTrackEntry.get_mix_blend()` / `set_mix_blend()` removed. Use `get_additive()` / `set_additive()` for additive blending.
@@ -526,6 +560,7 @@
   - Removed Spine Timeline `Spine Animation State Clip` property `Hold Previous`. New `AnimationState` hold system automatically calculates the required state values.
   - Removed intermediately added (4.3-beta branch only) `SkeletonAnimation` callbacks `MainThreadStart`, `MainThreadInterrupt`, `MainThreadEnd`, `MainThreadDispose`, `MainThreadComplete` and `MainThreadEvent`. Instead `SkeletonAnimation.AnimationState` and `TrackEntry` events are now automatically  processed on the main thread. There is no longer a change of user code required for these events, and `TrackEntry` events can be utilized directly even with threaded animation enabled.
   - `SkeletonGraphic` property `CustomSlotMaterials` now properly assigns the override material directly instead of assigning the texture of the override material, which was of little use.
+  - On-demand loading modules: New methods were added to the loader and Inspector base classes, see the list under **Additions** below. This is only breaking if a custom subclass already declares a method with the same name and signature (rather unlikely). In this case add the `new` or `override` modifier or rename the method.
 
 - **Changes of default values**
   - Changed default atlas texture workflow from PMA to straight alpha textures. This move was done because straight alpha textures are compatible with both Gamma and Linear color space, with the latter being the default for quite some time now in Unity. Note that `PMA Vertex Color` is unaffected and shall be enabled as usual to allow for single-pass additive rendering.
@@ -556,6 +591,21 @@
   - `SkeletonGraphicCustomMaterials` now exposes `Custom Slot Materials` property for slot material overrides.
   - Exposed `SpineVisualElement.Initialize` as `public`.
   - `SkeletonRenderer` and `SkeletonGraphic` classes now provide `PhysicsPositionInheritanceLimit` and `PhysicsRotationInheritanceLimit` properties, exposed in the component Inspector under `Physics Inheritance` as `Limit` properties, below `Position` and `Rotation`.
+  - `SkeletonGraphic` now provides a new method `MatchReferenceRectWithBounds` to adjust the reference rectangle bounds to the mesh bounds for use with automatic layout scale modes. The `Match RectTransform with Mesh` `Match` button is now available outside of `Edit Layout Bounds` mode as well and performs this adjustment for quick one-click setup.
+  - `SkeletonGraphic`: You can now offset the pivot with automatic offset compensation via a newly added blue circle handle. This lets you move the pivot to the skeleton part that you want fixed when auto layout mode scales and moves your skeleton around to fit the RectTransform bounds. It also helps to visualize the current pivot position if you set the pivot numerically via the RectTransform Inspector.
+  - `SkeletonAnimation` received a `DeltaTimeOverride` callback. This allows advancing by custom delta time for e.g. stepped animation updates in a threaded context. The callback may change `UpdateMode` to disable or limit skeleton updates for certain frames. It is called on the main thread once before animation update.
+  - Added sample component `SkeletonAnimationFixedTimestepThreaded` as a replacement component for `SkeletonAnimationFixedTimestep` which was limited to single-threaded use only. This component is using the new `DeltaTimeOverride` event and is thus compatible with both single-threaded and multi-threaded animation.
+  - Added sample component `SkeletonAnimationStaticPoseOptimizer` which automatically skips animation and mesh updates while a SkeletonAnimation's `AnimationState` retains a static pose. It is compatible with threaded animation and mesh updates. The component modifies `SkeletonAnimation.UpdateMode`, so watch out for side effects if multiple components modify this same property.
+  - On-demand loading modules: Added method `HasRequestFailed` to `GenericOnDemandTextureLoader`, automatically handling when requests fail to be processed. It provides a default implementation returning `false` to maintain the existing behaviour without code change. `AddressableTextureLoader` implements this method accordingly to cover Addressable request failure. Be sure to update both `com.esotericsoftware.spine.addressables` and `com.esotericsoftware.spine.on-demand-loading` UPM packages.
+  - On-demand loading modules: Added `IDeferredCleanupOnDemandTextureLoader` interface for automatic cleanup by `OnDemandTextureLoaderCleanup` below. `GenericOnDemandTextureLoader` implements this interface.
+  - On-demand loading modules: Added `OnDemandTextureLoaderCleanup`, which automatically maintains loaders with unreleased texture requests independently of skeleton renderer lifecycle. This is necessary because textures are deliberately kept alive for a delay after their last use to avoid unload/reload thrashing, so cleanup must continue after the last renderer using them is destroyed. When loaders are destroyed or unloaded they now also unload all textures and restore their low-resolution placeholders.
+  - On-demand loading modules: Build processing now automatically assigns placeholders to all `Material` assets whose main texture references an on-demand target texture. `RenderExistingMesh` replacement materials now support on-demand texture loading. Copied and custom materials used for on-demand loading are restored to placeholders when target textures unload.
+  - Added automatic multi-atlas matching during skeleton import when required attachment regions are distributed across multiple atlas assets.
+  - On-demand loading modules: Added support for on-demand loading of additional material textures such as normal maps. Add the shader texture property names (e.g. `_BumpMap`) to the new `Additional Texture Properties` list at the loader asset (e.g. `AddressableTextureLoader`), or hit `Add All Textures`. Placeholder textures are setup automatically and the high-resolution textures are loaded and unloaded together with the main texture, also at blend mode materials and copied materials. The loader setup is validated before builds and in the loader Inspector. If the placeholder map is out of date, warnings are logged and no placeholder textures are assigned for this loader when building, so its textures are included in the build at full resolution instead of being loaded on demand. Custom `GenericOnDemandTextureLoader` subclasses shall assign loaded textures via `SetTexture(material, textureIndex, texture)` instead of `material.mainTexture` in `CreateTextureRequest`. Be sure to update both `com.esotericsoftware.spine.addressables` and `com.esotericsoftware.spine.on-demand-loading` UPM packages.
+  - On-demand loading modules: Added the following public and protected methods to base classes. Custom subclasses already declaring a method with the same name and signature now hide the base method (warning CS0108) and shall add the `new` or `override` modifier or rename it.
+    - `OnDemandTextureLoader`: `AssignPlaceholderTextures(Material, out Texture[])`, `RestoreTargetTextures` (three overloads), `IsPlaceholderTexture`, `IsTargetTexture`, `ValidateSetup`, `GetTexturePropertyNames`.
+    - `GenericOnDemandTextureLoader`: `GetTexture`, `SetTexture`, `GetMainTexturePropertyID`, `FindMaterialIndexByPlaceholder`, `FindMaterialIndexByPlaceholderName`, `FindMaterialIndexByTargetTexture`, `FindLoadedMaterialIndexByTarget`, `ValidateSetup(bool)`, `AddAllTextureProperties`, `IsTextureAsset`, `IsValidAdditionalTextureProperty`, `OnDemandTextureCount`.
+    - `GenericOnDemandTextureLoaderInspector`: `DrawPlaceholderMapping(SerializedProperty, string)`, `UpdatePlaceholderTextures`, `GetTexturePropertyName`, `GetOtherLoaders`, `DeleteUnusedPlaceholderTextures`, `RestoreTargetTexturesBeforeDeletingPlaceholders`, `StaticMethodImplementations.RegenerateForAtlasAsset`.
 
 - **Deprecated**
 
@@ -570,17 +620,22 @@
 ## iOS
 
 - **Additions**
+  - Added native AppKit/macOS support to `SpineiOS` and the example app.
+  - Added `SpineTextureFilter` overrides to `SpineUIView` and `SpineView`.
   - Added generated slider data `max` APIs.
   - Added generated physics constraint `scaleYMode` APIs.
   - Added generated `Interpolation` and `TrackEntry` mix interpolation APIs.
   - Added convex and inverse clipping support through the updated spine-cpp clipping runtime.
 
 - **Bug fixes**
+  - Fixed Metal rendering to honor each atlas page's texture filter, mipmap, and wrap settings.
   - Fixed draw order timelines not mixing out to the setup pose.
   - Fixed bones that don't inherit rotation when parent scale is near zero.
   - Fixed `BonePose.updateLocalTransform(_:)` for `noScale` and `noScaleOrReflection` inheritance.
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
+  - Fixed one-bone IK inheritance calculations in Y-down coordinate systems.
+  - Improved clipping performance through the updated spine-cpp clipping runtime.
 
 - **Breaking changes**
   - Removed generated `BonePose.resetWorld(_:)` because resetWorld is an internal implementation detail.
@@ -609,6 +664,8 @@
   - Fixed `BonePose.updateLocalTransform()` for `noScale` and `noScaleOrReflection` inheritance.
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
+  - Fixed one-bone IK inheritance calculations in Y-down coordinate systems.
+  - Improved clipping performance through the updated spine-cpp clipping runtime.
 
 - **Breaking changes**
   - Removed generated `BonePose.resetWorld()` because resetWorld is an internal implementation detail.
@@ -648,6 +705,8 @@
   - Fixed `BonePose.updateLocalTransform()` for `noScale` and `noScaleOrReflection` inheritance.
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
+  - Fixed one-bone IK inheritance calculations in Y-down coordinate systems.
+  - Improved clipping performance through the updated spine-cpp clipping runtime.
 
 - **Breaking changes**
   - Removed generated `BonePose.resetWorld()` because resetWorld is an internal implementation detail.
@@ -1020,6 +1079,9 @@
   - Updated the Gradle wrapper and fixed the headless test fat jar task to build included libgdx runtime classpath artifacts before packaging.
   - Gradle builds now delete stale Eclipse `bin/` output before compiling so removed classes don't linger on Java headless test classpaths.
   - Updated the libGDX dependency from `1.14.1-SNAPSHOT` to the released `1.14.1`.
+  - Fixed `TwoColorPolygonBatch` ignoring the configured maximum vertex count.
+  - Improved clipping performance by computing barycentric data lazily and reusing edge side tests.
+  - Fixed binary skeleton loading from `FileHandle` to use buffered I/O, avoiding slow per-byte file reads.
 
 ### Android
 
@@ -1030,6 +1092,8 @@
   - Updated the Android atlas attachment loader to match the current `AttachmentLoader` method signatures.
   - Updated the Android examples to use `AnimationState.getTrack()` instead of the removed `getCurrent()` API.
   - Updated the libGDX dependency from `1.14.1-SNAPSHOT` to the released `1.14.1`.
+  - Updated the bundled spine-libgdx release with the `TwoColorPolygonBatch` max vertices fix and clipping performance improvements.
+  - Fixed large binary skeleton files taking a long time to load from files by buffering spine-libgdx file reads.
 
 ## Swift
 
@@ -1315,6 +1379,13 @@
   - Updated to use new TypeScript/JavaScript runtime
   - Updated skeleton and overlay component implementations
   - Removed `pma` property from `SpineWebComponentSkeleton` - PMA is handled automatically
+
+## Unreal Engine
+
+- **Bug fixes**
+  - Fixed `SSpineWidget` compilation with Unreal Engine 5.8 after the removal of boolean shrinking arguments from `TArray::Pop()`.
+  - Fixed Spine atlas and skeleton data reimport actions and automatic source change detection in recent Unreal Engine versions.
+  - Fixed editor crashes caused by parsing stale skeleton data while loading assets. Skeleton metadata is now validated and cached during import and reimport.
 
 # 4.2
 

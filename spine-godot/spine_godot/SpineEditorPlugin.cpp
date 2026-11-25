@@ -35,6 +35,7 @@
 #include "SpineSkeletonFileResource.h"
 
 #if VERSION_MAJOR > 3
+#include "SpineSprite3D.h"
 #ifdef SPINE_GODOT_EXTENSION
 #include <godot_cpp/classes/button.hpp>
 #include <godot_cpp/classes/h_box_container.hpp>
@@ -200,6 +201,28 @@ Error SpineBinaryResourceImportPlugin::import(const String &source_file, const S
 	return error;
 }
 
+#if VERSION_MAJOR > 3
+#ifdef SPINE_GODOT_EXTENSION
+bool SpineSprite3DGizmoPlugin::_has_gizmo(Node3D *node) const {
+#else
+bool SpineSprite3DGizmoPlugin::has_gizmo(Node3D *node) {
+#endif
+	return Object::cast_to<SpineSprite3D>(node) != nullptr;
+}
+
+#ifdef SPINE_GODOT_EXTENSION
+void SpineSprite3DGizmoPlugin::_redraw(const Ref<EditorNode3DGizmo> &gizmo) {
+#else
+void SpineSprite3DGizmoPlugin::redraw(EditorNode3DGizmo *gizmo) {
+#endif
+	gizmo->clear();
+	auto sprite = Object::cast_to<SpineSprite3D>(gizmo->get_node_3d());
+	if (!sprite) return;
+	Ref<TriangleMesh> mesh = sprite->get_editor_selection_mesh();
+	if (mesh.is_valid()) gizmo->add_collision_triangles(mesh);
+}
+#endif
+
 #ifdef SPINE_GODOT_EXTENSION
 SpineEditorPlugin::SpineEditorPlugin() {
 	atlas_import_plugin = Ref<EditorImportPlugin>(memnew(SpineAtlasResourceImportPlugin));
@@ -211,6 +234,8 @@ SpineEditorPlugin::SpineEditorPlugin() {
 	add_import_plugin(json_import_plugin);
 	add_import_plugin(binary_import_plugin);
 	add_inspector_plugin(skeleton_data_inspector_plugin);
+	sprite_3d_gizmo_plugin = Ref<SpineSprite3DGizmoPlugin>(memnew(SpineSprite3DGizmoPlugin));
+	add_node_3d_gizmo_plugin(sprite_3d_gizmo_plugin);
 }
 
 void SpineEditorPlugin::_notification(int p_what) {
@@ -219,6 +244,7 @@ void SpineEditorPlugin::_notification(int p_what) {
 		remove_import_plugin(json_import_plugin);
 		remove_import_plugin(binary_import_plugin);
 		remove_inspector_plugin(skeleton_data_inspector_plugin);
+		remove_node_3d_gizmo_plugin(sprite_3d_gizmo_plugin);
 	}
 }
 #else
@@ -228,6 +254,10 @@ SpineEditorPlugin::SpineEditorPlugin(EditorNode *node) {
 	add_import_plugin(memnew(SpineBinaryResourceImportPlugin));
 	add_inspector_plugin(memnew(SpineSkeletonDataResourceInspectorPlugin));
 	add_inspector_plugin(memnew(SpineSpriteInspectorPlugin));
+#if VERSION_MAJOR > 3
+	sprite_3d_gizmo_plugin = Ref<SpineSprite3DGizmoPlugin>(memnew(SpineSprite3DGizmoPlugin));
+	add_node_3d_gizmo_plugin(sprite_3d_gizmo_plugin);
+#endif
 }
 #endif
 

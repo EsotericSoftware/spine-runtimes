@@ -249,7 +249,7 @@ public class SkeletonClipping {
 			t = triangles[i + 2];
 			float x3 = vertices[t * stride], y3 = vertices[t * stride + 1];
 			float u3 = uvs[t << 1], v3 = uvs[(t << 1) + 1];
-			float d0 = y2 - y3, d1 = x3 - x2, d2 = x1 - x3, d4 = y3 - y1, d = 1 / (d0 * d2 + d1 * (y1 - y3));
+			float d0 = 0, d1 = 0, d2 = 0, d4 = 0, d = 0;
 			for (int p = 0; p < polygonsCount; p++) {
 				int s = clippedVertices.size;
 				if (clip(x1, y1, x2, y2, x3, y3, polygons[p])) {
@@ -257,6 +257,13 @@ public class SkeletonClipping {
 					int clipOutputLength = clipOutput.size;
 					if (clipOutputLength == 0) continue;
 					int clipOutputCount = clipOutputLength >> 1;
+					if (d == 0) {
+						d0 = y2 - y3;
+						d1 = x3 - x2;
+						d2 = x1 - x3;
+						d4 = y3 - y1;
+						d = 1 / (d0 * d2 - d1 * d4);
+					}
 
 					float[] cv = clippedVertices.setSize(s + clipOutputCount * stride);
 					for (int ii = 0; ii < clipOutputLength; ii += 2, s += 2) {
@@ -406,7 +413,7 @@ public class SkeletonClipping {
 			t = triangles[i + 2] << 1;
 			float x3 = vertices[vertexStart + t], y3 = vertices[vertexStart + t + 1];
 			float u3 = uvs[t], v3 = uvs[t + 1];
-			float d0 = y2 - y3, d1 = x3 - x2, d2 = x1 - x3, d4 = y3 - y1, d = 1 / (d0 * d2 + d1 * (y1 - y3));
+			float d0 = 0, d1 = 0, d2 = 0, d4 = 0, d = 0;
 			for (int p = 0; p < polygonsCount; p++) {
 				int s = clippedVertices.size;
 				if (clip(x1, y1, x2, y2, x3, y3, polygons[p])) {
@@ -414,6 +421,13 @@ public class SkeletonClipping {
 					int clipOutputLength = clipOutput.size;
 					if (clipOutputLength == 0) continue;
 					int clipOutputCount = clipOutputLength >> 1;
+					if (d == 0) {
+						d0 = y2 - y3;
+						d1 = x3 - x2;
+						d2 = x1 - x3;
+						d4 = y3 - y1;
+						d = 1 / (d0 * d2 - d1 * d4);
+					}
 
 					float[] cv = clippedVertices.setSize(s + clipOutputCount * 2), cu = clippedUvs.setSize(s + clipOutputCount * 2);
 					for (int ii = 0; ii < clipOutputLength; ii += 2, s += 2) {
@@ -494,16 +508,15 @@ public class SkeletonClipping {
 			float edgeX = v[i], edgeY = v[i + 1], ex = edgeX - v[i + 2], ey = edgeY - v[i + 3];
 			int outputStart = output.size;
 			iv = input.items;
-			for (int ii = 0, nn = input.size - 2; ii < nn;) {
-				x1 = iv[ii];
-				y1 = iv[ii + 1];
-				ii += 2;
+			x1 = iv[0];
+			y1 = iv[1];
+			float s1 = ey * (edgeX - x1) - ex * (edgeY - y1);
+			for (int ii = 2, nn = input.size - 2; ii <= nn; ii += 2) {
 				x2 = iv[ii];
 				y2 = iv[ii + 1];
-				boolean s2 = ey * (edgeX - x2) > ex * (edgeY - y2);
-				float s1 = ey * (edgeX - x1) - ex * (edgeY - y1);
+				float s2 = ey * (edgeX - x2) - ex * (edgeY - y2);
 				if (s1 > 0) {
-					if (s2) // v1 in, v2 in
+					if (s2 > 0) // v1 in, v2 in
 						output.add(x2, y2);
 					else { // v1 in, v2 out
 						float ix = x2 - x1, iy = y2 - y1, t = s1 / (ix * ey - iy * ex);
@@ -513,7 +526,7 @@ public class SkeletonClipping {
 						} else
 							output.add(x2, y2);
 					}
-				} else if (s2) { // v1 out, v2 in
+				} else if (s2 > 0) { // v1 out, v2 in
 					float ix = x2 - x1, iy = y2 - y1, t = s1 / (ix * ey - iy * ex);
 					if (t >= 0 && t <= 1) {
 						output.add(x1 + ix * t, y1 + iy * t, x2, y2);
@@ -522,6 +535,9 @@ public class SkeletonClipping {
 						output.add(x2, y2);
 				} else // v1 out, v2 out
 					clipped = true;
+				x1 = x2;
+				y1 = y2;
+				s1 = s2;
 			}
 			if (outputStart == output.size) { // All outside.
 				originalOutput.size = 0;
@@ -576,19 +592,17 @@ public class SkeletonClipping {
 			int outputStart = output.size, fragmentStart = inverseVertices.size;
 			inverseVertices.add(0);
 			iv = input.items;
-			for (int ii = 0, nn = input.size - 2; ii < nn;) {
-				x1 = iv[ii];
-				y1 = iv[ii + 1];
-				ii += 2;
+			x1 = iv[0];
+			y1 = iv[1];
+			float s1 = ey * (edgeX - x1) - ex * (edgeY - y1);
+			for (int ii = 2, nn = input.size - 2; ii <= nn; ii += 2) {
 				x2 = iv[ii];
 				y2 = iv[ii + 1];
-				boolean s2 = ey * (edgeX - x2) > ex * (edgeY - y2);
-				float s1 = ey * (edgeX - x1) - ex * (edgeY - y1);
+				float s2 = ey * (edgeX - x2) - ex * (edgeY - y2);
 				if (s1 > 0) {
-					if (s2) // v1 in, v2 in
+					if (s2 > 0) // v1 in, v2 in
 						output.add(x2, y2);
-					else {
-						// v1 in, v2 out
+					else { // v1 in, v2 out
 						float ix = x2 - x1, iy = y2 - y1, t = s1 / (ix * ey - iy * ex);
 						if (t >= 0 && t <= 1) {
 							float cx = x1 + ix * t, cy = y1 + iy * t;
@@ -597,16 +611,19 @@ public class SkeletonClipping {
 						} else
 							output.add(x2, y2);
 					}
-				} else if (s2) { // v1 out, v2 in
-					float dx = x2 - x1, dy = y2 - y1, t = s1 / (dx * ey - dy * ex);
+				} else if (s2 > 0) { // v1 out, v2 in
+					float ix = x2 - x1, iy = y2 - y1, t = s1 / (ix * ey - iy * ex);
 					if (t >= 0 && t <= 1) {
-						float cx = x1 + dx * t, cy = y1 + dy * t;
+						float cx = x1 + ix * t, cy = y1 + iy * t;
 						inverseVertices.add(cx, cy);
 						output.add(cx, cy, x2, y2);
 					} else
 						output.add(x2, y2);
 				} else // v1 out, v2 out
 					inverseVertices.add(x2, y2);
+				x1 = x2;
+				y1 = y2;
+				s1 = s2;
 			}
 
 			int fragmentSize = inverseVertices.size - fragmentStart - 1;
@@ -629,36 +646,34 @@ public class SkeletonClipping {
 
 	private boolean makeClockwise (FloatArray polygon) {
 		float[] v = polygon.items;
-		int n = polygon.size;
+		int n = polygon.size, flips = 0;
 		boolean noCW = true, noCCW = true;
-		float area = 0, prevX = v[n - 2], prevY = v[n - 1], currX = v[0], currY = v[1];
-		for (int i = 2; i < n; i += 2) {
-			float nextX = v[i], nextY = v[i + 1];
-			area += currX * nextY - nextX * currY;
-			float cross = (currX - prevX) * (nextY - currY) - (currY - prevY) * (nextX - currX);
+		float x = v[n - 2], y = v[n - 1], dx = x - v[n - 4], dy = y - v[n - 3], dir = dx != 0 ? dx : dy, area = 0;
+		for (int i = 0; i < n; i += 2) {
+			float nx = v[i], ny = v[i + 1], ndx = nx - x, ndy = ny - y, ndir = ndx != 0 ? ndx : ndy;
+			area += x * ny - nx * y;
+			float cross = dx * ndy - dy * ndx;
 			noCCW &= cross <= 0;
 			noCW &= cross >= 0;
-			prevX = currX;
-			prevY = currY;
-			currX = nextX;
-			currY = nextY;
+			if (dir * ndir <= 0) flips++;
+			x = nx;
+			y = ny;
+			dx = ndx;
+			dy = ndy;
+			dir = ndir;
 		}
-		area += currX * v[1] - v[0] * currY;
-		float cross = (currX - prevX) * (v[1] - currY) - (currY - prevY) * (v[0] - currX);
-		noCCW &= cross <= 0;
-		noCW &= cross >= 0;
 		if (area >= 0) {
 			for (int i = 0, lastX = n - 2, half = n >> 1; i < half; i += 2) {
-				float x = v[i], y = v[i + 1];
+				float tx = v[i], ty = v[i + 1];
 				int other = lastX - i;
 				v[i] = v[other];
 				v[i + 1] = v[other + 1];
-				v[other] = x;
-				v[other + 1] = y;
+				v[other] = tx;
+				v[other + 1] = ty;
 			}
-			return noCW;
+			return noCW && flips <= 2;
 		}
-		return noCCW;
+		return noCCW && flips <= 2;
 	}
 
 	private void makeConvex (FloatArray polygon) {

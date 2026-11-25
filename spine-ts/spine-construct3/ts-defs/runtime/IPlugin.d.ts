@@ -10,6 +10,7 @@ declare class IPlugin_
     readonly isWorldType: boolean;
     readonly isHTMLElementType: boolean;
     readonly isRotatable: boolean;
+    readonly isRotatable3d: boolean;
     readonly hasEffects: boolean;
     readonly is3d: boolean;
     readonly supportsHierarchies: boolean;

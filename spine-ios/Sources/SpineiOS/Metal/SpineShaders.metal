@@ -47,11 +47,9 @@ vertexShader(uint vertexID [[vertex_id]],
 
 fragment simd_float4
 fragmentShader(RasterizerData in [[stage_in]],
-               texture2d<half> colorTexture [[ texture(SpineTextureIndexBaseColor) ]])
+               texture2d<half> colorTexture [[ texture(SpineTextureIndexBaseColor) ]],
+               sampler textureSampler [[ sampler(SpineSamplerIndexTexture) ]])
 {
-    constexpr sampler textureSampler (mag_filter::nearest,
-                                      min_filter::nearest);
-    
     const half4 colorSample = colorTexture.sample(textureSampler, in.textureCoordinate);
     
     return simd_float4(colorSample) * in.color;

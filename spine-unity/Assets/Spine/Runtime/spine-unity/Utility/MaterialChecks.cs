@@ -50,6 +50,7 @@ namespace Spine.Unity {
 			};
 		static readonly string NORMALMAP_KEYWORD = "_NORMALMAP";
 		static readonly string CANVAS_GROUP_COMPATIBLE_KEYWORD = "_CANVAS_GROUP_COMPATIBLE";
+		static readonly string TINT_BLACK_KEYWORD = "_TINT_BLACK_ON";
 
 		public static readonly string kPMANotSupportedLinearMessage =
 			"\nWarning: Premultiply-alpha atlas textures not supported in Linear color space!"
@@ -327,8 +328,8 @@ namespace Spine.Unity {
 
 		static bool RequiresTintBlack (Material material) {
 			bool isTintBlackShader =
-				material.shader.name.Contains("Spine") &&
-				material.shader.name.Contains("Tint Black");
+				(material.shader.name.Contains("Spine") && material.shader.name.Contains("Tint Black")) ||
+				material.IsKeywordEnabled(TINT_BLACK_KEYWORD);
 			return isTintBlackShader;
 		}
 

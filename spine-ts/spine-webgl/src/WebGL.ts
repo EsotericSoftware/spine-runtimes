@@ -29,7 +29,7 @@
 
 import type { Disposable, Restorable } from "@esotericsoftware/spine-core";
 
-export class ManagedWebGLRenderingContext implements Disposable {
+export class ManagedWebGLRenderingContext implements Disposable, Restorable {
 	public canvas: HTMLCanvasElement | OffscreenCanvas;
 	public gl: WebGLRenderingContext;
 	private restorables = [] as Restorable[];
@@ -52,6 +52,10 @@ export class ManagedWebGLRenderingContext implements Disposable {
 	}
 
 	private contextRestoredHandler = () => {
+		this.restore();
+	}
+
+	restore (): void {
 		for (let i = 0, n = this.restorables.length; i < n; i++)
 			this.restorables[i].restore();
 	}

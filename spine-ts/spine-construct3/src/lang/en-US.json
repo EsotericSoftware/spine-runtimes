@@ -43,6 +43,10 @@
             "name": "Bounds provider",
             "desc": "Select the desired bound provider and fill the respective properties."
           },
+          "spine-rendering-group": {
+            "name": "Rendering",
+            "desc": "Rendering settings."
+          },
           "spine-bounds-provider": {
             "name": "Bounds provider",
             "desc": "The bounds provider to use.",
@@ -62,6 +66,10 @@
           "spine-offset-scale-y": {
             "name": "Offset Scale Y",
             "desc": "Offset Scale Y"
+          },
+          "spine-slot-z-offset": {
+            "name": "Slot Z offset",
+            "desc": "Optional rendering distance in 3D world units between successive visible slots. Increase it if 3D rotation causes z-fighting; keep it at 0 to leave all slots coplanar."
           },
           "spine-debug-skeleton": {
             "name": "Debug skeleton",
@@ -133,9 +141,9 @@
             "description": "Check if the skeleton has finished loading"
           },
           "is-playing": {
-            "list-name": "Is playing",
-            "display-text": "Is playing",
-            "description": "Check if the animation is currently playing"
+            "list-name": "Is playback enabled",
+            "display-text": "Is playback enabled",
+            "description": "Check whether updates are enabled by Play or Stop. This does not require an animation on a track."
           },
           "has-collision-body": {
             "list-name": "Has collision body",
@@ -476,11 +484,11 @@
           "set-skeleton-color": {
             "list-name": "Set skeleton color",
             "display-text": "Set skeleton color to {0}",
-            "description": "Set the color of the entire skeleton. Accepts hex colors (#RRGGBB or #RRGGBBAA) or color names.",
+            "description": "Set the color of the entire skeleton. Accepts hex colors (#RRGGBB or #RRGGBBAA).",
             "params": {
               "color": {
                 "name": "Color",
-                "desc": "Color value (hex like #FF0000 or color name)"
+                "desc": "Hex color value, such as #FF0000 or #FF000080"
               }
             }
           },
@@ -513,7 +521,7 @@
           "set-slot-color": {
             "list-name": "Set slot color",
             "display-text": "Set slot {0} color to {1}",
-            "description": "Set the color of a slot. Accepts hex colors (#RRGGBB or #RRGGBBAA) or color names.",
+            "description": "Set the color of a slot. Accepts hex colors (#RRGGBB or #RRGGBBAA).",
             "params": {
               "slot-name": {
                 "name": "Slot name",
@@ -521,7 +529,7 @@
               },
               "color": {
                 "name": "Color",
-                "desc": "Color value (hex like #FF0000 or color name)"
+                "desc": "Hex color value, such as #FF0000 or #FF000080"
               }
             }
           },
@@ -809,11 +817,11 @@
           "set-collision-body-drives-object": {
             "list-name": "Set collision body drives object",
             "display-text": "Set collision body drives object to {0}",
-            "description": "When enabled, movement of the generated Sprite collision body moves the Spine object. Useful for putting movement behaviors on the collision body.",
+            "description": "When enabled, movement and 2D angle changes of the generated Sprite collision body move and rotate the Spine object. Useful for putting movement behaviors on the collision body.",
             "params": {
               "enabled": {
                 "name": "Enabled",
-                "desc": "Whether the generated collision body should drive the Spine object's position"
+                "desc": "Whether the generated collision body should drive the Spine object's position and 2D angle"
               }
             }
           },

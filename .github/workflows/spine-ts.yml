@@ -6,9 +6,26 @@ on:
       - 'spine-ts-*'
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Release version, matching spine-ts/package.json (for example: 4.3.8)'
+      package:
+        description: 'Npm package to publish, or all for a complete release'
         required: true
+        type: choice
+        options:
+          - core
+          - canvas
+          - canvaskit
+          - webgl
+          - player
+          - webcomponents
+          - threejs
+          - phaser-v3
+          - phaser-v4
+          - pixi-v7
+          - pixi-v8
+          - all
+      version:
+        description: 'Package version; defaults to the version in spine-ts/package.json'
+        required: false
         type: string
 
 permissions:
@@ -25,24 +42,51 @@ jobs:
       with:
         node-version: '24'
         registry-url: 'https://registry.npmjs.org'
-    - name: Set release version
+    - name: Set release configuration
       env:
+        MANUAL_PACKAGE: ${{ inputs.package }}
         MANUAL_VERSION: ${{ inputs.version }}
       run: |
         VERSION="$MANUAL_VERSION"
         if [ -z "$VERSION" ]; then
-          VERSION="${GITHUB_REF_NAME#spine-ts-}"
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            VERSION=$(node -p "require('./spine-ts/package.json').version")
+          else
+            VERSION="${GITHUB_REF_NAME#spine-ts-}"
+          fi
         fi
+        if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+          echo "Invalid release version '$VERSION'; expected x.y.z."
+          exit 1
+        fi
+
+        WORKSPACE=""
+        if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+          case "$MANUAL_PACKAGE" in
+            all) ;;
+            core|canvas|canvaskit|webgl|player|webcomponents|threejs|phaser-v3|phaser-v4|pixi-v7|pixi-v8)
+              WORKSPACE="@esotericsoftware/spine-$MANUAL_PACKAGE"
+              ;;
+            *)
+              echo "Unsupported npm package '$MANUAL_PACKAGE'."
+              exit 1
+              ;;
+          esac
+        fi
+
         echo "TS_RELEASE_VERSION=$VERSION" >> "$GITHUB_ENV"
+        echo "TS_RELEASE_WORKSPACE=$WORKSPACE" >> "$GITHUB_ENV"
     - name: Build spine-ts
       working-directory: spine-ts
       run: ./scripts/build.sh
     - name: Deploy spine-ts artifacts
+      if: github.event_name == 'push' || inputs.package == 'all'
       working-directory: spine-ts
       env:
         TS_UPDATE_URL: ${{secrets.TS_UPDATE_URL}}
       run: ./scripts/deploy.sh
     - name: Deploy spine-construct3
+      if: github.event_name == 'push' || inputs.package == 'all'
       working-directory: spine-ts
       env:
         C3_UPDATE_URL: ${{secrets.C3_UPDATE_URL}}
@@ -50,15 +94,19 @@ jobs:
     - name: Publish npm packages
       working-directory: spine-ts
       run: |
-        npm publish --access public \
-          --workspace @esotericsoftware/spine-core \
-          --workspace @esotericsoftware/spine-canvas \
-          --workspace @esotericsoftware/spine-canvaskit \
-          --workspace @esotericsoftware/spine-webgl \
-          --workspace @esotericsoftware/spine-player \
-          --workspace @esotericsoftware/spine-webcomponents \
-          --workspace @esotericsoftware/spine-threejs \
-          --workspace @esotericsoftware/spine-phaser-v3 \
-          --workspace @esotericsoftware/spine-phaser-v4 \
-          --workspace @esotericsoftware/spine-pixi-v7 \
-          --workspace @esotericsoftware/spine-pixi-v8
+        if [ -n "$TS_RELEASE_WORKSPACE" ]; then
+          npm publish --access public --workspace "$TS_RELEASE_WORKSPACE"
+        else
+          npm publish --access public \
+            --workspace @esotericsoftware/spine-core \
+            --workspace @esotericsoftware/spine-canvas \
+            --workspace @esotericsoftware/spine-canvaskit \
+            --workspace @esotericsoftware/spine-webgl \
+            --workspace @esotericsoftware/spine-player \
+            --workspace @esotericsoftware/spine-webcomponents \
+            --workspace @esotericsoftware/spine-threejs \
+            --workspace @esotericsoftware/spine-phaser-v3 \
+            --workspace @esotericsoftware/spine-phaser-v4 \
+            --workspace @esotericsoftware/spine-pixi-v7 \
+            --workspace @esotericsoftware/spine-pixi-v8
+        fi

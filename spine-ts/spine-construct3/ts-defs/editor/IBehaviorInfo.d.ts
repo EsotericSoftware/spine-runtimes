@@ -1,5 +1,5 @@
 
-type BehaviorInfoCategory = "attributes" | "general" | "movements" | "other";
+type BehaviorInfoCategory = "3d" | "attributes" | "general" | "movements" | "other";
 
 declare namespace SDK {
 	class IBehaviorInfo {

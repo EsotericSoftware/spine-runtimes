@@ -183,7 +183,7 @@ public class SkeletonBinary extends SkeletonLoader {
 	public SkeletonData readSkeletonData (FileHandle file) {
 		if (file == null) throw new IllegalArgumentException("file cannot be null.");
 		try {
-			SkeletonData skeletonData = readSkeletonData(file.read());
+			SkeletonData skeletonData = readSkeletonData(file.read(10 * 1024));
 			skeletonData.name = file.nameWithoutExtension();
 			return skeletonData;
 		} catch (Throwable ex) {

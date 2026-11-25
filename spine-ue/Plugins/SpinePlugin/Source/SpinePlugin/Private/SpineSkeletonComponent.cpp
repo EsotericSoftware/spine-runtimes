@@ -170,8 +170,7 @@ void USpineSkeletonComponent::SetBoneWorldPosition(const FString &BoneName, cons
 		} else {
 			bone->getAppliedPose().worldToLocal(localPosition.X, localPosition.Z, localX, localY);
 		}
-		bone->getAppliedPose().setX(localX);
-		bone->getAppliedPose().setY(localY);
+		bone->getPose().setPosition(localX, localY);
 	}
 }
 

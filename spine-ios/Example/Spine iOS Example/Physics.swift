@@ -55,7 +55,7 @@ struct Physics: View {
             model.dispose()
         }
         .navigationTitle("Physics (drag anywhere)")
-        .navigationBarTitleDisplayMode(.inline)
+        .inlineNavigationTitle()
     }
 }
 

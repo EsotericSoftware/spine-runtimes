@@ -172,6 +172,7 @@ namespace Spine.Unity.Editor {
 			if (targetSkeletonData != null) EditorGUILayout.LabelField("(Drag and Drop to instantiate.)", EditorStyles.miniLabel);
 
 			// Main Serialized Fields
+			bool atlasAssetsChanged = false;
 			using (var changeCheck = new EditorGUI.ChangeCheckScope()) {
 				using (new SpineInspectorUtility.BoxScope())
 					DrawSkeletonDataFields();
@@ -180,13 +181,16 @@ namespace Spine.Unity.Editor {
 					return;
 
 				using (new SpineInspectorUtility.BoxScope()) {
-					DrawAtlasAssetsFields();
+					atlasAssetsChanged = DrawAtlasAssetsFields();
 					HandleAtlasAssetsNulls();
 				}
 
 				if (changeCheck.changed) {
 					if (serializedObject.ApplyModifiedProperties() || requiresReload) {
 						this.Clear();
+						if (atlasAssetsChanged)
+							BlendModeMaterialsUtility.UpdateBlendModeMaterials(targetSkeletonDataAsset);
+						requiresReload = false;
 						this.InitializeEditor();
 
 						if (SpineEditorUtilities.Preferences.autoReloadSceneSkeletons && NoProblems())
@@ -323,6 +327,8 @@ namespace Spine.Unity.Editor {
 		}
 
 		void OnInspectorGUIMulti () {
+			serializedObject.Update();
+			EditorGUI.BeginChangeCheck();
 
 			// Skeleton data file field.
 			using (new SpineInspectorUtility.BoxScope()) {
@@ -336,10 +342,16 @@ namespace Spine.Unity.Editor {
 			}
 
 			// Texture source field.
+			bool atlasAssetsChanged;
 			using (new SpineInspectorUtility.BoxScope()) {
 				EditorGUILayout.LabelField("Atlas", EditorStyles.boldLabel);
+				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(atlasAssets, true);
+				atlasAssetsChanged = EditorGUI.EndChangeCheck();
 			}
+
+			if (EditorGUI.EndChangeCheck())
+				ApplySkeletonDataChanges(atlasAssetsChanged);
 
 			// Mix settings.
 			using (new SpineInspectorUtility.BoxScope()) {
@@ -348,6 +360,17 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.Space();
 			}
 
+			// AnimationStateData is updated in-place by SkeletonDataAsset.OnValidate.
+			serializedObject.ApplyModifiedProperties();
+		}
+
+		void ApplySkeletonDataChanges (bool atlasAssetsChanged) {
+			serializedObject.ApplyModifiedProperties();
+			foreach (SkeletonDataAsset skeletonDataAsset in targets) {
+				if (atlasAssetsChanged)
+					BlendModeMaterialsUtility.UpdateBlendModeMaterials(skeletonDataAsset);
+				SpineEditorUtilities.DataReloadHandler.ReloadSkeletonDataAssetAndSceneComponents(skeletonDataAsset);
+			}
 		}
 
 		void DrawBlendModeMaterialProperties () {
@@ -406,7 +429,7 @@ namespace Spine.Unity.Editor {
 			DrawBlendModeMaterialProperties();
 		}
 
-		void DrawAtlasAssetsFields () {
+		bool DrawAtlasAssetsFields () {
 			EditorGUILayout.LabelField("Atlas", EditorStyles.boldLabel);
 
 			using (var changeCheck = new EditorGUI.ChangeCheckScope()) {
@@ -414,9 +437,9 @@ namespace Spine.Unity.Editor {
 				if (atlasAssets.arraySize == 0)
 					EditorGUILayout.HelpBox("AtlasAssets array is empty. Skeleton's attachments will load without being mapped to images.", MessageType.Info);
 
-				if (changeCheck.changed) {
+				if (changeCheck.changed)
 					requiresReload = true;
-				}
+				return changeCheck.changed;
 			}
 		}
 
@@ -494,9 +517,8 @@ namespace Spine.Unity.Editor {
 				}
 
 				if (cc.changed) {
-					targetSkeletonDataAsset.FillStateData(quiet: true);
-					EditorUtility.SetDirty(targetSkeletonDataAsset);
 					serializedObject.ApplyModifiedProperties();
+					targetSkeletonDataAsset.FillStateData(quiet: true);
 				}
 			}
 		}

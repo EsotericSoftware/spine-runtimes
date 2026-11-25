@@ -1,3 +1,10 @@
+# 4.3.6
+
+## Flutter
+
+- **Bug fixes**
+  - Improved clipping performance through the updated spine-cpp clipping runtime.
+
 # 4.3.5
 
 ## Flutter

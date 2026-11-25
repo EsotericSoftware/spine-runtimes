@@ -15,7 +15,7 @@
     <script>
       class ControlBonesExample extends Phaser.Scene {
         preload() {
-          this.load.spineBinary(
+          this.load.spineSkeleton(
             "stretchyman-data",
             "/assets/stretchyman-pro.skel"
           );
@@ -45,7 +45,7 @@
           for (var i = 0; i < controlBoneNames.length; i++) {
             const bone = stretchyman.skeleton.findBone(controlBoneNames[i]);
             const point = { x: bone.pose.worldX, y: bone.pose.worldY };
-            stretchyman.skeletonToPhaserWorldCoordinates(point);
+            stretchyman.skeletonToGame(point);
 
             const control = this.add
               .circle(point.x, point.y, 4, 0xff00ff)
@@ -68,7 +68,7 @@
             for (const controlBone of controlBones) {
               const bone = controlBone.getData("bone");
               const point = { x: controlBone.x, y: controlBone.y };
-              stretchyman.phaserWorldCoordinatesToBone(point, bone);
+              stretchyman.gameToBone(point, bone);
               bone.pose.x = point.x;
               bone.pose.y = point.y;
             }

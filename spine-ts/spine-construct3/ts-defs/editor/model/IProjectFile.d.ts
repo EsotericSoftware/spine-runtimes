@@ -4,5 +4,6 @@ declare namespace SDK {
 		GetPath(): string;
 		GetProject(): SDK.IProjectFile;
 		GetBlob(): Blob;
+		GetSID(): number;
 	}
 }

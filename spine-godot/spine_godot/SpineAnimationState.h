@@ -32,6 +32,7 @@
 #include "SpineCommon.h"
 #include "SpineSkeleton.h"
 
+class SpineController;
 class SpineTrackEntry;
 
 class SpineAnimationState : public REFCOUNTED {
@@ -42,7 +43,7 @@ protected:
 
 private:
 	spine::AnimationState *animation_state;
-	SpineSprite *sprite;
+	SpineController *controller;
 
 public:
 	SpineAnimationState();
@@ -52,7 +53,8 @@ public:
 		return animation_state;
 	}
 
-	void set_spine_sprite(SpineSprite *sprite);
+	void set_spine_controller(SpineController *controller);
+	void clear_spine_controller();
 
 	void update(float delta);
 

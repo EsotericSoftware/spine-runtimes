@@ -37,6 +37,7 @@ export const Transform = components.Transform;
 export const Visible = components.Visible;
 export const Origin = components.Origin;
 export const Alpha = components.Alpha;
+export const Tint = components.Tint;
 
 export interface Type<
 	T,
@@ -86,3 +87,6 @@ export const OriginMixin: OriginMixin = createMixin<Phaser.GameObjects.Component
 
 type AlphaMixin = Mixin<Phaser.GameObjects.Components.Alpha, Phaser.GameObjects.GameObject>;
 export const AlphaMixin: AlphaMixin = createMixin<Phaser.GameObjects.Components.Alpha>(Alpha);
+
+type TintMixin = Mixin<Phaser.GameObjects.Components.Tint, Phaser.GameObjects.GameObject>;
+export const TintMixin: TintMixin = createMixin<Phaser.GameObjects.Components.Tint>(Tint);

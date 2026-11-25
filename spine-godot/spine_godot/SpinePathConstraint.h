@@ -35,7 +35,7 @@
 
 class SpinePathConstraintPose;
 
-class SpinePathConstraint : public SpineSpriteOwnedObject<spine::PathConstraint> {
+class SpinePathConstraint : public SpineControllerOwnedObject<spine::PathConstraint> {
 	GDCLASS(SpinePathConstraint, SpineObjectWrapper)
 
 protected:

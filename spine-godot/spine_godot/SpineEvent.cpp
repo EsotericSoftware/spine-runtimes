@@ -29,6 +29,7 @@
 
 #include "SpineEvent.h"
 #include "SpineCommon.h"
+#include "SpineController.h"
 #include "SpineSprite.h"
 
 void SpineEvent::_bind_methods() {
@@ -49,7 +50,7 @@ void SpineEvent::_bind_methods() {
 Ref<SpineEventData> SpineEvent::get_data() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	Ref<SpineEventData> event_data(memnew(SpineEventData));
-	event_data->set_spine_object(*get_spine_owner()->get_skeleton_data_res(), (spine::EventData *) &get_spine_object()->getData());
+	event_data->set_spine_object(*get_spine_controller()->get_skeleton_data_res(), (spine::EventData *) &get_spine_object()->getData());
 	return event_data;
 }
 

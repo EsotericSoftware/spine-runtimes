@@ -307,11 +307,8 @@ class SkeletonClipping {
 			var x3 = vertices[vertexOffset], y3 = vertices[vertexOffset + 1];
 			var u3 = uvs[vertexOffset], v3 = uvs[vertexOffset + 1];
 
-			var d0:Float = y2 - y3,
-				d1:Float = x3 - x2,
-				d2:Float = x1 - x3,
-				d4:Float = y3 - y1;
-			var d:Float = 1 / (d0 * d2 + d1 * (y1 - y3));
+			var d0:Float = 0, d1:Float = 0, d2:Float = 0, d4:Float = 0;
+			var d:Float = 0;
 
 			for (p in 0...polygonsCount) {
 				var s:Int = clippedVerticesItems.length;
@@ -322,6 +319,13 @@ class SkeletonClipping {
 						continue;
 
 					var clipOutputCount:Int = clipOutputLength >> 1;
+					if (d == 0) {
+						d0 = y2 - y3;
+						d1 = x3 - x2;
+						d2 = x1 - x3;
+						d4 = y3 - y1;
+						d = 1 / (d0 * d2 - d1 * d4);
+					}
 					clippedVerticesItems.resize(s + clipOutputLength);
 					var clippedUvsItems = clippedUvs;
 					clippedUvsItems.resize(s + clipOutputLength);
@@ -424,18 +428,17 @@ class SkeletonClipping {
 				ey:Float = edgeY - polygon[i + 3];
 
 			var outputStart:Int = output.length;
-			var ii:Int = 0;
+			x1 = input[0];
+			y1 = input[1];
+			var s1:Float = ey * (edgeX - x1) - ex * (edgeY - y1);
+			var ii:Int = 2;
 			var nn:Int = input.length - 2;
-			while (ii < nn) {
-				x1 = input[ii];
-				y1 = input[ii + 1];
-				ii += 2;
+			while (ii <= nn) {
 				x2 = input[ii];
 				y2 = input[ii + 1];
-				var s2:Bool = ey * (edgeX - x2) > ex * (edgeY - y2);
-				var s1:Float = ey * (edgeX - x1) - ex * (edgeY - y1);
+				var s2:Float = ey * (edgeX - x2) - ex * (edgeY - y2);
 				if (s1 > 0) {
-					if (s2) {
+					if (s2 > 0) {
 						// v1 in, v2 in
 						output.push(x2);
 						output.push(y2);
@@ -452,7 +455,7 @@ class SkeletonClipping {
 							output.push(y2);
 						}
 					}
-				} else if (s2) {
+				} else if (s2 > 0) {
 					// v1 out, v2 in
 					var ix:Float = x2 - x1, iy:Float = y2 - y1;
 					var t:Float = s1 / (ix * ey - iy * ex);
@@ -470,6 +473,10 @@ class SkeletonClipping {
 					// v1 out, v2 out
 					clipped = true;
 				}
+				x1 = x2;
+				y1 = y2;
+				s1 = s2;
+				ii += 2;
 			}
 
 			if (outputStart == output.length) {
@@ -539,18 +546,17 @@ class SkeletonClipping {
 			var fragmentStart:Int = inverseVertices.length;
 			inverseVertices.push(0);
 
-			var ii:Int = 0;
+			x1 = input[0];
+			y1 = input[1];
+			var s1:Float = ey * (edgeX - x1) - ex * (edgeY - y1);
+			var ii:Int = 2;
 			var nn:Int = input.length - 2;
-			while (ii < nn) {
-				x1 = input[ii];
-				y1 = input[ii + 1];
-				ii += 2;
+			while (ii <= nn) {
 				x2 = input[ii];
 				y2 = input[ii + 1];
-				var s2:Bool = ey * (edgeX - x2) > ex * (edgeY - y2);
-				var s1:Float = ey * (edgeX - x1) - ex * (edgeY - y1);
+				var s2:Float = ey * (edgeX - x2) - ex * (edgeY - y2);
 				if (s1 > 0) {
-					if (s2) {
+					if (s2 > 0) {
 						// v1 in, v2 in
 						output.push(x2);
 						output.push(y2);
@@ -571,12 +577,12 @@ class SkeletonClipping {
 							output.push(y2);
 						}
 					}
-				} else if (s2) {
+				} else if (s2 > 0) {
 					// v1 out, v2 in
-					var dx:Float = x2 - x1, dy:Float = y2 - y1;
-					var t:Float = s1 / (dx * ey - dy * ex);
+					var ix:Float = x2 - x1, iy:Float = y2 - y1;
+					var t:Float = s1 / (ix * ey - iy * ex);
 					if (t >= 0 && t <= 1) {
-						var cx:Float = x1 + dx * t, cy:Float = y1 + dy * t;
+						var cx:Float = x1 + ix * t, cy:Float = y1 + iy * t;
 						inverseVertices.push(cx);
 						inverseVertices.push(cy);
 						output.push(cx);
@@ -592,6 +598,10 @@ class SkeletonClipping {
 					inverseVertices.push(x2);
 					inverseVertices.push(y2);
 				}
+				x1 = x2;
+				y1 = y2;
+				s1 = s2;
+				ii += 2;
 			}
 
 			var fragmentSize:Int = inverseVertices.length - fragmentStart - 1;

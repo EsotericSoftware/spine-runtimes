@@ -27,6 +27,10 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if NET_STANDARD || NET_STANDARD_2_0 || NET_STANDARD_2_1 || NET_4_6
+#define HAS_SYSTEM_THREADING_VOLATILE
+#endif
+
 using System.Threading;
 
 /// <summary>
@@ -34,16 +38,14 @@ using System.Threading;
 /// "Dynamic Circular Work-Stealing Deque", authors David Chase and Yossi Lev
 /// https://www.dre.vanderbilt.edu/~schmidt/PDF/work-stealing-dequeue.pdf.
 /// Requires that Push and Pop are called from the same thread.
-/// Simplified by not supporting growing the array size during a Push,
-/// in our usage scenario we populate tasks ahead of time before the first Pop.
 /// </summary>
 public class LockFreeWorkStealingDeque<T> {
 	public static readonly T Empty = default(T);
 	public static readonly T Abort = default(T);
 
 	private /*volatile*/ CircularArray<T> activeArray;
-	private volatile int bottom = 0;
-	private volatile int top = 0;
+	private int bottom = 0;
+	private int top = 0;
 
 	public int Capacity { get { return activeArray.Size; } }
 
@@ -54,49 +56,64 @@ public class LockFreeWorkStealingDeque<T> {
 		top = 0;
 	}
 
+	static int VolatileRead (ref int location) {
+#if HAS_SYSTEM_THREADING_VOLATILE
+		return Volatile.Read(ref location);
+#else
+		return Thread.VolatileRead(ref location);
+#endif
+	}
+
+	static void VolatileWrite (ref int location, int value) {
+#if HAS_SYSTEM_THREADING_VOLATILE
+		Volatile.Write(ref location, value);
+#else
+		Thread.VolatileWrite(ref location, value);
+#endif
+	}
+
 	/// <summary>Push an element (at the bottom), has to be called by owner of the deque, not a thief.</summary>
 	public void Push (T item) {
 		int b = bottom;
-		int t = top;
+		int t = VolatileRead(ref top);
 		CircularArray<T> a = this.activeArray;
 		int size = b - t;
 		if (size >= a.Size - 1) {
 			a = a.Grow(b, t, a.Size * 2);
+			Thread.MemoryBarrier(); // requires full fence to publish the copied elements before the new array reference.
 			this.activeArray = a;
 		}
 		a.Put(b, item);
-		bottom = b + 1;
-	}
-
-	/// <summary>Non-standard addition for ahead-of-time pushing to maintain queue FIFO order.
-	/// Push an element at the top, must only be called before any other thread calls Push, Pop or Steal.</summary>
-	public void PushTop (T item) {
-		int b = bottom;
-		int t = top;
-		CircularArray<T> a = this.activeArray;
-		int size = b - t;
-		if (size >= a.Size - 1) {
-			a = a.Grow(b, t, a.Size * 2);
-			this.activeArray = a;
-		}
-		int newT = t - 1;
-		a.Put(newT, item);
-		top = newT;
+		VolatileWrite(ref bottom, b + 1);
 	}
 
 	/// <summary>
 	/// Makes a different worker than the owner steal an element (from the top).
-	/// Returns false if empty.
+	/// Returns false if empty or if another thief took the element.
 	/// </summary>
 	public bool Steal (out T item) {
+		bool empty;
+		return Steal(out item, out empty);
+	}
+
+	/// <summary>
+	/// Makes a different worker than the owner steal an element (from the top).
+	/// Returns false if empty or if another thief took the element.
+	/// </summary>
+	/// <param name="empty">True if the deque was empty. False with a false return value means another thief
+	/// took the element, the caller may retry.</param>
+	public bool Steal (out T item, out bool empty) {
 		int t = top;
-		int b = bottom;
+		Thread.MemoryBarrier(); // requires full fence between observing top and bottom.
+		int b = VolatileRead(ref bottom);
 		CircularArray<T> a = this.activeArray;
 		int size = b - t;
 		if (size <= 0) {
 			item = Empty;
+			empty = true;
 			return false;
 		}
+		empty = false;
 		T o = a.Get(t);
 		// increment top
 		if (Interlocked.CompareExchange(ref top, t + 1, t) != t) {
@@ -114,6 +131,7 @@ public class LockFreeWorkStealingDeque<T> {
 		CircularArray<T> a = this.activeArray;
 		--b;
 		this.bottom = b;
+		Thread.MemoryBarrier(); // requires full fence here to prevent store-load reordering
 		int t = top;
 		int size = b - t;
 		if (size < 0) {
@@ -131,8 +149,7 @@ public class LockFreeWorkStealingDeque<T> {
 		if (Interlocked.CompareExchange(ref top, t + 1, t) != t) {
 			item = Empty;
 			wasSuccessful = false;
-		}
-		else {
+		} else {
 			item = o;
 		}
 		bottom = t + 1;

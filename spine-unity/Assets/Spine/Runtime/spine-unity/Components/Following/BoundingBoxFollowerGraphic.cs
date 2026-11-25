@@ -220,8 +220,9 @@ namespace Spine.Unity {
 		}
 
 		void LateUpdate () {
-			var slotPose = slot.AppliedPose;
-			if (slot != null && (slotPose.Attachment != currentAttachment || skinBoneEnabled != slot.Bone.Active)) {
+			if (slot == null) return;
+			SlotPose slotPose = slot.AppliedPose;
+			if (slotPose.Attachment != currentAttachment || skinBoneEnabled != slot.Bone.Active) {
 				skinBoneEnabled = slot.Bone.Active;
 				MatchAttachment(slotPose.Attachment);
 			}

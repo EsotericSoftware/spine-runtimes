@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="//cdn.jsdelivr.net/npm/phaser@4.0.0/dist/phaser.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/phaser@4.2.1/dist/phaser.js"></script>
     <script src="../dist/iife/spine-phaser-v4.js"></script>
     <link rel="stylesheet" href="../../index.css" />
     <title>Spine Phaser Example</title>
@@ -15,7 +15,7 @@
     <script>
       class ControlBonesExample extends Phaser.Scene {
         preload() {
-          this.load.spineBinary(
+          this.load.spineSkeleton(
             "stretchyman-data",
             "/assets/stretchyman-pro.skel"
           );
@@ -45,7 +45,7 @@
           for (var i = 0; i < controlBoneNames.length; i++) {
             const bone = stretchyman.skeleton.findBone(controlBoneNames[i]);
             const point = { x: bone.pose.worldX, y: bone.pose.worldY };
-            stretchyman.skeletonToPhaserWorldCoordinates(point);
+            stretchyman.skeletonToGame(point);
 
             const control = this.add
               .circle(point.x, point.y, 4, 0xff00ff)
@@ -68,7 +68,7 @@
             for (const controlBone of controlBones) {
               const bone = controlBone.getData("bone");
               const point = { x: controlBone.x, y: controlBone.y };
-              stretchyman.phaserWorldCoordinatesToBone(point, bone);
+              stretchyman.gameToBone(point, bone);
               bone.pose.x = point.x;
               bone.pose.y = point.y;
             }

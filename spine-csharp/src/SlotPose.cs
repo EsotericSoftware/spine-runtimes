@@ -76,7 +76,7 @@ namespace Spine {
 
 		/// <summary>Clamps the <see cref="GetColor()">color</see> used to tint the slot's attachment to the 0-1 range.</summary>
 		public void ClampColor () {
-			color.Clamp();
+			color = color.Clamp();
 		}
 
 		/// <returns>A copy of the dark color used to tint the slot's attachment for two color tinting, or null if two color tinting is not used. The dark

@@ -445,7 +445,10 @@ RES SpineAtlasResourceFormatLoader::load(const String &path, const String &origi
 #endif
 #endif
 	Ref<SpineAtlasResource> atlas = memnew(SpineAtlasResource);
-	atlas->load_from_file(path);
+	if (path.ends_with(".atlas"))
+		atlas->load_from_atlas_file(path);
+	else
+		atlas->load_from_file(path);
 #ifndef SPINE_GODOT_EXTENSION
 	if (error) *error = OK;
 #endif
@@ -457,11 +460,14 @@ RES SpineAtlasResourceFormatLoader::load(const String &path, const String &origi
 PackedStringArray SpineAtlasResourceFormatLoader::_get_recognized_extensions() {
 	PackedStringArray extensions;
 	extensions.push_back("spatlas");
+	extensions.push_back("atlas");
 	return extensions;
 }
 #else
 void SpineAtlasResourceFormatLoader::get_recognized_extensions(List<String> *extensions) const {
-	const char atlas_ext[] = "spatlas";
+	const char spatlas_ext[] = "spatlas";
+	if (!extensions->find(spatlas_ext)) extensions->push_back(spatlas_ext);
+	const char atlas_ext[] = "atlas";
 	if (!extensions->find(atlas_ext)) extensions->push_back(atlas_ext);
 }
 #endif

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>spine-phaser-v4 dragon</title>
+  <style>
+    html, body { margin: 0; padding: 0; overflow: hidden; background: #2c3e50; }
+    canvas { display: block; }
+  </style>
+  <script src="//cdn.jsdelivr.net/npm/phaser@4.2.1/dist/phaser.js"></script>
+  <script src="../dist/iife/spine-phaser-v4.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.20.0/dist/lil-gui.umd.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/lil-gui@0.20.0/dist/lil-gui.min.css" rel="stylesheet">
+</head>
+<body>
+  <script>
+    class Demo extends Phaser.Scene {
+      preload() {
+        this.load.spineSkeleton("dragon-data", "../../assets/dragon-ess.skel");
+        this.load.spineAtlas("dragon-atlas", "../../assets/dragon-pma.atlas");
+      }
+
+      create() {
+        const dragon = this.add.spine(this.scale.width / 2, this.scale.height / 2 - 30, "dragon-data", "dragon-atlas", {
+          boundsProvider: new spine.SkinsAndAnimationBoundsProvider("flying")
+        });
+        const dragon2 = this.add.spine(this.scale.width / 2, this.scale.height / 2 + 200, "dragon-data", "dragon-atlas", {
+          boundsProvider: new spine.SkinsAndAnimationBoundsProvider("flying")
+        });
+
+        dragon.setScale(0.5);
+        dragon2.setScale(0.5);
+        dragon.animationStateData.defaultMix = 0.2;
+        dragon.animationState.timeScale = 0;
+        dragon2.animationState.timeScale = 0;
+
+        const entry = dragon.animationState.setAnimation(0, "flying", true);
+        const entry2 = dragon2.animationState.setAnimation(0, "flying", true);
+        dragon.updatePose(0);
+        dragon2.updatePose(0);
+
+        const controls = { time: 0, time2: 0 };
+        const applyTime = (spineObject, trackEntry, time) => {
+          trackEntry.trackTime = time;
+          spineObject.updatePose(0);
+        };
+
+        const gui = new lil.GUI({});
+        gui.add(controls, "time", 0, 10, 0.01).name("time").onChange(value => applyTime(dragon, entry, value));
+        gui.add(controls, "time2", 0, 10, 0.01).name("time2").onChange(value => applyTime(dragon2, entry2, value));
+      }
+    }
+
+    new Phaser.Game({
+      type: Phaser.WEBGL,
+      parent: document.body,
+      width: window.innerWidth,
+      height: window.innerHeight,
+      resolution: window.devicePixelRatio || 1,
+      backgroundColor: "#2c3e50",
+      scene: Demo,
+      plugins: {
+        scene: [{ key: "spine.SpinePlugin", plugin: spine.SpinePlugin, mapping: "spine" }]
+      },
+      scale: {
+        mode: Phaser.Scale.RESIZE
+      }
+    });
+  </script>
+</body>
+</html>

@@ -35,7 +35,7 @@ Add spine-ios to your Xcode project or Package.swift:
 5. Select the libraries you need:
    - `SpineC` - C API for low-level access
    - `SpineSwift` - Swift API for Swift projects
-   - `SpineiOS` - iOS/tvOS rendering with Metal
+   - `SpineiOS` - iOS/tvOS/macOS rendering with Metal
 
 #### Via Package.swift
 
@@ -55,10 +55,23 @@ targets: [
 ]
 ```
 
+### Texture filtering
+
+`SpineUIView` and `SpineView` use each atlas page's exported texture filter and wrap settings by default. You can override filtering for every page in a view when pixel art or smoothing requires a specific mode:
+
+```swift
+SpineView(from: source)                           // Atlas page settings (default)
+SpineView(from: source, textureFilter: .nearest) // Nearest-neighbor override
+SpineView(from: source, textureFilter: .linear)  // Linear override
+```
+
+Atlas-driven mipmap filters are supported and generate mipmaps when textures are loaded. The nearest and linear overrides disable mipmapping.
+
 ## Examples
 
 The repository includes comprehensive example code demonstrating various features:
 - Simple animation playback
+- Atlas, nearest-neighbor, and linear texture filtering
 - Animation state events
 - Physics simulation
 - IK following
@@ -79,10 +92,10 @@ The repository includes comprehensive example code demonstrating various feature
    cd spine-runtimes/spine-ios
    open Example/Spine\ iOS\ Example.xcodeproj
    ```
-3. Select your target device (simulator or physical device)
+3. Select an iOS device/simulator or the `My Mac` destination
 4. Press Run (⌘R) to build and run the examples
 
-The example app includes multiple tabs showcasing different spine-ios features.
+The Swift and SwiftUI examples run on iOS and macOS. The Objective-C/UIKit example is available on iOS only.
 
 ## Development
 
@@ -99,7 +112,7 @@ swift build --product SpineC
 # Build SpineSwift (Swift API)
 swift build --product SpineSwift
 
-# Build SpineiOS (requires iOS/tvOS SDK)
+# Build SpineiOS (requires an Apple platform SDK)
 # Use Xcode for SpineiOS as it requires platform-specific SDKs
 ```
 

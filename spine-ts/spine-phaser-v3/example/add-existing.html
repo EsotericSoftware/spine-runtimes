@@ -16,7 +16,7 @@
   <script>
     class BasicExample extends Phaser.Scene {
       preload() {
-        this.load.spineBinary("spineboy-data", "/assets/spineboy-pro.skel");
+        this.load.spineSkeleton("spineboy-data", "/assets/spineboy-pro.skel");
         this.load.spineAtlas("spineboy-atlas", "/assets/spineboy-pma.atlas");
       }
 
@@ -28,14 +28,12 @@
           "spineboy-atlas"
         );
         const spineboy2 = this.add.existing(
-          new spine.SpineGameObject(
-            this,
-            this.spine,
-            500,
-            500,
-            "spineboy-data",
-            "spineboy-atlas"
-          )
+          new spine.SpineGameObject(this, this.spine, {
+            x: 500,
+            y: 500,
+            dataKey: "spineboy-data",
+            atlasKey: "spineboy-atlas"
+          })
         );
       }
     }

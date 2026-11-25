@@ -2,7 +2,7 @@
 /** Represents the Construct Game Services object.
  * @see {@link https://www.construct.net/make-games/manuals/construct-3/scripting/scripting-reference/plugin-interfaces/construct-game-services | ICGSObjectType documentation } */
 
-type CGSSignInProvider = "Apple" | "BattleNet" | "Discord" | "Facebook" | "Github" | "Google" | "ItchIO" | "Microsoft" | "Patreon" | "Reddit" | "Steam" | "X" | "Yandex";
+type CGSSignInProvider = "Apple" | "BattleNet" | "Discord" | "Facebook" | "Github" | "Google" | "ItchIO" | "Microsoft" | "Patreon" | "Reddit" | "Steam" | "Yandex";
 
 interface CGSObjectTypeEventMap<InstanceType = IInstance> extends ObjectClassEventMap<InstanceType> {
 	"signinpopupblocked": ConstructEvent
@@ -307,6 +307,73 @@ interface CGSCloudSaveBucketResult{
 }
 
 /*********
+MARK: ACHIEVEMENTS
+*********/
+
+interface CGSAchievementResult{
+	id: string;
+	created: string;
+	formattedDateCreated: string;
+	name: string;
+	description: string;
+	progressive: boolean;
+	clientProgressAllowed: boolean;
+	progressionRequired: number;
+	responseLanguage: CGSLanguageResult;
+	originalLanguage: CGSLanguageResult;
+	isSecret: boolean;
+	maxUnlocks: number;
+	formattedMaxUnlocked: string;
+	totalAwarded: number;
+	formattedTotalAwarded: string;
+	totalUniquePlayersAwarded: number;
+	formattedTotalUniquePlayersAwarded: string;
+	percentagePlayerBaseOwned: string;
+	firstAwarded: string;
+	formattedFirstAwarded: string;
+	lastAwarded: string;
+	formattedLastAwarded: string;
+	incrementOnly: boolean;
+	xpBonuses: CGSXPBonus[];
+	achievedLogos: CGSPictureResult[];
+	unachievedLogos: CGSPictureResult[];
+}
+interface CGSXPBonus{
+	from: number,
+	bonus: number
+}
+interface CGSPlayerAchievement{
+	count: number;
+	firstAwarded: string;
+	formattedCount: string;
+	lastAwarded: string;
+	formattedFirstAwarded: string;
+	progress: number;
+	formattedLastAwarded: string;
+	formattedProgress: string;
+	achievement: CGSAchievementResult;
+}
+interface CGSGetAllAchievementsResult{
+	achievements: CGSAchievementResult[];
+}
+interface CGSGetPlayerAchievementsResult{
+	playerAchievements:  CGSPlayerAchievement[];
+}
+
+type CGSAchievementOrderBy = "MostRecentlyAwarded" | "LeastRecentlyAwarded" | "MostAwarded" | "LeastAwarded";
+
+interface CGSPlayersAwardedAchievementOptions{
+	orderBy?: CGSAchievementOrderBy; 
+	resultsPerPage?: number;
+	page?: number;
+}
+interface CGSGetPlayersAwardedAchievementResult{
+	totalPageCount: number;
+	achievement: CGSAchievementResult;
+	awardedPlayers: CGSPlayerAchievement[];
+}
+
+/*********
 MARK: BROADCASTS
 *********/
 
@@ -322,8 +389,8 @@ interface CGSBroadcastChannelResult{
 	formattedLastBroadcast: string;
 	allowRatings: boolean;
 	anyUnreadMessages: boolean;
-	responseLanguage: CGSLanguageResult,
-	originalLanguage: CGSLanguageResult,
+	responseLanguage: CGSLanguageResult;
+	originalLanguage: CGSLanguageResult;
 	dimensionlessMaxRatingValue: number;
 	ratingDimensions: CGSRatingDimensionsResult[];
 }
@@ -408,6 +475,13 @@ declare class ICGSObjectType<InstType extends IInstance = IInstance> extends IOb
 	// Common
 	gameID: string;
 	targetLanguage: string;
+
+	// Achievements
+    getAllAchievements(): Promise<CGSGetAllAchievementsResult>;
+	getAchievement(achievementID: string): Promise<CGSAchievementResult>;
+	getPlayerAchievements(): Promise<CGSGetPlayerAchievementsResult>;
+	getAwardedPlayers(achievementID: string, opts?: CGSPlayersAwardedAchievementOptions): Promise<CGSGetPlayersAwardedAchievementResult>;
+	awardAchievement(achievementID: string, value: number): Promise<void>;
 
 	// Broadcasts
 	getBroadcastChannels(): Promise<CGSBroadcastChannelResult>;

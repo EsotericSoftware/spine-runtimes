@@ -494,14 +494,14 @@ export class Downloader {
 		let base64Idx = dataUri.indexOf("base64,");
 		if (base64Idx !== -1) {
 			base64Idx += "base64,".length;
-			return atob(dataUri.substr(base64Idx));
+			return new TextDecoder("utf-8").decode(this.base64ToUint8Array(dataUri.substr(base64Idx)));
 		} else {
 			return dataUri.substr(dataUri.indexOf(",") + 1);
 		}
 	}
 
 	base64ToUint8Array (base64: string): Uint8Array {
-		var binary_string = window.atob(base64);
+		var binary_string = atob(base64);
 		var len = binary_string.length;
 		var bytes = new Uint8Array(len);
 		for (let i = 0; i < len; i++) {

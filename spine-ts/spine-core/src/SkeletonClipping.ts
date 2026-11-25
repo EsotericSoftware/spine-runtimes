@@ -275,7 +275,7 @@ export class SkeletonClipping {
 			t = triangles[i + 2];
 			const x3 = vertices[t * stride], y3 = vertices[t * stride + 1];
 			const u3 = uvs[t << 1], v3 = uvs[(t << 1) + 1];
-			const d0 = y2 - y3, d1 = x3 - x2, d2 = x1 - x3, d4 = y3 - y1, d = 1 / (d0 * d2 + d1 * (y1 - y3));
+			let d0 = 0, d1 = 0, d2 = 0, d4 = 0, d = 0;
 			for (let p = 0; p < polygonsCount; p++) {
 				let s = clippedVertices.length;
 				if (this.clip(x1, y1, x2, y2, x3, y3, polygons[p])) {
@@ -283,6 +283,13 @@ export class SkeletonClipping {
 					const clipOutputLength = clipOutput.length;
 					if (clipOutputLength === 0) continue;
 					let clipOutputCount = clipOutputLength >> 1;
+					if (d === 0) {
+						d0 = y2 - y3;
+						d1 = x3 - x2;
+						d2 = x1 - x3;
+						d4 = y3 - y1;
+						d = 1 / (d0 * d2 - d1 * d4);
+					}
 
 					const cv = Utils.setArraySize(clippedVertices, s + clipOutputCount * stride);
 					for (let ii = 0; ii < clipOutputLength; ii += 2, s += stride) {
@@ -496,7 +503,7 @@ export class SkeletonClipping {
 			const x3 = vertices[vertexStart + v], y3 = vertices[vertexStart + v + 1];
 			uv = t << 1;
 			const u3 = uvs[uv], v3 = uvs[uv + 1];
-			const d0 = y2 - y3, d1 = x3 - x2, d2 = x1 - x3, d4 = y3 - y1, d = 1 / (d0 * d2 + d1 * (y1 - y3));
+			let d0 = 0, d1 = 0, d2 = 0, d4 = 0, d = 0;
 
 			for (let p = 0; p < polygonsCount; p++) {
 				let s = this.clippedVerticesLength;
@@ -505,6 +512,13 @@ export class SkeletonClipping {
 					const clipOutputLength = clipOutput.length;
 					if (clipOutputLength === 0) continue;
 					let clipOutputCount = clipOutputLength >> 1;
+					if (d === 0) {
+						d0 = y2 - y3;
+						d1 = x3 - x2;
+						d2 = x1 - x3;
+						d4 = y3 - y1;
+						d = 1 / (d0 * d2 - d1 * d4);
+					}
 
 					const newLength = s + clipOutputCount * stride;
 					if (clippedVertices.length < newLength) {
@@ -638,16 +652,15 @@ export class SkeletonClipping {
 			const edgeX = v[i], edgeY = v[i + 1], ex = edgeX - v[i + 2], ey = edgeY - v[i + 3];
 			const outputStart = output.length;
 			const iv = input;
-			for (let ii = 0, nn = input.length - 2; ii < nn;) {
-				x1 = iv[ii];
-				y1 = iv[ii + 1];
-				ii += 2;
+			x1 = iv[0];
+			y1 = iv[1];
+			let s1 = ey * (edgeX - x1) - ex * (edgeY - y1);
+			for (let ii = 2, nn = input.length - 2; ii <= nn; ii += 2) {
 				x2 = iv[ii];
 				y2 = iv[ii + 1];
-				const s2 = ey * (edgeX - x2) > ex * (edgeY - y2);
-				const s1 = ey * (edgeX - x1) - ex * (edgeY - y1);
+				const s2 = ey * (edgeX - x2) - ex * (edgeY - y2);
 				if (s1 > 0) {
-					if (s2) // v1 in, v2 in
+					if (s2 > 0) // v1 in, v2 in
 						output.push(x2, y2);
 					else { // v1 in, v2 out
 						const ix = x2 - x1, iy = y2 - y1, t = s1 / (ix * ey - iy * ex);
@@ -657,7 +670,7 @@ export class SkeletonClipping {
 						} else
 							output.push(x2, y2);
 					}
-				} else if (s2) { // v1 out, v2 in
+				} else if (s2 > 0) { // v1 out, v2 in
 					const ix = x2 - x1, iy = y2 - y1, t = s1 / (ix * ey - iy * ex);
 					if (t >= 0 && t <= 1) {
 						output.push(x1 + ix * t, y1 + iy * t, x2, y2);
@@ -666,6 +679,9 @@ export class SkeletonClipping {
 						output.push(x2, y2);
 				} else // v1 out, v2 out
 					clipped = true;
+				x1 = x2;
+				y1 = y2;
+				s1 = s2;
 			}
 
 			if (outputStart === output.length) { // All outside.
@@ -722,19 +738,17 @@ export class SkeletonClipping {
 			const outputStart = output.length, fragmentStart = this.inverseVertices.length;
 			this.inverseVertices.push(0);
 			iv = input;
-			for (let ii = 0, nn = input.length - 2; ii < nn;) {
-				x1 = iv[ii];
-				y1 = iv[ii + 1];
-				ii += 2;
+			x1 = iv[0];
+			y1 = iv[1];
+			let s1 = ey * (edgeX - x1) - ex * (edgeY - y1);
+			for (let ii = 2, nn = input.length - 2; ii <= nn; ii += 2) {
 				x2 = iv[ii];
 				y2 = iv[ii + 1];
-				const s2 = ey * (edgeX - x2) > ex * (edgeY - y2);
-				const s1 = ey * (edgeX - x1) - ex * (edgeY - y1);
+				const s2 = ey * (edgeX - x2) - ex * (edgeY - y2);
 				if (s1 > 0) {
-					if (s2) // v1 in, v2 in
+					if (s2 > 0) // v1 in, v2 in
 						output.push(x2, y2);
-					else {
-						// v1 in, v2 out
+					else { // v1 in, v2 out
 						const ix = x2 - x1, iy = y2 - y1, t = s1 / (ix * ey - iy * ex);
 						if (t >= 0 && t <= 1) {
 							const cx = x1 + ix * t, cy = y1 + iy * t;
@@ -743,16 +757,19 @@ export class SkeletonClipping {
 						} else
 							output.push(x2, y2);
 					}
-				} else if (s2) { // v1 out, v2 in
-					const dx = x2 - x1, dy = y2 - y1, t = s1 / (dx * ey - dy * ex);
+				} else if (s2 > 0) { // v1 out, v2 in
+					const ix = x2 - x1, iy = y2 - y1, t = s1 / (ix * ey - iy * ex);
 					if (t >= 0 && t <= 1) {
-						const cx = x1 + dx * t, cy = y1 + dy * t;
+						const cx = x1 + ix * t, cy = y1 + iy * t;
 						this.inverseVertices.push(cx, cy);
 						output.push(cx, cy, x2, y2);
 					} else
 						output.push(x2, y2);
 				} else // v1 out, v2 out
 					this.inverseVertices.push(x2, y2);
+				x1 = x2;
+				y1 = y2;
+				s1 = s2;
 			}
 
 			const fragmentSize = this.inverseVertices.length - fragmentStart - 1;

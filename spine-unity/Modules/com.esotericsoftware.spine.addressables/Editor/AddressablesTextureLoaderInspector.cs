@@ -34,6 +34,8 @@
 using System;
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEditor.AddressableAssets;
+using UnityEditor.AddressableAssets.Settings;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -55,6 +57,18 @@ namespace Spine.Unity.Editor {
 		static AddressablesTextureLoaderInspector () {
 			// The call below is necessary, otherwise the static GenericTextureLoaderInspector ctor is not called.
 			GenericTextureLoaderInspector.RegisterPlayModeChangedCallbacks();
+			AddressablesTextureLoader.validateTargetReference = ValidateTargetReference;
+		}
+
+		/// <summary>Returns an error message if the referenced texture is not marked as addressable, null otherwise.
+		/// Used by <c>GenericOnDemandTextureLoader.ValidateSetup</c>.</summary>
+		static string ValidateTargetReference (AddressableTextureReference targetReference) {
+			Texture texture = targetReference.EditorTexture;
+			if (texture == null) return null; // reported as missing target texture reference by the generic validation.
+			string assetPath = AssetDatabase.GetAssetPath(texture);
+			if (AddressablesMethodImplementations.IsAddressable(assetPath, AssetDatabase.AssetPathToGUID(assetPath))) return null;
+			return "is not marked as addressable (or no Addressable Asset Settings exist). " +
+				"Mark the texture or one of its parent folders as addressable";
 		}
 
 		public class AddressablesMethodImplementations : StaticMethodImplementations {
@@ -75,11 +89,34 @@ namespace Spine.Unity.Editor {
 			public override bool SetupOnDemandLoadingReference (
 				ref AddressableTextureReference targetTextureReference, Texture targetTexture) {
 
-				string targetTextureGUID = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(targetTexture));
+				string targetTexturePath = AssetDatabase.GetAssetPath(targetTexture);
+				string targetTextureGUID = AssetDatabase.AssetPathToGUID(targetTexturePath);
 				if (string.IsNullOrEmpty(targetTextureGUID))
 					return false;
+
+				if (!IsAddressable(targetTexturePath, targetTextureGUID)) {
+					Debug.LogError(string.Format("Target texture '{0}' is not marked as addressable (or no Addressable Asset Settings exist). " +
+						"Mark the texture or one of its parent folders as addressable, otherwise it can't be loaded on demand.",
+						targetTexturePath), targetTexture);
+				}
 				targetTextureReference.assetReference = new AssetReferenceTexture(targetTextureGUID);
-				return targetTextureReference.assetReference.IsValid();
+				return targetTextureReference.assetReference.RuntimeKeyIsValid();
+			}
+
+			/// <summary>Returns whether the asset is registered as addressable, either explicitly or implicitly
+			/// via an addressable parent folder.</summary>
+			public static bool IsAddressable (string assetPath, string assetGUID) {
+				AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
+				if (settings == null) return false;
+				if (settings.FindAssetEntry(assetGUID) != null) return true;
+
+				string folderPath = System.IO.Path.GetDirectoryName(assetPath);
+				while (!string.IsNullOrEmpty(folderPath)) {
+					string folderGUID = AssetDatabase.AssetPathToGUID(folderPath.Replace('\\', '/'));
+					if (!string.IsNullOrEmpty(folderGUID) && settings.FindAssetEntry(folderGUID) != null) return true;
+					folderPath = System.IO.Path.GetDirectoryName(folderPath);
+				}
+				return false;
 			}
 		}
 

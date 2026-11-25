@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>spine-phaser-v4 - 200 spineboy</title>
+  <style>
+    html, body { margin: 0; padding: 0; background: #202020; color: #fff; font-family: sans-serif; }
+  </style>
+</head>
+<body>
+  <script src="//cdn.jsdelivr.net/npm/phaser@4.2.1/dist/phaser.js"></script>
+  <script src="../dist/iife/spine-phaser-v4.js"></script>
+  <script>
+    const count = Number(new URLSearchParams(location.search).get("count") || 200);
+    const cols = Math.ceil(Math.sqrt(count * 16 / 9));
+    const rows = Math.ceil(count / cols);
+
+    class Demo extends Phaser.Scene {
+      preload() {
+        this.load.spineSkeleton("spineboy-data", "../../assets/spineboy-pro.skel");
+        this.load.spineAtlas("spineboy-atlas", "../../assets/spineboy-pma.atlas");
+      }
+
+      create() {
+        const cellW = this.scale.width / cols;
+        const cellH = this.scale.height / rows;
+        for (let i = 0; i < count; i++) {
+          const x = (i % cols + 0.5) * cellW;
+          const y = (Math.floor(i / cols) + 0.9) * cellH;
+          const spineboy = this.add.spine(x, y, "spineboy-data", "spineboy-atlas");
+          const scale = Math.min(cellW / Math.max(spineboy.width, 1), cellH / Math.max(spineboy.height, 1)) * 0.82;
+          spineboy.setScale(scale);
+          spineboy.animationState.setAnimation(0, "walk", true);
+        }
+      }
+
+    }
+
+    new Phaser.Game({
+      type: Phaser.WEBGL,
+      parent: document.body,
+      width: 1280,
+      height: 720,
+      backgroundColor: "#303030",
+      scene: Demo,
+      plugins: {
+        scene: [{ key: "spine.SpinePlugin", plugin: spine.SpinePlugin, mapping: "spine" }]
+      }
+    });
+  </script>
+</body>
+</html>

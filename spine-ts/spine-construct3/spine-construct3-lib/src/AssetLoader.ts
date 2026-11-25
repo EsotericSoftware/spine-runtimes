@@ -34,28 +34,31 @@ import { C3TextureEditor, C3TextureRuntime } from "./C3Texture";
 interface CacheEntry<T> {
 	data?: T;
 	promise: Promise<T>;
-	refCount: number;
+	users: Set<object>;
 }
 
 type ResourceCache<T> = Map<string, CacheEntry<T>>;
-type RuntimeCacheType = "skeleton" | "atlas" | "texture";
+type RuntimeCacheType = "skeleton" | "atlas";
 
 export class AssetLoader {
 
 	private static CacheSkeleton: ResourceCache<SkeletonData> = new Map();
 	private static CacheAtlas: ResourceCache<TextureAtlas> = new Map();
-	private static CacheTexture: ResourceCache<C3TextureRuntime> = new Map();
 	private static retainAllUnusedRuntimeResources = false;
 	private static retainedRuntimeResourceKeys = new Set<string>();
 
 	public async loadSkeletonEditor (sid: number, textureAtlas: TextureAtlas, scale = 1, instance: SDK.IWorldInstance) {
 		const projectFile = instance.GetProject().GetProjectFileBySID(sid);
-		if (!projectFile) return null;
+		if (!projectFile) throw new Error(`Skeleton file not found with the given SID: ${sid}`);
+		if (!/\.(json|skel)$/i.test(projectFile.GetName()))
+			throw new Error(`Invalid Spine skeleton file: ${projectFile.GetName()}`);
+		if (!Number.isFinite(scale) || scale <= 0)
+			throw new Error("Spine loader scale must be a finite number greater than zero.");
 
 		const blob = projectFile.GetBlob();
 		const atlasLoader = new AtlasAttachmentLoader(textureAtlas);
 
-		const isBinary = projectFile.GetName().endsWith(".skel");
+		const isBinary = projectFile.GetName().toLowerCase().endsWith(".skel");
 		if (isBinary) {
 			const skeletonFile = await blob.arrayBuffer();
 			const skeletonLoader = new SkeletonBinary(atlasLoader);
@@ -72,6 +75,8 @@ export class AssetLoader {
 	public async loadAtlasEditor (sid: number, instance: SDK.IWorldInstance, renderer: SDK.Gfx.IWebGLRenderer) {
 		const projectFile = instance.GetProject().GetProjectFileBySID(sid);
 		if (!projectFile) throw new Error(`Atlas file not found with the given SID: ${sid}`);
+		if (!projectFile.GetName().toLowerCase().endsWith(".atlas"))
+			throw new Error(`Invalid Spine atlas file: ${projectFile.GetName()}`);
 
 		const blob = projectFile.GetBlob();
 		const content = await blob.text();
@@ -101,21 +106,26 @@ export class AssetLoader {
 		return AssetLoader.createImageBitmapFromBlob(content, pma);
 	}
 
-	public getCachedRuntimeSkeletonAndAtlas (skeletonPath: string, atlasPath: string, scale = 1) {
+	public getCachedRuntimeSkeletonAndAtlas (skeletonPath: string, atlasPath: string, owner: object, scale = 1) {
 		const skeletonKey = AssetLoader.getSkeletonCacheKey(skeletonPath, atlasPath, scale);
 		const skeletonEntry = AssetLoader.CacheSkeleton.get(skeletonKey);
 		const atlasEntry = AssetLoader.CacheAtlas.get(atlasPath);
 		if (!skeletonEntry?.data || !atlasEntry?.data) return null;
 
-		skeletonEntry.refCount++;
-		atlasEntry.refCount++;
+		skeletonEntry.users.add(owner);
+		atlasEntry.users.add(owner);
 		return {
 			skeletonData: skeletonEntry.data,
 			textureAtlas: atlasEntry.data,
 		};
 	}
 
-	public async loadSkeletonRuntime (path: string, atlasPath: string, textureAtlas: TextureAtlas, scale = 1, instance: IRuntime) {
+	public loadSkeletonRuntime (path: string, atlasPath: string, textureAtlas: TextureAtlas, owner: object, scale = 1, instance: IRuntime) {
+		if (!/\.(json|skel)$/i.test(path)) throw new Error(`Invalid Spine skeleton file: ${path}`);
+		if (!atlasPath.toLowerCase().endsWith(".atlas")) throw new Error(`Invalid Spine atlas file: ${atlasPath}`);
+		if (!Number.isFinite(scale) || scale <= 0)
+			throw new Error("Spine loader scale must be a finite number greater than zero.");
+
 		const loadPromise = (async () => {
 			const fullPath = await instance.assets.getProjectFileUrl(path);
 			if (!fullPath) throw new Error(`Cannot find project file url for: ${path}`);
@@ -123,7 +133,7 @@ export class AssetLoader {
 			const atlasLoader = new AtlasAttachmentLoader(textureAtlas);
 
 			let skeletonData: SkeletonData;
-			const isBinary = path.endsWith(".skel");
+			const isBinary = path.toLowerCase().endsWith(".skel");
 			if (isBinary) {
 				const content = await instance.assets.fetchArrayBuffer(fullPath);
 				if (!content) throw new Error(`Cannot fetch array buffer for: ${fullPath}`);
@@ -142,10 +152,12 @@ export class AssetLoader {
 			return skeletonData;
 		});
 
-		return this.loadRuntimeResource(AssetLoader.getSkeletonCacheKey(path, atlasPath, scale), AssetLoader.CacheSkeleton, loadPromise);
+		return this.loadRuntimeResource(AssetLoader.getSkeletonCacheKey(path, atlasPath, scale), AssetLoader.CacheSkeleton, owner, loadPromise);
 	}
 
-	public async loadAtlasRuntime (path: string, instance: IRuntime, renderer: IRenderer) {
+	public loadAtlasRuntime (path: string, owner: object, instance: IRuntime, renderer: IRenderer) {
+		if (!path.toLowerCase().endsWith(".atlas")) throw new Error(`Invalid Spine atlas file: ${path}`);
+
 		const loadPromise = (async () => {
 			const fullPath = await instance.assets.getProjectFileUrl(path);
 			if (!fullPath) throw new Error(`Cannot find project file url for: ${path}`);
@@ -157,65 +169,37 @@ export class AssetLoader {
 			const textureAtlas = new TextureAtlas(content);
 			await Promise.all(textureAtlas.pages.map(async page => {
 				const texture = await this.loadSpineTextureRuntime(basePath, page, instance, renderer);
-				if (texture) page.setTexture(texture);
-				return texture;
+				page.setTexture(texture);
 			}));
-
 			return textureAtlas;
 		});
 
-		return this.loadRuntimeResource(path, AssetLoader.CacheAtlas, loadPromise);
+		return this.loadRuntimeResource(path, AssetLoader.CacheAtlas, owner, loadPromise);
 	}
 
 	public async loadSpineTextureRuntime (basePath: string, page: TextureAtlasPage, instance: IRuntime, renderer: IRenderer) {
-		const cacheKey = basePath + page.name;
+		const texturePath = basePath + page.name;
+		const fullPath = await instance.assets.getProjectFileUrl(texturePath);
+		if (!fullPath) throw new Error(`Cannot find project file url for: ${texturePath}`);
 
-		const loadPromise = (async () => {
-			const fullPath = await instance.assets.getProjectFileUrl(cacheKey);
-			if (!fullPath) throw new Error(`Cannot find project file url for: ${cacheKey}`);
+		const content = await instance.assets.fetchBlob(fullPath);
+		if (!content) throw new Error(`Cannot fetch blob for: ${fullPath}`);
 
-			const content = await instance.assets.fetchBlob(fullPath);
-			if (!content) throw new Error(`Cannot fetch blob for: ${fullPath}`);
-
-			const image = await AssetLoader.createImageBitmapFromBlob(content, page.pma);
-			if (!image) throw new Error(`Cannot create image bitmap for: ${fullPath}`);
-
-			return new C3TextureRuntime(image, renderer, page);
-		});
-
-		return this.loadRuntimeResource(cacheKey, AssetLoader.CacheTexture, loadPromise);
+		const image = await AssetLoader.createImageBitmapFromBlob(content, page.pma);
+		return new C3TextureRuntime(image, renderer, page);
 	}
 
-	public releaseInstanceResources (skeletonPath: string, atlasPath: string, loaderScale: number) {
-		this.releaseResource("skeleton", AssetLoader.CacheSkeleton, AssetLoader.getSkeletonCacheKey(skeletonPath, atlasPath, loaderScale));
-
-		const atlasEntry = AssetLoader.CacheAtlas.get(atlasPath);
-		if (atlasEntry) {
-			this.releaseResource("atlas", AssetLoader.CacheAtlas, atlasPath, async () => {
-				const basePath = atlasPath.substring(0, atlasPath.lastIndexOf("/") + 1);
-				for (const page of (await atlasEntry.promise).pages) {
-					const textureKey = basePath + page.name;
-					this.releaseResource("texture", AssetLoader.CacheTexture, textureKey, (texture) => {
-						texture?.dispose();
-					});
-				}
-			});
-		}
+	public releaseInstanceResources (owner: object) {
+		for (const key of Array.from(AssetLoader.CacheSkeleton.keys()))
+			this.releaseResource("skeleton", AssetLoader.CacheSkeleton, key, owner);
+		for (const key of Array.from(AssetLoader.CacheAtlas.keys()))
+			this.releaseResource("atlas", AssetLoader.CacheAtlas, key, owner, textureAtlas => textureAtlas.dispose());
 	}
 
 	public retainInstanceResources (skeletonPath: string, atlasPath: string, loaderScale: number, retained: boolean) {
 		const skeletonKey = AssetLoader.getSkeletonCacheKey(skeletonPath, atlasPath, loaderScale);
 		this.setRuntimeResourceRetained("skeleton", skeletonKey, retained);
 		this.setRuntimeResourceRetained("atlas", atlasPath, retained);
-
-		const atlasEntry = AssetLoader.CacheAtlas.get(atlasPath);
-		if (atlasEntry) {
-			const basePath = atlasPath.substring(0, atlasPath.lastIndexOf("/") + 1);
-			atlasEntry.promise.then(textureAtlas => {
-				for (const page of textureAtlas.pages)
-					this.setRuntimeResourceRetained("texture", basePath + page.name, retained);
-			});
-		}
 	}
 
 	public setAllRuntimeResourcesRetained (retained: boolean) {
@@ -232,9 +216,7 @@ export class AssetLoader {
 		for (const key of Array.from(AssetLoader.CacheSkeleton.keys()))
 			this.deleteResourceIfUnused("skeleton", AssetLoader.CacheSkeleton, key, undefined, true);
 		for (const key of Array.from(AssetLoader.CacheAtlas.keys()))
-			this.deleteAtlasResourceIfUnused(key, true);
-		for (const key of Array.from(AssetLoader.CacheTexture.keys()))
-			this.deleteResourceIfUnused("texture", AssetLoader.CacheTexture, key, texture => texture?.dispose(), true);
+			this.deleteResourceIfUnused("atlas", AssetLoader.CacheAtlas, key, textureAtlas => textureAtlas.dispose(), true);
 	}
 
 	private setRuntimeResourceRetained (type: RuntimeCacheType, key: string, retained: boolean) {
@@ -243,40 +225,27 @@ export class AssetLoader {
 			AssetLoader.retainedRuntimeResourceKeys.add(retainKey);
 		} else {
 			AssetLoader.retainedRuntimeResourceKeys.delete(retainKey);
-			switch (type) {
-				case "skeleton": this.deleteResourceIfUnused(type, AssetLoader.CacheSkeleton, key); break;
-				case "atlas": this.deleteAtlasResourceIfUnused(key); break;
-				case "texture": this.deleteResourceIfUnused(type, AssetLoader.CacheTexture, key, texture => texture?.dispose()); break;
+			if (type === "skeleton") {
+				this.deleteResourceIfUnused(type, AssetLoader.CacheSkeleton, key);
+			} else {
+				this.deleteResourceIfUnused(type, AssetLoader.CacheAtlas, key, textureAtlas => textureAtlas.dispose());
 			}
 		}
 	}
 
-	private releaseResource<T> (type: RuntimeCacheType, cache: ResourceCache<T>, key: string, disposer?: (data?: T) => void) {
+	private releaseResource<T> (type: RuntimeCacheType, cache: ResourceCache<T>, key: string, owner: object, disposer?: (data: T) => void) {
 		const entry = cache.get(key);
-		if (!entry) return;
-
-		entry.refCount--;
+		if (!entry?.users.delete(owner)) return;
 		this.deleteResourceIfUnused(type, cache, key, disposer);
 	}
 
-	private deleteAtlasResourceIfUnused (key: string, force = false) {
-		const atlasEntry = AssetLoader.CacheAtlas.get(key);
-		if (!atlasEntry) return;
-
-		this.deleteResourceIfUnused("atlas", AssetLoader.CacheAtlas, key, async () => {
-			const basePath = key.substring(0, key.lastIndexOf("/") + 1);
-			for (const page of (await atlasEntry.promise).pages)
-				this.releaseResource("texture", AssetLoader.CacheTexture, basePath + page.name, texture => texture?.dispose());
-		}, force);
-	}
-
-	private deleteResourceIfUnused<T> (type: RuntimeCacheType, cache: ResourceCache<T>, key: string, disposer?: (data?: T) => void, force = false) {
+	private deleteResourceIfUnused<T> (type: RuntimeCacheType, cache: ResourceCache<T>, key: string, disposer?: (data: T) => void, force = false) {
 		const entry = cache.get(key);
-		if (!entry || entry.refCount > 0) return;
+		if (!entry || entry.users.size > 0) return;
 		if (!force && (AssetLoader.retainAllUnusedRuntimeResources || AssetLoader.retainedRuntimeResourceKeys.has(AssetLoader.getRetainKey(type, key)))) return;
 
-		if (disposer) disposer(entry.data);
 		cache.delete(key);
+		if (disposer) void entry.promise.then(disposer, () => { });
 	}
 
 	private static getRetainKey (type: RuntimeCacheType, key: string) {
@@ -287,42 +256,29 @@ export class AssetLoader {
 		return `${skeletonPath}|atlas${atlasPath}|scale${scale}`;
 	}
 
-	private async loadRuntimeResource<T> (cacheKey: string, resourceCache: ResourceCache<T>, loader: () => Promise<T>): Promise<T> {
-		const entry = this.getFromCache(resourceCache, cacheKey);
-		if (entry) return entry.promise;
-		const result = loader();
-		this.addToCache(resourceCache, cacheKey, result);
-		return result;
-	}
+	private loadRuntimeResource<T> (cacheKey: string, resourceCache: ResourceCache<T>, owner: object, loader: () => Promise<T>): Promise<T> {
+		const cachedEntry = resourceCache.get(cacheKey);
+		if (cachedEntry) {
+			cachedEntry.users.add(owner);
+			return cachedEntry.promise;
+		}
 
-	private addToCache<T> (cache: ResourceCache<T>, cacheKey: string, promise: Promise<T>) {
-		const cacheEntry: CacheEntry<T> = { promise, refCount: 1 };
-		cache.set(cacheKey, cacheEntry);
+		const promise = loader();
+		const cacheEntry: CacheEntry<T> = { promise, users: new Set([owner]) };
+		resourceCache.set(cacheKey, cacheEntry);
 		promise.then(
 			data => {
-				if (cache.get(cacheKey) === cacheEntry) cacheEntry.data = data;
+				if (resourceCache.get(cacheKey) === cacheEntry) cacheEntry.data = data;
 			},
 			() => {
-				if (cache.get(cacheKey) === cacheEntry) cache.delete(cacheKey);
+				if (resourceCache.get(cacheKey) === cacheEntry) resourceCache.delete(cacheKey);
 			}
 		);
+		return promise;
 	}
 
-	private getFromCache<T> (cache: ResourceCache<T>, cacheKey: string) {
-		const entry = cache.get(cacheKey);
-		if (!entry) return undefined;
-
-		entry.refCount++;
-		return entry;
-	}
-
-	static async createImageBitmapFromBlob (blob: Blob, pma: boolean): Promise<ImageBitmap> {
-		try {
-			return createImageBitmap(blob, { premultiplyAlpha: pma ? "none" : "premultiply" });
-		} catch (e) {
-			console.error("Failed to create ImageBitmap from blob:", e);
-			throw e;
-		}
+	static createImageBitmapFromBlob (blob: Blob, pma: boolean): Promise<ImageBitmap> {
+		return createImageBitmap(blob, { premultiplyAlpha: pma ? "none" : "premultiply" });
 	}
 
 }

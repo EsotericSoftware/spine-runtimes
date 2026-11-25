@@ -57,7 +57,7 @@ struct DebugRendering: View {
             model.dispose()
         }
         .navigationTitle("Debug Rendering")
-        .navigationBarTitleDisplayMode(.inline)
+        .inlineNavigationTitle()
     }
 }
 

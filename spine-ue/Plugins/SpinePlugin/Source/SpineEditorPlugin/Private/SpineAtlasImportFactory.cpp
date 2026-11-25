@@ -31,6 +31,7 @@
 #include "AssetToolsModule.h"
 #include "SpineAtlasAsset.h"
 #include "Editor.h"
+#include "EditorFramework/AssetImportData.h"
 
 #define LOCTEXT_NAMESPACE "Spine"
 
@@ -50,7 +51,7 @@ FText USpineAtlasAssetFactory::GetToolTip() const {
 }
 
 bool USpineAtlasAssetFactory::FactoryCanImport(const FString &Filename) {
-	return true;
+	return FPaths::GetExtension(Filename).Equals(TEXT("atlas"), ESearchCase::IgnoreCase);
 }
 
 UObject *USpineAtlasAssetFactory::FactoryCreateFile(UClass *InClass, UObject *InParent, FName InName, EObjectFlags Flags, const FString &Filename,
@@ -71,6 +72,7 @@ UObject *USpineAtlasAssetFactory::FactoryCreateFile(UClass *InClass, UObject *In
 	asset->SetRawData(rawString);
 	asset->SetAtlasFileName(FName(*Filename));
 	LoadAtlas(asset, currentSourcePath, longPackagePath);
+	asset->UpdateAtlasFileName(FName(*Filename));
 	GEditor->GetEditorSubsystem<UImportSubsystem>()->BroadcastAssetPostImport(this, asset);
 	return asset;
 }
@@ -93,16 +95,19 @@ void USpineAtlasAssetFactory::SetReimportPaths(UObject *Obj, const TArray<FStrin
 
 EReimportResult::Type USpineAtlasAssetFactory::Reimport(UObject *Obj) {
 	USpineAtlasAsset *asset = Cast<USpineAtlasAsset>(Obj);
+	if (!asset) return EReimportResult::Failed;
+
+	const FString sourceFilename = asset->GetAtlasFileName().ToString();
 	FString rawString;
-	if (!FFileHelper::LoadFileToString(rawString, *asset->GetAtlasFileName().ToString())) return EReimportResult::Failed;
+	if (!FFileHelper::LoadFileToString(rawString, *sourceFilename)) return EReimportResult::Failed;
 	asset->SetRawData(rawString);
 
 	FString currentSourcePath, filenameNoExtension, unusedExtension;
 	const FString longPackagePath = FPackageName::GetLongPackagePath(asset->GetOutermost()->GetPathName());
-	FString currentFileName = asset->GetAtlasFileName().ToString();
-	FPaths::Split(currentFileName, currentSourcePath, filenameNoExtension, unusedExtension);
+	FPaths::Split(sourceFilename, currentSourcePath, filenameNoExtension, unusedExtension);
 
 	LoadAtlas(asset, currentSourcePath, longPackagePath);
+	asset->UpdateAtlasFileName(FName(*sourceFilename));
 
 	if (Obj->GetOuter())
 		Obj->GetOuter()->MarkPackageDirty();
@@ -113,16 +118,30 @@ EReimportResult::Type USpineAtlasAssetFactory::Reimport(UObject *Obj) {
 	return EReimportResult::Succeeded;
 }
 
-UTexture2D *resolveTexture(USpineAtlasAsset *Asset, const FString &PageFileName, const FString &TargetSubPath) {
-	FAssetToolsModule &AssetToolsModule = FModuleManager::GetModuleChecked<FAssetToolsModule>("AssetTools");
+static bool isTextureUpToDate(UTexture2D *Texture, const FString &SourceFilename) {
+	const UAssetImportData *importData = Texture->AssetImportData;
+	if (!importData || importData->GetSourceFileCount() != 1) return false;
+	if (!FPaths::IsSamePath(importData->GetFirstFilename(), SourceFilename)) return false;
+	const FMD5Hash &importedHash = importData->GetSourceData().SourceFiles[0].FileHash;
+	return importedHash.IsValid() && importedHash == FMD5Hash::HashFile(*SourceFilename);
+}
 
+static UTexture2D *resolveTexture(const FString &PageFileName, const FString &TargetSubPath) {
+	const FString assetName = FPaths::GetBaseFilename(PageFileName);
+	const FString objectPath = TargetSubPath / assetName + TEXT(".") + assetName;
+	if (UTexture2D *texture = LoadObject<UTexture2D>(nullptr, *objectPath, nullptr, LOAD_NoWarn | LOAD_Quiet)) {
+		// Reimport the existing texture in place if its source image changed, so references to it stay valid.
+		if (FPaths::FileExists(PageFileName) && !isTextureUpToDate(texture, PageFileName))
+			FReimportManager::Instance()->Reimport(texture, false, true, PageFileName, nullptr, INDEX_NONE, false, true);
+		return texture;
+	}
+
+	FAssetToolsModule &AssetToolsModule = FModuleManager::GetModuleChecked<FAssetToolsModule>("AssetTools");
 	TArray<FString> fileNames;
 	fileNames.Add(PageFileName);
 
-	TArray<UObject *> importedAsset = AssetToolsModule.Get().ImportAssets(fileNames, TargetSubPath);
-	UTexture2D *texture = (importedAsset.Num() > 0) ? Cast<UTexture2D>(importedAsset[0]) : nullptr;
-
-	return texture;
+	TArray<UObject *> importedAsset = AssetToolsModule.Get().ImportAssets(fileNames, TargetSubPath, nullptr, false);
+	return (importedAsset.Num() > 0) ? Cast<UTexture2D>(importedAsset[0]) : nullptr;
 }
 
 void USpineAtlasAssetFactory::LoadAtlas(USpineAtlasAsset *Asset, const FString &CurrentSourcePath, const FString &LongPackagePath) {
@@ -135,7 +154,7 @@ void USpineAtlasAssetFactory::LoadAtlas(USpineAtlasAsset *Asset, const FString &
 	for (size_t i = 0, n = pages.size(); i < n; i++) {
 		AtlasPage *page = pages[i];
 		const FString sourceTextureFilename = FPaths::Combine(*CurrentSourcePath, UTF8_TO_TCHAR(page->name.buffer()));
-		UTexture2D *texture = resolveTexture(Asset, sourceTextureFilename, targetTexturePath);
+		UTexture2D *texture = resolveTexture(sourceTextureFilename, targetTexturePath);
 		Asset->atlasPages.Add(texture);
 	}
 }

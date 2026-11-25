@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>spine-phaser-v4 slot objects</title>
+  <style>
+    html, body { margin: 0; padding: 0; overflow: hidden; background: #2c3e50; }
+    canvas { display: block; }
+  </style>
+  <script src="//cdn.jsdelivr.net/npm/phaser@4.2.1/dist/phaser.js"></script>
+  <script src="../dist/iife/spine-phaser-v4.js"></script>
+</head>
+<body>
+  <script>
+    class Demo extends Phaser.Scene {
+      preload() {
+        this.load.spineSkeleton("spineboy-data", "../../assets/spineboy-pro.skel");
+        this.load.spineAtlas("spineboy-atlas", "../../assets/spineboy-pma.atlas");
+        this.load.image("raptor-jaw", "../../assets/raptor-jaw-tooth.png");
+      }
+
+      create() {
+        const spineboy = this.add.spine(this.scale.width / 2, this.scale.height / 2, "spineboy-data", "spineboy-atlas", {
+          boundsProvider: new spine.SkinsAndAnimationBoundsProvider("walk"),
+          renderer: "phaser"
+        });
+        spineboy.setScale(0.25);
+        const slotObjectScale = 1 / spineboy.scaleX;
+        spineboy.animationStateData.defaultMix = 0.2;
+        spineboy.animationState.setAnimation(0, "walk", true);
+        spineboy.y = this.scale.height / 2 + spineboy.height * spineboy.scaleY / 2;
+
+        const tooth1 = this.add.image(0, 0, "raptor-jaw");
+        tooth1.setOrigin(0, 0);
+        const tooth2 = this.add.image(0, 0, "raptor-jaw");
+        tooth2.setOrigin(0, 0);
+        tooth2.removeFromDisplayList();
+        const toothContainer = this.add.container(0, 0, [tooth1]);
+        toothContainer.setScale(slotObjectScale);
+        toothContainer.removeFromDisplayList();
+        const text = this.add.text(0, 0, "Text GUN", { fontSize: "32px", color: "#ffff00", stroke: "#000000", strokeThickness: 4 });
+        text.setScale(slotObjectScale);
+        text.removeFromDisplayList();
+
+        let frontFoot;
+
+        this.time.delayedCall(1000, () => {
+          frontFoot = spineboy.skeleton.findSlot("front-foot");
+          tooth1.x = -10;
+          tooth1.y = -70;
+          tooth1.setTint(0xff0000);
+          frontFoot.pose.color.g = 0;
+          frontFoot.pose.color.b = 0;
+          spineboy.addSlotObject(frontFoot, toothContainer);
+          frontFoot.pose.setAttachment(null);
+        });
+
+        this.time.delayedCall(2000, () => {
+          frontFoot.bone.scaleX = 0.5;
+          frontFoot.bone.scaleY = 0.5;
+        });
+
+        this.time.delayedCall(4000, () => {
+          spineboy.addSlotObject("gun", text);
+        });
+
+        this.time.delayedCall(5000, () => {
+          tooth1.clearTint();
+          spineboy.addSlotObject("gun", toothContainer);
+        });
+
+        this.time.delayedCall(6000, () => {
+          toothContainer.add(tooth2);
+          tooth2.x = 30;
+          tooth2.y = -70;
+          tooth2.angle = 30;
+          tooth2.setTint(0xff5500);
+        });
+
+        this.time.delayedCall(7000, () => {
+          spineboy.removeSlotObject("gun");
+        });
+
+        this.time.delayedCall(8000, () => {
+          tooth2.setScale(slotObjectScale);
+          spineboy.addSlotObject("gun", tooth2);
+          spineboy.removeSlotObject("gun", text);
+        });
+
+        this.time.delayedCall(9000, () => {
+          spineboy.removeSlotObject("gun", tooth2);
+        });
+
+        this.time.delayedCall(10000, () => {
+          frontFoot.setupPose();
+          frontFoot.bone.setupPose();
+        });
+
+        this.time.delayedCall(11000, () => {
+          spineboy.animationState.setAnimation(0, "portal", true);
+          spineboy.updatePose(0);
+
+          const tooth3 = this.add.image(-60, 120, "raptor-jaw");
+          tooth3.setOrigin(0, 0);
+          tooth3.setScale(2);
+          tooth3.angle = 180;
+          const foot = this.add.container(0, 0, [tooth3]);
+          foot.setScale(slotObjectScale);
+          foot.removeFromDisplayList();
+          spineboy.addSlotObject("rear-foot", foot);
+        });
+      }
+    }
+
+    new Phaser.Game({
+      type: Phaser.WEBGL,
+      parent: document.body,
+      width: window.innerWidth,
+      height: window.innerHeight,
+      resolution: window.devicePixelRatio || 1,
+      backgroundColor: "#2c3e50",
+      scene: Demo,
+      plugins: {
+        scene: [{ key: "spine.SpinePlugin", plugin: spine.SpinePlugin, mapping: "spine" }]
+      },
+      scale: {
+        mode: Phaser.Scale.RESIZE
+      }
+    });
+  </script>
+</body>
+</html>

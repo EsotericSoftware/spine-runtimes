@@ -42,6 +42,10 @@ typedef enum SpineTextureIndex {
 	SpineTextureIndexBaseColor = 0,
 } SpineTextureIndex;
 
+typedef enum SpineSamplerIndex {
+	SpineSamplerIndexTexture = 0,
+} SpineSamplerIndex;
+
 typedef struct {
 	simd_float2 position;
 	simd_float4 color;

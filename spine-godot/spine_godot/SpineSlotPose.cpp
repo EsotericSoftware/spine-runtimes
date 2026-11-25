@@ -29,6 +29,7 @@
 
 #include "SpineSlotPose.h"
 #include "SpineCommon.h"
+#include "SpineController.h"
 #include "SpineSprite.h"
 
 void SpineSlotPose::_bind_methods() {
@@ -85,7 +86,7 @@ Ref<SpineAttachment> SpineSlotPose::get_attachment() {
 	auto attachment = get_spine_object()->getAttachment();
 	if (!attachment) return nullptr;
 	Ref<SpineAttachment> attachment_ref(memnew(SpineAttachment));
-	attachment_ref->set_spine_object(*get_spine_owner()->get_skeleton_data_res(), attachment);
+	attachment_ref->set_spine_object(*get_spine_controller()->get_skeleton_data_res(), attachment);
 	return attachment_ref;
 }
 

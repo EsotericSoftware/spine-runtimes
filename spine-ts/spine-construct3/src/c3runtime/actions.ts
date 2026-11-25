@@ -163,6 +163,7 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 	},
 
 	DetachObjectFromBone (this: SDKInstanceClass, objectClass: IObjectType, boneName: string) {
+		if (this.skeleton && !this.skeleton.findBone(boneName)) throw new Error(`[Spine] Bone not found: ${boneName}`);
 		const pickedInstances = objectClass.getPickedInstances();
 		for (const instance of pickedInstances) {
 			this.detachInstanceFromBoneByUid(instance.uid, boneName);
@@ -170,6 +171,7 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 	},
 
 	DetachAllFromBone (this: SDKInstanceClass, boneName: string) {
+		if (this.skeleton && !this.skeleton.findBone(boneName)) throw new Error(`[Spine] Bone not found: ${boneName}`);
 		this.detachAllFromBone(boneName);
 	},
 
@@ -223,18 +225,10 @@ C3.Plugins.EsotericSoftware_SpineConstruct3.Acts =
 
 };
 
-function toNumberOrUndefined (x: number | string): number | undefined {
-	if (typeof x === "number") {
-		return Number.isFinite(x) ? x : undefined;
-	}
+function toNumberOrUndefined (value: number | string): number | undefined {
+	if (typeof value === "string" && value.trim() === "") return undefined;
 
-	if (typeof x === "string") {
-		const trimmed = x.trim();
-		if (trimmed === "") return undefined;
-
-		const n = Number(trimmed);
-		return Number.isFinite(n) ? n : undefined;
-	}
-
-	return undefined;
+	const number = typeof value === "number" ? value : Number(value);
+	if (!Number.isFinite(number)) throw new Error(`[Spine] Bone pose value must be a finite number or empty: ${value}`);
+	return number;
 }

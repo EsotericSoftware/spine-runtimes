@@ -190,7 +190,7 @@ void PhysicsConstraint::update(Skeleton &skeleton, Physics physics) {
 							e = p._strength;
 						}
 						float ax = p._wind * skeleton._windX + p._gravity * skeleton._gravityX;
-						float ay = p._wind * skeleton._windY + p._gravity * skeleton._gravityY;
+						float ay = (p._wind * skeleton._windY + p._gravity * skeleton._gravityY) * (Bone::isYDown() ? -1 : 1);
 						float rs = _rotateOffset, ss = _scaleOffset, h = l / f;
 						while (true) {
 							a -= t;

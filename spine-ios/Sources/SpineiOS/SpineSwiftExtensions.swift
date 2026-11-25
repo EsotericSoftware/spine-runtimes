@@ -30,7 +30,12 @@
 import Foundation
 import SpineSwift
 import SwiftUI
+
+#if canImport(UIKit)
 import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 
 // Re-export version info from SpineSwift
 public var version: String {
@@ -56,7 +61,7 @@ extension Atlas {
     /// Loads an ``Atlas`` from the file with name `atlasFileName` in the `main` bundle or the optionally provided [bundle].
     ///
     /// Throws an `Error` in case the atlas could not be loaded.
-    public static func fromBundle(_ atlasFileName: String, bundle: Bundle = .main) async throws -> (Atlas, [UIImage]) {
+    public static func fromBundle(_ atlasFileName: String, bundle: Bundle = .main) async throws -> (Atlas, [SpineUIImage]) {
         let data = try await FileSource.bundle(fileName: atlasFileName, bundle: bundle).load()
         return try await Self.fromData(data: data) { name in
             return try await FileSource.bundle(fileName: name, bundle: bundle).load()
@@ -66,7 +71,7 @@ extension Atlas {
     /// Loads an ``Atlas`` from the file URL `atlasFile`.
     ///
     /// Throws an `Error` in case the atlas could not be loaded.
-    public static func fromFile(_ atlasFile: URL) async throws -> (Atlas, [UIImage]) {
+    public static func fromFile(_ atlasFile: URL) async throws -> (Atlas, [SpineUIImage]) {
         let data = try await FileSource.file(atlasFile).load()
         return try await Self.fromData(data: data) { name in
             let dir = atlasFile.deletingLastPathComponent()
@@ -78,7 +83,7 @@ extension Atlas {
     /// Loads an ``Atlas`` from the http URL `atlasURL`.
     ///
     /// Throws an `Error` in case the atlas could not be loaded.
-    public static func fromHttp(_ atlasURL: URL) async throws -> (Atlas, [UIImage]) {
+    public static func fromHttp(_ atlasURL: URL) async throws -> (Atlas, [SpineUIImage]) {
         let data = try await FileSource.http(atlasURL).load()
         return try await Self.fromData(data: data) { name in
             let dir = atlasURL.deletingLastPathComponent()
@@ -87,7 +92,7 @@ extension Atlas {
         }
     }
 
-    private static func fromData(data: Data, loadFile: (_ name: String) async throws -> Data) async throws -> (Atlas, [UIImage]) {
+    private static func fromData(data: Data, loadFile: (_ name: String) async throws -> Data) async throws -> (Atlas, [SpineUIImage]) {
         guard let atlasData = String(data: data, encoding: .utf8) else {
             throw SpineError("Couldn't read atlas bytes as utf8 string")
         }
@@ -95,7 +100,7 @@ extension Atlas {
         // Use SpineSwift's loadAtlas function
         let atlas = try loadAtlas(atlasData)
 
-        var atlasPages = [UIImage]()
+        var atlasPages = [SpineUIImage]()
 
         // Load images for each atlas page
         let pages = atlas.pages
@@ -104,7 +109,7 @@ extension Atlas {
             let imagePath = page.texturePath
 
             let imageData = try await loadFile(imagePath)
-            guard let image = UIImage(data: imageData) else {
+            guard let image = SpineUIImage(data: imageData) else {
                 continue
             }
             atlasPages.append(image)
@@ -201,7 +206,7 @@ internal enum FileSource {
         case .file(let fileUrl):
             return try Data(contentsOf: fileUrl, options: [])
         case .http(let url):
-            if #available(iOS 15.0, *) {
+            if #available(iOS 15.0, macOS 12.0, macCatalyst 15.0, tvOS 15.0, *) {
                 let (temp, response) = try await URLSession.shared.download(from: url)
                 guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
                     throw URLError(.badServerResponse)

@@ -1,0 +1,16 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://dvs0ydpenregm"
+path="res://.godot/imported/coin.atlas-26bb6f5fb1c32b0b5cb5398d3330824b.spatlas"
+
+[deps]
+
+source_file="res://assets/coin/coin.atlas"
+dest_files=["res://.godot/imported/coin.atlas-26bb6f5fb1c32b0b5cb5398d3330824b.spatlas"]
+
+[params]
+
+normal_map_prefix="n"
+specular_map_prefix="s"

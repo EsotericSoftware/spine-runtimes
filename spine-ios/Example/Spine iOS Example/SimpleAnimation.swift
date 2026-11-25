@@ -56,7 +56,7 @@ struct SimpleAnimation: View {
             controller.dispose()
         }
         .navigationTitle("Simple Animation")
-        .navigationBarTitleDisplayMode(.inline)
+        .inlineNavigationTitle()
     }
 }
 

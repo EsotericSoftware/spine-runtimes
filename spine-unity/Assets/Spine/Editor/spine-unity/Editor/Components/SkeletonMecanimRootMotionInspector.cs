@@ -59,6 +59,7 @@ namespace Spine.Unity.Editor {
 			int maxIndex = 0;
 			for (int i = 0; i < targets.Length; ++i) {
 				SkeletonMecanim skeletonMecanim = ((SkeletonMecanimRootMotion)targets[i]).SkeletonMecanim;
+				if (skeletonMecanim.Translator == null) continue;
 				int count = skeletonMecanim.Translator.MecanimLayerCount;
 				if (count > maxLayerCount) {
 					maxLayerCount = count;

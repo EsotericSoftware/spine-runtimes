@@ -185,7 +185,7 @@ function setupModalHandlers (overlay: HTMLDivElement, onCancel: () => void, extr
 		}
 	};
 
-	setTimeout(() => {
+	const keyDownTimer = setTimeout(() => {
 		document.addEventListener('keydown', handleKeyDown);
 	}, 0);
 
@@ -196,6 +196,7 @@ function setupModalHandlers (overlay: HTMLDivElement, onCancel: () => void, extr
 	});
 
 	return () => {
+		clearTimeout(keyDownTimer);
 		document.removeEventListener('keydown', handleKeyDown);
 		overlay.remove();
 	};

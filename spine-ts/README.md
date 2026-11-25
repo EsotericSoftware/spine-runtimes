@@ -201,6 +201,30 @@ Configure this for:
 
 Trusted publishing lets the workflow publish using GitHub OIDC instead of a long-lived npm token. npm also automatically publishes provenance for public packages released this way, which should show the npm provenance/verified badge.
 
+### Publishing npm packages manually
+
+Use the workflow's manual dispatch to publish either one npm workspace or all release artifacts. Select the package and the branch containing the package contents to publish. The optional version input defaults to the version in `spine-ts/package.json` on that branch. Selecting one package skips the web and Construct 3 deployments; selecting `all` performs the complete release workflow, including those deployments.
+
+For example, to publish `@esotericsoftware/spine-phaser-v4` version `4.3.11` from the `4.3` branch:
+
+```bash
+gh workflow run spine-ts.yml --ref 4.3 -f package=phaser-v4 -f version=4.3.11
+```
+
+Omit `version` to use the current package version:
+
+```bash
+gh workflow run spine-ts.yml --ref 4.3 -f package=phaser-v4
+```
+
+Valid package inputs are `core`, `canvas`, `canvaskit`, `webgl`, `player`, `webcomponents`, `threejs`, `phaser-v3`, `phaser-v4`, `pixi-v7`, `pixi-v8`, and `all`. The workflow always validates and builds all spine-ts packages. It then publishes only the selected npm workspace, or the complete workspace list when `all` is selected. Since npm package versions are immutable, select an individual package for recovery only when that package version has not already been published.
+
+To manually run the complete release workflow:
+
+```bash
+gh workflow run spine-ts.yml --ref 4.3 -f package=all -f version=4.3.11
+```
+
 ### Release process
 
 The normal release process is performed by running `./scripts/publish.sh` from the `spine-ts/` folder on a release branch such as `4.3`:

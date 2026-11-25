@@ -27,21 +27,32 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { type BlendMode, Color, MeshAttachment, type NumberArrayLike, RegionAttachment, type Skeleton, type Slot, type TextureRegion, Utils } from "@esotericsoftware/spine-core";
+import { BlendMode, Color, RegionAttachment, type Skeleton, SkeletonRendererCore, type TextureRegion } from "@esotericsoftware/spine-core";
 import type { CanvasTexture } from "./CanvasTexture.js";
 
-const worldVertices = Utils.newFloatArray(8);
+// Use Canvas2D's closest native compositing equivalents. These may not be pixel-identical to WebGL on transparent destinations.
+function blendModeToCompositeOperation (blendMode: BlendMode): GlobalCompositeOperation {
+	switch (blendMode) {
+		case BlendMode.Additive:
+			return "lighter";
+		case BlendMode.Multiply:
+			return "multiply";
+		case BlendMode.Screen:
+			return "screen";
+	}
+	return "source-over";
+}
 
 export class SkeletonRenderer {
-	static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
-	static VERTEX_SIZE = 2 + 2 + 4;
+	// Positions-only stride for triangle rendering and clipping.
+	static VERTEX_SIZE = 2;
 
 	private ctx: CanvasRenderingContext2D;
 
 	public triangleRendering = false;
 	public debugRendering = false;
-	private vertices = Utils.newFloatArray(8 * 1024);
 	private tempColor = new Color();
+	private rendererCore = new SkeletonRendererCore();
 
 	constructor (context: CanvasRenderingContext2D) {
 		this.ctx = context;
@@ -57,6 +68,8 @@ export class SkeletonRenderer {
 		const color = this.tempColor;
 		const skeletonColor = skeleton.color;
 		const drawOrder = skeleton.drawOrder.appliedPose;
+		const oldAlpha = ctx.globalAlpha;
+		const oldCompositeOperation = ctx.globalCompositeOperation;
 
 		if (this.debugRendering) ctx.strokeStyle = "green";
 
@@ -71,7 +84,6 @@ export class SkeletonRenderer {
 
 			const sequence = attachment.sequence;
 			const sequenceIndex = sequence.resolveIndex(pose);
-			attachment.computeWorldVertices(slot, attachment.getOffsets(pose), worldVertices, 0, 2);
 
 			const region = sequence.regions[sequenceIndex] as TextureRegion;
 
@@ -85,6 +97,8 @@ export class SkeletonRenderer {
 				skeletonColor.a * slotColor.a * regionColor.a);
 
 			ctx.save();
+			ctx.globalCompositeOperation = blendModeToCompositeOperation(slot.data.blendMode);
+
 			const boneApplied = bone.appliedPose;
 			ctx.transform(boneApplied.a, boneApplied.c, boneApplied.b, boneApplied.d, boneApplied.worldX, boneApplied.worldY);
 			const offsets = attachment.getOffsets(pose);
@@ -110,82 +124,51 @@ export class SkeletonRenderer {
 			if (this.debugRendering) ctx.strokeRect(0, 0, w, h);
 			ctx.restore();
 		}
+
+		ctx.globalAlpha = oldAlpha;
+		ctx.globalCompositeOperation = oldCompositeOperation;
 	}
 
 	private drawTriangles (skeleton: Skeleton) {
 		const ctx = this.ctx;
-		const color = this.tempColor;
-		const skeletonColor = skeleton.color;
-		const drawOrder = skeleton.drawOrder.appliedPose;
+		const oldAlpha = ctx.globalAlpha;
+		const oldCompositeOperation = ctx.globalCompositeOperation;
 
-		let blendMode: BlendMode | null = null;
-		let vertices: ArrayLike<number> = this.vertices;
-		let triangles: Array<number> | null = null;
+		for (let command = this.rendererCore.render(skeleton, false, undefined, SkeletonRenderer.VERTEX_SIZE); command; command = command.next) {
+			if (command.numVertices === 0 || command.numIndices === 0) continue;
 
-		for (let i = 0, n = drawOrder.length; i < n; i++) {
-			const slot = drawOrder[i];
-			const pose = slot.appliedPose;
-			const attachment = pose.attachment;
-
-			let texture: HTMLImageElement;
-			if (attachment instanceof RegionAttachment) {
-				const sequence = attachment.sequence;
-				const sequenceIndex = sequence.resolveIndex(pose);
-
-				const uvs = sequence.getUVs(sequenceIndex);
-				const offsets = attachment.getOffsets(pose);
-
-				vertices = this.computeRegionVertices(slot, attachment, offsets, uvs, false);
-				triangles = SkeletonRenderer.QUAD_TRIANGLES;
-
-				texture = (sequence.regions[sequenceIndex]?.texture as CanvasTexture).getImage();
-			} else if (attachment instanceof MeshAttachment) {
-				const sequence = attachment.sequence;
-				const sequenceIndex = sequence.resolveIndex(pose);
-
-				const uvs = sequence.getUVs(sequenceIndex);
-				vertices = this.computeMeshVertices(slot, attachment, uvs, false);
-				triangles = attachment.triangles;
-
-				texture = (sequence.regions[sequenceIndex]?.texture as CanvasTexture).getImage();
-			} else
-				continue;
-
-			if (texture) {
-				if (slot.data.blendMode !== blendMode) blendMode = slot.data.blendMode;
-
-				const slotColor = pose.color;
-				const attachmentColor = attachment.color;
-				color.set(skeletonColor.r * slotColor.r * attachmentColor.r,
-					skeletonColor.g * slotColor.g * attachmentColor.g,
-					skeletonColor.b * slotColor.b * attachmentColor.b,
-					skeletonColor.a * slotColor.a * attachmentColor.a);
-
-				ctx.globalAlpha = color.a;
-
-				for (let j = 0; j < triangles.length; j += 3) {
-					const t1 = triangles[j] * 8, t2 = triangles[j + 1] * 8, t3 = triangles[j + 2] * 8;
-
-					const x0 = vertices[t1], y0 = vertices[t1 + 1], u0 = vertices[t1 + 6], v0 = vertices[t1 + 7];
-					const x1 = vertices[t2], y1 = vertices[t2 + 1], u1 = vertices[t2 + 6], v1 = vertices[t2 + 7];
-					const x2 = vertices[t3], y2 = vertices[t3 + 1], u2 = vertices[t3 + 6], v2 = vertices[t3 + 7];
-
-					this.drawTriangle(texture, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2);
-
-					if (this.debugRendering) {
-						ctx.strokeStyle = "green";
-						ctx.beginPath();
-						ctx.moveTo(x0, y0);
-						ctx.lineTo(x1, y1);
-						ctx.lineTo(x2, y2);
-						ctx.lineTo(x0, y0);
-						ctx.stroke();
-					}
-				}
-			}
+			const texture = (command.texture as CanvasTexture).getImage();
+			ctx.globalCompositeOperation = blendModeToCompositeOperation(command.blendMode);
+			ctx.globalAlpha = (command.colors[0] >>> 24) / 255;
+			this.drawTriangleList(texture, command.positions.subarray(0, command.numVertices * SkeletonRenderer.VERTEX_SIZE),
+				command.uvs.subarray(0, command.numVertices << 1), command.indices.subarray(0, command.numIndices));
 		}
 
-		this.ctx.globalAlpha = 1;
+		ctx.globalAlpha = oldAlpha;
+		ctx.globalCompositeOperation = oldCompositeOperation;
+	}
+
+	private drawTriangleList (texture: HTMLImageElement, vertices: ArrayLike<number>, uvs: ArrayLike<number>, triangles: ArrayLike<number>) {
+		const ctx = this.ctx;
+		for (let j = 0; j < triangles.length; j += 3) {
+			const a = triangles[j] * SkeletonRenderer.VERTEX_SIZE, b = triangles[j + 1] * SkeletonRenderer.VERTEX_SIZE, c = triangles[j + 2] * SkeletonRenderer.VERTEX_SIZE;
+
+			const x0 = vertices[a], y0 = vertices[a + 1], u0 = uvs[a], v0 = uvs[a + 1];
+			const x1 = vertices[b], y1 = vertices[b + 1], u1 = uvs[b], v1 = uvs[b + 1];
+			const x2 = vertices[c], y2 = vertices[c + 1], u2 = uvs[c], v2 = uvs[c + 1];
+
+			this.drawTriangle(texture, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2);
+
+			if (this.debugRendering) {
+				ctx.strokeStyle = "green";
+				ctx.beginPath();
+				ctx.moveTo(x0, y0);
+				ctx.lineTo(x1, y1);
+				ctx.lineTo(x2, y2);
+				ctx.lineTo(x0, y0);
+				ctx.stroke();
+			}
+		}
 	}
 
 	// Adapted from http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
@@ -239,84 +222,5 @@ export class SkeletonRenderer {
 		ctx.clip();
 		ctx.drawImage(img, 0, 0);
 		ctx.restore();
-	}
-
-	private computeRegionVertices (slot: Slot, region: RegionAttachment, offsets: NumberArrayLike, uvs: NumberArrayLike, pma: boolean) {
-		const skeletonColor = slot.skeleton.color;
-		const slotColor = slot.appliedPose.color;
-		const regionColor = region.color;
-		const alpha = skeletonColor.a * slotColor.a * regionColor.a;
-		const multiplier = pma ? alpha : 1;
-		const color = this.tempColor;
-		color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier,
-			skeletonColor.g * slotColor.g * regionColor.g * multiplier,
-			skeletonColor.b * slotColor.b * regionColor.b * multiplier,
-			alpha);
-
-		region.computeWorldVertices(slot, offsets, this.vertices, 0, SkeletonRenderer.VERTEX_SIZE);
-
-		const vertices = this.vertices;
-
-		vertices[RegionAttachment.C1R] = color.r;
-		vertices[RegionAttachment.C1G] = color.g;
-		vertices[RegionAttachment.C1B] = color.b;
-		vertices[RegionAttachment.C1A] = color.a;
-		vertices[RegionAttachment.U1] = uvs[0];
-		vertices[RegionAttachment.V1] = uvs[1];
-
-		vertices[RegionAttachment.C2R] = color.r;
-		vertices[RegionAttachment.C2G] = color.g;
-		vertices[RegionAttachment.C2B] = color.b;
-		vertices[RegionAttachment.C2A] = color.a;
-		vertices[RegionAttachment.U2] = uvs[2];
-		vertices[RegionAttachment.V2] = uvs[3];
-
-		vertices[RegionAttachment.C3R] = color.r;
-		vertices[RegionAttachment.C3G] = color.g;
-		vertices[RegionAttachment.C3B] = color.b;
-		vertices[RegionAttachment.C3A] = color.a;
-		vertices[RegionAttachment.U3] = uvs[4];
-		vertices[RegionAttachment.V3] = uvs[5];
-
-		vertices[RegionAttachment.C4R] = color.r;
-		vertices[RegionAttachment.C4G] = color.g;
-		vertices[RegionAttachment.C4B] = color.b;
-		vertices[RegionAttachment.C4A] = color.a;
-		vertices[RegionAttachment.U4] = uvs[6];
-		vertices[RegionAttachment.V4] = uvs[7];
-
-		return vertices;
-	}
-
-	private computeMeshVertices (slot: Slot, mesh: MeshAttachment, uvs: NumberArrayLike, pma: boolean) {
-		const skeleton = slot.skeleton;
-		const skeletonColor = skeleton.color;
-		const slotColor = slot.appliedPose.color;
-		const regionColor = mesh.color;
-		const alpha = skeletonColor.a * slotColor.a * regionColor.a;
-		const multiplier = pma ? alpha : 1;
-		const color = this.tempColor;
-		color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier,
-			skeletonColor.g * slotColor.g * regionColor.g * multiplier,
-			skeletonColor.b * slotColor.b * regionColor.b * multiplier,
-			alpha);
-
-		const vertexCount = mesh.worldVerticesLength / 2;
-		let vertices = this.vertices;
-		if (vertices.length < mesh.worldVerticesLength) this.vertices = vertices = Utils.newFloatArray(mesh.worldVerticesLength);
-		mesh.computeWorldVertices(skeleton, slot, 0, mesh.worldVerticesLength, vertices, 0, SkeletonRenderer.VERTEX_SIZE);
-
-
-		for (let i = 0, u = 0, v = 2; i < vertexCount; i++) {
-			vertices[v++] = color.r;
-			vertices[v++] = color.g;
-			vertices[v++] = color.b;
-			vertices[v++] = color.a;
-			vertices[v++] = uvs[u++];
-			vertices[v++] = uvs[u++];
-			v += 2;
-		}
-
-		return vertices;
 	}
 }

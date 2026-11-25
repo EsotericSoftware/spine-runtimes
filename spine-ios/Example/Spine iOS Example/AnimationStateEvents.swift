@@ -75,7 +75,7 @@ struct AnimationStateEvents: View {
             controller.dispose()
         }
         .navigationTitle("Animation State Listener")
-        .navigationBarTitleDisplayMode(.inline)
+        .inlineNavigationTitle()
     }
 }
 

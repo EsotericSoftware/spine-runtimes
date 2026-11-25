@@ -223,12 +223,16 @@ PackedStringArray SpineSkeletonFileResourceFormatLoader::_get_recognized_extensi
 	PackedStringArray extensions;
 	extensions.push_back("spjson");
 	extensions.push_back("spskel");
+	extensions.push_back("spine-json");
+	extensions.push_back("skel");
 	return extensions;
 }
 #else
 void SpineSkeletonFileResourceFormatLoader::get_recognized_extensions(List<String> *extensions) const {
 	extensions->push_back("spjson");
 	extensions->push_back("spskel");
+	extensions->push_back("spine-json");
+	extensions->push_back("skel");
 }
 #endif
 

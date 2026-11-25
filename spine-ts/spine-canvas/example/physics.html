@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!--<script src="https://unpkg.com/@esotericsoftware/spine-canvas@4.3.*/dist/iife/spine-canvas.js"></script>-->
+	<script src="../dist/iife/spine-canvas.js"></script>
+</head>
+
+<body style="margin: 0; padding: 0; background: #333; overflow: hidden;">
+	<div style="position: absolute; left: 12px; top: 12px; z-index: 1; color: white; font: 14px sans-serif; user-select: none;">
+		Celestial Circus: physics, multiply blend modes, and mesh rendering. Drag to move.
+	</div>
+	<canvas id="canvas" style="width: 100%; height: 100vh;"></canvas>
+</body>
+
+<script>
+	let lastFrameTime = Date.now() / 1000;
+	let canvas, context;
+	let assetManager;
+	let skeleton, animationState, bounds;
+	let skeletonRenderer;
+	let fitScale = 1;
+	const fitPadding = 0.45;
+	let offsetX = 0, offsetY = 0;
+	let dragging = false, lastX = 0, lastY = 0;
+
+	async function load() {
+		canvas = document.getElementById("canvas");
+		context = canvas.getContext("2d");
+		skeletonRenderer = new spine.SkeletonRenderer(context);
+		// Celestial Circus is mesh-heavy, so render it through the triangle path.
+		skeletonRenderer.triangleRendering = true;
+
+		assetManager = new spine.AssetManager("/assets/");
+		assetManager.loadBinary("celestial-circus-pro.skel");
+		assetManager.loadTextureAtlas("celestial-circus.atlas");
+		await assetManager.loadAll();
+
+		const atlas = assetManager.require("celestial-circus.atlas");
+		const atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+		const skeletonBinary = new spine.SkeletonBinary(atlasLoader);
+		const skeletonData = skeletonBinary.readSkeletonData(assetManager.require("celestial-circus-pro.skel"));
+
+		skeleton = new spine.Skeleton(skeletonData);
+		skeleton.setupPose();
+		skeleton.updateWorldTransform(spine.Physics.pose);
+		bounds = skeleton.getBoundsRect();
+		resizeCanvas();
+		fitScale = Math.min(canvas.width / bounds.width, canvas.height / bounds.height) * fitPadding;
+
+		const animationStateData = new spine.AnimationStateData(skeleton.data);
+		animationStateData.defaultMix = 0.2;
+		animationState = new spine.AnimationState(animationStateData);
+		animationState.setAnimation(0, "swing", true);
+
+		canvas.addEventListener("pointerdown", event => {
+			dragging = true;
+			lastX = event.clientX;
+			lastY = event.clientY;
+			canvas.setPointerCapture(event.pointerId);
+		});
+		canvas.addEventListener("pointermove", event => {
+			if (!dragging) return;
+			offsetX += event.clientX - lastX;
+			offsetY += event.clientY - lastY;
+			lastX = event.clientX;
+			lastY = event.clientY;
+		});
+		canvas.addEventListener("pointerup", event => {
+			dragging = false;
+			canvas.releasePointerCapture(event.pointerId);
+		});
+		canvas.addEventListener("pointercancel", () => dragging = false);
+
+		lastFrameTime = Date.now() / 1000;
+		requestAnimationFrame(render);
+	}
+
+	function resizeCanvas() {
+		if (canvas.width != canvas.clientWidth || canvas.height != canvas.clientHeight) {
+			canvas.width = canvas.clientWidth;
+			canvas.height = canvas.clientHeight;
+		}
+	}
+
+	function fitSkeleton() {
+		const scale = Math.min(fitScale, Math.min(canvas.width / bounds.width, canvas.height / bounds.height) * fitPadding);
+		skeleton.scaleX = scale;
+		skeleton.scaleY = -scale;
+		skeleton.x = canvas.width / 2 - (bounds.x + bounds.width / 2) * scale + offsetX;
+		skeleton.y = canvas.height / 2 + (bounds.y + bounds.height / 2) * scale + offsetY;
+	}
+
+	function render() {
+		const now = Date.now() / 1000;
+		const delta = now - lastFrameTime;
+		lastFrameTime = now;
+
+		resizeCanvas();
+		context.clearRect(0, 0, canvas.width, canvas.height);
+
+		fitSkeleton();
+
+		animationState.update(delta);
+		animationState.apply(skeleton);
+		skeleton.update(delta);
+		skeleton.updateWorldTransform(spine.Physics.update);
+		skeletonRenderer.draw(skeleton);
+
+		requestAnimationFrame(render);
+	}
+
+	load();
+</script>
+
+</html>

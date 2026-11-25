@@ -78,7 +78,7 @@ namespace Spine.Unity.Editor {
 					},
 
 					// Populate the search keywords to enable smart search filtering and label highlighting:
-					keywords = new HashSet<string>(new[] { "Spine", "Preferences", "Skeleton", "Default", "Mix", "Duration" })
+					keywords = new HashSet<string>(new[] { "Spine", "Preferences", "Skeleton", "Default", "Mix", "Duration", "On-Demand", "Material", "Scan" })
 				};
 				return provider;
 			}
@@ -141,6 +141,9 @@ namespace Spine.Unity.Editor {
 
 			const string TEXTURE_SETTINGS_REFERENCE_KEY = "SPINE_TEXTURE_SETTINGS_REFERENCE";
 			public static string textureSettingsReference = SpinePreferences.DEFAULT_TEXTURE_SETTINGS_REFERENCE;
+
+			const string SCAN_ON_DEMAND_MATERIALS_KEY = "SPINE_SCAN_ON_DEMAND_MATERIALS";
+			public static bool scanOnDemandMaterials = SpinePreferences.DEFAULT_SCAN_ON_DEMAND_MATERIALS;
 
 			public static bool UsesPMAWorkflow {
 				get {
@@ -259,6 +262,7 @@ namespace Spine.Unity.Editor {
 				reloadAfterPlayMode = EditorPrefs.GetBool(RELOAD_AFTER_PLAYMODE_KEY, SpinePreferences.DEFAULT_RELOAD_AFTER_PLAYMODE);
 				setTextureImporterSettings = EditorPrefs.GetBool(SET_TEXTUREIMPORTER_SETTINGS_KEY, SpinePreferences.DEFAULT_SET_TEXTUREIMPORTER_SETTINGS);
 				textureSettingsReference = EditorPrefs.GetString(TEXTURE_SETTINGS_REFERENCE_KEY, SpinePreferences.DEFAULT_TEXTURE_SETTINGS_REFERENCE);
+				scanOnDemandMaterials = EditorPrefs.GetBool(SCAN_ON_DEMAND_MATERIALS_KEY, SpinePreferences.DEFAULT_SCAN_ON_DEMAND_MATERIALS);
 				applyAdditiveMaterial = EditorPrefs.GetBool(APPLY_ADDITIVE_MATERIAL_KEY, SpinePreferences.DEFAULT_APPLY_ADDITIVE_MATERIAL);
 				blendModeMaterialMultiply = EditorPrefs.GetString(BLEND_MODE_MATERIAL_MULTIPLY_KEY, "");
 				blendModeMaterialScreen = EditorPrefs.GetString(BLEND_MODE_MATERIAL_SCREEN_KEY, "");
@@ -292,6 +296,7 @@ namespace Spine.Unity.Editor {
 				newPreferences.reloadAfterPlayMode = EditorPrefs.GetBool(RELOAD_AFTER_PLAYMODE_KEY, SpinePreferences.DEFAULT_RELOAD_AFTER_PLAYMODE);
 				newPreferences.setTextureImporterSettings = EditorPrefs.GetBool(SET_TEXTUREIMPORTER_SETTINGS_KEY, SpinePreferences.DEFAULT_SET_TEXTUREIMPORTER_SETTINGS);
 				newPreferences.textureSettingsReference = EditorPrefs.GetString(TEXTURE_SETTINGS_REFERENCE_KEY, SpinePreferences.DEFAULT_TEXTURE_SETTINGS_REFERENCE);
+				newPreferences.scanOnDemandMaterials = EditorPrefs.GetBool(SCAN_ON_DEMAND_MATERIALS_KEY, SpinePreferences.DEFAULT_SCAN_ON_DEMAND_MATERIALS);
 				newPreferences.autoReloadSceneSkeletons = EditorPrefs.GetBool(AUTO_RELOAD_SCENESKELETONS_KEY, SpinePreferences.DEFAULT_AUTO_RELOAD_SCENESKELETONS);
 				newPreferences.mecanimEventIncludeFolderName = EditorPrefs.GetBool(MECANIM_EVENT_INCLUDE_FOLDERNAME_KEY, SpinePreferences.DEFAULT_MECANIM_EVENT_INCLUDE_FOLDERNAME);
 				newPreferences.atlasTxtImportWarning = EditorPrefs.GetBool(ATLASTXT_WARNING_KEY, SpinePreferences.DEFAULT_ATLASTXT_WARNING);
@@ -318,6 +323,7 @@ namespace Spine.Unity.Editor {
 				EditorPrefs.SetBool(RELOAD_AFTER_PLAYMODE_KEY, preferences.reloadAfterPlayMode);
 				EditorPrefs.SetBool(SET_TEXTUREIMPORTER_SETTINGS_KEY, preferences.setTextureImporterSettings);
 				EditorPrefs.SetString(TEXTURE_SETTINGS_REFERENCE_KEY, preferences.textureSettingsReference);
+				EditorPrefs.SetBool(SCAN_ON_DEMAND_MATERIALS_KEY, preferences.scanOnDemandMaterials);
 				EditorPrefs.SetBool(AUTO_RELOAD_SCENESKELETONS_KEY, preferences.autoReloadSceneSkeletons);
 				EditorPrefs.SetBool(MECANIM_EVENT_INCLUDE_FOLDERNAME_KEY, preferences.mecanimEventIncludeFolderName);
 				EditorPrefs.SetBool(ATLASTXT_WARNING_KEY, preferences.atlasTxtImportWarning);
@@ -447,6 +453,12 @@ namespace Spine.Unity.Editor {
 						EditorPrefs.SetFloat(SCENE_ICONS_SCALE_KEY, handleScale);
 						SceneView.RepaintAll();
 					}
+				}
+
+				EditorGUILayout.Space();
+				EditorGUILayout.LabelField("On-Demand Loading", EditorStyles.boldLabel);
+				{
+					SpineEditorUtilities.BoolPrefsField(ref scanOnDemandMaterials, SCAN_ON_DEMAND_MATERIALS_KEY, new GUIContent("Scan Additional Materials", "Scans the project for additional Materials referencing managed on-demand target textures and assigns placeholders before builds. Skipped when no active on-demand loader exists."));
 				}
 
 				GUILayout.Space(20);

@@ -41,22 +41,20 @@ abstract class C3SkeletonRenderer<
 > extends SkeletonRendererCore {
 
 	private command?: RenderCommand;
+	private transformedPositions: { buffer: Float32Array; positions: Float32Array }[] = [];
+	private transformedMatrixRevision = -1;
+	private inputColor: [number, number, number, number] = [1, 1, 1, 1];
 	private tempVertices = new Float32Array(4096);
 	private tempColors = new Float32Array(4096);
 	private tempPoint = new Vector2();
 	private tempArray = [] as number[];
 	private inv255 = 1 / 255;
 
-	private prevX = Infinity;
-	private prevY = Infinity;
-	private prevZ = Infinity;
-	private prevAngle = Infinity;
-	private prevScaleX = Infinity;
-	private prevScaleY = Infinity;
 	private prevRed = -1;
 	private prevGreen = -1;
 	private prevBlue = -1;
 	private prevAlpha = -1;
+	private prevSlotZOffset = Number.NaN;
 
 	constructor (
 		protected renderer: Renderer,
@@ -65,71 +63,55 @@ abstract class C3SkeletonRenderer<
 		super();
 	}
 
-	draw (skeleton: Skeleton, inColors: [number, number, number], opacity = 1, requestRedraw = true) {
-		const { matrix, inv255 } = this;
-		const { a, b, c, d, tx, ty, prevX, prevY, prevZ, prevAngle, prevScaleX, prevScaleY } = matrix;
-
-		const requestRedrawForMatrix = this.prevX !== prevX || this.prevY !== prevY || this.prevZ !== prevZ || this.prevAngle !== prevAngle || this.prevScaleX !== prevScaleX || this.prevScaleY !== prevScaleY;
-		this.prevX = prevX;
-		this.prevY = prevY;
-		this.prevZ = prevZ;
-		this.prevAngle = prevAngle;
-		this.prevScaleX = prevScaleX;
-		this.prevScaleY = prevScaleY;
-
-		const requestRedrawForColor = this.prevRed !== inColors[0] || this.prevGreen !== inColors[1] || this.prevBlue !== inColors[2] || this.prevAlpha !== opacity;
+	draw (skeleton: Skeleton, inColors: [number, number, number], opacity = 1, requestRedraw = true, slotZOffset = 0) {
+		const { inv255 } = this;
+		const newCommand = requestRedraw ||
+			this.prevRed !== inColors[0] || this.prevGreen !== inColors[1] || this.prevBlue !== inColors[2] ||
+			this.prevAlpha !== opacity || this.prevSlotZOffset !== slotZOffset || !this.command;
 		this.prevRed = inColors[0];
 		this.prevGreen = inColors[1];
 		this.prevBlue = inColors[2];
 		this.prevAlpha = opacity;
+		this.prevSlotZOffset = slotZOffset;
 
-		const newCommand = (requestRedraw || requestRedrawForColor || requestRedrawForMatrix || !this.command);
-		this.command = newCommand ? this.render(skeleton, true, [...inColors, opacity], 3) : this.command;
+		if (newCommand) {
+			const inputColor = this.inputColor;
+			inputColor[0] = inColors[0];
+			inputColor[1] = inColors[1];
+			inputColor[2] = inColors[2];
+			inputColor[3] = opacity;
+			this.command = this.render(skeleton, true, inputColor, 3, slotZOffset);
+		}
+		const transformPositions = newCommand || this.transformedMatrixRevision !== this.matrix.revision;
 		let command = this.command;
+		let commandIndex = 0;
 
 		while (command) {
-			const { numVertices, positions, uvs, colors, indices, numIndices, blendMode } = command;
-
+			const { numVertices, uvs, colors, indices, blendMode } = command;
+			const transformedPositions = this.getTransformedPositions(command, commandIndex++, transformPositions);
 			const c3colors = this.tempColors.length < numVertices * 4
 				? (this.tempColors = new Float32Array(numVertices * 4))
 				: this.tempColors;
 
-			if (newCommand) {
-				for (let i = 0; i < numVertices; i++) {
-					const index = i * 3;
-					const x = positions[index];
-					const y = positions[index + 1];
-					positions[index] = a * x + c * y + tx;
-					positions[index + 1] = b * x + d * y + ty;
-					positions[index + 2] = prevZ;
-
-					const color = colors[i];
-					const colorDst = i * 4;
-					c3colors[colorDst] = (color >>> 16 & 0xFF) * inv255;
-					c3colors[colorDst + 1] = (color >>> 8 & 0xFF) * inv255;
-					c3colors[colorDst + 2] = (color & 0xFF) * inv255;
-					c3colors[colorDst + 3] = (color >>> 24) * inv255;
-				}
-			} else {
-				for (let i = 0; i < numVertices; i++) {
-					const color = colors[i];
-					const colorDst = i * 4;
-					c3colors[colorDst] = (color >>> 16 & 0xFF) * inv255;
-					c3colors[colorDst + 1] = (color >>> 8 & 0xFF) * inv255;
-					c3colors[colorDst + 2] = (color & 0xFF) * inv255;
-					c3colors[colorDst + 3] = (color >>> 24) * inv255;
-				}
+			for (let i = 0; i < numVertices; i++) {
+				const color = colors[i];
+				const colorDst = i * 4;
+				c3colors[colorDst] = (color >>> 16 & 0xFF) * inv255;
+				c3colors[colorDst + 1] = (color >>> 8 & 0xFF) * inv255;
+				c3colors[colorDst + 2] = (color & 0xFF) * inv255;
+				c3colors[colorDst + 3] = (color >>> 24) * inv255;
 			}
 
 			this.renderSkeleton(
-				positions.subarray(0, numVertices * 3),
-				uvs.subarray(0, numVertices * 2),
-				indices.subarray(0, numIndices),
+				transformedPositions,
+				uvs,
+				indices,
 				c3colors.subarray(0, numVertices * 4),
 				command.texture,
 				blendMode)
 			command = command.next;
 		}
+		this.transformedMatrixRevision = this.matrix.revision;
 	}
 
 	drawDebug (skeleton: Skeleton, x: number, y: number, quad: C3Quad) {
@@ -202,6 +184,8 @@ abstract class C3SkeletonRenderer<
 			if (!slot.bone.active) continue;
 			const attachment = slot.appliedPose.attachment;
 			if (!(attachment instanceof MeshAttachment)) continue;
+			if (this.tempVertices.length < attachment.worldVerticesLength)
+				this.tempVertices = new Float32Array(attachment.worldVerticesLength);
 			const vertices = this.tempVertices;
 			attachment.computeWorldVertices(skeleton, slot, 0, attachment.worldVerticesLength, vertices, 0, 2);
 			const triangles = attachment.triangles;
@@ -300,6 +284,44 @@ abstract class C3SkeletonRenderer<
 		}
 
 		this.renderGameObjectBounds(x, y, quad, false);
+	}
+
+	private getTransformedPositions (command: RenderCommand, commandIndex: number, transformPositions: boolean) {
+		const length = command.numVertices * 3;
+		let cache = this.transformedPositions[commandIndex];
+		if (!cache || cache.buffer.length < length) {
+			const buffer = new Float32Array(length);
+			cache = { buffer, positions: buffer };
+			this.transformedPositions[commandIndex] = cache;
+			transformPositions = true;
+		}
+
+		if (cache.positions.length !== length) {
+			cache.positions = cache.buffer.length === length
+				? cache.buffer
+				: cache.buffer.subarray(0, length);
+			transformPositions = true;
+		}
+
+		if (transformPositions) {
+			const {
+				renderXAxisX, renderXAxisY, renderXAxisZ,
+				renderYAxisX, renderYAxisY, renderYAxisZ,
+				renderZAxisX, renderZAxisY, renderZAxisZ,
+				tx, ty, tz,
+			} = this.matrix;
+			const source = command.positions;
+			const destination = cache.positions;
+			for (let i = 0; i < length; i += 3) {
+				const x = source[i];
+				const y = source[i + 1];
+				const z = source[i + 2];
+				destination[i] = renderXAxisX * x + renderYAxisX * y + renderZAxisX * z + tx;
+				destination[i + 1] = renderXAxisY * x + renderYAxisY * y + renderZAxisY * z + ty;
+				destination[i + 2] = renderXAxisZ * x + renderYAxisZ * y + renderZAxisZ * z + tz;
+			}
+		}
+		return cache.positions;
 	}
 
 	protected abstract setColor (r: number, g: number, b: number, a: number): void;
@@ -418,8 +440,9 @@ export class C3RendererRuntime extends C3SkeletonRenderer<IRenderer, C3TextureRu
 	}
 
 	protected renderSkeleton (vertices: Float32Array, uvs: Float32Array, indices: Uint16Array, colors: Float32Array, texture: C3TextureRuntime, blendMode: BlendMode) {
-		this.renderer.setTexture(texture.texture);
 		this.renderer.setBlendMode(BlendingModeSpineToC3[blendMode]);
+		this.renderer.setTextureFillMode();
+		this.renderer.setTexture(texture.texture);
 		this.renderer.drawMesh(vertices, uvs, indices, colors);
 	};
 
@@ -463,7 +486,6 @@ export class C3RendererEditor extends C3SkeletonRenderer<SDK.Gfx.IWebGLRenderer,
 	}
 
 	protected renderSkeleton (vertices: Float32Array, uvs: Float32Array, indices: Uint16Array, colors: Float32Array, texture: C3TextureEditor, blendMode: BlendMode) {
-		this.renderer.ResetColor();
 		this.renderer.SetBlendMode(BlendingModeSpineToC3[blendMode]);
 		this.renderer.SetTextureFillMode();
 		this.renderer.SetTexture(texture.texture);

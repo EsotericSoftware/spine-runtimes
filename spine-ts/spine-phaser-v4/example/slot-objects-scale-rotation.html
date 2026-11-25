@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>spine-phaser-v4 slot objects scale rotation</title>
+  <style>
+    html, body { margin: 0; padding: 0; overflow: hidden; background: #2c3e50; }
+    canvas { display: block; }
+    #instructions {
+      position: fixed;
+      left: 10px;
+      top: 10px;
+      z-index: 10;
+      width: 320px;
+      color: white;
+      font: 20px/1.3 sans-serif;
+      pointer-events: none;
+    }
+  </style>
+  <script src="//cdn.jsdelivr.net/npm/phaser@4.2.1/dist/phaser.js"></script>
+  <script src="../dist/iife/spine-phaser-v4.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.20.0/dist/lil-gui.umd.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/lil-gui@0.20.0/dist/lil-gui.min.css" rel="stylesheet">
+</head>
+<body>
+  <div id="instructions">This example shows that Phaser slot objects follow scale, shear and rotation from ancestor bones too.</div>
+  <script>
+    const jsonSkel = {
+      "bones": [
+        { "name": "root" },
+        { "name": "pivot", "parent": "root", "scaleX": 1, "scaleY": 1, "rotation": 0, "x": 20, "y": -20 },
+        { "name": "pivot2", "parent": "pivot", "scaleX": 1, "scaleY": 1, "rotation": 0, "x": 20, "y": -20 },
+        { "name": "replaceMe", "parent": "pivot2", "scaleX": 1, "scaleY": 1, "rotation": 0, "x": 20, "y": -20 }
+      ],
+      "slots": [{ "name": "replaceMe", "bone": "replaceMe", "attachment": "image" }],
+      "skins": [{ "name": "default", "attachments": { "replaceMe": { "image": { "width": 100, "height": 100 } } }}],
+      "animations": { "animation": {} }
+    };
+
+    const txtAtlas =
+`skeleton.png
+size:100,100
+filter:Linear,Linear
+image
+bounds:0,0,100,100`;
+
+    const slotPng = "data:image/png;base64,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";
+
+    class Demo extends Phaser.Scene {
+      preload() {
+        this.load.image("slot-scale-atlas!skeleton.png", slotPng);
+      }
+
+      create() {
+        this.cache.json.add("slot-scale-data", jsonSkel);
+        this.cache.text.add("slot-scale-atlas", txtAtlas);
+
+        const spineGO = this.add.spine(300, 300, "slot-scale-data", "slot-scale-atlas", {
+          renderer: "phaser"
+        });
+
+        const slotObject = this.add.image(0, 0, "slot-scale-atlas!skeleton.png");
+        slotObject.setOrigin(0.5, 0.5);
+        slotObject.setTint(0x00ff00);
+        spineGO.addSlotObject("replaceMe", slotObject);
+
+        const parentBone = spineGO.skeleton.findBone("pivot");
+        const parent2Bone = spineGO.skeleton.findBone("pivot2");
+        const bone = spineGO.skeleton.findBone("replaceMe");
+
+        const settings = {
+          parentScaleX: 1,  parentScaleY: 1,  parentRotation: 0,  parentShearX: 0, parentShearY: 0,
+          parent2ScaleX: 1, parent2ScaleY: 1, parent2Rotation: 0, parent2ShearX: 0, parent2ShearY: 0,
+          scaleX: 1,        scaleY: 1,        rotation: 0,
+          shearX: 0,        shearY: 0,
+          spriteAlpha: 1,
+        };
+
+        const gui = new lil.GUI({ title: "Slot Object" });
+        gui.add(settings, "parentScaleX", -3, 3, 0.1).onChange(value => parentBone.pose.scaleX = value);
+        gui.add(settings, "parentScaleY", -3, 3, 0.1).onChange(value => parentBone.pose.scaleY = value);
+        gui.add(settings, "parentRotation", -180, 180, 1).onChange(value => parentBone.pose.rotation = value);
+        gui.add(settings, "parentShearX", -180, 180, 1).onChange(value => parentBone.pose.shearX = value);
+        gui.add(settings, "parentShearY", -180, 180, 1).onChange(value => parentBone.pose.shearY = value);
+        gui.add(settings, "parent2ScaleX", -3, 3, 0.1).onChange(value => parent2Bone.pose.scaleX = value);
+        gui.add(settings, "parent2ScaleY", -3, 3, 0.1).onChange(value => parent2Bone.pose.scaleY = value);
+        gui.add(settings, "parent2Rotation", -180, 180, 1).onChange(value => parent2Bone.pose.rotation = value);
+        gui.add(settings, "parent2ShearX", -180, 180, 1).onChange(value => parent2Bone.pose.shearX = value);
+        gui.add(settings, "parent2ShearY", -180, 180, 1).onChange(value => parent2Bone.pose.shearY = value);
+        gui.add(settings, "scaleX", -3, 3, 0.1).onChange(value => bone.pose.scaleX = value);
+        gui.add(settings, "scaleY", -3, 3, 0.1).onChange(value => bone.pose.scaleY = value);
+        gui.add(settings, "rotation", -180, 180, 1).onChange(value => bone.pose.rotation = value);
+        gui.add(settings, "shearX", -180, 180, 1).onChange(value => bone.pose.shearX = value);
+        gui.add(settings, "shearY", -180, 180, 1).onChange(value => bone.pose.shearY = value);
+        gui.add(settings, "spriteAlpha", 0, 1, 0.01).onChange(value => slotObject.alpha = value);
+      }
+    }
+
+    new Phaser.Game({
+      type: Phaser.WEBGL,
+      parent: document.body,
+      width: window.innerWidth,
+      height: window.innerHeight,
+      resolution: window.devicePixelRatio || 1,
+      backgroundColor: "#2c3e50",
+      scene: Demo,
+      plugins: {
+        scene: [{ key: "spine.SpinePlugin", plugin: spine.SpinePlugin, mapping: "spine" }]
+      },
+      scale: {
+        mode: Phaser.Scale.RESIZE
+      }
+    });
+  </script>
+</body>
+</html>

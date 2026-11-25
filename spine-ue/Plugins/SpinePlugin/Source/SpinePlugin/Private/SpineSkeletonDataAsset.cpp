@@ -33,6 +33,7 @@
 #include "SpinePlugin.h"
 #include "spine/Version.h"
 #include "spine/spine.h"
+#include <cstring>
 #include <string>
 
 #define LOCTEXT_NAMESPACE "Spine"
@@ -55,10 +56,23 @@ FName USpineSkeletonDataAsset::GetSkeletonDataFileName() const {
 #if WITH_EDITORONLY_DATA
 
 void USpineSkeletonDataAsset::SetSkeletonDataFileName(const FName &SkeletonDataFileName) {
+	skeletonDataFileName = SkeletonDataFileName;
+	if (!importData) return;
+
 	importData->UpdateFilenameOnly(SkeletonDataFileName.ToString());
 	TArray<FString> files;
 	importData->ExtractFilenames(files);
-	if (files.Num() > 0) this->skeletonDataFileName = FName(*files[0]);
+	if (files.Num() > 0) skeletonDataFileName = FName(*files[0]);
+}
+
+void USpineSkeletonDataAsset::UpdateSkeletonDataFileName(const FName &SkeletonDataFileName) {
+	skeletonDataFileName = SkeletonDataFileName;
+	if (!importData) return;
+
+	importData->Update(SkeletonDataFileName.ToString());
+	TArray<FString> files;
+	importData->ExtractFilenames(files);
+	if (files.Num() > 0) skeletonDataFileName = FName(*files[0]);
 }
 
 void USpineSkeletonDataAsset::PostInitProperties() {
@@ -91,7 +105,6 @@ void USpineSkeletonDataAsset::Serialize(FArchive &Ar) {
 	if (Ar.IsLoading() && Ar.UEVer() < VER_UE4_ASSET_IMPORT_DATA_AS_JSON && !importData)
 #endif
 		importData = NewObject<UAssetImportData>(this, TEXT("AssetImportData"));
-	LoadInfo();
 }
 
 #endif
@@ -141,21 +154,22 @@ public:
 };
 
 void USpineSkeletonDataAsset::SetRawData(TArray<uint8> &Data) {
-	this->rawData.Empty();
-	this->rawData.Append(Data);
-
+#if WITH_EDITORONLY_DATA
+	FString error;
+	if (!SetRawDataFromImport(Data, error)) UE_LOG(SpineLog, Error, TEXT("%s"), *error);
+#else
+	rawData = Data;
 	ClearNativeData();
-
-	LoadInfo();
+#endif
 }
 
 static bool checkVersion(const char *version) {
 	if (!version) return false;
-	char *result = (char *) (strstr(version, SPINE_VERSION_STRING) - version);
-	return result == 0;
+	return strncmp(version, SPINE_VERSION_STRING, strlen(SPINE_VERSION_STRING)) == 0;
 }
 
 static bool checkJson(const char *jsonData) {
+	if (!jsonData) return false;
 	Json json(jsonData);
 	Json *skeleton = Json::getItem(&json, "skeleton");
 	if (!skeleton) return false;
@@ -170,107 +184,103 @@ struct BinaryInput {
 	const unsigned char *end;
 };
 
-static unsigned char readByte(BinaryInput *input) {
-	return *input->cursor++;
-}
-
-static int readVarint(BinaryInput *input, bool optimizePositive) {
-	unsigned char b = readByte(input);
-	int value = b & 0x7F;
-	if (b & 0x80) {
-		b = readByte(input);
-		value |= (b & 0x7F) << 7;
-		if (b & 0x80) {
-			b = readByte(input);
-			value |= (b & 0x7F) << 14;
-			if (b & 0x80) {
-				b = readByte(input);
-				value |= (b & 0x7F) << 21;
-				if (b & 0x80) value |= (readByte(input) & 0x7F) << 28;
-			}
+static bool readVarint(BinaryInput &input, int &value) {
+	uint32 result = 0;
+	for (int shift = 0; shift <= 28; shift += 7) {
+		if (input.cursor >= input.end) return false;
+		const unsigned char b = *input.cursor++;
+		result |= (uint32) (b & 0x7F) << shift;
+		if (!(b & 0x80)) {
+			value = (int) result;
+			return true;
 		}
 	}
-
-	if (!optimizePositive) {
-		value = (((unsigned int) value >> 1) ^ -(value & 1));
-	}
-
-	return value;
+	return false;
 }
 
-static char *readString(BinaryInput *input) {
-	int length = readVarint(input, true);
-	char *string;
-	if (length == 0) {
-		return NULL;
-	}
-	string = SpineExtension::alloc<char>(length, __FILE__, __LINE__);
-	memcpy(string, input->cursor, length - 1);
-	input->cursor += length - 1;
-	string[length - 1] = '\0';
-	return string;
+static bool readString(BinaryInput &input, std::string &value) {
+	int length;
+	if (!readVarint(input, length) || length <= 0) return false;
+
+	const int byteCount = length - 1;
+	if (byteCount > input.end - input.cursor) return false;
+	value.assign((const char *) input.cursor, byteCount);
+	input.cursor += byteCount;
+	return true;
 }
 
 static bool checkBinary(const char *binaryData, int length) {
+	if (!binaryData || length < 9) return false;
+
 	BinaryInput input;
-	input.cursor = (const unsigned char *) binaryData;
+	input.cursor = (const unsigned char *) binaryData + 8;// Skip hash.
 	input.end = (const unsigned char *) binaryData + length;
-	// Skip hash
-	input.cursor += 8;
-	char *version = readString(&input);
-	bool result = checkVersion(version);
-	SpineExtension::free(version, __FILE__, __LINE__);
-	return result;
+	std::string version;
+	return readString(input, version) && checkVersion(version.c_str());
 }
 
-void USpineSkeletonDataAsset::LoadInfo() {
+static bool isJsonFile(const FName &fileName) {
+	return FPaths::GetExtension(fileName.ToString()).Equals(TEXT("json"), ESearchCase::IgnoreCase);
+}
+
 #if WITH_EDITORONLY_DATA
-	int dataLen = rawData.Num();
-	if (dataLen == 0) return;
+bool USpineSkeletonDataAsset::SetRawDataFromImport(const TArray<uint8> &Data, FString &Error) {
+	TArray<FString> newBones;
+	TArray<FString> newSlots;
+	TArray<FString> newSkins;
+	TArray<FString> newAnimations;
+	TArray<FString> newEvents;
+	if (!LoadInfo(Data, newBones, newSlots, newSkins, newAnimations, newEvents, Error)) return false;
+
+	rawData = Data;
+	ClearNativeData();
+	Bones = MoveTemp(newBones);
+	Slots = MoveTemp(newSlots);
+	Skins = MoveTemp(newSkins);
+	Animations = MoveTemp(newAnimations);
+	Events = MoveTemp(newEvents);
+	return true;
+}
+
+bool USpineSkeletonDataAsset::LoadInfo(const TArray<uint8> &Data, TArray<FString> &OutBones, TArray<FString> &OutSlots, TArray<FString> &OutSkins,
+									   TArray<FString> &OutAnimations, TArray<FString> &OutEvents, FString &Error) const {
+	if (Data.Num() == 0) {
+		Error = FString::Printf(TEXT("Couldn't load empty skeleton data: %s"), *skeletonDataFileName.ToString());
+		return false;
+	}
 	NullAttachmentLoader loader;
 	SkeletonData *skeletonData = nullptr;
-	if (skeletonDataFileName.GetPlainNameString().Contains(TEXT(".json"))) {
+	if (isJsonFile(skeletonDataFileName)) {
+		TArray<uint8> terminatedData = Data;
+		terminatedData.Add(0);
+		const char *jsonData = (const char *) terminatedData.GetData();
 		SkeletonJson *json = new (__FILE__, __LINE__) SkeletonJson(loader);
-		if (checkJson((const char *) rawData.GetData())) skeletonData = json->readSkeletonData((const char *) rawData.GetData());
-		if (!skeletonData) {
-			FMessageDialog::Debugf(FText::FromString(FString("Couldn't load skeleton data and/or atlas. Please ensure the "
-															 "version of your exported data matches your runtime "
-															 "version.\n\n") +
-													 skeletonDataFileName.GetPlainNameString() + FString("\n\n") +
-													 UTF8_TO_TCHAR(json->getError().buffer())));
-			UE_LOG(SpineLog, Error, TEXT("Couldn't load skeleton data and atlas: %s"), UTF8_TO_TCHAR(json->getError().buffer()));
-		}
+		if (checkJson(jsonData)) skeletonData = json->readSkeletonData(jsonData);
+		if (!skeletonData && !json->getError().isEmpty()) Error = UTF8_TO_TCHAR(json->getError().buffer());
 		delete json;
 	} else {
 		SkeletonBinary *binary = new (__FILE__, __LINE__) SkeletonBinary(loader);
-		if (checkBinary((const char *) rawData.GetData(), (int) rawData.Num()))
-			skeletonData = binary->readSkeletonData((const unsigned char *) rawData.GetData(), (int) rawData.Num());
-		if (!skeletonData) {
-			FMessageDialog::Debugf(FText::FromString(FString("Couldn't load skeleton data and/or atlas. Please ensure the "
-															 "version of your exported data matches your runtime "
-															 "version.\n\n") +
-													 skeletonDataFileName.GetPlainNameString() + FString("\n\n") +
-													 UTF8_TO_TCHAR(binary->getError().buffer())));
-			UE_LOG(SpineLog, Error, TEXT("Couldn't load skeleton data and atlas: %s"), UTF8_TO_TCHAR(binary->getError().buffer()));
-		}
+		if (checkBinary((const char *) Data.GetData(), Data.Num()))
+			skeletonData = binary->readSkeletonData((const unsigned char *) Data.GetData(), Data.Num());
+		if (!skeletonData && !binary->getError().isEmpty()) Error = UTF8_TO_TCHAR(binary->getError().buffer());
 		delete binary;
 	}
-	if (skeletonData) {
-		Bones.Empty();
-		for (int i = 0; i < skeletonData->getBones().size(); i++) Bones.Add(UTF8_TO_TCHAR(skeletonData->getBones()[i]->getName().buffer()));
-		Skins.Empty();
-		for (int i = 0; i < skeletonData->getSkins().size(); i++) Skins.Add(UTF8_TO_TCHAR(skeletonData->getSkins()[i]->getName().buffer()));
-		Slots.Empty();
-		for (int i = 0; i < skeletonData->getSlots().size(); i++) Slots.Add(UTF8_TO_TCHAR(skeletonData->getSlots()[i]->getName().buffer()));
-		Animations.Empty();
-		for (int i = 0; i < skeletonData->getAnimations().size(); i++)
-			Animations.Add(UTF8_TO_TCHAR(skeletonData->getAnimations()[i]->getName().buffer()));
-		Events.Empty();
-		for (int i = 0; i < skeletonData->getEvents().size(); i++) Events.Add(UTF8_TO_TCHAR(skeletonData->getEvents()[i]->getName().buffer()));
-		delete skeletonData;
+	if (!skeletonData) {
+		if (Error.IsEmpty()) Error = TEXT("The skeleton version does not match the runtime or the data is malformed.");
+		Error = FString::Printf(TEXT("Couldn't load skeleton data %s. %s"), *skeletonDataFileName.ToString(), *Error);
+		return false;
 	}
-#endif
+
+	for (int i = 0; i < skeletonData->getBones().size(); i++) OutBones.Add(UTF8_TO_TCHAR(skeletonData->getBones()[i]->getName().buffer()));
+	for (int i = 0; i < skeletonData->getSlots().size(); i++) OutSlots.Add(UTF8_TO_TCHAR(skeletonData->getSlots()[i]->getName().buffer()));
+	for (int i = 0; i < skeletonData->getSkins().size(); i++) OutSkins.Add(UTF8_TO_TCHAR(skeletonData->getSkins()[i]->getName().buffer()));
+	for (int i = 0; i < skeletonData->getAnimations().size(); i++)
+		OutAnimations.Add(UTF8_TO_TCHAR(skeletonData->getAnimations()[i]->getName().buffer()));
+	for (int i = 0; i < skeletonData->getEvents().size(); i++) OutEvents.Add(UTF8_TO_TCHAR(skeletonData->getEvents()[i]->getName().buffer()));
+	delete skeletonData;
+	return true;
 }
+#endif
 
 SkeletonData *USpineSkeletonDataAsset::GetSkeletonData(Atlas *Atlas) {
 	SkeletonData *skeletonData = nullptr;
@@ -281,10 +291,12 @@ SkeletonData *USpineSkeletonDataAsset::GetSkeletonData(Atlas *Atlas) {
 	}
 
 	if (!skeletonData) {
-		int dataLen = rawData.Num();
-		if (skeletonDataFileName.GetPlainNameString().Contains(TEXT(".json"))) {
+		if (isJsonFile(skeletonDataFileName)) {
+			TArray<uint8> terminatedData = rawData;
+			terminatedData.Add(0);
+			const char *jsonData = (const char *) terminatedData.GetData();
 			SkeletonJson *json = new (__FILE__, __LINE__) SkeletonJson(*Atlas);
-			if (checkJson((const char *) rawData.GetData())) skeletonData = json->readSkeletonData((const char *) rawData.GetData());
+			if (checkJson(jsonData)) skeletonData = json->readSkeletonData(jsonData);
 			if (!skeletonData) {
 #if WITH_EDITORONLY_DATA
 				FMessageDialog::Debugf(FText::FromString(FString("Couldn't load skeleton data and/or atlas. Please ensure "

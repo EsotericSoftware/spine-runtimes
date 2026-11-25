@@ -41,9 +41,8 @@
 #include <spine/Bone.h>
 
 class SpineSkeleton;
-class SpineSprite;
 
-class SpineBone : public SpineSpriteOwnedObject<spine::Bone> {
+class SpineBone : public SpineControllerOwnedObject<spine::Bone> {
 	GDCLASS(SpineBone, SpineObjectWrapper)
 
 protected:
@@ -86,8 +85,4 @@ public:
 	Transform2D get_transform();
 
 	void set_transform(Transform2D transform);
-
-	Transform2D get_global_transform();
-
-	void set_global_transform(Transform2D trans);
 };

@@ -1,5 +1,5 @@
 ﻿
-type TweenPropertyType = "x" | "y" | "z" | "width" | "height" | "angle" | "opacity" | "color" | "x-scale" | "y-scale" | "position" | "position-3d" | "size" | "scale" | "value";
+type TweenPropertyType = "x" | "y" | "z" | "width" | "height" | "angle" | "opacity" | "color" | "x-scale" | "y-scale" | "position" | "position-3d" | "size" | "size-3d" | "scale" | "scale-3d" | "value";
 type TweenEndValueType = number | Vec2Arr | Vec3Arr;
 type TweenBuiltInEaseType = "linear" | "in-sine" | "out-sine" | "in-out-sine" | "in-elastic" | "out-elastic" | "in-out-elastic" | "in-back" | "out-back" | "in-out-back" |
 	"in-bounce" | "out-bounce" | "in-out-bounce" | "in-cubic" | "out-cubic" | "in-out-cubic" | "in-quadratic" | "out-quadratic" | "in-out-quadratic" |

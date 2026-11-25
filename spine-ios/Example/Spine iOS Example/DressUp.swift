@@ -31,6 +31,28 @@ import SpineSwift
 import SpineiOS
 import SwiftUI
 
+#if canImport(UIKit)
+import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
+
+private func image(from cgImage: CGImage) -> Image {
+#if canImport(UIKit)
+    Image(uiImage: UIImage(cgImage: cgImage))
+#else
+    Image(nsImage: NSImage(cgImage: cgImage, size: .zero))
+#endif
+}
+
+private var screenScale: CGFloat {
+#if canImport(UIKit)
+    UIScreen.main.scale
+#else
+    NSScreen.main?.backingScaleFactor ?? 1
+#endif
+}
+
 struct DressUp: View {
 
     @StateObject
@@ -42,7 +64,7 @@ struct DressUp: View {
                 ForEach(model.skinImages.keys.sorted(), id: \.self) { skinName in
                     let rawImageData = model.skinImages[skinName]!
                     Button(action: { model.toggleSkin(skinName: skinName) }) {
-                        Image(uiImage: UIImage(cgImage: rawImageData))
+                        image(from: rawImageData)
                             .resizable()
                             .scaledToFit()
                             .frame(width: model.thumbnailSize.width, height: model.thumbnailSize.height)
@@ -79,7 +101,7 @@ struct DressUp: View {
             }
         }
         .navigationTitle("Dress Up")
-        .navigationBarTitleDisplayMode(.inline)
+        .inlineNavigationTitle()
     }
 }
 
@@ -164,7 +186,7 @@ final class DressUpModel: ObservableObject {
                             size: self.thumbnailSize,
                             boundsProvider: self.boundsProvider,
                             backgroundColor: .white,
-                            scaleFactor: UIScreen.main.scale
+                            scaleFactor: screenScale
                         )
                         self.selectedSkins[skinName] = false
                     }

@@ -6,6 +6,7 @@ declare class IImageInfo
 	readonly width: number;
     readonly height: number;
     getSize(): Vec2Arr;
+    toCanvas(): Promise<HTMLCanvasElement | OffscreenCanvas>;
 
     // For addon SDK
     getTexture(renderer: IRenderer): ITexture | null;

@@ -53,10 +53,12 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
 
     private let device: MTLDevice
     private let textures: [MTLTexture]
+    private let samplerStates: [MTLSamplerState]
     private let commandQueue: MTLCommandQueue
 
     private var sizeInPoints: CGSize = .zero
     private var viewPortSize = vector_uint2(0, 0)
+    private var backingScale = CGSize(width: 1, height: 1)
     private var transform = SpineTransform(
         translation: vector_float2(0, 0),
         scale: vector_float2(1, 1),
@@ -80,8 +82,10 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
         device: MTLDevice,
         commandQueue: MTLCommandQueue,
         pixelFormat: MTLPixelFormat,
-        atlasPages: [UIImage],
-        pma: Bool
+        atlas: Atlas,
+        atlasPages: [SpineUIImage],
+        pma: Bool,
+        textureFilter: SpineTextureFilter
     ) throws {
         self.device = device
         self.commandQueue = commandQueue
@@ -96,18 +100,51 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
 
         let defaultLibrary = try device.makeDefaultLibrary(bundle: bundle)
         let textureLoader = MTKTextureLoader(device: device)
-        textures =
-            try atlasPages
-            .compactMap { $0.cgImage }
-            .map {
+        var textures = [MTLTexture]()
+        var samplerStates = [MTLSamplerState]()
+        let pages = atlas.pages
+        guard atlasPages.count == pages.count else {
+            throw SpineError("The number of atlas page images doesn't match the number of atlas pages")
+        }
+        for (index, image) in atlasPages.enumerated() {
+#if canImport(UIKit)
+            guard let cgImage = image.cgImage else {
+                throw SpineError("Couldn't get a CGImage for atlas page \(index)")
+            }
+#elseif canImport(AppKit)
+            guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: [:]) else {
+                throw SpineError("Couldn't get a CGImage for atlas page \(index)")
+            }
+#endif
+            guard let page = pages[index] else {
+                throw SpineError("Couldn't get atlas page \(index)")
+            }
+            let minFilter = Self.minFilter(for: textureFilter, atlasFilter: page.minFilter)
+            let magFilter = Self.magFilter(for: textureFilter, atlasFilter: page.magFilter)
+            textures.append(
                 try textureLoader.newTexture(
-                    cgImage: $0,
+                    cgImage: cgImage,
                     options: [
                         .textureUsage: NSNumber(value: MTLTextureUsage.shaderRead.rawValue),
                         .SRGB: false,
+                        .generateMipmaps: NSNumber(value: Self.usesMipmaps(minFilter)),
                     ]
                 )
+            )
+
+            let samplerDescriptor = MTLSamplerDescriptor()
+            samplerDescriptor.minFilter = Self.metalMinFilter(minFilter)
+            samplerDescriptor.magFilter = Self.metalMagFilter(magFilter)
+            samplerDescriptor.mipFilter = Self.metalMipFilter(minFilter)
+            samplerDescriptor.sAddressMode = Self.metalAddressMode(page.uWrap)
+            samplerDescriptor.tAddressMode = Self.metalAddressMode(page.vWrap)
+            guard let samplerState = device.makeSamplerState(descriptor: samplerDescriptor) else {
+                throw SpineError("Couldn't create texture sampler state")
             }
+            samplerStates.append(samplerState)
+        }
+        self.textures = textures
+        self.samplerStates = samplerStates
 
         let blendModes: [BlendMode] = [
             .normal,
@@ -135,7 +172,11 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
         guard let spineView = view as? SpineUIView else { return }
 
-        sizeInPoints = CGSize(width: size.width / UIScreen.main.scale, height: size.height / UIScreen.main.scale)
+        backingScale = CGSize(
+            width: spineView.bounds.width > 0 && size.width > 0 ? size.width / spineView.bounds.width : 1,
+            height: spineView.bounds.height > 0 && size.height > 0 ? size.height / spineView.bounds.height : 1
+        )
+        sizeInPoints = CGSize(width: size.width / backingScale.width, height: size.height / backingScale.height)
         viewPortSize = vector_uint2(UInt32(size.width), UInt32(size.height))
         setTransform(
             bounds: spineView.computedBounds,
@@ -207,8 +248,8 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
 
         transform = SpineTransform(
             translation: vector_float2(Float(x), Float(y)),
-            scale: vector_float2(Float(scaleX * UIScreen.main.scale), Float(scaleY * UIScreen.main.scale)),
-            offset: vector_float2(Float(offsetX * UIScreen.main.scale), Float(offsetY * UIScreen.main.scale))
+            scale: vector_float2(Float(scaleX * backingScale.width), Float(scaleY * backingScale.height)),
+            offset: vector_float2(Float(offsetX * backingScale.width), Float(offsetY * backingScale.height))
         )
 
         delegate?.spineRendererDidUpdate(
@@ -293,10 +334,14 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
 
             // When using spine_atlas_load, texture is actually the atlas page index cast as a pointer
             let textureIndex = Int(bitPattern: renderCommand.texture)
-            if textures.indices.contains(textureIndex) {
+            if textures.indices.contains(textureIndex), samplerStates.indices.contains(textureIndex) {
                 renderEncoder.setFragmentTexture(
                     textures[textureIndex],
                     index: Int(SpineTextureIndexBaseColor.rawValue)
+                )
+                renderEncoder.setFragmentSamplerState(
+                    samplerStates[textureIndex],
+                    index: Int(SpineSamplerIndexTexture.rawValue)
                 )
             }
 
@@ -306,6 +351,68 @@ internal final class SpineRenderer: NSObject, MTKViewDelegate {
                 vertexCount: vertices.count
             )
             vertexStart += vertices.count
+        }
+    }
+
+    private static func minFilter(for textureFilter: SpineTextureFilter, atlasFilter: TextureFilter) -> TextureFilter {
+        switch textureFilter {
+        case .atlas: return atlasFilter
+        case .nearest: return .nearest
+        case .linear: return .linear
+        }
+    }
+
+    private static func magFilter(for textureFilter: SpineTextureFilter, atlasFilter: TextureFilter) -> TextureFilter {
+        switch textureFilter {
+        case .atlas: return atlasFilter
+        case .nearest: return .nearest
+        case .linear: return .linear
+        }
+    }
+
+    private static func usesMipmaps(_ textureFilter: TextureFilter) -> Bool {
+        switch textureFilter {
+        case .mipMap, .mipMapNearestNearest, .mipMapLinearNearest, .mipMapNearestLinear, .mipMapLinearLinear:
+            return true
+        default:
+            return false
+        }
+    }
+
+    private static func metalMinFilter(_ textureFilter: TextureFilter) -> MTLSamplerMinMagFilter {
+        switch textureFilter {
+        case .linear, .mipMap, .mipMapLinearNearest, .mipMapLinearLinear:
+            return .linear
+        default:
+            return .nearest
+        }
+    }
+
+    private static func metalMagFilter(_ textureFilter: TextureFilter) -> MTLSamplerMinMagFilter {
+        switch textureFilter {
+        case .linear, .mipMap, .mipMapNearestLinear, .mipMapLinearLinear:
+            return .linear
+        default:
+            return .nearest
+        }
+    }
+
+    private static func metalMipFilter(_ textureFilter: TextureFilter) -> MTLSamplerMipFilter {
+        switch textureFilter {
+        case .mipMapNearestNearest, .mipMapLinearNearest:
+            return .nearest
+        case .mipMap, .mipMapNearestLinear, .mipMapLinearLinear:
+            return .linear
+        default:
+            return .notMipmapped
+        }
+    }
+
+    private static func metalAddressMode(_ textureWrap: TextureWrap) -> MTLSamplerAddressMode {
+        switch textureWrap {
+        case .mirroredRepeat: return .mirrorRepeat
+        case .clampToEdge: return .clampToEdge
+        case .repeat: return .repeat
         }
     }
 

@@ -55,6 +55,7 @@ namespace spine {
 
 	public:
 		explicit SliderData(const String &name);
+		~SliderData();
 
 		/// Creates a slider instance.
 		virtual Constraint &create(Skeleton &skeleton) override;

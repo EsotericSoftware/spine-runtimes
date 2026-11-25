@@ -1,68 +1,36 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="SpineAnimationTrack" inherits="Node" version="3.4">
-	<brief_description>
-		Internal class to allow composing animations on [code]SpineSprite[/code] instances via Godot's animation player and animation editor.
-	</brief_description>
+<class name="SpineAnimationTrack" inherits="Node" version="4.3">
+	<brief_description>Composes Spine animations with Godot's AnimationPlayer and animation editor.</brief_description>
 	<description>
-		Internal class to allow composing animations on [code]SpineSprite[/code] instances via Godot's animation player and animation editor.
+		Add this node directly beneath a [SpineSprite] or [SpineSprite3D]. It drives that sprite's shared controller, so playback, mixing and editor scrubbing use the same Spine animation state in 2D and 3D. Available in both Godot4 module and GDExtension builds.
+		The helper creates an [AnimationPlayer] child (or uses an existing one) and generates clips named after the skeleton's animations. The [code]_looped[/code] suffix loops the Spine animation; [code]-- Empty --[/code] mixes to an empty Spine track. Generated clips/libraries are managed by this node and are rebuilt when its skeleton resource changes.
+		Create a separate master [AnimationPlayer] and add animation-playback tracks targeting these child players. Select and scrub the master in Godot's animation editor to preview the Spine poses, including when the master uses a custom [member AnimationMixer.root_node]. Multiple helpers can drive different Spine track indices. Key the helper properties below to control mixing and playback options. Set [member blend_tree_mode] when using an [AnimationTree] instead of the master animation editor workflow.
+		The generated [member animation_name] and [member loop] properties are internal keyed values, not inspector controls. A scrubbed pose stays paused when the animation editor closes or switches to another player. A track that is not targeted by the active animation editor leaves newly requested sprite preview animations alone. Runtime updates require the sprite's normal process/physics update, or an explicit [method SpineSprite.update_skeleton] / [method SpineSprite3D.update_skeleton] in manual mode.
+		See example16 for one master AnimationPlayer driving 2D and 3D sprites together. Godot3 module builds support the 2D sprite only.
 	</description>
 	<tutorials>
 	</tutorials>
 	<methods>
-		<method name="get_animation_name">
-			<return type="String" />
-			<description>
-			</description>
-		</method>
-		<method name="get_loop">
-			<return type="bool" />
-			<description>
-			</description>
-		</method>
-		<method name="set_animation_name">
-			<return type="void" />
-			<argument index="0" name="animation_name" type="String" />
-			<description>
-			</description>
-		</method>
-		<method name="set_loop">
-			<return type="void" />
-			<argument index="0" name="loop" type="bool" />
-			<description>
-			</description>
-		</method>
 		<method name="update_animation_state">
 			<return type="void" />
-			<argument index="0" name="spine_sprite" type="Variant" />
-			<description>
-			</description>
+			<param index="0" name="spine_sprite" type="Variant" />
+			<description>Internal callback connected to the parent sprite's before_animation_state_update signal. Passing another sprite does not retarget this node; reparent the helper instead.</description>
 		</method>
 	</methods>
 	<members>
-		<member name="alpha" type="float" setter="set_alpha" getter="get_alpha" default="1.0">
-		</member>
-		<member name="attachment_threshold" type="float" setter="set_attachment_threshold" getter="get_attachment_threshold" default="0.0">
-		</member>
-		<member name="blend_tree_mode" type="bool" setter="set_blend_tree_mode" getter="get_blend_tree_mode" default="false">
-		</member>
-		<member name="debug" type="bool" setter="set_debug" getter="get_debug" default="false">
-		</member>
-		<member name="draw_order_threshold" type="float" setter="set_draw_order_threshold" getter="get_draw_order_threshold" default="0.0">
-		</member>
-		<member name="hold_previous" type="bool" setter="set_hold_previous" getter="get_hold_previous" default="false">
-		</member>
-		<member name="mix_blend" type="int" setter="set_mix_blend" getter="get_mix_blend" enum="SpineConstant.MixBlend" default="2">
-		</member>
-		<member name="mix_duration" type="float" setter="set_mix_duration" getter="get_mix_duration" default="-1.0">
-		</member>
-		<member name="reverse" type="bool" setter="set_reverse" getter="get_reverse" default="false">
-		</member>
-		<member name="shortest_rotation" type="bool" setter="set_shortest_rotation" getter="get_shortest_rotation" default="false">
-		</member>
-		<member name="time_scale" type="float" setter="set_time_scale" getter="get_time_scale" default="1.0">
-		</member>
-		<member name="track_index" type="int" setter="set_track_index" getter="get_track_index" default="-1">
-		</member>
+		<member name="animation_name" type="String" setter="set_animation_name" getter="get_animation_name">Internal Spine animation name keyed by generated clips.</member>
+		<member name="loop" type="bool" setter="set_loop" getter="get_loop" default="false">Internal loop flag keyed by generated clips.</member>
+		<member name="track_index" type="int" setter="set_track_index" getter="get_track_index" default="-1">Spine track index. A negative initial value chooses the next available index beneath this sprite.</member>
+		<member name="mix_duration" type="float" setter="set_mix_duration" getter="get_mix_duration" default="-1.0">Mix duration for new entries. Negative values use the configured animation-state mix.</member>
+		<member name="additive" type="bool" setter="set_additive" getter="get_additive" default="false">Use additive animation mixing for new entries.</member>
+		<member name="reverse" type="bool" setter="set_reverse" getter="get_reverse" default="false">Play the selected Spine animation in reverse.</member>
+		<member name="shortest_rotation" type="bool" setter="set_shortest_rotation" getter="get_shortest_rotation" default="false">Use shortest-path rotation mixing for new entries.</member>
+		<member name="time_scale" type="float" setter="set_time_scale" getter="get_time_scale" default="1.0">Spine track playback speed, also applied when scrubbing the master timeline.</member>
+		<member name="alpha" type="float" setter="set_alpha" getter="get_alpha" default="1.0">Alpha applied to new Spine track entries.</member>
+		<member name="attachment_threshold" type="float" setter="set_mix_attachment_threshold" getter="get_mix_attachment_threshold" default="0.0">Attachment mixing threshold for new entries.</member>
+		<member name="draw_order_threshold" type="float" setter="set_mix_draw_order_threshold" getter="get_mix_draw_order_threshold" default="0.0">Draw-order mixing threshold for new entries.</member>
+		<member name="blend_tree_mode" type="bool" setter="set_blend_tree_mode" getter="get_blend_tree_mode" default="false">Use the AnimationTree editor preview path.</member>
+		<member name="debug" type="bool" setter="set_debug" getter="get_debug" default="false">Log animation changes.</member>
 	</members>
 	<constants>
 	</constants>

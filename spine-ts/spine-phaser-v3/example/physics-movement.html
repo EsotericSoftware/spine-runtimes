@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spine Phaser Physics Movement</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.js"></script>
+    <script src="../dist/iife/spine-phaser-v3.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body,
+      #game {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: #20252b;
+      }
+
+      #instructions {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        z-index: 1;
+        padding: 8px 10px;
+        color: white;
+        background: rgba(0, 0, 0, 0.55);
+        font-family: sans-serif;
+        font-size: 13px;
+        line-height: 1.4;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="instructions">
+      Arrow keys / WASD: move Celeste in the container<br />
+      Z / X: rotate Celeste locally<br />
+      Q / E: rotate the parent container<br />
+      Shift: move and rotate faster<br />
+      Parent scale: X = 1.35, Y = 0.75
+    </div>
+    <div id="game"></div>
+
+    <script>
+      class PhysicsMovementExample extends Phaser.Scene {
+        preload() {
+          this.load.spineSkeleton(
+            "celestial-circus-data",
+            "/assets/celestial-circus-pro.skel"
+          );
+          this.load.spineAtlas(
+            "celestial-circus-atlas",
+            "/assets/celestial-circus-pma.atlas"
+          );
+        }
+
+        create() {
+          const frame = this.add
+            .rectangle(0, 0, 360, 480, 0x101820, 0.35)
+            .setStrokeStyle(2, 0x6ec6ff, 0.8);
+
+          this.celeste = this.add.spine(
+            0,
+            150,
+            "celestial-circus-data",
+            "celestial-circus-atlas"
+          );
+          this.celeste.displayWidth = 150;
+          this.celeste.displayHeight =
+            (this.celeste.height / this.celeste.width) * 150;
+          this.celeste.animationState.setAnimation(0, "eyeblink-long", true);
+          this.celeste.skeletonPhysics.setPositionInheritance(1, 1);
+          this.celeste.skeletonPhysics.rotationInheritance = 1;
+
+          this.transformContainer = this.add.container(400, 300, [
+            frame,
+            this.celeste,
+          ]);
+          this.transformContainer.setScale(1.35, 0.75);
+          this.transformContainer.rotation = Phaser.Math.DegToRad(15);
+
+          this.keys = this.input.keyboard.addKeys({
+            left: Phaser.Input.Keyboard.KeyCodes.LEFT,
+            right: Phaser.Input.Keyboard.KeyCodes.RIGHT,
+            up: Phaser.Input.Keyboard.KeyCodes.UP,
+            down: Phaser.Input.Keyboard.KeyCodes.DOWN,
+            a: Phaser.Input.Keyboard.KeyCodes.A,
+            d: Phaser.Input.Keyboard.KeyCodes.D,
+            w: Phaser.Input.Keyboard.KeyCodes.W,
+            s: Phaser.Input.Keyboard.KeyCodes.S,
+            q: Phaser.Input.Keyboard.KeyCodes.Q,
+            e: Phaser.Input.Keyboard.KeyCodes.E,
+            z: Phaser.Input.Keyboard.KeyCodes.Z,
+            x: Phaser.Input.Keyboard.KeyCodes.X,
+            shift: Phaser.Input.Keyboard.KeyCodes.SHIFT,
+          });
+        }
+
+        update(_time, deltaMilliseconds) {
+          if (!this.celeste) return;
+
+          const delta = deltaMilliseconds / 1000;
+          const speedMultiplier = this.keys.shift.isDown ? 3 : 1;
+          const distance = 300 * speedMultiplier * delta;
+          const rotation = speedMultiplier * delta;
+
+          if (this.keys.left.isDown || this.keys.a.isDown) {
+            this.celeste.x -= distance;
+          }
+          if (this.keys.right.isDown || this.keys.d.isDown) {
+            this.celeste.x += distance;
+          }
+          if (this.keys.up.isDown || this.keys.w.isDown) {
+            this.celeste.y -= distance;
+          }
+          if (this.keys.down.isDown || this.keys.s.isDown) {
+            this.celeste.y += distance;
+          }
+          if (this.keys.z.isDown) this.celeste.rotation -= rotation;
+          if (this.keys.x.isDown) this.celeste.rotation += rotation;
+          if (this.keys.q.isDown) this.transformContainer.rotation -= rotation;
+          if (this.keys.e.isDown) this.transformContainer.rotation += rotation;
+        }
+      }
+
+      new Phaser.Game({
+        type: Phaser.WEBGL,
+        parent: "game",
+        width: 800,
+        height: 600,
+        backgroundColor: "#20252b",
+        scale: {
+          mode: Phaser.Scale.FIT,
+          autoCenter: Phaser.Scale.CENTER_BOTH,
+        },
+        scene: [PhysicsMovementExample],
+        plugins: {
+          scene: [
+            {
+              key: "spine.SpinePlugin",
+              plugin: spine.SpinePlugin,
+              mapping: "spine",
+            },
+          ],
+        },
+      });
+    </script>
+  </body>
+</html>

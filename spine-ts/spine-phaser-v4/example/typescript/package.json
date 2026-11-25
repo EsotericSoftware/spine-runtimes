@@ -1,7 +1,7 @@
 {
-  "name": "name",
-  "description": "description",
-  "authors": "author",
+  "name": "spine-phaser-v4-typescript-example",
+  "description": "TypeScript example for the Spine Phaser v4 runtime.",
+  "authors": "Esoteric Software LLC",
   "version": "1.0.0",
   "scripts": {
     "build": "npx esbuild index.ts --bundle --sourcemap --outfile=build/index.js --alias:phaser=phaser",
@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@esotericsoftware/spine-phaser-v4": "file://../../",
-    "phaser": "4.1.0"
+    "phaser": "^4.2.1"
   },
   "devDependencies": {
     "esbuild": "^0.25.6",

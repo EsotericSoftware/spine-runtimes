@@ -29,9 +29,14 @@
 
 import MetalKit
 import SpineSwift
-import UIKit
 
-/// A ``UIView`` to display a Spine skeleton. The skeleton can be loaded from a bundle, local files, http, or a pre-loaded ``SkeletonDrawableWrapper``.
+#if canImport(UIKit)
+import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
+
+/// An ``MTKView`` to display a Spine skeleton. The skeleton can be loaded from a bundle, local files, http, or a pre-loaded ``SkeletonDrawableWrapper``.
 ///
 /// The skeleton displayed by a ``SpineUIView`` can be controlled via a ``SpineController``.
 ///
@@ -46,6 +51,7 @@ public final class SpineUIView: MTKView {
     let mode: SpineContentMode
     let alignment: SpineAlignment
     let boundsProvider: BoundsProvider
+    @objc public let textureFilter: SpineTextureFilter
 
     internal var computedBounds: CGRect = .zero
     internal var renderer: SpineRenderer?
@@ -55,16 +61,29 @@ public final class SpineUIView: MTKView {
         mode: SpineContentMode = .fit,
         alignment: SpineAlignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .clear
+        backgroundColor: SpineUIColor = .clear,
+        textureFilter: SpineTextureFilter = .atlas
     ) {
         self.controller = controller
         self.mode = mode
         self.alignment = alignment
         self.boundsProvider = boundsProvider
+        self.textureFilter = textureFilter
 
         super.init(frame: .zero, device: SpineObjects.shared.device)
+
+#if canImport(AppKit)
+        // in AppKit (macOS), MTLClearColor must be constructed with `NSColor.usingColorSpace()`
+        if let color = backgroundColor.usingColorSpace(.sRGB) {
+            clearColor = MTLClearColor(red: color.redComponent, green: color.greenComponent, blue: color.blueComponent, alpha: color.alphaComponent)
+        }
+        layer?.isOpaque = backgroundColor != .clear
+#endif
+
+#if canImport(UIKit)
         clearColor = MTLClearColor(backgroundColor)
         isOpaque = backgroundColor != .clear
+#endif
     }
 
     /// An initializer that constructs a new ``SpineUIView`` from a ``SpineViewSource``.
@@ -79,6 +98,7 @@ public final class SpineUIView: MTKView {
     ///     - alignment: How the skeleton is alignment inside ``SpineUIView``. Per default, it is `.center`
     ///     - boundsProvider: The skeleton bounds must be computed via a ``BoundsProvider``. Per default, ``SetupPoseBounds`` is used.
     ///     - backgroundColor: The background color of the view. Per defaut, `UIColor.clear` is used
+    ///     - textureFilter: The texture filtering mode. Per default, atlas page settings are used.
     ///
     /// - Returns: A new instance of ``SpineUIView``.
     public convenience init(
@@ -87,9 +107,12 @@ public final class SpineUIView: MTKView {
         mode: SpineContentMode = .fit,
         alignment: SpineAlignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .clear
+        backgroundColor: SpineUIColor = .clear,
+        textureFilter: SpineTextureFilter = .atlas
     ) {
-        self.init(controller: controller, mode: mode, alignment: alignment, boundsProvider: boundsProvider, backgroundColor: backgroundColor)
+        self.init(
+            controller: controller, mode: mode, alignment: alignment, boundsProvider: boundsProvider, backgroundColor: backgroundColor,
+            textureFilter: textureFilter)
         Task.detached(priority: .high) {
             do {
                 let drawable = try await source.loadDrawable()
@@ -124,11 +147,28 @@ public final class SpineUIView: MTKView {
         mode: SpineContentMode = .fit,
         alignment: SpineAlignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .clear
+        backgroundColor: SpineUIColor = .clear
+    ) {
+        self.init(
+            atlasFileName: atlasFileName, skeletonFileName: skeletonFileName, bundle: bundle, controller: controller, mode: mode,
+            alignment: alignment, boundsProvider: boundsProvider, backgroundColor: backgroundColor, textureFilter: .atlas)
+    }
+
+    /// Constructs a new ``SpineUIView`` from bundled files with a texture filter override.
+    @objc public convenience init(
+        atlasFileName: String,
+        skeletonFileName: String,
+        bundle: Bundle = .main,
+        controller: SpineController = SpineController(),
+        mode: SpineContentMode = .fit,
+        alignment: SpineAlignment = .center,
+        boundsProvider: BoundsProvider = SetupPoseBounds(),
+        backgroundColor: SpineUIColor = .clear,
+        textureFilter: SpineTextureFilter
     ) {
         self.init(
             from: .bundle(atlasFileName: atlasFileName, skeletonFileName: skeletonFileName, bundle: bundle), controller: controller, mode: mode,
-            alignment: alignment, boundsProvider: boundsProvider, backgroundColor: backgroundColor)
+            alignment: alignment, boundsProvider: boundsProvider, backgroundColor: backgroundColor, textureFilter: textureFilter)
     }
 
     /// A convenience initializer that constructs a new ``SpineUIView`` from file URLs.
@@ -153,11 +193,27 @@ public final class SpineUIView: MTKView {
         mode: SpineContentMode = .fit,
         alignment: SpineAlignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .clear
+        backgroundColor: SpineUIColor = .clear
+    ) {
+        self.init(
+            atlasFile: atlasFile, skeletonFile: skeletonFile, controller: controller, mode: mode, alignment: alignment,
+            boundsProvider: boundsProvider, backgroundColor: backgroundColor, textureFilter: .atlas)
+    }
+
+    /// Constructs a new ``SpineUIView`` from file URLs with a texture filter override.
+    @objc public convenience init(
+        atlasFile: URL,
+        skeletonFile: URL,
+        controller: SpineController = SpineController(),
+        mode: SpineContentMode = .fit,
+        alignment: SpineAlignment = .center,
+        boundsProvider: BoundsProvider = SetupPoseBounds(),
+        backgroundColor: SpineUIColor = .clear,
+        textureFilter: SpineTextureFilter
     ) {
         self.init(
             from: .file(atlasFile: atlasFile, skeletonFile: skeletonFile), controller: controller, mode: mode, alignment: alignment,
-            boundsProvider: boundsProvider, backgroundColor: backgroundColor)
+            boundsProvider: boundsProvider, backgroundColor: backgroundColor, textureFilter: textureFilter)
     }
 
     /// A convenience initializer that constructs a new ``SpineUIView`` from HTTP.
@@ -182,11 +238,27 @@ public final class SpineUIView: MTKView {
         mode: SpineContentMode = .fit,
         alignment: SpineAlignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .clear
+        backgroundColor: SpineUIColor = .clear
+    ) {
+        self.init(
+            atlasURL: atlasURL, skeletonURL: skeletonURL, controller: controller, mode: mode, alignment: alignment,
+            boundsProvider: boundsProvider, backgroundColor: backgroundColor, textureFilter: .atlas)
+    }
+
+    /// Constructs a new ``SpineUIView`` from HTTP URLs with a texture filter override.
+    @objc public convenience init(
+        atlasURL: URL,
+        skeletonURL: URL,
+        controller: SpineController = SpineController(),
+        mode: SpineContentMode = .fit,
+        alignment: SpineAlignment = .center,
+        boundsProvider: BoundsProvider = SetupPoseBounds(),
+        backgroundColor: SpineUIColor = .clear,
+        textureFilter: SpineTextureFilter
     ) {
         self.init(
             from: .http(atlasURL: atlasURL, skeletonURL: skeletonURL), controller: controller, mode: mode, alignment: alignment,
-            boundsProvider: boundsProvider, backgroundColor: backgroundColor)
+            boundsProvider: boundsProvider, backgroundColor: backgroundColor, textureFilter: textureFilter)
     }
 
     /// A convenience initializer that constructs a new ``SpineUIView`` with a ``SkeletonDrawableWrapper``.
@@ -200,6 +272,7 @@ public final class SpineUIView: MTKView {
     ///     - mode: How the skeleton is fitted inside ``SpineUIView``. Per default, it is `.fit`
     ///     - alignment: How the skeleton is alignment inside ``SpineUIView``. Per default, it is `.center`
     ///     - boundsProvider: The skeleton bounds must be computed via a ``BoundsProvider``. Per default, ``SetupPoseBounds`` is used.
+    ///     - backgroundColor: The background color of the view. Per defaut, `UIColor.clear` is used
     ///
     /// - Returns: A new instance of ``SpineUIView``.
     @objc public convenience init(
@@ -208,11 +281,26 @@ public final class SpineUIView: MTKView {
         mode: SpineContentMode = .fit,
         alignment: SpineAlignment = .center,
         boundsProvider: BoundsProvider = SetupPoseBounds(),
-        backgroundColor: UIColor = .clear
+        backgroundColor: SpineUIColor = .clear
+    ) {
+        self.init(
+            drawable: drawable, controller: controller, mode: mode, alignment: alignment, boundsProvider: boundsProvider,
+            backgroundColor: backgroundColor, textureFilter: .atlas)
+    }
+
+    /// Constructs a new ``SpineUIView`` with a ``SkeletonDrawableWrapper`` and a texture filter override.
+    @objc public convenience init(
+        drawable: SkeletonDrawableWrapper,
+        controller: SpineController = SpineController(),
+        mode: SpineContentMode = .fit,
+        alignment: SpineAlignment = .center,
+        boundsProvider: BoundsProvider = SetupPoseBounds(),
+        backgroundColor: SpineUIColor = .clear,
+        textureFilter: SpineTextureFilter
     ) {
         self.init(
             from: .drawable(drawable), controller: controller, mode: mode, alignment: alignment, boundsProvider: boundsProvider,
-            backgroundColor: backgroundColor)
+            backgroundColor: backgroundColor, textureFilter: textureFilter)
     }
 
     internal override init(frame frameRect: CGRect, device: MTLDevice?) {
@@ -246,7 +334,7 @@ extension SpineUIView {
         controller.initialize()
     }
 
-    private func initRenderer(atlasPages: [UIImage]) throws {
+    private func initRenderer(atlasPages: [SpineUIImage]) throws {
         // Get PMA flag from first atlas page if available
         let pmaFlag = controller.atlas.pages.count > 0 ? (controller.atlas.pages[0]?.pma ?? false) : false
 
@@ -254,8 +342,10 @@ extension SpineUIView {
             device: SpineObjects.shared.device,
             commandQueue: SpineObjects.shared.commandQueue,
             pixelFormat: colorPixelFormat,
+            atlas: controller.atlas,
             atlasPages: atlasPages,
-            pma: pmaFlag
+            pma: pmaFlag,
+            textureFilter: textureFilter
         )
         renderer?.delegate = controller
         renderer?.dataSource = controller

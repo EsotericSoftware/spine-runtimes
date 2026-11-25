@@ -30,6 +30,7 @@
 #include "SpineSlider.h"
 #include "SpineSliderPose.h"
 #include "SpineCommon.h"
+#include "SpineController.h"
 #include "SpineSkeleton.h"
 #include "SpineSprite.h"
 
@@ -53,7 +54,7 @@ Ref<SpineSliderData> SpineSlider::get_data() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto &data = get_spine_object()->getData();
 	Ref<SpineSliderData> data_ref(memnew(SpineSliderData));
-	data_ref->set_spine_object(*get_spine_owner()->get_skeleton_data_res(), &data);
+	data_ref->set_spine_object(*get_spine_controller()->get_skeleton_data_res(), &data);
 	return data_ref;
 }
 
@@ -61,7 +62,7 @@ Ref<SpineBone> SpineSlider::get_bone() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto &bone = get_spine_object()->getBone();
 	Ref<SpineBone> bone_ref(memnew(SpineBone));
-	bone_ref->set_spine_object(get_spine_owner(), &bone);
+	bone_ref->set_spine_object(get_spine_controller(), &bone);
 	return bone_ref;
 }
 
@@ -76,7 +77,7 @@ Ref<SpineSliderPose> SpineSlider::get_pose() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto &pose = get_spine_object()->getPose();
 	Ref<SpineSliderPose> pose_ref(memnew(SpineSliderPose));
-	pose_ref->set_spine_object(get_spine_owner(), &pose);
+	pose_ref->set_spine_object(get_spine_controller(), &pose);
 	return pose_ref;
 }
 
@@ -84,7 +85,7 @@ Ref<SpineSliderPose> SpineSlider::get_applied_pose() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	auto &pose = get_spine_object()->getAppliedPose();
 	Ref<SpineSliderPose> pose_ref(memnew(SpineSliderPose));
-	pose_ref->set_spine_object(get_spine_owner(), &pose);
+	pose_ref->set_spine_object(get_spine_controller(), &pose);
 	return pose_ref;
 }
 

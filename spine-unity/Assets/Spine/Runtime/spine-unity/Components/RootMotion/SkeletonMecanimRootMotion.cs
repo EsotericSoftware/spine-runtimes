@@ -91,7 +91,7 @@ namespace Spine.Unity {
 		public override void Initialize () {
 			base.Initialize();
 			skeletonMecanim = GetComponent<SkeletonMecanim>();
-			if (skeletonMecanim) {
+			if (skeletonMecanim && skeletonMecanim.Translator != null) {
 				skeletonMecanim.Translator.OnClipApplied -= OnClipApplied;
 				skeletonMecanim.Translator.OnClipApplied += OnClipApplied;
 			}

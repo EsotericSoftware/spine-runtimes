@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="//cdn.jsdelivr.net/npm/phaser@4.0.0/dist/phaser.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/phaser@4.2.1/dist/phaser.js"></script>
     <script src="../dist/iife/spine-phaser-v4.js"></script>
     <link rel="stylesheet" href="../../index.css" />
     <title>Spine Phaser Batching Context Test</title>
@@ -16,7 +16,7 @@
   <script>
     class BatchingContextTest extends Phaser.Scene {
       preload() {
-        this.load.spineBinary("spineboy-data", "/assets/spineboy-pro.skel");
+        this.load.spineSkeleton("spineboy-data", "/assets/spineboy-pro.skel");
         this.load.spineAtlas("spineboy-atlas", "/assets/spineboy-pma.atlas");
       }
 
@@ -28,7 +28,7 @@
         camera.flash(300, 255, 255, 255, false);
         camera.shake(500, 0.002);
 
-        this.expectedSpineDrawCalls = 5;
+        this.drawCallCounter = installDrawCallCounter(this);
 
         this.debugText = document.createElement("pre");
         this.debugText.style.position = "absolute";
@@ -84,19 +84,44 @@
 
       update(time) {
         if (this.debugText) {
+          const drawCalls = this.drawCallCounter.getAndReset();
           this.debugText.textContent =
-            (() => {
-              const drawCalls = spine.PolygonBatcher.getAndResetGlobalDrawCalls();
-              const expectedDrawCalls = this.expectedSpineDrawCalls;
-              const status = drawCalls <= expectedDrawCalls ? "OK" : "TOO MANY";
-              this.debugText.style.color = drawCalls <= expectedDrawCalls ? "#80ff80" : "#ff8080";
-              return "Spine draw calls: " + drawCalls + " / expected <= " + expectedDrawCalls + " (" + status + ")" +
-                "\nPortal animation tests normal/additive PMA batching" +
-                "\nCamera forceComposite + internal/external filters" +
-                "\nContainer + invisible skipped children";
-            })();
+            "WebGL draw calls: " + drawCalls +
+            "\nDefault Phaser Mesh2D renderer" +
+            "\nPortal animation tests normal/additive PMA batching" +
+            "\nCamera forceComposite + internal/external filters" +
+            "\nContainer + invisible skipped children";
         }
       }
+    }
+
+    function installDrawCallCounter(scene) {
+      const gl = scene.game.renderer.gl;
+      const counter = { drawCalls: 0 };
+      const drawArrays = gl.drawArrays;
+      const drawElements = gl.drawElements;
+
+      gl.drawArrays = function () {
+        counter.drawCalls++;
+        return drawArrays.apply(this, arguments);
+      };
+      gl.drawElements = function () {
+        counter.drawCalls++;
+        return drawElements.apply(this, arguments);
+      };
+
+      scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+        gl.drawArrays = drawArrays;
+        gl.drawElements = drawElements;
+      });
+
+      return {
+        getAndReset() {
+          const drawCalls = counter.drawCalls;
+          counter.drawCalls = 0;
+          return drawCalls;
+        }
+      };
     }
 
     new Phaser.Game({

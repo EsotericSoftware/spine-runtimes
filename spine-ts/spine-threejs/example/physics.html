@@ -48,12 +48,16 @@
   <body>
     <div id="instructions">
       Mouse: orbit camera<br />
-      Arrow keys / WASD: move Celeste<br />
+      Arrow keys / WASD: move within Celeste's local plane<br />
+      Q / E: move along the local plane normal<br />
+      Z / X: rotate around local X<br />
+      C / V: rotate around local Y<br />
+      R / F: rotate around local Z<br />
       Shift: move faster
     </div>
     <script type="module">
-      import * as THREE from "three";
       import * as spine from "spine-threejs";
+      import * as THREE from "three";
       import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 
       let scene, camera, renderer;
@@ -141,6 +145,8 @@
               },
               twoColorTint: false,
             });
+            skeletonMesh.skeletonPhysics.setPositionInheritance(1, 1);
+            skeletonMesh.skeletonPhysics.rotationInheritance = 1;
             skeletonMesh.state.setAnimation(1, "eyeblink-long", true);
             mesh.add(skeletonMesh);
 
@@ -180,10 +186,20 @@
         const speed = moveSpeed * (pressedKeys.ShiftLeft || pressedKeys.ShiftRight ? 3 : 1);
         const distance = speed * delta;
 
-        if (pressedKeys.ArrowLeft || pressedKeys.KeyA) mesh.position.x -= distance;
-        if (pressedKeys.ArrowRight || pressedKeys.KeyD) mesh.position.x += distance;
-        if (pressedKeys.ArrowUp || pressedKeys.KeyW) mesh.position.y += distance;
-        if (pressedKeys.ArrowDown || pressedKeys.KeyS) mesh.position.y -= distance;
+        if (pressedKeys.ArrowLeft || pressedKeys.KeyA) mesh.translateX(-distance);
+        if (pressedKeys.ArrowRight || pressedKeys.KeyD) mesh.translateX(distance);
+        if (pressedKeys.ArrowUp || pressedKeys.KeyW) mesh.translateY(distance);
+        if (pressedKeys.ArrowDown || pressedKeys.KeyS) mesh.translateY(-distance);
+        if (pressedKeys.KeyQ) mesh.translateZ(-distance);
+        if (pressedKeys.KeyE) mesh.translateZ(distance);
+
+        const rotation = delta * (pressedKeys.ShiftLeft || pressedKeys.ShiftRight ? 3 : 1);
+        if (pressedKeys.KeyZ) mesh.rotateX(-rotation);
+        if (pressedKeys.KeyX) mesh.rotateX(rotation);
+        if (pressedKeys.KeyC) mesh.rotateY(-rotation);
+        if (pressedKeys.KeyV) mesh.rotateY(rotation);
+        if (pressedKeys.KeyR) mesh.rotateZ(rotation);
+        if (pressedKeys.KeyF) mesh.rotateZ(-rotation);
       }
 
       function resize() {

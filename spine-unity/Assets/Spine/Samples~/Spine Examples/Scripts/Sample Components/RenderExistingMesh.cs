@@ -53,6 +53,7 @@ namespace Spine.Unity.Examples {
 		MeshFilter referenceMeshFilter;
 		MeshRenderer ownRenderer;
 		MeshFilter ownMeshFilter;
+		SkeletonDataAsset referenceSkeletonDataAsset;
 
 		[System.Serializable]
 		public struct MaterialReplacement {
@@ -111,6 +112,7 @@ namespace Spine.Unity.Examples {
 			SkeletonAnimationBase skeletonRenderer = referenceRenderer.GetComponent<SkeletonAnimationBase>();
 #endif
 			if (skeletonRenderer != null) {
+				referenceSkeletonDataAsset = skeletonRenderer.SkeletonDataAsset;
 				skeletonRenderer.OnMeshAndMaterialsUpdated -= UpdateOnCallback;
 				skeletonRenderer.OnMeshAndMaterialsUpdated += UpdateOnCallback;
 				updateViaSkeletonCallback = true;
@@ -140,12 +142,15 @@ namespace Spine.Unity.Examples {
 			}
 #endif
 
-			if (updateViaSkeletonCallback)
+			if (updateViaSkeletonCallback) {
+				HandleOnDemandLoading();
 				return;
+			}
 			UpdateMaterials();
 		}
 
 		void UpdateOnCallback (ISkeletonRenderer r) {
+			referenceSkeletonDataAsset = r.SkeletonDataAsset;
 			UpdateMaterials();
 		}
 
@@ -176,7 +181,27 @@ namespace Spine.Unity.Examples {
 					sharedMaterials[i] = replacementMaterialDict[parentMaterial];
 				}
 			}
+			HandleOnDemandLoading();
 			ownRenderer.sharedMaterials = sharedMaterials;
+		}
+
+		void HandleOnDemandLoading () {
+			if (!Application.isPlaying || referenceSkeletonDataAsset == null ||
+				referenceSkeletonDataAsset.atlasAssets == null) return;
+
+			foreach (AtlasAssetBase atlasAsset in referenceSkeletonDataAsset.atlasAssets) {
+				if (!atlasAsset || atlasAsset.TextureLoadingMode == AtlasAssetBase.LoadingMode.Normal)
+					continue;
+
+				atlasAsset.BeginCustomTextureLoading();
+				for (int i = 0, count = sharedMaterials.Length; i < count; ++i) {
+					Material overrideMaterial = null;
+					atlasAsset.RequireTexturesLoaded(sharedMaterials[i], ref overrideMaterial);
+					if (overrideMaterial != null)
+						sharedMaterials[i] = overrideMaterial;
+				}
+				atlasAsset.EndCustomTextureLoading();
+			}
 		}
 
 		void InitializeDict () {

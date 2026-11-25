@@ -35,7 +35,7 @@
 #define BUILT_IN_SPRITE_MASK_COMPONENT
 #endif
 
-#if !SPINE_DISABLE_THREADING
+#if !SPINE_DISABLE_THREADING && !UNITY_WEBGL
 #define USE_THREADED_ANIMATION_UPDATE
 #endif
 
@@ -136,7 +136,7 @@ namespace Spine.Unity {
 
 				if (animationName == value) {
 					TrackEntry entry = state.GetTrack(0);
-					if (entry != null && entry.Loop == loop)
+					if (entry != null && entry.Loop == loop && entry.Animation.Name == value)
 						return;
 				}
 				animationName = value;
@@ -275,7 +275,7 @@ namespace Spine.Unity {
 
 		#region Transfer of Deprecated Fields
 #if UNITY_EDITOR && AUTO_UPGRADE_TO_43_COMPONENTS
-		// compatibility layer between 4.1 and 4.2, automatically transfer serialized attributes.
+		// compatibility layer for new split animation component architecture, automatically transfer serialized attributes.
 		public override void UpgradeTo43 () {
 			if (!Application.isPlaying && !wasDeprecatedTransferred) {
 				UpgradeTo43Components();
@@ -297,6 +297,10 @@ namespace Spine.Unity {
 		/// <summary>Transfer of former base class SkeletonRenderer parameters.</summary>
 		protected void TransferDeprecatedFields () {
 			wasDeprecatedTransferred = true;
+			// No deprecated asset means no pre-split data (component created after the split or saved with
+			// auto-upgrade disabled). Transferring would overwrite the renderer's values with defaults.
+			if (this.skeletonDataAssetDeprecated == null)
+				return;
 
 			SkeletonRenderer skeletonRenderer = gameObject.GetComponent<SkeletonRenderer>();
 			if (skeletonRenderer == null)
@@ -305,6 +309,7 @@ namespace Spine.Unity {
 			skeletonRenderer.skeletonDataAsset = this.skeletonDataAssetDeprecated;
 			skeletonRenderer.initialSkinName = this.initialSkinNameDeprecated;
 			skeletonRenderer.EditorSkipSkinSync = this.editorSkipSkinSyncDeprecated;
+			skeletonRenderer.fixPrefabOverrideViaMeshFilter = this.fixPrefabOverrideViaMeshFilterDeprecated;
 			skeletonRenderer.initialFlipX = this.initialFlipXDeprecated;
 			skeletonRenderer.initialFlipY = this.initialFlipYDeprecated;
 			skeletonRenderer.UpdateMode = this.updateModeDeprecated;
@@ -321,7 +326,14 @@ namespace Spine.Unity {
 
 			skeletonRenderer.clearStateOnDisable = this.clearStateOnDisableDeprecated;
 			skeletonRenderer.singleSubmesh = this.singleSubmeshDeprecated;
+#if UNITY_2018_1_OR_NEWER
+			skeletonRenderer.fixDrawOrder = this.fixDrawOrderDeprecated;
+#endif
 			skeletonRenderer.MaskInteraction = this.maskInteractionDeprecated;
+			skeletonRenderer.disableRenderingOnOverride = this.disableRenderingOnOverrideDeprecated;
+			skeletonRenderer.PhysicsPositionInheritanceFactor = this.physicsPositionInheritanceFactorDeprecated;
+			skeletonRenderer.PhysicsRotationInheritanceFactor = this.physicsRotationInheritanceFactorDeprecated;
+			skeletonRenderer.PhysicsMovementRelativeTo = this.physicsMovementRelativeToDeprecated;
 		}
 
 		[SerializeField] protected bool wasDeprecatedTransferred = false;
@@ -330,6 +342,8 @@ namespace Spine.Unity {
 
 		[FormerlySerializedAs("initialSkinName")] [SpineSkin(defaultAsEmptyString: true)] [SerializeField] private string initialSkinNameDeprecated;
 		[FormerlySerializedAs("editorSkipSkinSync")] [SerializeField] private bool editorSkipSkinSyncDeprecated = false;
+		[FormerlySerializedAs("fixPrefabOverrideViaMeshFilter")] [SerializeField]
+		private SettingsTriState fixPrefabOverrideViaMeshFilterDeprecated = SettingsTriState.UseGlobalSetting;
 		[FormerlySerializedAs("initialFlipX")] [SerializeField] private bool initialFlipXDeprecated = false;
 		[FormerlySerializedAs("initialFlipY")] [SerializeField] private bool initialFlipYDeprecated = false;
 		[FormerlySerializedAs("updateMode")] [SerializeField] private UpdateMode updateModeDeprecated = UpdateMode.FullUpdate;
@@ -345,10 +359,20 @@ namespace Spine.Unity {
 		[FormerlySerializedAs("clearStateOnDisable")] [SerializeField] private bool clearStateOnDisableDeprecated = false;
 		[FormerlySerializedAs("tintBlack")] [SerializeField] private bool tintBlackDeprecated = false;
 		[FormerlySerializedAs("singleSubmesh")] [SerializeField] private bool singleSubmeshDeprecated = false;
+#if UNITY_2018_1_OR_NEWER
+		[FormerlySerializedAs("fixDrawOrder")] [SerializeField] private bool fixDrawOrderDeprecated = false;
+#endif
 		[FormerlySerializedAs("calculateNormals"),
 			FormerlySerializedAs("addNormals")]
 		[SerializeField] private bool addNormalsDeprecated = false;
 		[FormerlySerializedAs("calculateTangents")] [SerializeField] private bool calculateTangentsDeprecated = false;
+		[FormerlySerializedAs("disableRenderingOnOverride")] [SerializeField] private bool disableRenderingOnOverrideDeprecated = true;
+		[FormerlySerializedAs("physicsPositionInheritanceFactor")] [SerializeField]
+		private Vector2 physicsPositionInheritanceFactorDeprecated = Vector2.one;
+		[FormerlySerializedAs("physicsRotationInheritanceFactor")] [SerializeField]
+		private float physicsRotationInheritanceFactorDeprecated = 1.0f;
+		[FormerlySerializedAs("physicsMovementRelativeTo")] [SerializeField]
+		private Transform physicsMovementRelativeToDeprecated = null;
 
 #if BUILT_IN_SPRITE_MASK_COMPONENT
 		[FormerlySerializedAs("maskInteraction")] [SerializeField] private SpriteMaskInteraction maskInteractionDeprecated = SpriteMaskInteraction.None;

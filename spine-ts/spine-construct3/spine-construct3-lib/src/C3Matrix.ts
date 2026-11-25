@@ -29,6 +29,8 @@
 
 import { type Bone, Vector2 } from "@esotericsoftware/spine-core";
 
+const identityQuaternion = [0, 0, 0, 1] as const;
+
 export class C3Matrix {
 
 	public a = 0;
@@ -39,34 +41,117 @@ export class C3Matrix {
 	public ty = 0;
 	public tz = 0;
 
-	public prevX = Infinity;
-	public prevY = Infinity;
-	public prevZ = Infinity;
-	public prevAngle = Infinity;
-	public prevScaleX = Infinity;
-	public prevScaleY = Infinity;
+	// separate 3D basis used only for rendering
+	public renderXAxisX = 0;
+	public renderXAxisY = 0;
+	public renderXAxisZ = 0;
+	public renderYAxisX = 0;
+	public renderYAxisY = 0;
+	public renderYAxisZ = 0;
+	public renderZAxisX = 0;
+	public renderZAxisY = 0;
+	public renderZAxisZ = 1;
+	public revision = 0;
 
+	private prevScaleX = Infinity;
+	private prevScaleY = Infinity;
+	private prevObjectAngle = Infinity;
+	private prevOffsetAngle = Infinity;
+	private prevQuaternionX = Infinity;
+	private prevQuaternionY = Infinity;
+	private prevQuaternionZ = Infinity;
+	private prevQuaternionW = Infinity;
 	private tempPoint = new Vector2();
 
-	public update (x: number, y: number, z: number, angle: number, scaleX = 1, scaleY = 1) {
-		if (this.prevX === x && this.prevY === y && this.prevZ === z &&
-			this.prevAngle === angle &&
-			this.prevScaleX === scaleX && this.prevScaleY === scaleY) return false;
-		this.prevX = x;
-		this.prevY = y;
-		this.prevZ = z;
-		this.prevAngle = angle;
+	public update (
+		x: number,
+		y: number,
+		z: number,
+		objectAngle: number,
+		scaleX = 1,
+		scaleY = 1,
+		quaternion: ArrayLike<number> = identityQuaternion,
+		offsetAngle = 0,
+	) {
+		const quaternionX = quaternion[0];
+		const quaternionY = quaternion[1];
+		const quaternionZ = quaternion[2];
+		const quaternionW = quaternion[3];
+		if (this.tx === x && this.ty === y && this.tz === z &&
+			this.prevObjectAngle === objectAngle && this.prevOffsetAngle === offsetAngle &&
+			this.prevScaleX === scaleX && this.prevScaleY === scaleY &&
+			this.prevQuaternionX === quaternionX && this.prevQuaternionY === quaternionY &&
+			this.prevQuaternionZ === quaternionZ && this.prevQuaternionW === quaternionW) return false;
+
+		this.prevObjectAngle = objectAngle;
+		this.prevOffsetAngle = offsetAngle;
 		this.prevScaleX = scaleX;
 		this.prevScaleY = scaleY;
-		const cos = Math.cos(angle);
-		const sin = Math.sin(angle);
-		this.a = scaleX * cos;
-		this.b = scaleX * sin;
-		this.c = -scaleY * sin;
-		this.d = scaleY * cos;
+		this.prevQuaternionX = quaternionX;
+		this.prevQuaternionY = quaternionY;
+		this.prevQuaternionZ = quaternionZ;
+		this.prevQuaternionW = quaternionW;
+
+		// keep pre-3D transform for all existing 2D APIs.
+		const angle2D = objectAngle + offsetAngle;
+		const cos2D = Math.cos(angle2D);
+		const sin2D = Math.sin(angle2D);
+		this.a = scaleX * cos2D;
+		this.b = scaleX * sin2D;
+		this.c = -scaleY * sin2D;
+		this.d = scaleY * cos2D;
 		this.tx = x;
 		this.ty = y;
 		this.tz = z;
+
+		if (quaternionX === 0 && quaternionY === 0 && quaternionZ === 0 && quaternionW === 1) {
+			this.renderXAxisX = this.a;
+			this.renderXAxisY = this.b;
+			this.renderXAxisZ = 0;
+			this.renderYAxisX = this.c;
+			this.renderYAxisY = this.d;
+			this.renderYAxisZ = 0;
+			this.renderZAxisX = 0;
+			this.renderZAxisY = 0;
+			this.renderZAxisZ = 1;
+			this.revision++;
+			return true;
+		}
+
+		// Rz(objectAngle) * quaternion3D * Rz(offsetAngle) * Scale.
+		const xy = quaternionX * quaternionY;
+		const wz = quaternionW * quaternionZ;
+		const rotation00 = 1 - 2 * (quaternionY * quaternionY + quaternionZ * quaternionZ);
+		const rotation01 = 2 * (xy - wz);
+		const rotation10 = 2 * (xy + wz);
+		const rotation11 = 1 - 2 * (quaternionX * quaternionX + quaternionZ * quaternionZ);
+
+		const offsetCos = Math.cos(offsetAngle);
+		const offsetSin = Math.sin(offsetAngle);
+
+		const quaternionXAxisX = (rotation00 * offsetCos + rotation01 * offsetSin) * scaleX;
+		const quaternionXAxisY = (rotation10 * offsetCos + rotation11 * offsetSin) * scaleX;
+		const quaternionYAxisX = (-rotation00 * offsetSin + rotation01 * offsetCos) * scaleY;
+		const quaternionYAxisY = (-rotation10 * offsetSin + rotation11 * offsetCos) * scaleY;
+
+		const rotation02 = 2 * (quaternionX * quaternionZ + quaternionW * quaternionY);
+		const rotation12 = 2 * (quaternionY * quaternionZ - quaternionW * quaternionX);
+		const rotation20 = 2 * (quaternionX * quaternionZ - quaternionW * quaternionY);
+		const rotation21 = 2 * (quaternionY * quaternionZ + quaternionW * quaternionX);
+
+		const objectCos = Math.cos(objectAngle);
+		const objectSin = Math.sin(objectAngle);
+
+		this.renderXAxisX = objectCos * quaternionXAxisX - objectSin * quaternionXAxisY;
+		this.renderXAxisY = objectSin * quaternionXAxisX + objectCos * quaternionXAxisY;
+		this.renderXAxisZ = (rotation20 * offsetCos + rotation21 * offsetSin) * scaleX;
+		this.renderYAxisX = objectCos * quaternionYAxisX - objectSin * quaternionYAxisY;
+		this.renderYAxisY = objectSin * quaternionYAxisX + objectCos * quaternionYAxisY;
+		this.renderYAxisZ = (-rotation20 * offsetSin + rotation21 * offsetCos) * scaleY;
+		this.renderZAxisX = objectCos * rotation02 - objectSin * rotation12;
+		this.renderZAxisY = objectSin * rotation02 + objectCos * rotation12;
+		this.renderZAxisZ = 1 - 2 * (quaternionX * quaternionX + quaternionY * quaternionY);
+		this.revision++;
 		return true;
 	}
 
@@ -81,10 +166,7 @@ export class C3Matrix {
 	}
 
 	public gameToBone (x: number, y: number, bone: Bone) {
-		const point = this.gameToSkeleton(x, y);
-		if (bone.parent)
-			return bone.parent.appliedPose.worldToLocal(point);
-		return bone.appliedPose.worldToLocal(point);
+		return bone.appliedPose.worldToParent(this.gameToSkeleton(x, y));
 	}
 
 	public skeletonToGame = (skeletonX: number, skeletonY: number) => {
@@ -107,7 +189,10 @@ export class C3Matrix {
 		const rad = gameAngleDeg * Math.PI / 180;
 		const sin = Math.sin(rad), cos = Math.cos(rad);
 		const { a, b, c, d } = this;
-		return Math.atan2(a * sin - b * cos, d * cos - c * sin) * (180 / Math.PI);
+		const delta = a * d - b * c;
+		const x = (d * cos - c * sin) / delta;
+		const y = (a * sin - b * cos) / delta;
+		return Math.atan2(y, x) * (180 / Math.PI);
 	}
 
 }

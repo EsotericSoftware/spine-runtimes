@@ -32,7 +32,7 @@ let package = Package(
         .target(
             name: "SpineiOSWrapper",
             dependencies: [
-                .target(name: "SpineiOS", condition: .when(platforms: [.iOS, .visionOS, .tvOS, .macCatalyst]))
+                .target(name: "SpineiOS", condition: .when(platforms: [.iOS, .visionOS, .tvOS, .macCatalyst, .macOS]))
             ],
             path: "spine-ios/Sources/SpineiOSWrapper"
         ),

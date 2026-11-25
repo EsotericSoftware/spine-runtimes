@@ -1,0 +1,138 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Spine PixiJS Physics Movement</title>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.4.2/dist/pixi.min.js"></script>
+    <script src="../dist/iife/spine-pixi-v7.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: #20252b;
+      }
+
+      #instructions {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        z-index: 1;
+        padding: 8px 10px;
+        color: white;
+        background: rgba(0, 0, 0, 0.55);
+        font-family: sans-serif;
+        font-size: 13px;
+        line-height: 1.4;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="instructions">
+      Arrow keys / WASD: move Celeste in the container<br />
+      Z / X: rotate Celeste locally<br />
+      Q / E: rotate the parent normally<br />
+      C / V: decrease / increase parent skew X<br />
+      B / N: decrease / increase parent skew Y<br />
+      Shift: move and rotate faster<br />
+      Parent skew: X = <span id="skew-x">0.0°</span>, Y = <span id="skew-y">0.0°</span><br />
+      Inherited physics rotation: <span id="physics-rotation">0.0°</span><br />
+      Parent scale: X = 1.35, Y = 0.75
+    </div>
+
+    <script>
+      (async () => {
+        const app = new PIXI.Application({
+          resizeTo: window,
+          resolution: window.devicePixelRatio || 1,
+          autoDensity: true,
+          backgroundColor: 0x20252b,
+        });
+        document.body.appendChild(app.view);
+
+        PIXI.Assets.add("celestial-circus-data", "/assets/celestial-circus-pro.skel");
+        PIXI.Assets.add("celestial-circus-atlas", "/assets/celestial-circus-pma.atlas");
+        await PIXI.Assets.load([
+          "celestial-circus-data",
+          "celestial-circus-atlas",
+        ]);
+
+        const frame = new PIXI.Graphics();
+        frame.lineStyle(2, 0x6ec6ff, 0.8);
+        frame.beginFill(0x101820, 0.35);
+        frame.drawRect(-180, -240, 360, 480);
+        frame.endFill();
+
+        const celeste = new spine.Spine({
+          skeleton: "celestial-circus-data",
+          atlas: "celestial-circus-atlas",
+          scale: 0.2,
+        });
+        celeste.position.set(0, 150);
+        celeste.state.setAnimation(0, "eyeblink-long", true);
+        celeste.skeletonPhysics.setPositionInheritance(1, 1);
+        celeste.skeletonPhysics.rotationInheritance = 1;
+
+        let inheritedPhysicsRotation = 0;
+        const physicsRotationLabel = document.getElementById("physics-rotation");
+        const physicsRotate = celeste.skeleton.physicsRotate.bind(celeste.skeleton);
+        celeste.skeleton.physicsRotate = (x, y, degrees) => {
+          inheritedPhysicsRotation += degrees;
+          physicsRotationLabel.textContent = `${inheritedPhysicsRotation.toFixed(1)}°`;
+          physicsRotate(x, y, degrees);
+        };
+
+        const transformContainer = new PIXI.Container();
+        transformContainer.position.set(app.screen.width / 2, app.screen.height / 2);
+        transformContainer.scale.set(1.35, 0.75);
+        transformContainer.rotation = 15 * Math.PI / 180;
+        transformContainer.addChild(frame, celeste);
+        app.stage.addChild(transformContainer);
+
+        let skewX = 0;
+        let skewY = 0;
+        const skewXLabel = document.getElementById("skew-x");
+        const skewYLabel = document.getElementById("skew-y");
+        const pressedKeys = Object.create(null);
+        window.addEventListener("keydown", (event) => {
+          pressedKeys[event.code] = true;
+          if (event.code.startsWith("Arrow")) event.preventDefault();
+        });
+        window.addEventListener("keyup", (event) => {
+          pressedKeys[event.code] = false;
+          if (event.code.startsWith("Arrow")) event.preventDefault();
+        });
+
+        app.ticker.add(() => {
+          const delta = app.ticker.deltaMS / 1000;
+          const speedMultiplier = pressedKeys.ShiftLeft || pressedKeys.ShiftRight ? 3 : 1;
+          const distance = 300 * speedMultiplier * delta;
+          const rotation = speedMultiplier * delta;
+
+          if (pressedKeys.ArrowLeft || pressedKeys.KeyA) celeste.x -= distance;
+          if (pressedKeys.ArrowRight || pressedKeys.KeyD) celeste.x += distance;
+          if (pressedKeys.ArrowUp || pressedKeys.KeyW) celeste.y -= distance;
+          if (pressedKeys.ArrowDown || pressedKeys.KeyS) celeste.y += distance;
+          if (pressedKeys.KeyZ) celeste.rotation -= rotation;
+          if (pressedKeys.KeyX) celeste.rotation += rotation;
+          if (pressedKeys.KeyQ) transformContainer.rotation -= rotation;
+          if (pressedKeys.KeyE) transformContainer.rotation += rotation;
+          if (pressedKeys.KeyC) skewX -= rotation;
+          if (pressedKeys.KeyV) skewX += rotation;
+          if (pressedKeys.KeyB) skewY -= rotation;
+          if (pressedKeys.KeyN) skewY += rotation;
+          transformContainer.skew.set(skewX, skewY);
+          skewXLabel.textContent = `${(skewX * 180 / Math.PI).toFixed(1)}°`;
+          skewYLabel.textContent = `${(skewY * 180 / Math.PI).toFixed(1)}°`;
+        });
+      })();
+    </script>
+  </body>
+</html>

@@ -282,7 +282,8 @@ namespace Spine.Unity {
 				totalRawVertexCount += attachmentVertexCount;
 			}
 
-			if (material == null && rendererObject != null)
+			// avoid UnityEngine.Object == null check, not allowed on worker threads.
+			if (System.Object.ReferenceEquals(material, null) && rendererObject != null)
 				current.material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
 
 			instructionOutput.hasActiveClipping = skeletonHasClipping;
