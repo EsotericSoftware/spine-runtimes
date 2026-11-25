@@ -646,36 +646,34 @@ public class SkeletonClipping {
 
 	private boolean makeClockwise (FloatArray polygon) {
 		float[] v = polygon.items;
-		int n = polygon.size;
+		int n = polygon.size, flips = 0;
 		boolean noCW = true, noCCW = true;
-		float area = 0, prevX = v[n - 2], prevY = v[n - 1], currX = v[0], currY = v[1];
-		for (int i = 2; i < n; i += 2) {
-			float nextX = v[i], nextY = v[i + 1];
-			area += currX * nextY - nextX * currY;
-			float cross = (currX - prevX) * (nextY - currY) - (currY - prevY) * (nextX - currX);
+		float x = v[n - 2], y = v[n - 1], dx = x - v[n - 4], dy = y - v[n - 3], dir = dx != 0 ? dx : dy, area = 0;
+		for (int i = 0; i < n; i += 2) {
+			float nx = v[i], ny = v[i + 1], ndx = nx - x, ndy = ny - y, ndir = ndx != 0 ? ndx : ndy;
+			area += x * ny - nx * y;
+			float cross = dx * ndy - dy * ndx;
 			noCCW &= cross <= 0;
 			noCW &= cross >= 0;
-			prevX = currX;
-			prevY = currY;
-			currX = nextX;
-			currY = nextY;
+			if (dir * ndir <= 0) flips++;
+			x = nx;
+			y = ny;
+			dx = ndx;
+			dy = ndy;
+			dir = ndir;
 		}
-		area += currX * v[1] - v[0] * currY;
-		float cross = (currX - prevX) * (v[1] - currY) - (currY - prevY) * (v[0] - currX);
-		noCCW &= cross <= 0;
-		noCW &= cross >= 0;
 		if (area >= 0) {
 			for (int i = 0, lastX = n - 2, half = n >> 1; i < half; i += 2) {
-				float x = v[i], y = v[i + 1];
+				float tx = v[i], ty = v[i + 1];
 				int other = lastX - i;
 				v[i] = v[other];
 				v[i + 1] = v[other + 1];
-				v[other] = x;
-				v[other + 1] = y;
+				v[other] = tx;
+				v[other + 1] = ty;
 			}
-			return noCW;
+			return noCW && flips <= 2;
 		}
-		return noCCW;
+		return noCCW && flips <= 2;
 	}
 
 	private void makeConvex (FloatArray polygon) {
