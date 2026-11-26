@@ -132,8 +132,8 @@ bool SkeletonClipping::clipTriangles(float *vertices, unsigned short *triangles,
 			size_t s = clippedVertices.size();
 			if (clip(x1, y1, x2, y2, x3, y3, polygons[p])) {
 				int clipOutputLength = (int) clipOutput.size();
-				if (clipOutputLength == 0) continue;
 				clipped = true;
+				if (clipOutputLength == 0) continue;
 				int clipOutputCount = clipOutputLength >> 1;
 
 				float *cv = clippedVertices.setSize(s + clipOutputLength, 0).buffer();
@@ -246,8 +246,8 @@ bool SkeletonClipping::clipTriangles(float *vertices, unsigned short *triangles,
 			size_t s = clippedVertices.size();
 			if (clip(x1, y1, x2, y2, x3, y3, polygons[p])) {
 				int clipOutputLength = (int) clipOutput.size();
-				if (clipOutputLength == 0) continue;
 				clipped = true;
+				if (clipOutputLength == 0) continue;
 				int clipOutputCount = clipOutputLength >> 1;
 				if (d == 0) {
 					d0 = y2 - y3;

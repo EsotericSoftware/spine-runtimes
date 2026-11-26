@@ -168,8 +168,7 @@ export class SkeletonClipping {
 
 					s = clippedTriangles.length;
 					const ct = Utils.setArraySize(clippedTriangles, s + 3 * (clipOutputCount - 2));
-					clipOutputCount--;
-					for (let ii = 1; ii < clipOutputCount; ii++, s += 3) {
+					for (let ii = 1, nn = clipOutputCount - 1; ii < nn; ii++, s += 3) {
 						ct[s] = index;
 						ct[s + 1] = (index + ii);
 						ct[s + 2] = (index + ii + 1);

@@ -25,6 +25,7 @@
   - Fixed one-bone IK inheritance calculations in Y-down coordinate systems.
   - Improved clipping performance through the updated spine-cpp clipping runtime.
   - Fixed folded clipping polygons with overlapping edges or duplicate points being detected as convex and clipping everything, and fixed a heap overflow when forcing non-convex clipping polygons convex, through the updated spine-cpp clipping runtime. See [#3206](https://github.com/EsotericSoftware/spine-runtimes/issues/3206).
+  - Fixed `spine_skeleton_get_bounds_*()` including fully clipped attachments through the updated spine-cpp clipping runtime.
 
 - **Breaking changes**
   - Removed generated `spine_bone_pose_reset_world()` because resetWorld is an internal implementation detail.
@@ -148,6 +149,7 @@
   - Improved clipping performance by computing barycentric data lazily and reusing edge side tests.
   - Fixed folded clipping polygons with overlapping edges or duplicate points being detected as convex and clipping everything. See [#3206](https://github.com/EsotericSoftware/spine-runtimes/issues/3206).
   - Fixed `SkeletonClipping::makeConvex()` writing past the clipping polygon buffer when forcing a non-convex polygon convex for convex or inverse clipping. See [#3206](https://github.com/EsotericSoftware/spine-runtimes/issues/3206).
+  - Fixed `SkeletonClipping::clipTriangles()` returning false when all triangles were clipped away, which caused `Skeleton::getBounds()` to include fully clipped attachments, matching spine-libgdx.
 
 - **Breaking changes**
   - `MathUtil::Epsilon2` renamed to `MathUtil::EpsilonSq`.
@@ -767,6 +769,7 @@
 - **Bug fixes**
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
   - Fixed folded clipping polygons with overlapping edges or duplicate points being detected as convex and clipping everything. See [#3206](https://github.com/EsotericSoftware/spine-runtimes/issues/3206).
+  - Fixed `Triangulator` accepting ears that contain concave vertices, which produced incorrect triangulation for concave clipping polygons.
 
 - **Breaking changes**
   - `Bone` now extends `PosedActive` with separate pose, constrained, and applied states
@@ -1169,6 +1172,7 @@
 - **Bug fixes**
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
   - Fixed folded clipping polygons with overlapping edges or duplicate points being detected as convex and clipping everything. See [#3206](https://github.com/EsotericSoftware/spine-runtimes/issues/3206).
+  - Fixed `SkeletonClipping.clipTriangles()` without UVs producing incorrect triangle indices after the first clipped polygon.
 
 - **Breaking changes**
   - `Bone` now extends `PosedActive` with separate pose, constrained, and applied states
