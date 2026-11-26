@@ -629,46 +629,46 @@ class SkeletonClipping {
 
 	private function makeClockwise(polygon:Array<Float>):Bool {
 		var v:Array<Float> = polygon;
-		var n:Int = polygon.length;
+		var n:Int = polygon.length, flips:Int = 0;
 		var noCW:Bool = true, noCCW:Bool = true;
-		var area:Float = 0,
-			prevX:Float = v[n - 2],
-			prevY:Float = v[n - 1],
-			currX:Float = v[0],
-			currY:Float = v[1];
-		var i:Int = 2;
+		var x:Float = v[n - 2],
+			y:Float = v[n - 1],
+			dx:Float = x - v[n - 4],
+			dy:Float = y - v[n - 3];
+		var dir:Float = dx != 0 ? dx : dy, area:Float = 0;
+		var i:Int = 0;
 		while (i < n) {
-			var nextX:Float = v[i], nextY:Float = v[i + 1];
-			area += currX * nextY - nextX * currY;
-			var cross:Float = (currX - prevX) * (nextY - currY) - (currY - prevY) * (nextX - currX);
+			var nx:Float = v[i], ny:Float = v[i + 1], ndx:Float = nx - x, ndy:Float = ny - y;
+			var ndir:Float = ndx != 0 ? ndx : ndy;
+			area += x * ny - nx * y;
+			var cross:Float = dx * ndy - dy * ndx;
 			noCCW = noCCW && cross <= 0;
 			noCW = noCW && cross >= 0;
-			prevX = currX;
-			prevY = currY;
-			currX = nextX;
-			currY = nextY;
+			if (dir * ndir <= 0)
+				flips++;
+			x = nx;
+			y = ny;
+			dx = ndx;
+			dy = ndy;
+			dir = ndir;
 			i += 2;
 		}
-		area += currX * v[1] - v[0] * currY;
-		var cross:Float = (currX - prevX) * (v[1] - currY) - (currY - prevY) * (v[0] - currX);
-		noCCW = noCCW && cross <= 0;
-		noCW = noCW && cross >= 0;
 		if (area >= 0) {
 			var lastX:Int = n - 2;
 			var half:Int = n >> 1;
 			i = 0;
 			while (i < half) {
-				var x:Float = v[i], y:Float = v[i + 1];
+				var tx:Float = v[i], ty:Float = v[i + 1];
 				var other:Int = lastX - i;
 				v[i] = v[other];
 				v[i + 1] = v[other + 1];
-				v[other] = x;
-				v[other + 1] = y;
+				v[other] = tx;
+				v[other + 1] = ty;
 				i += 2;
 			}
-			return noCW;
+			return noCW && flips <= 2;
 		}
-		return noCCW;
+		return noCCW && flips <= 2;
 	}
 
 	private function makeConvex(polygon:Array<Float>):Void {

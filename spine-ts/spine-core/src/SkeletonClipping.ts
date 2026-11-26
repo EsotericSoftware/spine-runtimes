@@ -793,35 +793,33 @@ export class SkeletonClipping {
 	private makeClockwise (polygon: number[]): boolean {
 		const v = polygon;
 		const n = polygon.length;
-		let noCW = true, noCCW = true;
-		let area = 0, prevX = v[n - 2], prevY = v[n - 1], currX = v[0], currY = v[1];
-		for (let i = 2; i < n; i += 2) {
-			const nextX = v[i], nextY = v[i + 1];
-			area += currX * nextY - nextX * currY;
-			const cross = (currX - prevX) * (nextY - currY) - (currY - prevY) * (nextX - currX);
+		let flips = 0, noCW = true, noCCW = true;
+		let x = v[n - 2], y = v[n - 1], dx = x - v[n - 4], dy = y - v[n - 3], dir = dx !== 0 ? dx : dy, area = 0;
+		for (let i = 0; i < n; i += 2) {
+			const nx = v[i], ny = v[i + 1], ndx = nx - x, ndy = ny - y, ndir = ndx !== 0 ? ndx : ndy;
+			area += x * ny - nx * y;
+			const cross = dx * ndy - dy * ndx;
 			noCCW = noCCW && cross <= 0;
 			noCW = noCW && cross >= 0;
-			prevX = currX;
-			prevY = currY;
-			currX = nextX;
-			currY = nextY;
+			if (dir * ndir <= 0) flips++;
+			x = nx;
+			y = ny;
+			dx = ndx;
+			dy = ndy;
+			dir = ndir;
 		}
-		area += currX * v[1] - v[0] * currY;
-		const cross = (currX - prevX) * (v[1] - currY) - (currY - prevY) * (v[0] - currX);
-		noCCW = noCCW && cross <= 0;
-		noCW = noCW && cross >= 0;
 		if (area >= 0) {
 			for (let i = 0, lastX = n - 2, half = n >> 1; i < half; i += 2) {
-				const x = v[i], y = v[i + 1];
+				const tx = v[i], ty = v[i + 1];
 				const other = lastX - i;
 				v[i] = v[other];
 				v[i + 1] = v[other + 1];
-				v[other] = x;
-				v[other + 1] = y;
+				v[other] = tx;
+				v[other + 1] = ty;
 			}
-			return noCW;
+			return noCW && flips <= 2;
 		}
-		return noCCW;
+		return noCCW && flips <= 2;
 	}
 
 	private makeConvex (polygon: number[]): void {

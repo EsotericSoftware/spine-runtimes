@@ -24,6 +24,7 @@
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
   - Fixed one-bone IK inheritance calculations in Y-down coordinate systems.
   - Improved clipping performance through the updated spine-cpp clipping runtime.
+  - Fixed folded clipping polygons with overlapping edges or duplicate points being detected as convex and clipping everything, and fixed a heap overflow when forcing non-convex clipping polygons convex, through the updated spine-cpp clipping runtime. See [#3206](https://github.com/EsotericSoftware/spine-runtimes/issues/3206).
 
 - **Breaking changes**
   - Removed generated `spine_bone_pose_reset_world()` because resetWorld is an internal implementation detail.
@@ -145,6 +146,8 @@
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
   - Fixed one-bone IK inheritance calculations in Y-down coordinate systems.
   - Improved clipping performance by computing barycentric data lazily and reusing edge side tests.
+  - Fixed folded clipping polygons with overlapping edges or duplicate points being detected as convex and clipping everything. See [#3206](https://github.com/EsotericSoftware/spine-runtimes/issues/3206).
+  - Fixed `SkeletonClipping::makeConvex()` writing past the clipping polygon buffer when forcing a non-convex polygon convex for convex or inverse clipping. See [#3206](https://github.com/EsotericSoftware/spine-runtimes/issues/3206).
 
 - **Breaking changes**
   - `MathUtil::Epsilon2` renamed to `MathUtil::EpsilonSq`.
@@ -636,6 +639,7 @@
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
   - Fixed one-bone IK inheritance calculations in Y-down coordinate systems.
   - Improved clipping performance through the updated spine-cpp clipping runtime.
+  - Fixed folded clipping polygons with overlapping edges or duplicate points being detected as convex and clipping everything, and fixed a heap overflow when forcing non-convex clipping polygons convex, through the updated spine-cpp clipping runtime. See [#3206](https://github.com/EsotericSoftware/spine-runtimes/issues/3206).
 
 - **Breaking changes**
   - Removed generated `BonePose.resetWorld(_:)` because resetWorld is an internal implementation detail.
@@ -666,6 +670,7 @@
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
   - Fixed one-bone IK inheritance calculations in Y-down coordinate systems.
   - Improved clipping performance through the updated spine-cpp clipping runtime.
+  - Fixed folded clipping polygons with overlapping edges or duplicate points being detected as convex and clipping everything, and fixed a heap overflow when forcing non-convex clipping polygons convex, through the updated spine-cpp clipping runtime. See [#3206](https://github.com/EsotericSoftware/spine-runtimes/issues/3206).
 
 - **Breaking changes**
   - Removed generated `BonePose.resetWorld()` because resetWorld is an internal implementation detail.
@@ -707,6 +712,7 @@
   - Fixed constraints so modifying a constrained bone's world transform preserves descendant bone transforms from earlier constraints.
   - Fixed one-bone IK inheritance calculations in Y-down coordinate systems.
   - Improved clipping performance through the updated spine-cpp clipping runtime.
+  - Fixed folded clipping polygons with overlapping edges or duplicate points being detected as convex and clipping everything, and fixed a heap overflow when forcing non-convex clipping polygons convex, through the updated spine-cpp clipping runtime. See [#3206](https://github.com/EsotericSoftware/spine-runtimes/issues/3206).
 
 - **Breaking changes**
   - Removed generated `BonePose.resetWorld()` because resetWorld is an internal implementation detail.
@@ -760,6 +766,7 @@
 
 - **Bug fixes**
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
+  - Fixed folded clipping polygons with overlapping edges or duplicate points being detected as convex and clipping everything. See [#3206](https://github.com/EsotericSoftware/spine-runtimes/issues/3206).
 
 - **Breaking changes**
   - `Bone` now extends `PosedActive` with separate pose, constrained, and applied states
@@ -1161,6 +1168,7 @@
 
 - **Bug fixes**
   - Fixed attachment timelines so hidden setup-pose attachments remain hidden while mixing out, preserving deform behavior.
+  - Fixed folded clipping polygons with overlapping edges or duplicate points being detected as convex and clipping everything. See [#3206](https://github.com/EsotericSoftware/spine-runtimes/issues/3206).
 
 - **Breaking changes**
   - `Bone` now extends `PosedActive` with separate pose, constrained, and applied states
