@@ -65,8 +65,8 @@ cpp_dirs=(
     "../spine-ios/Example/Spine iOS Example"
 
     # spine-flutter
-    "../spine-flutter/ios/Classes"
-    "../spine-flutter/macos/Classes"
+    "../spine-flutter/ios/spine_flutter/Sources/spine_flutter"
+    "../spine-flutter/macos/spine_flutter/Sources/spine_flutter"
     "../spine-flutter/src"
 )
 
