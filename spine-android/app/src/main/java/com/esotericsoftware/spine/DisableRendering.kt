@@ -37,7 +37,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -63,12 +63,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import com.esotericsoftware.spine.android.AndroidSkeletonDrawable
 import com.esotericsoftware.spine.android.AndroidTextureAtlas
 import com.esotericsoftware.spine.android.SpineController
-import com.esotericsoftware.spine.android.SpineView
+import com.esotericsoftware.spine.android.compose.Spine
+import com.esotericsoftware.spine.android.compose.rememberSpineStateFromDrawable
 import com.esotericsoftware.spine.android.utils.SkeletonDataUtils
 import kotlin.random.Random
 
@@ -82,7 +82,7 @@ fun DisableRendering(nav: NavHostController) {
                 navigationIcon = {
                     IconButton({ nav.navigateUp() }) {
                         Icon(
-                            Icons.Rounded.ArrowBack,
+                            Icons.AutoMirrored.Rounded.ArrowBack,
                             null,
                         )
                     }
@@ -203,25 +203,19 @@ fun SpineBoys(visibleSpineBoys: MutableList<Int>) {
                         visibleSpineBoys.addAll(visibleSpineBoysAsSet)
                     }
                 ) {
-                    AndroidView(
-                        factory = { ctx ->
-                            SpineView.loadFromDrawable(
-                                AndroidSkeletonDrawable(cachedAtlas, cachedSkeletonData),
-                                ctx,
-                                SpineController {
-                                    it.animationState.setAnimation(
-                                        0,
-                                        spineBoyData.animation,
-                                        true
-                                    )
-                                }
-                            ).apply {
-                                isRendering = false
-                            }
-                        },
-                        update = { view ->
-                            view.isRendering = isSpineBoyVisible.value
+                    val drawable = remember(spineBoyData.id) {
+                        AndroidSkeletonDrawable(cachedAtlas, cachedSkeletonData)
+                    }
+                    val controller = remember(spineBoyData.id) {
+                        SpineController {
+                            it.animationState.setAnimation(0, spineBoyData.animation, true)
                         }
+                    }
+                    val state = rememberSpineStateFromDrawable(drawable = drawable, controller = controller)
+                    Spine(
+                        state = state,
+                        rendering = isSpineBoyVisible.value,
+                        modifier = Modifier.fillMaxSize(),
                     )
                 }
             }
