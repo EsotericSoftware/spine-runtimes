@@ -22,14 +22,14 @@
 			</description>
 		</method>
 		<method name="get_bone">
-			<return type="SpineBonePose" />
+			<return type="SpineBone" />
 			<description>
 				Returns the bone affected by this slider.
 			</description>
 		</method>
 		<method name="set_bone">
 			<return type="void" />
-			<param index="0" name="v" type="SpineBonePose" />
+			<param index="0" name="v" type="SpineBone" />
 			<description>
 				Sets the bone affected by this slider.
 			</description>
@@ -60,4 +60,21 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="data" type="SpineSliderData" setter="" getter="get_data">
+			The slider constraint's setup data. A new wrapper may be returned on each access.
+		</member>
+		<member name="bone" type="SpineBone" setter="set_bone" getter="get_bone">
+			The bone affected by this slider. A new wrapper may be returned on each access. Assigning [code]null[/code] is ignored and does not clear the current bone.
+		</member>
+		<member name="pose" type="SpineSliderPose" setter="" getter="get_pose">
+			The slider's current time and mix values. A new wrapper may be returned on each access.
+		</member>
+		<member name="applied_pose" type="SpineSliderPose" setter="" getter="get_applied_pose">
+			The slider pose last applied by the animation state. A new wrapper may be returned on each access.
+		</member>
+		<member name="active" type="bool" setter="set_active" getter="is_active">
+			Whether this slider constraint is active.
+		</member>
+	</members>
 </class>

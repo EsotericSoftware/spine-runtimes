@@ -45,6 +45,19 @@ void SpinePathConstraintData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_offset_rotation"), &SpinePathConstraintData::get_offset_rotation);
 	ClassDB::bind_method(D_METHOD("set_offset_rotation", "v"), &SpinePathConstraintData::set_offset_rotation);
 	ClassDB::bind_method(D_METHOD("get_setup_pose"), &SpinePathConstraintData::get_setup_pose);
+
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "bones", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_bones");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "slot", PROPERTY_HINT_RESOURCE_TYPE, "SpineSlotData", PROPERTY_USAGE_NONE), "set_slot", "get_slot");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "position_mode", PROPERTY_HINT_ENUM, "Fixed,Percent", PROPERTY_USAGE_NONE), "set_position_mode",
+				 "get_position_mode");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "spacing_mode", PROPERTY_HINT_ENUM, "Length,Fixed,Percent,Proportional", PROPERTY_USAGE_NONE),
+				 "set_spacing_mode", "get_spacing_mode");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "rotate_mode", PROPERTY_HINT_ENUM, "Tangent,Chain,Chain Scale", PROPERTY_USAGE_NONE), "set_rotate_mode",
+				 "get_rotate_mode");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "offset_rotation", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_offset_rotation",
+				 "get_offset_rotation");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "setup_pose", PROPERTY_HINT_RESOURCE_TYPE, "SpinePathConstraintPose", PROPERTY_USAGE_NONE), "",
+				 "get_setup_pose");
 }
 
 Array SpinePathConstraintData::get_bones() {

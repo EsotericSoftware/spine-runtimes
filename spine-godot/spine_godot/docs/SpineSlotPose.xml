@@ -73,17 +73,34 @@
 			</description>
 		</method>
 		<method name="get_deform">
-			<return type="PackedFloat32Array" />
+			<return type="Array" />
 			<description>
 				Returns values to deform the slot's attachment. For an unweighted mesh, the entries are local positions for each vertex. For a weighted mesh, the entries are an offset for each vertex which will be added to the mesh's local vertex positions.
 			</description>
 		</method>
 		<method name="set_deform">
 			<return type="void" />
-			<param index="0" name="v" type="PackedFloat32Array" />
+			<param index="0" name="v" type="Array" />
 			<description>
 				Sets values to deform the slot's attachment. For an unweighted mesh, the entries are local positions for each vertex. For a weighted mesh, the entries are an offset for each vertex which will be added to the mesh's local vertex positions.
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="color" type="Color" setter="set_color" getter="get_color">
+			The color used to tint the slot's attachment. When [member has_dark_color] is true, this is the light color for two-color tinting.
+		</member>
+		<member name="dark_color" type="Color" setter="set_dark_color" getter="get_dark_color">
+			The dark color used for two-color tinting. Its alpha component is not used.
+		</member>
+		<member name="attachment" type="SpineAttachment" setter="set_attachment" getter="get_attachment">
+			The slot's current attachment, or [code]null[/code] if none is set. Changing it resets [member sequence_index] and usually clears [member deform]; the deform is preserved when the old and new attachments share the same timeline attachment. A new wrapper may be returned on each access.
+		</member>
+		<member name="sequence_index" type="int" setter="set_sequence_index" getter="get_sequence_index">
+			The texture region index displayed by an attachment with a sequence. [code]-1[/code] selects the sequence's setup index.
+		</member>
+		<member name="deform" type="Array" setter="set_deform" getter="get_deform">
+			A copied array of values that deform the slot's attachment. For an unweighted mesh, entries are local vertex positions; for a weighted mesh, entries are offsets added to the mesh's local vertex positions. Each read returns a copy, so modifying that array does not change the native pose until the changed array is assigned back through this property.
+		</member>
+	</members>
 </class>

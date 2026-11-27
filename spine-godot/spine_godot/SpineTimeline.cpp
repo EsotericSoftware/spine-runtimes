@@ -43,6 +43,13 @@ void SpineTimeline::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_duration"), &SpineTimeline::get_duration);
 	ClassDB::bind_method(D_METHOD("get_property_ids"), &SpineTimeline::get_property_ids);
 	ClassDB::bind_method(D_METHOD("get_type"), &SpineTimeline::get_type);
+
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "frame_entries", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_frame_entries");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "frame_count", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_frame_count");
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "frames", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_frames");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "duration", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_duration");
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "property_ids", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_property_ids");
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "type", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_type");
 }
 
 void SpineTimeline::apply(Ref<SpineSkeleton> skeleton, float last_time, float time, Array events, float alpha, bool from_setup, bool add, bool out,

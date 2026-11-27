@@ -34,4 +34,12 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="time" type="float" setter="set_time" getter="get_time">
+			The time in the slider data's animation at which the animation is applied.
+		</member>
+		<member name="mix" type="float" setter="set_mix" getter="get_mix">
+			The unbounded percentage used to mix between the unconstrained pose and the pose produced by the slider's animation.
+		</member>
+	</members>
 </class>

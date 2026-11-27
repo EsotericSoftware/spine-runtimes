@@ -104,6 +104,41 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="bones" type="Array" setter="" getter="get_bones">
+			A snapshot of the [SpineBoneData] objects modified by this transform constraint. Each access rebuilds the array; modifying the returned array does not modify the constraint data.
+		</member>
+		<member name="source" type="SpineBoneData" setter="" getter="get_source">
+			The source bone whose transform is copied to the constrained bones. A new wrapper may be returned on each access.
+		</member>
+		<member name="offset_rotation" type="float" setter="" getter="get_offset_rotation">
+			The offset added to each constrained bone's rotation.
+		</member>
+		<member name="offset_x" type="float" setter="" getter="get_offset_x">
+			The offset added to each constrained bone's X translation.
+		</member>
+		<member name="offset_y" type="float" setter="" getter="get_offset_y">
+			The offset added to each constrained bone's Y translation.
+		</member>
+		<member name="offset_scale_x" type="float" setter="" getter="get_offset_scale_x">
+			The offset added to each constrained bone's X scale.
+		</member>
+		<member name="offset_scale_y" type="float" setter="" getter="get_offset_scale_y">
+			The offset added to each constrained bone's Y scale.
+		</member>
+		<member name="offset_shear_y" type="float" setter="" getter="get_offset_shear_y">
+			The offset added to each constrained bone's Y shear.
+		</member>
+		<member name="local_source" type="bool" setter="" getter="is_local_source">
+			Whether the source bone's local transform is read instead of its world transform.
+		</member>
+		<member name="local_target" type="bool" setter="" getter="is_local_target">
+			Whether the constrained bones' local transforms are set instead of their world transforms.
+		</member>
+		<member name="setup_pose" type="SpineTransformConstraintPose" setter="" getter="get_setup_pose">
+			The transform constraint's setup mix values. A new wrapper may be returned on each access.
+		</member>
+	</members>
 	<constants>
 	</constants>
 </class>

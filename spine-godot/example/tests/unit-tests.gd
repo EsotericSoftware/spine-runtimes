@@ -1,16 +1,33 @@
 extends SpineSprite
 
+func test_spine_constants():
+	assert(SpineConstant.SpacingMode_Proportional == 3)
+
 func test_spine_animation():
 	var walkAnim: SpineAnimation = get_skeleton().get_data().find_animation("walk")
 	assert(walkAnim.get_name() == "walk")
+	assert(walkAnim.name == walkAnim.get_name())
 	var duration = walkAnim.get_duration()
 	walkAnim.set_duration(duration + 1)
 	assert(walkAnim.get_duration() == duration + 1)
+	walkAnim.set_duration(duration)
+	walkAnim.duration = duration + 1
+	assert(walkAnim.duration == walkAnim.get_duration())
+	walkAnim.duration = duration
+	assert(walkAnim.duration == duration and walkAnim.get_duration() == duration)
+	assert(walkAnim.timelines.size() == walkAnim.get_timelines().size())
 	assert(walkAnim.get_timelines().size() == 39)
 	var timeline: SpineTimeline = walkAnim.get_timelines()[0]
 	var propertyIds = timeline.get_property_ids()
 	assert(walkAnim.has_timeline(propertyIds))
 	assert(!walkAnim.has_timeline([0]))
+	var entry = get_animation_state().set_animation("walk", true, 0)
+	assert(entry.get_animation().get_name() == "walk")
+	assert(entry.animation.name == "walk")
+	entry.loop = false
+	assert(entry.loop == false and entry.get_loop() == false)
+	entry.loop = true
+	assert(entry.loop == true and entry.get_loop() == true)
 	
 func test_spine_timeline():
 	var walkAnim: SpineAnimation = get_skeleton().get_data().find_animation("walk")
@@ -33,6 +50,7 @@ func test_spine_object_invalidation():
 
 func _ready():
 	
+	test_spine_constants()
 	test_spine_animation()
 	test_spine_timeline()
 	test_spine_object_invalidation()

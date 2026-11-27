@@ -44,6 +44,14 @@ void SpineEventData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_volume", "v"), &SpineEventData::set_volume);
 	ClassDB::bind_method(D_METHOD("get_balance"), &SpineEventData::get_balance);
 	ClassDB::bind_method(D_METHOD("set_balance", "v"), &SpineEventData::set_balance);
+
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "event_name", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_event_name");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "int_value", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_int_value", "get_int_value");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "float_value", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_float_value", "get_float_value");
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "string_value", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_string_value", "get_string_value");
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "audio_path", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_audio_path", "get_audio_path");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "volume", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_volume", "get_volume");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "balance", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_balance", "get_balance");
 }
 
 String SpineEventData::get_event_name() {

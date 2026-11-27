@@ -88,6 +88,20 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="name" type="String" setter="" getter="get_name">
+			The skin's name.
+		</member>
+		<member name="attachments" type="Array" setter="" getter="get_attachments">
+			A snapshot of all [SpineSkinEntry] objects in this skin. Each access rebuilds the array; modifying the returned array does not modify the skin.
+		</member>
+		<member name="bones" type="Array" setter="" getter="get_bones">
+			A snapshot of the [SpineBoneData] objects associated with this skin. Each access rebuilds the array; modifying the returned array does not modify the skin.
+		</member>
+		<member name="constraints" type="Array" setter="" getter="get_constraints">
+			A snapshot of the [SpineConstraintData] objects associated with this skin. Each access rebuilds the array; modifying the returned array does not modify the skin.
+		</member>
+	</members>
 	<constants>
 	</constants>
 </class>

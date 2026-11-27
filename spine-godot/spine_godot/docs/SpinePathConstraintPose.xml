@@ -73,4 +73,21 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="position" type="float" setter="set_position" getter="get_position">
+			The position of the first constrained bone along the path, interpreted according to the constraint data's position mode.
+		</member>
+		<member name="spacing" type="float" setter="set_spacing" getter="get_spacing">
+			The spacing between constrained bones along the path, interpreted according to the constraint data's spacing mode.
+		</member>
+		<member name="mix_rotate" type="float" setter="set_mix_rotate" getter="get_mix_rotate">
+			The percentage from 0 to 1 used to mix between unconstrained and path-constrained rotation.
+		</member>
+		<member name="mix_x" type="float" setter="set_mix_x" getter="get_mix_x">
+			The percentage from 0 to 1 used to mix between unconstrained and path-constrained X translation.
+		</member>
+		<member name="mix_y" type="float" setter="set_mix_y" getter="get_mix_y">
+			The percentage from 0 to 1 used to mix between unconstrained and path-constrained Y translation.
+		</member>
+	</members>
 </class>

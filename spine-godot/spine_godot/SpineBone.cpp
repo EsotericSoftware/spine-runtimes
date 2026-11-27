@@ -52,6 +52,14 @@ void SpineBone::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("update", "skeleton", "physics"), &SpineBone::update);
 	ClassDB::bind_method(D_METHOD("get_transform"), &SpineBone::get_transform);
 	ClassDB::bind_method(D_METHOD("set_transform", "local_transform"), &SpineBone::set_transform);
+
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "data", PROPERTY_HINT_RESOURCE_TYPE, "SpineBoneData", PROPERTY_USAGE_NONE), "", "get_data");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "parent", PROPERTY_HINT_RESOURCE_TYPE, "SpineBone", PROPERTY_USAGE_NONE), "", "get_parent");
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "children", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_children");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "pose", PROPERTY_HINT_RESOURCE_TYPE, "SpineBonePose", PROPERTY_USAGE_NONE), "", "get_pose");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "applied_pose", PROPERTY_HINT_RESOURCE_TYPE, "SpineBonePose", PROPERTY_USAGE_NONE), "",
+				 "get_applied_pose");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "active", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_active", "is_active");
 }
 
 Vector2 SpineBone::world_to_local(Vector2 world_position) {

@@ -44,6 +44,17 @@ void SpineBoneData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_icon"), &SpineBoneData::get_icon);
 	ClassDB::bind_method(D_METHOD("set_visible", "v"), &SpineBoneData::set_visible);
 	ClassDB::bind_method(D_METHOD("is_visible"), &SpineBoneData::is_visible);
+
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "index", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_index");
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "bone_name", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_bone_name");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "parent", PROPERTY_HINT_RESOURCE_TYPE, "SpineBoneData", PROPERTY_USAGE_NONE), "", "get_parent");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "length", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_length", "get_length");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "setup_pose", PROPERTY_HINT_RESOURCE_TYPE, "SpineBonePose", PROPERTY_USAGE_NONE), "",
+				 "get_setup_pose");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "skin_required", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_skin_required", "is_skin_required");
+	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "color", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_color", "get_color");
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "icon", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "", "get_icon");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "visible", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_visible", "is_visible");
 }
 
 int SpineBoneData::get_index() {

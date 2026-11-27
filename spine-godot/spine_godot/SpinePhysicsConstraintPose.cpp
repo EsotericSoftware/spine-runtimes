@@ -45,6 +45,14 @@ void SpinePhysicsConstraintPose::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_gravity", "value"), &SpinePhysicsConstraintPose::set_gravity);
 	ClassDB::bind_method(D_METHOD("get_mix"), &SpinePhysicsConstraintPose::get_mix);
 	ClassDB::bind_method(D_METHOD("set_mix", "value"), &SpinePhysicsConstraintPose::set_mix);
+
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "inertia", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_inertia", "get_inertia");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "strength", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_strength", "get_strength");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "damping", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_damping", "get_damping");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "mass_inverse", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_mass_inverse", "get_mass_inverse");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "wind", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_wind", "get_wind");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "gravity", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_gravity", "get_gravity");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "mix", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_mix", "get_mix");
 }
 
 float SpinePhysicsConstraintPose::get_inertia() {

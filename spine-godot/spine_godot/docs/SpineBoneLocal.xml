@@ -135,4 +135,30 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="x" type="float" setter="set_x" getter="get_x">
+			The bone's translation along the local X axis, relative to its parent.
+		</member>
+		<member name="y" type="float" setter="set_y" getter="get_y">
+			The bone's translation along the local Y axis, relative to its parent.
+		</member>
+		<member name="rotation" type="float" setter="set_rotation" getter="get_rotation">
+			The bone's local counterclockwise rotation in degrees.
+		</member>
+		<member name="scale_x" type="float" setter="set_scale_x" getter="get_scale_x">
+			The bone's local scale along the X axis.
+		</member>
+		<member name="scale_y" type="float" setter="set_scale_y" getter="get_scale_y">
+			The bone's local scale along the Y axis.
+		</member>
+		<member name="shear_x" type="float" setter="set_shear_x" getter="get_shear_x">
+			The bone's local shear along the X axis in degrees.
+		</member>
+		<member name="shear_y" type="float" setter="set_shear_y" getter="get_shear_y">
+			The bone's local shear along the Y axis in degrees.
+		</member>
+		<member name="inherit" type="int" setter="set_inherit" getter="get_inherit" enum="SpineConstant.Inherit">
+			How the parent bone's world transform affects this bone's world transform.
+		</member>
+	</members>
 </class>

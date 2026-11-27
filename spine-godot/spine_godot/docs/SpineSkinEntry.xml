@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineSkinEntry" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Describes one attachment entry in a Spine skin snapshot.
+	</brief_description>
+	<description>
+		Stores the slot index, placeholder name, and attachment for an entry returned by [member SpineSkin.attachments].
+	</description>
+	<methods>
+		<method name="get_slot_index">
+			<return type="int" />
+			<description>
+				Returns the index of the slot containing this skin entry.
+			</description>
+		</method>
+		<method name="get_name">
+			<return type="String" />
+			<description>
+				Returns the placeholder name used to look up this attachment in the skin.
+			</description>
+		</method>
+		<method name="get_attachment">
+			<return type="SpineAttachment" />
+			<description>
+				Returns the attachment stored by this entry, or [code]null[/code] if the entry has no attachment.
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="slot_index" type="int" setter="" getter="get_slot_index">
+			The index of the slot containing this skin entry.
+		</member>
+		<member name="name" type="String" setter="" getter="get_name">
+			The placeholder name used to look up this attachment in the skin.
+		</member>
+		<member name="attachment" type="SpineAttachment" setter="" getter="get_attachment">
+			The attachment stored by this entry, or [code]null[/code] if the entry has no attachment.
+		</member>
+	</members>
+</class>
