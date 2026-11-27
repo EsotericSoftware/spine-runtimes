@@ -32,6 +32,7 @@ import 'package:flutter/material.dart';
 import 'package:spine_flutter_example/debug_rendering.dart';
 
 import 'animation_state_events.dart';
+import 'custom_attachment.dart';
 import 'dress_up.dart';
 import 'flame_example.dart';
 import 'ik_following.dart';
@@ -84,6 +85,13 @@ class ExampleSelector extends StatelessWidget {
               child: const Text('Dress Up'),
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute<void>(builder: (context) => const DressUp()));
+              },
+            ),
+            spacer,
+            ElevatedButton(
+              child: const Text('Custom Attachment'),
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute<void>(builder: (context) => const CustomAttachment()));
               },
             ),
             spacer,
